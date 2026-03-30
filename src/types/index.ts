@@ -78,11 +78,12 @@ export interface Service {
 export interface Address {
   id: string;
   label: string;
-  fullAddress: string;
+  details: string;
   note?: string;
   isDefault?: boolean;
-  latitude?: number;
-  longitude?: number;
+  lat?: number;
+  lng?: number;
+  fullAddress?: string; // keeping for compatibility during transition
 }
 
 export interface TimeSlot {

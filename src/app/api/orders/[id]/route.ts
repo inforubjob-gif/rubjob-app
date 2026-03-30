@@ -8,12 +8,10 @@ export const runtime = "edge";
  */
 export async function GET(
   req: Request,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: { id: string } }
 ) {
   try {
-    const { id } = await params;
-
-    // Access D1 from Cloudflare context
+    const { id } = params;
     const db = (req as any).context?.env?.DB;
     if (!db) {
       return NextResponse.json({ error: "D1 Database binding 'DB' not found" }, { status: 500 });
@@ -30,14 +28,18 @@ export async function GET(
       return NextResponse.json({ error: "Order not found" }, { status: 404 });
     }
 
-    // Parse JSON strings back to objects
-    const formattedOrder = {
-      ...order,
-      items: JSON.parse(order.items || "[]"),
-      address: JSON.parse(order.address || "{}")
-    };
+    // Parse JSON fields if they are strings
+    if (typeof order.items === "string") {
+      order.items = JSON.parse(order.items);
+    }
+    if (typeof order.address === "string") {
+      order.address = JSON.parse(order.address);
+    }
+    if (typeof order.paymentInfo === "string") {
+      order.paymentInfo = JSON.parse(order.paymentInfo);
+    }
 
-    return NextResponse.json({ order: formattedOrder });
+    return NextResponse.json({ order });
   } catch (error: any) {
     console.error("Fetch order detail error:", error);
     return NextResponse.json({ error: error.message }, { status: 500 });

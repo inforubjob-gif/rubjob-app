@@ -21,26 +21,23 @@ export default function OrdersPage() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    if (!profile?.userId) return;
+
     async function fetchOrders() {
-      const userId = profile?.userId || "U1234567890";
       try {
-        const res = await fetch(`/api/orders?userId=${userId}`);
-        const data = await res.json() as any;
+        const res = await fetch(`/api/orders?userId=${profile?.userId}`);
+        const data = (await res.json()) as any;
         if (data.orders) {
           setOrders(data.orders);
-        } else {
-          // Fallback to mock if API fails or returns empty in dev
-          setOrders(MOCK_ORDERS);
         }
       } catch (err) {
         console.error("Failed to fetch orders:", err);
-        setOrders(MOCK_ORDERS);
       } finally {
         setIsLoading(false);
       }
     }
     fetchOrders();
-  }, [profile]);
+  }, [profile?.userId]);
 
   const filtered = orders.filter((o) => {
     if (tab === "active") return o.status !== "completed" && o.status !== "cancelled";
@@ -104,39 +101,44 @@ export default function OrdersPage() {
             </Link>
           </div>
         ) : (
-          filtered.map((order) => (
-            <Link key={order.id} href={`/orders/${order.id}`} className="block">
-              <Card className="p-5 shadow-lg shadow-slate-200/50 border border-slate-100" hoverable>
-                <div className="flex items-start justify-between mb-4">
-                  <div className="flex items-center gap-3.5">
-                    <div className="w-12 h-12 bg-primary-light rounded-xl flex items-center justify-center text-primary-dark shrink-0">
-                      {getServiceIcon(order.service, { size: 24 })}
+          filtered.map((order) => {
+            const serviceId = order.serviceId || order.service;
+            const items = typeof order.items === "string" ? JSON.parse(order.items) : (order.items || []);
+            
+            return (
+              <Link key={order.id} href={`/orders/${order.id}`} className="block">
+                <Card className="p-5 shadow-lg shadow-slate-200/50 border border-slate-100" hoverable>
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex items-center gap-3.5">
+                      <div className="w-12 h-12 bg-primary-light rounded-xl flex items-center justify-center text-primary-dark shrink-0">
+                        {getServiceIcon(serviceId, { size: 24 })}
+                      </div>
+                      <div>
+                        <h3 className="text-base font-black text-foreground">
+                          {t(`orders.services.${serviceId}`) || "Service"}
+                        </h3>
+                        <p className="text-xs text-muted mt-0.5 font-medium">{order.id}</p>
+                      </div>
                     </div>
-                    <div>
-                      <h3 className="text-base font-black text-foreground">
-                        {t(`orders.services.${order.service}`) || "Service"}
-                      </h3>
-                      <p className="text-xs text-muted mt-0.5 font-medium">{order.id}</p>
-                    </div>
+                    <Badge variant={statusToBadgeVariant(order.status)}>
+                      {t(`orders.status.${order.status}`)}
+                    </Badge>
                   </div>
-                  <Badge variant={statusToBadgeVariant(order.status)}>
-                    {t(`orders.status.${order.status}`)}
-                  </Badge>
-                </div>
 
-                <div className="mt-4 pt-4 border-t border-dashed border-slate-200 flex items-center justify-between text-sm">
-                  <span className="text-muted font-medium">
-                    {order.items.length} {t("orders.itemCount")} •{" "}
-                    {new Date(order.createdAt).toLocaleDateString(language === "th" ? "th" : language === "zh" ? "zh" : "en", {
-                      month: "short",
-                      day: "numeric",
-                    })}
-                  </span>
-                  <span className="font-black text-foreground text-base">฿{order.totalPrice}</span>
-                </div>
-              </Card>
-            </Link>
-          ))
+                  <div className="mt-4 pt-4 border-t border-dashed border-slate-200 flex items-center justify-between text-sm">
+                    <span className="text-muted font-medium">
+                      {items.length} {t("orders.itemCount")} •{" "}
+                      {new Date(order.createdAt).toLocaleDateString(language === "th" ? "th" : language === "zh" ? "zh" : "en", {
+                        month: "short",
+                        day: "numeric",
+                      })}
+                    </span>
+                    <span className="font-black text-foreground text-base">฿{order.totalPrice}</span>
+                  </div>
+                </Card>
+              </Link>
+            );
+          })
         )}
       </div>
     </div>

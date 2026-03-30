@@ -154,11 +154,19 @@ export default function LiffProvider({ children }: { children: ReactNode }) {
       const liff = (await import("@line/liff")).default;
       if (liff.isLoggedIn()) {
         liff.logout();
-        window.location.reload();
+        setCtx(prev => ({ ...prev, isLoggedIn: false, profile: null }));
+        
+        if (liff.isInClient()) {
+          liff.closeWindow();
+        } else {
+          window.location.href = "/";
+        }
+      } else {
+        window.location.href = "/";
       }
     } catch (err) {
-      // In dev mode without LIFF
-      window.location.reload();
+      console.error("[RUBJOB] Logout error:", err);
+      window.location.href = "/";
     }
   };
 

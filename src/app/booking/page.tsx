@@ -62,6 +62,40 @@ function BookingFlow() {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [dbServices, setDbServices] = useState<any[]>([]);
+  const [dbStores, setDbStores] = useState<any[]>([]);
+  const [dbAddresses, setDbAddresses] = useState<any[]>([]);
+
+  // Fetch real data from APIs
+  useEffect(() => {
+    if (!profile?.userId) return;
+
+    async function fetchData() {
+      try {
+        const [sRes, stRes, adRes] = await Promise.all([
+          fetch("/api/services"),
+          fetch("/api/stores"),
+          fetch(`/api/user/addresses?userId=${profile?.userId}`)
+        ]);
+
+        const sData = (await sRes.json()) as any;
+        const stData = (await stRes.json()) as any;
+        const adData = (await adRes.json()) as any;
+
+        if (sData.services) setDbServices(sData.services);
+        if (stData.stores) setDbStores(stData.stores);
+        if (adData.addresses) {
+          setDbAddresses(adData.addresses);
+          if (adData.addresses.length > 0 && !selectedAddress) {
+            setSelectedAddress(adData.addresses[0]);
+          }
+        }
+      } catch (err) {
+        console.error("Failed to fetch booking data:", err);
+      }
+    }
+    fetchData();
+  }, [profile?.userId]);
 
   // Load drafted state
   useEffect(() => {
@@ -95,7 +129,8 @@ function BookingFlow() {
     sessionStorage.setItem("rubjob_booking_draft", JSON.stringify({
       step, selectedStore, selectedService, selectedAddress, deliverySpeed, 
       deliveryDate, deliverySlot, selectedPayment, bagSize, withFolding, 
-      pickupSpeed, pickupDate, pickupSlot
+      pickupSpeed, pickupDate, pickupSlot,
+      userId: profile?.userId
     }));
   }, [isLoaded, step, selectedStore, selectedService, selectedAddress, deliverySpeed, deliveryDate, deliverySlot, selectedPayment, bagSize, withFolding, pickupSpeed, pickupDate, pickupSlot]);
 
@@ -107,7 +142,7 @@ function BookingFlow() {
   const pointsDiscount = usePoints ? 50 : 0;
   const couponDiscount = appliedCoupon ? appliedCoupon.discount : 0;
 
-  const service = SERVICES.find((s) => s.id === selectedService);
+  const service = dbServices.find((s) => s.id === selectedService);
 
   const locale = language === "th" ? "th" : language === "zh" ? "zh" : "en";
 
@@ -136,8 +171,8 @@ function BookingFlow() {
   }, [pickupSpeed, dates, pickupDate, pickupSlot]);
 
   // Calculate distance based on actual coordinates or fallback
-  const distanceKm = selectedStore && selectedAddress?.latitude && selectedAddress?.longitude 
-    ? getDistanceKm(selectedAddress.latitude, selectedAddress.longitude, selectedStore.lat, selectedStore.lng)
+  const distanceKm = selectedStore && selectedAddress?.lat && selectedAddress?.lng 
+    ? getDistanceKm(selectedAddress.lat, selectedAddress.lng, selectedStore.lat, selectedStore.lng)
     : 5.1; 
     
   // New Pricing Logic
@@ -245,9 +280,9 @@ function BookingFlow() {
         {/* ─── Step: Store ─── */}
         {step === "store" && (
           <div className="space-y-3 stagger">
-            {MOCK_STORES.map((st) => {
-              const dist = selectedAddress?.latitude && selectedAddress?.longitude 
-                ? getDistanceKm(selectedAddress.latitude, selectedAddress.longitude, st.lat, st.lng) 
+            {dbStores.map((st) => {
+              const dist = selectedAddress?.lat && selectedAddress?.lng 
+                ? getDistanceKm(selectedAddress.lat, selectedAddress.lng, st.lat, st.lng) 
                 : 0;
               const isOutOfRange = dist > st.serviceRadiusKm;
               
@@ -293,7 +328,7 @@ function BookingFlow() {
         {/* ─── Step: Service ─── */}
         {step === "service" && (
           <div className="space-y-4 stagger">
-            {SERVICES.filter(s => s.category === "laundry").map((svc) => (
+            {dbServices.filter(s => s.category === "laundry").map((svc) => (
               <Card
                 key={svc.id}
                 hoverable
@@ -348,7 +383,10 @@ function BookingFlow() {
                 </button>
               </div>
               <div className="space-y-2">
-                {MOCK_ADDRESSES.map((addr) => (
+                {dbAddresses.length === 0 && (
+                  <p className="text-center py-4 text-xs text-muted italic">No saved addresses. Please add one in profile.</p>
+                )}
+                {dbAddresses.map((addr) => (
                   <Card
                     key={addr.id}
                     hoverable
@@ -363,13 +401,13 @@ function BookingFlow() {
                       <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 mt-0.5 transition-colors ${
                         selectedAddress?.id === addr.id ? "bg-primary text-white" : "bg-slate-100 text-slate-400"
                       }`}>
-                        {addr.label === "Home" ? <Icons.Home size={18} /> : <Icons.Office size={18} />}
+                        {addr.label.toLowerCase().includes("home") || addr.label.toLowerCase().includes("บ้าน") ? <Icons.Home size={18} /> : <Icons.Office size={18} />}
                       </div>
                       <div>
                         <p className={`text-sm font-bold transition-colors ${
                           selectedAddress?.id === addr.id ? "text-primary-dark" : "text-foreground"
                         }`}>{addr.label}</p>
-                        <p className="text-xs text-muted mt-0.5">{addr.fullAddress}</p>
+                        <p className="text-xs text-muted mt-0.5">{addr.details}</p>
                         {addr.note && (
                           <div className="flex items-center gap-1.5 mt-1 text-primary-dark">
                             <Icons.FileText size={12} strokeWidth={3} />

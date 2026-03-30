@@ -8,7 +8,7 @@ import { MOCK_ORDERS, SERVICES } from "@/lib/mock-data";
 import { Icons, getServiceIcon } from "@/components/ui/Icons";
 import { useTranslation } from "@/components/providers/LanguageProvider";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Button from "@/components/ui/Button";
 
 export default function HomePage() {
@@ -16,9 +16,46 @@ export default function HomePage() {
   const { t } = useTranslation();
   const [comingSoonModal, setComingSoonModal] = useState<string | null>(null);
 
-  const laundryServices = SERVICES.filter(s => s.category === "laundry");
-  const otherServices = SERVICES.filter(s => s.category !== "laundry");
-  const activeOrders = MOCK_ORDERS.filter((o) => o.status !== "completed" && o.status !== "cancelled");
+  // State for live data
+  const [services, setServices] = useState<any[]>(SERVICES);
+  const [orders, setOrders] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // 1. Fetch Services from D1
+  useEffect(() => {
+    async function fetchServices() {
+      try {
+        const res = await fetch("/api/services");
+        const data = (await res.json()) as any;
+        if (data.services) setServices(data.services);
+      } catch (err) {
+        console.error("Failed to fetch services:", err);
+      }
+    }
+    fetchServices();
+  }, []);
+
+  // 2. Fetch User Orders from D1
+  useEffect(() => {
+    if (!profile?.userId) return;
+
+    async function fetchOrders() {
+      try {
+        const res = await fetch(`/api/orders?userId=${profile?.userId}`);
+        const data = (await res.json()) as any;
+        if (data.orders) setOrders(data.orders);
+      } catch (err) {
+        console.error("Failed to fetch orders:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    fetchOrders();
+  }, [profile?.userId]);
+
+  const laundryServices = services.filter(s => s.category === "laundry");
+  const otherServices = services.filter(s => s.category !== "laundry");
+  const activeOrders = orders.filter((o) => o.status !== "completed" && o.status !== "cancelled");
 
   return (
     <div className="flex flex-col min-h-dvh bg-slate-50 relative overflow-hidden">
@@ -73,16 +110,16 @@ export default function HomePage() {
             </div>
             <div className="flex flex-col gap-5 stagger">
               {activeOrders.map((order) => {
-                const service = SERVICES.find((s) => s.id === order.service);
+                const serviceId = order.serviceId || order.service;
                 return (
                   <Link key={order.id} href={`/orders/${order.id}`}>
                     <Card className="p-4 flex items-center gap-3" hoverable>
                       <div className="w-11 h-11 bg-primary-light rounded-xl flex items-center justify-center text-primary-dark shrink-0">
-                        {getServiceIcon(order.service, { size: 22 })}
+                        {getServiceIcon(serviceId, { size: 22 })}
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-semibold text-foreground truncate">
-                          {t(`orders.services.${order.service}`)}
+                          {t(`orders.services.${serviceId}`)}
                         </p>
                         <p className="text-xs text-muted truncate">{order.id}</p>
                       </div>

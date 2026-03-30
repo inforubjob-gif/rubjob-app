@@ -32,13 +32,38 @@ export default function ProfilePage() {
     { icon: <Icons.Lock size={20} />, label: t("profile.privacyPolicy"), description: t("profile.privacyPolicyDesc"), href: "/profile/privacy" },
   ];
 
-  useEffect(() => {
-    if (profile?.displayName) setTempName(profile.displayName);
-  }, [profile]);
+  const [orders, setOrders] = useState<any[]>([]);
+  const [addresses, setAddresses] = useState<any[]>([]);
+  const [isDataLoading, setIsDataLoading] = useState(true);
 
-  // Determine user tier based on overall purchase history (without showing explicit points tally in UI here anymore)
-  const totalPointsForTier = MOCK_ORDERS.reduce((acc, order) => acc + order.totalPrice, 0);
-  const tierKey = totalPointsForTier >= 2000 ? "gold" : totalPointsForTier >= 500 ? "silver" : "bronze";
+  // Fetch real data
+  useEffect(() => {
+    if (!profile?.userId) return;
+
+    async function fetchData() {
+      try {
+        const [ordersRes, addrRes] = await Promise.all([
+          fetch(`/api/orders?userId=${profile?.userId}`),
+          fetch(`/api/user/addresses?userId=${profile?.userId}`)
+        ]);
+
+        const ordersData = (await ordersRes.json()) as any;
+        const addrData = (await addrRes.json()) as any;
+
+        if (ordersData.orders) setOrders(ordersData.orders);
+        if (addrData.addresses) setAddresses(addrData.addresses);
+      } catch (err) {
+        console.error("Failed to fetch profile data:", err);
+      } finally {
+        setIsDataLoading(false);
+      }
+    }
+    fetchData();
+  }, [profile?.userId]);
+
+  // Determine user tier based on real purchase history
+  const totalAmount = orders.reduce((acc, order) => acc + (order.totalPrice || 0), 0);
+  const tierKey = totalAmount >= 2000 ? "gold" : totalAmount >= 500 ? "silver" : "bronze";
   const tier = t(`tiers.${tierKey}`);
 
   const languages: { key: Language; label: string; sub: string }[] = [
@@ -110,15 +135,20 @@ export default function ProfilePage() {
             </Link>
           </div>
           <div className="space-y-2">
-            {MOCK_ADDRESSES.map((addr) => (
+            {addresses.length === 0 && !isDataLoading && (
+              <p className="text-center py-4 text-xs text-muted italic">
+                {t("profile.noAddress") || "No saved addresses yet."}
+              </p>
+            )}
+            {addresses.map((addr) => (
               <Card key={addr.id} className="p-4" hoverable>
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 bg-slate-100 rounded-xl flex items-center justify-center text-slate-400 shrink-0">
-                    {addr.label.toLowerCase().includes("home") ? <Icons.Home size={20} strokeWidth={3} /> : <Icons.Office size={20} strokeWidth={3} />}
+                    {addr.label.toLowerCase().includes("home") || addr.label.toLowerCase().includes("บ้าน") ? <Icons.Home size={20} strokeWidth={3} /> : <Icons.Office size={20} strokeWidth={3} />}
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-bold text-slate-900">{addr.label}</p>
-                    <p className="text-[11px] text-slate-400 truncate">{addr.fullAddress}</p>
+                    <p className="text-[11px] text-slate-400 truncate">{addr.details}</p>
                   </div>
                   <Icons.Back size={14} className="text-slate-300 rotate-180" />
                 </div>

@@ -32,23 +32,20 @@ export default function OrderDetailPage() {
 
   useEffect(() => {
     async function fetchOrder() {
+      if (!id) return;
       try {
         const res = await fetch(`/api/orders/${id}`);
-        const data = await res.json() as any;
+        const data = (await res.json()) as any;
         if (data.order) {
           setOrder(data.order);
-        } else {
-          // Fallback to mock for dev
-          setOrder(MOCK_ORDERS.find(o => o.id === id));
         }
       } catch (err) {
         console.error("Fetch order detail error:", err);
-        setOrder(MOCK_ORDERS.find(o => o.id === id));
       } finally {
         setIsLoading(false);
       }
     }
-    if (id) fetchOrder();
+    fetchOrder();
   }, [id]);
 
   const sendToLine = async () => {
@@ -99,7 +96,9 @@ export default function OrderDetailPage() {
     );
   }
 
-  const service = SERVICES.find((s) => s.id === order.service);
+  const serviceId = order.serviceId || order.service;
+  const items = Array.isArray(order.items) ? order.items : [];
+  const address = typeof order.address === "object" ? order.address : { label: "N/A" };
 
   return (
     <div className="flex flex-col min-h-dvh">
@@ -129,18 +128,18 @@ export default function OrderDetailPage() {
         <Card className="p-4">
           <div className="flex items-center gap-3 mb-3">
             <div className="w-12 h-12 bg-primary-light rounded-2xl flex items-center justify-center text-primary-dark shrink-0">
-              {getServiceIcon(order.service, { size: 24 })}
+              {getServiceIcon(serviceId, { size: 24 })}
             </div>
             <div>
-              <h2 className="text-base font-bold text-foreground">{t(`orders.services.${order.service}`) || service?.name}</h2>
-              <p className="text-xs text-muted">~{service?.estimatedDays} {t("booking.dayTurnaround")}</p>
+              <h2 className="text-base font-bold text-foreground">{t(`orders.services.${serviceId}`) || order.serviceName}</h2>
+              <p className="text-xs text-muted">~{order.estimatedDays || 2} {t("booking.dayTurnaround")}</p>
             </div>
           </div>
 
           <div className="border-t border-border pt-3 space-y-2">
             <InfoRow label={t("orders.info.pickupDate")} value={order.pickupDate} />
             <InfoRow label={t("orders.info.timeSlot")} value={order.pickupTimeSlot} />
-            <InfoRow label={t("orders.info.address")} value={order.address.label} />
+            <InfoRow label={t("orders.info.address")} value={address.label} />
             {order.deliveryDate && (
               <InfoRow label={t("orders.info.delivered")} value={order.deliveryDate} />
             )}
@@ -189,13 +188,13 @@ export default function OrderDetailPage() {
             <Icons.FileText size={18} className="text-primary" /> {t("orders.items")}
           </h3>
           <div className="space-y-2">
-            {order.items.map((item: any, i: number) => (
+            {items.map((item: any, i: number) => (
               <div key={i} className="flex items-center justify-between text-sm">
                 <span className="text-muted">
                   {t(ITEM_KEY_MAP[item.name] || "") || item.name} × {item.quantity}
                 </span>
                 <span className="font-semibold text-foreground">
-                  ฿{item.quantity * item.pricePerUnit}
+                  ฿{item.quantity * (item.pricePerUnit || 0)}
                 </span>
               </div>
             ))}
