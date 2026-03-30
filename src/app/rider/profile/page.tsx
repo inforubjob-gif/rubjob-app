@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
@@ -35,6 +35,44 @@ export default function RiderProfilePage() {
   const { language, setLanguage, t } = useTranslation();
   const [workStatus, setWorkStatus] = useState(true);
   const [showLanguageModal, setShowLanguageModal] = useState(false);
+  const [prefs, setPrefs] = useState<any>({});
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    if (!profile?.userId) return;
+    async function fetchPrefs() {
+      try {
+        const res = await fetch(`/api/users/preferences?userId=${profile?.userId}`);
+        const data = await res.json() as any;
+        if (data.preferences) {
+          setPrefs(data.preferences);
+          if (data.preferences.workStatus !== undefined) {
+             setWorkStatus(data.preferences.workStatus);
+          }
+        }
+      } catch (err) {
+        console.error("Failed to fetch preferences", err);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    fetchPrefs();
+  }, [profile?.userId]);
+
+  const handleToggleWorkStatus = async () => {
+    const nextStatus = !workStatus;
+    setWorkStatus(nextStatus);
+    if (!profile?.userId) return;
+    try {
+      await fetch("/api/users/preferences", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: profile.userId, workStatus: nextStatus })
+      });
+    } catch (err) {
+      console.error("Failed to update work status", err);
+    }
+  };
 
   return (
     <div className="flex flex-col min-h-dvh bg-slate-50">
@@ -91,25 +129,25 @@ export default function RiderProfilePage() {
              <SettingItem 
                 icon={<Icons.MapPin size={20} />} 
                 label={t("rider.profile.serviceArea")} 
-                value="Wattana, Khlong Toei" 
+                value={prefs?.serviceArea || "Not Set"} 
                 onClick={() => router.push("/rider/profile/service-area")}
              />
              <SettingItem 
                 icon={<Icons.Bike size={20} />} 
                 label={t("rider.vehicleType")} 
-                value="Motorcycle" 
+                value={prefs?.vehicleType || "Not Set"} 
                 onClick={() => router.push("/rider/profile/vehicle-type")}
              />
              <SettingItem 
                 icon={<Icons.Clock size={20} />} 
                 label={t("rider.profile.activeHours")} 
-                value="08:00 - 22:00" 
+                value={prefs?.activeHours || "Not Set"} 
                 onClick={() => router.push("/rider/profile/active-hours")}
              />
              <SettingItem 
                 icon={<Icons.Payment size={20} />} 
                 label={t("rider.profile.payoutMethod")} 
-                value="SCB ***5678" 
+                value={prefs?.payoutMethod ? `${prefs.payoutMethod.bank ? prefs.payoutMethod.bank.toUpperCase() : 'Account'} ***${prefs.payoutMethod.account?.slice(-4) || ''}` : "Not Set"} 
                 onClick={() => router.push("/rider/profile/payout-method")}
              />
           </div>

@@ -18,9 +18,18 @@ export async function GET(
     }
 
     const order = await db.prepare(`
-      SELECT o.*, s.name as serviceName, s.icon as serviceIcon, s.estimatedDays
+      SELECT o.*, 
+             s.name as serviceName, s.icon as serviceIcon, s.estimatedDays,
+             u_customer.displayName as userName,
+             st.name as storeName, st.lat as storeLat, st.lng as storeLng,
+             u_pickup.displayName as pickupDriverName,
+             u_delivery.displayName as deliveryDriverName
       FROM orders o
       JOIN services s ON o.serviceId = s.id
+      JOIN users u_customer ON o.userId = u_customer.id
+      JOIN stores st ON o.storeId = st.id
+      LEFT JOIN users u_pickup ON o.pickupDriverId = u_pickup.id
+      LEFT JOIN users u_delivery ON o.deliveryDriverId = u_delivery.id
       WHERE o.id = ?
     `).bind(id).first();
 

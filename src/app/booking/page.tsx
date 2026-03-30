@@ -4,7 +4,7 @@ import { useState, useEffect, Suspense, useMemo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
-import { SERVICES, TIME_SLOTS, MOCK_ADDRESSES, MOCK_STORES } from "@/lib/mock-data";
+import { TIME_SLOTS } from "@/lib/constants";
 import type { ServiceType, Address, Store } from "@/types";
 
 function getDistanceKm(lat1: number, lon1: number, lat2: number, lon2: number) {
@@ -37,14 +37,14 @@ function BookingFlow() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const initServiceRaw = searchParams.get("service") as ServiceType | null;
-  const validInitService = initServiceRaw && SERVICES.some(s => s.id === initServiceRaw) ? initServiceRaw : null;
+  const validInitService = initServiceRaw;
 
   const { profile } = useLiff();
   const { t, language } = useTranslation();
   const [step, setStep] = useState<BookingStep>(validInitService ? "store" : "service");
   const [selectedStore, setSelectedStore] = useState<Store | null>(null);
   const [selectedService, setSelectedService] = useState<ServiceType | null>(validInitService);
-  const [selectedAddress, setSelectedAddress] = useState<Address | null>(MOCK_ADDRESSES[0]);
+  const [selectedAddress, setSelectedAddress] = useState<Address | null>(null);
   type DeliverySpeed = "standard" | "express" | "flash";
   const [deliverySpeed, setDeliverySpeed] = useState<DeliverySpeed>("standard");
   const [deliveryDate, setDeliveryDate] = useState("");

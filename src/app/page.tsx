@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useLiff } from "@/components/providers/LiffProvider";
 import Card from "@/components/ui/Card";
 import Badge, { statusToBadgeVariant, statusLabel } from "@/components/ui/Badge";
-import { MOCK_ORDERS, SERVICES } from "@/lib/mock-data";
+// Removed mock import
 import { Icons, getServiceIcon } from "@/components/ui/Icons";
 import { useTranslation } from "@/components/providers/LanguageProvider";
 
@@ -17,7 +17,7 @@ export default function HomePage() {
   const [comingSoonModal, setComingSoonModal] = useState<string | null>(null);
 
   // State for live data
-  const [services, setServices] = useState<any[]>(SERVICES);
+  const [services, setServices] = useState<any[]>([]);
   const [orders, setOrders] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 

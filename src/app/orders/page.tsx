@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Card from "@/components/ui/Card";
 import Badge, { statusToBadgeVariant } from "@/components/ui/Badge";
-import { MOCK_ORDERS, SERVICES } from "@/lib/mock-data";
+// Removed mock import
 import { Icons, getServiceIcon } from "@/components/ui/Icons";
 import { useTranslation } from "@/components/providers/LanguageProvider";
 import { useLiff } from "@/components/providers/LiffProvider";

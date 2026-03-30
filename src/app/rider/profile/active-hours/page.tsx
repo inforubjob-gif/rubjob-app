@@ -7,12 +7,17 @@ import Button from "@/components/ui/Button";
 import { Icons } from "@/components/ui/Icons";
 import { useTranslation } from "@/components/providers/LanguageProvider";
 
+import { useLiff } from "@/components/providers/LiffProvider";
+import { useEffect } from "react";
+
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"] as const;
 type Day = typeof DAYS[number];
 
 export default function RiderActiveHoursPage() {
   const router = useRouter();
   const { t } = useTranslation();
+  const { profile } = useLiff();
+  const [isSaving, setIsSaving] = useState(false);
   
   const [workingHours, setWorkingHours] = useState<Record<Day, { start: string, end: string, isOpen: boolean }>>(
     DAYS.reduce((acc, day) => ({
@@ -22,6 +27,34 @@ export default function RiderActiveHoursPage() {
   );
 
   const [selectedDay, setSelectedDay] = useState<Day>("Mon");
+
+  useEffect(() => {
+    if (!profile?.userId) return;
+    fetch(`/api/users/preferences?userId=${profile.userId}`)
+      .then(res => res.json())
+      .then((data: any) => {
+         if (data.preferences?.activeHoursObj) {
+           setWorkingHours(data.preferences.activeHoursObj);
+         }
+      });
+  }, [profile?.userId]);
+
+  const handleSave = async () => {
+    if (!profile?.userId) return;
+    setIsSaving(true);
+    
+    // Create a string representation for the main page
+    const mon = workingHours["Mon"];
+    const activeHoursStr = mon.isOpen ? `${mon.start} - ${mon.end}` : "Varies";
+
+    await fetch("/api/users/preferences", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ userId: profile.userId, activeHoursObj: workingHours, activeHours: activeHoursStr })
+    });
+    setIsSaving(false);
+    router.back();
+  };
 
   const updateHour = (day: Day, field: "start" | "end", value: string) => {
     setWorkingHours(prev => ({
@@ -69,9 +102,10 @@ export default function RiderActiveHoursPage() {
             size="sm" 
             variant="primary" 
             className="rounded-xl px-4 font-black italic shadow-lg shadow-primary/20"
-            onClick={() => router.back()}
+            onClick={handleSave}
+            disabled={isSaving}
           >
-            {t("common.save")}
+            {isSaving ? "..." : t("common.save")}
           </Button>
         </div>
       </header>

@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import Card from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
-import { MOCK_ORDERS } from "@/lib/mock-data";
 
 // Revenue constants based on the business model
 const PARTNER_COMMISSION_RATE = 0.3; // 30%
@@ -16,23 +15,32 @@ export default function AdminDashboard() {
   const [totalCommision, setTotalCommision] = useState(0);
   const [netProfit, setNetProfit] = useState(0);
   const [orderCount, setOrderCount] = useState(0);
+  const [adminOrders, setAdminOrders] = useState<any[]>([]);
 
   useEffect(() => {
-    // In a real app, this would fetch from Firestore via orderService
-    const orders = MOCK_ORDERS;
-    const completedOrders = orders.filter(o => o.status === "completed");
-    
-    const revenue = completedOrders.reduce((sum, o) => sum + o.totalPrice, 0);
-    const commision = revenue * PARTNER_COMMISSION_RATE;
-    
-    // Simple profit calculation: (Price we charge - Cost from shop) * orders
-    const marginPerOrder = AVG_WASH_PRICE - AVG_WASH_COST;
-    const directProfit = completedOrders.length * marginPerOrder;
-    
-    setTotalRevenue(revenue);
-    setTotalCommision(commision);
-    setNetProfit(directProfit - (commision * 0.1)); // Simulating some ops cost
-    setOrderCount(orders.length);
+    async function fetchAllOrders() {
+      try {
+        const res = await fetch("/api/orders?userId=all");
+        const data = await res.json() as any;
+        const orders = data.orders || [];
+        const completedOrders = orders.filter((o: any) => o.status === "completed");
+        
+        const revenue = completedOrders.reduce((sum: number, o: any) => sum + o.totalPrice, 0);
+        const commision = revenue * PARTNER_COMMISSION_RATE;
+        
+        const marginPerOrder = AVG_WASH_PRICE - AVG_WASH_COST;
+        const directProfit = completedOrders.length * marginPerOrder;
+        
+        setTotalRevenue(revenue);
+        setTotalCommision(commision);
+        setNetProfit(directProfit - (commision * 0.1));
+        setOrderCount(orders.length);
+        setAdminOrders(orders);
+      } catch (err) {
+        console.error("Admin fetch error:", err);
+      }
+    }
+    fetchAllOrders();
   }, []);
 
   return (
@@ -99,7 +107,7 @@ export default function AdminDashboard() {
             <button className="text-[10px] font-bold bg-slate-200 px-2 py-1 rounded">Update Status</button>
           </div>
           <div className="space-y-3">
-            {MOCK_ORDERS.slice(0, 5).map(order => (
+            {adminOrders.slice(0, 5).map(order => (
               <Card key={order.id} className="p-4 flex items-center justify-between">
                 <div>
                   <div className="flex items-center gap-2">

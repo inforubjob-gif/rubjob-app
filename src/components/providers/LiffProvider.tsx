@@ -33,15 +33,7 @@ export function useLiff() {
   return useContext(LiffContext);
 }
 
-// ─── Dev-mode fallback when not running inside LINE ───
-const MOCK_PROFILE: User = {
-  userId: "U_dev_user_001",
-  displayName: "RUBJOB Tester",
-  email: "tester@rubjob.com",
-  pictureUrl: "/images/avata-01.png",
-  statusMessage: "Testing RUBJOB 🧺",
-};
-
+// ─── Real LIFF Provider ───
 const LIFF_ID = process.env.NEXT_PUBLIC_LIFF_ID ?? "";
 
 export default function LiffProvider({ children }: { children: ReactNode }) {

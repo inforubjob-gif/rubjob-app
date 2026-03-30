@@ -7,11 +7,24 @@ import Button from "@/components/ui/Button";
 import { Icons } from "@/components/ui/Icons";
 import { useTranslation } from "@/components/providers/LanguageProvider";
 
+import { useLiff } from "@/components/providers/LiffProvider";
+import { useEffect } from "react";
+
 export default function RiderServiceAreaPage() {
   const router = useRouter();
   const { t } = useTranslation();
+  const { profile } = useLiff();
   const [location, setLocation] = useState<{lat: number, lng: number} | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+
+  useEffect(() => {
+    if (!profile?.userId) return;
+    fetch(`/api/users/preferences?userId=${profile.userId}`)
+      .then(res => res.json())
+      .then((data: any) => {
+         if (data.preferences?.serviceAreaCoords) setLocation(data.preferences.serviceAreaCoords);
+      });
+  }, [profile?.userId]);
 
   const confirmLocation = () => {
     // Simulated coordinate selection
@@ -19,9 +32,17 @@ export default function RiderServiceAreaPage() {
   };
 
   const handleSave = async () => {
+    if (!profile?.userId || !location) return;
     setIsSaving(true);
-    // Simulate API call
-    await new Promise(r => setTimeout(r, 1000));
+    await fetch("/api/users/preferences", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ 
+        userId: profile.userId, 
+        serviceArea: "Wattana, Bangkok", 
+        serviceAreaCoords: location 
+      })
+    });
     setIsSaving(false);
     router.back();
   };

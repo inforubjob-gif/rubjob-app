@@ -11,18 +11,7 @@ import { useLiff } from "@/components/providers/LiffProvider";
 
 import Modal from "@/components/ui/Modal";
 
-// Mock Data for Rider
-const MOCK_TOTAL_DELIVERIES = 15;
-const MOCK_RIDER_EARNINGS = 850;
-
-const INITIAL_AVAILABLE_JOBS = [
-  { id: "DLV-001", type: "pickup", store: "Rubjob Phrom Phong", customer: "The EmQuartier", dist: "0.5", earn: 45 },
-  { id: "DLV-002", type: "delivery", store: "Rubjob Thong Lo", customer: "Grande Centre Point", dist: "1.8", earn: 65 },
-];
-
-const INITIAL_ACTIVE_JOBS = [
-  { id: "DLV-000", type: "delivery", status: "delivering_to_customer", location: "Sukhumvit 49", time: "10 mins" },
-];
+// Operational state for Rider
 
 export default function RiderDashboard() {
   const { t } = useTranslation();
@@ -34,12 +23,13 @@ export default function RiderDashboard() {
   const [selectedJob, setSelectedJob] = useState<any | null>(null);
   
   // Lifted state
-  const [availableJobs, setAvailableJobs] = useState(INITIAL_AVAILABLE_JOBS);
-  const [activeJobs, setActiveJobs] = useState(INITIAL_ACTIVE_JOBS);
+  const [availableJobs, setAvailableJobs] = useState<any[]>([]);
+  const [activeJobs, setActiveJobs] = useState<any[]>([]);
 
   useEffect(() => {
     async function fetchRiderData() {
-      const riderId = profile?.userId || "U1234567890";
+      if (!profile?.userId) return;
+      const riderId = profile.userId;
       try {
         const res = await fetch(`/api/rider/orders?riderId=${riderId}`);
         const data = await res.json() as any;
@@ -80,7 +70,7 @@ export default function RiderDashboard() {
             </div>
             <div className="min-w-0">
               <p className="text-[10px] text-white/60 font-black uppercase tracking-[0.2em] leading-none mb-1 truncate">{t("rider.hero")}</p>
-              <h1 className="text-xl font-black tracking-tight truncate drop-shadow-sm">{profile?.displayName || "Rider Tester"}</h1>
+              <h1 className="text-xl font-black tracking-tight truncate drop-shadow-sm">{profile?.displayName || t("common.guest")}</h1>
             </div>
           </div>
           <button className="w-10 h-10 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/20 shadow-md shadow-primary-dark/10 active:scale-90 transition-transform">
@@ -216,12 +206,12 @@ export default function RiderDashboard() {
                         <Icons.User size={20} />
                      </div>
                      <div>
-                        <p className="text-sm font-black text-slate-900 uppercase">Tawan Berkfah</p>
+                        <p className="text-sm font-black text-slate-900 uppercase">{selectedJob.userName || selectedJob.customer || t("common.guest")}</p>
                         <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{selectedJob.id}</p>
                      </div>
                   </div>
                   <div className="text-right">
-                     <p className="text-xl font-black text-slate-900 leading-none">฿{selectedJob.earn}</p>
+                     <p className="text-xl font-black text-slate-900 leading-none">฿{selectedJob.deliveryFee || selectedJob.earn}</p>
                      <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">{t("rider.earnAmount")}</p>
                   </div>
                </div>
@@ -231,15 +221,15 @@ export default function RiderDashboard() {
                     <Icons.Navigation size={18} className="text-primary shrink-0 mt-0.5" />
                     <div className="flex-1">
                        <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest mb-1">{t("rider.pickup")}</p>
-                       <p className="text-xs font-bold text-slate-700 leading-relaxed">{selectedJob.storeName || selectedJob.store}</p>
+                       <p className="text-xs font-bold text-slate-700 leading-relaxed">{selectedJob.storeName || selectedJob.store || "Unknown Store"}</p>
                     </div>
                   </div>
                  <div className="flex gap-4">
                     <Icons.MapPin size={18} className="text-primary shrink-0 mt-0.5" />
                     <div className="flex-1">
                        <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest mb-1">{t("rider.delivery")}</p>
-                       <p className="text-xs font-black text-slate-900 leading-relaxed">{selectedJob.customer}</p>
-                       <p className="text-[10px] text-slate-400 font-bold mt-1">Sukhumvit 49, Wattana, Bangkok</p>
+                       <p className="text-xs font-black text-slate-900 leading-relaxed">{selectedJob.customerName || selectedJob.customer || "Unknown Customer"}</p>
+                       <p className="text-[10px] text-slate-400 font-bold mt-1">{selectedJob.address || "No address provided"}</p>
                     </div>
                  </div>
                </div>

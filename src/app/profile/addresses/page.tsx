@@ -1,17 +1,34 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Card from "@/components/ui/Card";
-import { MOCK_ADDRESSES } from "@/lib/mock-data";
+// Removed mock import
 import type { Address } from "@/types";
 import { useTranslation } from "@/components/providers/LanguageProvider";
 import { Icons } from "@/components/ui/Icons";
+import { useLiff } from "@/components/providers/LiffProvider";
 
 export default function ManageAddressesPage() {
   const router = useRouter();
   const { t } = useTranslation();
-  const [addresses, setAddresses] = useState<Address[]>(MOCK_ADDRESSES);
+  const [addresses, setAddresses] = useState<Address[]>([]);
+  const { profile } = useLiff();
+  
+  // Fetch real addresses
+  useEffect(() => {
+    if (!profile?.userId) return;
+    async function fetchAddresses() {
+      try {
+        const res = await fetch(`/api/user/addresses?userId=${profile?.userId}`);
+        const data = await res.json() as any;
+        if (data.addresses) setAddresses(data.addresses);
+      } catch (err) {
+        console.error("Failed to fetch addresses:", err);
+      }
+    }
+    fetchAddresses();
+  }, [profile?.userId]);
   const [isAdding, setIsAdding] = useState(false);
   const [isSelectingLocation, setIsSelectingLocation] = useState(false);
   
@@ -30,10 +47,10 @@ export default function ManageAddressesPage() {
     const newAddr: Address = {
       id: `addr-${Date.now()}`,
       label: newLabel,
-      fullAddress: newAddress,
+      details: newAddress,
       note: newNote,
-      latitude: location?.lat || 13.7563,
-      longitude: location?.lng || 100.5018,
+      lat: location?.lat || 13.7563,
+      lng: location?.lng || 100.5018,
     };
 
     setAddresses([newAddr, ...addresses]);

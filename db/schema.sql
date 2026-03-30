@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS users (
   role TEXT DEFAULT 'user', -- user, store_admin, driver
   assignedStoreId TEXT, -- specifically for drivers to bind them to a store area
   points INTEGER DEFAULT 0,
+  preferences TEXT, -- JSON holding activeHours, serviceArea, vehicleType, payoutMethod, etc.
   createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 

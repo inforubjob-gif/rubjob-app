@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
@@ -35,6 +35,44 @@ export default function StaffProfilePage() {
   const { language, setLanguage, t } = useTranslation();
   const [workStatus, setWorkStatus] = useState(true);
   const [showLanguageModal, setShowLanguageModal] = useState(false);
+  const [prefs, setPrefs] = useState<any>({});
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    if (!profile?.userId) return;
+    async function fetchPrefs() {
+      try {
+        const res = await fetch(`/api/users/preferences?userId=${profile?.userId}`);
+        const data = await res.json() as any;
+        if (data.preferences) {
+          setPrefs(data.preferences);
+          if (data.preferences.workStatus !== undefined) {
+             setWorkStatus(data.preferences.workStatus);
+          }
+        }
+      } catch (err) {
+        console.error("Failed to fetch preferences", err);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    fetchPrefs();
+  }, [profile?.userId]);
+
+  const handleToggleWorkStatus = async () => {
+    const nextStatus = !workStatus;
+    setWorkStatus(nextStatus);
+    if (!profile?.userId) return;
+    try {
+      await fetch("/api/users/preferences", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: profile.userId, workStatus: nextStatus })
+      });
+    } catch (err) {
+      console.error("Failed to update work status", err);
+    }
+  };
 
   return (
     <div className="flex flex-col min-h-dvh bg-slate-50">
@@ -50,7 +88,9 @@ export default function StaffProfilePage() {
               <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-emerald-500 border-4 border-primary rounded-full shadow-sm" />
             </div>
             <div className="flex-1">
-              <h1 className="text-xl font-black text-white tracking-tight truncate drop-shadow-sm">{profile?.displayName || "Rubjob Tester"}</h1>
+              <h1 className="text-xl font-extrabold tracking-tight truncate">
+                {profile?.displayName || t("common.guest")}
+              </h1>
               <p className="text-[10px] text-white/80 font-black uppercase tracking-[0.2em]">{t("staff.profile.verifiedHero")} #8812</p>
             </div>
         </div>
@@ -90,25 +130,25 @@ export default function StaffProfilePage() {
              <SettingItem 
                 icon={<Icons.MapPin size={20} />} 
                 label={t("staff.profile.serviceArea")} 
-                value="Wattana, Pathum Wan" 
+                value={prefs?.serviceArea || "Not Set"} 
                 onClick={() => router.push("/staff/profile/service-area")}
              />
              <SettingItem 
                 icon={<Icons.Clock size={20} />} 
                 label={t("staff.profile.activeHours")} 
-                value="09:00 - 20:00" 
+                value={prefs?.activeHours || "Not Set"} 
                 onClick={() => router.push("/staff/profile/active-hours")}
              />
              <SettingItem 
                 icon={<Icons.Truck size={20} />} 
                 label={t("staff.profile.vehicleType")} 
-                value="Standard Car" 
+                value={prefs?.vehicleType || "Not Set"} 
                 onClick={() => router.push("/staff/profile/vehicle-type")}
              />
              <SettingItem 
                 icon={<Icons.Payment size={20} />} 
                 label={t("staff.profile.payoutMethod")} 
-                value="K-Bank ***1234" 
+                value={prefs?.payoutMethod ? `${prefs.payoutMethod.bank ? prefs.payoutMethod.bank.toUpperCase() : 'Account'} ***${prefs.payoutMethod.account?.slice(-4) || ''}` : "Not Set"} 
                 onClick={() => router.push("/staff/profile/payout-method")}
              />
           </div>

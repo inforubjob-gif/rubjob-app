@@ -1,13 +1,12 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import { Icons } from "@/components/ui/Icons";
 import { useTranslation } from "@/components/providers/LanguageProvider";
 import { useLiff } from "@/components/providers/LiffProvider";
-import { MOCK_ORDERS } from "@/lib/mock-data";
 
 export default function PromotionsPage() {
   const router = useRouter();
@@ -24,8 +23,24 @@ export default function PromotionsPage() {
     router.push("/");
   };
 
-  const { isLoggedIn } = useLiff();
-  const totalPoints = MOCK_ORDERS.reduce((acc, order) => acc + order.totalPrice, 0);
+  const [orders, setOrders] = useState<any[]>([]);
+  const { profile, isLoggedIn } = useLiff();
+
+  useEffect(() => {
+    if (!profile?.userId) return;
+    async function fetchOrders() {
+      try {
+        const res = await fetch(`/api/orders?userId=${profile?.userId}`);
+        const data = await res.json() as any;
+        if (data.orders) setOrders(data.orders);
+      } catch (err) {
+        console.error("Failed to fetch orders in Promotions:", err);
+      }
+    }
+    fetchOrders();
+  }, [profile?.userId]);
+
+  const totalPoints = orders.reduce((acc, order) => acc + (order.totalPrice || 0), 0);
   const nextTierPoints = 1500;
   const progress = Math.min((totalPoints / nextTierPoints) * 100, 100);
   const pointsToGo = Math.max(nextTierPoints - totalPoints, 0);

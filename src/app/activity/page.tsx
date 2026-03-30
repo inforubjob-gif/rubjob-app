@@ -1,14 +1,32 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Card from "@/components/ui/Card";
-import { MOCK_ORDERS } from "@/lib/mock-data";
+// Removed mock import
 import Badge, { statusToBadgeVariant, statusLabel } from "@/components/ui/Badge";
 import { useTranslation } from "@/components/providers/LanguageProvider";
+import { useLiff } from "@/components/providers/LiffProvider";
 
 export default function ActivityPage() {
   const { t } = useTranslation();
-  // Show all orders as activity/history
-  const activities = [...MOCK_ORDERS].sort(
+  const [orders, setOrders] = useState<any[]>([]);
+  const { profile } = useLiff();
+
+  useEffect(() => {
+    if (!profile?.userId) return;
+    async function fetchOrders() {
+      try {
+        const res = await fetch(`/api/orders?userId=${profile?.userId}`);
+        const data = await res.json() as any;
+        if (data.orders) setOrders(data.orders);
+      } catch (err) {
+        console.error("Activity fetch error:", err);
+      }
+    }
+    fetchOrders();
+  }, [profile?.userId]);
+
+  const activities = [...orders].sort(
     (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
   );
 

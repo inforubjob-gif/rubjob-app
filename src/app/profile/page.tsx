@@ -5,7 +5,6 @@ import { useLiff } from "@/components/providers/LiffProvider";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Card from "@/components/ui/Card";
-import { MOCK_ADDRESSES, MOCK_ORDERS } from "@/lib/mock-data";
 import { Icons } from "@/components/ui/Icons";
 import { useTranslation } from "@/components/providers/LanguageProvider";
 import type { Language } from "@/lib/i18n";

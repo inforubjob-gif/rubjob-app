@@ -10,19 +10,7 @@ import { useTranslation } from "@/components/providers/LanguageProvider";
 import { useLiff } from "@/components/providers/LiffProvider";
 import CountdownTimer from "@/components/ui/CountdownTimer";
 
-// Mock Data for Store
-const MOCK_TOTAL_STORE_TASKS = 18;
-const MOCK_STORE_EARNINGS = 2450;
-
-const INITIAL_INCOMING_ORDERS = [
-  { id: "ORD-7712", svc: "wash_fold", rider: "Somchai (MC-922)", status: "delivering_to_store", time: "5 mins" },
-  { id: "ORD-7715", svc: "dry_clean", rider: "Wichai (MC-102)", status: "picking_up", time: "15 mins" },
-];
-
-const INITIAL_PROCESSING_ORDERS = [
-  { id: "ORD-7705", svc: "wash_fold", isExpress: true, status: "washing", timeLeft: 1200 }, // 20 mins
-  { id: "ORD-7702", svc: "iron_only", isExpress: false, status: "washing", timeLeft: 3600 }, // 1 hr
-];
+// Operational state for Store
 
 export default function StaffDashboard() {
   const { t } = useTranslation();
@@ -33,8 +21,8 @@ export default function StaffDashboard() {
   const [workStatus, setWorkStatus] = useState(true);
 
   // Lifted state
-  const [incomingOrders, setIncomingOrders] = useState(INITIAL_INCOMING_ORDERS);
-  const [processingOrders, setProcessingOrders] = useState(INITIAL_PROCESSING_ORDERS);
+  const [incomingOrders, setIncomingOrders] = useState<any[]>([]);
+  const [processingOrders, setProcessingOrders] = useState<any[]>([]);
 
   useEffect(() => {
     async function fetchStoreData() {
@@ -87,7 +75,7 @@ export default function StaffDashboard() {
             </div>
             <div className="min-w-0">
               <p className="text-[10px] text-white/70 font-black uppercase tracking-[0.2em] leading-none mb-1 shadow-sm">STORE UNIT #049</p>
-              <h1 className="text-2xl font-black text-white tracking-tight truncate drop-shadow-md">{profile?.displayName || "Rubjob Store"}</h1>
+              <h1 className="text-2xl font-black text-white tracking-tight truncate drop-shadow-md">{profile?.displayName || t("common.guest")}</h1>
             </div>
           </div>
           <button className="w-11 h-11 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/30 shadow-lg shadow-white/5 active:scale-90 transition-transform text-white">

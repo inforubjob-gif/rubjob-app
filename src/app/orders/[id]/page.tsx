@@ -8,7 +8,7 @@ import Card from "@/components/ui/Card";
 import Badge, { statusToBadgeVariant, statusLabel } from "@/components/ui/Badge";
 import StatusTimeline from "@/components/ui/StatusTimeline";
 import Button from "@/components/ui/Button";
-import { MOCK_ORDERS, SERVICES } from "@/lib/mock-data";
+// Removed mock import
 import { Icons, getServiceIcon } from "@/components/ui/Icons";
 import { useTranslation } from "@/components/providers/LanguageProvider";
 import { useLiff } from "@/components/providers/LiffProvider";

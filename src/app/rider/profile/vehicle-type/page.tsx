@@ -7,6 +7,9 @@ import Button from "@/components/ui/Button";
 import { Icons } from "@/components/ui/Icons";
 import { useTranslation } from "@/components/providers/LanguageProvider";
 
+import { useLiff } from "@/components/providers/LiffProvider";
+import { useEffect } from "react";
+
 const VEHICLES = [
   { id: "motorcycle", name: "Motorcycle", icon: <Icons.Bike size={24} />, desc: "Fast & Agile (Up to 10kg)" },
   { id: "car", name: "Small Car", icon: <Icons.Truck size={24} />, desc: "Standard (Up to 30kg)" },
@@ -16,7 +19,30 @@ const VEHICLES = [
 export default function VehicleTypePage() {
   const router = useRouter();
   const { t } = useTranslation();
+  const { profile } = useLiff();
   const [selectedVehicle, setSelectedVehicle] = useState("motorcycle");
+  const [isSaving, setIsSaving] = useState(false);
+
+  useEffect(() => {
+    if (!profile?.userId) return;
+    fetch(`/api/users/preferences?userId=${profile.userId}`)
+      .then(res => res.json())
+      .then((data: any) => {
+         if (data.preferences?.vehicleType) setSelectedVehicle(data.preferences.vehicleType);
+      });
+  }, [profile?.userId]);
+
+  const handleSave = async () => {
+    if (!profile?.userId) return;
+    setIsSaving(true);
+    await fetch("/api/users/preferences", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ userId: profile.userId, vehicleType: selectedVehicle })
+    });
+    setIsSaving(false);
+    router.back();
+  };
 
   return (
     <div className="flex flex-col min-h-dvh bg-slate-50 pb-24">
@@ -36,9 +62,10 @@ export default function VehicleTypePage() {
             size="sm" 
             variant="primary" 
             className="rounded-xl px-4 font-black italic shadow-lg shadow-primary/20"
-            onClick={() => router.back()}
+            onClick={handleSave}
+            disabled={isSaving}
           >
-            {t("common.save")}
+            {isSaving ? "..." : t("common.save")}
           </Button>
         </div>
       </header>
