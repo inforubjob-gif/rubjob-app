@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
+import { useState, useEffect, Suspense, useMemo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
@@ -111,16 +111,28 @@ function BookingFlow() {
   const locale = language === "th" ? "th" : language === "zh" ? "zh" : "en";
 
   // Date/time constraints and generation...
-  const dates = Array.from({ length: 7 }, (_, i) => {
-    const d = new Date();
-    d.setDate(d.getDate() + i + 1);
-    return {
-      value: d.toISOString().slice(0, 10),
-      day: d.toLocaleDateString(locale, { weekday: "short" }),
-      date: d.getDate(),
-      month: d.toLocaleDateString(locale, { month: "short" }),
-    };
-  });
+  const dates = useMemo(() => {
+    return Array.from({ length: 7 }, (_, i) => {
+      const d = new Date();
+      d.setDate(d.getDate() + i + 1);
+      return {
+        value: d.toISOString().slice(0, 10),
+        day: d.toLocaleDateString(locale, { weekday: "short" }),
+        date: d.getDate(),
+        month: d.toLocaleDateString(locale, { month: "short" }),
+      };
+    });
+  }, [locale]);
+
+  // Set default pickup date/slot if scheduled
+  useEffect(() => {
+    if (pickupSpeed === "scheduled" && !pickupDate) {
+      setPickupDate(dates[0].value);
+    }
+    if (pickupSpeed === "scheduled" && !pickupSlot) {
+      setPickupSlot(TIME_SLOTS[0].id);
+    }
+  }, [pickupSpeed, dates, pickupDate, pickupSlot]);
 
   // Calculate distance based on actual coordinates or fallback
   const distanceKm = selectedStore && selectedAddress?.latitude && selectedAddress?.longitude 
@@ -410,7 +422,7 @@ function BookingFlow() {
               {pickupSpeed === "scheduled" && (
                 <div className="mt-3 p-3 bg-slate-50/80 rounded-xl space-y-4 animate-fade-in border border-slate-100 mx-2">
                   <div className="flex gap-2 overflow-x-auto hide-scrollbar pb-1">
-                    {dates.map((d) => (
+                    {dates.map((d: { value: string; day: string; date: number; month: string }) => (
                       <button
                         key={d.value}
                         onClick={() => setPickupDate(d.value)}
