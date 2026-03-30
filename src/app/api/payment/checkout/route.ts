@@ -9,7 +9,7 @@ export const runtime = "edge";
  */
 export async function POST(req: Request) {
   try {
-    const { orderId, amount, paymentMethod } = await req.json();
+    const { orderId, amount, paymentMethod } = await req.json() as any;
 
     if (!orderId || !amount) {
       return NextResponse.json({ error: "Order ID and Amount required" }, { status: 400 });

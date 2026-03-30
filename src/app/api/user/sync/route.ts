@@ -9,7 +9,7 @@ export const runtime = "edge";
  */
 export async function POST(req: Request) {
   try {
-    const { id, displayName, pictureUrl } = await req.json();
+    const { id, displayName, pictureUrl } = await req.json() as any;
     
     if (!id) {
       return NextResponse.json({ error: "User ID required" }, { status: 400 });

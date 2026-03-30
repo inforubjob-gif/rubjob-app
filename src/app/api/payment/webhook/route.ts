@@ -8,7 +8,7 @@ export const runtime = "edge";
  */
 export async function POST(req: Request) {
   try {
-    const payload = await req.json();
+    const payload = (await req.json()) as any;
     const eventType = payload.key;
     const data = payload.data;
 

@@ -17,7 +17,7 @@ export interface OmiseChargeParams {
   metadata?: any;
 }
 
-export async function createOmiseCharge(params: OmiseChargeParams, secretKey: string) {
+export async function createOmiseCharge(params: any, secretKey: string): Promise<any> {
   if (!secretKey) {
     throw new Error("OMISE_SECRET_KEY is not set.");
   }
@@ -49,7 +49,7 @@ export async function createOmiseCharge(params: OmiseChargeParams, secretKey: st
 /**
  * Specifically for PromptPay QR creation
  */
-export async function createPromptPayCharge(amount: number, orderId: string, secretKey: string) {
+export async function createPromptPayCharge(amount: number, orderId: string, secretKey: string): Promise<any> {
   return createOmiseCharge({
     amount: Math.round(amount * 100), // Convert Baht to Satang
     currency: "thb",

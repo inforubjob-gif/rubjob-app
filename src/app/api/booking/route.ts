@@ -11,7 +11,7 @@ export const runtime = "edge";
  */
 export async function POST(req: Request) {
   try {
-    const body = await req.json();
+    const body = await req.json() as any;
     const { 
       userId, storeId, serviceId, items, address, paymentMethod, 
       laundryFee, deliveryFee, distanceKm, totalPrice, scheduledDate 
