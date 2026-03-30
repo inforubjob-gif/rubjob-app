@@ -60,18 +60,14 @@ export default function LiffProvider({ children }: { children: ReactNode }) {
       try {
         const liff = (await import("@line/liff")).default;
 
-        // If no LIFF_ID is configured, use mock profile for local dev
+        // If no LIFF_ID is configured, show error in production
         if (!LIFF_ID) {
-          console.warn("[RUBJOB] No LIFF_ID set — using mock profile for dev");
-          setCtx({
-            isReady: true,
-            isLoggedIn: true,
-            isInClient: false,
-            profile: MOCK_PROFILE,
-            error: null,
-            login: handleLogin,
-            logout: handleLogout,
-          });
+          console.error("[RUBJOB] NEXT_PUBLIC_LIFF_ID is missing from environment");
+          setCtx(prev => ({ 
+            ...prev, 
+            isReady: true, 
+            error: "Configuration Error: LIFF ID is missing. Please check Cloudflare Environment Variables." 
+          }));
           return;
         }
 
@@ -131,16 +127,11 @@ export default function LiffProvider({ children }: { children: ReactNode }) {
         });
       } catch (err) {
         console.error("[RUBJOB] LIFF init failed:", err);
-        // Fallback to mock in dev when LIFF can't initialize
-        setCtx({
+        setCtx(prev => ({
+          ...prev,
           isReady: true,
-          isLoggedIn: true,
-          isInClient: false,
-          profile: MOCK_PROFILE,
           error: String(err),
-          login: handleLogin,
-          logout: handleLogout,
-        });
+        }));
       }
     }
 
