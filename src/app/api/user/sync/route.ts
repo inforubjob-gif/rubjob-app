@@ -23,8 +23,8 @@ export async function POST(req: Request) {
 
     // Upsert User
     await db.prepare(`
-      INSERT INTO users (id, displayName, pictureUrl) 
-      VALUES (?, ?, ?)
+      INSERT INTO users (id, displayName, pictureUrl, role, assignedStoreId) 
+      VALUES (?, ?, ?, 'user', 'STORE-001')
       ON CONFLICT(id) DO UPDATE SET 
         displayName = excluded.displayName,
         pictureUrl = excluded.pictureUrl

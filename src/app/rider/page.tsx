@@ -38,9 +38,27 @@ export default function RiderDashboard() {
   const [activeJobs, setActiveJobs] = useState(INITIAL_ACTIVE_JOBS);
 
   useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 800);
-    return () => clearTimeout(timer);
-  }, []);
+    async function fetchRiderData() {
+      const riderId = profile?.userId || "U1234567890";
+      try {
+        const res = await fetch(`/api/rider/orders?riderId=${riderId}`);
+        const data = await res.json() as any;
+        if (data.available) setAvailableJobs(data.available);
+        if (data.active) setActiveJobs(data.active);
+      } catch (err) {
+        console.error("Failed to fetch rider dashboard data:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    if (profile) {
+      fetchRiderData();
+    } else {
+      const timer = setTimeout(() => setIsLoading(false), 800);
+      return () => clearTimeout(timer);
+    }
+  }, [profile]);
 
   const handleAcceptJob = (jobId: string) => {
     // Navigate to the order detail page with map and details
@@ -96,11 +114,13 @@ export default function RiderDashboard() {
         <div className="grid grid-cols-2 gap-4 text-center">
           <div className="bg-white/10 backdrop-blur-md p-4 rounded-[2rem] border border-white/10">
             <p className="text-[10px] font-black text-white/50 uppercase tracking-widest">{t("rider.tasksToday")}</p>
-            <p className="text-2xl font-black mt-1 text-white">{MOCK_TOTAL_DELIVERIES + (INITIAL_ACTIVE_JOBS.length - activeJobs.length) * -1}</p>
+            <p className="text-2xl font-black mt-1 text-white">{activeJobs.length}</p>
           </div>
           <div className="bg-white/10 backdrop-blur-md p-4 rounded-[2rem] border border-white/10">
             <p className="text-[10px] font-black text-white/50 uppercase tracking-widest">{t("rider.earnings")}</p>
-            <p className="text-2xl font-black mt-1 text-white">฿{MOCK_RIDER_EARNINGS.toLocaleString()}</p>
+            <p className="text-2xl font-black mt-1 text-white">
+              ฿{activeJobs.reduce((sum, o: any) => sum + (o.deliveryFee || 0), 0).toLocaleString()}
+            </p>
           </div>
         </div>
       </header>
@@ -207,13 +227,13 @@ export default function RiderDashboard() {
                </div>
 
                <div className="space-y-4 pt-2">
-                 <div className="flex gap-4">
+                  <div className="flex gap-4">
                     <Icons.Navigation size={18} className="text-primary shrink-0 mt-0.5" />
                     <div className="flex-1">
                        <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest mb-1">{t("rider.pickup")}</p>
-                       <p className="text-xs font-bold text-slate-700 leading-relaxed">{selectedJob.store}</p>
+                       <p className="text-xs font-bold text-slate-700 leading-relaxed">{selectedJob.storeName || selectedJob.store}</p>
                     </div>
-                 </div>
+                  </div>
                  <div className="flex gap-4">
                     <Icons.MapPin size={18} className="text-primary shrink-0 mt-0.5" />
                     <div className="flex-1">
@@ -267,18 +287,18 @@ function AvailableDeliveries({ t, router, jobs, onAccept, onViewDetails }: { t: 
           <Card key={job.id} className="p-4 border-2 border-transparent hover:border-primary/20 transition-all">
             <div className="flex items-start gap-4">
               <div className="w-14 h-14 bg-slate-100 rounded-2xl flex items-center justify-center text-slate-400 shrink-0">
-                {job.type === "pickup" ? <Icons.Package size={28} /> : <Icons.Truck size={28} />}
+                {getServiceIcon(job.serviceId as any, { size: 28 })}
               </div>
               <div className="flex-1">
                 <div className="flex items-center justify-between mb-1">
                   <span className="text-[10px] font-black text-primary-dark uppercase tracking-widest">{job.id}</span>
-                  <span className="text-xs font-black text-slate-900">฿{job.earn}</span>
+                  <span className="text-xs font-black text-slate-900">฿{job.deliveryFee}</span>
                 </div>
                 <h3 className="font-bold text-slate-900 mb-1 leading-tight">
-                  {job.type === "pickup" ? `${job.store} → Customer` : `Store → ${job.customer}`}
+                  {job.storeName} → Customer
                 </h3>
                 <div className="flex items-center gap-3 text-[11px] text-slate-500 font-medium">
-                  <span className="flex items-center gap-1"><Icons.MapPin size={12} className="text-primary" /> {job.dist} {t("rider.nearby")}</span>
+                  <span className="flex items-center gap-1"><Icons.MapPin size={12} className="text-primary" /> {job.distanceKm || "0.5"} {t("rider.nearby")}</span>
                   <span className="flex items-center gap-1"><Icons.ArrowRight size={12} className="text-primary" /> {t("rider.earnAmount")}</span>
                 </div>
               </div>
@@ -319,17 +339,19 @@ function ActiveDeliveries({ t, router, activeJobs }: { t: any, router: any, acti
           <Card key={job.id} className="p-4 border-l-4 border-primary shadow-sm hover:shadow-md transition-shadow">
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 bg-primary/10 text-primary-dark rounded-xl flex items-center justify-center shrink-0">
-                <Icons.Truck size={24} />
+                {getServiceIcon(job.serviceId as any, { size: 24 })}
               </div>
               <div className="flex-1 border-r border-slate-100 mr-2 pr-2">
                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-tighter">{job.id}</p>
-                <h3 className="text-sm font-bold text-slate-900 leading-tight truncate">{job.location}</h3>
+                <h3 className="text-sm font-bold text-slate-900 leading-tight truncate">{job.storeName}</h3>
               </div>
               <div className="text-right min-w-[80px]">
                 <Badge variant={statusToBadgeVariant(job.status as any)}>
                   {t(`orders.status.${job.status}`)}
                 </Badge>
-                <p className="text-[10px] font-bold text-slate-400 mt-1 uppercase tracking-tighter">{job.time}</p>
+                <p className="text-[10px] font-bold text-slate-400 mt-1 uppercase tracking-tighter">
+                  {new Date(job.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                </p>
               </div>
             </div>
             <Button 

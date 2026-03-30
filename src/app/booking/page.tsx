@@ -39,6 +39,7 @@ function BookingFlow() {
   const initServiceRaw = searchParams.get("service") as ServiceType | null;
   const validInitService = initServiceRaw && SERVICES.some(s => s.id === initServiceRaw) ? initServiceRaw : null;
 
+  const { profile } = useLiff();
   const { t, language } = useTranslation();
   const [step, setStep] = useState<BookingStep>(validInitService ? "store" : "service");
   const [selectedStore, setSelectedStore] = useState<Store | null>(null);
@@ -169,8 +170,8 @@ function BookingFlow() {
   async function handleConfirm() {
     setIsSubmitting(true);
     try {
-      // Provide a mock user id if Liff is not fully loaded
-      const userId = "U1234567890";
+      // Use real LIFF userId with a fallback for dev mode
+      const userId = profile?.userId || "U1234567890";
       const payload = {
         userId,
         storeId: selectedStore?.id || "STORE-001",

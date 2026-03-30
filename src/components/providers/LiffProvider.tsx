@@ -94,6 +94,7 @@ export default function LiffProvider({ children }: { children: ReactNode }) {
         };
 
         // Sync with Cloudflare D1
+        let mergedProfile = { ...profile };
         try {
           await fetch("/api/user/sync", {
             method: "POST",
@@ -104,15 +105,26 @@ export default function LiffProvider({ children }: { children: ReactNode }) {
               pictureUrl: profile.pictureUrl
             }),
           });
+
+          // Fetch extra DB fields (role, assignedStoreId)
+          const dbRes = await fetch(`/api/user/${profile.userId}`);
+          const dbData = await dbRes.json() as any;
+          if (dbData.user) {
+            mergedProfile = {
+              ...profile,
+              role: dbData.user.role,
+              assignedStoreId: dbData.user.assignedStoreId
+            };
+          }
         } catch (err) {
-          console.error("Failed to sync user with D1:", err);
+          console.error("Failed to sync/fetch user with D1:", err);
         }
 
         setCtx({
           isReady: true,
           isLoggedIn: true,
           isInClient,
-          profile,
+          profile: mergedProfile,
           error: null,
           login: handleLogin,
           logout: handleLogout,

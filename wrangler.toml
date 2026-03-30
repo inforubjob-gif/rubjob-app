@@ -6,5 +6,5 @@ pages_build_output_dir = ".next"
 [[d1_databases]]
 binding = "DB" # The binding name available in your worker/app
 database_name = "rubjob-db"
-database_id = "YOUR_D1_DATABASE_ID_HERE" # Replace after 'npx wrangler d1 create rubjob-db'
+database_id = "617d4342-c1c3-4216-8e83-03cc1a6bd57d"
 migrations_dir = "db"

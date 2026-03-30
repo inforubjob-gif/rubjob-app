@@ -37,9 +37,31 @@ export default function StaffDashboard() {
   const [processingOrders, setProcessingOrders] = useState(INITIAL_PROCESSING_ORDERS);
 
   useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 800);
-    return () => clearTimeout(timer);
-  }, []);
+    async function fetchStoreData() {
+      const storeId = profile?.assignedStoreId || "STORE-001";
+      try {
+        const res = await fetch(`/api/staff/orders?storeId=${storeId}`);
+        const data = await res.json() as any;
+        if (data.orders) {
+          const allOrders = data.orders;
+          setIncomingOrders(allOrders.filter((o: any) => o.status === "delivering_to_store" || o.status === "picking_up"));
+          setProcessingOrders(allOrders.filter((o: any) => o.status === "washing" || o.status === "pending"));
+        }
+      } catch (err) {
+        console.error("Failed to fetch staff dashboard data:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    if (profile) {
+      fetchStoreData();
+    } else {
+      // Small delay for dev mode if profile is missing
+      const timer = setTimeout(() => setIsLoading(false), 800);
+      return () => clearTimeout(timer);
+    }
+  }, [profile]);
 
   const handleReceiveOrder = (orderId: string) => {
     // Navigate to the order detail page for confirmation and processing
@@ -99,11 +121,15 @@ export default function StaffDashboard() {
         <div className="grid grid-cols-2 gap-4 text-center">
           <div className="bg-white/10 backdrop-blur-lg p-5 rounded-[2.5rem] border border-white/20 shadow-lg shadow-primary-dark/20">
             <p className="text-[10px] font-black text-white/50 uppercase tracking-[0.15em]">{t("staff.tasksToday")}</p>
-            <p className="text-3xl font-black mt-1 text-white tracking-tighter">{MOCK_TOTAL_STORE_TASKS + (INITIAL_PROCESSING_ORDERS.length - processingOrders.length)}</p>
+            <p className="text-3xl font-black mt-1 text-white tracking-tighter">
+              {incomingOrders.length + processingOrders.length}
+            </p>
           </div>
           <div className="bg-white/10 backdrop-blur-lg p-5 rounded-[2.5rem] border border-white/20 shadow-lg shadow-primary-dark/20">
             <p className="text-[10px] font-black text-white/50 uppercase tracking-[0.15em]">{t("staff.earnings")}</p>
-            <p className="text-3xl font-black mt-1 text-white tracking-tighter">฿{MOCK_STORE_EARNINGS.toLocaleString()}</p>
+            <p className="text-3xl font-black mt-1 text-white tracking-tighter">
+              ฿{processingOrders.reduce((sum, o: any) => sum + (o.laundryFee || 0), 0).toLocaleString()}
+            </p>
           </div>
         </div>
       </header>
@@ -169,18 +195,20 @@ function IncomingOrders({ t, router, orders, onReceive }: { t: any, router: any,
           <Card key={job.id} className="p-4 border border-slate-100 shadow-sm hover:shadow-xl transition-all duration-300 group">
             <div className="flex items-start gap-4">
               <div className="w-14 h-14 bg-slate-50 border border-slate-100 rounded-2xl flex items-center justify-center text-slate-400 shrink-0 group-hover:bg-primary/5 transition-colors">
-                 {getServiceIcon(job.svc as any, { size: 30, className: "group-hover:text-primary transition-colors" })}
+                 {getServiceIcon(job.serviceId as any, { size: 30, className: "group-hover:text-primary transition-colors" })}
               </div>
               <div className="flex-1">
                 <div className="flex items-center justify-between mb-1.5">
                   <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{job.id}</span>
-                  <Badge variant="info" className="scale-75 origin-right px-3 py-1 bg-blue-50 text-blue-600 font-black">Rider arriving</Badge>
+                  <Badge variant="info" className="scale-75 origin-right px-3 py-1 bg-blue-50 text-blue-600 font-black">
+                    {t(`orders.status.${job.status}`)}
+                  </Badge>
                 </div>
                 <h3 className="font-extrabold text-slate-800 mb-1.5 leading-tight text-base">
-                  {t(`orders.services.${job.svc}`)}
+                  {t(`orders.services.${job.serviceId}`)}
                 </h3>
                 <div className="flex items-center gap-2.5 text-[11px] text-slate-500 font-bold uppercase tracking-tight">
-                   <Icons.Bike size={14} className="text-primary" /> {job.rider} • {job.time}
+                   <Icons.User size={14} className="text-primary" /> {job.userName}
                 </div>
               </div>
             </div>
@@ -218,24 +246,23 @@ function ProcessingOrders({ t, router, orders, onHandover }: { t: any, router: a
         orders.map((job) => (
           <Card key={job.id} className={`p-5 border-2 ${job.isExpress ? 'border-red-200 bg-red-50 shadow-red-100' : 'border-slate-100'} shadow-sm rounded-[2.5rem] transition-all hover:shadow-xl`}>
             <div className="flex items-center gap-4">
-              <div className={`w-14 h-14 ${job.isExpress ? 'bg-red-600 text-white' : 'bg-slate-100 text-slate-400'} rounded-2xl flex items-center justify-center shrink-0 shadow-lg shadow-black/5`}>
-                {getServiceIcon(job.svc as any, { size: 32 })}
+              <div className={`w-14 h-14 ${job.totalPrice > 100 ? 'bg-red-600 text-white' : 'bg-slate-100 text-slate-400'} rounded-2xl flex items-center justify-center shrink-0 shadow-lg shadow-black/5`}>
+                {getServiceIcon(job.serviceId as any, { size: 32 })}
               </div>
               <div className="flex-1 border-r border-slate-200 mr-2 pr-2">
                 <div className="flex items-center gap-2 mb-1.5">
                     <p className="text-[10px] font-black text-slate-500/80 uppercase tracking-widest">{job.id}</p>
-                    {job.isExpress && <Badge variant="danger" className="scale-[0.85] origin-left bg-red-700 text-white font-black italic px-2 tracking-tighter shadow-sm">FLASH EXPRESS</Badge>}
+                    {job.totalPrice > 200 && <Badge variant="danger" className="scale-[0.85] origin-left bg-red-700 text-white font-black italic px-2 tracking-tighter shadow-sm">PRIORITY</Badge>}
                 </div>
                 <h3 className="text-base font-black text-slate-900 leading-tight">
-                   {t(`orders.services.${job.svc}`)}
+                   {t(`orders.services.${job.serviceId}`)}
                 </h3>
               </div>
               <div className="text-right">
-                 <CountdownTimer 
-                    seconds={job.timeLeft} 
-                    urgentThreshold={job.isExpress ? 900 : 1800} 
-                    onAlarm={() => {}}
-                 />
+                 <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Created</div>
+                 <div className="text-xs font-bold text-slate-600">
+                    {new Date(job.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                 </div>
               </div>
             </div>
             <div className="grid grid-cols-2 gap-3 mt-5">

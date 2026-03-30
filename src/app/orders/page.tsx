@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Card from "@/components/ui/Card";
@@ -8,15 +8,41 @@ import Badge, { statusToBadgeVariant } from "@/components/ui/Badge";
 import { MOCK_ORDERS, SERVICES } from "@/lib/mock-data";
 import { Icons, getServiceIcon } from "@/components/ui/Icons";
 import { useTranslation } from "@/components/providers/LanguageProvider";
+import { useLiff } from "@/components/providers/LiffProvider";
 
 type TabFilter = "active" | "completed";
 
 export default function OrdersPage() {
   const router = useRouter();
+  const { profile } = useLiff();
   const { t, language } = useTranslation();
   const [tab, setTab] = useState<TabFilter>("active");
+  const [orders, setOrders] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const filtered = MOCK_ORDERS.filter((o) => {
+  useEffect(() => {
+    async function fetchOrders() {
+      const userId = profile?.userId || "U1234567890";
+      try {
+        const res = await fetch(`/api/orders?userId=${userId}`);
+        const data = await res.json() as any;
+        if (data.orders) {
+          setOrders(data.orders);
+        } else {
+          // Fallback to mock if API fails or returns empty in dev
+          setOrders(MOCK_ORDERS);
+        }
+      } catch (err) {
+        console.error("Failed to fetch orders:", err);
+        setOrders(MOCK_ORDERS);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    fetchOrders();
+  }, [profile]);
+
+  const filtered = orders.filter((o) => {
     if (tab === "active") return o.status !== "completed" && o.status !== "cancelled";
     return o.status === "completed" || o.status === "cancelled";
   });
@@ -56,7 +82,14 @@ export default function OrdersPage() {
       </header>
 
       <div className="relative z-10 flex-1 px-5 py-4 space-y-5 animate-fade-in stagger pb-24">
-        {filtered.length === 0 && (
+        {isLoading ? (
+          <div className="flex flex-col items-center justify-center py-20">
+            <div className="w-10 h-10 border-4 border-white/20 border-t-white rounded-full animate-spin" />
+            <p className="text-white/60 text-xs mt-4 font-bold tracking-widest uppercase">
+              {t("common.loading") || "Loading Orders..."}
+            </p>
+          </div>
+        ) : filtered.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 text-center text-slate-300">
             <Icons.FileText size={48} strokeWidth={1.5} className="mb-4 opacity-20" />
             <p className="text-sm font-semibold text-foreground">{t("orders.noOrders")}</p>
@@ -70,10 +103,8 @@ export default function OrdersPage() {
               {t("orders.bookFirst")}
             </Link>
           </div>
-        )}
-
-        {filtered.map((order) => {
-          return (
+        ) : (
+          filtered.map((order) => (
             <Link key={order.id} href={`/orders/${order.id}`} className="block">
               <Card className="p-5 shadow-lg shadow-slate-200/50 border border-slate-100" hoverable>
                 <div className="flex items-start justify-between mb-4">
@@ -105,8 +136,8 @@ export default function OrdersPage() {
                 </div>
               </Card>
             </Link>
-          );
-        })}
+          ))
+        )}
       </div>
     </div>
   );

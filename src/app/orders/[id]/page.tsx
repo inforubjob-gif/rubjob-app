@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Card from "@/components/ui/Card";
 import Badge, { statusToBadgeVariant, statusLabel } from "@/components/ui/Badge";
@@ -8,6 +9,7 @@ import Button from "@/components/ui/Button";
 import { MOCK_ORDERS, SERVICES } from "@/lib/mock-data";
 import { Icons, getServiceIcon } from "@/components/ui/Icons";
 import { useTranslation } from "@/components/providers/LanguageProvider";
+import { useLiff } from "@/components/providers/LiffProvider";
 
 const ITEM_KEY_MAP: Record<string, string> = {
   "T-shirt": "items.tshirt",
@@ -21,8 +23,31 @@ const ITEM_KEY_MAP: Record<string, string> = {
 export default function OrderDetailPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
+  const { profile } = useLiff();
   const { t } = useTranslation();
-  const order = MOCK_ORDERS.find((o) => o.id === id);
+  const [order, setOrder] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchOrder() {
+      try {
+        const res = await fetch(`/api/orders/${id}`);
+        const data = await res.json() as any;
+        if (data.order) {
+          setOrder(data.order);
+        } else {
+          // Fallback to mock for dev
+          setOrder(MOCK_ORDERS.find(o => o.id === id));
+        }
+      } catch (err) {
+        console.error("Fetch order detail error:", err);
+        setOrder(MOCK_ORDERS.find(o => o.id === id));
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    if (id) fetchOrder();
+  }, [id]);
 
   const sendToLine = async () => {
     try {
@@ -47,6 +72,17 @@ export default function OrderDetailPage() {
       console.error("Failed to send message:", err);
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-dvh">
+        <div className="w-10 h-10 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
+        <p className="text-muted text-xs mt-4 font-bold tracking-widest uppercase">
+          {t("common.loading") || "Fetching Order Detail..."}
+        </p>
+      </div>
+    );
+  }
 
   if (!order) {
     return (
@@ -151,7 +187,7 @@ export default function OrderDetailPage() {
             <Icons.FileText size={18} className="text-primary" /> {t("orders.items")}
           </h3>
           <div className="space-y-2">
-            {order.items.map((item, i) => (
+            {order.items.map((item: any, i: number) => (
               <div key={i} className="flex items-center justify-between text-sm">
                 <span className="text-muted">
                   {t(ITEM_KEY_MAP[item.name] || "") || item.name} × {item.quantity}
