@@ -239,7 +239,7 @@ export default function ManageAddressesPage() {
               onClick={() => setIsAdding(true)}
               className="w-full py-4 bg-primary text-black rounded-2xl text-[14px] font-black tracking-wide shadow-2xl shadow-primary/30 active:scale-95 transition-all outline-none"
             >
-              เพิ่มที่อยู่ใหม่
+              {t("profile.addNewAddress")}
             </button>
           </div>
         )}
