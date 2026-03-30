@@ -1,0 +1,10 @@
+# RUBJOB Cloudflare Configuration
+name = "rubjob"
+compatibility_date = "2024-03-28"
+pages_build_output_dir = ".next"
+
+[[d1_databases]]
+binding = "DB" # The binding name available in your worker/app
+database_name = "rubjob-db"
+database_id = "YOUR_D1_DATABASE_ID_HERE" # Replace after 'npx wrangler d1 create rubjob-db'
+migrations_dir = "db"

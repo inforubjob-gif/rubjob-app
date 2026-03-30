@@ -1,65 +1,207 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import Link from "next/link";
+import { useLiff } from "@/components/providers/LiffProvider";
+import Card from "@/components/ui/Card";
+import Badge, { statusToBadgeVariant, statusLabel } from "@/components/ui/Badge";
+import { MOCK_ORDERS, SERVICES } from "@/lib/mock-data";
+import { Icons, getServiceIcon } from "@/components/ui/Icons";
+import { useTranslation } from "@/components/providers/LanguageProvider";
+
+import { useState } from "react";
+import Button from "@/components/ui/Button";
+
+export default function HomePage() {
+  const { profile, isReady } = useLiff();
+  const { t } = useTranslation();
+  const [comingSoonModal, setComingSoonModal] = useState<string | null>(null);
+
+  const laundryServices = SERVICES.filter(s => s.category === "laundry");
+  const otherServices = SERVICES.filter(s => s.category !== "laundry");
+  const activeOrders = MOCK_ORDERS.filter((o) => o.status !== "completed" && o.status !== "cancelled");
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <div className="flex flex-col min-h-dvh bg-slate-50 relative overflow-hidden">
+      {/* Background Gradient Layer */}
+      <div className="absolute top-0 left-0 right-0 h-[250px] bg-gradient-to-b from-primary via-primary/90 to-slate-50 z-0" />
+
+      {/* ─── Header ─── */}
+      <header className="relative z-10 px-5 pt-12 pb-6">
+        <div className="flex items-center justify-between mb-4">
+          <Icons.Logo size={60} variant="white" />
+          
+          <Link href="/profile" className="relative group">
+            <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-white text-lg font-bold overflow-hidden ring-4 ring-white/30 shadow-xl group-active:scale-90 transition-all">
+              {profile?.pictureUrl ? (
+                <img
+                  src={profile.pictureUrl}
+                  alt={profile.displayName}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <span>{isReady ? (profile?.displayName?.[0] ?? "R") : "…"}</span>
+              )}
+            </div>
+          </Link>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+        {/* Search-like bar */}
+        <div className="bg-white/20 backdrop-blur-md rounded-2xl px-4 py-3.5 flex items-center gap-2 text-white/80 shadow-inner border border-white/10 mt-6">
+          <Icons.Search size={18} />
+          <span className="text-sm font-medium">{t("common.searchHint")}</span>
         </div>
-      </main>
+      </header>
+
+      <div className="relative z-10 px-5 space-y-7 pt-2 pb-24 animate-fade-in">
+        {/* ─── Hero Ads ─── */}
+        <section className="relative h-52 w-full rounded-2xl overflow-hidden shadow-xl shadow-primary/15 group active:scale-[0.98] transition-transform duration-300">
+          <img 
+            src="/images/ads/Cover-app.png" 
+            alt="Rubjob Promotion"
+            className="w-full h-full object-cover"
+          />
+        </section>
+
+        {/* ─── Active Orders ─── */}
+        {activeOrders.length > 0 && (
+          <section>
+            <div className="flex items-center justify-between mb-5">
+              <h2 className="text-base font-bold text-foreground tracking-tight">{t("home.activeOrders")}</h2>
+              <Link href="/orders" className="text-xs font-black text-primary-dark uppercase tracking-widest">
+                {t("common.seeAll")} →
+              </Link>
+            </div>
+            <div className="flex flex-col gap-5 stagger">
+              {activeOrders.map((order) => {
+                const service = SERVICES.find((s) => s.id === order.service);
+                return (
+                  <Link key={order.id} href={`/orders/${order.id}`}>
+                    <Card className="p-4 flex items-center gap-3" hoverable>
+                      <div className="w-11 h-11 bg-primary-light rounded-xl flex items-center justify-center text-primary-dark shrink-0">
+                        {getServiceIcon(order.service, { size: 22 })}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-semibold text-foreground truncate">
+                          {t(`orders.services.${order.service}`)}
+                        </p>
+                        <p className="text-xs text-muted truncate">{order.id}</p>
+                      </div>
+                      <Badge variant={statusToBadgeVariant(order.status)}>
+                        {t(`orders.status.${order.status}`)}
+                      </Badge>
+                    </Card>
+                  </Link>
+                );
+              })}
+            </div>
+          </section>
+        )}
+
+        {/* ─── Laundry Services ─── */}
+        <section>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-base font-bold text-foreground tracking-tight">{t("home.ourServices")}</h2>
+          </div>
+          <div className="grid grid-cols-2 gap-4 stagger">
+            {laundryServices.map((svc) => (
+              <ServiceCard key={svc.id} svc={svc} t={t} className="block w-full h-full" />
+            ))}
+          </div>
+        </section>
+
+        {/* ─── Other Services ─── */}
+        {otherServices.length > 0 && (
+          <section>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-base font-bold text-foreground tracking-tight">{t("home.otherServices")}</h2>
+            </div>
+            <div className="flex overflow-x-auto gap-4 -mx-5 px-5 pb-2 hide-scrollbar stagger snap-x snap-mandatory">
+              {otherServices.map((svc) => (
+                <ServiceCard key={svc.id} svc={svc} t={t} onComingSoon={setComingSoonModal} />
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* ─── Trust Bar ─── */}
+        <section className="pb-4">
+          <Card className="p-5 bg-gradient-to-r from-primary-light to-amber-50">
+            <div className="flex items-center gap-3">
+              <div className="w-14 h-14 bg-amber-50 rounded-2xl flex items-center justify-center p-2.5 shrink-0 shadow-sm border border-amber-100 transition-transform active:scale-95 duration-300">
+                <img 
+                  src="/images/icon/icon-shield.png" 
+                  alt={t("home.guaranteeTitle")} 
+                  className="w-full h-full object-contain" 
+                />
+              </div>
+              <div>
+                <h3 className="text-sm font-bold text-foreground">{t("home.guaranteeTitle")}</h3>
+                <p className="text-xs text-muted mt-0.5">
+                  {t("home.guaranteeDesc")}
+                </p>
+              </div>
+            </div>
+          </Card>
+        </section>
+      </div>
+
+      {/* ─── Coming Soon Modal ─── */}
+      {comingSoonModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-5 animate-fade-in">
+          <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={() => setComingSoonModal(null)} />
+          <div className="bg-white rounded-[2rem] p-8 w-full max-w-[320px] relative z-10 shadow-2xl animate-scale-in flex flex-col items-center text-center">
+            <div className="w-28 h-28 bg-amber-50 rounded-full flex items-center justify-center p-4 mb-6 shrink-0 shadow-inner">
+              <img 
+                src="/images/icon/icon-Under-maintenance..png" 
+                alt="Under Maintenance" 
+                className="w-full h-full object-contain animate-bounce-slow" 
+              />
+            </div>
+            <h3 className="text-xl font-black text-slate-800 mb-2 tracking-tight">Coming Soon...</h3>
+            <p className="text-sm text-slate-500 font-medium mb-8 leading-relaxed">
+              บริการ <span className="text-primary-dark font-bold underline decoration-primary/30 underline-offset-4">{comingSoonModal}</span><br/>
+              กำลังอยู่ในช่วงเตรียมระบบ<br/>อดใจรออีกนิดนะครับ! ✨
+            </p>
+            <Button 
+              fullWidth 
+              onClick={() => setComingSoonModal(null)} 
+              className="rounded-2xl shadow-lg shadow-primary/20"
+            >
+              รับทราบ
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
+  );
+}
+
+function ServiceCard({ svc, t, onComingSoon, className }: { svc: any, t: any, onComingSoon?: (name: string) => void, className?: string }) {
+  if (onComingSoon) {
+    return (
+      <button onClick={() => onComingSoon(t(`orders.services.${svc.id}`) || svc.name)} className={className || "min-w-[145px] flex-shrink-0 snap-center"}>
+        <Card className="p-5 h-full flex flex-col items-center justify-center text-center" hoverable>
+          <div className="w-12 h-12 bg-primary-light rounded-2xl flex items-center justify-center text-primary-dark mb-4 group-hover:scale-110 transition-transform">
+            {getServiceIcon(svc.id, { size: 24 })}
+          </div>
+          <h3 className="text-[13px] font-black text-foreground whitespace-nowrap overflow-hidden text-ellipsis w-full">
+            {t(`orders.services.${svc.id}`) || svc.name}
+          </h3>
+        </Card>
+      </button>
+    );
+  }
+
+  return (
+    <Link href={`/booking?service=${svc.id}`} className={className || "min-w-[145px] flex-shrink-0 snap-center"}>
+      <Card className="p-5 h-full flex flex-col items-center justify-center text-center" hoverable>
+        <div className="w-12 h-12 bg-primary-light rounded-2xl flex items-center justify-center text-primary-dark mb-4 group-hover:scale-110 transition-transform">
+          {getServiceIcon(svc.id, { size: 24 })}
+        </div>
+        <h3 className="text-[13px] font-black text-foreground whitespace-nowrap overflow-hidden text-ellipsis w-full">
+          {t(`orders.services.${svc.id}`) || svc.name}
+        </h3>
+      </Card>
+    </Link>
   );
 }
