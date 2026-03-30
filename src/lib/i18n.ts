@@ -1,6 +1,6 @@
 export type Language = "th" | "en" | "zh";
 
-export const translations = {
+export const translations: any = {
   th: {
     common: {
       back: "ย้อนกลับ",

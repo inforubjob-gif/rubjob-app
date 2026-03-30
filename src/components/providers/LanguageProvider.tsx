@@ -29,7 +29,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
 
   const t = (path: string): string => {
     const keys = path.split(".");
-    let current: any = translations[language];
+    let current: any = (translations as any)[language];
     
     for (const key of keys) {
       if (current[key] === undefined) return path;
