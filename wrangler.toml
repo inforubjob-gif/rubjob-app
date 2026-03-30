@@ -1,7 +1,7 @@
 # RUBJOB Cloudflare Configuration
 name = "rubjob"
 compatibility_date = "2024-03-28"
-pages_build_output_dir = ".next"
+pages_build_output_dir = ".vercel/output/static"
 
 [[d1_databases]]
 binding = "DB" # The binding name available in your worker/app
