@@ -54,11 +54,11 @@ export default function HomePage() {
 
       <div className="relative z-10 px-5 space-y-7 pt-2 pb-24 animate-fade-in">
         {/* ─── Hero Ads ─── */}
-        <section className="relative h-52 w-full rounded-2xl overflow-hidden shadow-xl shadow-primary/15 group active:scale-[0.98] transition-transform duration-300">
+        <section className="relative w-full rounded-3xl overflow-hidden shadow-2xl shadow-primary/20 group active:scale-[0.98] transition-all duration-500 bg-white">
           <img 
             src="/images/ads/Cover-app.png" 
             alt="Rubjob Promotion"
-            className="w-full h-full object-cover"
+            className="w-full h-auto block"
           />
         </section>
 
