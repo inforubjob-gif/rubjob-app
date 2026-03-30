@@ -17,10 +17,10 @@ export const Icons = {
     variant?: "horizontal" | "icon" | "white" | "color" 
   }) => {
     const src = variant === "icon" 
-      ? "/images/rubjob complete_logo-color.png" 
+      ? "/images/rubjob-complete_logo-color.png" 
       : variant === "white" 
-        ? "/images/rubjob complete_Text-white.png"
-        : "/images/rubjob complete_Text-color.png";
+        ? "/images/rubjob-complete_Text-white.png"
+        : "/images/rubjob-complete_Text-color.png";
         
     return (
       <div className={`flex items-center ${className}`}>

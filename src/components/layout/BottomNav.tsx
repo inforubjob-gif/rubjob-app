@@ -48,7 +48,7 @@ export default function BottomNav() {
       icon: () => (
         <div className="w-14 h-14 -mt-8 bg-white rounded-full flex items-center justify-center shadow-2xl shadow-primary/20 text-slate-900 border-4 border-white active:scale-90 transition-transform overflow-hidden p-1">
           <img 
-            src="/images/rubjob complete_logo-color.png" 
+            src="/images/rubjob-complete_logo-color.png" 
             alt="Book" 
             className="w-full h-full object-contain"
           />
