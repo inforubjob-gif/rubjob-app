@@ -1,3 +1,6 @@
+import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
+
 export const runtime = "edge";
 
 export async function POST(req: Request) {
@@ -7,6 +10,8 @@ export async function POST(req: Request) {
     if (!email || !password) {
       return NextResponse.json({ success: false, error: "Please provide email and password" }, { status: 400 });
     }
+
+    let adminName = null;
 
     const db = (req as any).context?.env?.DB;
     if (!db) {
@@ -18,16 +23,31 @@ export async function POST(req: Request) {
       `).bind(email, password).first();
 
       if (admin) {
-        return NextResponse.json({ success: true, name: admin.name });
+        adminName = admin.name;
       }
     }
 
     // 2. Fallback to Environment Variables
-    const validEmail = process.env.ADMIN_EMAIL || "admin@rubjob.com";
-    const validPassword = process.env.ADMIN_PASSWORD || "admin123";
+    if (!adminName) {
+      const validEmail = process.env.ADMIN_EMAIL || "admin@rubjob.com";
+      const validPassword = process.env.ADMIN_PASSWORD || "admin123";
 
-    if (email === validEmail && password === validPassword) {
-      return NextResponse.json({ success: true, name: "Master Admin" });
+      if (email === validEmail && password === validPassword) {
+        adminName = "Master Admin";
+      }
+    }
+
+    if (adminName) {
+      // Set HTTP-only cookie
+      const cookieStore = await cookies();
+      cookieStore.set("admin_token", email, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        path: "/",
+        maxAge: 60 * 60 * 24 * 7 // 1 week
+      });
+      return NextResponse.json({ success: true, name: adminName });
     } else {
       return NextResponse.json({ success: false, error: "อีเมลหรือรหัสผ่านไม่ถูกต้อง" }, { status: 401 });
     }

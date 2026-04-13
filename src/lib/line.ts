@@ -158,7 +158,7 @@ export const bookingConfirmationFlex = (orderId: string, serviceName: string, to
           action: {
             type: "uri",
             label: "ดูรายละเอียด",
-            uri: "https://liff.line.me/YOUR_LIFF_ID/orders",
+            uri: `https://liff.line.me/${process.env.NEXT_PUBLIC_LIFF_ID}/orders`,
           },
         },
       ],

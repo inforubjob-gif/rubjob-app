@@ -4,13 +4,12 @@ export const config = {
   matcher: [
     /*
      * Match all request paths except for the ones starting with:
-     * - api (API routes)
      * - _next/static (static files)
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
      * - images (public images)
      */
-    "/((?!api|_next/static|_next/image|favicon.ico|images|lib).*)",
+    "/((?!_next/static|_next/image|favicon.ico|images|lib).*)",
   ],
 };
 
@@ -49,7 +48,7 @@ export default function middleware(req: NextRequest) {
   if (targetFolder) {
     // If we're at the root of the subdomain (e.g., rider.rubjob.com/)
     // and the path doesn't already start with the folder name
-    if (!url.pathname.startsWith(`/${targetFolder}`) && targetFolder !== "") {
+    if (!url.pathname.startsWith('/api') && !url.pathname.startsWith(`/${targetFolder}`) && targetFolder !== "") {
       return NextResponse.rewrite(new URL(`/${targetFolder}${url.pathname}`, req.url));
     }
   }
@@ -64,6 +63,17 @@ export default function middleware(req: NextRequest) {
     if (restrictedFolders.some(folder => url.pathname.startsWith(`/${folder}`))) {
       // Prevent users from manually typing rubjob.com/admin in production
       return new NextResponse(null, { status: 404 });
+    }
+  }
+
+  // Admin API Auth Check
+  if (url.pathname.startsWith("/api/admin") && !url.pathname.startsWith("/api/admin/login")) {
+    const adminToken = req.cookies.get("admin_token");
+    if (!adminToken) {
+      return new NextResponse(JSON.stringify({ error: "Unauthorized" }), { 
+        status: 401, 
+        headers: { "Content-Type": "application/json" } 
+      });
     }
   }
 

@@ -25,7 +25,7 @@ export async function POST(req: Request) {
     if (phone) {
       await db.prepare(`
         INSERT INTO users (id, displayName, pictureUrl, phone, role, assignedStoreId) 
-        VALUES (?, ?, ?, ?, 'user', 'STORE-001')
+        VALUES (?, ?, ?, ?, 'user', NULL)
         ON CONFLICT(id) DO UPDATE SET 
           displayName = excluded.displayName,
           pictureUrl = excluded.pictureUrl,
@@ -34,7 +34,7 @@ export async function POST(req: Request) {
     } else {
       await db.prepare(`
         INSERT INTO users (id, displayName, pictureUrl, role, assignedStoreId) 
-        VALUES (?, ?, ?, 'user', 'STORE-001')
+        VALUES (?, ?, ?, 'user', NULL)
         ON CONFLICT(id) DO UPDATE SET 
           displayName = excluded.displayName,
           pictureUrl = excluded.pictureUrl
