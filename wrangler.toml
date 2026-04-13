@@ -2,7 +2,7 @@
 name = "rubjob"
 compatibility_date = "2026-04-07"
 compatibility_flags = [ "nodejs_compat" ]
-# Output directory is managed by Cloudflare Dashboard for stability
+pages_build_output_dir = ".vercel/output/static"
 
 [vars]
 NEXT_PUBLIC_LIFF_ID = "2009652089-lRGKgXfJ"
