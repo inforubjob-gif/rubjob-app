@@ -63,6 +63,8 @@ export const translations: any = {
       myAddress: "ที่อยู่ของฉัน",
       privacyPolicy: "นโยบายความเป็นส่วนตัว",
       logout: "ออกจากระบบ",
+      noAddress: "ยังไม่มีที่อยู่ที่บันทึกไว้",
+      addPhone: "เพิ่มเบอร์โทรศัพท์",
       otpTitle: "ยืนยันตัวตน",
       otpDesc: "เราได้ส่งรหัส 4 หลักไปที่เบอร์",
       invalidOtp: "รหัส OTP ไม่ถูกต้อง ลองใช้ 1234",

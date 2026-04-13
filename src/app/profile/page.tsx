@@ -33,25 +33,33 @@ export default function ProfilePage() {
 
   const [orders, setOrders] = useState<any[]>([]);
   const [addresses, setAddresses] = useState<any[]>([]);
+  const [phone, setPhone] = useState<string | null>(null);
   const [isDataLoading, setIsDataLoading] = useState(true);
 
   // Fetch real data
   useEffect(() => {
     if (!profile?.userId) return;
 
-    async function fetchData() {
-      try {
-        const [ordersRes, addrRes] = await Promise.all([
-          fetch(`/api/orders?userId=${profile?.userId}`),
-          fetch(`/api/user/addresses?userId=${profile?.userId}`)
-        ]);
+      async function fetchData() {
+        try {
+          const [ordersRes, addrRes, syncRes] = await Promise.all([
+            fetch(`/api/orders?userId=${profile?.userId}`),
+            fetch(`/api/user/addresses?userId=${profile?.userId}`),
+            fetch("/api/user/sync", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ id: profile?.userId, displayName: profile?.displayName, pictureUrl: profile?.pictureUrl })
+            })
+          ]);
 
-        const ordersData = (await ordersRes.json()) as any;
-        const addrData = (await addrRes.json()) as any;
+          const ordersData = (await ordersRes.json()) as any;
+          const addrData = (await addrRes.json()) as any;
+          const syncData = (await syncRes.json()) as any;
 
-        if (ordersData.orders) setOrders(ordersData.orders);
-        if (addrData.addresses) setAddresses(addrData.addresses);
-      } catch (err) {
+          if (ordersData.orders) setOrders(ordersData.orders);
+          if (addrData.addresses) setAddresses(addrData.addresses);
+          if (syncData.phone) setPhone(syncData.phone);
+        } catch (err) {
         console.error("Failed to fetch profile data:", err);
       } finally {
         setIsDataLoading(false);
@@ -106,8 +114,14 @@ export default function ProfilePage() {
               </h1>
               <Icons.Edit size={14} className="text-white/50 group-hover:text-white transition-colors" />
             </div>
-            {profile?.email && (
-              <p className="text-xs text-white/70 font-medium truncate mt-0.5">{profile.email}</p>
+            {phone ? (
+              <p className="text-xs text-white/90 font-bold tracking-wide mt-0.5 flex items-center gap-1.5">
+                <Icons.Phone size={10} strokeWidth={3} /> {phone}
+              </p>
+            ) : (
+              <button onClick={() => router.push("/profile/edit")} className="text-[10px] text-white/70 font-bold uppercase tracking-wider mt-1 border border-white/30 px-2 py-0.5 rounded-md hover:bg-white/10 transition-colors">
+                {t("profile.addPhone")}
+              </button>
             )}
             <div className="flex items-center gap-2 mt-1">
               <span className="px-2 py-0.5 bg-white/20 backdrop-blur-md rounded-full text-[10px] font-bold uppercase tracking-wider">
