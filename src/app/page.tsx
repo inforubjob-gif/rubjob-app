@@ -65,7 +65,7 @@ export default function HomePage() {
       {/* ─── Header ─── */}
       <header className="relative z-10 px-5 pt-12 pb-6">
         <div className="flex items-center justify-between mb-4">
-          <Icons.Logo size={60} variant="white" />
+          <Icons.Logo size={40} variant="icon" />
           
           <Link href="/profile" className="relative group">
             <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-white text-lg font-bold overflow-hidden ring-4 ring-white/30 shadow-xl group-active:scale-90 transition-all">

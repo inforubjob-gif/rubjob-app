@@ -10,6 +10,10 @@ export const metadata: Metadata = {
   description:
     "Professional laundry pickup & delivery. Book, track, and manage your laundry from LINE.",
   keywords: ["laundry", "pickup", "delivery", "LINE", "RUBJOB"],
+  icons: {
+    icon: "/images/rubjob-complete_logo-color.png",
+    apple: "/images/rubjob-complete_logo-color.png",
+  },
 };
 
 export const viewport: Viewport = {

@@ -18,6 +18,12 @@ export default function AppWrapper({ children }: { children: React.ReactNode }) 
       return;
     }
 
+    // Fast check: skip if we've already done this on this device
+    if (localStorage.getItem("rubjob_onboarding_done") === "true") {
+      setNeedsOnboarding(false);
+      return;
+    }
+
     async function checkOnboarding() {
       setCheckingOnboarding(true);
       try {
