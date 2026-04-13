@@ -26,7 +26,7 @@ export default function StoreDashboard() {
 
   useEffect(() => {
     async function fetchStoreData() {
-      const storeId = profile?.assignedStoreId;
+      const storeId = profile?.assignedStoreId || "STORE-001";
       try {
         const res = await fetch(`/api/store/orders?storeId=${storeId}`);
         const data = await res.json() as any;
