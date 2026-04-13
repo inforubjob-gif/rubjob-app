@@ -1,10 +1,11 @@
+import { getRequestContext } from "@cloudflare/next-on-pages";
 import { NextResponse } from "next/server";
 
 export const runtime = "edge";
 
 export async function GET(req: Request) {
   try {
-    const db = (req as any).context?.env?.DB;
+    const db = getRequestContext().env.DB;
     if (!db) return NextResponse.json({ error: "D1 not found" }, { status: 500 });
 
     const { results: riders } = await db.prepare(`
@@ -30,7 +31,7 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
   try {
     const { email, password, name, phone, vehicleType, address, idNumber, licensePlate, emergencyContact } = await req.json() as any;
-    const db = (req as any).context?.env?.DB;
+    const db = getRequestContext().env.DB;
     if (!db) return NextResponse.json({ error: "D1 not found" }, { status: 500 });
 
     if (!email || !password || !name) return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
@@ -56,7 +57,7 @@ export async function POST(req: Request) {
 export async function PUT(req: Request) {
   try {
     const { id, status, name, phone, vehicleType, address, idNumber, licensePlate, emergencyContact, documents } = await req.json() as any;
-    const db = (req as any).context?.env?.DB;
+    const db = getRequestContext().env.DB;
     if (!db) return NextResponse.json({ error: "D1 not found" }, { status: 500 });
 
     if (!id) return NextResponse.json({ error: "Missing ID" }, { status: 400 });
@@ -103,7 +104,7 @@ export async function PUT(req: Request) {
 export async function DELETE(req: Request) {
   try {
     const { id } = await req.json() as any;
-    const db = (req as any).context?.env?.DB;
+    const db = getRequestContext().env.DB;
     if (!db) return NextResponse.json({ error: "D1 not found" }, { status: 500 });
 
     if (!id) return NextResponse.json({ error: "Missing ID" }, { status: 400 });

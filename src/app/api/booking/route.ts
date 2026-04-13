@@ -1,3 +1,4 @@
+import { getRequestContext } from "@cloudflare/next-on-pages";
 import { NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 import { nanoid } from "nanoid";
@@ -18,7 +19,7 @@ export async function POST(req: Request) {
     } = body;
 
     // Access D1 from Cloudflare context
-    const env = (req as any).context?.env;
+    const env = getRequestContext().env;
     const db = env?.DB;
     if (!db) {
       return NextResponse.json({ error: "D1 Database binding 'DB' not found" }, { status: 500 });
