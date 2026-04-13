@@ -245,11 +245,21 @@ function BookingFlow() {
   async function handleConfirm() {
     setIsSubmitting(true);
     try {
-      // Use real LIFF userId with a fallback for dev mode
-      const userId = profile?.userId || "U1234567890";
+      if (!profile?.userId) {
+        alert("Please login first to confirm your booking.");
+        setIsSubmitting(false);
+        return;
+      }
+      if (!selectedStore?.id) {
+        alert("Please select a store to process your booking.");
+        setIsSubmitting(false);
+        return;
+      }
+      
+      const userId = profile.userId;
       const payload = {
         userId,
-        storeId: selectedStore?.id || "STORE-001",
+        storeId: selectedStore.id,
         serviceId: selectedService,
         items: [{ name: `Bag ${bagSize}`, qty: 1 }],
         address: selectedAddress,
@@ -410,32 +420,7 @@ function BookingFlow() {
                 ))}
               </div>
 
-              {/* Auto-assigned store display */}
-              {selectedStore && selectedAddress && (
-                <div className="mt-3 p-3 bg-amber-50/80 rounded-xl border border-amber-100 animate-fade-in">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm border border-amber-100 shrink-0">
-                      <img 
-                        src="/images/icon/icon-ร้านซักผ้า.png" 
-                        alt="Laundry Store" 
-                        className="w-6 h-6 object-contain" 
-                      />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-xs font-bold text-amber-800 flex items-center gap-1">
-                        🏪 ร้านซักรีดที่รับงาน
-                      </p>
-                      <p className="text-sm font-black text-foreground mt-0.5">{selectedStore.name}</p>
-                      <p className="text-[10px] text-amber-600 font-bold mt-0.5">
-                        📍 {distanceKm.toFixed(1)} กม. จากที่อยู่ของคุณ
-                      </p>
-                    </div>
-                    <div className="w-6 h-6 bg-emerald-500 rounded-full flex items-center justify-center text-white text-xs shrink-0 shadow-sm">
-                      ✓
-                    </div>
-                  </div>
-                </div>
-              )}
+              {/* Auto-assigned store is hidden from the user per requirements */}
             </section>
 
             {/* Pickup Info — always show date/time picker (no instant option) */}
