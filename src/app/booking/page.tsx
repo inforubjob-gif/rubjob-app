@@ -145,8 +145,10 @@ function BookingFlow() {
     if (saved) {
       try {
         const p = JSON.parse(saved);
-        if (p.step && p.step !== "store") setStep(p.step);
-        if (p.selectedService) setSelectedService(p.selectedService);
+        // If we have a URL param, prioritize it over drafted step/service
+        if (p.step && p.step !== "store" && !validInitService) setStep(p.step);
+        if (p.selectedService && !validInitService) setSelectedService(p.selectedService);
+        
         if (p.selectedAddress) setSelectedAddress(p.selectedAddress);
         if (p.deliverySpeed && p.deliverySpeed !== "flash") setDeliverySpeed(p.deliverySpeed);
         if (p.deliveryDate) setDeliveryDate(p.deliveryDate);
@@ -161,7 +163,7 @@ function BookingFlow() {
       }
     }
     setIsLoaded(true);
-  }, []);
+  }, [validInitService]);
 
   // Sync state to draft
   useEffect(() => {
