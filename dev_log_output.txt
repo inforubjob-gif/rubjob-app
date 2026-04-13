@@ -117,3 +117,5 @@ Using secrets defined in .env.local
  ✓ Compiled in 250ms (300 modules)
  ✓ Compiled in 149ms (300 modules)
  ✓ Compiled in 72ms (300 modules)
+ ✓ Compiled in 233ms (300 modules)
+ ✓ Compiled in 189ms (300 modules)
