@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState, useEffect } from "react";
 import { Icons } from "@/components/ui/Icons";
 import { useTranslation } from "@/components/providers/LanguageProvider";
 
@@ -14,10 +15,40 @@ interface Tab {
 export default function BottomNav() {
   const pathname = usePathname();
   const { t } = useTranslation();
-  const isStaffRoute = pathname.startsWith("/staff");
-  const isRiderRoute = pathname.startsWith("/rider");
+  
+  // State to handle subdomain detection on client side
+  const [subdomain, setSubdomain] = useState<string>("");
 
-  const TABS: Tab[] = [
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const hostname = window.location.hostname;
+      if (hostname.includes("lvh.me")) {
+        setSubdomain(hostname.split(".lvh.me")[0] || "");
+      } else if (hostname.includes("rubjob.com")) {
+        setSubdomain(hostname.split(".rubjob.com")[0] || "");
+      } else if (hostname.includes("rubjob-app.pages.dev")) {
+        setSubdomain(hostname.split(".rubjob-app.pages.dev")[0] || "");
+      }
+    }
+  }, []);
+
+  const isStoreContext = subdomain === "store" || pathname.startsWith("/store");
+  const isRiderContext = subdomain === "rider" || pathname.startsWith("/rider");
+  const isAdminContext = subdomain === "admin" || pathname.startsWith("/admin");
+
+  if (isAdminContext) return null;
+
+  // Helper to get clean link for subdomains
+  const getLink = (path: string, type: "store" | "rider" | "user") => {
+    if (subdomain === type) {
+      // If we are on the subdomain, remove the prefix
+      // e.g. /store/orders -> /orders
+      return path.replace(`/${type}`, "") || "/";
+    }
+    return path;
+  };
+
+  const USER_TABS: Tab[] = [
     {
       href: "/",
       label: t("home.navHome") || "Home",
@@ -72,59 +103,60 @@ export default function BottomNav() {
     },
   ];
 
-  const STAFF_TABS: Tab[] = [
+  const STORE_TABS: Tab[] = [
     {
-      href: "/staff",
-      label: t("staff.navDashboard") || "Dashboard",
+      href: getLink("/store", "store"),
+      label: t("store.navDashboard") || "Dashboard",
       icon: (active) => <Icons.Tasks size={24} strokeWidth={active ? 3 : 2} />,
     },
     {
-      href: "/staff/orders",
-      label: t("staff.navOrders") || "Orders",
+      href: getLink("/store/orders", "store"),
+      label: t("store.navOrders") || "Orders",
       icon: (active) => <Icons.FileText size={24} strokeWidth={active ? 3 : 2} />,
     },
     {
-      href: "/staff/wallet",
-      label: t("staff.navWallet") || "Wallet",
+      href: getLink("/store/wallet", "store"),
+      label: t("store.navWallet") || "Wallet",
       icon: (active) => <Icons.Wallet size={24} strokeWidth={active ? 3 : 2} />,
     },
     {
-      href: "/staff/profile",
-      label: t("staff.navProfile") || "Profile",
+      href: getLink("/store/profile", "store"),
+      label: t("store.navProfile") || "Profile",
       icon: (active) => <Icons.UserCog size={24} strokeWidth={active ? 3 : 2} />,
     },
   ];
 
   const RIDER_TABS: Tab[] = [
     {
-      href: "/rider",
+      href: getLink("/rider", "rider"),
       label: t("rider.navDashboard") || "Tasks",
       icon: (active) => <Icons.Tasks size={24} strokeWidth={active ? 3 : 2} />,
     },
     {
-      href: "/rider/orders",
+      href: getLink("/rider/orders", "rider"),
       label: t("rider.navOrders") || "Orders",
       icon: (active) => <Icons.FileText size={24} strokeWidth={active ? 3 : 2} />,
     },
     {
-      href: "/rider/wallet",
+      href: getLink("/rider/wallet", "rider"),
       label: t("rider.navWallet") || "Earnings",
       icon: (active) => <Icons.Wallet size={24} strokeWidth={active ? 3 : 2} />,
     },
     {
-      href: "/rider/profile",
+      href: getLink("/rider/profile", "rider"),
       label: t("rider.navProfile") || "Profile",
       icon: (active) => <Icons.UserCog size={24} strokeWidth={active ? 3 : 2} />,
     },
   ];
 
-  const tabs = isRiderRoute ? RIDER_TABS : (isStaffRoute ? STAFF_TABS : TABS);
+  const tabs = isRiderContext ? RIDER_TABS : (isStoreContext ? STORE_TABS : USER_TABS);
 
   return (
     <nav className={`fixed bottom-0 left-0 right-0 z-50 bg-primary border-primary-dark/20 border-t shadow-[0_-8px_30px_rgba(255,159,28,0.25)] pb-[env(safe-area-inset-bottom,0px)]`}>
       <div className={`flex items-center justify-around h-16 max-w-lg mx-auto px-2 text-white/70`}>
         {tabs.map((tab) => {
-          const isActive = (tab.href === "/" || tab.href === "/staff" || tab.href === "/rider") 
+          // Fix active state logic for subdomains
+          const isActive = (tab.href === "/" || tab.href === "/store" || tab.href === "/rider") 
             ? pathname === tab.href 
             : pathname.startsWith(tab.href);
           

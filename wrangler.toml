@@ -10,5 +10,5 @@ NEXT_PUBLIC_LIFF_ID = "2009652089-lRGKgXfJ"
 [[d1_databases]]
 binding = "DB" # The binding name available in your worker/app
 database_name = "rubjob-db"
-database_id = "617d4342-c1c3-4216-8e83-03cc1a6bd57d"
+database_id = "8e8b099a-249f-40fc-9d1b-72f765586cf6"
 migrations_dir = "db"

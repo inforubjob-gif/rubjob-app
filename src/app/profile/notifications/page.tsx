@@ -1,23 +1,69 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Card from "@/components/ui/Card";
 import { useTranslation } from "@/components/providers/LanguageProvider";
 import { Icons } from "@/components/ui/Icons";
+import { useLiff } from "@/components/providers/LiffProvider";
 
 export default function NotificationsPage() {
   const router = useRouter();
   const { t } = useTranslation();
+  const { profile } = useLiff();
   const [settings, setSettings] = useState({
     orderStatus: true,
     promotions: false,
     linePush: true,
     email: false,
   });
+  const [isLoading, setIsLoading] = useState(true);
 
-  const toggle = (key: keyof typeof settings) => {
-    setSettings(prev => ({ ...prev, [key]: !prev[key] }));
+  // Fetch settings from API
+  useEffect(() => {
+    if (!profile?.userId) return;
+    async function fetchSettings() {
+      try {
+        const res = await fetch(`/api/user/settings?userId=${profile?.userId}`);
+        const data = await res.json() as any;
+        if (data.settings?.notifications) {
+          setSettings(prev => ({ ...prev, ...data.settings.notifications }));
+        }
+      } catch (err) {
+        console.error("Failed to fetch settings:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    fetchSettings();
+  }, [profile?.userId]);
+
+  const toggle = async (key: keyof typeof settings) => {
+    const newValue = !settings[key];
+    const updatedSettings = { ...settings, [key]: newValue };
+    
+    // Optimistic Update
+    setSettings(updatedSettings);
+
+    if (!profile?.userId) return;
+
+    try {
+      await fetch("/api/user/settings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId: profile.userId,
+          settings: {
+            notifications: updatedSettings
+          }
+        }),
+      });
+    } catch (err) {
+      console.error("Failed to save settings:", err);
+      // Revert on failure
+      setSettings(prev => ({ ...prev, [key]: !newValue }));
+      alert("Failed to save settings");
+    }
   };
 
   return (

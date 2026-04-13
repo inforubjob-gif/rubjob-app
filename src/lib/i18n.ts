@@ -80,7 +80,7 @@ export const translations: any = {
       toGo: "อีก",
       selectLanguage: "เลือกภาษา",
       scanAtBranch: "สแกนที่สาขาใดก็ได้",
-      scanDesc: "แสดงรหัสนี้ให้พนักงานเพื่อสะสมคะแนนและแลกของรางวัล",
+      scanDesc: "ยื่นรหัสนี้ให้พนักงานที่ร้านเพื่อสะสมแต้มและรับรางวัล",
       memberId: "รหัสสมาชิก",
       addressDesc: "เพิ่มหรือแก้ไขที่อยู่ของคุณ",
       workStatus: "สถานะงาน",
@@ -321,7 +321,7 @@ export const translations: any = {
         flashExpires: "วันนี้เท่านั้น",
       },
     },
-    staff: {
+    store: {
       hero: "พนักงาน",
       tasksToday: "งานวันนี้",
       earnings: "รายได้",
@@ -428,6 +428,10 @@ export const translations: any = {
       myJobs: "งานจัดส่ง",
       newRequests: "งานใหม่ใกล้คุณ",
       nearby: "กม.",
+      noJobs: "ยังไม่มีงาน",
+      activeJobs: "งานที่กำลังทำ",
+      inProgressTab: "กำลังทำ",
+      completedTab: "สำเร็จแล้ว",
       acceptJob: "กดรับงาน",
       manageTask: "จัดการส่ง",
       pickup: "จุดรับผ้า",
@@ -559,7 +563,7 @@ export const translations: any = {
       toGo: "to go",
       selectLanguage: "Select Language",
       scanAtBranch: "Scan at any branch",
-      scanDesc: "Present this code to the staff to collect points and redeem rewards.",
+      scanDesc: "Present this code at the store to collect points and redeem rewards.",
       memberId: "Member ID",
       addressDesc: "Add or edit your addresses",
       workStatus: "Work Status",
@@ -801,7 +805,7 @@ export const translations: any = {
         flashExpires: "Today Only",
       },
     },
-    staff: {
+    store: {
       hero: "Staff Hero",
       tasksToday: "Tasks Today",
       earnings: "Earnings",
@@ -920,6 +924,10 @@ export const translations: any = {
       },
       completePickup: "Confirm Pickup Complete",
       completeDelivery: "Confirm Delivery Complete",
+      noJobs: "No jobs available",
+      activeJobs: "Active Jobs",
+      inProgressTab: "In Progress",
+      completedTab: "Completed",
     },
   },
   zh: {
@@ -1016,7 +1024,7 @@ export const translations: any = {
     },
     selectLanguage: "选择语言",
     scanAtBranch: "在任何分店扫描",
-    scanDesc: "向工作人员出示此代码以收集积分和兑换奖励。",
+    scanDesc: "将此代码展示给店内人员以收集积分并兑奖。",
     memberId: "会员ID",
     addressDesc: "添加或编辑您的地址",
     workStatus: "工作状态",
@@ -1231,7 +1239,7 @@ export const translations: any = {
         flashExpires: "仅限今天",
       },
     },
-    staff: {
+    store: {
       hero: "服务人员",
       tasksToday: "今日任务",
       earnings: "收入",
@@ -1338,6 +1346,10 @@ export const translations: any = {
       vehicleType: "车辆类型",
       completePickup: "确认取件完成",
       completeDelivery: "确认送件完成",
+      noJobs: "暂无工作",
+      activeJobs: "进行中任务",
+      inProgressTab: "进行中",
+      completedTab: "已完成",
     },
   },
 };

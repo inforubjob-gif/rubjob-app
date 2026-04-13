@@ -14,6 +14,7 @@ export default function ManageAddressesPage() {
   const { t } = useTranslation();
   const [addresses, setAddresses] = useState<Address[]>([]);
   const { profile } = useLiff();
+  const [isSaving, setIsSaving] = useState(false);
   
   // Fetch real addresses
   useEffect(() => {
@@ -38,29 +39,57 @@ export default function ManageAddressesPage() {
   const [newNote, setNewNote] = useState("");
   const [location, setLocation] = useState<{lat: number, lng: number} | null>(null);
 
-  const handleAddAddress = () => {
+  const handleAddAddress = async () => {
+    if (!profile?.userId) return;
     if (!newLabel || !newAddress) {
       alert(t("profile.addressRequired"));
       return;
     }
 
-    const newAddr: Address = {
-      id: `addr-${Date.now()}`,
-      label: newLabel,
-      details: newAddress,
-      note: newNote,
-      lat: location?.lat || 13.7563,
-      lng: location?.lng || 100.5018,
-    };
+    setIsSaving(true);
+    try {
+      const res = await fetch("/api/user/addresses", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId: profile.userId,
+          label: newLabel,
+          details: newAddress,
+          note: newNote,
+          lat: location?.lat || 13.7563,
+          lng: location?.lng || 100.5018,
+          isDefault: addresses.length === 0, // Default if first address
+        }),
+      });
 
-    setAddresses([newAddr, ...addresses]);
-    setIsAdding(false);
-    
-    // Reset Form
-    setNewLabel("");
-    setNewAddress("");
-    setNewNote("");
-    setLocation(null);
+      const data = await res.json() as any;
+      if (data.success) {
+        const newAddr: Address = {
+          id: data.id,
+          label: newLabel,
+          details: newAddress,
+          note: newNote,
+          lat: location?.lat || 13.7563,
+          lng: location?.lng || 100.5018,
+        };
+
+        setAddresses([newAddr, ...addresses]);
+        setIsAdding(false);
+        
+        // Reset Form
+        setNewLabel("");
+        setNewAddress("");
+        setNewNote("");
+        setLocation(null);
+      } else {
+        alert(data.error || "Failed to save address");
+      }
+    } catch (err) {
+      console.error("Save address error:", err);
+      alert("Failed to connect to server");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const confirmLocation = () => {
@@ -198,9 +227,10 @@ export default function ManageAddressesPage() {
                    </button>
                    <button 
                      onClick={handleAddAddress}
-                     className="flex-1 py-3.5 bg-primary text-slate-900 rounded-xl text-sm font-bold shadow-lg shadow-primary/20 active:scale-95 transition-transform"
+                     disabled={isSaving}
+                     className={`flex-1 py-3.5 bg-primary text-slate-900 rounded-xl text-sm font-bold shadow-lg shadow-primary/20 active:scale-95 transition-transform ${isSaving ? 'opacity-50' : ''}`}
                    >
-                     {t("profile.saveAddress")}
+                     {isSaving ? t("common.confirm") + "..." : t("profile.saveAddress")}
                    </button>
                 </div>
              </div>

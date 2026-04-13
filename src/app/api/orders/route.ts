@@ -42,3 +42,62 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
+
+/**
+ * POST /api/orders
+ * Creates a new order
+ */
+export async function POST(req: Request) {
+  try {
+    const body = await req.json() as any;
+    const { 
+      userId, 
+      storeId, 
+      serviceId, 
+      items, 
+      address, 
+      totalPrice, 
+      deliveryFee, 
+      laundryFee,
+      paymentMethod,
+      scheduledDate
+    } = body;
+
+    if (!userId || !serviceId || !totalPrice) {
+      return NextResponse.json({ error: "Missing required order fields" }, { status: 400 });
+    }
+
+    const db = (req as any).context?.env?.DB;
+    if (!db) {
+      return NextResponse.json({ error: "D1 Database binding 'DB' not found" }, { status: 500 });
+    }
+
+    const orderId = `RJ-${Math.random().toString(36).substring(2, 10).toUpperCase()}`;
+
+    await db.prepare(`
+      INSERT INTO orders (
+        id, userId, storeId, serviceId, status, 
+        laundryFee, deliveryFee, totalPrice, 
+        paymentMethod, paymentStatus, items, address, 
+        scheduledDate, createdAt, updatedAt
+      ) VALUES (?, ?, ?, ?, 'pending', ?, ?, ?, ?, 'pending', ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+    `).bind(
+      orderId, 
+      userId, 
+      storeId || 'STORE-001', 
+      serviceId, 
+      laundryFee || 0, 
+      deliveryFee || 0, 
+      totalPrice, 
+      paymentMethod || 'cash', 
+      JSON.stringify(items || []), 
+      JSON.stringify(address || {}), 
+      scheduledDate || null
+    ).run();
+
+    return NextResponse.json({ success: true, orderId });
+  } catch (error: any) {
+    console.error("Create order error:", error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+}

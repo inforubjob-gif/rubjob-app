@@ -41,13 +41,13 @@ export default function RiderOrdersPage() {
                 onClick={() => setFilter("active")}
                 className={`flex-1 py-3.5 text-[11px] font-black uppercase tracking-widest rounded-[1.4rem] transition-all duration-500 ${filter === "active" ? "bg-white text-primary shadow-lg shadow-primary/20 scale-[1.02]" : "text-white/60"}`}
            >
-                 {t("staff.inProgressTab")}
+                 {t("rider.inProgressTab")}
            </button>
            <button 
                 onClick={() => setFilter("completed")}
                 className={`flex-1 py-3.5 text-[11px] font-black uppercase tracking-widest rounded-[1.4rem] transition-all duration-500 ${filter === "completed" ? "bg-white text-primary shadow-lg shadow-primary/20 scale-[1.02]" : "text-white/70"}`}
            >
-                 {t("staff.completedTab")}
+                 {t("rider.completedTab")}
            </button>
         </div>
       </header>
@@ -85,7 +85,7 @@ export default function RiderOrdersPage() {
         {orders.length === 0 && (
             <div className="flex flex-col items-center justify-center py-20 text-slate-300">
                 <Icons.Tasks size={48} className="opacity-20 mb-4" />
-                <p className="font-bold text-slate-400">{t("staff.noJobs")}</p>
+                <p className="font-bold text-slate-400">{t("rider.noJobs")}</p>
             </div>
         )}
       </div>

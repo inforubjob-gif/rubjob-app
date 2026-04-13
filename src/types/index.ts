@@ -6,7 +6,8 @@ export interface User {
   pictureUrl?: string;
   email?: string;
   statusMessage?: string;
-  role?: "user" | "store_admin" | "driver";
+  phone?: string;
+  role?: "user" | "store_admin" | "system_admin" | "driver";
   assignedStoreId?: string;
 }
 

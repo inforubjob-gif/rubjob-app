@@ -75,16 +75,11 @@ export const SERVICES: Service[] = [
   },
 ];
 
-// ─── Standard Time Slots ───
+// ─── Standard Time Slots (7:00–17:00) ───
 export const TIME_SLOTS: TimeSlot[] = [
-  { id: "morning", label: "เช้า", startTime: "08:00", endTime: "10:00" },
-  { id: "midday", label: "สาย", startTime: "10:00", endTime: "12:00" },
-  { id: "afternoon", label: "บ่าย", startTime: "13:00", endTime: "15:00" },
-  { id: "evening", label: "เย็น", startTime: "17:00", endTime: "19:00" },
-  { id: "night", label: "ค่ำ", startTime: "19:00", endTime: "21:00" },
-  { id: "late_night", label: "ดึก", startTime: "21:00", endTime: "23:00" },
-  { id: "midnight", label: "เที่ยงคืน", startTime: "23:00", endTime: "01:00" },
-  { id: "am1", label: "ตีหนึ่ง", startTime: "01:00", endTime: "03:00" },
-  { id: "am3", label: "ตีสาม", startTime: "03:00", endTime: "05:00" },
-  { id: "am5", label: "เช้ามืด", startTime: "05:00", endTime: "07:00" },
+  { id: "early_morning", label: "เช้าตรู่", startTime: "07:00", endTime: "09:00" },
+  { id: "morning",       label: "เช้า",     startTime: "09:00", endTime: "11:00" },
+  { id: "midday",        label: "สาย",      startTime: "11:00", endTime: "13:00" },
+  { id: "afternoon",     label: "บ่าย",     startTime: "13:00", endTime: "15:00" },
+  { id: "late_afternoon", label: "บ่ายแก่", startTime: "15:00", endTime: "17:00" },
 ];

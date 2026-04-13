@@ -15,23 +15,32 @@ import Modal from "@/components/ui/Modal";
 
 export default function RiderDashboard() {
   const { t } = useTranslation();
-  const { profile } = useLiff();
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<"available" | "active">("available");
   const [isLoading, setIsLoading] = useState(true);
   const [workStatus, setWorkStatus] = useState(true);
   const [selectedJob, setSelectedJob] = useState<any | null>(null);
+  const [rider, setRider] = useState<any>(null);
   
   // Lifted state
   const [availableJobs, setAvailableJobs] = useState<any[]>([]);
   const [activeJobs, setActiveJobs] = useState<any[]>([]);
 
   useEffect(() => {
+    const session = localStorage.getItem("rubjob_rider_session");
+    if (session) {
+      setRider(JSON.parse(session));
+    } else {
+      router.push("/rider/login"); // Fallback if gate fails
+    }
+  }, [router]);
+
+  useEffect(() => {
+    if (!rider?.id) return;
+    
     async function fetchRiderData() {
-      if (!profile?.userId) return;
-      const riderId = profile.userId;
       try {
-        const res = await fetch(`/api/rider/orders?riderId=${riderId}`);
+        const res = await fetch(`/api/rider/orders?riderId=${rider.id}`);
         const data = await res.json() as any;
         if (data.available) setAvailableJobs(data.available);
         if (data.active) setActiveJobs(data.active);
@@ -42,18 +51,17 @@ export default function RiderDashboard() {
       }
     }
 
-    if (profile) {
-      fetchRiderData();
-    } else {
-      const timer = setTimeout(() => setIsLoading(false), 800);
-      return () => clearTimeout(timer);
-    }
-  }, [profile]);
+    fetchRiderData();
+  }, [rider]);
 
   const handleAcceptJob = (jobId: string) => {
-    // Navigate to the order detail page with map and details
     setSelectedJob(null);
     router.push(`/rider/orders/${jobId}`);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("rubjob_rider_session");
+    window.location.reload();
   };
 
   return (
@@ -70,12 +78,20 @@ export default function RiderDashboard() {
             </div>
             <div className="min-w-0">
               <p className="text-[10px] text-white/60 font-black uppercase tracking-[0.2em] leading-none mb-1 truncate">{t("rider.hero")}</p>
-              <h1 className="text-xl font-black tracking-tight truncate drop-shadow-sm">{profile?.displayName || t("common.guest")}</h1>
+              <h1 className="text-xl font-black tracking-tight truncate drop-shadow-sm">{rider?.name || t("common.guest")}</h1>
             </div>
           </div>
-          <button className="w-10 h-10 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/20 shadow-md shadow-primary-dark/10 active:scale-90 transition-transform">
-            <Icons.Bell size={20} className="text-white" />
-          </button>
+          <div className="flex items-center gap-2">
+            <button className="w-10 h-10 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/20 shadow-md shadow-primary-dark/10 active:scale-90 transition-transform">
+              <Icons.Bell size={20} className="text-white" />
+            </button>
+            <button 
+              onClick={handleLogout}
+              className="w-10 h-10 rounded-2xl bg-rose-500/20 backdrop-blur-md flex items-center justify-center border border-rose-500/30 text-rose-100 shadow-md active:scale-90 transition-transform"
+            >
+              <Icons.Lock size={18} />
+            </button>
+          </div>
         </div>
 
         {/* Work Status Toggle (Dashboard Version) */}
@@ -264,13 +280,13 @@ function AvailableDeliveries({ t, router, jobs, onAccept, onViewDetails }: { t: 
     <div className="space-y-4">
       <div className="flex items-center justify-between px-1">
         <h2 className="text-sm font-black text-slate-400 uppercase tracking-widest">{t("rider.newRequests")}</h2>
-        <span className="text-[10px] font-bold bg-green-100 text-green-700 px-2 py-0.5 rounded-full">{jobs.length} {t("staff.nearby")}</span>
+        <span className="text-[10px] font-bold bg-green-100 text-green-700 px-2 py-0.5 rounded-full">{jobs.length} {t("rider.nearby")}</span>
       </div>
 
       {jobs.length === 0 ? (
         <div className="text-center py-12 bg-white rounded-[2rem] border border-slate-100">
            <div className="text-4xl mb-3">✨</div>
-           <p className="text-xs font-black text-slate-400 uppercase tracking-widest">{t("staff.noJobs") || "No new jobs nearby"}</p>
+           <p className="text-xs font-black text-slate-400 uppercase tracking-widest">{t("rider.noJobs") || "No new jobs nearby"}</p>
         </div>
       ) : (
         jobs.map((job) => (
@@ -316,13 +332,13 @@ function ActiveDeliveries({ t, router, activeJobs }: { t: any, router: any, acti
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between px-1">
-        <h2 className="text-sm font-black text-slate-400 uppercase tracking-widest">{t("staff.activeJobs")}</h2>
+        <h2 className="text-sm font-black text-slate-400 uppercase tracking-widest">{t("rider.activeJobs")}</h2>
       </div>
 
       {activeJobs.length === 0 ? (
         <div className="text-center py-12 bg-white rounded-[2rem] border border-slate-100">
            <div className="text-4xl mb-3">🚛</div>
-           <p className="text-xs font-black text-slate-400 uppercase tracking-widest">{t("staff.noJobs") || "No active jobs"}</p>
+           <p className="text-xs font-black text-slate-400 uppercase tracking-widest">{t("rider.noJobs") || "No active jobs"}</p>
         </div>
       ) : (
         activeJobs.map((job) => (

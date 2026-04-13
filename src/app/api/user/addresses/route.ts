@@ -23,7 +23,7 @@ export async function GET(req: Request) {
     const { results } = await db.prepare(`
       SELECT * FROM addresses 
       WHERE userId = ? 
-      ORDER BY isDefault DESC, createdAt DESC
+      ORDER BY isDefault DESC, id DESC
     `).bind(userId).all();
 
     return NextResponse.json({ addresses: results });
@@ -40,7 +40,7 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
   try {
     const body = (await req.json()) as any;
-    const { userId, label, details, lat, lng, isDefault } = body;
+    const { userId, label, details, note, lat, lng, isDefault } = body;
     
     if (!userId || !label || !details) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
@@ -59,9 +59,9 @@ export async function POST(req: Request) {
     }
 
     await db.prepare(`
-      INSERT INTO addresses (id, userId, label, details, lat, lng, isDefault)
-      VALUES (?, ?, ?, ?, ?, ?, ?)
-    `).bind(id, userId, label, details, lat, lng, isDefault ? 1 : 0).run();
+      INSERT INTO addresses (id, userId, label, details, note, lat, lng, isDefault)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    `).bind(id, userId, label, details, note, lat, lng, isDefault ? 1 : 0).run();
 
     return NextResponse.json({ success: true, id });
   } catch (error: any) {

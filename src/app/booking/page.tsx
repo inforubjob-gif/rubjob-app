@@ -31,7 +31,7 @@ const ITEM_KEY_MAP: Record<string, string> = {
   "Skirt": "items.skirt",
 };
 
-type BookingStep = "store" | "service" | "details" | "payment";
+type BookingStep = "service" | "details" | "payment";
 
 function BookingFlow() {
   const router = useRouter();
@@ -41,11 +41,11 @@ function BookingFlow() {
 
   const { profile } = useLiff();
   const { t, language } = useTranslation();
-  const [step, setStep] = useState<BookingStep>(validInitService ? "store" : "service");
+  const [step, setStep] = useState<BookingStep>(validInitService ? "details" : "service");
   const [selectedStore, setSelectedStore] = useState<Store | null>(null);
   const [selectedService, setSelectedService] = useState<ServiceType | null>(validInitService);
   const [selectedAddress, setSelectedAddress] = useState<Address | null>(null);
-  type DeliverySpeed = "standard" | "express" | "flash";
+  type DeliverySpeed = "standard" | "express";
   const [deliverySpeed, setDeliverySpeed] = useState<DeliverySpeed>("standard");
   const [deliveryDate, setDeliveryDate] = useState("");
   const [deliverySlot, setDeliverySlot] = useState("");
@@ -55,8 +55,7 @@ function BookingFlow() {
   const [bagSize, setBagSize] = useState<"9kg" | "14kg" | "18kg" | "28kg">("9kg");
   const [withFolding, setWithFolding] = useState<boolean>(true);
 
-  type PickupSpeed = "instant" | "scheduled";
-  const [pickupSpeed, setPickupSpeed] = useState<PickupSpeed>("instant");
+  // Pickup: always scheduled (no more instant option)
   const [pickupDate, setPickupDate] = useState("");
   const [pickupSlot, setPickupSlot] = useState("");
 
@@ -65,6 +64,35 @@ function BookingFlow() {
   const [dbServices, setDbServices] = useState<any[]>([]);
   const [dbStores, setDbStores] = useState<any[]>([]);
   const [dbAddresses, setDbAddresses] = useState<any[]>([]);
+
+  // Auto-assign store based on selected address
+  function autoAssignStore(address: Address, stores: any[]): Store | null {
+    if (!address?.lat || !address?.lng || stores.length === 0) return null;
+
+    let bestStore: Store | null = null;
+    let bestDist = Infinity;
+
+    for (const store of stores) {
+      const dist = getDistanceKm(address.lat, address.lng, store.lat, store.lng);
+      if (dist <= store.serviceRadiusKm && dist < bestDist) {
+        bestDist = dist;
+        bestStore = store;
+      }
+    }
+
+    // If no store is within radius, pick the closest one anyway
+    if (!bestStore && stores.length > 0) {
+      for (const store of stores) {
+        const dist = getDistanceKm(address.lat!, address.lng!, store.lat, store.lng);
+        if (dist < bestDist) {
+          bestDist = dist;
+          bestStore = store;
+        }
+      }
+    }
+
+    return bestStore;
+  }
 
   // Fetch real data from APIs
   useEffect(() => {
@@ -87,7 +115,13 @@ function BookingFlow() {
         if (adData.addresses) {
           setDbAddresses(adData.addresses);
           if (adData.addresses.length > 0 && !selectedAddress) {
-            setSelectedAddress(adData.addresses[0]);
+            const firstAddr = adData.addresses[0];
+            setSelectedAddress(firstAddr);
+            // Auto-assign store for default address
+            if (stData.stores) {
+              const store = autoAssignStore(firstAddr, stData.stores);
+              if (store) setSelectedStore(store);
+            }
           }
         }
       } catch (err) {
@@ -97,23 +131,29 @@ function BookingFlow() {
     fetchData();
   }, [profile?.userId]);
 
+  // Re-assign store when address changes
+  useEffect(() => {
+    if (selectedAddress && dbStores.length > 0) {
+      const store = autoAssignStore(selectedAddress, dbStores);
+      if (store) setSelectedStore(store);
+    }
+  }, [selectedAddress, dbStores]);
+
   // Load drafted state
   useEffect(() => {
     const saved = sessionStorage.getItem("rubjob_booking_draft");
     if (saved) {
       try {
         const p = JSON.parse(saved);
-        if (p.step) setStep(p.step);
-        if (p.selectedStore) setSelectedStore(p.selectedStore);
+        if (p.step && p.step !== "store") setStep(p.step);
         if (p.selectedService) setSelectedService(p.selectedService);
         if (p.selectedAddress) setSelectedAddress(p.selectedAddress);
-        if (p.deliverySpeed) setDeliverySpeed(p.deliverySpeed);
+        if (p.deliverySpeed && p.deliverySpeed !== "flash") setDeliverySpeed(p.deliverySpeed);
         if (p.deliveryDate) setDeliveryDate(p.deliveryDate);
         if (p.deliverySlot) setDeliverySlot(p.deliverySlot);
         if (p.selectedPayment) setSelectedPayment(p.selectedPayment);
         if (p.bagSize) setBagSize(p.bagSize);
         if (p.withFolding !== undefined) setWithFolding(p.withFolding);
-        if (p.pickupSpeed) setPickupSpeed(p.pickupSpeed);
         if (p.pickupDate) setPickupDate(p.pickupDate);
         if (p.pickupSlot) setPickupSlot(p.pickupSlot);
       } catch (e) {
@@ -127,12 +167,12 @@ function BookingFlow() {
   useEffect(() => {
     if (!isLoaded) return;
     sessionStorage.setItem("rubjob_booking_draft", JSON.stringify({
-      step, selectedStore, selectedService, selectedAddress, deliverySpeed, 
+      step, selectedService, selectedAddress, deliverySpeed, 
       deliveryDate, deliverySlot, selectedPayment, bagSize, withFolding, 
-      pickupSpeed, pickupDate, pickupSlot,
+      pickupDate, pickupSlot,
       userId: profile?.userId
     }));
-  }, [isLoaded, step, selectedStore, selectedService, selectedAddress, deliverySpeed, deliveryDate, deliverySlot, selectedPayment, bagSize, withFolding, pickupSpeed, pickupDate, pickupSlot]);
+  }, [isLoaded, step, selectedService, selectedAddress, deliverySpeed, deliveryDate, deliverySlot, selectedPayment, bagSize, withFolding, pickupDate, pickupSlot]);
 
   // Discounts
   const [couponCode, setCouponCode] = useState("");
@@ -160,23 +200,23 @@ function BookingFlow() {
     });
   }, [locale]);
 
-  // Set default pickup date/slot if scheduled
+  // Set default pickup date/slot
   useEffect(() => {
-    if (pickupSpeed === "scheduled" && !pickupDate) {
+    if (!pickupDate && dates.length > 0) {
       setPickupDate(dates[0].value);
     }
-    if (pickupSpeed === "scheduled" && !pickupSlot) {
+    if (!pickupSlot && TIME_SLOTS.length > 0) {
       setPickupSlot(TIME_SLOTS[0].id);
     }
-  }, [pickupSpeed, dates, pickupDate, pickupSlot]);
+  }, [dates, pickupDate, pickupSlot]);
 
   // Calculate distance based on actual coordinates or fallback
   const distanceKm = selectedStore && selectedAddress?.lat && selectedAddress?.lng 
     ? getDistanceKm(selectedAddress.lat, selectedAddress.lng, selectedStore.lat, selectedStore.lng)
     : 5.1; 
     
-  // New Pricing Logic
-  const baseDeliveryFee = deliverySpeed === "flash" ? 79 : deliverySpeed === "express" ? 59 : 39;
+  // Pricing Logic
+  const baseDeliveryFee = deliverySpeed === "express" ? 59 : 39;
   
   let distanceExtra = 0;
   if (distanceKm > 10) {
@@ -218,8 +258,8 @@ function BookingFlow() {
         deliveryFee,
         distanceKm,
         totalPrice,
-        pickupDateTime: pickupSpeed === "instant" ? "Immediate" : `${pickupDate} ${pickupSlot}`,
-        scheduledDate: deliverySpeed === "flash" ? "Flash (2 hrs)" : deliverySpeed === "express" ? "Express (6 hrs)" : "Standard (24 hrs)"
+        pickupDateTime: `${pickupDate} ${pickupSlot}`,
+        scheduledDate: deliverySpeed === "express" ? "ด่วนพิเศษ (6 ชม.)" : "มาตรฐาน (24 ชม.)"
       };
 
       const res = await fetch("/api/booking", {
@@ -246,10 +286,8 @@ function BookingFlow() {
           <button
             onClick={() => {
               if (step === "service") router.back();
-              else if (step === "store") setStep("service");
-              else if (step === "details") setStep("store");
+              else if (step === "details") setStep("service");
               else if (step === "payment") setStep("details");
-              else setStep("payment");
             }}
             className="w-9 h-9 rounded-xl bg-surface-alt flex items-center justify-center text-foreground active:scale-95 transition-transform"
           >
@@ -257,19 +295,18 @@ function BookingFlow() {
           </button>
           <h1 className="text-lg font-bold text-foreground">
             {step === "service" ? t("booking.serviceTitle") : 
-             step === "store" ? t("booking.selectStore") || "Select Store" : 
             step === "details" ? t("booking.pickupTitle") : 
              t("orders.payment.title")}
           </h1>
         </div>
 
-        {/* Progress bar */}
+        {/* Progress bar — 3 steps now */}
         <div className="flex gap-2 mt-4">
-          {(["service", "store", "details", "payment"] as BookingStep[]).map((s, i) => (
+          {(["service", "details", "payment"] as BookingStep[]).map((s, i) => (
             <div
               key={s}
               className={`h-1 flex-1 rounded-full transition-colors duration-300 ${
-                i <= ["service", "store", "details", "payment"].indexOf(step) ? "bg-primary" : "bg-gray-100"
+                i <= ["service", "details", "payment"].indexOf(step) ? "bg-primary" : "bg-gray-100"
               }`}
             />
           ))}
@@ -277,53 +314,6 @@ function BookingFlow() {
       </header>
 
       <div className="flex-1 px-5 py-5 pb-56 space-y-4 animate-fade-in relative">
-        {/* ─── Step: Store ─── */}
-        {step === "store" && (
-          <div className="space-y-3 stagger">
-            {dbStores.map((st) => {
-              const dist = selectedAddress?.lat && selectedAddress?.lng 
-                ? getDistanceKm(selectedAddress.lat, selectedAddress.lng, st.lat, st.lng) 
-                : 0;
-              const isOutOfRange = dist > st.serviceRadiusKm;
-              
-              return (
-                <Card
-                  key={st.id}
-                  hoverable={!isOutOfRange}
-                  onClick={() => { if (!isOutOfRange) setSelectedStore(st); }}
-                  className={`p-4 transition-all duration-300 ${
-                    selectedStore?.id === st.id ? "bg-primary/5 shadow-lg shadow-primary/10 border-primary border-2 scale-[1.02]" : isOutOfRange ? "opacity-40 grayscale" : "border-transparent border-2"
-                  }`}
-                >
-                  <div className="flex items-start gap-4">
-                    <div className="w-14 h-14 bg-amber-50 rounded-2xl flex items-center justify-center p-2 shrink-0 shadow-sm border border-amber-100 transition-transform active:scale-95">
-                      <img 
-                        src="/images/icon/icon-ร้านซักผ้า.png" 
-                        alt="Laundry Store" 
-                        className="w-full h-full object-contain" 
-                      />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <h3 className="text-sm font-bold text-foreground">{st.name}</h3>
-                      <p className="text-xs text-muted mt-0.5">{st.address}</p>
-                      <div className="flex items-center gap-2 mt-2">
-                        <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-500">
-                          {dist.toFixed(1)} km
-                        </span>
-                        {isOutOfRange && <span className="text-[10px] text-red-500 font-bold">Out of Range</span>}
-                      </div>
-                    </div>
-                    {selectedStore?.id === st.id && (
-                      <div className="w-6 h-6 bg-primary rounded-full flex items-center justify-center text-white text-xs mt-3 shrink-0 shadow-md">
-                        ✓
-                      </div>
-                    )}
-                  </div>
-                </Card>
-              );
-            })}
-          </div>
-        )}
 
         {/* ─── Step: Service ─── */}
         {step === "service" && (
@@ -419,77 +409,71 @@ function BookingFlow() {
                   </Card>
                 ))}
               </div>
-            </section>
 
-            {/* Pickup Info */}
-            <section>
-              <h3 className="text-sm font-bold text-foreground mb-2 flex items-center gap-2">
-                <Icons.Bell size={18} className="text-primary" /> เลือกวันเวลาที่สะดวกให้เข้ารับผ้า
-              </h3>
-              <div className="space-y-2">
-                <label className={`flex items-center justify-between p-3.5 rounded-xl border-2 cursor-pointer transition-all ${pickupSpeed === "instant" ? "border-primary bg-primary/5 shadow-md shadow-primary/5" : "border-slate-100 bg-white hover:bg-slate-50"}`} onClick={() => setPickupSpeed("instant")}>
+              {/* Auto-assigned store display */}
+              {selectedStore && selectedAddress && (
+                <div className="mt-3 p-3 bg-amber-50/80 rounded-xl border border-amber-100 animate-fade-in">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center text-primary-dark shadow-sm shrink-0 border border-primary/10">
-                      <Icons.Truck size={20} />
+                    <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm border border-amber-100 shrink-0">
+                      <img 
+                        src="/images/icon/icon-ร้านซักผ้า.png" 
+                        alt="Laundry Store" 
+                        className="w-6 h-6 object-contain" 
+                      />
                     </div>
-                    <div>
-                      <h4 className="text-sm font-bold text-foreground">เข้ารับทันที (ตลอด 24 ชม.)</h4>
-                      <p className="text-[11px] text-muted mt-0.5 opacity-80">We'll assign a driver immediately upon booking.</p>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-bold text-amber-800 flex items-center gap-1">
+                        🏪 ร้านซักรีดที่รับงาน
+                      </p>
+                      <p className="text-sm font-black text-foreground mt-0.5">{selectedStore.name}</p>
+                      <p className="text-[10px] text-amber-600 font-bold mt-0.5">
+                        📍 {distanceKm.toFixed(1)} กม. จากที่อยู่ของคุณ
+                      </p>
                     </div>
-                  </div>
-                  <div className={`w-5 h-5 rounded-full flex items-center justify-center transition-colors ${pickupSpeed === "instant" ? "bg-primary text-white" : "border-2 border-slate-200"}`}>
-                    {pickupSpeed === "instant" && <span className="text-xs font-bold leading-none translate-y-[0.5px]">✓</span>}
-                  </div>
-                </label>
-
-                <label className={`flex items-center justify-between p-3.5 rounded-xl border-2 cursor-pointer transition-all ${pickupSpeed === "scheduled" ? "border-primary bg-primary/5 shadow-md shadow-primary/5" : "border-slate-100 bg-white hover:bg-slate-50"}`} onClick={() => setPickupSpeed("scheduled")}>
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center text-primary-dark shadow-sm shrink-0 border border-primary/10">
-                      <Icons.Clock size={20} />
+                    <div className="w-6 h-6 bg-emerald-500 rounded-full flex items-center justify-center text-white text-xs shrink-0 shadow-sm">
+                      ✓
                     </div>
-                    <div>
-                      <h4 className="text-sm font-bold text-foreground">กำหนดวันและเวลาเอง</h4>
-                      <p className="text-[11px] text-muted mt-0.5 opacity-80">ระบุวันที่และเวลาที่ต้องการให้ไรเดอร์เข้ารับผ้า</p>
-                    </div>
-                  </div>
-                  <div className={`w-5 h-5 rounded-full flex items-center justify-center transition-colors ${pickupSpeed === "scheduled" ? "bg-primary text-white" : "border-2 border-slate-200"}`}>
-                    {pickupSpeed === "scheduled" && <span className="text-xs font-bold leading-none translate-y-[0.5px]">✓</span>}
-                  </div>
-                </label>
-              </div>
-
-              {pickupSpeed === "scheduled" && (
-                <div className="mt-3 p-3 bg-slate-50/80 rounded-xl space-y-4 animate-fade-in border border-slate-100 mx-2">
-                  <div className="flex gap-2 overflow-x-auto hide-scrollbar pb-1">
-                    {dates.map((d: { value: string; day: string; date: number; month: string }) => (
-                      <button
-                        key={d.value}
-                        onClick={() => setPickupDate(d.value)}
-                        className={`flex flex-col items-center min-w-[60px] py-2 px-2 rounded-xl transition-all duration-300 ${pickupDate === d.value ? "bg-primary text-white shadow-md shadow-primary/20 scale-105" : "bg-white text-foreground hover:bg-slate-100 border border-border"}`}
-                      >
-                        <span className="text-[10px] font-medium opacity-80">{d.day}</span>
-                        <span className="text-sm font-bold">{d.date}</span>
-                        <span className="text-[10px] opacity-80">{d.month}</span>
-                      </button>
-                    ))}
-                  </div>
-                  <div className="grid grid-cols-2 gap-2">
-                    {TIME_SLOTS.map((slot) => (
-                      <button
-                        key={slot.id}
-                        onClick={() => setPickupSlot(slot.id)}
-                        className={`py-2 px-2 rounded-xl text-center transition-all duration-300 ${pickupSlot === slot.id ? "bg-primary text-white shadow-md shadow-primary/20 scale-[1.02]" : "bg-white text-foreground hover:bg-slate-100 border border-border"}`}
-                      >
-                        <p className="text-xs font-semibold">{t(`timeSlots.${slot.id}`) || slot.label}</p>
-                        <p className="text-[10px] opacity-80">{slot.startTime}–{slot.endTime}</p>
-                      </button>
-                    ))}
                   </div>
                 </div>
               )}
             </section>
 
-            {/* Delivery Options */}
+            {/* Pickup Info — always show date/time picker (no instant option) */}
+            <section>
+              <h3 className="text-sm font-bold text-foreground mb-2 flex items-center gap-2">
+                <Icons.Bell size={18} className="text-primary" /> เลือกวันและเวลาเข้ารับผ้า (7:00–17:00)
+              </h3>
+              
+              <div className="p-3 bg-slate-50/80 rounded-xl space-y-4 animate-fade-in border border-slate-100">
+                <div className="flex gap-2 overflow-x-auto hide-scrollbar pb-1">
+                  {dates.map((d: { value: string; day: string; date: number; month: string }) => (
+                    <button
+                      key={d.value}
+                      onClick={() => setPickupDate(d.value)}
+                      className={`flex flex-col items-center min-w-[60px] py-2 px-2 rounded-xl transition-all duration-300 ${pickupDate === d.value ? "bg-primary text-white shadow-md shadow-primary/20 scale-105" : "bg-white text-foreground hover:bg-slate-100 border border-border"}`}
+                    >
+                      <span className="text-[10px] font-medium opacity-80">{d.day}</span>
+                      <span className="text-sm font-bold">{d.date}</span>
+                      <span className="text-[10px] opacity-80">{d.month}</span>
+                    </button>
+                  ))}
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  {TIME_SLOTS.map((slot) => (
+                    <button
+                      key={slot.id}
+                      onClick={() => setPickupSlot(slot.id)}
+                      className={`py-2 px-2 rounded-xl text-center transition-all duration-300 ${pickupSlot === slot.id ? "bg-primary text-white shadow-md shadow-primary/20 scale-[1.02]" : "bg-white text-foreground hover:bg-slate-100 border border-border"}`}
+                    >
+                      <p className="text-xs font-semibold">{t(`timeSlots.${slot.id}`) || slot.label}</p>
+                      <p className="text-[10px] opacity-80">{slot.startTime}–{slot.endTime}</p>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </section>
+
+            {/* Delivery Options — 2 choices: มาตรฐาน + ด่วนพิเศษ */}
             <section>
               <h3 className="text-sm font-bold text-foreground mb-2 flex items-center gap-2">
                 <Icons.Home size={18} className="text-primary" /> {t("booking.deliveryOptions")}
@@ -497,7 +481,7 @@ function BookingFlow() {
               <div className="space-y-2">
                 <label className={`flex items-center justify-between p-3.5 rounded-xl border-2 cursor-pointer transition-all ${deliverySpeed === "standard" ? "border-primary bg-primary/5 shadow-md shadow-primary/5" : "border-slate-100 bg-white hover:bg-slate-50"}`} onClick={() => setDeliverySpeed("standard")}>
                   <div className="flex flex-col">
-                    <span className="text-sm font-bold text-foreground">Standard (บริการรอบมาตรฐาน)</span>
+                    <span className="text-sm font-bold text-foreground">มาตรฐาน (บริการรอบมาตรฐาน)</span>
                     <span className="text-xs text-muted block mt-0.5">รับผ้าภายใน 24 ชม. (ค่าส่ง ฿{39 + distanceExtra})</span>
                   </div>
                   <div className={`w-5 h-5 rounded-full flex items-center justify-center transition-colors ${deliverySpeed === "standard" ? "bg-primary text-white" : "border-2 border-slate-200"}`}>
@@ -507,21 +491,11 @@ function BookingFlow() {
 
                 <label className={`flex items-center justify-between p-3.5 rounded-xl border-2 cursor-pointer transition-all ${deliverySpeed === "express" ? "border-[#ff9800] bg-[#fff8e1] shadow-md shadow-[#ff9800]/10" : "border-slate-100 bg-white hover:bg-slate-50"}`} onClick={() => setDeliverySpeed("express")}>
                   <div className="flex flex-col">
-                    <span className="text-sm font-bold text-[#ff9800]">Express (บริการด่วนภายในวัน)</span>
+                    <span className="text-sm font-bold text-[#ff9800]">ด่วนพิเศษ (บริการด่วนภายในวัน) ⚡</span>
                     <span className="text-xs text-[#ff9800]/80 block mt-0.5">รับผ้าภายใน 6 ชม. (ค่าส่ง ฿{59 + distanceExtra})</span>
                   </div>
                   <div className={`w-5 h-5 rounded-full flex items-center justify-center transition-colors ${deliverySpeed === "express" ? "bg-[#ff9800] text-white" : "border-2 border-slate-200"}`}>
                     {deliverySpeed === "express" && <span className="text-xs font-bold leading-none translate-y-[0.5px]">✓</span>}
-                  </div>
-                </label>
-                
-                <label className={`flex items-center justify-between p-3.5 rounded-xl border-2 cursor-pointer transition-all ${deliverySpeed === "flash" ? "border-[#FF6B6B] bg-[#FFF5F5] shadow-md shadow-[#FF6B6B]/10" : "border-slate-100 bg-white hover:bg-slate-50"}`} onClick={() => setDeliverySpeed("flash")}>
-                  <div className="flex flex-col">
-                    <span className="text-sm font-bold text-[#FF6B6B]">Flash (บริการด่วนพิเศษ ⚡)</span>
-                    <span className="text-xs text-[#FF6B6B]/80 block mt-0.5">รับผ้าภายใน 2 ชม. (ค่าส่ง ฿{79 + distanceExtra})</span>
-                  </div>
-                  <div className={`w-5 h-5 rounded-full flex items-center justify-center transition-colors ${deliverySpeed === "flash" ? "bg-[#FF6B6B] text-white" : "border-2 border-slate-200"}`}>
-                    {deliverySpeed === "flash" && <span className="text-xs font-bold leading-none translate-y-[0.5px]">✓</span>}
                   </div>
                 </label>
               </div>
@@ -635,7 +609,7 @@ function BookingFlow() {
                   <div>
                     <div className="flex items-center gap-1.5 mb-2 text-primary-dark font-bold">
                       <span className="text-sm leading-none pt-0.5">🏪</span>
-                      <span>ส่วนของร้านซักรีด</span>
+                      <span>ส่วนของร้านซักรีด{selectedStore ? ` (${selectedStore.name})` : ""}</span>
                     </div>
                     <div className="space-y-2 pl-5">
                       <div className="flex items-center justify-between">
@@ -669,7 +643,7 @@ function BookingFlow() {
                     </div>
                     <div className="space-y-2 pl-5">
                       <div className="flex items-center justify-between">
-                        <span>ค่าจัดส่ง ({deliverySpeed})</span>
+                        <span>ค่าจัดส่ง ({deliverySpeed === "express" ? "ด่วนพิเศษ" : "มาตรฐาน"})</span>
                         <span className="font-bold text-slate-800">+฿{deliveryFee}</span>
                       </div>
                     </div>
@@ -713,7 +687,7 @@ function BookingFlow() {
         {/* ─── Step: Payment & Summary ─── */}
         {step === "payment" && (
           <div className="space-y-6 animate-fade-in">
-            {/* Order Summary (Moved from Confirm step) */}
+            {/* Order Summary */}
             <section className="space-y-3">
               <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
                 <Icons.FileText size={18} className="text-primary" /> {t("booking.confirmOrder")}
@@ -731,12 +705,15 @@ function BookingFlow() {
 
                 <div className="bg-slate-50/50 p-3.5 rounded-2xl space-y-2.5 border border-slate-100">
                   <Row icon={<Icons.MapPin size={12} />} label={t("booking.pickupLocation")} value={selectedAddress?.label || ""} />
-                  <Row icon={<Icons.Bell size={12} />} label={t("booking.pickupDate")} value={pickupSpeed === "instant" ? "เข้ารับทันที (ตลอด 24 ชม.)" : `${pickupDate} ${pickupSlot}`} />
+                  <Row icon={<Icons.Bell size={12} />} label={t("booking.pickupDate")} value={`${pickupDate} ${TIME_SLOTS.find(s => s.id === pickupSlot)?.label || pickupSlot}`} />
                   <Row
                     icon={<Icons.Truck size={12} />}
                     label="บริการจัดส่ง"
-                    value={deliverySpeed === "flash" ? "Flash (2 ชม.)" : deliverySpeed === "express" ? "Express (6 ชม.)" : "Standard (24 ชม.)"}
+                    value={deliverySpeed === "express" ? "ด่วนพิเศษ (6 ชม.)" : "มาตรฐาน (24 ชม.)"}
                   />
+                  {selectedStore && (
+                    <Row icon={<Icons.Home size={12} />} label="ร้านซักรีด" value={`${selectedStore.name} (${distanceKm.toFixed(1)} กม.)`} />
+                  )}
                   <Row icon={<Icons.FileText size={11} />} label="ขนาดสัมภาระ" value={`${bagSize} ${bagSizeExtra > 0 ? `(+฿${bagSizeExtra})` : ""}`} />
                   <Row icon={<Icons.Tasks size={11} />} label="บริการเสริม" value={withFolding ? `พับผ้า (+฿${foldingFee})` : "ไม่พับผ้า"} />
                 </div>
@@ -805,16 +782,6 @@ function BookingFlow() {
             fullWidth
             size="lg"
             disabled={!selectedService}
-            onClick={() => setStep("store")}
-          >
-            {t("common.confirm")}
-          </Button>
-        )}
-        {step === "store" && (
-          <Button
-            fullWidth
-            size="lg"
-            disabled={!selectedStore}
             onClick={() => setStep("details")}
           >
             {t("common.confirm")}
@@ -824,7 +791,7 @@ function BookingFlow() {
           <Button
             fullWidth
             size="lg"
-            disabled={!selectedAddress || (pickupSpeed === 'scheduled' && (!pickupDate || !pickupSlot))}
+            disabled={!selectedAddress || !pickupDate || !pickupSlot}
             onClick={() => setStep("payment")}
           >
             {t("common.confirm")}

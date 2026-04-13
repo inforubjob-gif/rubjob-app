@@ -1,4 +1,40 @@
--- RUBJOB Database Schema (Cloudflare D1)
+-- Admin Users Table
+CREATE TABLE IF NOT EXISTS admin_users (
+  id TEXT PRIMARY KEY,
+  email TEXT UNIQUE NOT NULL,
+  password TEXT NOT NULL,
+  name TEXT,
+  role TEXT DEFAULT 'admin', -- super_admin, admin
+  createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Rider Users Table (Created exclusively by Admin)
+CREATE TABLE IF NOT EXISTS rider_users (
+  id TEXT PRIMARY KEY,
+  email TEXT UNIQUE NOT NULL,
+  password TEXT NOT NULL,
+  name TEXT,
+  phone TEXT,
+  vehicleType TEXT, -- bike, car, truck
+  status TEXT DEFAULT 'active', -- active, suspended
+  address TEXT, -- Detailed address
+  idNumber TEXT, -- National ID
+  licensePlate TEXT, -- Vehicle plate number
+  emergencyContact TEXT,
+  createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Rider Documents Table
+CREATE TABLE IF NOT EXISTS rider_documents (
+  id TEXT PRIMARY KEY,
+  riderId TEXT NOT NULL,
+  type TEXT NOT NULL, -- id_card, license, insurance
+  status TEXT DEFAULT 'pending', -- pending, verified, rejected
+  url TEXT,
+  notes TEXT,
+  createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (riderId) REFERENCES rider_users(id) ON DELETE CASCADE
+);
 
 -- Users Table
 CREATE TABLE IF NOT EXISTS users (
@@ -77,6 +113,7 @@ CREATE TABLE IF NOT EXISTS addresses (
   userId TEXT NOT NULL,
   label TEXT NOT NULL,
   details TEXT,
+  note TEXT,
   lat REAL,
   lng REAL,
   isDefault INTEGER DEFAULT 0,
@@ -92,3 +129,45 @@ INSERT OR REPLACE INTO services (id, name, category, description, basePrice, uni
 ('home_cleaning', 'Home Cleaning', 'cleaning', 'Professional deep cleaning for your home', 500, 'session', 'home_cleaning', 1),
 ('personal_assistant', 'Personal Assistant', 'personal', 'Secretarial tasks, errands, or just accompaniment', 300, 'hour', 'personal_assistant', 0),
 ('companionship', 'Companionship', 'friend', 'Going to the doctor or sharing a meal together', 200, 'hour', 'companionship', 0);
+
+-- Coupons Table
+CREATE TABLE IF NOT EXISTS coupons (
+  id TEXT PRIMARY KEY,
+  code TEXT UNIQUE NOT NULL,
+  type TEXT NOT NULL, -- percentage, fixed
+  value REAL NOT NULL,
+  minOrder REAL DEFAULT 0,
+  maxDiscount REAL, -- for percentage type
+  expiryDate TEXT,
+  usageLimit INTEGER,
+  usedCount INTEGER DEFAULT 0,
+  isVisible INTEGER DEFAULT 1, -- Added: visibility control
+  isActive INTEGER DEFAULT 1,
+  createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Store Services Junction Table
+CREATE TABLE IF NOT EXISTS store_services (
+  storeId TEXT NOT NULL,
+  serviceId TEXT NOT NULL,
+  price REAL, -- Added: store-specific pricing override
+  PRIMARY KEY (storeId, serviceId),
+  FOREIGN KEY (storeId) REFERENCES stores(id) ON DELETE CASCADE,
+  FOREIGN KEY (serviceId) REFERENCES services(id) ON DELETE CASCADE
+);
+
+-- Payout Requests Table
+CREATE TABLE IF NOT EXISTS payout_requests (
+  id TEXT PRIMARY KEY,
+  requesterId TEXT NOT NULL,
+  requesterType TEXT NOT NULL, -- 'store' or 'rider'
+  amount REAL NOT NULL,
+  bankName TEXT NOT NULL,
+  accountNumber TEXT NOT NULL,
+  accountName TEXT NOT NULL,
+  status TEXT DEFAULT 'pending', -- 'pending', 'processing', 'completed', 'rejected'
+  receiptUrl TEXT,
+  notes TEXT,
+  createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+  processedAt DATETIME
+);

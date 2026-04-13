@@ -45,7 +45,7 @@ export default function CountdownTimer({
   return (
     <div className={`flex flex-col items-end ${isUrgent ? "text-red-600" : "text-slate-600"} drop-shadow-sm`}>
       <span className={`text-[11px] font-black uppercase tracking-[0.1em] mb-0.5 ${isUrgent ? "animate-pulse text-red-700 font-black" : ""}`}>
-        {isUrgent ? t("staff.urgent") : t("staff.timeLeft")}
+        {isUrgent ? t("store.urgent") : t("store.timeLeft")}
       </span>
       <span className={`text-sm font-black tabular-nums tracking-tight ${isUrgent ? "scale-110 origin-right transition-transform" : ""}`}>
         {formatTime(timeLeft)}
