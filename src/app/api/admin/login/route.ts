@@ -1,3 +1,4 @@
+import { getRequestContext } from "@cloudflare/next-on-pages";
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 
@@ -13,7 +14,7 @@ export async function POST(req: Request) {
 
     let adminName = null;
 
-    const db = (req as any).context?.env?.DB;
+    const db = getRequestContext().env.DB;
     if (!db) {
       console.warn("D1 not found, falling back to environment variables only.");
     } else {

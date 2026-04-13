@@ -1,3 +1,4 @@
+import { getRequestContext } from "@cloudflare/next-on-pages";
 import { NextResponse } from "next/server";
 
 export const runtime = "edge";
@@ -15,7 +16,7 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: "userId is required" }, { status: 400 });
     }
 
-    const db = (req as any).context?.env?.DB;
+    const db = getRequestContext().env.DB;
     if (!db) {
       return NextResponse.json({ error: "Database not found" }, { status: 500 });
     }
@@ -55,7 +56,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "userId is required" }, { status: 400 });
     }
 
-    const db = (req as any).context?.env?.DB;
+    const db = getRequestContext().env.DB;
     if (!db) {
       return NextResponse.json({ error: "Database not found" }, { status: 500 });
     }

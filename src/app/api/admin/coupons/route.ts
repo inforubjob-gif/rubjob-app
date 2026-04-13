@@ -1,10 +1,11 @@
+import { getRequestContext } from "@cloudflare/next-on-pages";
 import { NextResponse } from "next/server";
 
 export const runtime = "edge";
 
 export async function GET(req: Request) {
   try {
-    const db = (req as any).context?.env?.DB;
+    const db = getRequestContext().env.DB;
     if (!db) return NextResponse.json({ error: "D1 not found" }, { status: 500 });
 
     const { results } = await db.prepare(`
@@ -21,7 +22,7 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
   try {
     const { code, type, value, minOrder, maxDiscount, expiryDate, usageLimit, isVisible } = await req.json() as any;
-    const db = (req as any).context?.env?.DB;
+    const db = getRequestContext().env.DB;
     if (!db) return NextResponse.json({ error: "D1 not found" }, { status: 500 });
 
     if (!code || !type || !value) return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
@@ -47,7 +48,7 @@ export async function POST(req: Request) {
 export async function PUT(req: Request) {
   try {
     const { id, isActive, isVisible } = await req.json() as any;
-    const db = (req as any).context?.env?.DB;
+    const db = getRequestContext().env.DB;
     if (!db) return NextResponse.json({ error: "D1 not found" }, { status: 500 });
 
     if (!id) return NextResponse.json({ error: "Missing ID" }, { status: 400 });
@@ -72,7 +73,7 @@ export async function PUT(req: Request) {
 export async function DELETE(req: Request) {
   try {
     const { id } = await req.json() as any;
-    const db = (req as any).context?.env?.DB;
+    const db = getRequestContext().env.DB;
     if (!db) return NextResponse.json({ error: "D1 not found" }, { status: 500 });
 
     await db.prepare(`DELETE FROM coupons WHERE id = ?`).bind(id).run();
