@@ -1,6 +1,6 @@
 # RUBJOB Cloudflare Configuration
 name = "rubjob"
-compatibility_date = "2024-03-28"
+compatibility_date = "2024-11-18"
 compatibility_flags = [ "nodejs_compat" ]
 pages_build_output_dir = ".vercel/output/static"
 
