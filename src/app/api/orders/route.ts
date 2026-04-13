@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import { getRequestContext } from "@cloudflare/next-on-pages";
 
 export const runtime = "edge";
 
@@ -16,8 +15,8 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: "User ID required" }, { status: 400 });
     }
 
-    // Access D1 from Cloudflare context via getRequestContext
-    const db = getRequestContext().env.DB;
+    // Access D1 from Cloudflare context
+    const db = (req as any).context?.env?.DB;
     if (!db) {
       return NextResponse.json({ error: "D1 Database binding 'DB' not found" }, { status: 500 });
     }
@@ -68,7 +67,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Missing required order fields" }, { status: 400 });
     }
 
-    const db = getRequestContext().env.DB;
+    const db = (req as any).context?.env?.DB;
     if (!db) {
       return NextResponse.json({ error: "D1 Database binding 'DB' not found" }, { status: 500 });
     }

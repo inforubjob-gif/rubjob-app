@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
-import { getRequestContext } from "@cloudflare/next-on-pages";
 
 export const runtime = "edge";
 
@@ -17,7 +16,7 @@ export async function POST(req: Request) {
     }
 
     // Access D1 from Cloudflare context
-    const db = getRequestContext().env.DB;
+    const db = (req as any).context?.env?.DB;
     if (!db) {
       return NextResponse.json({ error: "D1 Database binding 'DB' not found" }, { status: 500 });
     }

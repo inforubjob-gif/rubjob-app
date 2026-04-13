@@ -1,4 +1,3 @@
-import { getRequestContext } from "@cloudflare/next-on-pages";
 import { NextResponse } from "next/server";
 
 export const runtime = "edge";
@@ -11,7 +10,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ success: false, error: "Please provide email and password" }, { status: 400 });
     }
 
-    const db = getRequestContext().env.DB;
+    const db = (req as any).context?.env?.DB;
     if (!db) {
       return NextResponse.json({ success: false, error: "Database not connected" }, { status: 500 });
     }

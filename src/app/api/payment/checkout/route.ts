@@ -1,4 +1,3 @@
-import { getRequestContext } from "@cloudflare/next-on-pages";
 import { NextResponse } from "next/server";
 import { createOmiseCharge } from "@/lib/payment";
 
@@ -17,7 +16,7 @@ export async function POST(req: Request) {
     }
 
     // Access Env from Cloudflare context
-    const env = getRequestContext().env;
+    const env = (req as any).context?.env;
     const db = env?.DB;
     const secretKey = env?.OMISE_SECRET_KEY;
 

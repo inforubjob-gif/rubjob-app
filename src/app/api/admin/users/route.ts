@@ -1,11 +1,10 @@
-import { getRequestContext } from "@cloudflare/next-on-pages";
 import { NextResponse } from "next/server";
 
 export const runtime = "edge";
 
 export async function GET(req: Request) {
   try {
-    const db = getRequestContext().env.DB;
+    const db = (req as any).context?.env?.DB;
     if (!db) return NextResponse.json({ error: "D1 not found" }, { status: 500 });
 
     const { results } = await db.prepare(`
@@ -25,7 +24,7 @@ export async function POST(req: Request) {
     const { id, role, assignedStoreId } = await req.json() as any;
     if (!id || !role) return NextResponse.json({ error: "Missing fields" }, { status: 400 });
 
-    const db = getRequestContext().env.DB;
+    const db = (req as any).context?.env?.DB;
     if (!db) return NextResponse.json({ error: "D1 not found" }, { status: 500 });
 
     await db.prepare(`

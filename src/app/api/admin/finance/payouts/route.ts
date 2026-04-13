@@ -1,11 +1,10 @@
-import { getRequestContext } from "@cloudflare/next-on-pages";
 import { NextResponse } from "next/server";
 
 export const runtime = "edge";
 
 export async function GET(req: Request) {
   try {
-    const db = getRequestContext().env.DB;
+    const db = (req as any).context?.env?.DB;
     if (!db) return NextResponse.json({ error: "D1 not found" }, { status: 500 });
 
     const { results: payouts } = await db.prepare(`
@@ -30,7 +29,7 @@ export async function GET(req: Request) {
 export async function PUT(req: Request) {
   try {
     const { id, status, receiptUrl, notes } = await req.json() as any;
-    const db = getRequestContext().env.DB;
+    const db = (req as any).context?.env?.DB;
     if (!db) return NextResponse.json({ error: "D1 not found" }, { status: 500 });
 
     if (!id || !status) return NextResponse.json({ error: "Missing ID or status" }, { status: 400 });

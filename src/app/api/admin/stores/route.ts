@@ -1,11 +1,10 @@
-import { getRequestContext } from "@cloudflare/next-on-pages";
 import { NextResponse } from "next/server";
 
 export const runtime = "edge";
 
 export async function GET(req: Request) {
   try {
-    const db = getRequestContext().env.DB;
+    const db = (req as any).context?.env?.DB;
     if (!db) return NextResponse.json({ error: "D1 not found" }, { status: 500 });
 
     const { results: stores } = await db.prepare(`
@@ -38,7 +37,7 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
   try {
     const { name, ownerId, address, lat, lng, serviceRadiusKm, baseDeliveryFee, extraFeePerKm, services } = await req.json() as any;
-    const db = getRequestContext().env.DB;
+    const db = (req as any).context?.env?.DB;
     if (!db) return NextResponse.json({ error: "D1 not found" }, { status: 500 });
 
     if (!name || !ownerId) return NextResponse.json({ error: "Missing name or ownerId" }, { status: 400 });
@@ -69,7 +68,7 @@ export async function POST(req: Request) {
 export async function PUT(req: Request) {
   try {
     const { id, name, ownerId, address, lat, lng, serviceRadiusKm, baseDeliveryFee, extraFeePerKm, isActive, services } = await req.json() as any;
-    const db = getRequestContext().env.DB;
+    const db = (req as any).context?.env?.DB;
     if (!db) return NextResponse.json({ error: "D1 not found" }, { status: 500 });
 
     if (!id) return NextResponse.json({ error: "Missing ID" }, { status: 400 });
@@ -109,7 +108,7 @@ export async function DELETE(req: Request) {
     const { id } = await req.json() as any;
     if (!id) return NextResponse.json({ error: "Missing ID" }, { status: 400 });
 
-    const db = getRequestContext().env.DB;
+    const db = (req as any).context?.env?.DB;
     if (!db) return NextResponse.json({ error: "D1 not found" }, { status: 500 });
 
     await db.prepare(`DELETE FROM stores WHERE id = ?`).bind(id).run();

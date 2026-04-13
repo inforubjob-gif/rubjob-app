@@ -1,11 +1,10 @@
-import { getRequestContext } from "@cloudflare/next-on-pages";
 import { NextResponse } from "next/server";
 
 export const runtime = "edge";
 
 export async function GET(req: Request) {
   try {
-    const db = getRequestContext().env.DB;
+    const db = (req as any).context?.env?.DB;
     if (!db) return NextResponse.json({ error: "D1 not found" }, { status: 500 });
 
     const { results } = await db.prepare(`
@@ -25,7 +24,7 @@ export async function POST(req: Request) {
     const { email, password, name, role } = await req.json() as any;
     if (!email || !password) return NextResponse.json({ error: "Missing email or password" }, { status: 400 });
 
-    const db = getRequestContext().env.DB;
+    const db = (req as any).context?.env?.DB;
     if (!db) return NextResponse.json({ error: "D1 not found" }, { status: 500 });
 
     const id = crypto.randomUUID();
@@ -49,7 +48,7 @@ export async function DELETE(req: Request) {
     const { id } = await req.json() as any;
     if (!id) return NextResponse.json({ error: "Missing ID" }, { status: 400 });
 
-    const db = getRequestContext().env.DB;
+    const db = (req as any).context?.env?.DB;
     if (!db) return NextResponse.json({ error: "D1 not found" }, { status: 500 });
 
     // Prevent deleting the initial system admin if needed, but for now allow it if requested
