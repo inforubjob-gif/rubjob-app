@@ -18,26 +18,22 @@ export async function POST(req: Request, { params }: { params: { type: string } 
       return NextResponse.json({ error: "Missing signature" }, { status: 401 });
     }
 
-    const db = getRequestContext().env.DB;
-    const env = getRequestContext().env as any;
-
-    if (!db) {
-      return NextResponse.json({ error: "D1 not found" }, { status: 500 });
-    }
-
-    // 1. Determine which tokens to use based on channel type
-    const channelSecret = channelType === "help" ? env.LINE_SECRET_HELP : env.LINE_SECRET_REGULAR;
+    // 1. Fetch Credentials from Database instead of ENV
+    const channelKeySecret = `line_secret_${channelType}`;
+    const result = await db.prepare(`SELECT value FROM system_settings WHERE key = ?`).bind(channelKeySecret).first() as { value: string };
+    const channelSecret = result?.value;
     
     if (!channelSecret) {
-      console.error(`Missing LINE Secret for channel: ${channelType}`);
-      return NextResponse.json({ error: "Config missing" }, { status: 500 });
+      console.error(`Missing LINE Secret in DB for channel: ${channelType}`);
+      // If not in DB, fallback to ENV for migration period if needed, or just error
+      return NextResponse.json({ error: "LINE configuration missing in settings" }, { status: 500 });
     }
 
     // 2. Verify Signature (Skip for manual in-app source)
     const isManual = body.manual_source === "in_app";
     
     if (!isManual) {
-      if (!signature || !channelSecret) {
+      if (!signature) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
       }
       const hash = crypto

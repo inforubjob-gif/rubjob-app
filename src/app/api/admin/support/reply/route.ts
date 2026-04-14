@@ -28,13 +28,17 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Ticket not found" }, { status: 404 });
     }
 
-    // 2. Determine which token to use
-    let channelToken = "";
-    if (ticket.channel === "regular_line") channelToken = env.LINE_TOKEN_REGULAR;
-    else if (ticket.channel === "help_line") channelToken = env.LINE_TOKEN_HELP;
+    // 2. Fetch Token from Database
+    const channelKeyToken = `line_token_${ticket.channel.replace('_line', '')}`;
+    const result = await db.prepare(`SELECT value FROM system_settings WHERE key = ?`).bind(channelKeyToken).first() as { value: string };
+    const channelToken = result?.value;
+
+    if (!channelToken) {
+      return NextResponse.json({ error: "LINE Token not found in settings" }, { status: 500 });
+    }
 
     // 3. Send Push Message to LINE if it's a LINE channel
-    if (channelToken) {
+    if (ticket.channel.includes('line')) {
       const lineRes = await fetch("https://api.line.me/v2/bot/message/push", {
         method: "POST",
         headers: {

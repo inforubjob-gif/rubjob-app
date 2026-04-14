@@ -295,6 +295,92 @@
               </div>
             </div>
           </Card>
+
+          {/* LINE API Integration */}
+          <Card className="p-8 bg-slate-900 border border-slate-800 shadow-2xl rounded-[2.5rem] md:col-span-2">
+            <div className="flex items-center justify-between mb-8">
+              <div className="w-14 h-14 bg-emerald-500/10 text-emerald-400 rounded-[1.25rem] flex items-center justify-center shadow-inner">
+                <Icons.Chat size={28} />
+              </div>
+              <div className="px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-[10px] font-black text-emerald-400 uppercase tracking-widest">
+                LINE Messaging API Integration
+              </div>
+            </div>
+            
+            <h3 className="text-xl font-black text-white tracking-tight">Messaging Integration</h3>
+            <p className="text-sm text-slate-400 mt-2 mb-10 font-medium">Configure credentials for Regular and Help OA channels to enable real-time chat sync.</p>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+              {/* Regular Channel */}
+              <div className="space-y-6">
+                <h4 className="text-xs font-black text-white uppercase tracking-[0.2em] flex items-center gap-2">
+                  <div className="w-2 h-2 rounded-full bg-emerald-500" />
+                  Regular Channel (Client)
+                </h4>
+                <div className="space-y-4">
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block ml-1">Channel Secret</label>
+                    <input 
+                      type="password"
+                      value={getSetting('line_secret_regular') || ''}
+                      onChange={(e) => handleUpdateLocalSetting('line_secret_regular', e.target.value)}
+                      placeholder="••••••••••••••••••••••••••••••••"
+                      className="w-full bg-white/5 border-2 border-white/5 rounded-2xl px-5 py-3 text-sm font-bold text-slate-300 focus:border-emerald-500/50 transition-all outline-none"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block ml-1">Access Token</label>
+                    <textarea 
+                      rows={2}
+                      value={getSetting('line_token_regular') || ''}
+                      onChange={(e) => handleUpdateLocalSetting('line_token_regular', e.target.value)}
+                      placeholder="Enter long channel access token..."
+                      className="w-full bg-white/5 border-2 border-white/5 rounded-2xl px-5 py-3 text-xs font-bold text-slate-300 focus:border-emerald-500/50 transition-all outline-none resize-none"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Help Channel */}
+              <div className="space-y-6">
+                <h4 className="text-xs font-black text-white uppercase tracking-[0.2em] flex items-center gap-2">
+                  <div className="w-2 h-2 rounded-full bg-rose-500" />
+                  Help & Support Channel
+                </h4>
+                <div className="space-y-4">
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block ml-1">Channel Secret</label>
+                    <input 
+                      type="password"
+                      value={getSetting('line_secret_help') || ''}
+                      onChange={(e) => handleUpdateLocalSetting('line_secret_help', e.target.value)}
+                      placeholder="••••••••••••••••••••••••••••••••"
+                      className="w-full bg-white/5 border-2 border-white/5 rounded-2xl px-5 py-3 text-sm font-bold text-slate-300 focus:border-rose-500/50 transition-all outline-none"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block ml-1">Access Token</label>
+                    <textarea 
+                      rows={2}
+                      value={getSetting('line_token_help') || ''}
+                      onChange={(e) => handleUpdateLocalSetting('line_token_help', e.target.value)}
+                      placeholder="Enter long channel access token..."
+                      className="w-full bg-white/5 border-2 border-white/5 rounded-2xl px-5 py-3 text-xs font-bold text-slate-300 focus:border-rose-500/50 transition-all outline-none resize-none"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div className="mt-10 p-4 bg-white/5 rounded-2xl flex items-center gap-3">
+              <div className="w-10 h-10 bg-amber-500/10 text-amber-500 rounded-xl flex items-center justify-center shrink-0">
+                <Icons.Settings size={20} />
+              </div>
+              <p className="text-[10px] text-slate-400 font-medium leading-relaxed">
+                <span className="text-white font-black uppercase">Note:</span> Credential changes take immediate effect for all new incoming webhooks and outgoing replies. Please ensure tokens are copied accurately from the LINE Developer Console.
+              </p>
+            </div>
+          </Card>
         </div>
       )}
     </div>

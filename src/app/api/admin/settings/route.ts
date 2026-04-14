@@ -9,6 +9,10 @@ const DEFAULT_SETTINGS = [
   { key: "commission_rate", value: "15", type: "number", description: "Platform commission percentage taken from orders." },
   { key: "min_order_amount", value: "0", type: "number", description: "Minimum order value required to place a booking." },
   { key: "delivery_fee_base", value: "0", type: "number", description: "Default base delivery fee for laundry services." },
+  { key: "line_token_regular", value: "", type: "string", description: "Channel Access Token for the Regular LINE OA." },
+  { key: "line_secret_regular", value: "", type: "string", description: "Channel Secret for the Regular LINE OA." },
+  { key: "line_token_help", value: "", type: "string", description: "Channel Access Token for the Help Support LINE OA." },
+  { key: "line_secret_help", value: "", type: "string", description: "Channel Secret for the Help Support LINE OA." },
 ];
 
 /**
