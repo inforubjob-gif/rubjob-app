@@ -61,57 +61,58 @@ export default function AdminAuthGate({ children }: { children: React.ReactNode 
 
   if (isAuthenticated === false) {
     return (
-      <div className="flex h-screen w-full items-center justify-center bg-slate-900 absolute inset-0 z-[100]">
-        <div className="bg-white rounded-2xl w-full max-w-md p-8 shadow-2xl relative overflow-hidden">
-          {/* Header Gradient */}
-          <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-indigo-500 to-purple-600" />
+      <div className="flex h-screen w-full items-center justify-center bg-slate-50 absolute inset-0 z-[100]">
+        <div className="bg-white rounded-[2.5rem] w-full max-w-md p-10 shadow-2xl relative overflow-hidden border border-slate-100">
+          {/* Header Brand Line */}
+          <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-primary via-primary-dark to-primary" />
           
-          <div className="flex justify-center mb-6">
-            <div className="w-16 h-16 bg-slate-100 rounded-2xl flex items-center justify-center text-slate-800 ring-4 ring-slate-50">
-              <Icons.Settings size={32} />
+          <div className="flex justify-center mb-8">
+            <div className="w-24 h-24 bg-primary-light rounded-[2rem] flex items-center justify-center ring-8 ring-primary-light/50 transition-transform hover:scale-105 duration-500">
+              <Icons.Logo size={60} variant="color" />
             </div>
           </div>
           
-          <div className="text-center mb-8">
-            <h1 className="text-2xl font-black text-slate-900 tracking-tight">ระบบหลังบ้าน</h1>
-            <p className="text-sm text-slate-500 mt-1">RUBJOB Administration</p>
+          <div className="text-center mb-10">
+            <h1 className="text-3xl font-black text-slate-900 tracking-tight">ระบบหลังบ้าน</h1>
+            <p className="text-sm text-slate-500 mt-2 font-medium">RUBJOB Administration</p>
           </div>
 
-          <form onSubmit={handleLogin} className="space-y-4">
-            <div>
-              <label className="text-[11px] font-bold text-slate-500 uppercase tracking-widest block mb-1.5">อีเมล (Email)</label>
+          <form onSubmit={handleLogin} className="space-y-6">
+            <div className="space-y-1.5">
+              <label className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] block ml-1">อีเมล (Email)</label>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="admin@rubjob.com"
-                className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/20 transition-all font-medium"
+                className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-5 py-4 text-sm focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all font-bold text-slate-700"
               />
             </div>
             
-            <div>
-              <label className="text-[11px] font-bold text-slate-500 uppercase tracking-widest block mb-1.5">รหัสผ่าน (Password)</label>
+            <div className="space-y-1.5">
+              <label className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] block ml-1">รหัสผ่าน (Password)</label>
               <input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/20 transition-all font-medium"
+                className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-5 py-4 text-sm focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all font-bold text-slate-700"
               />
             </div>
 
             {error && (
-              <p className="text-xs text-rose-500 font-bold bg-rose-50 p-3 rounded-lg text-center animate-fade-in">
-                {error}
-              </p>
+              <div className="bg-rose-50 text-rose-600 p-4 rounded-2xl flex items-center gap-3 border border-rose-100 animate-fade-in">
+                <div className="w-2 h-2 rounded-full bg-rose-500 animate-pulse" />
+                <p className="text-xs font-bold">{error}</p>
+              </div>
             )}
 
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl py-3.5 text-sm font-bold shadow-lg shadow-indigo-600/30 transition-all active:scale-[0.98] disabled:opacity-50 mt-4"
+              className="w-full bg-primary hover:bg-primary-dark text-white rounded-2xl py-4.5 text-sm font-black shadow-xl shadow-primary/20 transition-all active:scale-[0.98] disabled:opacity-50 mt-4 uppercase tracking-widest"
             >
-              {isLoading ? "กำลังตรวจสอบ..." : "เข้าสู่ระบบ (Login)"}
+              {isLoading ? "กำลังประมวลผล..." : "เข้าสู่ระบบ (Login)"}
             </button>
           </form>
           
