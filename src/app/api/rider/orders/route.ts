@@ -22,6 +22,25 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: "D1 Database binding 'DB' not found" }, { status: 500 });
     }
 
+    // Fetch Financial Settings for Calculation
+    const settingsRows = await db.prepare(`
+      SELECT key, value FROM system_settings 
+      WHERE key IN ('gp_rider_percent', 'rider_base_payout')
+    `).all();
+    
+    const settings: Record<string, string> = {};
+    settingsRows.results.forEach((row: any) => {
+      settings[row.key] = row.value;
+    });
+
+    const gpRiderPercent = parseFloat(settings.gp_rider_percent || "10");
+    const riderBasePayout = parseFloat(settings.rider_base_payout || "0");
+
+    const calculateRiderEarn = (deliveryFee: number) => {
+      const commission = (deliveryFee * gpRiderPercent) / 100;
+      return (deliveryFee - commission) + riderBasePayout;
+    };
+
     // 1. Available Jobs: pending with no driver
     const availableJobs = await db.prepare(`
       SELECT o.*, s.name as serviceName, st.name as storeName, st.address as storeAddress
@@ -44,11 +63,13 @@ export async function GET(req: Request) {
     return NextResponse.json({ 
       available: availableJobs.results.map((r: any) => ({
         ...r,
+        riderEarn: calculateRiderEarn(r.deliveryFee || 0),
         address: JSON.parse(r.address || "{}"),
         items: JSON.parse(r.items || "[]")
       })),
       active: activeJobs.results.map((r: any) => ({
         ...r,
+        riderEarn: calculateRiderEarn(r.deliveryFee || 0),
         address: JSON.parse(r.address || "{}"),
         items: JSON.parse(r.items || "[]")
       }))

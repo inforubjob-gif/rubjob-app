@@ -125,7 +125,7 @@ export default function RiderDashboard() {
           <div className="bg-white/10 backdrop-blur-md p-4 rounded-[2rem] border border-white/10">
             <p className="text-[10px] font-black text-white/50 uppercase tracking-widest">{t("rider.earnings")}</p>
             <p className="text-2xl font-black mt-1 text-white">
-              ฿{activeJobs.reduce((sum, o: any) => sum + (o.deliveryFee || 0), 0).toLocaleString()}
+              ฿{activeJobs.reduce((sum, o: any) => sum + (o.riderEarn || 0), 0).toLocaleString()}
             </p>
           </div>
         </div>
@@ -227,8 +227,8 @@ export default function RiderDashboard() {
                      </div>
                   </div>
                   <div className="text-right">
-                     <p className="text-xl font-black text-slate-900 leading-none">฿{selectedJob.deliveryFee || selectedJob.earn}</p>
-                     <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">{t("rider.earnAmount")}</p>
+                     <p className="text-xl font-black text-slate-900 leading-none">฿{selectedJob.riderEarn || selectedJob.deliveryFee}</p>
+                     <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">รายได้ที่จะได้รับ</p>
                   </div>
                </div>
 
@@ -298,7 +298,7 @@ function AvailableDeliveries({ t, router, jobs, onAccept, onViewDetails }: { t: 
               <div className="flex-1">
                 <div className="flex items-center justify-between mb-1">
                   <span className="text-[10px] font-black text-primary-dark uppercase tracking-widest">{job.id}</span>
-                  <span className="text-xs font-black text-slate-900">฿{job.deliveryFee}</span>
+                  <span className="text-xs font-black text-slate-900">฿{job.riderEarn || job.deliveryFee}</span>
                 </div>
                 <h3 className="font-bold text-slate-900 mb-1 leading-tight">
                   {job.storeName} → Customer
