@@ -141,42 +141,40 @@ export default function SettingsAdminPage() {
   const getSetting = (key: string) => localSettings[key];
 
   return (
-    <div className="space-y-8 max-w-5xl pb-24">
+    <div className="space-y-8 max-w-5xl pb-40">
       <header className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-black text-slate-900 tracking-tight">System Settings</h1>
-          <p className="text-slate-500 font-medium">Manage authorized personnel and application configuration</p>
+          <p className="text-slate-500 font-medium tracking-tight">Manage application configuration and authorized personnel</p>
         </div>
-        {hasChanges && (
-          <button 
-            onClick={handleSaveSettings}
-            disabled={isSaving}
-            className="bg-primary text-white px-8 py-3 rounded-2xl font-black text-sm shadow-xl shadow-primary/30 hover:scale-105 active:scale-95 transition-all flex items-center gap-2 animate-slide-up"
-          >
-            {isSaving ? <Icons.Refresh size={18} className="animate-spin" /> : <Icons.Settings size={18} />}
-            Save All Changes
-          </button>
-        )}
+        <div className="flex gap-2">
+           <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-slate-300 border border-slate-100 italic font-black text-xs shadow-sm">
+             V1
+           </div>
+        </div>
       </header>
       
       {/* Tabs */}
       <div className="flex border-b border-slate-200">
         <button 
           onClick={() => setActiveTab("admins")}
-          className={`px-6 py-4 text-sm font-black border-b-2 transition-all ${activeTab === 'admins' ? 'border-primary text-primary' : 'border-transparent text-slate-400 hover:text-slate-600'}`}
+          className={`px-8 py-5 text-sm font-black border-b-2 transition-all ${activeTab === 'admins' ? 'border-primary text-primary' : 'border-transparent text-slate-400 hover:text-slate-600'}`}
         >
           Admin Management
         </button>
         <button 
           onClick={() => setActiveTab("system")}
-          className={`px-6 py-4 text-sm font-black border-b-2 transition-all ${activeTab === 'system' ? 'border-primary text-primary' : 'border-transparent text-slate-400 hover:text-slate-600'}`}
+          className={`px-8 py-5 text-sm font-black border-b-2 transition-all ${activeTab === 'system' ? 'border-primary text-primary' : 'border-transparent text-slate-400 hover:text-slate-600'}`}
         >
           Application Settings
         </button>
       </div>
 
       {(error || success) && (
-        <div className={`p-4 rounded-2xl font-bold text-sm animate-fade-in ${error ? 'bg-rose-50 text-rose-600 border border-rose-100' : 'bg-emerald-50 text-emerald-600 border border-emerald-100'}`}>
+        <div className={`p-5 rounded-[2rem] font-bold text-sm animate-fade-in flex items-center gap-3 ${error ? 'bg-rose-50 text-rose-600 border border-rose-100' : 'bg-emerald-50 text-emerald-600 border border-emerald-100'}`}>
+          <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${error ? 'bg-rose-100' : 'bg-emerald-100'}`}>
+             {error ? <Icons.Close size={16} /> : <Icons.Check size={16} />}
+          </div>
           {error || success}
         </div>
       )}
@@ -186,7 +184,12 @@ export default function SettingsAdminPage() {
           {/* Add Form */}
           <div className="lg:col-span-1">
             <Card className="p-8 bg-white border border-slate-200/60 shadow-xl overflow-hidden sticky top-8 rounded-[2.5rem]">
-              <h3 className="text-xl font-black text-slate-900 mb-6">Add New Admin</h3>
+              <div className="w-12 h-12 bg-primary/10 text-primary rounded-2xl flex items-center justify-center mb-6">
+                <Icons.User size={24} />
+              </div>
+              <h3 className="text-xl font-black text-slate-900 mb-2">Add New Admin</h3>
+              <p className="text-xs text-slate-400 font-medium mb-6">Authorize a new team member to access this portal.</p>
+              
               <form onSubmit={handleAddAdmin} className="space-y-4">
                 <div className="space-y-1.5">
                   <label className="text-[10px] uppercase tracking-[0.2em] font-black text-slate-400 block ml-1">Full Name</label>
@@ -194,7 +197,7 @@ export default function SettingsAdminPage() {
                     type="text" 
                     value={newAdmin.name}
                     onChange={e => setNewAdmin({...newAdmin, name: e.target.value})}
-                    placeholder="Admin Name"
+                    placeholder="e.g. Somchai RUBJOB"
                     className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-5 py-3 text-sm font-bold focus:outline-none focus:border-primary/50 transition-all"
                   />
                 </div>
@@ -204,7 +207,7 @@ export default function SettingsAdminPage() {
                     type="email" 
                     value={newAdmin.email}
                     onChange={e => setNewAdmin({...newAdmin, email: e.target.value})}
-                    placeholder="admin@example.com"
+                    placeholder="admin@rubjob.com"
                     className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-5 py-3 text-sm font-bold focus:outline-none focus:border-primary/50 transition-all"
                   />
                 </div>
@@ -273,21 +276,15 @@ export default function SettingsAdminPage() {
                   </div>
                )}
             </Card>
-            <div className="mt-4 flex items-center gap-2 px-4">
-              <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-              <p className="text-[10px] text-slate-400 font-black uppercase tracking-[0.2em]">
-                Note: Database settings prioritize server context.
-              </p>
-            </div>
           </div>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 animate-fade-in">
           {/* Platform Status */}
-          <Card className="p-8 bg-white border border-slate-200/60 shadow-xl rounded-[2.5rem]">
+          <Card className="p-10 bg-white border border-slate-200/60 shadow-xl rounded-[2.5rem]">
             <div className="flex items-center justify-between mb-8">
-              <div className="w-14 h-14 bg-amber-50 text-amber-500 rounded-[1.25rem] flex items-center justify-center shadow-inner">
-                <Icons.Settings size={28} />
+              <div className="w-16 h-16 bg-emerald-50 text-emerald-500 rounded-[1.5rem] flex items-center justify-center shadow-inner">
+                <Icons.Settings size={32} />
               </div>
               <button 
                 onClick={() => handleUpdateLocalSetting('is_open', getSetting('is_open') === 'true' ? 'false' : 'true')}
@@ -296,26 +293,29 @@ export default function SettingsAdminPage() {
                 <div className={`absolute top-1 w-6 h-6 bg-white rounded-full transition-all duration-300 ${getSetting('is_open') === 'true' ? 'left-9' : 'left-1'}`} />
               </button>
             </div>
-            <h3 className="text-xl font-black text-slate-900 tracking-tight">Operation Status</h3>
-            <p className="text-sm text-slate-500 mt-2 font-medium">Control the availability of the RUBJOB platform for all users.</p>
-            <div className={`mt-6 inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest ${getSetting('is_open') === 'true' ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'}`}>
-              Platform is currently {getSetting('is_open') === 'true' ? 'Open' : 'Closed'}
+            <h3 className="text-2xl font-black text-slate-900 tracking-tight">Operation Status</h3>
+            <p className="text-sm text-slate-500 mt-2 font-medium leading-relaxed">Global control for platform accessibility. Turning this off prevents all users from creating new orders.</p>
+            <div className={`mt-8 inline-flex items-center gap-2 px-6 py-2.5 rounded-2xl text-xs font-black uppercase tracking-widest ${getSetting('is_open') === 'true' ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-rose-50 text-rose-600 border border-rose-100'}`}>
+              <div className={`w-2 h-2 rounded-full ${getSetting('is_open') === 'true' ? 'bg-emerald-500 animate-pulse' : 'bg-rose-500'}`} />
+              Platform is currently {getSetting('is_open') === 'true' ? 'Active' : 'Offline'}
             </div>
           </Card>
 
           {/* Business Configuration */}
-          <Card className="p-8 bg-white border border-slate-200/60 shadow-xl rounded-[2.5rem] md:row-span-2">
-            <div className="w-14 h-14 bg-indigo-50 text-indigo-500 rounded-[1.25rem] flex items-center justify-center mb-8 shadow-inner">
-              <Icons.Finance size={28} />
+          <Card className="p-10 bg-white border border-slate-200/60 shadow-xl rounded-[2.5rem] md:row-span-2">
+            <div className="w-16 h-16 bg-indigo-50 text-indigo-500 rounded-[1.5rem] flex items-center justify-center mb-8 shadow-inner">
+              <Icons.Finance size={32} />
             </div>
-            <h3 className="text-xl font-black text-slate-900 tracking-tight">Financial & Rules</h3>
-            <p className="text-sm text-slate-500 mt-2 mb-8 font-medium">Configure commission rates and order minimums.</p>
+            <h3 className="text-2xl font-black text-slate-900 tracking-tight">Financial Engine</h3>
+            <p className="text-sm text-slate-500 mt-2 mb-10 font-medium leading-relaxed">Control the economics of your platform, including commission rates and order floor limits.</p>
             
-            <div className="space-y-6">
-              <div className="space-y-2">
-                <div className="flex justify-between ml-1 mb-1">
-                   <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Platform Commission (%)</label>
-                   <span className="text-xs font-black text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-md">{getSetting('commission_rate')}%</span>
+            <div className="space-y-10">
+              <div className="space-y-4">
+                <div className="flex justify-between items-end">
+                   <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Platform Commission</label>
+                   <div className="text-3xl font-black text-indigo-600 font-mono tracking-tighter">
+                     {getSetting('commission_rate')}<span className="text-sm ml-0.5 text-slate-400">%</span>
+                   </div>
                 </div>
                 <input 
                   type="range"
@@ -323,146 +323,185 @@ export default function SettingsAdminPage() {
                   max="50"
                   step="1"
                   value={getSetting('commission_rate') || 15}
-                  onChange={(e) => handleUpdateLocalSetting('commission_rate', e.target.value)}
-                  className="w-full h-8 appearance-none bg-transparent cursor-pointer accent-indigo-500"
+                  onChange={(e) => handleUpdateLocalSetting('commission_rate', Number(e.target.value))}
+                  className="w-full h-2.5 appearance-none bg-slate-100 rounded-lg cursor-pointer accent-indigo-500"
                 />
-                <p className="text-[10px] text-slate-400 font-medium italic mt-1">
-                  Commission taken from each laundry or helper service order.
-                </p>
+                <div className="flex justify-between text-[9px] font-black text-slate-300 uppercase tracking-widest">
+                   <span>0% (Free)</span>
+                   <span>50% (Max)</span>
+                </div>
               </div>
 
-              <div className="space-y-2 pt-4 border-t border-slate-50">
-                 <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block ml-1">Minimum Order Amount (฿)</label>
+              <div className="space-y-2.5 pt-10 border-t border-slate-50">
+                 <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block ml-1">Order Minimum Amount</label>
                  <div className="relative">
                    <input 
                     type="number"
                     value={getSetting('min_order_amount') || 0}
-                    onChange={(e) => handleUpdateLocalSetting('min_order_amount', e.target.value)}
-                    className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-5 py-3 text-lg font-black text-slate-700 transition-all focus:outline-none focus:border-indigo-200 focus:ring-4 focus:ring-indigo-50"
+                    onChange={(e) => handleUpdateLocalSetting('min_order_amount', Number(e.target.value))}
+                    className="w-full bg-slate-50 border-2 border-slate-100 rounded-3xl px-6 py-4 text-2xl font-black text-slate-700 transition-all focus:outline-none focus:border-indigo-200 focus:ring-8 focus:ring-indigo-50/50"
                    />
-                   <div className="absolute right-5 top-1/2 -translate-y-1/2 text-slate-300 font-black">THB</div>
+                   <div className="absolute right-6 top-1/2 -translate-y-1/2 text-slate-300 font-black text-sm tracking-widest">THB</div>
                  </div>
+                 <p className="text-[10px] text-slate-400 font-medium italic mt-2 px-2">Customers cannot checkout if total is below this value.</p>
               </div>
             </div>
           </Card>
 
           {/* Delivery Configuration */}
-          <Card className="p-8 bg-white border border-slate-200/60 shadow-xl rounded-[2.5rem]">
-            <div className="w-14 h-14 bg-emerald-50 text-emerald-500 rounded-[1.25rem] flex items-center justify-center mb-8 shadow-inner">
-              <Icons.Settings size={28} />
+          <Card className="p-10 bg-white border border-slate-200/60 shadow-xl rounded-[2.5rem]">
+            <div className="w-16 h-16 bg-amber-50 text-amber-500 rounded-[1.5rem] flex items-center justify-center mb-8 shadow-inner">
+              <Icons.Truck size={32} />
             </div>
-            <h3 className="text-xl font-black text-slate-900 tracking-tight">Delivery Defaults</h3>
-            <p className="text-sm text-slate-500 mt-2 mb-8 font-medium">Set fallback values for store range and fees.</p>
+            <h3 className="text-2xl font-black text-slate-900 tracking-tight">Logistics Rules</h3>
+            <p className="text-sm text-slate-500 mt-2 mb-10 font-medium leading-relaxed">Set standard delivery radius and base fees for all partner stores on the platform.</p>
             
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-1.5">
-                 <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block ml-1">Radius (Km)</label>
-                 <input 
-                  type="number"
-                  value={getSetting('radius_km') || 5}
-                  onChange={(e) => handleUpdateLocalSetting('radius_km', e.target.value)}
-                  className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-5 py-3 text-sm font-black text-slate-700"
-                 />
+            <div className="grid grid-cols-2 gap-6">
+              <div className="space-y-2">
+                 <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block ml-2">Service Radius</label>
+                 <div className="relative">
+                   <input 
+                    type="number"
+                    value={getSetting('radius_km') || 5}
+                    onChange={(e) => handleUpdateLocalSetting('radius_km', Number(e.target.value))}
+                    className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-5 py-3.5 text-lg font-black text-slate-700 focus:border-amber-500/30 transition-all outline-none"
+                   />
+                   <div className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-black text-slate-300 uppercase">KM</div>
+                 </div>
               </div>
-              <div className="space-y-1.5">
-                 <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block ml-1">Base Fee (฿)</label>
-                 <input 
-                  type="number"
-                  value={getSetting('delivery_fee_base') || 0}
-                  onChange={(e) => handleUpdateLocalSetting('delivery_fee_base', e.target.value)}
-                  className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-5 py-3 text-sm font-black text-slate-700"
-                 />
+              <div className="space-y-2">
+                 <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block ml-2">Base Delivery Fee</label>
+                 <div className="relative">
+                   <input 
+                    type="number"
+                    value={getSetting('delivery_fee_base') || 0}
+                    onChange={(e) => handleUpdateLocalSetting('delivery_fee_base', Number(e.target.value))}
+                    className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-5 py-3.5 text-lg font-black text-slate-700 focus:border-amber-500/30 transition-all outline-none"
+                   />
+                   <div className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-black text-slate-300 uppercase font-mono">฿</div>
+                 </div>
               </div>
             </div>
           </Card>
 
           {/* LINE API Integration */}
-          <Card className="p-8 bg-slate-900 border border-slate-800 shadow-2xl rounded-[2.5rem] md:col-span-2">
-            <div className="flex items-center justify-between mb-8">
-              <div className="w-14 h-14 bg-emerald-500/10 text-emerald-400 rounded-[1.25rem] flex items-center justify-center shadow-inner">
-                <Icons.Chat size={28} />
+          <Card className="p-12 bg-slate-900 border border-slate-800 shadow-2xl rounded-[3rem] md:col-span-2 overflow-hidden relative">
+            {/* Background elements for premium feel */}
+            <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 rounded-full blur-[100px] -mr-32 -mt-32" />
+            <div className="absolute bottom-0 left-0 w-64 h-64 bg-rose-500/10 rounded-full blur-[100px] -ml-32 -mb-32" />
+
+            <div className="flex items-center justify-between mb-10 relative z-10">
+              <div className="w-16 h-16 bg-emerald-500/10 text-emerald-400 rounded-[1.5rem] flex items-center justify-center shadow-inner">
+                <Icons.Chat size={32} />
               </div>
-              <div className="px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-[10px] font-black text-emerald-400 uppercase tracking-widest">
-                LINE Messaging API Integration
+              <div className="px-5 py-2.5 bg-white/5 border border-white/10 rounded-2xl text-[10px] font-black text-emerald-400 uppercase tracking-[0.2em]">
+                Messaging Integration System
               </div>
             </div>
             
-            <h3 className="text-xl font-black text-white tracking-tight">Messaging Integration</h3>
-            <p className="text-sm text-slate-400 mt-2 mb-10 font-medium">Configure credentials for Regular and Help OA channels to enable real-time chat sync.</p>
+            <h3 className="text-3xl font-black text-white tracking-tight relative z-10">Integration Keys</h3>
+            <p className="text-base text-slate-400 mt-3 mb-12 font-medium leading-relaxed max-w-2xl relative z-10">
+              Provide necessary credentials for your LINE Official Accounts. These keys enable secure two-way communication with your customers.
+            </p>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 relative z-10">
               {/* Regular Channel */}
-              <div className="space-y-6">
-                <h4 className="text-xs font-black text-white uppercase tracking-[0.2em] flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-full bg-emerald-500" />
-                  Regular Channel (Client)
-                </h4>
-                <div className="space-y-4">
-                  <div className="space-y-1.5">
+              <div className="space-y-8">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-2xl bg-emerald-500/20 flex items-center justify-center text-emerald-500 border border-emerald-500/20">
+                     <Icons.Check size={20} />
+                  </div>
+                  <h4 className="text-sm font-black text-white uppercase tracking-[0.2em]">Regular LINE (Client)</h4>
+                </div>
+                <div className="space-y-6">
+                  <div className="space-y-2">
                     <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block ml-1">Channel Secret</label>
                     <input 
                       type="password"
                       value={getSetting('line_secret_regular') || ''}
                       onChange={(e) => handleUpdateLocalSetting('line_secret_regular', e.target.value)}
-                      placeholder="••••••••••••••••••••••••••••••••"
-                      className="w-full bg-white/5 border-2 border-white/5 rounded-2xl px-5 py-3 text-sm font-bold text-slate-300 focus:border-emerald-500/50 transition-all outline-none"
+                      placeholder="Paste channel secret here"
+                      className="w-full bg-white/[0.03] border-2 border-white/5 rounded-2xl px-6 py-4 text-sm font-bold text-slate-300 focus:border-emerald-500/50 focus:bg-white/[0.05] transition-all outline-none"
                     />
                   </div>
-                  <div className="space-y-1.5">
+                  <div className="space-y-2">
                     <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block ml-1">Access Token</label>
                     <textarea 
-                      rows={2}
+                      rows={3}
                       value={getSetting('line_token_regular') || ''}
                       onChange={(e) => handleUpdateLocalSetting('line_token_regular', e.target.value)}
-                      placeholder="Enter long channel access token..."
-                      className="w-full bg-white/5 border-2 border-white/5 rounded-2xl px-5 py-3 text-xs font-bold text-slate-300 focus:border-emerald-500/50 transition-all outline-none resize-none"
+                      placeholder="Paste long access token here..."
+                      className="w-full bg-white/[0.03] border-2 border-white/5 rounded-2xl px-6 py-4 text-xs font-bold text-slate-300 focus:border-emerald-500/50 focus:bg-white/[0.05] transition-all outline-none resize-none leading-relaxed"
                     />
                   </div>
                 </div>
               </div>
 
               {/* Help Channel */}
-              <div className="space-y-6">
-                <h4 className="text-xs font-black text-white uppercase tracking-[0.2em] flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-full bg-rose-500" />
-                  Help & Support Channel
-                </h4>
-                <div className="space-y-4">
-                  <div className="space-y-1.5">
+              <div className="space-y-8">
+                <div className="flex items-center gap-3">
+                   <div className="w-10 h-10 rounded-2xl bg-rose-500/20 flex items-center justify-center text-rose-500 border border-rose-500/20">
+                      <Icons.Info size={20} />
+                   </div>
+                   <h4 className="text-sm font-black text-white uppercase tracking-[0.2em]">Help & Support LINE</h4>
+                </div>
+                <div className="space-y-6">
+                  <div className="space-y-2">
                     <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block ml-1">Channel Secret</label>
                     <input 
                       type="password"
                       value={getSetting('line_secret_help') || ''}
                       onChange={(e) => handleUpdateLocalSetting('line_secret_help', e.target.value)}
-                      placeholder="••••••••••••••••••••••••••••••••"
-                      className="w-full bg-white/5 border-2 border-white/5 rounded-2xl px-5 py-3 text-sm font-bold text-slate-300 focus:border-rose-500/50 transition-all outline-none"
+                      placeholder="Paste channel secret here"
+                      className="w-full bg-white/[0.03] border-2 border-white/5 rounded-2xl px-6 py-4 text-sm font-bold text-slate-300 focus:border-rose-500/50 focus:bg-white/[0.05] transition-all outline-none"
                     />
                   </div>
-                  <div className="space-y-1.5">
+                  <div className="space-y-2">
                     <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block ml-1">Access Token</label>
                     <textarea 
-                      rows={2}
+                      rows={3}
                       value={getSetting('line_token_help') || ''}
                       onChange={(e) => handleUpdateLocalSetting('line_token_help', e.target.value)}
-                      placeholder="Enter long channel access token..."
-                      className="w-full bg-white/5 border-2 border-white/5 rounded-2xl px-5 py-3 text-xs font-bold text-slate-300 focus:border-rose-500/50 transition-all outline-none resize-none"
+                      placeholder="Paste long access token here..."
+                      className="w-full bg-white/[0.03] border-2 border-white/5 rounded-2xl px-6 py-4 text-xs font-bold text-slate-300 focus:border-rose-500/50 focus:bg-white/[0.05] transition-all outline-none resize-none leading-relaxed"
                     />
                   </div>
                 </div>
               </div>
             </div>
-            
-            <div className="mt-10 p-4 bg-white/5 rounded-2xl flex items-center gap-3">
-              <div className="w-10 h-10 bg-amber-500/10 text-amber-500 rounded-xl flex items-center justify-center shrink-0">
-                <Icons.Settings size={20} />
-              </div>
-              <p className="text-[10px] text-slate-400 font-medium leading-relaxed">
-                <span className="text-white font-black uppercase">Note:</span> Credential changes take immediate effect for all new incoming webhooks and outgoing replies. Please ensure tokens are copied accurately from the LINE Developer Console.
-              </p>
-            </div>
           </Card>
         </div>
       )}
+
+      {/* Floating Save Bar - Sticky Action Footer */}
+      <div className={`fixed bottom-8 left-1/2 -translate-x-1/2 z-50 transition-all duration-500 ${hasChanges ? 'translate-y-0 opacity-100 scale-100' : 'translate-y-20 opacity-0 scale-95 pointer-events-none'}`}>
+          <div className="bg-slate-900 border border-white/10 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.5)] rounded-full px-4 py-3 flex items-center gap-6 backdrop-blur-xl">
+             <div className="flex items-center gap-3 pl-4">
+                <div className="w-10 h-10 bg-amber-400 rounded-full flex items-center justify-center animate-pulse shadow-[0_0_20px_rgba(251,191,36,0.5)]">
+                   <Icons.Settings size={18} className="text-slate-900" />
+                </div>
+                <div className="pr-4 border-r border-white/10">
+                   <p className="text-[10px] font-black text-white uppercase tracking-widest leading-none">Unsaved Changes Detected</p>
+                   <p className="text-[9px] font-medium text-slate-400 mt-1">Please review and save your updates</p>
+                </div>
+             </div>
+             
+             <button 
+                onClick={handleSaveSettings}
+                disabled={isSaving}
+                className="bg-primary text-white h-12 px-10 rounded-full font-black text-sm shadow-xl shadow-primary/30 hover:scale-105 active:scale-95 transition-all flex items-center gap-2 group"
+             >
+                {isSaving ? (
+                  <Icons.Refresh size={18} className="animate-spin" />
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <span>บันทึกการเปลี่ยนแปลงทั้งหมด</span>
+                    <Icons.ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+                  </div>
+                )}
+             </button>
+          </div>
+      </div>
     </div>
   );
 }

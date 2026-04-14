@@ -5,7 +5,7 @@ import Card from "@/components/ui/Card";
 import { Icons } from "@/components/ui/Icons";
 
 export default function AdminDashboard() {
-  const [stats, setStats] = useState({ users: 0, stores: 0, orders: 0, revenue: 0 });
+  const [stats, setStats] = useState({ users: 0, stores: 0, orders: 0, revenue: 0, earnings: 0, commissionRate: 15 });
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -18,7 +18,9 @@ export default function AdminDashboard() {
             users: data.users || 0,
             stores: data.stores || 0,
             orders: data.orders || 0,
-            revenue: data.revenue || 0
+            revenue: data.revenue || 0,
+            earnings: data.earnings || 0,
+            commissionRate: data.commissionRate || 15
           });
         }
       } catch (err) {
@@ -32,9 +34,14 @@ export default function AdminDashboard() {
 
   return (
     <div className="space-y-6">
-      <header className="mb-8">
-        <h1 className="text-3xl font-black text-slate-900 tracking-tight">System Overview</h1>
-        <p className="text-slate-500 font-medium">Real-time metrics and platform health</p>
+      <header className="mb-8 flex justify-between items-end">
+        <div>
+          <h1 className="text-3xl font-black text-slate-900 tracking-tight">System Overview</h1>
+          <p className="text-slate-500 font-medium">Real-time metrics and platform health</p>
+        </div>
+        <div className="bg-emerald-50 text-emerald-600 px-4 py-2 rounded-2xl text-xs font-black uppercase tracking-widest border border-emerald-100 italic shadow-sm">
+           Live Sync Active
+        </div>
       </header>
 
       {isLoading ? (
@@ -43,39 +50,57 @@ export default function AdminDashboard() {
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
             <Card className="p-6 bg-white border border-slate-200/60 shadow-sm hover:shadow-md transition-shadow">
                <div className="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center mb-4">
                   <Icons.User size={24} />
                </div>
-               <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Total Users</p>
-               <h2 className="text-3xl font-black text-slate-900">{stats.users.toLocaleString()}</h2>
+               <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Total Users</p>
+               <h2 className="text-3xl font-black text-slate-900 leading-none">{stats.users.toLocaleString()}</h2>
             </Card>
 
             <Card className="p-6 bg-white border border-slate-200/60 shadow-sm hover:shadow-md transition-shadow">
                <div className="w-12 h-12 rounded-xl bg-orange-50 text-orange-600 flex items-center justify-center mb-4">
                   <Icons.Office size={24} />
                </div>
-               <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Active Stores</p>
-               <h2 className="text-3xl font-black text-slate-900">{stats.stores.toLocaleString()}</h2>
+               <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Active Stores</p>
+               <h2 className="text-3xl font-black text-slate-900 leading-none">{stats.stores.toLocaleString()}</h2>
             </Card>
 
             <Card className="p-6 bg-white border border-slate-200/60 shadow-sm hover:shadow-md transition-shadow">
-               <div className="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-4">
+               <div className="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center mb-4">
                   <Icons.FileText size={24} />
                </div>
-               <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Total Orders</p>
-               <h2 className="text-3xl font-black text-slate-900">{stats.orders.toLocaleString()}</h2>
+               <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Total Orders</p>
+               <h2 className="text-3xl font-black text-slate-900 leading-none">{stats.orders.toLocaleString()}</h2>
             </Card>
 
-            <Card className="p-6 bg-slate-900 text-white shadow-xl shadow-slate-900/20">
-               <div className="w-12 h-12 rounded-xl bg-white/10 text-emerald-400 flex items-center justify-center mb-4">
+            <Card className="p-6 bg-white border border-slate-100 shadow-sm relative overflow-hidden group">
+               <div className="absolute top-0 right-0 w-20 h-20 bg-slate-50 rounded-full blur-3xl -mr-10 -mt-10" />
+               <div className="w-12 h-12 rounded-xl bg-slate-50 text-slate-400 flex items-center justify-center mb-4 relative z-10">
+                  <Icons.Finance size={24} />
+               </div>
+               <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 relative z-10">Gross Revenue</p>
+               <h2 className="text-2xl font-black text-slate-900 leading-none relative z-10">
+                 <span className="text-sm font-bold text-slate-300 mr-1">฿</span>
+                 {stats.revenue.toLocaleString()}
+               </h2>
+            </Card>
+
+            <Card className="p-6 bg-indigo-600 text-white shadow-xl shadow-indigo-600/20 relative overflow-hidden">
+               <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-3xl -mr-16 -mt-16" />
+               <div className="w-12 h-12 rounded-xl bg-white/20 text-white flex items-center justify-center mb-4 relative z-10 shadow-lg">
                   <Icons.Wallet size={24} />
                </div>
-               <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Gross Revenue</p>
-               <h2 className="text-3xl font-black tracking-tighter">
-                 <span className="text-xl text-slate-400 font-bold mr-1">฿</span>
-                 {stats.revenue.toLocaleString()}
+               <div className="relative z-10 flex items-center justify-between mb-1">
+                 <p className="text-[10px] font-black text-indigo-100 uppercase tracking-widest">Platform Earnings</p>
+                 <div className="bg-white/20 px-2 py-0.5 rounded-md text-[9px] font-black tracking-tighter">
+                   {stats.commissionRate}% FEE
+                 </div>
+               </div>
+               <h2 className="text-3xl font-black tracking-tighter relative z-10">
+                 <span className="text-xl text-white/50 font-bold mr-1">฿</span>
+                 {stats.earnings.toLocaleString()}
                </h2>
             </Card>
           </div>

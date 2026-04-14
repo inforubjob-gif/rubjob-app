@@ -100,18 +100,28 @@ function BookingFlow() {
 
     async function fetchData() {
       try {
-        const [sRes, stRes, adRes] = await Promise.all([
+        const [sRes, stRes, adRes, setRes] = await Promise.all([
           fetch("/api/services"),
           fetch("/api/stores"),
-          fetch(`/api/user/addresses?userId=${profile?.userId}`)
+          fetch(`/api/user/addresses?userId=${profile?.userId}`),
+          fetch("/api/admin/settings") // Fetch system settings
         ]);
 
         const sData = (await sRes.json()) as any;
         const stData = (await stRes.json()) as any;
         const adData = (await adRes.json()) as any;
+        const setData = (await setRes.json()) as any;
 
         if (sData.services) setDbServices(sData.services);
         if (stData.stores) setDbStores(stData.stores);
+        if (setData.settings) {
+          const settingsMap: Record<string, any> = {};
+          setData.settings.forEach((s: any) => {
+            settingsMap[s.key] = s.value;
+          });
+          setSystemSettings(settingsMap);
+        }
+        
         if (adData.addresses) {
           setDbAddresses(adData.addresses);
           if (adData.addresses.length > 0 && !selectedAddress) {
@@ -220,11 +230,15 @@ function BookingFlow() {
   // Pricing Logic
   const baseDeliveryFee = deliverySpeed === "express" ? 59 : 39;
   
+  // Dynamic radius from settings
+  const radiusLimit = Number(systemSettings.radius_km) || 5;
+  const radiusExtended = radiusLimit * 2; // e.g. 10 if radius is 5
+
   let distanceExtra = 0;
-  if (distanceKm > 10) {
-    distanceExtra = (10 - 5) * 8 + Math.ceil(distanceKm - 10) * 20;
-  } else if (distanceKm > 5) {
-    distanceExtra = Math.ceil(distanceKm - 5) * 8;
+  if (distanceKm > radiusExtended) {
+    distanceExtra = (radiusExtended - radiusLimit) * 8 + Math.ceil(distanceKm - radiusExtended) * 20;
+  } else if (distanceKm > radiusLimit) {
+    distanceExtra = Math.ceil(distanceKm - radiusLimit) * 8;
   }
   const deliveryFee = selectedAddress && selectedStore ? baseDeliveryFee + distanceExtra : 0;
 
@@ -242,9 +256,17 @@ function BookingFlow() {
   const totalDiscount = couponDiscount + pointsDiscount;
   const totalPrice = Math.max(subTotal - totalDiscount, 0);
 
+  const minOrderAmount = Number(systemSettings.min_order_amount) || 0;
+  const isBelowMinOrder = totalPrice < minOrderAmount;
+
   const unitLabel = service?.unit === "hour" ? t("booking.hours") : service?.unit === "session" ? t("home.perSession") : t("home.perPiece");
 
   async function handleConfirm() {
+    if (isBelowMinOrder) {
+      alert(`ยอดสั่งซื้อขั้นต่ำคือ ฿${minOrderAmount} กรุณาเพิ่มบริการอื่นเพิ่มเติม`);
+      return;
+    }
+
     setIsSubmitting(true);
     try {
       if (!profile?.userId) {
@@ -288,6 +310,29 @@ function BookingFlow() {
     } finally {
       setIsSubmitting(false);
     }
+  }
+
+  // Handle platform closed state
+  if (isLoaded && systemSettings.is_open === "false") {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-dvh px-10 text-center animate-fade-in bg-slate-50">
+        <div className="w-24 h-24 bg-white rounded-[2.5rem] shadow-xl flex items-center justify-center mb-8 border border-slate-100">
+           <Icons.Settings size={48} className="text-slate-300 animate-spin-slow" />
+        </div>
+        <h2 className="text-2xl font-black text-slate-900 tracking-tight">ขออภัย ระบบปิดให้บริการชั่วคราว</h2>
+        <p className="text-slate-500 mt-3 font-medium leading-relaxed">
+          ขณะนี้แอดมินกำลังปรับปรุงระบบ หรือนอกเวลาทำการ <br/>
+          กรุณากลับมาใหม่อีกครั้งในภายหลังครับ
+        </p>
+        <Button 
+          variant="outline" 
+          className="mt-10 rounded-2xl border-2 font-black px-10"
+          onClick={() => router.push("/")}
+        >
+          กลับหน้าหลัก
+        </Button>
+      </div>
+    );
   }
 
   return (
@@ -763,7 +808,18 @@ function BookingFlow() {
       </div>
 
       {/* ─── Bottom CTA ─── */}
-      <div className="sticky bottom-20 px-5 pb-4">
+      <div className="sticky bottom-20 px-5 pb-4 space-y-3">
+        {step === "payment" && isBelowMinOrder && (
+          <div className="bg-rose-50 border border-rose-100 p-3 rounded-2xl flex items-center gap-3 animate-bounce">
+            <div className="w-8 h-8 bg-rose-100 text-rose-600 rounded-full flex items-center justify-center shrink-0">
+               <Icons.Info size={16} />
+            </div>
+            <p className="text-[11px] font-black text-rose-600 uppercase tracking-tight">
+              ยอดสั่งซื้อขั้นต่ำคือ ฿{minOrderAmount} (ยังขาดอีก ฿{minOrderAmount - totalPrice})
+            </p>
+          </div>
+        )}
+
         {step === "service" && (
           <Button
             fullWidth
@@ -789,10 +845,11 @@ function BookingFlow() {
             fullWidth
             size="lg"
             isLoading={isSubmitting}
-            disabled={!selectedPayment}
+            disabled={!selectedPayment || isBelowMinOrder}
             onClick={handleConfirm}
+            className={isBelowMinOrder ? "bg-slate-300 text-slate-500 shadow-none border-transparent" : ""}
           >
-            {isSubmitting ? t("common.loading") : `${t("booking.placeOrder")} — ฿${totalPrice}`}
+            {isSubmitting ? t("common.loading") : isBelowMinOrder ? `สั่งซื้อไม่ได้ (ขั้นต่ำ ฿${minOrderAmount})` : `${t("booking.placeOrder")} — ฿${totalPrice}`}
           </Button>
         )}
       </div>
