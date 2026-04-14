@@ -68,12 +68,16 @@ export default function RiderAuthGate({ children }: { children: React.ReactNode 
         <div className="absolute bottom-0 left-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl -ml-32 -mb-32" />
 
         <div className="relative z-10 w-full max-w-sm mx-auto space-y-10">
-          <div className="text-center">
-            <div className="w-24 h-24 bg-primary rounded-[2.5rem] flex items-center justify-center text-slate-900 mx-auto shadow-2xl shadow-primary/30 mb-8 border-4 border-white">
-              <Icons.Truck size={48} strokeWidth={2.5} />
+          <div className="text-center px-4">
+            <div className="mb-10 flex justify-center">
+              <img 
+                src="/images/rubjob-complete_logo-color.png" 
+                alt="RUBJOB Official Logo" 
+                className="h-20 w-auto object-contain drop-shadow-md"
+              />
             </div>
-            <h1 className="text-3xl font-black text-slate-900 tracking-tight leading-none">เข้าสู่ระบบไรเดอร์</h1>
-            <p className="text-[10px] text-slate-400 font-black uppercase tracking-[0.2em] mt-3 bg-white/80 backdrop-blur-sm py-1 px-4 rounded-full inline-block border border-slate-100 italic">
+            <h2 className="text-30 font-black text-slate-900 tracking-tight leading-none underline decoration-primary decoration-4 underline-offset-8">เข้าสู่ระบบไรเดอร์</h2>
+            <p className="text-[10px] text-slate-400 font-black uppercase tracking-[0.2em] mt-6 bg-white/80 backdrop-blur-sm py-1 px-4 rounded-full inline-block border border-slate-100 italic">
               RUBJOB DELIVERY SERVICE
             </p>
           </div>
