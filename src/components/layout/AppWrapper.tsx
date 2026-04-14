@@ -11,9 +11,15 @@ export default function AppWrapper({ children }: { children: React.ReactNode }) 
   const [needsOnboarding, setNeedsOnboarding] = useState<boolean | null>(null);
   const [checkingOnboarding, setCheckingOnboarding] = useState(false);
 
+  const isBackoffice = typeof window !== "undefined" && (
+    window.location.pathname.startsWith("/admin") || 
+    window.location.pathname.startsWith("/rider") || 
+    window.location.pathname.startsWith("/store")
+  );
+
   // Check if user has completed onboarding (has phone + at least 1 address)
   useEffect(() => {
-    if (!isReady || !isLoggedIn || !profile?.userId) {
+    if (!isReady || !isLoggedIn || !profile?.userId || isBackoffice) {
       setNeedsOnboarding(null);
       return;
     }
@@ -49,7 +55,7 @@ export default function AppWrapper({ children }: { children: React.ReactNode }) 
     }
 
     checkOnboarding();
-  }, [isReady, isLoggedIn, profile?.userId]);
+  }, [isReady, isLoggedIn, profile?.userId, isBackoffice]);
 
   if (!isReady) {
     return (
@@ -61,10 +67,15 @@ export default function AppWrapper({ children }: { children: React.ReactNode }) 
   }
 
   if (!isLoggedIn) {
-    if (typeof window !== "undefined" && (window.location.pathname.startsWith("/admin") || window.location.pathname.startsWith("/rider"))) {
+    if (isBackoffice) {
       return <>{children}</>;
     }
     return <LoginView />;
+  }
+
+  // If on backoffice, don't check onboarding at all
+  if (isBackoffice) {
+    return <>{children}</>;
   }
 
   // Still checking onboarding status
