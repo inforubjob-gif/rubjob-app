@@ -39,12 +39,12 @@ export default function AdminDashboard() {
 
   return (
     <div className="space-y-6">
-      <header className="mb-8 flex justify-between items-end">
+      <header className="mb-6 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-black text-slate-900 tracking-tight">System Overview</h1>
-          <p className="text-slate-500 font-medium tracking-tight">Financial formulas: Store {stats.gpStore}% / Rider {stats.gpRider}%</p>
+          <h1 className="text-2xl md:text-3xl font-black text-slate-900 tracking-tight">System Overview</h1>
+          <p className="text-slate-500 text-sm md:text-base font-medium tracking-tight">Financial formulas: Store {stats.gpStore}% / Rider {stats.gpRider}%</p>
         </div>
-        <div className="bg-emerald-50 text-emerald-600 px-4 py-2 rounded-2xl text-[10px] font-black uppercase tracking-widest border border-emerald-100 italic shadow-sm flex items-center gap-2">
+        <div className="w-fit bg-emerald-50 text-emerald-600 px-4 py-2 rounded-2xl text-[10px] font-black uppercase tracking-widest border border-emerald-100 italic shadow-sm flex items-center gap-2">
            <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
            Live Sync Active
         </div>

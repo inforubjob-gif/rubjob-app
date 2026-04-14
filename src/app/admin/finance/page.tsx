@@ -68,14 +68,14 @@ export default function FinanceAdminPage() {
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto pb-20">
-      <header className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+      <header className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-           <h1 className="text-3xl font-black text-slate-900 tracking-tight uppercase">Accounting & Treasury</h1>
-           <p className="text-slate-500 font-medium mt-1">Audit operational revenue and facilitate partner withdrawals</p>
+           <h1 className="text-2xl md:text-3xl font-black text-slate-900 tracking-tight uppercase">Accounting & Treasury</h1>
+           <p className="text-slate-500 text-sm md:text-base font-medium mt-1">Audit operational revenue and facilitate partner withdrawals</p>
         </div>
-        <div className="flex gap-2">
-            <button className="px-4 py-2 bg-emerald-600 text-white rounded-xl text-sm font-bold shadow-lg shadow-emerald-200 flex items-center gap-2 hover:bg-emerald-700 transition-colors">
-               <Icons.FileText size={16} /> Export Treasury Report
+        <div className="flex gap-2 w-full sm:w-auto">
+            <button className="px-5 py-3 bg-emerald-600 text-white rounded-xl text-sm font-bold shadow-lg shadow-emerald-200 flex items-center justify-center gap-2 hover:bg-emerald-700 transition-colors w-full sm:w-auto">
+               <Icons.FileText size={16} /> Export Report
             </button>
         </div>
       </header>
@@ -105,17 +105,17 @@ export default function FinanceAdminPage() {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-4 border-b border-slate-200 mb-6">
+      <div className="flex gap-6 border-b border-slate-200 mb-6 overflow-x-auto no-scrollbar whitespace-nowrap">
         <button 
           onClick={() => setActiveTab('revenue')}
-          className={`pb-4 text-xs font-black uppercase tracking-widest transition-all relative ${activeTab === 'revenue' ? 'text-slate-900' : 'text-slate-400 hover:text-slate-600'}`}
+          className={`pb-4 text-[11px] font-black uppercase tracking-widest transition-all relative shrink-0 ${activeTab === 'revenue' ? 'text-slate-900' : 'text-slate-400 hover:text-slate-600'}`}
         >
           Revenue Audit
           {activeTab === 'revenue' && <div className="absolute bottom-0 left-0 right-0 h-1 bg-primary rounded-t-full shadow-lg shadow-primary/40 animate-in slide-in-from-bottom-1" />}
         </button>
         <button 
           onClick={() => setActiveTab('payouts')}
-          className={`pb-4 text-xs font-black uppercase tracking-widest transition-all relative ${activeTab === 'payouts' ? 'text-slate-900' : 'text-slate-400 hover:text-slate-600'}`}
+          className={`pb-4 text-[11px] font-black uppercase tracking-widest transition-all relative shrink-0 ${activeTab === 'payouts' ? 'text-slate-900' : 'text-slate-400 hover:text-slate-600'}`}
         >
           Payout Requests
           {activeTab === 'payouts' && <div className="absolute bottom-0 left-0 right-0 h-1 bg-primary rounded-t-full shadow-lg shadow-primary/40 animate-in slide-in-from-bottom-1" />}

@@ -14,18 +14,22 @@ export async function POST(req: Request) {
 
     let adminName = null;
 
-    const db = getRequestContext().env.DB;
-    if (!db) {
-      console.warn("D1 not found, falling back to environment variables only.");
-    } else {
-      // 1. Check D1 Database
-      const admin = await db.prepare(`
-        SELECT * FROM admin_users WHERE email = ? AND password = ?
-      `).bind(email, password).first();
+    // 1. Try D1 Database (Safe check for local dev)
+    try {
+      const context = getRequestContext();
+      const db = context?.env?.DB;
+      
+      if (db) {
+        const admin = await db.prepare(`
+          SELECT * FROM admin_users WHERE email = ? AND password = ?
+        `).bind(email, password).first();
 
-      if (admin) {
-        adminName = admin.name;
+        if (admin) {
+          adminName = (admin as any).name;
+        }
       }
+    } catch (dbErr) {
+      console.warn("D1 access failed or context missing, using fallback:", dbErr);
     }
 
     // 2. Fallback to Environment Variables

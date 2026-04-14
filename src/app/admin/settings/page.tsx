@@ -143,32 +143,32 @@ export default function SettingsAdminPage() {
 
   return (
     <div className="space-y-8 max-w-5xl pb-40">
-      <header className="flex items-center justify-between">
+      <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-4xl font-black text-slate-900 tracking-tight">System Settings</h1>
-          <p className="text-slate-500 font-medium tracking-tight">Manage authorized personnel and application configuration</p>
+          <h1 className="text-3xl md:text-4xl font-black text-slate-900 tracking-tight">System Settings</h1>
+          <p className="text-slate-500 text-sm md:text-base font-medium tracking-tight">Manage authorized personnel and application configuration</p>
         </div>
-        <div className="bg-white px-4 py-2 rounded-2xl border border-slate-100 shadow-sm text-[10px] font-black uppercase tracking-widest text-slate-400">
+        <div className="w-fit bg-white px-4 py-2 rounded-2xl border border-slate-100 shadow-sm text-[10px] font-black uppercase tracking-widest text-slate-400">
            Admin Engine v2.0
         </div>
       </header>
       
       {/* Tabs */}
-      <div className="flex gap-1 bg-slate-100 p-1.5 rounded-[2rem] w-fit">
+      <div className="flex bg-slate-100 p-1.5 rounded-[2rem] w-full sm:w-fit overflow-x-auto no-scrollbar whitespace-nowrap">
         <button 
           onClick={() => setActiveTab("system")}
-          className={`px-8 py-3.5 text-sm font-black rounded-[1.75rem] transition-all ${activeTab === 'system' ? 'bg-white text-primary shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
+          className={`flex-1 sm:flex-none px-6 md:px-8 py-3.5 text-xs md:text-sm font-black rounded-[1.75rem] transition-all ${activeTab === 'system' ? 'bg-white text-primary shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
         >
-          <div className="flex items-center gap-2">
+          <div className="flex items-center justify-center gap-2">
             <Icons.Settings size={18} />
-            Application Settings
+            System
           </div>
         </button>
         <button 
           onClick={() => setActiveTab("admins")}
-          className={`px-8 py-3.5 text-sm font-black rounded-[1.75rem] transition-all ${activeTab === 'admins' ? 'bg-white text-primary shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
+          className={`flex-1 sm:flex-none px-6 md:px-8 py-3.5 text-xs md:text-sm font-black rounded-[1.75rem] transition-all ${activeTab === 'admins' ? 'bg-white text-primary shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
         >
-          <div className="flex items-center gap-2">
+          <div className="flex items-center justify-center gap-2">
             <Icons.User size={18} />
             Admins
           </div>
@@ -437,29 +437,29 @@ export default function SettingsAdminPage() {
       )}
 
       {/* Floating Save Bar - Sticky Action Footer */}
-      <div className={`fixed bottom-8 left-1/2 -translate-x-1/2 z-50 transition-all duration-500 ${hasChanges ? 'translate-y-0 opacity-100 scale-100' : 'translate-y-20 opacity-0 scale-95 pointer-events-none'}`}>
-          <div className="bg-slate-900 border border-white/10 shadow-[0_25px_70px_-15px_rgba(0,0,0,0.6)] rounded-full px-5 py-4 flex items-center gap-8 backdrop-blur-2xl">
-             <div className="flex items-center gap-3 pl-4">
-                <div className="w-12 h-12 bg-amber-400 rounded-2xl flex items-center justify-center animate-pulse shadow-[0_0_20px_rgba(251,191,36,0.3)]">
-                   <Icons.Settings size={22} className="text-slate-900" />
+      <div className={`fixed bottom-8 left-4 right-4 md:left-1/2 md:-translate-x-1/2 md:right-auto z-50 transition-all duration-500 ${hasChanges ? 'translate-y-0 opacity-100 scale-100' : 'translate-y-20 opacity-0 scale-95 pointer-events-none'}`}>
+          <div className="bg-slate-900 border border-white/10 shadow-[0_25px_70px_-15px_rgba(0,0,0,0.6)] rounded-[2rem] md:rounded-full px-4 md:px-5 py-3 md:py-4 flex flex-col md:flex-row items-center gap-4 md:gap-8 backdrop-blur-2xl">
+             <div className="flex items-center gap-3 md:pl-4">
+                <div className="w-10 h-10 md:w-12 md:h-12 bg-amber-400 rounded-xl md:rounded-2xl flex items-center justify-center animate-pulse shadow-[0_0_20px_rgba(251,191,36,0.3)] shrink-0">
+                   <Icons.Settings size={20} className="text-slate-900" />
                 </div>
-                <div className="pr-6 border-r border-white/10">
-                   <p className="text-[11px] font-black text-white uppercase tracking-widest leading-none">Unsaved Updates</p>
-                   <p className="text-[9px] font-medium text-slate-400 mt-2">New GP formula ready to deploy</p>
+                <div className="md:pr-6 md:border-r md:border-white/10">
+                   <p className="text-[10px] md:text-[11px] font-black text-white uppercase tracking-widest leading-none">Unsaved Updates</p>
+                   <p className="hidden md:block text-[9px] font-medium text-slate-400 mt-2">New GP formula ready to deploy</p>
                 </div>
              </div>
              
              <button 
                 onClick={handleSaveSettings}
                 disabled={isSaving}
-                className="bg-primary text-white h-14 px-12 rounded-[1.25rem] font-black text-sm shadow-2xl shadow-primary/30 hover:scale-105 active:scale-95 transition-all flex items-center gap-3 group"
+                className="bg-primary text-white h-12 md:h-14 px-8 md:px-12 rounded-xl md:rounded-[1.25rem] font-black text-xs md:text-sm shadow-2xl shadow-primary/30 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3 group w-full md:w-auto"
              >
                 {isSaving ? (
-                  <Icons.Refresh size={20} className="animate-spin" />
+                  <Icons.Refresh size={18} className="animate-spin" />
                 ) : (
                   <div className="flex items-center gap-3">
-                    <span className="uppercase tracking-widest">บันทึกการเปลี่ยนแปลงทั้งหมด</span>
-                    <Icons.ArrowRight size={18} className="group-hover:translate-x-1.5 transition-transform" />
+                    <span className="uppercase tracking-widest text-[10px] md:text-sm">บันทึกทั้งหมด</span>
+                    <Icons.ArrowRight size={16} className="group-hover:translate-x-1.5 transition-transform" />
                   </div>
                 )}
              </button>

@@ -107,14 +107,14 @@ export default function CouponsAdminPage() {
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
-      <header className="mb-6 flex items-center justify-between">
+      <header className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-black text-slate-900 tracking-tight">Coupon Management</h1>
-          <p className="text-slate-500 font-medium mt-1">Create marketing codes and wallet-based promotions</p>
+          <h1 className="text-xl md:text-2xl font-black text-slate-900 tracking-tight">Coupon Management</h1>
+          <p className="text-slate-500 text-sm md:text-base font-medium mt-1">Create marketing codes and wallet-based promotions</p>
         </div>
         <button 
           onClick={() => setIsModalOpen(true)}
-          className="px-5 py-2.5 bg-slate-900 text-white rounded-xl text-sm font-bold shadow-lg flex items-center gap-2 hover:bg-slate-800 transition-all active:scale-95"
+          className="px-5 py-3 bg-slate-900 text-white rounded-xl text-sm font-bold shadow-lg flex items-center justify-center gap-2 hover:bg-slate-800 transition-all active:scale-95 w-full sm:w-auto"
         >
           <Icons.Plus size={16} /> New Coupon
         </button>

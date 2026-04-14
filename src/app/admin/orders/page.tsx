@@ -27,11 +27,9 @@ export default function AdminOrdersPage() {
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
-      <header className="mb-6 flex items-center justify-between">
-        <div>
-           <h1 className="text-2xl font-black text-slate-900 tracking-tight">Active Orders</h1>
-           <p className="text-slate-500 font-medium mt-1">Monitor real-time operational status across all stores</p>
-        </div>
+      <header className="mb-6">
+         <h1 className="text-xl md:text-2xl font-black text-slate-900 tracking-tight">Active Orders</h1>
+         <p className="text-slate-500 text-sm md:text-base font-medium mt-1">Monitor real-time operational status across all stores</p>
       </header>
 
       <Card className="bg-white border border-slate-200/60 shadow-sm overflow-hidden">

@@ -44,14 +44,14 @@ export default function RiderManagementAdminPage() {
 
   return (
     <div className="space-y-8 max-w-7xl mx-auto">
-      <header className="flex items-center justify-between">
+      <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-black text-slate-900 tracking-tight">Fleet Directory</h1>
-          <p className="text-slate-500 font-medium mt-1">Manage delivery personnel, vehicles, and verification documents</p>
+          <h1 className="text-2xl md:text-3xl font-black text-slate-900 tracking-tight">Fleet Directory</h1>
+          <p className="text-slate-500 text-sm md:text-base font-medium mt-1">Manage delivery personnel, vehicles, and verification documents</p>
         </div>
         <Link 
           href="/admin/riders/new"
-          className="px-5 py-2.5 bg-slate-900 text-white rounded-xl text-sm font-bold shadow-lg flex items-center gap-2 hover:bg-slate-800 transition-all active:scale-95"
+          className="px-5 py-3 bg-slate-900 text-white rounded-xl text-sm font-bold shadow-lg flex items-center justify-center gap-2 hover:bg-slate-800 transition-all active:scale-95 w-full sm:w-auto"
         >
           <Icons.Plus size={16} /> New Rider
         </Link>

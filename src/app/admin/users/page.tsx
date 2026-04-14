@@ -45,16 +45,16 @@ export default function UsersAdminPage() {
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
-      <header className="mb-6 flex items-center justify-between">
+      <header className="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-           <h1 className="text-2xl font-black text-slate-900 tracking-tight">User Management</h1>
-           <p className="text-slate-500 font-medium mt-1">View and manage customer, store, and rider accounts</p>
+           <h1 className="text-xl md:text-2xl font-black text-slate-900 tracking-tight">User Management</h1>
+           <p className="text-slate-500 text-sm md:text-base font-medium mt-1">View and manage customer, store, and rider accounts</p>
         </div>
-        <div className="flex bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
+        <div className="flex bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm w-full md:w-auto">
            <div className="px-4 py-2 bg-slate-50 border-r border-slate-200 text-slate-500 font-bold text-sm flex items-center gap-2">
              <Icons.Search size={16} />
            </div>
-           <input type="text" placeholder="Search ID or Name" className="px-4 py-2 outline-none text-sm font-medium w-64" />
+           <input type="text" placeholder="Search ID or Name" className="px-4 py-2 outline-none text-sm font-medium flex-1 md:w-64" />
         </div>
       </header>
 
