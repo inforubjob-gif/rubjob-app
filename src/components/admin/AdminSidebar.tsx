@@ -15,6 +15,7 @@ export default function AdminSidebar() {
     { label: "Riders", href: "/admin/riders", icon: <Icons.Car size={20} /> },
     { label: "Coupons", href: "/admin/coupons", icon: <Icons.Ticket size={20} /> },
     { label: "Finance", href: "/admin/finance", icon: <Icons.Wallet size={20} /> },
+    { label: "Support Center", href: "/admin/support", icon: <Icons.Chat size={20} /> },
     { label: "Settings", href: "/admin/settings", icon: <Icons.Settings size={20} /> },
   ];
 

@@ -171,3 +171,28 @@ CREATE TABLE IF NOT EXISTS payout_requests (
   createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
   processedAt DATETIME
 );
+
+-- Support Tickets Table
+CREATE TABLE IF NOT EXISTS support_tickets (
+  id TEXT PRIMARY KEY,
+  userId TEXT NOT NULL,
+  channel TEXT NOT NULL, -- 'regular_line', 'help_line', 'in_app'
+  status TEXT DEFAULT 'open', -- 'open', 'pending', 'resolved', 'closed'
+  subject TEXT,
+  assignedAdminId TEXT,
+  createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (userId) REFERENCES users(id)
+);
+
+-- Support Messages Table
+CREATE TABLE IF NOT EXISTS support_messages (
+  id TEXT PRIMARY KEY,
+  ticketId TEXT NOT NULL,
+  senderType TEXT NOT NULL, -- 'user', 'admin'
+  senderId TEXT NOT NULL, -- can be LINE userId or Admin email
+  content TEXT NOT NULL,
+  contentType TEXT DEFAULT 'text', -- 'text', 'image', 'file'
+  createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (ticketId) REFERENCES support_tickets(id) ON DELETE CASCADE
+);
