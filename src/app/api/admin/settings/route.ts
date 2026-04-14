@@ -38,21 +38,28 @@ export async function GET() {
     `).run();
 
     // 2. Fetch existing
-    let { results } = await db.prepare(`SELECT * FROM system_settings`).all();
+    const { results: existing } = await db.prepare(`SELECT * FROM system_settings`).all();
+    const existingKeys = new Set((existing as any[]).map(r => r.key));
 
-    // 3. Seed if empty
-    if (results.length === 0) {
-      for (const item of DEFAULT_SETTINGS) {
+    // 3. Ensure all DEFAULT_SETTINGS exist (Auto-migration)
+    let needsRefresh = false;
+    for (const item of DEFAULT_SETTINGS) {
+      if (!existingKeys.has(item.key)) {
         await db.prepare(`
           INSERT INTO system_settings (key, value, type, description)
           VALUES (?, ?, ?, ?)
         `).bind(item.key, item.value, item.type, item.description).run();
+        needsRefresh = true;
       }
-      const seeded = await db.prepare(`SELECT * FROM system_settings`).all();
-      results = seeded.results;
     }
 
-    return NextResponse.json({ settings: results });
+    let finalResults = existing;
+    if (needsRefresh) {
+      const { results } = await db.prepare(`SELECT * FROM system_settings`).all();
+      finalResults = results;
+    }
+
+    return NextResponse.json({ settings: finalResults });
   } catch (error: any) {
     console.error("Fetch settings error:", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
