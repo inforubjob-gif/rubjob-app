@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import Card from "@/components/ui/Card";
 import { Icons } from "@/components/ui/Icons";
 
@@ -120,18 +121,18 @@ export default function AdminDashboard() {
             <Card className="p-6 bg-white border border-slate-200/60 shadow-sm">
                <h3 className="text-lg font-black text-slate-900 mb-6">Quick Actions</h3>
                <div className="space-y-3">
-                  <button className="w-full py-4 px-4 bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold rounded-xl flex items-center justify-between transition-colors">
+                  <Link href="/admin/finance" className="w-full py-4 px-4 bg-slate-50 hover:bg-slate-100 hover:scale-[1.02] active:scale-[0.98] text-slate-700 font-bold rounded-xl flex items-center justify-between transition-all group">
                      Process Payouts (3 Pending)
-                     <Icons.ArrowRight size={18} />
-                  </button>
-                  <button className="w-full py-4 px-4 bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold rounded-xl flex items-center justify-between transition-colors">
+                     <Icons.ArrowRight size={18} className="text-slate-300 group-hover:text-primary group-hover:translate-x-1 transition-all" />
+                  </Link>
+                  <Link href="/admin/stores" className="w-full py-4 px-4 bg-slate-50 hover:bg-slate-100 hover:scale-[1.02] active:scale-[0.98] text-slate-700 font-bold rounded-xl flex items-center justify-between transition-all group">
                      Review New Store Registrations
-                     <Icons.ArrowRight size={18} />
-                  </button>
-                  <button className="w-full py-4 px-4 bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold rounded-xl flex items-center justify-between transition-colors">
+                     <Icons.ArrowRight size={18} className="text-slate-300 group-hover:text-primary group-hover:translate-x-1 transition-all" />
+                  </Link>
+                  <Link href="/admin/settings" className="w-full py-4 px-4 bg-slate-50 hover:bg-slate-100 hover:scale-[1.02] active:scale-[0.98] text-slate-700 font-bold rounded-xl flex items-center justify-between transition-all group">
                      System Maintenance
-                     <Icons.ArrowRight size={18} />
-                  </button>
+                     <Icons.ArrowRight size={18} className="text-slate-300 group-hover:text-primary group-hover:translate-x-1 transition-all" />
+                  </Link>
                </div>
             </Card>
           </div>
