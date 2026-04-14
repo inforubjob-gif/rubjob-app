@@ -20,7 +20,19 @@ export async function GET(req: Request) {
     const adminName = "System Owner";
     const adminId = "emergency-" + Date.now();
 
-    // Reset table or just insert/replace
+    // 1. Force create table if it doesn't exist (Self-healing)
+    await db.prepare(`
+      CREATE TABLE IF NOT EXISTS admin_users (
+        id TEXT PRIMARY KEY,
+        email TEXT UNIQUE NOT NULL,
+        password TEXT NOT NULL,
+        name TEXT,
+        role TEXT DEFAULT 'admin',
+        createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
+      )
+    `).run();
+
+    // 2. Insert or replace the master admin
     await db.prepare(`
       INSERT OR REPLACE INTO admin_users (id, email, password, name, role)
       VALUES (?, ?, ?, ?, 'super_admin')
