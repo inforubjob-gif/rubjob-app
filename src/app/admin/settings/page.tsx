@@ -1,3 +1,24 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import { Icons } from "@/components/ui/Icons";
+import Card from "@/components/ui/Card";
+
+export default function SettingsAdminPage() {
+  const [activeTab, setActiveTab] = useState<"admins" | "system">("admins");
+  const [admins, setAdmins] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+
+  const [newAdmin, setNewAdmin] = useState({
+    name: "",
+    email: "",
+    password: "",
+    role: "admin"
+  });
+
   // System Settings State
   const [systemSettings, setSystemSettings] = useState<any[]>([]);
   const [localSettings, setLocalSettings] = useState<Record<string, any>>({});
@@ -7,6 +28,65 @@
     fetchAdmins();
     fetchSettings();
   }, []);
+
+  async function fetchAdmins() {
+    setIsLoading(true);
+    try {
+      const res = await fetch("/api/admin/users");
+      const data = await res.json();
+      if (data.users) setAdmins(data.users);
+    } catch (err) {
+      setError("Failed to fetch admin list.");
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  const handleAddAdmin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newAdmin.name || !newAdmin.email || !newAdmin.password) {
+      setError("Please fill in all fields.");
+      return;
+    }
+
+    setIsSaving(true);
+    setError("");
+    try {
+      const res = await fetch("/api/admin/users", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newAdmin)
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setSuccess("Admin created successfully!");
+        setNewAdmin({ name: "", email: "", password: "", role: "admin" });
+        fetchAdmins();
+        setTimeout(() => setSuccess(""), 3000);
+      } else {
+        setError(data.error || "Failed to create admin.");
+      }
+    } catch (err) {
+      setError("Connection error.");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleDeleteAdmin = async (id: number, email: string) => {
+    if (!confirm(`Are you sure you want to delete admin ${email}?`)) return;
+
+    try {
+      const res = await fetch(`/api/admin/users?id=${id}`, { method: "DELETE" });
+      if (res.ok) {
+        setSuccess("Admin deleted.");
+        fetchAdmins();
+        setTimeout(() => setSuccess(""), 3000);
+      }
+    } catch (err) {
+      setError("Failed to delete admin.");
+    }
+  };
 
   async function fetchSettings() {
     try {
