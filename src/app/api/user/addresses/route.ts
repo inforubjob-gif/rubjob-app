@@ -54,7 +54,21 @@ export async function POST(req: Request) {
 
     const id = `ADDR-${Date.now()}`;
     
-    // If isDefault is true, unset other defaults first
+    // 1. Ensure table exists (Self-healing)
+    await db.prepare(`
+      CREATE TABLE IF NOT EXISTS addresses (
+        id TEXT PRIMARY KEY,
+        userId TEXT NOT NULL,
+        label TEXT NOT NULL,
+        details TEXT,
+        note TEXT,
+        lat REAL,
+        lng REAL,
+        isDefault INTEGER DEFAULT 0
+      )
+    `).run();
+
+    // 2. If isDefault is true, unset other defaults first
     if (isDefault) {
       await db.prepare(`UPDATE addresses SET isDefault = 0 WHERE userId = ?`).bind(userId).run();
     }

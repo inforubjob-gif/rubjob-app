@@ -22,6 +22,35 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "D1 Database binding 'DB' not found" }, { status: 500 });
     }
 
+    // 1. Ensure table exists (Self-healing)
+    await db.prepare(`
+      CREATE TABLE IF NOT EXISTS addresses (
+        id TEXT PRIMARY KEY,
+        userId TEXT NOT NULL,
+        label TEXT NOT NULL,
+        details TEXT,
+        note TEXT,
+        lat REAL,
+        lng REAL,
+        isDefault INTEGER DEFAULT 0
+      )
+    `).run();
+
+    // Ensure users table exists (Self-healing)
+    await db.prepare(`
+      CREATE TABLE IF NOT EXISTS users (
+        id TEXT PRIMARY KEY,
+        displayName TEXT,
+        pictureUrl TEXT,
+        phone TEXT,
+        role TEXT DEFAULT 'user',
+        assignedStoreId TEXT,
+        points INTEGER DEFAULT 0,
+        preferences TEXT,
+        createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
+      )
+    `).run();
+
     // Upsert User (include phone if provided)
     if (phone) {
       await db.prepare(`
