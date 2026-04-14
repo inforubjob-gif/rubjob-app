@@ -16,12 +16,16 @@ export async function GET(req: Request) {
       db.prepare("SELECT key, value FROM system_settings WHERE key IN ('gp_store_percent', 'gp_rider_percent')")
     ]);
 
-    const results = stats[3].results[0];
-    const grossRevenue = results.revenue || 0;
-    const totalLaundry = results.totalLaundry || 0;
-    const totalDelivery = results.totalDelivery || 0;
+    const usersCount = stats[0].results?.[0]?.total || 0;
+    const storesCount = stats[1].results?.[0]?.total || 0;
+    const ordersCount = stats[2].results?.[0]?.total || 0;
 
-    const settings = stats[4].results as { key: string, value: string }[];
+    const revResult = stats[3].results?.[0] || {};
+    const grossRevenue = revResult.revenue || 0;
+    const totalLaundry = revResult.totalLaundry || 0;
+    const totalDelivery = revResult.totalDelivery || 0;
+
+    const settings = (stats[4].results || []) as { key: string, value: string }[];
     const gpStore = Number(settings.find(s => s.key === 'gp_store_percent')?.value) || 20;
     const gpRider = Number(settings.find(s => s.key === 'gp_rider_percent')?.value) || 10;
 
@@ -31,9 +35,9 @@ export async function GET(req: Request) {
     const totalPlatformEarnings = storeEarnings + riderEarnings;
 
     return NextResponse.json({ 
-      users: stats[0].results[0].total,
-      stores: stats[1].results[0].total,
-      orders: stats[2].results[0].total,
+      users: usersCount,
+      stores: storesCount,
+      orders: ordersCount,
       revenue: grossRevenue,
       earnings: totalPlatformEarnings,
       gpStore,
