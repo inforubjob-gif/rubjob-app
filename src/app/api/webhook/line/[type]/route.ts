@@ -1,6 +1,5 @@
 import { getRequestContext } from "@cloudflare/next-on-pages";
 import { NextResponse } from "next/server";
-import crypto from "crypto";
 
 export const runtime = "edge";
 
@@ -10,13 +9,15 @@ export const runtime = "edge";
  */
 export async function POST(req: Request, { params }: { params: { type: string } }) {
   try {
+    const db = getRequestContext().env.DB as any;
+    if (!db) return NextResponse.json({ error: "D1 not found" }, { status: 500 });
+    
     const channelType = params.type; // 'regular' or 'help'
     const bodyText = await req.text();
+    let body: any = {};
+    try { body = JSON.parse(bodyText); } catch(e) {}
+    
     const signature = req.headers.get("x-line-signature");
-
-    if (!signature) {
-      return NextResponse.json({ error: "Missing signature" }, { status: 401 });
-    }
 
     // 1. Fetch Credentials from Database instead of ENV
     const channelKeySecret = `line_secret_${channelType}`;
@@ -36,10 +37,17 @@ export async function POST(req: Request, { params }: { params: { type: string } 
       if (!signature) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
       }
-      const hash = crypto
-        .createHmac("sha256", channelSecret)
-        .update(bodyText)
-        .digest("base64");
+      const encoder = new TextEncoder();
+      const key = await crypto.subtle.importKey(
+        'raw',
+        encoder.encode(channelSecret),
+        { name: 'HMAC', hash: 'SHA-256' },
+        false,
+        ['sign']
+      );
+      const hashBuffer = await crypto.subtle.sign('HMAC', key, encoder.encode(bodyText));
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      const hash = btoa(String.fromCharCode(...hashArray));
 
       if (hash !== signature) {
         return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
