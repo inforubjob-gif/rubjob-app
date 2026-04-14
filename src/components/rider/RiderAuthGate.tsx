@@ -69,59 +69,73 @@ export default function RiderAuthGate({ children }: { children: React.ReactNode 
 
         <div className="relative z-10 w-full max-w-sm mx-auto space-y-10">
           <div className="text-center">
-            <div className="w-20 h-20 bg-primary rounded-[2rem] flex items-center justify-center text-slate-900 mx-auto shadow-xl shadow-primary/20 mb-6">
-              <Icons.Truck size={40} strokeWidth={2.5} />
+            <div className="w-24 h-24 bg-primary rounded-[2.5rem] flex items-center justify-center text-slate-900 mx-auto shadow-2xl shadow-primary/30 mb-8 border-4 border-white">
+              <Icons.Truck size={48} strokeWidth={2.5} />
             </div>
-            <h1 className="text-2xl font-black text-slate-900 tracking-tight">RIDER PORTAL</h1>
-            <p className="text-sm text-slate-400 font-bold uppercase tracking-widest mt-1">Rubjob Delivery Service</p>
+            <h1 className="text-3xl font-black text-slate-900 tracking-tight leading-none">เข้าสู่ระบบไรเดอร์</h1>
+            <p className="text-[10px] text-slate-400 font-black uppercase tracking-[0.2em] mt-3 bg-white/80 backdrop-blur-sm py-1 px-4 rounded-full inline-block border border-slate-100 italic">
+              RUBJOB DELIVERY SERVICE
+            </p>
           </div>
 
-          <form onSubmit={handleLogin} className="space-y-4">
-            <div className="space-y-1.5">
-              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Email (Authorized)</label>
-              <div className="relative">
-                <Icons.User size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="rider@rubjob.com"
-                  className="w-full bg-white border-2 border-slate-100 rounded-2xl pl-12 pr-4 py-4 text-sm font-bold shadow-sm focus:outline-none focus:border-primary transition-all"
-                />
+          <form onSubmit={handleLogin} className="space-y-5 bg-white/40 backdrop-blur-md p-2 rounded-[2rem] border border-white/20 shadow-xl shadow-slate-200/40">
+            <div className="bg-white rounded-[1.75rem] p-6 space-y-5 shadow-sm border border-slate-50">
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">อีเมลผู้ใช้งาน</label>
+                <div className="relative">
+                  <Icons.User size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" />
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="rider@rubjob.com"
+                    className="w-full bg-slate-50 border-none rounded-2xl pl-12 pr-4 py-4 text-sm font-bold placeholder:text-slate-300 focus:ring-2 focus:ring-primary/20 transition-all"
+                  />
+                </div>
               </div>
+
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">รหัสผ่านลับ</label>
+                <div className="relative">
+                  <Icons.Lock size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" />
+                  <input
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="••••••••"
+                    className="w-full bg-slate-50 border-none rounded-2xl pl-12 pr-4 py-4 text-sm font-bold placeholder:text-slate-300 focus:ring-2 focus:ring-primary/20 transition-all"
+                  />
+                </div>
+              </div>
+
+              {error && (
+                <div className="bg-rose-50 text-rose-500 text-[11px] font-bold p-4 rounded-2xl text-center border border-rose-100 animate-shake shadow-inner">
+                  {error}
+                </div>
+              )}
+
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="w-full bg-slate-900 text-white rounded-2xl py-5 text-sm font-black uppercase tracking-widest shadow-xl shadow-slate-900/20 transition-all active:scale-95 disabled:opacity-50 mt-2 flex items-center justify-center gap-3 group"
+              >
+                {isLoading ? (
+                  <Icons.Refresh size={20} className="animate-spin" />
+                ) : (
+                  <>
+                    <span>เข้าสู่ระบบเพื่อเริ่มงาน</span>
+                    <Icons.ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+                  </>
+                )}
+              </button>
             </div>
-
-            <div className="space-y-1.5">
-              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Password</label>
-              <div className="relative">
-                <Icons.Lock size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
-                <input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  className="w-full bg-white border-2 border-slate-100 rounded-2xl pl-12 pr-4 py-4 text-sm font-bold shadow-sm focus:outline-none focus:border-primary transition-all"
-                />
-              </div>
-            </div>
-
-            {error && (
-              <div className="bg-rose-50 text-rose-500 text-xs font-bold p-4 rounded-xl text-center border border-rose-100 animate-fade-in shadow-sm shadow-rose-100/50">
-                {error}
-              </div>
-            )}
-
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="w-full bg-slate-900 text-white rounded-2xl py-5 text-sm font-black uppercase tracking-widest shadow-xl shadow-slate-200 transition-all active:scale-95 disabled:opacity-50 mt-4"
-            >
-              {isLoading ? "Checking..." : "Sign In to Work"}
-            </button>
           </form>
 
-          <div className="text-center">
-            <p className="text-[10px] text-slate-300 font-black uppercase tracking-[0.2em]">Restricted to Active Hub Riders</p>
+          <div className="text-center pb-8">
+            <p className="text-[10px] text-slate-300 font-bold uppercase tracking-[0.2em] leading-relaxed">
+              สำหรับไรเดอร์ที่ลงทะเบียนแล้วเท่านั้น <br/>
+              พบปัญหาติดต่อ @RUBJOB_HELP
+            </p>
           </div>
         </div>
       </div>
