@@ -57,6 +57,8 @@ export default function AppWrapper({ children }: { children: React.ReactNode }) 
     checkOnboarding();
   }, [isReady, isLoggedIn, profile?.userId, isBackoffice]);
 
+  const isApi = typeof window !== "undefined" && window.location.pathname.startsWith("/api/");
+
   if (!isReady) {
     return (
       <div className="flex flex-col items-center justify-center min-h-dvh bg-slate-50">
@@ -64,6 +66,11 @@ export default function AppWrapper({ children }: { children: React.ReactNode }) 
         <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] animate-pulse">Initializing RUBJOB...</p>
       </div>
     );
+  }
+
+  // API routes should never be wrapped or redirected to login view
+  if (isApi) {
+    return <>{children}</>;
   }
 
   if (!isLoggedIn) {
