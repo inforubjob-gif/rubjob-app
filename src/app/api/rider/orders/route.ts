@@ -79,3 +79,37 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
+
+/**
+ * PUT /api/rider/orders
+ * Rider accepts a job
+ */
+export async function PUT(req: Request) {
+  try {
+    const { orderId, riderId } = await req.json();
+
+    if (!orderId || !riderId) {
+      return NextResponse.json({ error: "Order ID and Rider ID required" }, { status: 400 });
+    }
+
+    const db = getRequestContext().env.DB;
+    if (!db) return NextResponse.json({ error: "D1 not found" }, { status: 500 });
+
+    // Update order: assign rider and change status
+    // Only allow if order is still 'pending' and has no pickup driver
+    const result = await db.prepare(`
+      UPDATE orders 
+      SET pickupDriverId = ?, status = 'picking_up', updatedAt = CURRENT_TIMESTAMP
+      WHERE id = ? AND status = 'pending' AND pickupDriverId IS NULL
+    `).bind(riderId, orderId).run();
+
+    if (result.meta.changes > 0) {
+      return NextResponse.json({ success: true, message: "Job accepted successfully" });
+    } else {
+      return NextResponse.json({ success: false, error: "งานนี้อาจถูกรับไปแล้วหรือสถานะเปลี่ยนไปแล้ว" }, { status: 409 });
+    }
+  } catch (error: any) {
+    console.error("Accept job error:", error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+}

@@ -54,9 +54,28 @@ export default function RiderDashboard() {
     fetchRiderData();
   }, [rider]);
 
-  const handleAcceptJob = (jobId: string) => {
-    setSelectedJob(null);
-    router.push(`/rider/orders/${jobId}`);
+  const handleAcceptJob = async (jobId: string) => {
+    if (!rider?.id) return;
+    setIsLoading(true);
+    try {
+      const res = await fetch("/api/rider/orders", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ orderId: jobId, riderId: rider.id }),
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setSelectedJob(null);
+        // Clean refresh to sync all stats
+        window.location.reload();
+      } else {
+        alert(data.error || "Failed to accept job");
+      }
+    } catch (err) {
+      alert("Network error");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleLogout = () => {
