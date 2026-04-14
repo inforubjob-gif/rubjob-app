@@ -19,7 +19,14 @@ export async function GET(req: Request) {
       WHERE isActive = 1
     `).all();
 
-    return NextResponse.json({ stores: results });
+    return NextResponse.json(
+      { stores: results },
+      {
+        headers: {
+          "Cache-Control": "public, s-maxage=60, stale-while-revalidate=300",
+        },
+      }
+    );
   } catch (error: any) {
     console.error("Fetch stores error:", error);
     return NextResponse.json({ error: error.message }, { status: 500 });

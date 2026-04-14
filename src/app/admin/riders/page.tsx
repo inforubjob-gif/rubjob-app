@@ -5,8 +5,11 @@ import Link from "next/link";
 import Card from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 import { Icons } from "@/components/ui/Icons";
+import { useToast } from "@/components/providers/ToastProvider";
+import Skeleton from "@/components/ui/Skeleton";
 
 export default function RiderManagementAdminPage() {
+  const { showToast } = useToast();
   const [riders, setRiders] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -35,10 +38,11 @@ export default function RiderManagementAdminPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id, status: newStatus }),
       });
-      setRiders(prev => prev.map(r => r.id === id ? { ...r, status: newStatus } : s));
-      fetchRiders(); // Refresh to be safe
+      setRiders(prev => prev.map(r => r.id === id ? { ...r, status: newStatus } : r));
+      showToast(`Rider ${newStatus} successfully`, "success");
     } catch (err) {
-      alert("Failed to update status");
+      console.error("Failed to update status", err);
+      showToast("Failed to update rider status", "error");
     }
   }
 
@@ -59,8 +63,19 @@ export default function RiderManagementAdminPage() {
 
       <div className="grid grid-cols-1 gap-4">
         {isLoading ? (
-          <div className="flex justify-center py-20">
-            <div className="w-8 h-8 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[1, 2, 3].map(i => (
+              <Card key={i} className="bg-white border border-slate-200/60 shadow-sm overflow-hidden p-5 flex flex-col gap-4">
+                <div className="flex items-center gap-4">
+                  <Skeleton variant="circle" className="w-12 h-12" />
+                  <div className="flex-1 space-y-2">
+                    <Skeleton variant="text" className="w-1/2 h-4" />
+                    <Skeleton variant="text" className="w-1/4 h-3" />
+                  </div>
+                </div>
+                <Skeleton variant="rect" className="w-full h-20 rounded-xl" />
+              </Card>
+            ))}
           </div>
         ) : riders.length === 0 ? (
           <div className="text-center py-24 bg-white rounded-3xl border-2 border-dashed border-slate-100 flex flex-col items-center">

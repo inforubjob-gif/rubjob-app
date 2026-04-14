@@ -5,8 +5,11 @@ import Link from "next/link";
 import Card from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 import { Icons } from "@/components/ui/Icons";
+import { useToast } from "@/components/providers/ToastProvider";
+import Skeleton from "@/components/ui/Skeleton";
 
 export default function StoresAdminPage() {
+  const { showToast } = useToast();
   const [stores, setStores] = useState<any[]>([]);
   const [allServices, setAllServices] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -47,8 +50,10 @@ export default function StoresAdminPage() {
         body: JSON.stringify({ id, isActive: currentStatus === 1 ? 0 : 1 })
       });
       setStores(prev => prev.map(s => s.id === id ? { ...s, isActive: currentStatus === 1 ? 0 : 1 } : s));
+      showToast(`Store ${currentStatus === 1 ? 'suspended' : 'activated'} successfully`, "success");
     } catch (err) {
       console.error("Failed to toggle status", err);
+      showToast("Failed to update store status", "error");
     }
   }
 
@@ -69,8 +74,16 @@ export default function StoresAdminPage() {
 
       <div className="grid grid-cols-1 gap-4">
         {isLoading ? (
-          <div className="flex justify-center py-20">
-            <div className="w-8 h-8 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
+          <div className="space-y-4">
+            {[1, 2, 3].map(i => (
+              <Card key={i} className="p-6 bg-white border border-slate-200/60 shadow-sm flex items-center gap-6">
+                <Skeleton variant="rect" className="w-16 h-16 rounded-2xl" />
+                <div className="flex-1 space-y-3">
+                  <Skeleton variant="text" className="w-1/3 h-6" />
+                  <Skeleton variant="text" className="w-2/3 h-4" />
+                </div>
+              </Card>
+            ))}
           </div>
         ) : stores.length === 0 ? (
           <div className="text-center py-24 bg-white rounded-3xl border-2 border-dashed border-slate-100 flex flex-col items-center">

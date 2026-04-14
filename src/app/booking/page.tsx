@@ -18,9 +18,9 @@ function getDistanceKm(lat1: number, lon1: number, lat2: number, lon2: number) {
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   return R * c; 
 }
-import { Icons, getServiceIcon } from "@/components/ui/Icons";
 import { useTranslation } from "@/components/providers/LanguageProvider";
 import { useLiff } from "@/components/providers/LiffProvider";
+import { useToast } from "@/components/providers/ToastProvider";
 
 const ITEM_KEY_MAP: Record<string, string> = {
   "T-shirt": "items.tshirt",
@@ -41,6 +41,7 @@ function BookingFlow() {
 
   const { profile } = useLiff();
   const { t, language } = useTranslation();
+  const { showToast } = useToast();
   const [step, setStep] = useState<BookingStep>(validInitService ? "details" : "service");
   const [selectedStore, setSelectedStore] = useState<Store | null>(null);
   const [selectedService, setSelectedService] = useState<ServiceType | null>(validInitService);
@@ -64,6 +65,9 @@ function BookingFlow() {
   const [dbServices, setDbServices] = useState<any[]>([]);
   const [dbStores, setDbStores] = useState<any[]>([]);
   const [dbAddresses, setDbAddresses] = useState<any[]>([]);
+  const [systemSettings, setSystemSettings] = useState<any>({});
+  const [paymentQR, setPaymentQR] = useState<string | null>(null);
+  const [activeOrderId, setActiveOrderId] = useState<string | null>(null);
 
   // Auto-assign store based on selected address
   function autoAssignStore(address: Address, stores: any[]): Store | null {
@@ -263,19 +267,25 @@ function BookingFlow() {
 
   async function handleConfirm() {
     if (isBelowMinOrder) {
-      alert(`ยอดสั่งซื้อขั้นต่ำคือ ฿${minOrderAmount} กรุณาเพิ่มบริการอื่นเพิ่มเติม`);
+      showToast(`ยอดสั่งซื้อขั้นต่ำคือ ฿${minOrderAmount} กรุณาเพิ่มบริการอื่นเพิ่มเติม`, "error");
+      return;
+    }
+
+    if (activeOrderId && paymentQR) {
+      // If we already have a QR and ID, just redirect to orders (user might have scanned already)
+      router.push(`/orders/${activeOrderId}`);
       return;
     }
 
     setIsSubmitting(true);
     try {
       if (!profile?.userId) {
-        alert("Please login first to confirm your booking.");
+        showToast("Please login first to confirm your booking.", "error");
         setIsSubmitting(false);
         return;
       }
-      if (!selectedStore?.id) {
-        alert("Please select a store to process your booking.");
+      if (!selectedStore?.id || !selectedService) {
+        showToast("Please select a service and store to process your booking.", "error");
         setIsSubmitting(false);
         return;
       }
@@ -296,17 +306,41 @@ function BookingFlow() {
         scheduledDate: deliverySpeed === "express" ? "ด่วนพิเศษ (6 ชม.)" : "มาตรฐาน (24 ชม.)"
       };
 
+      // 1. Create Booking
       const res = await fetch("/api/booking", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
       });
 
-      if (!res.ok) throw new Error("Booking failed");
+      const bookingData = await res.json();
+      if (!res.ok || !bookingData.success) throw new Error(bookingData.error || "Booking failed");
       
-      router.push("/orders");
-    } catch (error) {
+      const orderId = bookingData.orderId;
+      setActiveOrderId(orderId);
+
+      // 2. Initiate Payment Checkout
+      const payRes = await fetch("/api/payment/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          orderId,
+          amount: totalPrice,
+          paymentMethod: selectedPayment
+        })
+      });
+
+      const payData = await payRes.json();
+      if (payRes.ok && payData.paymentData) {
+        setPaymentQR(payData.paymentData);
+        // Step remains 'payment' but now shows the real QR
+      } else {
+        // If payment fails to init, still have the order. Redirect to order page.
+        router.push(`/orders/${orderId}`);
+      }
+    } catch (error: any) {
       console.error(error);
+      showToast(`Error: ${error.message}`, "error");
     } finally {
       setIsSubmitting(false);
     }
@@ -594,13 +628,25 @@ function BookingFlow() {
                     className="flex-1 bg-slate-100 border-none rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 font-bold uppercase"
                   />
                   <Button 
-                    onClick={() => {
-                      if (["SONGKRAN20", "WELCOME50", "HOMEFLASH"].includes(couponCode.toUpperCase())) {
-                        setAppliedCoupon({ code: couponCode.toUpperCase(), discount: 50 });
-                        alert("✅ ใช้คูปองส่วนลด ฿50 สำเร็จ!");
-                      } else {
-                        alert("❌ คูปองไม่ถูกต้อง");
-                        setAppliedCoupon(null);
+                    onClick={async () => {
+                      if (!couponCode) return;
+                      try {
+                        const res = await fetch("/api/coupons/validate", {
+                          method: "POST",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({ code: couponCode, subtotal: laundryFee + deliveryFee })
+                        });
+                        const data = await res.json();
+                        if (res.ok && data.success) {
+                          setAppliedCoupon({ code: data.coupon.code, discount: data.coupon.discount });
+                          showToast(`✅ ใช้คูปองส่วนลด ฿${data.coupon.discount} สำเร็จ!`, "success");
+                        } else {
+                          showToast(`❌ ${data.error || "คูปองไม่ถูกต้อง"}`, "error");
+                          setAppliedCoupon(null);
+                        }
+                      } catch (err) {
+                        console.error("Coupon validation error:", err);
+                        showToast("❌ เกิดข้อผิดพลาดในการตรวจสอบคูปอง", "error");
                       }
                     }}
                     className="min-w-[80px] rounded-xl text-xs font-black shadow-md shadow-primary/20"
@@ -774,14 +820,14 @@ function BookingFlow() {
                 
                 <div className="bg-white p-4 rounded-[2rem] shadow-inner border border-slate-100 relative overflow-hidden">
                   <img 
-                    src={`https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=00020101021129370016A000000677010111011300660000000005802TH5303764580215${totalPrice}.006304`}
+                    src={paymentQR || `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=00020101021129370016A000000677010111011300660000000005802TH5303764580215${totalPrice}.006304`}
                     alt="PromptPay QR" 
                     className="w-48 h-48 object-contain"
                   />
-                  {selectedPayment !== "promptpay" && (
+                  {(selectedPayment !== "promptpay" || !paymentQR) && (
                     <div className="absolute inset-0 bg-white/60 backdrop-blur-[1px] flex items-center justify-center">
                       <div className="w-12 h-12 bg-primary text-white rounded-full flex items-center justify-center shadow-xl">
-                        <Icons.Payment size={24} />
+                        {isSubmitting ? <Icons.Loading className="animate-spin" /> : <Icons.Payment size={24} />}
                       </div>
                     </div>
                   )}
@@ -792,7 +838,9 @@ function BookingFlow() {
                     <span className="text-xs font-bold text-muted">{t("booking.amountDue")}</span>
                     <span className="text-2xl font-black text-foreground">฿{totalPrice}.00</span>
                   </div>
-                  <p className="text-[10px] text-primary-dark font-bold mt-1 uppercase tracking-wider">{t("booking.instantConfirmation")}</p>
+                  <p className="text-[10px] text-primary-dark font-bold mt-1 uppercase tracking-wider">
+                    {paymentQR ? "กดปุ่มด้านล่างหลังชำระเงินเสร็จสิ้น" : t("booking.instantConfirmation")}
+                  </p>
                 </div>
               </Card>
             </div>
@@ -831,14 +879,52 @@ function BookingFlow() {
           </Button>
         )}
         {step === "details" && (
-          <Button
-            fullWidth
-            size="lg"
-            disabled={!selectedAddress || !pickupDate || !pickupSlot}
-            onClick={() => setStep("payment")}
-          >
-            {t("common.confirm")}
-          </Button>
+          <div className="space-y-3">
+            {!profile?.phone && (
+              <div className="bg-amber-50 border border-amber-100 p-3 rounded-2xl">
+                <p className="text-[11px] font-bold text-amber-700 mb-2">ระบุเบอร์โทรศัพท์เพื่อติดต่อรับผ้า</p>
+                <input 
+                  type="tel" 
+                  placeholder="081-234-5678" 
+                  className="w-full bg-white border border-amber-200 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 font-bold"
+                  onChange={(e) => {
+                    // Update locally for now, sync on confirm if needed or just use for order
+                    (window as any).rubjob_temp_phone = e.target.value;
+                  }}
+                />
+              </div>
+            )}
+            <Button
+              fullWidth
+              size="lg"
+              disabled={!selectedAddress || !pickupDate || !pickupSlot || (!profile?.phone && !(window as any).rubjob_temp_phone)}
+              onClick={async () => {
+                // If phone was provided in the temp input, sync it to user profile
+                const tempPhone = (window as any).rubjob_temp_phone;
+                if (tempPhone && !profile?.phone) {
+                  try {
+                    await fetch("/api/user/sync", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({
+                        id: profile?.userId,
+                        displayName: profile?.displayName,
+                        pictureUrl: profile?.pictureUrl,
+                        phone: tempPhone
+                      })
+                    });
+                    // Note: LiffProvider might not refresh immediately, but we have it in D1 now
+                    profile!.phone = tempPhone; 
+                  } catch (e) {
+                    console.error("Phone sync failed", e);
+                  }
+                }
+                setStep("payment");
+              }}
+            >
+              {t("common.confirm")}
+            </Button>
+          </div>
         )}
         {step === "payment" && (
           <Button
@@ -849,7 +935,8 @@ function BookingFlow() {
             onClick={handleConfirm}
             className={isBelowMinOrder ? "bg-slate-300 text-slate-500 shadow-none border-transparent" : ""}
           >
-            {isSubmitting ? t("common.loading") : isBelowMinOrder ? `สั่งซื้อไม่ได้ (ขั้นต่ำ ฿${minOrderAmount})` : `${t("booking.placeOrder")} — ฿${totalPrice}`}
+            {isSubmitting ? t("common.loading") : isBelowMinOrder ? `สั่งซื้อไม่ได้ (ขั้นต่ำ ฿${minOrderAmount})` : 
+             paymentQR ? "ดูประวัติการสั่งซื้อ" : `${t("booking.placeOrder")} — ฿${totalPrice}`}
           </Button>
         )}
       </div>

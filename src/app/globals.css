@@ -64,9 +64,23 @@ body {
   50%      { box-shadow: 0 0 0 10px rgba(255,159,28,0); }
 }
 
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes scale-press {
+  0% { transform: scale(1); }
+  50% { transform: scale(0.95); }
+  100% { transform: scale(1); }
+}
+
 .animate-fade-in   { animation: fade-in 0.4s ease-out both; }
 .animate-slide-up  { animation: slide-up 0.5s ease-out both; }
 .animate-pulse-gold { animation: pulse-gold 2s infinite; }
+.animate-shimmer { animation: shimmer 2s infinite linear; }
+
+.active-scale:active { transform: scale(0.95); transition: transform 0.1s; }
 
 /* Stagger children */
 .stagger > *:nth-child(1) { animation-delay: 0ms; }

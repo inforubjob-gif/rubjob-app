@@ -22,6 +22,7 @@ export default function Card({
         ${!className.includes("bg-") ? "bg-surface" : ""} 
         rounded-2xl
         shadow-[var(--shadow-card)]
+        animate-fade-in
         ${hoverable ? "hover:shadow-[var(--shadow-card-hover)] transition-all duration-300 cursor-pointer active:scale-[0.98] hover:-translate-y-0.5" : "border-none"}
         ${className}
       `}

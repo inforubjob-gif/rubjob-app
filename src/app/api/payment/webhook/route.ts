@@ -1,5 +1,6 @@
 import { getRequestContext } from "@cloudflare/next-on-pages";
 import { NextResponse } from "next/server";
+import { transitionOrderStatus } from "@/lib/order-logic";
 
 export const runtime = "edge";
 
@@ -24,14 +25,13 @@ export async function POST(req: Request) {
       const status = data.status; // 'successful' or 'failed'
 
       if (orderId && status === "successful") {
-        // Update Order to 'paid'
+        // Update Payment Status and possible logic for what happens after payment
         await db.prepare(`
-          UPDATE orders 
-          SET paymentStatus = 'paid',
-              updatedAt = CURRENT_TIMESTAMP
-          WHERE id = ?
+          UPDATE orders SET paymentStatus = 'paid', updatedAt = CURRENT_TIMESTAMP WHERE id = ?
         `).bind(orderId).run();
 
+        // Optionally transition order status if logic dictates (e.g. notify customer of payment)
+        // For now, let's just log it. If you want a status change like 'confirmed', we can add it.
         console.log(`Order ${orderId} marked as PAID via Webhook`);
       }
     }

@@ -45,9 +45,9 @@ export default function RiderOrderDetailPage() {
   // Define steps that require photo
   const photoSteps: Record<string, string> = {
     "picking_up": "pickupUser",
-    "collected_from_user": "deliveryStore",
-    "ready_for_delivery": "pickupStore",
-    "out_for_delivery": "deliveryUser",
+    "delivering_to_store": "deliveryStore",
+    "ready_for_pickup": "pickupStore",
+    "delivering_to_customer": "deliveryUser",
   };
 
   const currentPhotoStep = photoSteps[status];
@@ -76,12 +76,10 @@ export default function RiderOrderDetailPage() {
 
   const getNextStatus = (currentStatus: string) => {
     switch(currentStatus) {
-        case "picking_up": return "collected_from_user";
-        case "collected_from_user": return "at_store";
-        case "at_store": return "washing";
-        case "washing": return "ready_for_delivery";
-        case "ready_for_delivery": return "out_for_delivery";
-        case "out_for_delivery": return "completed";
+        case "picking_up": return "delivering_to_store";
+        case "delivering_to_store": return "washing";
+        case "ready_for_pickup": return "delivering_to_customer";
+        case "delivering_to_customer": return "completed";
         default: return currentStatus;
     }
   };
@@ -217,7 +215,7 @@ export default function RiderOrderDetailPage() {
 
         {/* Action Button */}
         <div className="fixed bottom-0 left-0 right-0 p-5 bg-white/80 backdrop-blur-2xl border-t border-slate-100/50 z-40">
-           {status === "washing" || status === "at_store" || status === "delivering_to_store" ? (
+           {status === "washing" ? (
              <div className="text-center p-4 bg-slate-50 rounded-3xl border-2 border-dashed border-slate-200">
                 <p className="text-xs font-black text-slate-400 uppercase tracking-widest">{t("staff.processing")}</p>
                 <p className="text-[10px] text-slate-400 mt-1 uppercase font-bold italic">Waiting for store completion...</p>
@@ -233,7 +231,10 @@ export default function RiderOrderDetailPage() {
                 isLoading={isUpdating}
                 className="bg-primary text-white hover:bg-primary-dark shadow-2xl shadow-primary/30 py-6 text-base font-black italic rounded-[2rem] uppercase tracking-widest"
              >
-                {t(`rider.complete${status.includes('pickup') || status.includes('picking') ? 'Pickup' : status.includes('delivery') ? 'Delivery' : 'Pickup'}`)}
+                {status === "picking_up" ? "Confirm Pickup" : 
+                 status === "delivering_to_store" ? "Handover to Store" : 
+                 status === "ready_for_pickup" ? "Pickup from Store" : 
+                 status === "delivering_to_customer" ? "Finish Delivery" : "Update Task"}
              </Button>
            )}
         </div>

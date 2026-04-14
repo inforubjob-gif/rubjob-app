@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import LiffProvider from "@/components/providers/LiffProvider";
 import { LanguageProvider } from "@/components/providers/LanguageProvider";
+import { ToastProvider } from "@/components/providers/ToastProvider";
 import AppWrapper from "@/components/layout/AppWrapper";
 import BottomNav from "@/components/layout/BottomNav";
 
@@ -37,11 +38,13 @@ export default function RootLayout({
       <body className="min-h-full bg-surface-alt font-sans antialiased">
         <LiffProvider>
           <LanguageProvider>
-            <AppWrapper>
-              {/* Main content area with bottom nav padding */}
-              <main className="pb-20 min-h-dvh">{children}</main>
-              <BottomNav />
-            </AppWrapper>
+            <ToastProvider>
+              <AppWrapper>
+                {/* Main content area with bottom nav padding */}
+                <main className="pb-20 min-h-dvh">{children}</main>
+                <BottomNav />
+              </AppWrapper>
+            </ToastProvider>
           </LanguageProvider>
         </LiffProvider>
       </body>

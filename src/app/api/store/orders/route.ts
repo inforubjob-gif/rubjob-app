@@ -1,5 +1,7 @@
 import { getRequestContext } from "@cloudflare/next-on-pages";
 import { NextResponse } from "next/server";
+import { transitionOrderStatus } from "@/lib/order-logic";
+import { OrderStatus } from "@/types";
 
 export const runtime = "edge";
 
@@ -41,6 +43,40 @@ export async function GET(req: Request) {
     return NextResponse.json({ orders });
   } catch (error: any) {
 
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+}
+
+/**
+ * PUT /api/store/orders
+ * Store updates status (e.g. washing, ready_for_delivery)
+ */
+export async function PUT(req: Request) {
+  try {
+    const { orderId, status } = await req.json();
+
+    if (!orderId || !status) {
+      return NextResponse.json({ error: "Order ID and Status required" }, { status: 400 });
+    }
+
+    const env = getRequestContext().env;
+    const db = env.DB;
+    if (!db) return NextResponse.json({ error: "D1 not found" }, { status: 500 });
+
+    const result = await transitionOrderStatus(
+      db, 
+      orderId, 
+      status as OrderStatus, 
+      env
+    );
+
+    if (result.success) {
+      return NextResponse.json({ success: true, status: result.nextStatus });
+    } else {
+      return NextResponse.json({ error: result.message }, { status: 400 });
+    }
+  } catch (error: any) {
+    console.error("Store status update error:", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

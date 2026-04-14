@@ -165,3 +165,157 @@ export const bookingConfirmationFlex = (orderId: string, serviceName: string, to
     },
   },
 });
+
+/**
+ * Flex Message for Order Status Update
+ */
+export const orderStatusUpdateFlex = (orderId: string, statusText: string, description: string, color: string = "#3b82f6") => ({
+  type: "flex",
+  altText: `อัพเดทสถานะออเดอร์ ${orderId}`,
+  contents: {
+    type: "bubble",
+    body: {
+      type: "box",
+      layout: "vertical",
+      spacing: "md",
+      contents: [
+        {
+          type: "text",
+          text: "อัพเดทสถานะ! 🕒",
+          weight: "bold",
+          size: "sm",
+          color: "#aaaaaa",
+        },
+        {
+          type: "text",
+          text: statusText,
+          weight: "bold",
+          size: "xl",
+          color: color,
+        },
+        {
+          type: "text",
+          text: description,
+          size: "sm",
+          color: "#666666",
+          wrap: true,
+        },
+        {
+          type: "separator",
+          margin: "md",
+        },
+        {
+          type: "box",
+          layout: "baseline",
+          spacing: "sm",
+          margin: "md",
+          contents: [
+            {
+              type: "text",
+              text: "ออเดอร์",
+              color: "#aaaaaa",
+              size: "xs",
+              flex: 1,
+            },
+            {
+              type: "text",
+              text: orderId,
+              color: "#666666",
+              size: "xs",
+              flex: 4,
+            },
+          ],
+        },
+      ],
+    },
+    footer: {
+      type: "box",
+      layout: "vertical",
+      contents: [
+        {
+          type: "button",
+          style: "link",
+          height: "sm",
+          action: {
+            type: "uri",
+            label: "ตรวจสอบสถานะ",
+            uri: `https://liff.line.me/${process.env.NEXT_PUBLIC_LIFF_ID}/orders`,
+          },
+        },
+      ],
+    },
+  },
+});
+
+/**
+ * Flex Message for Rider Accepted
+ */
+export const riderAcceptedFlex = (orderId: string, riderName: string) => 
+  orderStatusUpdateFlex(orderId, "มี Rider รับงานแล้ว!", `คุณ ${riderName} กำลังเดินทางไปรับผ้าของคุณครับ`, "#10b981");
+
+/**
+ * Flex Message for Washing
+ */
+export const washingOrderFlex = (orderId: string) => 
+  orderStatusUpdateFlex(orderId, "กำลังซักรีด...", `ออเดอร์ของคุณเข้าสู่กระบวนการซักรีดแล้วครับ`, "#6366f1");
+
+/**
+ * Flex Message for Ready for Delivery
+ */
+export const readyForDeliveryFlex = (orderId: string) => 
+  orderStatusUpdateFlex(orderId, "ซักเสร็จแล้ว!", `ผ้าซักเสร็จเรียบร้อยแล้ว กำลังรอ Rider จัดส่งให้คุณครับ`, "#f59e0b");
+
+/**
+ * Flex Message for Completed
+ */
+export const orderCompletedFlex = (orderId: string) => ({
+  type: "flex",
+  altText: "ออเดอร์ส่งสำเร็จแล้ว!",
+  contents: {
+    type: "bubble",
+    hero: {
+      type: "image",
+      url: "https://images.unsplash.com/photo-1521791136064-7986c29596ad?w=800&q=80",
+      size: "full",
+      aspectRatio: "20:13",
+      aspectMode: "cover",
+    },
+    body: {
+      type: "box",
+      layout: "vertical",
+      spacing: "md",
+      contents: [
+        {
+          type: "text",
+          text: "งานเสร็จสิ้น! ✨",
+          weight: "bold",
+          size: "xl",
+          color: "#10b981",
+        },
+        {
+          type: "text",
+          text: `ออเดอร์ ${orderId} ถูกจัดส่งเรียบร้อยแล้ว ขอบคุณที่ใช้บริการ Rubjob ครับ`,
+          wrap: true,
+          size: "sm",
+          color: "#4b5563",
+        },
+      ],
+    },
+    footer: {
+      type: "box",
+      layout: "vertical",
+      contents: [
+        {
+          type: "button",
+          style: "primary",
+          color: "#10b981",
+          action: {
+            type: "uri",
+            label: "ให้คะแนนบริการ",
+            uri: `https://liff.line.me/${process.env.NEXT_PUBLIC_LIFF_ID}/activity`,
+          },
+        },
+      ],
+    },
+  },
+});

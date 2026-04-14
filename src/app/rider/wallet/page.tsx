@@ -1,25 +1,70 @@
-"use client";
-
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import Modal from "@/components/ui/Modal";
 import { Icons } from "@/components/ui/Icons";
 import { useTranslation } from "@/components/providers/LanguageProvider";
+import { useLiff } from "@/components/providers/LiffProvider";
 
 export default function RiderWalletPage() {
   const { t } = useTranslation();
+  const { profile } = useLiff();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [amount, setAmount] = useState("");
+  const [bankName, setBankName] = useState("");
+  const [accountNumber, setAccountNumber] = useState("");
+  const [accountName, setAccountName] = useState("");
   const [isSuccess, setIsSuccess] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [balance, setBalance] = useState(0);
+  const [transactions, setTransactions] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    if (!profile?.userId) return;
+    fetchWalletData();
+  }, [profile?.userId]);
+
+  const fetchWalletData = async () => {
+    try {
+      const res = await fetch(`/api/rider/wallet?riderId=${profile?.userId}`);
+      const data = await res.json();
+      if (data.balance !== undefined) setBalance(data.balance);
+      if (data.transactions) setTransactions(data.transactions);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleWithdraw = async () => {
+    if (!amount || !bankName || !accountNumber) {
+      alert("กรุณากรอกข้อมูลธนาคารให้ครบถ้วน");
+      return;
+    }
     setIsProcessing(true);
-    // Simulate API call
-    await new Promise(r => setTimeout(r, 1500));
-    setIsProcessing(false);
-    setIsSuccess(true);
+    try {
+      const res = await fetch("/api/rider/wallet", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          riderId: profile?.userId,
+          amount: parseFloat(amount),
+          bankName,
+          accountNumber,
+          accountName
+        })
+      });
+      if (res.ok) {
+        setIsSuccess(true);
+        fetchWalletData();
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   const closeModal = () => {
@@ -28,15 +73,6 @@ export default function RiderWalletPage() {
     setAmount("");
   };
 
-  const balance = 1450.00;
-
-  const transactions = [
-    { id: "TRX-201", type: t("staff.wallet.jobCompletion"), amount: 65, date: "Today, 15:30", status: t("staff.wallet.success") },
-    { id: "TRX-200", type: t("staff.wallet.jobCompletion"), amount: 45, date: "Today, 14:15", status: t("staff.wallet.success") },
-    { id: "WDR-008", type: t("staff.wallet.withdrawal"), amount: -1200, date: "Yesterday", status: t("staff.wallet.pending") },
-    { id: "TRX-198", type: t("staff.wallet.jobCompletion"), amount: 60, date: "24 Mar", status: t("staff.wallet.success") },
-  ];
-
   return (
     <div className="flex flex-col min-h-dvh bg-slate-50">
       <header className="bg-primary text-white px-5 pt-12 pb-10 rounded-b-[3rem] shadow-xl relative overflow-hidden text-center">
@@ -44,8 +80,8 @@ export default function RiderWalletPage() {
         <div className="relative z-10">
           <p className="text-[10px] font-black text-white/50 uppercase tracking-[0.2em] mb-2">{t("rider.wallet.balance") || t("staff.wallet.availableBalance")}</p>
           <div className="flex items-baseline justify-center gap-2 mb-8 text-white">
-            <span className="text-5xl font-black tracking-tight drop-shadow-md">฿1,450</span>
-            <span className="text-lg font-bold opacity-50">.00</span>
+            <span className="text-5xl font-black tracking-tight drop-shadow-md">฿{Math.floor(balance).toLocaleString()}</span>
+            <span className="text-lg font-bold opacity-50">.{(balance % 1).toFixed(2).split('.')[1]}</span>
           </div>
           <div className="flex gap-3 max-w-xs mx-auto">
              <Button 
@@ -101,7 +137,7 @@ export default function RiderWalletPage() {
       >
         {!isSuccess ? (
           <div className="w-full space-y-8 h-full flex flex-col items-center">
-             <div className="relative w-full">
+              <div className="relative w-full">
                 <input
                   type="text"
                   value={amount}
@@ -109,11 +145,35 @@ export default function RiderWalletPage() {
                     const val = e.target.value.replace(/\D/g, "");
                     setAmount(val);
                   }}
-                  className="w-full bg-slate-50 rounded-[2.5rem] px-8 py-8 text-4xl font-black text-center text-slate-900 outline-none focus:ring-4 focus:ring-primary/20 transition-all border-none"
+                  className="w-full bg-slate-50 rounded-2xl px-8 py-6 text-3xl font-black text-center text-slate-900 outline-none focus:ring-4 focus:ring-primary/20 transition-all border-none"
                   placeholder="0.00"
                 />
-                <span className="absolute left-10 top-1/2 -translate-y-1/2 text-2xl font-black text-slate-300 pointer-events-none">฿</span>
-             </div>
+                <span className="absolute left-6 top-1/2 -translate-y-1/2 text-xl font-black text-slate-300 pointer-events-none">฿</span>
+              </div>
+
+              <div className="w-full grid grid-cols-1 gap-3">
+                 <input 
+                   type="text" 
+                   placeholder="Bank Name (e.g. Kasikorn)" 
+                   value={bankName}
+                   onChange={(e) => setBankName(e.target.value)}
+                   className="w-full bg-slate-50 rounded-xl px-4 py-3 text-sm font-bold outline-none focus:ring-2 focus:ring-primary/20"
+                 />
+                 <input 
+                   type="text" 
+                   placeholder="Account Number" 
+                   value={accountNumber}
+                   onChange={(e) => setAccountNumber(e.target.value)}
+                   className="w-full bg-slate-50 rounded-xl px-4 py-3 text-sm font-bold outline-none focus:ring-2 focus:ring-primary/20"
+                 />
+                 <input 
+                   type="text" 
+                   placeholder="Account Holder Name" 
+                   value={accountName}
+                   onChange={(e) => setAccountName(e.target.value)}
+                   className="w-full bg-slate-50 rounded-xl px-4 py-3 text-sm font-bold outline-none focus:ring-2 focus:ring-primary/20"
+                 />
+              </div>
              
              <div className="w-full space-y-4">
                 <div className="flex justify-between items-center px-4">

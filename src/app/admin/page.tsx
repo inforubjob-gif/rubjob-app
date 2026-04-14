@@ -112,26 +112,23 @@ export default function AdminDashboard() {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-8">
-            <Card className="col-span-2 p-6 bg-white border border-slate-200/60 shadow-sm">
-               <h3 className="text-lg font-black text-slate-900 mb-6">Revenue Growth (Simulated)</h3>
-               <div className="h-64 flex items-end justify-between gap-2">
-                  {[40, 60, 45, 80, 55, 90, 100, 75, 110, 85, 120, 95].map((h, i) => (
-                    <div key={i} className="w-full bg-slate-100 rounded-t-lg relative group">
-                       <div className="absolute bottom-0 w-full bg-primary rounded-t-lg transition-all duration-500 hover:bg-primary-dark" style={{ height: `${h}%` }} />
-                    </div>
-                  ))}
+            <Card className="col-span-2 p-8 bg-white border border-slate-200/60 shadow-sm flex flex-col items-center justify-center text-center">
+               <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center text-slate-200 mb-4">
+                  <Icons.Finance size={32} />
                </div>
+               <h3 className="text-lg font-black text-slate-900 mb-2">Detailed Analytics</h3>
+               <p className="text-slate-500 text-sm max-w-xs mx-auto">Real-time charts will appear here as you process more orders through the system.</p>
             </Card>
             
             <Card className="p-6 bg-white border border-slate-200/60 shadow-sm">
                <h3 className="text-lg font-black text-slate-900 mb-6">Quick Actions</h3>
                <div className="space-y-3">
                   <Link href="/admin/finance" className="w-full py-4 px-4 bg-slate-50 hover:bg-slate-100 hover:scale-[1.02] active:scale-[0.98] text-slate-700 font-bold rounded-xl flex items-center justify-between transition-all group">
-                     Process Payouts (3 Pending)
+                     Process Payouts
                      <Icons.ArrowRight size={18} className="text-slate-300 group-hover:text-primary group-hover:translate-x-1 transition-all" />
                   </Link>
                   <Link href="/admin/stores" className="w-full py-4 px-4 bg-slate-50 hover:bg-slate-100 hover:scale-[1.02] active:scale-[0.98] text-slate-700 font-bold rounded-xl flex items-center justify-between transition-all group">
-                     Review New Store Registrations
+                     Review Store Registrations
                      <Icons.ArrowRight size={18} className="text-slate-300 group-hover:text-primary group-hover:translate-x-1 transition-all" />
                   </Link>
                   <Link href="/admin/settings" className="w-full py-4 px-4 bg-slate-50 hover:bg-slate-100 hover:scale-[1.02] active:scale-[0.98] text-slate-700 font-bold rounded-xl flex items-center justify-between transition-all group">

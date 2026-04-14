@@ -9,6 +9,7 @@ import { Icons, getServiceIcon } from "@/components/ui/Icons";
 import { useTranslation } from "@/components/providers/LanguageProvider";
 import { useLiff } from "@/components/providers/LiffProvider";
 import CountdownTimer from "@/components/ui/CountdownTimer";
+import Skeleton from "@/components/ui/Skeleton";
 
 // Operational state for Store
 
@@ -16,54 +17,68 @@ export default function StoreDashboard() {
   const { t } = useTranslation();
   const { profile } = useLiff();
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<"incoming" | "processing">("incoming");
+  const [activeTab, setActiveTab] = useState<"incoming" | "washing" | "ready">("incoming");
   const [isLoading, setIsLoading] = useState(true);
   const [workStatus, setWorkStatus] = useState(true);
 
   // Lifted state
   const [incomingOrders, setIncomingOrders] = useState<any[]>([]);
-  const [processingOrders, setProcessingOrders] = useState<any[]>([]);
+  const [washingOrders, setWashingOrders] = useState<any[]>([]);
+  const [readyOrders, setReadyOrders] = useState<any[]>([]);
+  const [balance, setBalance] = useState(0);
+
+  const fetchStoreData = async () => {
+    const storeId = profile?.assignedStoreId;
+    if (!storeId) return;
+    try {
+      const res = await fetch(`/api/store/orders?storeId=${storeId}`);
+      const data = await res.json() as any;
+      if (data.orders) {
+        const allOrders = data.orders;
+        setIncomingOrders(allOrders.filter((o: any) => o.status === "delivering_to_store" || o.status === "picking_up" || o.status === "pending"));
+        setWashingOrders(allOrders.filter((o: any) => o.status === "washing"));
+        setReadyOrders(allOrders.filter((o: any) => o.status === "ready_for_pickup"));
+
+        // Also fetch balance
+        const walRes = await fetch(`/api/store/wallet?storeId=${storeId}`);
+        const walData = await walRes.json();
+        if (walData.balance !== undefined) setBalance(walData.balance);
+      }
+    } catch (err) {
+      console.error("Failed to fetch store dashboard data:", err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
-    async function fetchStoreData() {
-      const storeId = profile?.assignedStoreId;
-      try {
-        const res = await fetch(`/api/store/orders?storeId=${storeId}`);
-        const data = await res.json() as any;
-        if (data.orders) {
-          const allOrders = data.orders;
-          setIncomingOrders(allOrders.filter((o: any) => o.status === "delivering_to_store" || o.status === "picking_up"));
-          setProcessingOrders(allOrders.filter((o: any) => o.status === "washing" || o.status === "pending"));
-        }
-      } catch (err) {
-        console.error("Failed to fetch store dashboard data:", err);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-
     if (profile) {
       fetchStoreData();
     } else {
-      // Small delay for dev mode if profile is missing
       const timer = setTimeout(() => setIsLoading(false), 800);
       return () => clearTimeout(timer);
     }
   }, [profile]);
 
-  const handleReceiveOrder = (orderId: string) => {
-    // Navigate to the order detail page for confirmation and processing
-    router.push(`/store/orders/${orderId}`);
-  };
-
-  const handleHandover = (orderId: string) => {
-    // Navigate to the order detail page for the two-step handover (Call Rider -> Handover)
-    router.push(`/store/orders/${orderId}`);
+  const handleUpdateStatus = async (orderId: string, newStatus: string) => {
+    setIsSubmitting(true);
+    try {
+      await fetch(`/api/store/orders/${orderId}/status`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: newStatus }),
+      });
+      await fetchStoreData();
+    } catch (err) {
+      console.error("Update status failed:", err);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
     <div className="flex flex-col min-h-dvh bg-slate-50 relative overflow-hidden">
-      {/* Background Gradient Layer (Vibrant Orange Theme) */}
+      {/* Background Gradient Layer */}
       <div className="absolute top-0 left-0 right-0 h-[480px] bg-gradient-to-b from-primary via-primary-dark to-slate-50 z-0" />
       
       {/* Store Header */}
@@ -74,7 +89,7 @@ export default function StoreDashboard() {
               <Icons.Logo size={36} variant="icon" />
             </div>
             <div className="min-w-0">
-              <p className="text-[10px] text-white/70 font-black uppercase tracking-[0.2em] leading-none mb-1 shadow-sm">STORE UNIT #049</p>
+              <p className="text-[10px] text-white/70 font-black uppercase tracking-[0.2em] leading-none mb-1 shadow-sm">STORE UNIT #{profile?.assignedStoreId?.split('-')[1] || '001'}</p>
               <h1 className="text-2xl font-black text-white tracking-tight truncate drop-shadow-md">{profile?.displayName || t("common.guest")}</h1>
             </div>
           </div>
@@ -83,82 +98,127 @@ export default function StoreDashboard() {
           </button>
         </div>
 
-        {/* Work Status Toggle */}
-        <Card className="mb-6 bg-white/10 backdrop-blur-xl border border-white/20 shadow-xl shadow-primary-dark/20 rounded-[2rem] p-4">
-           <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${workStatus ? 'bg-emerald-500 text-white' : 'bg-white/20 text-white/60'}`}>
-                      <Icons.Shield size={20} />
-                  </div>
-                  <div>
-                      <p className="text-[10px] font-black text-white/50 uppercase tracking-widest leading-none mb-1">{t("store.profile.workStatus")}</p>
-                      <p className="text-sm font-black text-white uppercase tracking-tight">
-                        {workStatus ? t("store.profile.receivingJobs") : t("store.profile.notReceiving")}
-                      </p>
-                  </div>
-              </div>
-              <button 
-                onClick={() => setWorkStatus(!workStatus)}
-                className={`w-14 h-8 rounded-full p-1 transition-all duration-300 ${workStatus ? 'bg-white shadow-lg shadow-white/20' : 'bg-white/20'}`}
-              >
-                <div className={`w-6 h-6 rounded-full shadow-md transition-all duration-300 ${workStatus ? 'bg-primary transform translate-x-6' : 'bg-white'}`} />
-              </button>
-           </div>
-        </Card>
-
         <div className="grid grid-cols-2 gap-4 text-center">
-          <div className="bg-white/10 backdrop-blur-lg p-5 rounded-[2.5rem] border border-white/20 shadow-lg shadow-primary-dark/20">
-            <p className="text-[10px] font-black text-white/50 uppercase tracking-[0.15em]">{t("store.tasksToday")}</p>
-            <p className="text-3xl font-black mt-1 text-white tracking-tighter">
-              {incomingOrders.length + processingOrders.length}
+          <div className="bg-white/10 backdrop-blur-lg p-5 rounded-[2.5rem] border border-white/20 shadow-lg shadow-primary-dark/20 text-white">
+            <p className="text-[10px] font-black text-white/50 uppercase tracking-[0.15em]">Orders</p>
+            <p className="text-3xl font-black mt-1 tracking-tighter">
+              {incomingOrders.length + washingOrders.length + readyOrders.length}
             </p>
           </div>
-          <div className="bg-white/10 backdrop-blur-lg p-5 rounded-[2.5rem] border border-white/20 shadow-lg shadow-primary-dark/20">
-            <p className="text-[10px] font-black text-white/50 uppercase tracking-[0.15em]">{t("store.earnings")}</p>
-            <p className="text-3xl font-black mt-1 text-white tracking-tighter">
-              ฿{processingOrders.reduce((sum, o: any) => sum + (o.laundryFee || 0), 0).toLocaleString()}
+          <div className="bg-white/10 backdrop-blur-lg p-5 rounded-[2.5rem] border border-white/20 shadow-lg shadow-primary-dark/20 text-white">
+            <p className="text-[10px] font-black text-white/50 uppercase tracking-[0.15em]">Balance</p>
+            <p className="text-3xl font-black mt-1 tracking-tighter flex items-center justify-center gap-1">
+              <span className="text-sm">฿</span>{Math.floor(balance).toLocaleString()}
             </p>
           </div>
         </div>
       </header>
 
-      <div className="relative z-10 px-5 space-y-7 pt-2 animate-fade-in shadow-primary/20">
+      <div className="relative z-10 px-5 space-y-7 pt-2 animate-fade-in">
         <div className="bg-white/40 backdrop-blur-xl p-1.5 rounded-[1.8rem] flex shadow-lg shadow-primary-dark/10 border border-white/40">
-          <button
-            onClick={() => setActiveTab("incoming")}
-            className={`flex-1 py-3.5 text-[11px] font-black uppercase tracking-[0.1em] rounded-[1.4rem] transition-all duration-500 ${
-              activeTab === "incoming" ? "bg-white text-primary shadow-lg shadow-primary/20 scale-[1.02]" : "text-white/70"
-            }`}
-          >
-            {t("store.incomingFromRider")}
-          </button>
-          <button
-            onClick={() => setActiveTab("processing")}
-            className={`flex-1 py-3.5 text-[11px] font-black uppercase tracking-[0.1em] rounded-[1.4rem] transition-all duration-500 ${
-              activeTab === "processing" ? "bg-white text-primary shadow-lg shadow-primary/20 scale-[1.02]" : "text-white/70"
-            }`}
-          >
-            {t("store.processing")}
-          </button>
+          {(["incoming", "washing", "ready"] as const).map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={`flex-1 py-3.5 text-[10px] font-black uppercase tracking-[0.1em] rounded-[1.4rem] transition-all duration-500 ${
+                activeTab === tab ? "bg-white text-primary shadow-lg shadow-primary/20 scale-[1.02]" : "text-white/70"
+              }`}
+            >
+              {tab === "incoming" ? "Incoming" : tab === "washing" ? "Washing" : "Ready"}
+              {tab === "incoming" && incomingOrders.length > 0 && <span className="ml-1 opacity-50">({incomingOrders.length})</span>}
+            </button>
+          ))}
         </div>
       </div>
 
-      <div className="flex-1 px-5 pt-8 space-y-6 pb-24 animate-fade-in">
         {isLoading ? (
-          <div className="flex flex-col items-center justify-center h-48 gap-4">
-            <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin shadow-lg" />
-            <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest animate-pulse">Initializing Terminal...</p>
+          <div className="space-y-4 px-5">
+             {[1, 2, 3].map((i) => (
+               <div key={i} className="bg-white p-5 rounded-[2.5rem] border border-slate-100 flex items-center gap-4">
+                 <Skeleton variant="circle" className="w-14 h-14" />
+                 <div className="flex-1 space-y-2">
+                    <Skeleton variant="text" className="w-24 h-4" />
+                    <Skeleton variant="text" className="w-full h-3" />
+                 </div>
+               </div>
+             ))}
           </div>
         ) : (
-          <>
-            {activeTab === "incoming" ? (
-              <IncomingOrders t={t} router={router} orders={incomingOrders} onReceive={handleReceiveOrder} />
+          <div className="space-y-4">
+            {(activeTab === "incoming" ? incomingOrders : activeTab === "washing" ? washingOrders : readyOrders).length === 0 ? (
+              <div className="text-center py-20 bg-white rounded-[2.5rem] border-2 border-dashed border-slate-100 flex flex-col items-center justify-center gap-3">
+                 <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center text-slate-200">
+                    <Icons.FileText size={32} />
+                 </div>
+                 <p className="text-xs font-black text-slate-400 uppercase tracking-widest leading-tight">
+                    No orders in this stage
+                 </p>
+              </div>
             ) : (
-              <ProcessingOrders t={t} router={router} orders={processingOrders} onHandover={handleHandover} />
+              (activeTab === "incoming" ? incomingOrders : activeTab === "washing" ? washingOrders : readyOrders).map((order) => (
+                <Card key={order.id} className="p-4 border border-slate-100 shadow-sm hover:shadow-xl transition-all duration-300 group rounded-[2rem]">
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 bg-slate-50 border border-slate-100 rounded-2xl flex items-center justify-center text-slate-400 shrink-0 group-hover:bg-primary/5 transition-colors">
+                      {getServiceIcon(order.serviceId as any, { size: 24, className: "group-hover:text-primary transition-colors" })}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{order.id}</span>
+                        <Badge variant={statusToBadgeVariant(order.status)} className="scale-[0.8] origin-right">
+                          {t(`orders.status.${order.status}`)}
+                        </Badge>
+                      </div>
+                      <h3 className="font-black text-slate-800 leading-tight text-sm truncate">
+                        {t(`orders.services.${order.serviceId}`) || order.serviceName}
+                      </h3>
+                      <div className="flex items-center gap-2 mt-1.5 grayscale opacity-60">
+                        <div className="w-5 h-5 rounded-full bg-slate-200" />
+                        <span className="text-[10px] font-bold text-slate-500">{order.userName || "Customer"}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex gap-2 mt-4 pt-4 border-t border-slate-50">
+                    <Button 
+                      variant="outline" 
+                      className="flex-1 rounded-xl text-[10px] font-black uppercase tracking-widest py-3 border-2"
+                      onClick={() => router.push(`/store/orders/${order.id}`)}
+                    >
+                      Details
+                    </Button>
+                    {activeTab === "incoming" && (
+                      <Button 
+                        className="flex-[2] bg-blue-600 text-white rounded-xl text-[10px] font-black uppercase tracking-widest py-3"
+                        isLoading={isSubmitting}
+                        onClick={() => handleUpdateStatus(order.id, "washing")}
+                      >
+                        Receive
+                      </Button>
+                    )}
+                    {activeTab === "washing" && (
+                      <Button 
+                        className="flex-[2] bg-primary text-white rounded-xl text-[10px] font-black uppercase tracking-widest py-3"
+                        isLoading={isSubmitting}
+                        onClick={() => handleUpdateStatus(order.id, "ready_for_pickup")}
+                      >
+                        Finish Wash
+                      </Button>
+                    )}
+                    {activeTab === "ready" && (
+                      <Button 
+                        className="flex-[2] bg-emerald-600 text-white rounded-xl text-[10px] font-black uppercase tracking-widest py-3"
+                        isLoading={isSubmitting}
+                        onClick={() => handleUpdateStatus(order.id, "completed")}
+                      >
+                        Handover
+                      </Button>
+                    )}
+                  </div>
+                </Card>
+              ))
             )}
-          </>
+          </div>
         )}
-      </div>
     </div>
   );
 }

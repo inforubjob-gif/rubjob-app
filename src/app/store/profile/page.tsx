@@ -133,12 +133,18 @@ export default function StoreProfilePage() {
                 value={prefs?.serviceArea || "Not Set"} 
                 onClick={() => router.push("/store/profile/service-area")}
              />
-             <SettingItem 
-                icon={<Icons.Clock size={20} />} 
-                label={t("store.profile.activeHours")} 
-                value={prefs?.activeHours || "Not Set"} 
-                onClick={() => router.push("/store/profile/active-hours")}
-             />
+              <SettingItem 
+                 icon={<Icons.Clipboard size={20} />} 
+                 label="Laundry Services" 
+                 value="Configure Prices & Toggle" 
+                 onClick={() => router.push("/store/services")}
+              />
+              <SettingItem 
+                 icon={<Icons.Clock size={20} />} 
+                 label={t("store.profile.activeHours")} 
+                 value={prefs?.activeHours || "Not Set"} 
+                 onClick={() => router.push("/store/profile/active-hours")}
+              />
              <SettingItem 
                 icon={<Icons.Truck size={20} />} 
                 label={t("store.profile.vehicleType")} 

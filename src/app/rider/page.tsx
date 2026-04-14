@@ -10,6 +10,7 @@ import { useTranslation } from "@/components/providers/LanguageProvider";
 import { useLiff } from "@/components/providers/LiffProvider";
 
 import Modal from "@/components/ui/Modal";
+import Skeleton from "@/components/ui/Skeleton";
 
 // Operational state for Rider
 
@@ -25,25 +26,31 @@ export default function RiderDashboard() {
   // Lifted state
   const [availableJobs, setAvailableJobs] = useState<any[]>([]);
   const [activeJobs, setActiveJobs] = useState<any[]>([]);
+  const [balance, setBalance] = useState(0);
+
+  const [verificationStatus, setVerificationStatus] = useState<"active" | "pending" | "unregistered" | "rejected">("pending");
 
   useEffect(() => {
-    const session = localStorage.getItem("rubjob_rider_session");
-    if (session) {
-      setRider(JSON.parse(session));
-    } else {
-      router.push("/rider/login"); // Fallback if gate fails
-    }
-  }, [router]);
-
-  useEffect(() => {
-    if (!rider?.id) return;
+    if (!profile?.userId) return;
     
     async function fetchRiderData() {
       try {
-        const res = await fetch(`/api/rider/orders?riderId=${rider.id}`);
+        const res = await fetch(`/api/rider/orders?riderId=${profile.userId}`);
         const data = await res.json() as any;
+        
+        if (data.status === "unregistered") {
+          router.replace("/rider/setup");
+          return;
+        }
+
+        setVerificationStatus(data.status);
         if (data.available) setAvailableJobs(data.available);
         if (data.active) setActiveJobs(data.active);
+
+        // Fetch Balance
+        const walRes = await fetch(`/api/rider/wallet?riderId=${profile.userId}`);
+        const walData = await walRes.json();
+        if (walData.balance !== undefined) setBalance(walData.balance);
       } catch (err) {
         console.error("Failed to fetch rider dashboard data:", err);
       } finally {
@@ -52,7 +59,7 @@ export default function RiderDashboard() {
     }
 
     fetchRiderData();
-  }, [rider]);
+  }, [profile, router]);
 
   const handleAcceptJob = async (jobId: string) => {
     if (!rider?.id) return;
@@ -104,12 +111,6 @@ export default function RiderDashboard() {
             <button className="w-10 h-10 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/20 shadow-md shadow-primary-dark/10 active:scale-90 transition-transform">
               <Icons.Bell size={20} className="text-white" />
             </button>
-            <button 
-              onClick={handleLogout}
-              className="w-10 h-10 rounded-2xl bg-rose-500/20 backdrop-blur-md flex items-center justify-center border border-rose-500/30 text-rose-100 shadow-md active:scale-90 transition-transform"
-            >
-              <Icons.Lock size={18} />
-            </button>
           </div>
         </div>
 
@@ -144,7 +145,7 @@ export default function RiderDashboard() {
           <div className="bg-white/10 backdrop-blur-md p-4 rounded-[2rem] border border-white/10">
             <p className="text-[10px] font-black text-white/50 uppercase tracking-widest">{t("rider.earnings")}</p>
             <p className="text-2xl font-black mt-1 text-white">
-              ฿{activeJobs.reduce((sum, o: any) => sum + (o.riderEarn || 0), 0).toLocaleString()}
+              ฿{balance.toLocaleString()}
             </p>
           </div>
         </div>
@@ -174,8 +175,35 @@ export default function RiderDashboard() {
 
       <div className="flex-1 px-5 pt-6 space-y-7 pb-24 animate-fade-in">
         {isLoading ? (
-          <div className="flex items-center justify-center h-48">
-            <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+          <div className="space-y-4">
+             {[1, 2, 3].map((i) => (
+               <div key={i} className="bg-white p-5 rounded-[2.5rem] border border-slate-100 flex items-center gap-4">
+                 <Skeleton variant="circle" className="w-14 h-14" />
+                 <div className="flex-1 space-y-2">
+                    <Skeleton variant="text" className="w-24 h-4" />
+                    <Skeleton variant="text" className="w-full h-3" />
+                 </div>
+               </div>
+             ))}
+          </div>
+        ) : verificationStatus !== "active" ? (
+          <div className="flex flex-col items-center justify-center py-20 px-6 text-center">
+             <div className="w-24 h-24 bg-white/20 backdrop-blur-xl rounded-[2.5rem] flex items-center justify-center text-white border border-white/30 shadow-2xl mb-8 relative">
+                <Icons.Shield size={48} />
+                <div className="absolute -bottom-2 -right-2 w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center border-4 border-slate-50 text-white animate-pulse">
+                   <Icons.Clock size={18} strokeWidth={4} />
+                </div>
+             </div>
+             <h2 className="text-xl font-black text-slate-900 uppercase tracking-tight">Verification Pending</h2>
+             <p className="text-sm text-slate-400 font-bold mt-2 leading-relaxed">
+               ทีมงานกำลังตรวจสอบเอกสารของคุณครับ<br/>กรุณารอสักครู่ (ไม่เกิน 24 ชม.)
+             </p>
+             <Button 
+               className="mt-10 bg-white border border-slate-200 text-slate-900 px-10 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest"
+               onClick={() => window.location.reload()}
+             >
+               Refresh Status
+             </Button>
           </div>
         ) : (
           <>
@@ -315,12 +343,14 @@ function AvailableDeliveries({ t, router, jobs, onAccept, onViewDetails }: { t: 
                 {getServiceIcon(job.serviceId as any, { size: 28 })}
               </div>
               <div className="flex-1">
-                <div className="flex items-center justify-between mb-1">
-                  <span className="text-[10px] font-black text-primary-dark uppercase tracking-widest">{job.id}</span>
-                  <span className="text-xs font-black text-slate-900">฿{job.riderEarn || job.deliveryFee}</span>
+                <div className="flex items-center gap-1.5 mb-1">
+                  <span className={`text-[8px] font-black px-1.5 py-0.5 rounded uppercase tracking-tighter ${job.status === 'pending' ? 'bg-blue-100 text-blue-700' : 'bg-orange-100 text-orange-700'}`}>
+                    {job.status === 'pending' ? 'Pickup Leg' : 'Delivery Leg'}
+                  </span>
+                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{job.id}</span>
                 </div>
                 <h3 className="font-bold text-slate-900 mb-1 leading-tight">
-                  {job.storeName} → Customer
+                  {job.status === 'pending' ? 'Customer → Store' : 'Store → Customer'}
                 </h3>
                 <div className="flex items-center gap-3 text-[11px] text-slate-500 font-medium">
                   <span className="flex items-center gap-1"><Icons.MapPin size={12} className="text-primary" /> {job.distanceKm || "0.5"} {t("rider.nearby")}</span>

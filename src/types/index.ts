@@ -30,6 +30,7 @@ export type OrderStatus =
   | "picking_up"
   | "delivering_to_store"
   | "washing"
+  | "ready_for_pickup"
   | "delivering_to_customer"
   | "completed"
   | "cancelled";
