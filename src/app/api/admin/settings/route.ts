@@ -6,9 +6,11 @@ export const runtime = "edge";
 const DEFAULT_SETTINGS = [
   { key: "is_open", value: "true", type: "boolean", description: "Whether the platform is currently accepting new orders." },
   { key: "radius_km", value: "5", type: "number", description: "Default service radius for stores in kilometers." },
-  { key: "commission_rate", value: "15", type: "number", description: "Platform commission percentage taken from orders." },
+  { key: "gp_store_percent", value: "20", type: "number", description: "GP percentage taken from Store sales (Commission)." },
+  { key: "gp_rider_percent", value: "10", type: "number", description: "GP percentage taken from Rider delivery fees." },
+  { key: "rider_base_payout", value: "25", type: "number", description: "Flat base amount paid to riders per delivery before distance bonus." },
   { key: "min_order_amount", value: "0", type: "number", description: "Minimum order value required to place a booking." },
-  { key: "delivery_fee_base", value: "0", type: "number", description: "Default base delivery fee for laundry services." },
+  { key: "delivery_fee_base", value: "39", type: "number", description: "Base delivery fee charged to customers." },
   { key: "line_token_regular", value: "", type: "string", description: "Channel Access Token for the Regular LINE OA." },
   { key: "line_secret_regular", value: "", type: "string", description: "Channel Secret for the Regular LINE OA." },
   { key: "line_token_help", value: "", type: "string", description: "Channel Access Token for the Help Support LINE OA." },

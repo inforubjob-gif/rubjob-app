@@ -6,7 +6,10 @@ import Card from "@/components/ui/Card";
 import { Icons } from "@/components/ui/Icons";
 
 export default function AdminDashboard() {
-  const [stats, setStats] = useState({ users: 0, stores: 0, orders: 0, revenue: 0, earnings: 0, commissionRate: 15 });
+  const [stats, setStats] = useState({ 
+    users: 0, stores: 0, orders: 0, revenue: 0, earnings: 0, 
+    gpStore: 20, gpRider: 10 
+  });
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -21,7 +24,8 @@ export default function AdminDashboard() {
             orders: data.orders || 0,
             revenue: data.revenue || 0,
             earnings: data.earnings || 0,
-            commissionRate: data.commissionRate || 15
+            gpStore: data.gpStore || 20,
+            gpRider: data.gpRider || 10
           });
         }
       } catch (err) {
@@ -38,9 +42,10 @@ export default function AdminDashboard() {
       <header className="mb-8 flex justify-between items-end">
         <div>
           <h1 className="text-3xl font-black text-slate-900 tracking-tight">System Overview</h1>
-          <p className="text-slate-500 font-medium">Real-time metrics and platform health</p>
+          <p className="text-slate-500 font-medium tracking-tight">Financial formulas: Store {stats.gpStore}% / Rider {stats.gpRider}%</p>
         </div>
-        <div className="bg-emerald-50 text-emerald-600 px-4 py-2 rounded-2xl text-xs font-black uppercase tracking-widest border border-emerald-100 italic shadow-sm">
+        <div className="bg-emerald-50 text-emerald-600 px-4 py-2 rounded-2xl text-[10px] font-black uppercase tracking-widest border border-emerald-100 italic shadow-sm flex items-center gap-2">
+           <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
            Live Sync Active
         </div>
       </header>
@@ -95,8 +100,8 @@ export default function AdminDashboard() {
                </div>
                <div className="relative z-10 flex items-center justify-between mb-1">
                  <p className="text-[10px] font-black text-indigo-100 uppercase tracking-widest">Platform Earnings</p>
-                 <div className="bg-white/20 px-2 py-0.5 rounded-md text-[9px] font-black tracking-tighter">
-                   {stats.commissionRate}% FEE
+                 <div className="bg-white/20 px-2 py-0.5 rounded-md text-[9px] font-black tracking-tighter uppercase">
+                   GP: S-{stats.gpStore}% / R-{stats.gpRider}%
                  </div>
                </div>
                <h2 className="text-3xl font-black tracking-tighter relative z-10">
