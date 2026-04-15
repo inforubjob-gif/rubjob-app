@@ -20,6 +20,14 @@ export async function POST(req: Request) {
       const db = context?.env?.DB;
       
       if (db) {
+        // Self-healing: Ensure columns exist
+        try {
+          await db.prepare("ALTER TABLE admin_users ADD COLUMN permissions TEXT").run();
+        } catch (e) {}
+        try {
+          await db.prepare("ALTER TABLE admin_users ADD COLUMN avatarUrl TEXT").run();
+        } catch (e) {}
+
         const admin = await db.prepare(`
           SELECT * FROM admin_users WHERE email = ? AND password = ?
         `).bind(email, password).first();
