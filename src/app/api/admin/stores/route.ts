@@ -8,17 +8,23 @@ export async function GET(req: Request) {
     const db = getRequestContext().env.DB;
     if (!db) return NextResponse.json({ error: "D1 not found" }, { status: 500 });
 
-    // Self-healing: Ensure store_services exists
-    await db.prepare(`
-      CREATE TABLE IF NOT EXISTS store_services (
-        storeId TEXT NOT NULL,
-        serviceId TEXT NOT NULL,
-        price REAL,
-        PRIMARY KEY (storeId, serviceId),
-        FOREIGN KEY (storeId) REFERENCES stores(id) ON DELETE CASCADE,
-        FOREIGN KEY (serviceId) REFERENCES services(id) ON DELETE CASCADE
-      )
-    `).run();
+    // Self-healing: Ensure new columns and tables exist
+    try {
+      await db.prepare(`
+        CREATE TABLE IF NOT EXISTS store_services (
+          storeId TEXT NOT NULL,
+          serviceId TEXT NOT NULL,
+          price REAL,
+          PRIMARY KEY (storeId, serviceId),
+          FOREIGN KEY (storeId) REFERENCES stores(id) ON DELETE CASCADE,
+          FOREIGN KEY (serviceId) REFERENCES services(id) ON DELETE CASCADE
+        )
+      `).run();
+      await db.prepare("ALTER TABLE stores ADD COLUMN bankName TEXT").run();
+      await db.prepare("ALTER TABLE stores ADD COLUMN accountNumber TEXT").run();
+      await db.prepare("ALTER TABLE stores ADD COLUMN accountName TEXT").run();
+    } catch (e) {}
+    
 
     const { results: stores } = await db.prepare(`
       SELECT s.*, u.displayName as ownerName, COUNT(o.id) as orderCount
@@ -49,7 +55,8 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
   try {
-    const { name, ownerId, address, lat, lng, serviceRadiusKm, baseDeliveryFee, extraFeePerKm, phone, services } = await req.json() as any;
+    const payload = await req.json() as any;
+    const { name, ownerId, address, lat, lng, serviceRadiusKm, baseDeliveryFee, extraFeePerKm, phone, services, bankName, accountNumber, accountName } = payload;
     const db = getRequestContext().env.DB;
     if (!db) return NextResponse.json({ error: "D1 not found" }, { status: 500 });
 
@@ -75,10 +82,11 @@ export async function POST(req: Request) {
 
     // Insert store
     await db.prepare(`
-      INSERT INTO stores (id, name, ownerId, address, lat, lng, serviceRadiusKm, baseDeliveryFee, extraFeePerKm, phone, isActive)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)
+      INSERT INTO stores (id, name, ownerId, address, lat, lng, serviceRadiusKm, baseDeliveryFee, extraFeePerKm, phone, isActive, bankName, accountNumber, accountName)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?, ?, ?)
     `).bind(
-      id, name, finalOwnerId, address || "", lat || 0, lng || 0, serviceRadiusKm || 5, baseDeliveryFee || 0, extraFeePerKm || 0, phone || ""
+      id, name, finalOwnerId, address || "", lat || 0, lng || 0, serviceRadiusKm || 5, baseDeliveryFee || 0, extraFeePerKm || 0, phone || "", 
+      bankName || "", accountNumber || "", accountName || ""
     ).run();
 
     // Sync services with custom prices
@@ -96,7 +104,8 @@ export async function POST(req: Request) {
 
 export async function PUT(req: Request) {
   try {
-    const { id, name, ownerId, address, lat, lng, serviceRadiusKm, baseDeliveryFee, extraFeePerKm, phone, isActive, services } = await req.json() as any;
+    const payload = await req.json() as any;
+    const { id, name, ownerId, address, lat, lng, serviceRadiusKm, baseDeliveryFee, extraFeePerKm, phone, isActive, services, bankName, accountNumber, accountName } = payload;
     const db = getRequestContext().env.DB;
     if (!db) return NextResponse.json({ error: "D1 not found" }, { status: 500 });
 
@@ -113,10 +122,14 @@ export async function PUT(req: Request) {
           baseDeliveryFee = COALESCE(?, baseDeliveryFee),
           extraFeePerKm = COALESCE(?, extraFeePerKm),
           phone = COALESCE(?, phone),
-          isActive = COALESCE(?, isActive)
+          isActive = COALESCE(?, isActive),
+          bankName = COALESCE(?, bankName),
+          accountNumber = COALESCE(?, accountNumber),
+          accountName = COALESCE(?, accountName)
       WHERE id = ?
     `).bind(
-      name, ownerId, address, lat, lng, serviceRadiusKm, baseDeliveryFee, extraFeePerKm, phone, isActive, id
+      name || null, ownerId || null, address || null, lat || null, lng || null, serviceRadiusKm || null, baseDeliveryFee || null, extraFeePerKm || null, phone || null, isActive || null, 
+      bankName || null, accountNumber || null, accountName || null, id
     ).run();
 
     // Sync services with custom prices

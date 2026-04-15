@@ -33,6 +33,9 @@ export default function StoreForm({ initialData, isEdit }: StoreFormProps) {
     baseDeliveryFee: initialData?.baseDeliveryFee?.toString() || "0",
     extraFeePerKm: initialData?.extraFeePerKm?.toString() || "10",
     phone: initialData?.phone || "",
+    bankName: initialData?.bankName || "",
+    accountNumber: initialData?.accountNumber || "",
+    accountName: initialData?.accountName || "",
     services: initialData?.services || [] as any[] // [{ serviceId, price }]
   });
 
@@ -308,6 +311,53 @@ export default function StoreForm({ initialData, isEdit }: StoreFormProps) {
                           />
                        </div>
                     </div>
+                 </div>
+              </div>
+           </Card>
+
+           <Card className="p-8 bg-white border border-slate-200/60 shadow-sm">
+              <div className="flex items-center gap-3 mb-6">
+                 <div className="w-10 h-10 rounded-xl bg-primary/5 text-primary flex items-center justify-center">
+                    <Icons.Wallet size={20} />
+                 </div>
+                 <h2 className="text-xl font-black text-slate-900 uppercase tracking-tight">Payout Information</h2>
+              </div>
+              
+              <div className="space-y-5">
+                 <div>
+                    <label className="text-[10px] uppercase font-black text-slate-400 tracking-widest block mb-1.5 ml-1">Bank Name</label>
+                    <select 
+                      value={formData.bankName}
+                      onChange={e => setFormData({...formData, bankName: e.target.value})}
+                      className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-5 py-3.5 text-sm font-bold focus:outline-none focus:border-primary/50 transition-all font-mono"
+                    >
+                       <option value="">Select Bank / PromptPay</option>
+                       <option value="PromptPay">PromptPay (Mobile/ID)</option>
+                       <option value="KBank">Kasikorn (KBank)</option>
+                       <option value="SCB">Siam Commercial (SCB)</option>
+                       <option value="BBL">Bangkok Bank (BBL)</option>
+                       <option value="KTB">Krungthai (KTB)</option>
+                       <option value="Krungsri">Krungsri (BAY)</option>
+                       <option value="TTB">TMBThanachart (TTB)</option>
+                    </select>
+                 </div>
+                 <div>
+                    <label className="text-[10px] uppercase font-black text-slate-400 tracking-widest block mb-1.5 ml-1">Account Number / PromptPay ID</label>
+                    <input 
+                      value={formData.accountNumber}
+                      onChange={e => setFormData({...formData, accountNumber: e.target.value})}
+                      placeholder="000-0-00000-0"
+                      className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-5 py-3.5 text-sm font-bold focus:outline-none focus:border-primary/50 transition-all font-mono"
+                    />
+                 </div>
+                 <div>
+                    <label className="text-[10px] uppercase font-black text-slate-400 tracking-widest block mb-1.5 ml-1">Account Holder Name</label>
+                    <input 
+                      value={formData.accountName}
+                      onChange={e => setFormData({...formData, accountName: e.target.value})}
+                      placeholder="As shown in bank book"
+                      className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-5 py-3.5 text-sm font-bold focus:outline-none focus:border-primary/50 transition-all font-mono"
+                    />
                  </div>
               </div>
            </Card>

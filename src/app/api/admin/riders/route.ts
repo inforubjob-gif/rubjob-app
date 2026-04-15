@@ -36,7 +36,8 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
   try {
-    const { email, password, name, phone, vehicleType, address, idNumber, licensePlate, emergencyContact } = await req.json() as any;
+    const payload = await req.json() as any;
+    const { email, password, name, phone, vehicleType, address, idNumber, licensePlate, emergencyContact, bankName, accountNumber, accountName } = payload;
     const db = getRequestContext().env.DB;
     if (!db) return NextResponse.json({ error: "D1 not found" }, { status: 500 });
 
@@ -54,10 +55,11 @@ export async function POST(req: Request) {
     const id = `RDR-${Math.random().toString(36).substr(2, 6).toUpperCase()}`;
 
     await db.prepare(`
-      INSERT INTO rider_users (id, email, password, name, phone, vehicleType, address, idNumber, licensePlate, emergencyContact, status, rider_number)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'active', ?)
+      INSERT INTO rider_users (id, email, password, name, phone, vehicleType, address, idNumber, licensePlate, emergencyContact, status, rider_number, bankName, accountNumber, accountName)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'active', ?, ?, ?, ?)
     `).bind(
-      id, email, password, name, phone || "", vehicleType || "bike", address || "", idNumber || "", licensePlate || "", emergencyContact || "", nextNumber
+      id, email, password, name, phone || "", vehicleType || "bike", address || "", idNumber || "", licensePlate || "", emergencyContact || "", nextNumber,
+      bankName || "", accountNumber || "", accountName || ""
     ).run();
 
     return NextResponse.json({ success: true, id, displayId });
@@ -71,7 +73,8 @@ export async function POST(req: Request) {
 
 export async function PUT(req: Request) {
   try {
-    const { id, status, name, phone, vehicleType, address, idNumber, licensePlate, emergencyContact, documents } = await req.json() as any;
+    const payload = await req.json() as any;
+    const { id, status, name, phone, vehicleType, address, idNumber, licensePlate, emergencyContact, bankName, accountNumber, accountName, documents } = payload;
     const db = getRequestContext().env.DB;
     if (!db) return NextResponse.json({ error: "D1 not found" }, { status: 500 });
 
@@ -87,10 +90,14 @@ export async function PUT(req: Request) {
           address = COALESCE(?, address),
           idNumber = COALESCE(?, idNumber),
           licensePlate = COALESCE(?, licensePlate),
-          emergencyContact = COALESCE(?, emergencyContact)
+          emergencyContact = COALESCE(?, emergencyContact),
+          bankName = COALESCE(?, bankName),
+          accountNumber = COALESCE(?, accountNumber),
+          accountName = COALESCE(?, accountName)
       WHERE id = ?
     `).bind(
-      status || null, name || null, phone || null, vehicleType || null, address || null, idNumber || null, licensePlate || null, emergencyContact || null, id
+      status || null, name || null, phone || null, vehicleType || null, address || null, idNumber || null, licensePlate || null, emergencyContact || null, 
+      bankName || null, accountNumber || null, accountName || null, id
     ).run();
 
     // Handle documents if provided
