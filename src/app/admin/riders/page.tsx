@@ -131,11 +131,17 @@ export default function RiderManagementAdminPage() {
                     <td className="px-6 py-4">
                        <span className="text-xs font-bold text-slate-600 font-mono">{rider.phone || "No phone"}</span>
                     </td>
-                    <td className="px-6 py-4">
-                       <Badge variant={rider.status === 'active' ? "success" : "danger"}>
-                          {rider.status === 'active' ? 'Active' : 'Suspended'}
-                       </Badge>
-                    </td>
+                     <td className="px-6 py-4">
+                        <Badge variant={
+                          rider.status === 'active' ? "success" : 
+                          rider.status === 'pending' ? "warning" : 
+                          "danger"
+                        }>
+                           {rider.status === 'active' ? 'Active' : 
+                            rider.status === 'pending' ? 'Pending Review' : 
+                            'Suspended'}
+                        </Badge>
+                     </td>
                     <td className="px-6 py-4 text-right">
                        <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                           <Link 
@@ -148,7 +154,7 @@ export default function RiderManagementAdminPage() {
                             onClick={() => toggleStatus(rider.id, rider.status)}
                             className={`px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-tight transition-all active:scale-95 ${rider.status === 'active' ? 'bg-rose-50 text-rose-600 hover:bg-rose-100' : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100'}`}
                           >
-                            {rider.status === 'active' ? 'Suspend' : 'Activate'}
+                            {rider.status === 'active' ? 'Suspend' : rider.status === 'pending' ? 'Review Application' : 'Activate'}
                           </button>
                        </div>
                     </td>
@@ -159,7 +165,7 @@ export default function RiderManagementAdminPage() {
           </div>
         )}
       </Card>
-iv>
+   </div>
     </div>
   );
 }

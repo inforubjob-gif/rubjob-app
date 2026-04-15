@@ -81,8 +81,57 @@ export default function RiderForm({ initialData, isEdit }: RiderFormProps) {
     }
   };
 
+  const handleApprove = async () => {
+    setIsSaving(true);
+    try {
+      const res = await fetch("/api/admin/riders", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: initialData.id, status: 'active' })
+      });
+      if (res.ok) {
+        showToast("Application Approved! Rider is now active.", "success");
+        router.push("/admin/riders");
+        router.refresh();
+      }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   return (
     <form onSubmit={handleSave} className="space-y-8 pb-20 animate-in fade-in slide-in-from-bottom-4 duration-500">
+      {initialData?.status === 'pending' && (
+        <div className="bg-amber-50 border-2 border-amber-200 rounded-[2rem] p-6 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xl shadow-amber-500/5">
+           <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-amber-500 rounded-2xl flex items-center justify-center text-white animate-pulse">
+                 <Icons.Shield size={24} />
+              </div>
+              <div>
+                 <h3 className="font-black text-amber-900 uppercase tracking-tight">Pending Application</h3>
+                 <p className="text-xs font-bold text-amber-700/60 uppercase">Review documents below before approving</p>
+              </div>
+           </div>
+           <div className="flex items-center gap-3 w-full sm:w-auto">
+              <button 
+                type="button"
+                onClick={handleApprove}
+                disabled={isSaving}
+                className="flex-1 sm:flex-none px-8 py-3 bg-amber-500 text-white rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-amber-600 transition-all shadow-lg shadow-amber-500/20"
+              >
+                {isSaving ? 'Processing...' : 'Approve Application'}
+              </button>
+              <button 
+                type="button"
+                className="flex-1 sm:flex-none px-8 py-3 bg-white border-2 border-amber-200 text-amber-500 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-amber-100 transition-all"
+              >
+                Reject
+              </button>
+           </div>
+        </div>
+      )}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         
         {/* Left Column: Personal & Credentials */}

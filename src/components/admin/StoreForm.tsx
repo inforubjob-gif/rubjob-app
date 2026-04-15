@@ -36,7 +36,9 @@ export default function StoreForm({ initialData, isEdit }: StoreFormProps) {
     bankName: initialData?.bankName || "",
     accountNumber: initialData?.accountNumber || "",
     accountName: initialData?.accountName || "",
-    services: initialData?.services || [] as any[] // [{ serviceId, price }]
+    status: initialData?.status || "active",
+    services: initialData?.services || [] as any[], // [{ serviceId, price }]
+    documents: initialData?.documents || [] as any[] // [{ type, url, status, notes }]
   });
 
   useEffect(() => {
@@ -69,6 +71,19 @@ export default function StoreForm({ initialData, isEdit }: StoreFormProps) {
         newServices = [...prev.services, { serviceId, price: parseFloat(price) || null }];
       }
       return { ...prev, services: newServices };
+    });
+  };
+
+  const handleDocChange = (type: string, field: string, value: string) => {
+    setFormData(prev => {
+      const existing = prev.documents.find((d: any) => d.type === type);
+      let newDocs;
+      if (existing) {
+        newDocs = prev.documents.map((d: any) => d.type === type ? { ...d, [field]: value } : d);
+      } else {
+        newDocs = [...prev.documents, { type, status: 'pending', url: '', notes: '', [field]: value }];
+      }
+      return { ...prev, documents: newDocs };
     });
   };
 
@@ -130,8 +145,51 @@ export default function StoreForm({ initialData, isEdit }: StoreFormProps) {
     }
   };
 
+  const handleApprove = async () => {
+    setIsSaving(true);
+    try {
+      const res = await fetch("/api/admin/stores", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: initialData.id, status: 'active', isActive: 1 })
+      });
+      if (res.ok) {
+        showToast("Branch Authorized! It is now visible to customers.", "success");
+        router.push("/admin/stores");
+        router.refresh();
+      }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   return (
     <form onSubmit={handleSave} className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+      {initialData?.status === 'pending' && (
+        <div className="bg-primary/5 border-2 border-primary/20 rounded-[2.5rem] p-6 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xl shadow-primary/5">
+           <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-primary rounded-2xl flex items-center justify-center text-slate-900 animate-pulse">
+                 <Icons.Shield size={24} />
+              </div>
+              <div>
+                 <h3 className="font-black text-slate-900 uppercase tracking-tight">Partner Application Pending</h3>
+                 <p className="text-xs font-bold text-slate-500 uppercase">Review business documentation before activation</p>
+              </div>
+           </div>
+           <div className="flex items-center gap-3 w-full sm:w-auto">
+              <button 
+                type="button"
+                onClick={handleApprove}
+                disabled={isSaving}
+                className="flex-1 sm:flex-none px-8 py-4 bg-slate-900 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-slate-800 transition-all shadow-lg"
+              >
+                {isSaving ? 'Processing...' : 'Verify & Authorize'}
+              </button>
+           </div>
+        </div>
+      )}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         
         {/* Left Column: Basic Info & Map */}
@@ -196,6 +254,59 @@ export default function StoreForm({ initialData, isEdit }: StoreFormProps) {
                  </div>
               </div>
            </Card>
+
+           <Card className="p-8 bg-white border border-slate-200/60 shadow-sm">
+               <div className="flex items-center gap-3 mb-8">
+                  <div className="w-10 h-10 rounded-xl bg-orange-50 text-orange-600 flex items-center justify-center">
+                     <Icons.Shield size={20} />
+                  </div>
+                  <h2 className="text-xl font-black text-slate-900 uppercase tracking-tight">Business Documentation</h2>
+               </div>
+               
+               <div className="space-y-6">
+                  {['business_license', 'owner_id', 'storefront'].map(docType => {
+                     const doc = formData.documents.find((d: any) => d.type === docType) || { status: 'none', url: '', notes: '' };
+                     return (
+                        <div key={docType} className="p-6 rounded-3xl border-2 border-slate-50 bg-slate-50/20 space-y-4">
+                           <div className="flex items-center justify-between">
+                              <span className="text-sm font-black text-slate-900 uppercase tracking-tight">{docType.replace('_', ' ').toUpperCase()}</span>
+                              <select 
+                                 value={doc.status}
+                                 onChange={e => handleDocChange(docType, 'status', e.target.value)}
+                                 className={`text-[10px] font-black uppercase px-3 py-1.5 rounded-lg border-2 focus:outline-none ${
+                                    doc.status === 'verified' ? 'bg-emerald-50 border-emerald-100 text-emerald-600' :
+                                    doc.status === 'rejected' ? 'bg-rose-50 border-rose-100 text-rose-600' :
+                                    'bg-white border-slate-100 text-slate-400'
+                                 }`}
+                              >
+                                 <option value="none">Not Submitted</option>
+                                 <option value="pending">Pending Review</option>
+                                 <option value="verified">Verified Official</option>
+                                 <option value="rejected">Rejected / Invalid</option>
+                              </select>
+                           </div>
+                           
+                           {doc.url && (
+                             <div className="aspect-[16/7] rounded-2xl overflow-hidden border-2 border-slate-100">
+                                <img src={doc.id ? `/api/admin/documents/${doc.id}` : doc.url} alt={docType} className="w-full h-full object-cover" />
+                             </div>
+                           )}
+                           
+                           <div>
+                              <label className="text-[9px] uppercase font-black text-slate-400 block mb-1 ml-1">Internal Review Notes</label>
+                              <textarea 
+                                rows={2}
+                                value={doc.notes}
+                                onChange={e => handleDocChange(docType, 'notes', e.target.value)}
+                                placeholder="Audit findings..."
+                                className="w-full bg-white border border-slate-200 rounded-2xl px-4 py-3 text-xs font-bold focus:outline-none focus:border-indigo-400 transition-all"
+                              />
+                           </div>
+                        </div>
+                     );
+                  })}
+               </div>
+            </Card>
            
            <Card className="p-8 bg-white border border-slate-200/60 shadow-sm">
               <div className="flex items-center gap-3 mb-6">

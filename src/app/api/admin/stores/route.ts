@@ -20,6 +20,7 @@ export async function GET(req: Request) {
           FOREIGN KEY (serviceId) REFERENCES services(id) ON DELETE CASCADE
         )
       `).run();
+      await db.prepare("ALTER TABLE stores ADD COLUMN status TEXT DEFAULT 'active'").run();
       await db.prepare("ALTER TABLE stores ADD COLUMN bankName TEXT").run();
       await db.prepare("ALTER TABLE stores ADD COLUMN accountNumber TEXT").run();
       await db.prepare("ALTER TABLE stores ADD COLUMN accountName TEXT").run();
@@ -40,11 +41,17 @@ export async function GET(req: Request) {
       SELECT storeId, serviceId, price FROM store_services
     `).all();
 
+    // Fetch documents for all stores
+    const { results: storeDocs } = await db.prepare(`
+      SELECT * FROM store_documents
+    `).all();
+
     const storesWithServices = stores.map((s: any) => ({
       ...s,
       services: storeServices
         .filter((ss: any) => ss.storeId === s.id)
-        .map((ss: any) => ({ serviceId: ss.serviceId, price: ss.price }))
+        .map((ss: any) => ({ serviceId: ss.serviceId, price: ss.price })),
+      documents: storeDocs.filter((d: any) => d.storeId === s.id)
     }));
 
     return NextResponse.json({ stores: storesWithServices });
@@ -105,7 +112,7 @@ export async function POST(req: Request) {
 export async function PUT(req: Request) {
   try {
     const payload = await req.json() as any;
-    const { id, name, ownerId, address, lat, lng, serviceRadiusKm, baseDeliveryFee, extraFeePerKm, phone, isActive, services, bankName, accountNumber, accountName } = payload;
+    const { id, name, ownerId, address, lat, lng, serviceRadiusKm, baseDeliveryFee, extraFeePerKm, phone, isActive, status, services, bankName, accountNumber, accountName, documents } = payload;
     const db = getRequestContext().env.DB;
     if (!db) return NextResponse.json({ error: "D1 not found" }, { status: 500 });
 
@@ -123,14 +130,27 @@ export async function PUT(req: Request) {
           extraFeePerKm = COALESCE(?, extraFeePerKm),
           phone = COALESCE(?, phone),
           isActive = COALESCE(?, isActive),
+          status = COALESCE(?, status),
           bankName = COALESCE(?, bankName),
           accountNumber = COALESCE(?, accountNumber),
           accountName = COALESCE(?, accountName)
       WHERE id = ?
     `).bind(
       name || null, ownerId || null, address || null, lat || null, lng || null, serviceRadiusKm || null, baseDeliveryFee || null, extraFeePerKm || null, phone || null, isActive || null, 
-      bankName || null, accountNumber || null, accountName || null, id
+      status || null, bankName || null, accountNumber || null, accountName || null, id
     ).run();
+
+    // Handle documents
+    if (documents && Array.isArray(documents)) {
+      for (const doc of documents) {
+        if (doc.id) {
+          await db.prepare(`UPDATE store_documents SET status = ?, url = ?, notes = ? WHERE id = ?`).bind(doc.status, doc.url, doc.notes, doc.id).run();
+        } else {
+          const docId = `DOC-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
+          await db.prepare(`INSERT INTO store_documents (id, storeId, type, url, status) VALUES (?, ?, ?, ?, ?)`).bind(docId, id, doc.type, doc.url, doc.status || 'pending').run();
+        }
+      }
+    }
 
     // Sync services with custom prices
     if (services && Array.isArray(services)) {

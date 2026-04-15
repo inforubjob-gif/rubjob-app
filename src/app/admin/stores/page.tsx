@@ -137,8 +137,14 @@ export default function StoresAdminPage() {
                        <span className="font-black text-slate-900">฿{store.baseDeliveryFee}</span>
                     </td>
                     <td className="px-6 py-4">
-                       <Badge variant={store.isActive === 1 ? "success" : "danger"}>
-                          {store.isActive === 1 ? 'Active' : 'Suspended'}
+                       <Badge variant={
+                         store.status === 'active' ? "success" : 
+                         store.status === 'pending' ? "warning" : 
+                         "danger"
+                       }>
+                          {store.status === 'active' ? 'Active' : 
+                           store.status === 'pending' ? 'Pending Review' : 
+                           'Suspended'}
                        </Badge>
                     </td>
                     <td className="px-6 py-4 text-right">
@@ -153,7 +159,7 @@ export default function StoresAdminPage() {
                             onClick={() => toggleStoreStatus(store.id, store.isActive)}
                             className={`px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-tight transition-all active:scale-95 ${store.isActive === 1 ? 'bg-rose-50 text-rose-600 hover:bg-rose-100' : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100'}`}
                           >
-                            {store.isActive === 1 ? 'Suspend' : 'Activate'}
+                            {store.status === 'active' ? 'Suspend' : store.status === 'pending' ? 'Review & Approve' : 'Activate' }
                           </button>
                        </div>
                     </td>

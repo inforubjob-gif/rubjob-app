@@ -22,6 +22,9 @@ CREATE TABLE IF NOT EXISTS rider_users (
   licensePlate TEXT, -- Vehicle plate number
   emergencyContact TEXT,
   rider_number INTEGER, -- Sequential ID counter
+  bankName TEXT,
+  accountNumber TEXT,
+  accountName TEXT,
   createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -63,8 +66,24 @@ CREATE TABLE IF NOT EXISTS stores (
   extraFeePerKm REAL DEFAULT 10,
   phone TEXT,
   isActive INTEGER DEFAULT 1,
+  status TEXT DEFAULT 'active', -- active, pending, suspended
+  bankName TEXT,
+  accountNumber TEXT,
+  accountName TEXT,
   createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (ownerId) REFERENCES users(id)
+);
+
+-- Store Documents Table
+CREATE TABLE IF NOT EXISTS store_documents (
+  id TEXT PRIMARY KEY,
+  storeId TEXT NOT NULL,
+  type TEXT NOT NULL, -- business_license, id_card, registration
+  status TEXT DEFAULT 'pending', -- pending, verified, rejected
+  url TEXT,
+  notes TEXT,
+  createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (storeId) REFERENCES stores(id) ON DELETE CASCADE
 );
 
 -- Services Table (Master Data)
