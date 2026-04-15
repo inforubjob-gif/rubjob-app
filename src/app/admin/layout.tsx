@@ -47,7 +47,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             </div>
           </main>
         </div>
-      </div>
+        </div>
+      </ToastProvider>
     </AdminAuthGate>
   );
 }
