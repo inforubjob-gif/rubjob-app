@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import { Icons } from "@/components/ui/Icons";
 import Card from "@/components/ui/Card";
+import { useToast } from "@/components/providers/ToastProvider";
 
 const MapPicker = dynamic(() => import("@/components/ui/MapPicker"), { 
   ssr: false,
@@ -18,6 +19,7 @@ interface StoreFormProps {
 
 export default function StoreForm({ initialData, isEdit }: StoreFormProps) {
   const router = useRouter();
+  const { showToast } = useToast();
   const [isSaving, setIsSaving] = useState(false);
   const [allServices, setAllServices] = useState<any[]>([]);
   
@@ -79,6 +81,13 @@ export default function StoreForm({ initialData, isEdit }: StoreFormProps) {
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // 🛡️ Final Validation
+    if (!formData.name.trim()) return showToast("Store Name is required", "error");
+    if (!formData.address.trim()) return showToast("Physical Address is required", "error");
+    if (!formData.ownerId.trim()) return showToast("Store Owner Binding (User ID) is required", "error");
+    if (formData.services.length === 0) return showToast("Please select at least one service", "error");
+
     setIsSaving(true);
     
     const payload = {
@@ -98,12 +107,20 @@ export default function StoreForm({ initialData, isEdit }: StoreFormProps) {
         body: JSON.stringify(payload)
       });
       
+      const data = await res.json() as any;
+
       if (res.ok) {
-        router.push("/admin/stores");
-        router.refresh();
+        showToast(isEdit ? "Branch updated successfully" : "New branch established!", "success");
+        setTimeout(() => {
+          router.push("/admin/stores");
+          router.refresh();
+        }, 1500);
+      } else {
+        showToast(data.error || "Failed to save branch. Ensure the Owner ID exists.", "error");
       }
     } catch (err) {
       console.error("Save failed", err);
+      showToast("Network error. Please try again.", "error");
     } finally {
       setIsSaving(false);
     }
@@ -300,8 +317,8 @@ export default function StoreForm({ initialData, isEdit }: StoreFormProps) {
 
            <div className="pt-4">
               <button 
+                type="submit"
                 disabled={isSaving}
-                onClick={handleSave}
                 className="w-full bg-slate-900 text-white py-6 rounded-3xl font-black text-xs uppercase tracking-[0.3em] shadow-2xl shadow-slate-300 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50"
               >
                 {isSaving ? "Syncing..." : isEdit ? "Update Branch Core Data" : "Establish New Branch"}

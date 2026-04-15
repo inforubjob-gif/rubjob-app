@@ -4,13 +4,15 @@ import { useState } from "react";
 import AdminSidebar from "@/components/admin/AdminSidebar";
 import AdminAuthGate from "@/components/admin/AdminAuthGate";
 import { Icons } from "@/components/ui/Icons";
+import { ToastProvider } from "@/components/providers/ToastProvider";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   return (
     <AdminAuthGate>
-      <div className="fixed inset-0 z-50 bg-slate-50 flex flex-col lg:flex-row overflow-hidden font-sans text-slate-900">
+      <ToastProvider>
+        <div className="fixed inset-0 z-50 bg-slate-50 flex flex-col lg:flex-row overflow-hidden font-sans text-slate-900">
         {/* Mobile Header */}
         <header className="lg:hidden h-20 bg-slate-900 border-b border-slate-800 flex items-center justify-between px-6 shrink-0 z-[55]">
           <div className="flex items-center gap-3">
