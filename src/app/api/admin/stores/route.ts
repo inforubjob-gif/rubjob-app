@@ -43,6 +43,22 @@ export async function POST(req: Request) {
 
     if (!name || !ownerId) return NextResponse.json({ error: "Missing name or ownerId" }, { status: 400 });
 
+    let finalOwnerId = ownerId;
+    
+    // 🤖 Automation: Create a new system-generated owner if requested
+    if (ownerId === "auto") {
+      finalOwnerId = `OWNER-${Math.random().toString(36).substr(2, 6).toUpperCase()}`;
+      try {
+        await db.prepare(`
+          INSERT INTO users (id, displayName, role)
+          VALUES (?, ?, 'store_admin')
+        `).bind(finalOwnerId, `Owner of ${name}`).run();
+      } catch (e: any) {
+        console.error("Auto-owner creation failed:", e);
+        return NextResponse.json({ error: "Could not auto-generate owner: " + e.message }, { status: 500 });
+      }
+    }
+
     const id = `STORE-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
 
     // Insert store
@@ -50,7 +66,7 @@ export async function POST(req: Request) {
       INSERT INTO stores (id, name, ownerId, address, lat, lng, serviceRadiusKm, baseDeliveryFee, extraFeePerKm, isActive)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 1)
     `).bind(
-      id, name, ownerId, address || "", lat || 0, lng || 0, serviceRadiusKm || 5, baseDeliveryFee || 0, extraFeePerKm || 0
+      id, name, finalOwnerId, address || "", lat || 0, lng || 0, serviceRadiusKm || 5, baseDeliveryFee || 0, extraFeePerKm || 0
     ).run();
 
     // Sync services with custom prices
@@ -60,7 +76,7 @@ export async function POST(req: Request) {
       }
     }
 
-    return NextResponse.json({ success: true, id });
+    return NextResponse.json({ success: true, id, ownerId: finalOwnerId });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
