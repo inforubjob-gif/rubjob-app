@@ -8,6 +8,11 @@ export async function GET(req: Request) {
     const db = getRequestContext().env.DB;
     if (!db) return NextResponse.json({ error: "D1 not found" }, { status: 500 });
 
+    // Self-healing: Ensure rider_number column exists
+    try {
+      await db.prepare("ALTER TABLE rider_users ADD COLUMN rider_number INTEGER").run();
+    } catch (e) {}
+
     const { results: riders } = await db.prepare(`
       SELECT * FROM rider_users ORDER BY createdAt DESC
     `).all();
@@ -34,6 +39,11 @@ export async function POST(req: Request) {
     const { email, password, name, phone, vehicleType, address, idNumber, licensePlate, emergencyContact } = await req.json() as any;
     const db = getRequestContext().env.DB;
     if (!db) return NextResponse.json({ error: "D1 not found" }, { status: 500 });
+
+    // Self-healing: Ensure rider_number column exists
+    try {
+      await db.prepare("ALTER TABLE rider_users ADD COLUMN rider_number INTEGER").run();
+    } catch (e) {}
 
     if (!email || !password || !name) return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
 
