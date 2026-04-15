@@ -21,6 +21,7 @@ CREATE TABLE IF NOT EXISTS rider_users (
   idNumber TEXT, -- National ID
   licensePlate TEXT, -- Vehicle plate number
   emergencyContact TEXT,
+  rider_number INTEGER, -- Sequential ID counter
   createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 

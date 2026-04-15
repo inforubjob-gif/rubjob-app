@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Icons } from "@/components/ui/Icons";
 import Card from "@/components/ui/Card";
+import AdminDocumentUpload from "./AdminDocumentUpload";
 
 interface RiderFormProps {
   initialData?: any;
@@ -83,7 +84,12 @@ export default function RiderForm({ initialData, isEdit }: RiderFormProps) {
                  <div className="w-10 h-10 rounded-xl bg-slate-900 text-white flex items-center justify-center">
                     <Icons.User size={20} />
                  </div>
-                 <h2 className="text-xl font-black text-slate-900 uppercase tracking-tight">Personnel Identity</h2>
+                 <div>
+                   <h2 className="text-xl font-black text-slate-900 uppercase tracking-tight">Personnel Identity</h2>
+                   {initialData?.displayId && (
+                     <p className="text-[10px] font-black text-primary uppercase tracking-widest">{initialData.displayId}</p>
+                   )}
+                 </div>
               </div>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -193,23 +199,20 @@ export default function RiderForm({ initialData, isEdit }: RiderFormProps) {
                              </select>
                           </div>
                           
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                             <div>
-                                <label className="text-[9px] uppercase font-black text-slate-400 block mb-1 ml-1">Document URL / Link</label>
-                                <input 
-                                  value={doc.url}
-                                  onChange={e => handleDocChange(docType.id, 'url', e.target.value)}
-                                  placeholder="https://storage.rubjob.com/..."
-                                  className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2 text-xs font-bold focus:outline-none focus:border-indigo-400 transition-all font-mono"
-                                />
-                             </div>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                             <AdminDocumentUpload 
+                               label="Document Photo"
+                               value={doc.id || doc.url}
+                               onChange={(val) => handleDocChange(docType.id, 'url', val)}
+                             />
                              <div>
                                 <label className="text-[9px] uppercase font-black text-slate-400 block mb-1 ml-1">Internal Verification Notes</label>
-                                <input 
+                                <textarea 
+                                  rows={4}
                                   value={doc.notes}
                                   onChange={e => handleDocChange(docType.id, 'notes', e.target.value)}
                                   placeholder="e.g. Checked with DLT database"
-                                  className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2 text-xs font-bold focus:outline-none focus:border-indigo-400 transition-all"
+                                  className="w-full bg-white border border-slate-200 rounded-2xl px-4 py-3 text-xs font-bold focus:outline-none focus:border-indigo-400 transition-all font-medium"
                                 />
                              </div>
                           </div>

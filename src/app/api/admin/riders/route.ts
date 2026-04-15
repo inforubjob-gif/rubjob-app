@@ -19,6 +19,7 @@ export async function GET(req: Request) {
 
     const ridersWithDocs = riders.map((r: any) => ({
       ...r,
+      displayId: r.rider_number ? `RD-${String(r.rider_number).padStart(4, '0')}` : r.id,
       documents: docs.filter((d: any) => d.riderId === r.id)
     }));
 
@@ -36,16 +37,20 @@ export async function POST(req: Request) {
 
     if (!email || !password || !name) return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
 
-    const id = `RDR-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
+    // 1. Get next rider number
+    const lastRider = await db.prepare("SELECT rider_number FROM rider_users ORDER BY rider_number DESC LIMIT 1").first() as any;
+    const nextNumber = (lastRider?.rider_number || 0) + 1;
+    const displayId = `RD-${String(nextNumber).padStart(4, '0')}`;
+    const id = `RDR-${Math.random().toString(36).substr(2, 6).toUpperCase()}`;
 
     await db.prepare(`
-      INSERT INTO rider_users (id, email, password, name, phone, vehicleType, address, idNumber, licensePlate, emergencyContact, status)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'active')
+      INSERT INTO rider_users (id, email, password, name, phone, vehicleType, address, idNumber, licensePlate, emergencyContact, status, rider_number)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'active', ?)
     `).bind(
-      id, email, password, name, phone || "", vehicleType || "bike", address || "", idNumber || "", licensePlate || "", emergencyContact || ""
+      id, email, password, name, phone || "", vehicleType || "bike", address || "", idNumber || "", licensePlate || "", emergencyContact || "", nextNumber
     ).run();
 
-    return NextResponse.json({ success: true, id });
+    return NextResponse.json({ success: true, id, displayId });
   } catch (error: any) {
     if (error.message.includes("UNIQUE constraint failed")) {
       return NextResponse.json({ error: "Email already exists" }, { status: 400 });
