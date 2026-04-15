@@ -61,21 +61,10 @@ export default function RiderManagementAdminPage() {
         </Link>
       </header>
 
-      <div className="grid grid-cols-1 gap-4">
+      <Card className="bg-white border border-slate-200/60 shadow-sm overflow-hidden">
         {isLoading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[1, 2, 3].map(i => (
-              <Card key={i} className="bg-white border border-slate-200/60 shadow-sm overflow-hidden p-5 flex flex-col gap-4">
-                <div className="flex items-center gap-4">
-                  <Skeleton variant="circle" className="w-12 h-12" />
-                  <div className="flex-1 space-y-2">
-                    <Skeleton variant="text" className="w-1/2 h-4" />
-                    <Skeleton variant="text" className="w-1/4 h-3" />
-                  </div>
-                </div>
-                <Skeleton variant="rect" className="w-full h-20 rounded-xl" />
-              </Card>
-            ))}
+          <div className="flex justify-center py-20">
+            <div className="w-8 h-8 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
           </div>
         ) : riders.length === 0 ? (
           <div className="text-center py-24 bg-white rounded-3xl border-2 border-dashed border-slate-100 flex flex-col items-center">
@@ -86,77 +75,91 @@ export default function RiderManagementAdminPage() {
             <Link href="/admin/riders/new" className="mt-4 text-primary font-black text-sm uppercase tracking-tight hover:underline">Add first rider →</Link>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {riders.map(rider => (
-              <Card key={rider.id} className="bg-white border border-slate-200/60 shadow-sm overflow-hidden flex flex-col hover:border-primary/40 transition-colors group">
-                 <div className="p-5 border-b border-slate-50 flex justify-between items-start">
-                    <div className="flex items-center gap-4">
-                       <div className="w-12 h-12 rounded-2xl bg-slate-900 text-white flex items-center justify-center font-black shadow-lg shadow-slate-200">
-                          {rider.name?.[0]?.toUpperCase() || 'R'}
-                       </div>
-                       <div>
-                          <h2 className="font-black text-slate-900 leading-none mb-1">{rider.name}</h2>
-                          <Badge variant={rider.status === 'active' ? "success" : "danger"}>
-                             {rider.status === 'active' ? "Active" : "Suspended"}
-                          </Badge>
-                       </div>
-                    </div>
-                    <div className="flex gap-1">
-                       <Link 
-                         href={`/admin/riders/${rider.id}`}
-                         className="p-2 text-slate-400 hover:text-slate-900 hover:bg-slate-50 rounded-lg transition-colors"
-                       >
-                          <Icons.Edit size={18} />
-                       </Link>
-                    </div>
-                 </div>
-                 
-                 <div className="p-5 space-y-4 flex-1">
-                    <div className="grid grid-cols-2 gap-4">
-                       <div>
-                          <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Vehicle</p>
-                          <div className="flex items-center gap-2 text-xs font-bold text-slate-700">
-                             {rider.vehicleType === 'bike' ? <Icons.Bike size={14} className="text-indigo-500" /> : <Icons.Car size={14} className="text-indigo-500" />}
-                             <span className="capitalize">{rider.vehicleType}</span>
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-sm whitespace-nowrap">
+              <thead className="bg-slate-50 text-slate-500 font-bold uppercase text-[10px] tracking-wider border-b border-slate-200">
+                <tr>
+                  <th className="px-6 py-4">Rider</th>
+                  <th className="px-6 py-4">ID / Vehicle</th>
+                  <th className="px-6 py-4">Verification</th>
+                  <th className="px-6 py-4">Contact</th>
+                  <th className="px-6 py-4">Status</th>
+                  <th className="px-6 py-4 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {riders.map(rider => (
+                  <tr key={rider.id} className="hover:bg-slate-50/50 transition-colors group">
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-3">
+                         <div className="w-10 h-10 rounded-xl bg-slate-900 text-white flex items-center justify-center shrink-0 shadow-sm overflow-hidden font-black">
+                            {rider.name?.[0]?.toUpperCase() || 'R'}
+                         </div>
+                         <div className="flex flex-col">
+                            <span className="font-bold text-slate-900">{rider.name}</span>
+                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tight">{rider.email}</span>
+                         </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                       <div className="flex flex-col gap-0.5">
+                          <span className="text-xs font-black text-primary uppercase">{rider.displayId || rider.id.slice(0, 8)}</span>
+                          <div className="flex items-center gap-1.5 text-[10px] font-bold text-slate-400 capitalize">
+                             {rider.vehicleType === 'bike' ? <Icons.Bike size={10} /> : <Icons.Car size={10} />}
+                             <span>{rider.vehicleType} • {rider.licensePlate || "N/A"}</span>
                           </div>
                        </div>
-                       <div>
-                          <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Plate</p>
-                          <p className="text-xs font-mono font-black text-slate-900 underline decoration-indigo-200 decoration-2">{rider.licensePlate || "N/A"}</p>
-                       </div>
-                    </div>
-                    
-                    <div>
-                       <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Documents Status</p>
-                       <div className="flex gap-1.5 flex-wrap">
+                    </td>
+                    <td className="px-6 py-4">
+                       <div className="flex gap-1.5 transform group-hover:scale-110 origin-left transition-transform">
                           {['id_card', 'license', 'insurance'].map(type => {
                              const doc = rider.documents?.find((d: any) => d.type === type);
                              return (
-                                <span key={type} className={`px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-tighter ${
-                                   doc?.status === 'verified' ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' :
-                                   doc?.status === 'pending' ? 'bg-amber-50 text-amber-600 border border-amber-100' :
-                                   'bg-slate-50 text-slate-400 border border-slate-100'
-                                }`}>
-                                   {type.replace('_', ' ')}
-                                </span>
+                                <div 
+                                  key={type} 
+                                  title={`${type.replace('_', ' ').toUpperCase()}: ${doc?.status || 'none'}`}
+                                  className={`w-2.5 h-2.5 rounded-full border-2 border-white ring-1 ${
+                                    doc?.status === 'verified' ? 'bg-emerald-500 ring-emerald-100' :
+                                    doc?.status === 'pending' ? 'bg-amber-500 ring-amber-100' :
+                                    'bg-slate-200 ring-slate-100'
+                                  }`}
+                                />
                              );
                           })}
                        </div>
-                    </div>
-                 </div>
-                 
-                 <div className="px-5 py-3 bg-slate-50/50 border-t border-slate-50 flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                       <Icons.Phone size={12} className="text-slate-300" />
-                       <span className="text-[10px] font-bold text-slate-400 font-mono tracking-tighter">{rider.phone || "No phone"}</span>
-                    </div>
-                    <Link href={`/admin/riders/${rider.id}`} className="text-[9px] font-black text-primary uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">View Profile →</Link>
-                 </div>
-              </Card>
-            ))}
+                    </td>
+                    <td className="px-6 py-4">
+                       <span className="text-xs font-bold text-slate-600 font-mono">{rider.phone || "No phone"}</span>
+                    </td>
+                    <td className="px-6 py-4">
+                       <Badge variant={rider.status === 'active' ? "success" : "danger"}>
+                          {rider.status === 'active' ? 'Active' : 'Suspended'}
+                       </Badge>
+                    </td>
+                    <td className="px-6 py-4 text-right">
+                       <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <Link 
+                            href={`/admin/riders/${rider.id}`}
+                            className="p-1.5 text-slate-400 hover:text-slate-900 transition-colors"
+                          >
+                            <Icons.Edit size={16} />
+                          </Link>
+                          <button 
+                            onClick={() => toggleStatus(rider.id, rider.status)}
+                            className={`px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-tight transition-all active:scale-95 ${rider.status === 'active' ? 'bg-rose-50 text-rose-600 hover:bg-rose-100' : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100'}`}
+                          >
+                            {rider.status === 'active' ? 'Suspend' : 'Activate'}
+                          </button>
+                       </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         )}
-      </div>
+      </Card>
+iv>
     </div>
   );
 }

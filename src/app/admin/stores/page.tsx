@@ -72,18 +72,10 @@ export default function StoresAdminPage() {
         </Link>
       </header>
 
-      <div className="grid grid-cols-1 gap-4">
+      <Card className="bg-white border border-slate-200/60 shadow-sm overflow-hidden">
         {isLoading ? (
-          <div className="space-y-4">
-            {[1, 2, 3].map(i => (
-              <Card key={i} className="p-6 bg-white border border-slate-200/60 shadow-sm flex items-center gap-6">
-                <Skeleton variant="rect" className="w-16 h-16 rounded-2xl" />
-                <div className="flex-1 space-y-3">
-                  <Skeleton variant="text" className="w-1/3 h-6" />
-                  <Skeleton variant="text" className="w-2/3 h-4" />
-                </div>
-              </Card>
-            ))}
+          <div className="flex justify-center py-20">
+            <div className="w-8 h-8 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
           </div>
         ) : stores.length === 0 ? (
           <div className="text-center py-24 bg-white rounded-3xl border-2 border-dashed border-slate-100 flex flex-col items-center">
@@ -94,70 +86,84 @@ export default function StoresAdminPage() {
             <Link href="/admin/stores/new" className="mt-4 text-primary font-black text-sm uppercase tracking-tight hover:underline">Register first branch →</Link>
           </div>
         ) : (
-          stores.map(store => (
-            <Card key={store.id} className="p-6 bg-white border border-slate-200/60 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6 hover:border-primary/40 transition-colors">
-              <div className="flex items-start md:items-center gap-6">
-                 <div className="w-16 h-16 rounded-2xl bg-slate-900 text-white flex items-center justify-center shrink-0 shadow-lg shadow-slate-100">
-                    <Icons.Office size={28} />
-                 </div>
-                 <div>
-                    <div className="flex items-center gap-3 mb-1">
-                      <h2 className="text-lg font-black text-slate-900">{store.name}</h2>
-                      <Badge variant={store.isActive === 1 ? "success" : "danger"}>
-                        {store.isActive === 1 ? 'Active' : 'Suspended'}
-                      </Badge>
-                    </div>
-                    <p className="text-sm text-slate-500 font-medium flex items-center gap-2 mb-1">
-                      <Icons.MapPin size={14} className="text-primary" /> {store.address}
-                    </p>
-                    {store.phone && (
-                      <p className="text-sm text-slate-500 font-medium flex items-center gap-2 mb-2">
-                        <Icons.Phone size={14} className="text-indigo-500" /> {store.phone}
-                      </p>
-                    )}
-                    <div className="flex flex-wrap gap-2">
-                       {store.services?.map((ss: any) => {
-                          const svc = allServices.find(s => s.id === ss.serviceId);
-                          return svc ? (
-                            <div key={ss.serviceId} className="flex items-center gap-1.5 px-2 py-0.5 bg-slate-100 rounded-md">
-                               <span className="text-[9px] font-black uppercase text-slate-500">{svc.name}</span>
-                               {ss.price && (
-                                  <span className="text-[9px] font-bold text-indigo-500 border-l border-slate-300 pl-1.5">฿{ss.price}</span>
-                               )}
-                            </div>
-                          ) : null;
-                       })}
-                       {(!store.services || store.services.length === 0) && (
-                          <span className="text-[9px] font-bold text-slate-300 uppercase italic">No services assigned</span>
-                       )}
-                    </div>
-                 </div>
-              </div>
-
-              <div className="flex flex-row md:flex-col items-center md:items-end justify-between md:justify-center gap-3 md:border-l border-slate-100 md:pl-8 pt-4 md:pt-0 border-t md:border-t-0 mt-4 md:mt-0">
-                 <div className="text-left md:text-right">
-                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Base Delivery</p>
-                    <p className="text-xl font-black text-slate-900">฿{store.baseDeliveryFee}</p>
-                 </div>
-                 <div className="flex gap-2">
-                    <Link 
-                      href={`/admin/stores/${store.id}`}
-                      className="p-2 border border-slate-200 rounded-xl text-slate-400 hover:text-slate-900 hover:bg-slate-50 transition-colors"
-                    >
-                      <Icons.Edit size={18} />
-                    </Link>
-                    <button 
-                      onClick={() => toggleStoreStatus(store.id, store.isActive)}
-                      className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-tight transition-all active:scale-95 ${store.isActive === 1 ? 'bg-rose-50 text-rose-600 hover:bg-rose-100' : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100'}`}
-                    >
-                      {store.isActive === 1 ? 'Suspend' : 'Activate'}
-                    </button>
-                 </div>
-              </div>
-            </Card>
-          ))
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-sm whitespace-nowrap">
+              <thead className="bg-slate-50 text-slate-500 font-bold uppercase text-[10px] tracking-wider border-b border-slate-200">
+                <tr>
+                  <th className="px-6 py-4">Store</th>
+                  <th className="px-6 py-4">Location & Contact</th>
+                  <th className="px-6 py-4">Services</th>
+                  <th className="px-6 py-4">Base Delivery</th>
+                  <th className="px-6 py-4">Status</th>
+                  <th className="px-6 py-4 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {stores.map(store => (
+                  <tr key={store.id} className="hover:bg-slate-50/50 transition-colors group">
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-3">
+                         <div className="w-10 h-10 rounded-xl bg-slate-900 text-white flex items-center justify-center shrink-0 shadow-sm">
+                            <Icons.Office size={20} />
+                         </div>
+                         <div className="font-bold text-slate-900">{store.name}</div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                       <div className="flex flex-col gap-0.5">
+                          <p className="text-xs font-medium text-slate-600 flex items-center gap-1.5">
+                             <Icons.MapPin size={12} className="text-slate-300" /> {store.address}
+                          </p>
+                          {store.phone && (
+                            <p className="text-[10px] font-bold text-slate-400 flex items-center gap-1.5 font-mono">
+                               <Icons.Phone size={10} className="text-slate-300" /> {store.phone}
+                            </p>
+                          )}
+                       </div>
+                    </td>
+                    <td className="px-6 py-4">
+                       <div className="flex flex-wrap gap-1 max-w-[200px]">
+                          {store.services?.map((ss: any) => {
+                             const svc = allServices.find(s => s.id === ss.serviceId);
+                             return svc ? (
+                               <span key={ss.serviceId} className="px-1.5 py-0.5 bg-slate-100 text-slate-500 text-[8px] font-black uppercase rounded">
+                                  {svc.name}
+                               </span>
+                             ) : null;
+                          })}
+                       </div>
+                    </td>
+                    <td className="px-6 py-4">
+                       <span className="font-black text-slate-900">฿{store.baseDeliveryFee}</span>
+                    </td>
+                    <td className="px-6 py-4">
+                       <Badge variant={store.isActive === 1 ? "success" : "danger"}>
+                          {store.isActive === 1 ? 'Active' : 'Suspended'}
+                       </Badge>
+                    </td>
+                    <td className="px-6 py-4 text-right">
+                       <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <Link 
+                            href={`/admin/stores/${store.id}`}
+                            className="p-1.5 text-slate-400 hover:text-slate-900 transition-colors"
+                          >
+                            <Icons.Edit size={16} />
+                          </Link>
+                          <button 
+                            onClick={() => toggleStoreStatus(store.id, store.isActive)}
+                            className={`px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-tight transition-all active:scale-95 ${store.isActive === 1 ? 'bg-rose-50 text-rose-600 hover:bg-rose-100' : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100'}`}
+                          >
+                            {store.isActive === 1 ? 'Suspend' : 'Activate'}
+                          </button>
+                       </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
-      </div>
+      </Card>
     </div>
   );
 }
