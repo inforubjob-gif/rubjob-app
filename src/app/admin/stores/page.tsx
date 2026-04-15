@@ -107,9 +107,14 @@ export default function StoresAdminPage() {
                         {store.isActive === 1 ? 'Active' : 'Suspended'}
                       </Badge>
                     </div>
-                    <p className="text-sm text-slate-500 font-medium flex items-center gap-2 mb-2">
+                    <p className="text-sm text-slate-500 font-medium flex items-center gap-2 mb-1">
                       <Icons.MapPin size={14} className="text-primary" /> {store.address}
                     </p>
+                    {store.phone && (
+                      <p className="text-sm text-slate-500 font-medium flex items-center gap-2 mb-2">
+                        <Icons.Phone size={14} className="text-indigo-500" /> {store.phone}
+                      </p>
+                    )}
                     <div className="flex flex-wrap gap-2">
                        {store.services?.map((ss: any) => {
                           const svc = allServices.find(s => s.id === ss.serviceId);

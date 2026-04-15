@@ -60,6 +60,7 @@ CREATE TABLE IF NOT EXISTS stores (
   serviceRadiusKm REAL DEFAULT 5,
   baseDeliveryFee REAL DEFAULT 0,
   extraFeePerKm REAL DEFAULT 10,
+  phone TEXT,
   isActive INTEGER DEFAULT 1,
   createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (ownerId) REFERENCES users(id)

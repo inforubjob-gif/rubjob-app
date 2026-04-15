@@ -32,6 +32,7 @@ export default function StoreForm({ initialData, isEdit }: StoreFormProps) {
     serviceRadiusKm: initialData?.serviceRadiusKm?.toString() || "5.0",
     baseDeliveryFee: initialData?.baseDeliveryFee?.toString() || "0",
     extraFeePerKm: initialData?.extraFeePerKm?.toString() || "10",
+    phone: initialData?.phone || "",
     services: initialData?.services || [] as any[] // [{ serviceId, price }]
   });
 
@@ -177,6 +178,16 @@ export default function StoreForm({ initialData, isEdit }: StoreFormProps) {
                       value={formData.address}
                       onChange={e => setFormData({...formData, address: e.target.value})}
                       placeholder="Street number, building name, floor, district..."
+                      className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-5 py-4 text-sm font-bold focus:outline-none focus:border-primary/50 transition-all"
+                    />
+                 </div>
+                 <div>
+                    <label className="text-[10px] uppercase font-black text-slate-400 tracking-widest block mb-2 ml-1">Contact Phone Number</label>
+                    <input 
+                      type="tel"
+                      value={formData.phone}
+                      onChange={e => setFormData({...formData, phone: e.target.value})}
+                      placeholder="e.g. 081-234-5678"
                       className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-5 py-4 text-sm font-bold focus:outline-none focus:border-primary/50 transition-all"
                     />
                  </div>

@@ -49,7 +49,7 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
   try {
-    const { name, ownerId, address, lat, lng, serviceRadiusKm, baseDeliveryFee, extraFeePerKm, services } = await req.json() as any;
+    const { name, ownerId, address, lat, lng, serviceRadiusKm, baseDeliveryFee, extraFeePerKm, phone, services } = await req.json() as any;
     const db = getRequestContext().env.DB;
     if (!db) return NextResponse.json({ error: "D1 not found" }, { status: 500 });
 
@@ -75,10 +75,10 @@ export async function POST(req: Request) {
 
     // Insert store
     await db.prepare(`
-      INSERT INTO stores (id, name, ownerId, address, lat, lng, serviceRadiusKm, baseDeliveryFee, extraFeePerKm, isActive)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 1)
+      INSERT INTO stores (id, name, ownerId, address, lat, lng, serviceRadiusKm, baseDeliveryFee, extraFeePerKm, phone, isActive)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)
     `).bind(
-      id, name, finalOwnerId, address || "", lat || 0, lng || 0, serviceRadiusKm || 5, baseDeliveryFee || 0, extraFeePerKm || 0
+      id, name, finalOwnerId, address || "", lat || 0, lng || 0, serviceRadiusKm || 5, baseDeliveryFee || 0, extraFeePerKm || 0, phone || ""
     ).run();
 
     // Sync services with custom prices
@@ -96,7 +96,7 @@ export async function POST(req: Request) {
 
 export async function PUT(req: Request) {
   try {
-    const { id, name, ownerId, address, lat, lng, serviceRadiusKm, baseDeliveryFee, extraFeePerKm, isActive, services } = await req.json() as any;
+    const { id, name, ownerId, address, lat, lng, serviceRadiusKm, baseDeliveryFee, extraFeePerKm, phone, isActive, services } = await req.json() as any;
     const db = getRequestContext().env.DB;
     if (!db) return NextResponse.json({ error: "D1 not found" }, { status: 500 });
 
@@ -112,10 +112,11 @@ export async function PUT(req: Request) {
           serviceRadiusKm = COALESCE(?, serviceRadiusKm),
           baseDeliveryFee = COALESCE(?, baseDeliveryFee),
           extraFeePerKm = COALESCE(?, extraFeePerKm),
+          phone = COALESCE(?, phone),
           isActive = COALESCE(?, isActive)
       WHERE id = ?
     `).bind(
-      name, ownerId, address, lat, lng, serviceRadiusKm, baseDeliveryFee, extraFeePerKm, isActive, id
+      name, ownerId, address, lat, lng, serviceRadiusKm, baseDeliveryFee, extraFeePerKm, phone, isActive, id
     ).run();
 
     // Sync services with custom prices
