@@ -22,15 +22,26 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
   try {
-    const { id, role, assignedStoreId } = await req.json() as any;
-    if (!id || !role) return NextResponse.json({ error: "Missing fields" }, { status: 400 });
+    const { id, role, assignedStoreId, displayName, points } = await req.json() as any;
+    if (!id) return NextResponse.json({ error: "Missing user ID" }, { status: 400 });
 
     const db = getRequestContext().env.DB;
     if (!db) return NextResponse.json({ error: "D1 not found" }, { status: 500 });
 
     await db.prepare(`
-      UPDATE users SET role = ?, assignedStoreId = ? WHERE id = ?
-    `).bind(role, assignedStoreId || null, id).run();
+      UPDATE users 
+      SET role = COALESCE(?, role), 
+          assignedStoreId = COALESCE(?, assignedStoreId),
+          displayName = COALESCE(?, displayName),
+          points = COALESCE(?, points)
+      WHERE id = ?
+    `).bind(
+      role || null, 
+      assignedStoreId || null, 
+      displayName || null, 
+      points !== undefined ? points : null,
+      id
+    ).run();
 
     return NextResponse.json({ success: true });
   } catch (error: any) {

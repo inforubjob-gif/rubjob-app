@@ -12,7 +12,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ success: false, error: "Please provide email and password" }, { status: 400 });
     }
 
-    let adminName = null;
+    let adminData: any = null;
 
     // 1. Try D1 Database (Safe check for local dev)
     try {
@@ -25,7 +25,7 @@ export async function POST(req: Request) {
         `).bind(email, password).first();
 
         if (admin) {
-          adminName = (admin as any).name;
+          adminData = admin;
         }
       }
     } catch (dbErr) {
@@ -33,16 +33,21 @@ export async function POST(req: Request) {
     }
 
     // 2. Fallback to Environment Variables
-    if (!adminName) {
+    if (!adminData) {
       const validEmail = process.env.ADMIN_EMAIL || "admin@rubjob.com";
       const validPassword = process.env.ADMIN_PASSWORD || "admin123";
 
       if (email === validEmail && password === validPassword) {
-        adminName = "Master Admin";
+        adminData = {
+          name: "Master Admin",
+          role: "super_admin",
+          permissions: null,
+          avatarUrl: null
+        };
       }
     }
 
-    if (adminName) {
+    if (adminData) {
       // Set HTTP-only cookie
       const cookieStore = await cookies();
       cookieStore.set("admin_token", email, {
@@ -52,7 +57,13 @@ export async function POST(req: Request) {
         path: "/",
         maxAge: 60 * 60 * 24 * 7 // 1 week
       });
-      return NextResponse.json({ success: true, name: adminName });
+      return NextResponse.json({ 
+        success: true, 
+        name: adminData.name,
+        role: adminData.role,
+        permissions: adminData.permissions ? JSON.parse(adminData.permissions) : null,
+        avatarUrl: adminData.avatarUrl
+      });
     } else {
       return NextResponse.json({ success: false, error: "อีเมลหรือรหัสผ่านไม่ถูกต้อง" }, { status: 401 });
     }

@@ -1,24 +1,11 @@
-"use client";
-
-import { useState, useEffect } from "react";
-import { Icons } from "@/components/ui/Icons";
+import { useAdmin } from "@/components/providers/AdminProvider";
 
 export default function AdminAuthGate({ children }: { children: React.ReactNode }) {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const { admin, isLoading, refreshAdmin } = useAdmin();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-
-  useEffect(() => {
-    // Check session on mount
-    const adminSession = localStorage.getItem("rubjob_admin_session");
-    if (adminSession) {
-      setIsAuthenticated(true);
-    } else {
-      setIsAuthenticated(false);
-    }
-  }, []);
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -27,7 +14,7 @@ export default function AdminAuthGate({ children }: { children: React.ReactNode 
       return;
     }
 
-    setIsLoading(true);
+    setIsLoggingIn(true);
     setError("");
 
     try {
@@ -40,18 +27,18 @@ export default function AdminAuthGate({ children }: { children: React.ReactNode 
 
       if (res.ok && data.success) {
         localStorage.setItem("rubjob_admin_session", email);
-        setIsAuthenticated(true);
+        await refreshAdmin();
       } else {
         setError(data.error || "เข้าสู่ระบบไม่สำเร็จ");
       }
     } catch (err) {
       setError("เกิดข้อผิดพลาดในการเชื่อมต่อ");
     } finally {
-      setIsLoading(false);
+      setIsLoggingIn(false);
     }
   };
 
-  if (isAuthenticated === null) {
+  if (isLoading) {
     return (
       <div className="flex h-screen w-full items-center justify-center bg-slate-50">
         <div className="w-12 h-12 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin"></div>
@@ -59,7 +46,7 @@ export default function AdminAuthGate({ children }: { children: React.ReactNode 
     );
   }
 
-  if (isAuthenticated === false) {
+  if (!admin) {
     return (
       <div className="flex h-screen w-full items-center justify-center bg-slate-50 absolute inset-0 z-[100]">
         <div className="bg-white rounded-[2.5rem] w-full max-w-md p-10 shadow-2xl relative overflow-hidden border border-slate-100">
@@ -109,10 +96,10 @@ export default function AdminAuthGate({ children }: { children: React.ReactNode 
 
             <button
               type="submit"
-              disabled={isLoading}
+              disabled={isLoggingIn}
               className="w-full bg-primary hover:bg-primary-dark text-white rounded-2xl py-4.5 text-sm font-black shadow-xl shadow-primary/20 transition-all active:scale-[0.98] disabled:opacity-50 mt-4 uppercase tracking-widest"
             >
-              {isLoading ? "กำลังประมวลผล..." : "เข้าสู่ระบบ (Login)"}
+              {isLoggingIn ? "กำลังประมวลผล..." : "เข้าสู่ระบบ (Login)"}
             </button>
           </form>
           
