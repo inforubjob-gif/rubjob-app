@@ -120,87 +120,101 @@ export default function CouponsAdminPage() {
         </button>
       </header>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <Card className="bg-white border border-slate-200/60 shadow-sm overflow-hidden">
         {isLoading ? (
-          <div className="col-span-full py-20 flex justify-center">
-             <div className="w-8 h-8 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
+          <div className="flex justify-center py-20">
+            <div className="w-8 h-8 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
           </div>
         ) : coupons.length === 0 ? (
-          <div className="col-span-full text-center py-20 bg-white rounded-2xl border border-slate-100 italic text-slate-400">
+          <div className="text-center py-20 bg-white rounded-2xl border border-slate-100 italic text-slate-400">
              No coupons found. Create your first one to boost sales!
           </div>
         ) : (
-          coupons.map(coupon => (
-            <Card key={coupon.id} className={`bg-white border shadow-sm overflow-hidden flex flex-col group transition-all ${coupon.isVisible === 1 ? 'border-indigo-100 ring-2 ring-indigo-50/50' : 'border-slate-200/60'}`}>
-               <div className="p-5 border-b border-slate-50 flex justify-between items-start">
-                  <div>
-                    <div className="flex items-center gap-2 mb-1">
-                       <span className="text-lg font-black text-slate-900 tracking-tight">{coupon.code}</span>
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-sm whitespace-nowrap">
+              <thead className="bg-slate-50 text-slate-500 font-bold uppercase text-[10px] tracking-wider border-b border-slate-200">
+                <tr>
+                  <th className="px-6 py-4">Promo Code</th>
+                  <th className="px-6 py-4">Discount</th>
+                  <th className="px-6 py-4">Claims / Limit</th>
+                  <th className="px-6 py-4">Expiration</th>
+                  <th className="px-6 py-4">Status</th>
+                  <th className="px-6 py-4 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {coupons.map(coupon => (
+                  <tr key={coupon.id} className="hover:bg-slate-50/50 transition-colors group">
+                    <td className="px-6 py-4">
+                      <div className="flex flex-col gap-1">
+                         <div className="flex items-center gap-2">
+                            <span className="text-sm font-black text-slate-900 tracking-tight">{coupon.code}</span>
+                            {coupon.isVisible === 1 && (
+                               <span className="text-[8px] font-black text-indigo-500 uppercase bg-indigo-50 px-1 py-0.5 rounded leading-none">Wallet</span>
+                            )}
+                         </div>
+                         <p className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">
+                            {coupon.isVisible === 1 ? "Public Visibility" : "Exclusive Code"}
+                         </p>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                       <span className="font-black text-indigo-600">
+                          {coupon.type === 'percentage' ? `${coupon.value}%` : `฿${coupon.value}`}
+                       </span>
+                       <p className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter mt-0.5">
+                          Min ฿{coupon.minOrder || 0}
+                       </p>
+                    </td>
+                    <td className="px-6 py-4">
+                       <div className="flex flex-col gap-1">
+                          <span className="font-bold text-slate-900 text-xs">{coupon.usedCount || 0} / {coupon.usageLimit || "∞"}</span>
+                          <div className="w-20 h-1 bg-slate-100 rounded-full overflow-hidden">
+                             <div 
+                                className="h-full bg-primary" 
+                                style={{ width: coupon.usageLimit ? `${Math.min(100, (coupon.usedCount / coupon.usageLimit) * 100)}%` : '0%' }}
+                             />
+                          </div>
+                       </div>
+                    </td>
+                    <td className="px-6 py-4 font-medium text-xs text-slate-500">
+                       {coupon.expiryDate ? new Date(coupon.expiryDate).toLocaleDateString() : "Never Expires"}
+                    </td>
+                    <td className="px-6 py-4">
                        <Badge variant={coupon.isActive === 1 ? "success" : "danger"}>
-                          {coupon.isActive === 1 ? "Active" : "Disabled"}
+                          {coupon.isActive === 1 ? 'Active' : 'Disabled'}
                        </Badge>
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                       {coupon.isVisible === 1 ? (
-                          <span className="flex items-center gap-1 text-[9px] font-black text-indigo-500 uppercase tracking-tighter bg-indigo-50 px-1.5 py-0.5 rounded">
-                             <Icons.Check size={10} /> Public in Wallet
-                          </span>
-                       ) : (
-                          <span className="flex items-center gap-1 text-[9px] font-black text-slate-400 uppercase tracking-tighter bg-slate-50 px-1.5 py-0.5 rounded">
-                             <Icons.Lock size={10} /> Private Code
-                          </span>
-                       )}
-                    </div>
-                  </div>
-                  <div className="flex gap-1">
-                     <button 
-                       onClick={() => toggleVisibility(coupon.id, coupon.isVisible)}
-                       title={coupon.isVisible === 1 ? "Hide from customer wallet" : "Show in customer wallet"}
-                       className={`p-2 rounded-lg transition-colors ${coupon.isVisible === 1 ? 'text-indigo-500 bg-indigo-50' : 'text-slate-400 hover:bg-slate-50'}`}
-                     >
-                        {coupon.isVisible === 1 ? <Icons.Check size={18} /> : <Icons.Settings size={18} />}
-                     </button>
-                     <button 
-                       onClick={() => toggleStatus(coupon.id, coupon.isActive)}
-                       className={`p-2 rounded-lg transition-colors ${coupon.isActive === 1 ? 'text-slate-400 hover:text-rose-500 hover:bg-rose-50' : 'text-slate-400 hover:text-emerald-500 hover:bg-emerald-50'}`}
-                     >
-                        {coupon.isActive === 1 ? <Icons.Lock size={18} /> : <Icons.Refresh size={18} />}
-                     </button>
-                     <button 
-                       onClick={() => handleDelete(coupon.id, coupon.code)}
-                       className="p-2 text-slate-200 hover:text-rose-500 hover:bg-rose-50 rounded-lg transition-colors"
-                     >
-                        <Icons.Trash size={18} />
-                     </button>
-                  </div>
-               </div>
-               
-               <div className="p-5 space-y-3 flex-1">
-                  <div className="flex items-center justify-between text-xs font-medium">
-                     <span className="text-slate-400">Discount</span>
-                     <span className="text-indigo-600 font-black">{coupon.type === 'percentage' ? `${coupon.value}%` : `฿${coupon.value}`}</span>
-                  </div>
-                  <div className="flex items-center justify-between text-xs font-medium">
-                     <span className="text-slate-400">Min. Order</span>
-                     <span className="text-slate-900 font-bold">฿{coupon.minOrder || 0}</span>
-                  </div>
-                  <div className="flex items-center justify-between text-xs font-medium">
-                     <span className="text-slate-400">Claims</span>
-                     <span className="text-slate-900 font-bold">{coupon.usedCount || 0} / {coupon.usageLimit || "∞"}</span>
-                  </div>
-                  <div className="flex items-center justify-between text-xs font-medium pt-1 border-t border-slate-50 mt-2">
-                     <span className="text-slate-400">Expires</span>
-                     <span className="text-slate-900 font-bold">{coupon.expiryDate ? new Date(coupon.expiryDate).toLocaleDateString() : "Never"}</span>
-                  </div>
-               </div>
-               
-               <div className={`px-5 py-3 border-t flex items-center justify-center text-[10px] uppercase font-black tracking-widest italic transition-colors ${coupon.isVisible === 1 ? 'bg-indigo-500 text-white border-indigo-600' : 'bg-slate-50 text-slate-400 border-slate-100'}`}>
-                  {coupon.isVisible === 1 ? "Customer Wallet Visible" : "Exclusive Private Promo"}
-               </div>
-            </Card>
-          ))
+                    </td>
+                    <td className="px-6 py-4 text-right">
+                       <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <button 
+                            onClick={() => toggleVisibility(coupon.id, coupon.isVisible)}
+                            title={coupon.isVisible === 1 ? "Hide from customer wallet" : "Show in customer wallet"}
+                            className={`p-1.5 rounded-lg transition-colors border ${coupon.isVisible === 1 ? 'text-indigo-500 border-indigo-100 bg-indigo-50' : 'text-slate-400 border-slate-100 hover:bg-slate-50'}`}
+                          >
+                            {coupon.isVisible === 1 ? <Icons.Check size={16} /> : <Icons.Settings size={16} />}
+                          </button>
+                          <button 
+                            onClick={() => toggleStatus(coupon.id, coupon.isActive)}
+                            className={`px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-tight transition-all active:scale-95 ${coupon.isActive === 1 ? 'bg-rose-50 text-rose-600 hover:bg-rose-100' : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100'}`}
+                          >
+                            {coupon.isActive === 1 ? 'Lock' : 'Unlock'}
+                          </button>
+                          <button 
+                            onClick={() => handleDelete(coupon.id, coupon.code)}
+                            className="p-1.5 text-slate-300 hover:text-rose-500 transition-colors"
+                          >
+                             <Icons.Trash size={16} />
+                          </button>
+                       </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
-      </div>
+      </Card>
 
       {/* New Coupon Modal */}
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Create Marketing Coupon">
