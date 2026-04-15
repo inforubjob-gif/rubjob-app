@@ -11,6 +11,18 @@ export async function GET(req: Request) {
     // Self-healing: Ensure rider_number column exists
     try {
       await db.prepare("ALTER TABLE rider_users ADD COLUMN rider_number INTEGER").run();
+      await db.prepare(`
+        CREATE TABLE IF NOT EXISTS rider_documents (
+          id TEXT PRIMARY KEY,
+          riderId TEXT NOT NULL,
+          type TEXT NOT NULL,
+          url TEXT NOT NULL,
+          status TEXT DEFAULT 'pending',
+          notes TEXT,
+          createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+          FOREIGN KEY (riderId) REFERENCES rider_users(id) ON DELETE CASCADE
+        )
+      `).run();
     } catch (e) {}
 
     const { results: riders } = await db.prepare(`

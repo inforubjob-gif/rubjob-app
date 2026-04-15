@@ -20,6 +20,18 @@ export async function GET(req: Request) {
           FOREIGN KEY (serviceId) REFERENCES services(id) ON DELETE CASCADE
         )
       `).run();
+      await db.prepare(`
+        CREATE TABLE IF NOT EXISTS store_documents (
+          id TEXT PRIMARY KEY,
+          storeId TEXT NOT NULL,
+          type TEXT NOT NULL,
+          url TEXT NOT NULL,
+          status TEXT DEFAULT 'pending',
+          notes TEXT,
+          createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+          FOREIGN KEY (storeId) REFERENCES stores(id) ON DELETE CASCADE
+        )
+      `).run();
       await db.prepare("ALTER TABLE stores ADD COLUMN status TEXT DEFAULT 'active'").run();
       await db.prepare("ALTER TABLE stores ADD COLUMN bankName TEXT").run();
       await db.prepare("ALTER TABLE stores ADD COLUMN accountNumber TEXT").run();
