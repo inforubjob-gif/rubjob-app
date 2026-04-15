@@ -12,9 +12,14 @@ interface RiderFormProps {
 }
 
 const DOCUMENT_TYPES = [
+  { id: 'profile_photo', label: 'Rider Profile Photo', icon: <Icons.User size={18} /> },
   { id: 'id_card', label: 'ID Card / National Identity', icon: <Icons.User size={18} /> },
   { id: 'license', label: 'Driver License', icon: <Icons.Shield size={18} /> },
   { id: 'insurance', label: 'Vehicle Insurance / Act', icon: <Icons.Settings size={18} /> },
+  { id: 'vehicle_front', label: 'Vehicle: Front View', icon: <Icons.Bike size={18} /> },
+  { id: 'vehicle_back', label: 'Vehicle: Rear View', icon: <Icons.Bike size={18} /> },
+  { id: 'vehicle_left', label: 'Vehicle: Left Side', icon: <Icons.Bike size={18} /> },
+  { id: 'vehicle_right', label: 'Vehicle: Right Side', icon: <Icons.Bike size={18} /> },
 ];
 
 export default function RiderForm({ initialData, isEdit }: RiderFormProps) {
@@ -92,43 +97,55 @@ export default function RiderForm({ initialData, isEdit }: RiderFormProps) {
                  </div>
               </div>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                 <div className="md:col-span-2">
-                    <label className="text-[10px] uppercase font-black text-slate-400 tracking-widest block mb-1.5 ml-1">Full Name</label>
-                    <input 
-                      required
-                      value={formData.name}
-                      onChange={e => setFormData({...formData, name: e.target.value})}
-                      placeholder="e.g. Somchai Laundry"
-                      className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-5 py-4 text-sm font-bold focus:outline-none focus:border-primary/50 transition-all font-mono tracking-tight"
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+                 <div className="md:col-span-1">
+                    <AdminDocumentUpload 
+                       variant="square"
+                       label="Profile Photo"
+                       value={formData.documents.find((d: any) => d.type === 'profile_photo')?.id || formData.documents.find((d: any) => d.type === 'profile_photo')?.url}
+                       onChange={(val) => handleDocChange('profile_photo', 'url', val)}
                     />
                  </div>
                  
-                 <div>
-                    <label className="text-[10px] uppercase font-black text-slate-400 tracking-widest block mb-1.5 ml-1">Work Email</label>
-                    <input 
-                      required
-                      disabled={isEdit}
-                      value={formData.email}
-                      onChange={e => setFormData({...formData, email: e.target.value})}
-                      placeholder="rider@rubjob.com"
-                      className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-5 py-4 text-sm font-bold focus:outline-none focus:border-primary/50 transition-all disabled:opacity-50"
-                    />
-                 </div>
-                 
-                 {!isEdit && (
-                    <div>
-                       <label className="text-[10px] uppercase font-black text-slate-400 tracking-widest block mb-1.5 ml-1">Portal Password</label>
+                 <div className="md:col-span-3 grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="md:col-span-2">
+                       <label className="text-[10px] uppercase font-black text-slate-400 tracking-widest block mb-1.5 ml-1">Full Name</label>
                        <input 
                          required
-                         type="password"
-                         value={formData.password}
-                         onChange={e => setFormData({...formData, password: e.target.value})}
-                         placeholder="••••••••"
-                         className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-5 py-4 text-sm font-bold focus:outline-none focus:border-primary/50 transition-all px-10 relative"
+                         value={formData.name}
+                         onChange={e => setFormData({...formData, name: e.target.value})}
+                         placeholder="e.g. Somchai Laundry"
+                         className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-5 py-4 text-sm font-bold focus:outline-none focus:border-primary/50 transition-all font-mono tracking-tight"
                        />
                     </div>
-                 )}
+                    
+                    <div>
+                       <label className="text-[10px] uppercase font-black text-slate-400 tracking-widest block mb-1.5 ml-1">Work Email</label>
+                       <input 
+                         required
+                         disabled={isEdit}
+                         value={formData.email}
+                         onChange={e => setFormData({...formData, email: e.target.value})}
+                         placeholder="rider@rubjob.com"
+                         className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-5 py-4 text-sm font-bold focus:outline-none focus:border-primary/50 transition-all disabled:opacity-50"
+                       />
+                    </div>
+                    
+                    {!isEdit && (
+                       <div>
+                          <label className="text-[10px] uppercase font-black text-slate-400 tracking-widest block mb-1.5 ml-1">Portal Password</label>
+                          <input 
+                            required
+                            type="password"
+                            value={formData.password}
+                            onChange={e => setFormData({...formData, password: e.target.value})}
+                            placeholder="••••••••"
+                            className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-5 py-4 text-sm font-bold focus:outline-none focus:border-primary/50 transition-all px-10 relative"
+                          />
+                       </div>
+                    )}
+                 </div>
+              </div>
                  
                  <div>
                     <label className="text-[10px] uppercase font-black text-slate-400 tracking-widest block mb-1.5 ml-1">National ID Number</label>
@@ -219,6 +236,26 @@ export default function RiderForm({ initialData, isEdit }: RiderFormProps) {
                        </div>
                     );
                  })}
+              </div>
+           </Card>
+
+           <Card className="p-8 bg-white border border-slate-200/60 shadow-sm">
+              <div className="flex items-center gap-3 mb-8">
+                 <div className="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
+                    <Icons.Camera size={20} />
+                 </div>
+                 <h2 className="text-xl font-black text-slate-900 uppercase tracking-tight">Vehicle Visual Inspection</h2>
+              </div>
+              
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                 {['vehicle_front', 'vehicle_back', 'vehicle_left', 'vehicle_right'].map((type) => (
+                   <AdminDocumentUpload 
+                     key={type}
+                     label={type.replace('vehicle_', '').toUpperCase()}
+                     value={formData.documents.find((d: any) => d.type === type)?.id || formData.documents.find((d: any) => d.type === type)?.url}
+                     onChange={(val) => handleDocChange(type, 'url', val)}
+                   />
+                 ))}
               </div>
            </Card>
         </div>

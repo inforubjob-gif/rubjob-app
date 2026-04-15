@@ -7,9 +7,10 @@ interface AdminDocumentUploadProps {
   value?: string; // Current URL or Base64
   onChange: (value: string) => void;
   label: string;
+  variant?: 'video' | 'square';
 }
 
-export default function AdminDocumentUpload({ value, onChange, label }: AdminDocumentUploadProps) {
+export default function AdminDocumentUpload({ value, onChange, label, variant = 'video' }: AdminDocumentUploadProps) {
   const [preview, setPreview] = useState<string | null>(value || null);
   const [isCompressing, setIsCompressing] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -76,7 +77,9 @@ export default function AdminDocumentUpload({ value, onChange, label }: AdminDoc
       
       <div 
         onClick={() => fileInputRef.current?.click()}
-        className={`relative aspect-video rounded-3xl border-2 border-dashed transition-all cursor-pointer overflow-hidden flex flex-col items-center justify-center gap-2 ${
+        className={`relative rounded-3xl border-2 border-dashed transition-all cursor-pointer overflow-hidden flex flex-col items-center justify-center gap-2 ${
+          variant === 'square' ? 'aspect-square' : 'aspect-video'
+        } ${
           displayUrl ? 'border-indigo-200 bg-indigo-50/30' : 'border-slate-100 bg-slate-50 hover:bg-slate-100/50'
         }`}
       >
