@@ -166,6 +166,5 @@ export default function RiderManagementAdminPage() {
         )}
       </Card>
    </div>
-    </div>
   );
 }

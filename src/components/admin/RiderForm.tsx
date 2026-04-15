@@ -229,7 +229,6 @@ export default function RiderForm({ initialData, isEdit }: RiderFormProps) {
                       className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-5 py-4 text-sm font-bold focus:outline-none focus:border-primary/50 transition-all"
                     />
                  </div>
-              </div>
            </Card>
            
            <Card className="p-8 bg-white border border-slate-200/60 shadow-sm">
