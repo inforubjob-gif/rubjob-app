@@ -196,3 +196,12 @@ CREATE TABLE IF NOT EXISTS support_messages (
   createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (ticketId) REFERENCES support_tickets(id) ON DELETE CASCADE
 );
+
+-- System Settings Table
+CREATE TABLE IF NOT EXISTS system_settings (
+  key TEXT PRIMARY KEY,
+  value TEXT,
+  type TEXT,
+  description TEXT,
+  updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP
+);

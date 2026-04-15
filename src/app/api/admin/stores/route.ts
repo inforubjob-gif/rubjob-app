@@ -8,6 +8,18 @@ export async function GET(req: Request) {
     const db = getRequestContext().env.DB;
     if (!db) return NextResponse.json({ error: "D1 not found" }, { status: 500 });
 
+    // Self-healing: Ensure store_services exists
+    await db.prepare(`
+      CREATE TABLE IF NOT EXISTS store_services (
+        storeId TEXT NOT NULL,
+        serviceId TEXT NOT NULL,
+        price REAL,
+        PRIMARY KEY (storeId, serviceId),
+        FOREIGN KEY (storeId) REFERENCES stores(id) ON DELETE CASCADE,
+        FOREIGN KEY (serviceId) REFERENCES services(id) ON DELETE CASCADE
+      )
+    `).run();
+
     const { results: stores } = await db.prepare(`
       SELECT s.*, u.displayName as ownerName, COUNT(o.id) as orderCount
       FROM stores s
