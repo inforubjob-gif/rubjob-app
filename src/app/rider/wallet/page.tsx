@@ -231,8 +231,5 @@ export default function RiderWalletPage() {
         )}
       </Modal>
     </div>
-  );
-}
-    </div>
-  );
+   );
 }

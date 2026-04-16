@@ -138,7 +138,6 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
                        </button>
                      ))}
                   </div>
-                  </div>
                </div>
            </div>
         </div>

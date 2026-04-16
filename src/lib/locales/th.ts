@@ -178,7 +178,6 @@ export const th = {
       confirmLocation: "ยืนยันพิกัดที่ตั้ง",
       pinned: "ปักหมุดแล้ว!",
       addressRequired: "กรุณาระบุป้ายกำกับและที่อยู่ให้ครบถ้วน",
-      },
     },
     booking: {
       pickupTitle: "รายละเอียดการรับผ้า",
