@@ -132,6 +132,35 @@ export default function SettingsAdminPage() {
     }
   };
 
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsSaving(true);
+    setSuccess("Uploading image...");
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const res = await fetch("/api/admin/upload", {
+        method: "POST",
+        body: formData
+      });
+      const data = await res.json();
+      if (res.ok && data.url) {
+        setProfileForm(prev => ({ ...prev, avatarUrl: data.url }));
+        setSuccess("Image uploaded successfully!");
+        setTimeout(() => setSuccess(""), 2000);
+      } else {
+        setError(data.error || "Image upload failed.");
+      }
+    } catch (err) {
+      setError("Upload error.");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   const togglePermission = (id: string) => {
     setNewAdmin(prev => ({
       ...prev,
@@ -385,9 +414,15 @@ export default function SettingsAdminPage() {
                     <div className="w-32 h-32 rounded-[2.5rem] bg-slate-50 border-4 border-white shadow-xl flex items-center justify-center overflow-hidden ring-1 ring-slate-100">
                        {profileForm.avatarUrl ? <img src={profileForm.avatarUrl} className="w-full h-full object-cover" /> : <Icons.User size={48} className="text-slate-200" />}
                     </div>
-                    <div className="absolute -bottom-2 -right-2 w-10 h-10 bg-primary text-white rounded-2xl flex items-center justify-center shadow-lg border-4 border-white">
+                    <label className="absolute -bottom-2 -right-2 w-10 h-10 bg-primary text-white rounded-2xl flex items-center justify-center shadow-lg border-4 border-white cursor-pointer hover:scale-110 active:scale-95 transition-all">
                        <Icons.Camera size={18} />
-                    </div>
+                       <input 
+                         type="file" 
+                         className="hidden" 
+                         accept="image/*"
+                         onChange={handleImageUpload}
+                       />
+                    </label>
                  </div>
                  <div className="text-center md:text-left">
                     <h2 className="text-3xl font-black text-slate-900 tracking-tight">{admin?.name}</h2>
