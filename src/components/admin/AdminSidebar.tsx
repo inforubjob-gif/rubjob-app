@@ -128,7 +128,7 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
                {/* Language Switcher */}
                <div className="mt-4 pt-4 border-t border-white/5">
                   <div className="bg-slate-900 rounded-2xl p-1 flex gap-1 shadow-inner ring-1 ring-white/5">
-                     {(['th', 'en', 'zh'] as const).map((l) => (
+                     {(['th', 'en'] as const).map((l) => (
                        <button
                          key={l}
                          onClick={() => setLanguage(l)}
