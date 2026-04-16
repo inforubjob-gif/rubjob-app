@@ -10,6 +10,16 @@ import Button from "@/components/ui/Button";
 import { Icons } from "@/components/ui/Icons";
 import { useTranslation } from "@/components/providers/LanguageProvider";
 import PhotoUpload from "@/components/ui/PhotoUpload";
+import dynamic from "next/dynamic";
+
+const RiderMap = dynamic(() => import("@/components/rider/RiderMap"), { 
+  ssr: false,
+  loading: () => (
+    <div className="h-full w-full bg-slate-100 animate-pulse flex items-center justify-center">
+      <div className="w-8 h-8 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
+    </div>
+  )
+});
 
 export default function RiderOrderDetailPage() {
   const params = useParams<{ id: string }>();
@@ -41,6 +51,12 @@ export default function RiderOrderDetailPage() {
     }
     fetchOrder();
   }, [id]);
+
+  const storePos = { lat: order?.storeLat || 13.7563, lng: order?.storeLng || 100.5018 };
+  const userPos = { 
+    lat: order?.address?.lat || order?.lat || 13.7563, 
+    lng: order?.address?.lng || order?.lng || 100.5018 
+  };
 
   // Define steps that require photo
   const photoSteps: Record<string, string> = {
@@ -115,35 +131,18 @@ export default function RiderOrderDetailPage() {
       </header>
 
       <div className="flex-1 space-y-6 animate-fade-in relative">
-        {/* Animated Map Section */}
-        <div className="h-48 relative bg-slate-200 overflow-hidden">
-           <div className="absolute inset-0 bg-[#f8f9fa] flex items-center justify-center">
-              <div className="absolute inset-0 opacity-[0.05]" style={{ backgroundImage: 'radial-gradient(#000 1px, transparent 1px)', backgroundSize: '30px 30px' }} />
-              <div className="text-center opacity-30 scale-125 translate-y-2">
-                 <div className="text-6xl mb-4 grayscale">🗺️</div>
-              </div>
-              <div className="absolute top-1/2 left-1/4 right-1/4 h-1 bg-primary/20 rounded-full">
-                 <div className="absolute top-0 left-0 h-full bg-primary w-2/3 shadow-[0_0_8px_rgba(255,159,28,0.5)]" />
-              </div>
-           </div>
-
-           <div className="absolute top-[40%] left-[22%] -translate-x-1/2 -translate-y-1/2 z-10">
-              <div className="w-8 h-8 bg-black rounded-xl flex items-center justify-center shadow-lg ring-2 ring-white text-white">
-                 <Icons.Logo size={18} variant="icon" />
-              </div>
-              <div className="bg-black text-[8px] font-black text-white px-2 py-0.5 rounded-full mt-1.5 shadow-md uppercase tracking-tighter">Store</div>
-           </div>
-
-           <div className="absolute top-[48%] right-[22%] translate-x-1/2 -translate-y-1/2 z-10">
-              <div className="w-10 h-10 bg-primary rounded-2xl flex items-center justify-center shadow-[0_10px_20px_rgba(255,159,28,0.3)] ring-4 ring-white text-white animate-bounce-slow">
-                 <Icons.MapPin size={22} strokeWidth={3} />
-              </div>
-              <div className="bg-primary text-[8px] font-black text-slate-900 px-2 py-0.5 rounded-full mt-1.5 shadow-md uppercase tracking-tighter whitespace-nowrap">Order Location</div>
-           </div>
+        {/* Functional Map Section */}
+        <div className="h-48 relative bg-slate-200 overflow-hidden border-b border-slate-100">
+           <RiderMap 
+             storeLat={storePos.lat}
+             storeLng={storePos.lng}
+             userLat={userPos.lat}
+             userLng={userPos.lng}
+           />
            
            <div className="absolute bottom-4 right-4 z-20 flex gap-2">
               <button 
-                onClick={() => window.open(`https://www.google.com/maps/dir/?api=1&destination=${order?.storeLat || 13.7563},${order?.storeLng || 100.5018}`, "_blank")}
+                onClick={() => window.open(`https://www.google.com/maps/dir/?api=1&destination=${userPos.lat},${userPos.lng}`, "_blank")}
                 className="bg-white/90 backdrop-blur-md px-4 py-2 rounded-2xl border border-slate-200 shadow-xl text-primary font-black text-[10px] uppercase tracking-widest flex items-center gap-2 active:scale-95 transition-all"
               >
                  <Icons.MapPin size={14} strokeWidth={3} /> {t("rider.navigate")}
