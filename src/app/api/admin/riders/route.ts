@@ -8,9 +8,13 @@ export async function GET(req: Request) {
     const db = getRequestContext().env.DB;
     if (!db) return NextResponse.json({ error: "D1 not found" }, { status: 500 });
 
-    // Self-healing: Ensure rider_number column exists
+    // Self-healing: Ensure required columns and tables exist
     try {
       await db.prepare("ALTER TABLE rider_users ADD COLUMN rider_number INTEGER").run();
+      await db.prepare("ALTER TABLE rider_users ADD COLUMN bankName TEXT").run();
+      await db.prepare("ALTER TABLE rider_users ADD COLUMN accountNumber TEXT").run();
+      await db.prepare("ALTER TABLE rider_users ADD COLUMN accountName TEXT").run();
+      
       await db.prepare(`
         CREATE TABLE IF NOT EXISTS rider_documents (
           id TEXT PRIMARY KEY,
@@ -53,9 +57,12 @@ export async function POST(req: Request) {
     const db = getRequestContext().env.DB;
     if (!db) return NextResponse.json({ error: "D1 not found" }, { status: 500 });
 
-    // Self-healing: Ensure rider_number column exists
+    // Self-healing: Ensure required columns exist
     try {
       await db.prepare("ALTER TABLE rider_users ADD COLUMN rider_number INTEGER").run();
+      await db.prepare("ALTER TABLE rider_users ADD COLUMN bankName TEXT").run();
+      await db.prepare("ALTER TABLE rider_users ADD COLUMN accountNumber TEXT").run();
+      await db.prepare("ALTER TABLE rider_users ADD COLUMN accountName TEXT").run();
     } catch (e) {}
 
     if (!email || !password || !name) return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
