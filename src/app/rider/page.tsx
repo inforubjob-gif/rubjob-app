@@ -62,6 +62,13 @@ export default function RiderDashboard() {
     if (!riderId) return;
     setIsLoading(true);
     try {
+      // Fetch Preferences (includes Work Status)
+      const prefRes = await fetch(`/api/users/preferences?userId=${riderId}`);
+      const prefData = await prefRes.json();
+      if (prefData.preferences?.workStatus !== undefined) {
+        setWorkStatus(prefData.preferences.workStatus);
+      }
+
       const res = await fetch(`/api/rider/orders?riderId=${riderId}`);
       const data = await res.json() as any;
       
@@ -84,6 +91,21 @@ export default function RiderDashboard() {
       setIsLoading(false);
     }
   }
+
+  const handleToggleWorkStatus = async () => {
+    const nextStatus = !workStatus;
+    setWorkStatus(nextStatus);
+    if (!rider?.id) return;
+    try {
+      await fetch("/api/users/preferences", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: rider.id, workStatus: nextStatus })
+      });
+    } catch (err) {
+      console.error("Failed to update work status", err);
+    }
+  };
 
   const handleAcceptJob = async (jobId: string) => {
     if (!rider?.id) return;
@@ -109,9 +131,11 @@ export default function RiderDashboard() {
     }
   };
 
+  const { logout } = useLiff();
+
   const handleLogout = () => {
     localStorage.removeItem("rubjob_rider_session");
-    window.location.reload();
+    logout("/rider");
   };
 
   return (
@@ -122,13 +146,16 @@ export default function RiderDashboard() {
       {/* Rider Header */}
       <header className="relative z-10 px-5 pt-12 pb-6">
         <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center text-white border border-white/30 shadow-lg shadow-primary-dark/10">
-              <Icons.Truck size={32} strokeWidth={2.5} />
+          <div className="flex items-center gap-4">
+            <div className="w-14 h-14 rounded-2xl bg-white flex items-center justify-center p-2.5 shadow-xl shadow-primary-dark/20 border-2 border-white/50 ring-4 ring-primary/10">
+              <Icons.Logo variant="icon" size={36} />
             </div>
             <div className="min-w-0">
-              <p className="text-[10px] text-white/60 font-black uppercase tracking-[0.2em] leading-none mb-1 truncate">{t("rider.hero")}</p>
-              <h1 className="text-xl font-black tracking-tight truncate drop-shadow-sm">{rider?.name || t("common.guest")}</h1>
+              <p className="text-[10px] text-white/70 font-black uppercase tracking-[0.25em] leading-tight mb-2 flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-white/50 animate-pulse" />
+                {t("rider.hero")}
+              </p>
+              <h1 className="text-2xl font-black text-slate-900 tracking-tight truncate drop-shadow-sm leading-none">{rider?.name || t("common.guest")}</h1>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -153,7 +180,7 @@ export default function RiderDashboard() {
                   </div>
               </div>
               <button 
-                onClick={() => setWorkStatus(!workStatus)}
+                onClick={handleToggleWorkStatus}
                 className={`w-14 h-8 rounded-full p-1 transition-all duration-300 ${workStatus ? 'bg-white shadow-lg shadow-white/20' : 'bg-white/20'}`}
               >
                 <div className={`w-6 h-6 rounded-full shadow-md transition-all duration-300 ${workStatus ? 'bg-primary transform translate-x-6' : 'bg-white'}`} />
@@ -177,22 +204,22 @@ export default function RiderDashboard() {
 
       <div className="relative z-10 px-5 space-y-7 pt-2 animate-fade-in">
         {/* Tabs */}
-        <div className="bg-white p-1.5 rounded-2xl flex shadow-sm border border-slate-200">
+        <div className="bg-slate-100 p-1.5 rounded-2xl flex shadow-inner border border-slate-200/50">
           <button
             onClick={() => setActiveTab("available")}
-            className={`flex-1 py-3 text-xs font-black uppercase tracking-wider rounded-xl transition-all ${
-              activeTab === "available" ? "bg-primary text-slate-900 shadow-lg shadow-primary/20 scale-[1.01]" : "text-white/70"
+            className={`flex-1 py-3 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all ${
+              activeTab === "available" ? "bg-white text-primary shadow-lg scale-[1.02]" : "text-slate-400 hover:text-slate-600"
             }`}
           >
-            {t("rider.availableJobs")}
+            {t("rider.availableJobs") || "Available Pickups"}
           </button>
           <button
             onClick={() => setActiveTab("active")}
-            className={`flex-1 py-3 text-xs font-black uppercase tracking-wider rounded-xl transition-all ${
-              activeTab === "active" ? "bg-primary text-slate-900 shadow-lg shadow-primary/20 scale-[1.01]" : "text-white/70"
+            className={`flex-1 py-3 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all ${
+              activeTab === "active" ? "bg-white text-primary shadow-lg scale-[1.02]" : "text-slate-400 hover:text-slate-600"
             }`}
           >
-            {t("rider.myJobs")}
+            {t("rider.myJobs") || "My Deliveries"}
           </button>
         </div>
       </div>
@@ -355,9 +382,11 @@ function AvailableDeliveries({ t, router, jobs, onAccept, onViewDetails }: { t: 
       </div>
 
       {jobs.length === 0 ? (
-        <div className="text-center py-12 bg-white rounded-[2rem] border border-slate-100">
-           <div className="text-4xl mb-3">✨</div>
-           <p className="text-xs font-black text-slate-400 uppercase tracking-widest">{t("rider.noJobs") || "No new jobs nearby"}</p>
+        <div className="text-center py-16 bg-white rounded-[2.5rem] border border-slate-100 shadow-sm flex flex-col items-center">
+           <div className="w-20 h-20 bg-slate-50 rounded-[2rem] flex items-center justify-center mb-4 transition-all hover:scale-105 border border-slate-100 grayscale opacity-40">
+              <Icons.Logo variant="icon" size={40} />
+           </div>
+           <p className="text-[10px] font-black text-slate-300 uppercase tracking-[0.2em]">{t("rider.noJobs") || "No new jobs nearby"}</p>
         </div>
       ) : (
         jobs.map((job) => (
@@ -409,9 +438,11 @@ function ActiveDeliveries({ t, router, activeJobs }: { t: any, router: any, acti
       </div>
 
       {activeJobs.length === 0 ? (
-        <div className="text-center py-12 bg-white rounded-[2rem] border border-slate-100">
-           <div className="text-4xl mb-3">🚛</div>
-           <p className="text-xs font-black text-slate-400 uppercase tracking-widest">{t("rider.noJobs") || "No active jobs"}</p>
+        <div className="text-center py-16 bg-white rounded-[2.5rem] border border-slate-100 shadow-sm flex flex-col items-center">
+           <div className="w-20 h-20 bg-slate-50 rounded-[2rem] flex items-center justify-center mb-4 transition-all hover:scale-105 border border-slate-100 grayscale opacity-40">
+              <Icons.Logo variant="icon" size={40} />
+           </div>
+           <p className="text-[10px] font-black text-slate-300 uppercase tracking-[0.2em]">{t("rider.noJobs") || "No active jobs"}</p>
         </div>
       ) : (
         activeJobs.map((job) => (

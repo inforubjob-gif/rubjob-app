@@ -100,6 +100,16 @@ export default function RiderOrderDetailPage() {
     }
   };
 
+  // Helper to determine active destination
+  const getActiveDestination = () => {
+    if (status === "delivering_to_store" || status === "ready_for_pickup") {
+      return { pos: storePos, label: "Store" };
+    }
+    return { pos: userPos, label: "User" };
+  };
+
+  const activeDest = getActiveDestination();
+
   if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-dvh bg-slate-50 gap-4">
@@ -142,10 +152,10 @@ export default function RiderOrderDetailPage() {
            
            <div className="absolute bottom-4 right-4 z-20 flex gap-2">
               <button 
-                onClick={() => window.open(`https://www.google.com/maps/dir/?api=1&destination=${userPos.lat},${userPos.lng}`, "_blank")}
+                onClick={() => window.open(`https://www.google.com/maps/dir/?api=1&destination=${activeDest.pos.lat},${activeDest.pos.lng}`, "_blank")}
                 className="bg-white/90 backdrop-blur-md px-4 py-2 rounded-2xl border border-slate-200 shadow-xl text-primary font-black text-[10px] uppercase tracking-widest flex items-center gap-2 active:scale-95 transition-all"
               >
-                 <Icons.MapPin size={14} strokeWidth={3} /> {t("rider.navigate")}
+                 <Icons.MapPin size={14} strokeWidth={3} /> {t("rider.navigate")} TO {activeDest.label}
               </button>
            </div>
         </div>

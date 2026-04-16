@@ -77,19 +77,23 @@ export default function RiderProfilePage() {
   return (
     <div className="flex flex-col min-h-dvh bg-slate-50">
       <header className="bg-primary text-white px-5 pt-12 pb-10 rounded-b-[3rem] shadow-xl relative overflow-hidden">
-        <div className="absolute top-0 left-0 w-32 h-32 bg-white/20 rounded-full -ml-16 -mt-16 blur-2xl" />
-        <div className="flex items-center gap-4">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-32 -mt-32 blur-3xl" />
+        <div className="flex items-center gap-5">
             <div className="relative">
-              <div className="w-16 h-16 rounded-3xl bg-white shadow-xl flex items-center justify-center p-1 border-2 border-orange-100/50">
-                <div className="w-full h-full rounded-2xl bg-orange-50 flex items-center justify-center text-primary overflow-hidden">
+              <div className="w-20 h-20 rounded-[2rem] bg-white flex items-center justify-center p-1.5 shadow-2xl border-4 border-white/20 ring-8 ring-primary/5">
+                <div className="w-full h-full rounded-[1.5rem] bg-orange-50 flex items-center justify-center overflow-hidden border border-orange-100">
                     <img src={profile?.pictureUrl || "https://api.dicebear.com/7.x/avataaars/svg?seed=Rubjob"} alt="Avatar" className="w-full h-full object-cover" />
                 </div>
               </div>
-              <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-emerald-500 border-4 border-primary rounded-full shadow-sm" />
+              <div className="absolute -bottom-1 -right-1 w-7 h-7 bg-emerald-500 border-4 border-primary rounded-full shadow-lg" />
             </div>
             <div className="flex-1">
-              <h1 className="text-xl font-black text-white tracking-tight truncate drop-shadow-sm">{profile?.displayName || "Rubjob Rider"}</h1>
-              <p className="text-[10px] text-white/80 font-black uppercase tracking-[0.2em]">{t("rider.profile.verifiedHero")} #0012</p>
+              <div className="flex items-center gap-2 mb-1.5 opacity-80">
+                 <Icons.Logo variant="icon" size={16} className="grayscale brightness-[100] invert" />
+                 <p className="text-[10px] font-black uppercase tracking-[0.2em]">{t("rider.hero") || "Rubjob Rider"}</p>
+              </div>
+              <h1 className="text-2xl font-black text-white tracking-tight truncate drop-shadow-lg">{profile?.displayName || "Rubjob Rider"}</h1>
+              <p className="text-[10px] text-white/60 font-bold uppercase tracking-[0.1em] mt-1">Verified Hero #0012</p>
             </div>
         </div>
       </header>
@@ -156,7 +160,10 @@ export default function RiderProfilePage() {
         <section>
           <p className="text-[10px] font-black text-slate-300 uppercase tracking-[0.25em] mb-4 pl-1">{t("rider.profile.account")}</p>
           <button 
-            onClick={logout}
+            onClick={() => {
+              localStorage.removeItem("rubjob_rider_session");
+              logout("/rider");
+            }}
             className="w-full p-5 bg-white rounded-[2rem] border border-slate-100 flex items-center gap-4 active:scale-95 transition-all shadow-sm"
           >
              <div className="w-10 h-10 rounded-xl bg-red-50 text-red-500 flex items-center justify-center">

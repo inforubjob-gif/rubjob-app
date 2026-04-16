@@ -4,6 +4,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAdmin } from "@/components/providers/AdminProvider";
 import { Icons } from "@/components/ui/Icons";
+import { useTranslation } from "@/components/providers/LanguageProvider";
+import type { Language } from "@/lib/i18n";
 
 interface AdminSidebarProps {
   isOpen: boolean;
@@ -13,16 +15,17 @@ interface AdminSidebarProps {
 export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
   const pathname = usePathname();
   const { admin, logout, hasPermission } = useAdmin();
+  const { t, language, setLanguage } = useTranslation();
 
   const NAV_ITEMS = [
-    { label: "Dashboard", href: "/admin", icon: <Icons.Tasks size={20} />, permission: "dashboard" },
-    { label: "Orders", href: "/admin/orders", icon: <Icons.FileText size={20} />, permission: "orders" },
-    { label: "Users & Roles", href: "/admin/users", icon: <Icons.User size={20} />, permission: "users" },
-    { label: "Stores", href: "/admin/stores", icon: <Icons.Office size={20} />, permission: "stores" },
-    { label: "Riders", href: "/admin/riders", icon: <Icons.Car size={20} />, permission: "riders" },
-    { label: "Coupons", href: "/admin/coupons", icon: <Icons.Ticket size={20} />, permission: "coupons" },
-    { label: "Finance", href: "/admin/finance", icon: <Icons.Wallet size={20} />, permission: "finance" },
-    { label: "Support Center", href: "/admin/support", icon: <Icons.Chat size={20} />, permission: "support" },
+    { label: t("admin.nav.dashboard"), href: "/admin", icon: <Icons.Tasks size={20} />, permission: "dashboard" },
+    { label: t("admin.nav.orders"), href: "/admin/orders", icon: <Icons.FileText size={20} />, permission: "orders" },
+    { label: t("admin.nav.users"), href: "/admin/users", icon: <Icons.User size={20} />, permission: "users" },
+    { label: t("admin.nav.stores"), href: "/admin/stores", icon: <Icons.Office size={20} />, permission: "stores" },
+    { label: t("admin.nav.riders"), href: "/admin/riders", icon: <Icons.Car size={20} />, permission: "riders" },
+    { label: t("admin.nav.coupons"), href: "/admin/coupons", icon: <Icons.Ticket size={20} />, permission: "coupons" },
+    { label: t("admin.nav.finance"), href: "/admin/finance", icon: <Icons.Wallet size={20} />, permission: "finance" },
+    { label: t("admin.nav.support"), href: "/admin/support", icon: <Icons.Chat size={20} />, permission: "support" },
   ].filter(item => hasPermission(item.permission));
 
   return (
@@ -97,30 +100,45 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
               </div>
 
               <div className="grid grid-cols-2 gap-2">
-                 {hasPermission("settings") && (
-                   <Link 
-                     href="/admin/settings"
-                     className={`flex flex-col items-center justify-center gap-1.5 p-2.5 rounded-2xl text-[10px] font-black uppercase transition-all ${pathname === '/admin/settings' ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'bg-white/5 text-slate-400 hover:text-white hover:bg-white/10'}`}
-                   >
-                     <Icons.Settings size={18} />
-                     Setts
-                   </Link>
-                 )}
-                 <Link 
-                   href="/"
-                   className="flex flex-col items-center justify-center gap-1.5 p-2.5 rounded-2xl bg-white/5 text-slate-400 hover:text-white hover:bg-white/10 text-[10px] font-black uppercase transition-all"
-                 >
-                   <Icons.Back size={18} />
-                   App
-                 </Link>
-                 <button 
-                   onClick={logout}
-                   className="col-span-2 flex items-center justify-center gap-2 mt-1 p-2.5 rounded-2xl bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 text-[10px] font-black uppercase tracking-widest transition-all"
-                 >
-                   <Icons.Lock size={14} />
-                   Sign Out
-                 </button>
-              </div>
+                  {hasPermission("settings") && (
+                    <Link 
+                      href="/admin/settings"
+                      className={`flex flex-col items-center justify-center gap-1.5 p-2.5 rounded-2xl text-[10px] font-black uppercase transition-all ${pathname === '/admin/settings' ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'bg-white/5 text-slate-400 hover:text-white hover:bg-white/10'}`}
+                    >
+                      <Icons.Settings size={18} />
+                      {t("admin.nav.settings").slice(0, 5)}
+                    </Link>
+                  )}
+                  <Link 
+                    href="/"
+                    className="flex flex-col items-center justify-center gap-1.5 p-2.5 rounded-2xl bg-white/5 text-slate-400 hover:text-white hover:bg-white/10 text-[10px] font-black uppercase transition-all"
+                  >
+                    <Icons.Back size={18} />
+                    UI
+                  </Link>
+                  <button 
+                    onClick={logout}
+                    className="col-span-2 flex items-center justify-center gap-2 mt-1 p-2.5 rounded-2xl bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 text-[10px] font-black uppercase tracking-widest transition-all"
+                  >
+                    <Icons.Lock size={14} />
+                    {t("rider.profile.logout")}
+                  </button>
+               </div>
+
+               {/* Language Switcher */}
+               <div className="mt-4 pt-4 border-t border-white/5">
+                  <div className="bg-slate-900 rounded-2xl p-1 flex gap-1 shadow-inner ring-1 ring-white/5">
+                     {(['th', 'en'] as const).map((l) => (
+                       <button
+                         key={l}
+                         onClick={() => setLanguage(l)}
+                         className={`flex-1 py-2 text-[10px] font-black uppercase rounded-xl transition-all ${language === l ? 'bg-primary text-white shadow-lg' : 'text-slate-500 hover:text-slate-300'}`}
+                       >
+                         {l}
+                       </button>
+                     ))}
+                  </div>
+               </div>
            </div>
         </div>
       </aside>

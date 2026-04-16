@@ -163,7 +163,7 @@ export default function StoreProfilePage() {
         <section>
           <p className="text-[10px] font-black text-slate-300 uppercase tracking-[0.25em] mb-4 pl-1">{t("store.profile.account")}</p>
           <button 
-            onClick={logout}
+            onClick={() => logout("/store")}
             className="w-full p-5 bg-white rounded-[2rem] border border-slate-100 flex items-center gap-4 active:scale-95 transition-all shadow-sm"
           >
              <div className="w-10 h-10 rounded-xl bg-red-50 text-red-500 flex items-center justify-center">

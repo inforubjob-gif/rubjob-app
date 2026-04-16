@@ -16,7 +16,7 @@ interface LiffContextValue {
   profile: User | null;
   error: string | null;
   login: () => void;
-  logout: () => void;
+  logout: (redirectPath?: string) => void;
 }
 
 const LiffContext = createContext<LiffContextValue>({
@@ -178,24 +178,26 @@ export default function LiffProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const handleLogout = async () => {
+  const handleLogout = async (redirectPath?: string) => {
     try {
       const liff = (await import("@line/liff")).default;
       if (liff.isLoggedIn()) {
         liff.logout();
-        setCtx(prev => ({ ...prev, isLoggedIn: false, profile: null }));
-        
-        if (liff.isInClient()) {
-          liff.closeWindow();
-        } else {
-          window.location.href = "/";
-        }
+      }
+      
+      setCtx(prev => ({ ...prev, isLoggedIn: false, profile: null }));
+      
+      // Clear session storage if any
+      sessionStorage.clear();
+
+      if (liff.isInClient?.()) {
+        liff.closeWindow();
       } else {
-        window.location.href = "/";
+        window.location.href = redirectPath || "/";
       }
     } catch (err) {
       console.error("[RUBJOB] Logout error:", err);
-      window.location.href = "/";
+      window.location.href = redirectPath || "/";
     }
   };
 
