@@ -46,6 +46,26 @@ export default function RiderManagementAdminPage() {
     }
   }
 
+  async function deleteRider(id: string) {
+    if (!window.confirm("Are you sure you want to PERMANENTLY delete this rider? This cannot be undone.")) return;
+    
+    try {
+      const res = await fetch("/api/admin/riders", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id })
+      });
+      
+      if (!res.ok) throw new Error("Failed to delete");
+      
+      setRiders(prev => prev.filter(r => r.id !== id));
+      showToast("Rider deleted permanently", "success");
+    } catch (err) {
+      console.error(err);
+      showToast("Failed to delete rider", "error");
+    }
+  }
+
   return (
     <div className="space-y-8 max-w-7xl mx-auto">
       <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -143,20 +163,27 @@ export default function RiderManagementAdminPage() {
                         </Badge>
                      </td>
                     <td className="px-6 py-4 text-right">
-                       <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <Link 
-                            href={`/admin/riders/${rider.id}`}
-                            className="p-1.5 text-slate-400 hover:text-slate-900 transition-colors"
-                          >
-                            <Icons.Edit size={16} />
-                          </Link>
-                          <button 
-                            onClick={() => toggleStatus(rider.id, rider.status)}
-                            className={`px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-tight transition-all active:scale-95 ${rider.status === 'active' ? 'bg-rose-50 text-rose-600 hover:bg-rose-100' : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100'}`}
-                          >
-                            {rider.status === 'active' ? 'Suspend' : rider.status === 'pending' ? 'Review Application' : 'Activate'}
-                          </button>
-                       </div>
+                        <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                           <Link 
+                             href={`/admin/riders/${rider.id}`}
+                             className="p-1.5 text-slate-400 hover:text-slate-900 transition-colors"
+                           >
+                             <Icons.Edit size={16} />
+                           </Link>
+                           <button 
+                             onClick={() => toggleStatus(rider.id, rider.status)}
+                             className={`px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-tight transition-all active:scale-95 ${rider.status === 'active' ? 'bg-rose-50 text-rose-600 hover:bg-rose-100' : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100'}`}
+                           >
+                             {rider.status === 'active' ? 'Suspend' : rider.status === 'pending' ? 'Review Application' : 'Activate'}
+                           </button>
+                           <button 
+                             onClick={() => deleteRider(rider.id)}
+                             className="p-1.5 text-slate-300 hover:text-rose-500 transition-colors"
+                             title="Delete Rider"
+                           >
+                             <Icons.Trash size={16} />
+                           </button>
+                        </div>
                     </td>
                   </tr>
                 ))}

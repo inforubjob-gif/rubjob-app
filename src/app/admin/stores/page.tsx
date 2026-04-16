@@ -57,6 +57,26 @@ export default function StoresAdminPage() {
     }
   }
 
+  async function deleteStore(id: string) {
+    if (!window.confirm("Are you sure you want to PERMANENTLY delete this store? This cannot be undone.")) return;
+    
+    try {
+      const res = await fetch("/api/admin/stores", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id })
+      });
+      
+      if (!res.ok) throw new Error("Failed to delete");
+      
+      setStores(prev => prev.filter(s => s.id !== id));
+      showToast("Store deleted permanently", "success");
+    } catch (err) {
+      console.error(err);
+      showToast("Failed to delete store", "error");
+    }
+  }
+
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
       <header className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -148,20 +168,27 @@ export default function StoresAdminPage() {
                        </Badge>
                     </td>
                     <td className="px-6 py-4 text-right">
-                       <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <Link 
-                            href={`/admin/stores/${store.id}`}
-                            className="p-1.5 text-slate-400 hover:text-slate-900 transition-colors"
-                          >
-                            <Icons.Edit size={16} />
-                          </Link>
-                          <button 
-                            onClick={() => toggleStoreStatus(store.id, store.isActive)}
-                            className={`px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-tight transition-all active:scale-95 ${store.isActive === 1 ? 'bg-rose-50 text-rose-600 hover:bg-rose-100' : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100'}`}
-                          >
-                            {store.status === 'active' ? 'Suspend' : store.status === 'pending' ? 'Review & Approve' : 'Activate' }
-                          </button>
-                       </div>
+                        <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                           <Link 
+                             href={`/admin/stores/${store.id}`}
+                             className="p-1.5 text-slate-400 hover:text-slate-900 transition-colors"
+                           >
+                             <Icons.Edit size={16} />
+                           </Link>
+                           <button 
+                             onClick={() => toggleStoreStatus(store.id, store.isActive)}
+                             className={`px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-tight transition-all active:scale-95 ${store.isActive === 1 ? 'bg-rose-50 text-rose-600 hover:bg-rose-100' : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100'}`}
+                           >
+                             {store.status === 'active' ? 'Suspend' : store.status === 'pending' ? 'Review & Approve' : 'Activate' }
+                           </button>
+                           <button 
+                             onClick={() => deleteStore(store.id)}
+                             className="p-1.5 text-slate-300 hover:text-rose-500 transition-colors"
+                             title="Delete Store"
+                           >
+                             <Icons.Trash size={16} />
+                           </button>
+                        </div>
                     </td>
                   </tr>
                 ))}
