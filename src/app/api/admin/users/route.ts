@@ -11,6 +11,7 @@ export async function GET(req: Request) {
     const { results } = await db.prepare(`
       SELECT id, displayName, pictureUrl, role, assignedStoreId, points, createdAt
       FROM users
+      WHERE role IS NULL OR role = 'user'
       ORDER BY createdAt DESC
     `).all();
 
