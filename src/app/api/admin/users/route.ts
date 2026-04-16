@@ -48,3 +48,19 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
+
+export async function DELETE(req: Request) {
+  try {
+    const { id } = await req.json() as any;
+    if (!id) return NextResponse.json({ error: "Missing user ID" }, { status: 400 });
+
+    const db = getRequestContext().env.DB;
+    if (!db) return NextResponse.json({ error: "D1 not found" }, { status: 500 });
+
+    await db.prepare(`DELETE FROM users WHERE id = ?`).bind(id).run();
+
+    return NextResponse.json({ success: true });
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+}

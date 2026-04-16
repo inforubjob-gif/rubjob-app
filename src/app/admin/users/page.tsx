@@ -2,9 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Card from "@/components/ui/Card";
-import Badge from "@/components/ui/Badge";
 import { Icons } from "@/components/ui/Icons";
-
 import Modal from "@/components/ui/Modal";
 
 export default function UsersAdminPage() {
@@ -69,6 +67,30 @@ export default function UsersAdminPage() {
     }
   }
 
+  async function handleDeleteUser(id: string, name: string) {
+    if (!confirm(`Are you absolutely sure you want to delete account "${name || 'Unknown'}"? This action is permanent and cannot be undone.`)) return;
+    
+    setIsSaving(true);
+    try {
+      const res = await fetch("/api/admin/users", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id })
+      });
+      if (res.ok) {
+        setUsers(prev => prev.filter(u => u.id !== id));
+        setIsModalOpen(false);
+        setSelectedUser(null);
+      } else {
+        alert("Failed to delete user. They might have active orders or other linked data.");
+      }
+    } catch (err) {
+      console.error("Failed to delete user", err);
+    } finally {
+      setIsSaving(false);
+    }
+  }
+
   async function handleRoleChange(id: string, newRole: string) {
     setUpdatingId(id);
     try {
@@ -120,7 +142,7 @@ export default function UsersAdminPage() {
                   <th className="px-8 py-5">Account Status</th>
                   <th className="px-8 py-5">Points</th>
                   <th className="px-8 py-5">Activity</th>
-                  <th className="px-8 py-5 text-right">Details</th>
+                  <th className="px-8 py-5 text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-50">
@@ -164,12 +186,20 @@ export default function UsersAdminPage() {
                        </div>
                     </td>
                     <td className="px-8 py-5 text-right">
-                       <button 
-                         onClick={() => { setSelectedUser(user); setIsModalOpen(true); }}
-                         className="bg-slate-100 hover:bg-primary hover:text-white text-slate-500 w-10 h-10 rounded-xl flex items-center justify-center transition-all shadow-sm active:scale-95"
-                       >
-                         <Icons.ArrowRight size={18} />
-                       </button>
+                       <div className="flex items-center justify-end gap-2">
+                          <button 
+                            onClick={() => handleDeleteUser(user.id, user.displayName)}
+                            className="bg-slate-50 hover:bg-rose-50 text-slate-300 hover:text-rose-500 w-10 h-10 rounded-xl flex items-center justify-center transition-all group-hover:bg-rose-50/50"
+                          >
+                            <Icons.Trash size={18} />
+                          </button>
+                          <button 
+                            onClick={() => { setSelectedUser(user); setIsModalOpen(true); }}
+                            className="bg-slate-100 hover:bg-primary hover:text-white text-slate-500 w-10 h-10 rounded-xl flex items-center justify-center transition-all shadow-sm active:scale-95"
+                          >
+                            <Icons.ArrowRight size={18} />
+                          </button>
+                       </div>
                     </td>
                   </tr>
                 ))}
@@ -234,19 +264,27 @@ export default function UsersAdminPage() {
                 </div>
              </div>
 
-             <div className="bg-indigo-50/50 p-6 rounded-[2rem] border border-indigo-100/50 flex items-center justify-between">
+             <div className="bg-indigo-50/50 p-6 rounded-[2rem] border border-indigo-100/50 flex flex-col sm:flex-row items-center justify-between gap-4">
                 <div>
                    <p className="text-[10px] font-black text-indigo-400 uppercase tracking-widest">Linked Role</p>
                    <p className="text-lg font-black text-slate-900 mt-1 uppercase tracking-tight">{selectedUser.role?.replace('_', ' ') || 'Customer'}</p>
                 </div>
-                <button 
-                  onClick={() => handleUpdateUser({ displayName: selectedUser.displayName, points: selectedUser.points })}
-                  disabled={isSaving}
-                  className="bg-primary hover:bg-primary-dark text-white px-8 py-4 rounded-2xl font-black text-sm shadow-xl shadow-primary/20 transition-all active:scale-95 disabled:opacity-50 uppercase tracking-widest"
-                >
-                  {isSaving ? "Saving..." : "Update Intelligence"}
-                </button>
-             </div>
+                <div className="flex items-center gap-3 w-full sm:w-auto">
+                    <button 
+                      onClick={() => handleDeleteUser(selectedUser.id, selectedUser.displayName)}
+                      className="flex-1 sm:flex-none border-2 border-rose-100 text-rose-500 hover:bg-rose-50 px-6 py-4 rounded-2xl font-black text-sm transition-all uppercase tracking-widest"
+                    >
+                      Delete Account
+                    </button>
+                    <button 
+                      onClick={() => handleUpdateUser({ displayName: selectedUser.displayName, points: selectedUser.points })}
+                      disabled={isSaving}
+                      className="flex-1 sm:flex-none bg-primary hover:bg-primary-dark text-white px-8 py-4 rounded-2xl font-black text-sm shadow-xl shadow-primary/20 transition-all active:scale-95 disabled:opacity-50 uppercase tracking-widest"
+                    >
+                      {isSaving ? "Saving..." : "Update Intelligence"}
+                    </button>
+                 </div>
+              </div>
           </div>
         )}
       </Modal>
