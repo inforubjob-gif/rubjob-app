@@ -30,32 +30,47 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const t = (path: string): string => {
     try {
       const keys = path.split(".");
+      const currentLang = language || "th";
       
-      // Smart Fallback: if language is "en-US", try "en". If not found, use "th" as ultimate fallback.
-      const baseLang = language.split("-")[0] as Language;
-      const langsToTry = [language, baseLang, "th" as Language];
-      
-      for (const lang of langsToTry) {
+      // Look up helper
+      const lookup = (lang: string) => {
         let current: any = (translations as any)[lang];
-        if (!current) continue;
+        if (!current) return null;
         
-        let found = true;
         for (const key of keys) {
-          if (!current || current[key] === undefined) {
-            found = false;
-            break;
-          }
+          if (current[key] === undefined) return null;
           current = current[key];
         }
-        
-        if (found && typeof current === 'string') {
-          return current;
-        }
+        return typeof current === 'string' ? current : null;
+      };
+
+      // 1. Try exact language
+      let result = lookup(currentLang);
+      if (result) return result;
+
+      // 2. Try base language (e.g. 'en' from 'en-US')
+      const baseLang = currentLang.split("-")[0];
+      if (baseLang !== currentLang) {
+        result = lookup(baseLang);
+        if (result) return result;
       }
-      
+
+      // 3. Ultimate fallback to 'th'
+      if (currentLang !== "th") {
+        result = lookup("th");
+        if (result) return result;
+      }
+
+      // 4. Fallback to English just in case Thai is missing
+      if (currentLang !== "en" && baseLang !== "en") {
+        result = lookup("en");
+        if (result) return result;
+      }
+
+      console.warn(`Translation path not found: ${path} (Lang: ${currentLang})`);
       return path;
     } catch (err) {
-      console.error("Translation error for path:", path, err);
+      console.error("Critical translation error:", err);
       return path;
     }
   };

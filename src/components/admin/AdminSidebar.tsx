@@ -139,8 +139,8 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
                      ))}
                   </div>
                   <div className="mt-4 flex items-center justify-between px-1">
-                    <span className="text-[8px] font-black text-slate-700 uppercase tracking-widest">Build Status</span>
-                    <span className="text-[8px] font-black text-primary-light uppercase tracking-tighter bg-primary/10 px-2 py-0.5 rounded-full">v1.2-Admin-Fixed</span>
+                    <span className="text-[8px] font-black text-slate-700 uppercase tracking-widest">{language} mode</span>
+                    <span className="text-[8px] font-black text-primary-light uppercase tracking-tighter bg-primary/10 px-2 py-0.5 rounded-full">v1.3-Admin-Audit</span>
                   </div>
                </div>
            </div>

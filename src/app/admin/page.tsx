@@ -9,7 +9,7 @@ import { useTranslation } from "@/components/providers/LanguageProvider";
 export default function AdminDashboard() {
   const { t } = useTranslation();
   const [stats, setStats] = useState({ 
-    users: 0, stores: 0, activeStores: 0, 
+    users: 0, rawUsers: 0, stores: 0, activeStores: 0, 
     orders: 0, revenue: 0, earnings: 0, 
     gpStore: 20, gpRider: 10,
     totalRiders: 0, activeRiders: 0
@@ -30,6 +30,7 @@ export default function AdminDashboard() {
         } else {
            setStats({
             users: data.users || 0,
+            rawUsers: data.rawUsers || 0,
             stores: data.stores || 0,
             activeStores: data.activeStores || 0,
             orders: data.orders || 0,
@@ -101,7 +102,7 @@ export default function AdminDashboard() {
                </div>
                <div className="flex items-center justify-between mb-1">
                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t("admin.dashboard.totalUsers")}</p>
-                 <span className="text-[9px] font-bold text-slate-300">{t("admin.dashboard.totalLabel")}</span>
+                 <span className="text-[9px] font-bold text-slate-300">Raw DB Count: {stats.rawUsers}</span>
                </div>
                <h2 className="text-3xl font-black text-slate-900 leading-none">{Number(stats.users).toLocaleString()}</h2>
             </Card>
