@@ -16,10 +16,6 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
 
   // Load saved preference if any
   useEffect(() => {
-    console.log("RUBJOB_I18N Initialized:", {
-      keys: Object.keys(RUBJOB_I18N || {}),
-      th_dashboard: RUBJOB_I18N?.th?.admin?.nav?.dashboard
-    });
     const saved = localStorage.getItem("rubjob_lang") as Language;
     if (saved && (saved === "th" || saved === "en" || saved === "zh")) {
       setLanguage(saved);

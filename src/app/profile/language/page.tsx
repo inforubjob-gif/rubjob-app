@@ -1,12 +1,12 @@
 "use client";
 
-import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Card from "@/components/ui/Card";
+import { useTranslation } from "@/components/providers/LanguageProvider";
 
 export default function LanguagePage() {
   const router = useRouter();
-  const [lang, setLang] = useState<"en" | "th">("en");
+  const { language, setLanguage, t } = useTranslation();
 
   return (
     <div className="flex flex-col min-h-dvh bg-slate-50">
@@ -19,29 +19,31 @@ export default function LanguagePage() {
             <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
           </svg>
         </button>
-        <h1 className="text-lg font-bold text-slate-900">Language</h1>
+        <h1 className="text-lg font-bold text-slate-900">{t("profile.language")}</h1>
       </header>
 
       <main className="p-5 space-y-4">
-        <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Select Language / เลือกภาษา</p>
+        <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">
+          {t("profile.selectLanguage")}
+        </p>
         <Card className="divide-y divide-slate-100 overflow-hidden">
           <LanguageOption 
             label="English" 
             flag="🇺🇸" 
-            isSelected={lang === "en"} 
-            onSelect={() => setLang("en")} 
+            isSelected={language === "en"} 
+            onSelect={() => setLanguage("en")} 
           />
           <LanguageOption 
             label="ภาษาไทย (Thai)" 
             flag="🇹🇭" 
-            isSelected={lang === "th"} 
-            onSelect={() => setLang("th")} 
+            isSelected={language === "th"} 
+            onSelect={() => setLanguage("th")} 
           />
         </Card>
 
         <section className="pt-4 text-center">
             <p className="text-xs text-slate-400 italic">
-               More languages coming soon...
+               {t("common.comingSoon")}
             </p>
         </section>
       </main>

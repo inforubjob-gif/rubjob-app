@@ -42,7 +42,7 @@ export default function StoreWalletPage() {
 
   const handleWithdraw = async () => {
     if (!amount || !bankName || !accountNumber) {
-      alert("กรุณากรอกข้อมูลธนาคารให้ครบถ้วน");
+      alert(t("store.wallet.alertBankInfo"));
       return;
     }
     setIsProcessing(true);
@@ -63,7 +63,7 @@ export default function StoreWalletPage() {
         fetchWalletData();
       } else {
         const data = await res.json();
-        alert(data.error || "ถอนเงินไม่สำเร็จ");
+        alert(data.error || t("store.wallet.withdrawError"));
       }
     } catch (err) {
       console.error("Withdrawal error:", err);
@@ -159,21 +159,21 @@ export default function StoreWalletPage() {
               <div className="w-full grid grid-cols-1 gap-3">
                  <input 
                    type="text" 
-                   placeholder="Bank Name (e.g. Kasikorn)" 
+                   placeholder={t("rider.wallet.bankNamePlaceholder")} 
                    value={bankName}
                    onChange={(e) => setBankName(e.target.value)}
                    className="w-full bg-slate-50 rounded-xl px-4 py-3 text-sm font-bold outline-none focus:ring-2 focus:ring-primary/20"
                  />
                  <input 
                    type="text" 
-                   placeholder="Account Number" 
+                   placeholder={t("rider.wallet.accountNumberPlaceholder")} 
                    value={accountNumber}
                    onChange={(e) => setAccountNumber(e.target.value)}
                    className="w-full bg-slate-50 rounded-xl px-4 py-3 text-sm font-bold outline-none focus:ring-2 focus:ring-primary/20"
                  />
                  <input 
                    type="text" 
-                   placeholder="Account Holder Name" 
+                   placeholder={t("rider.wallet.accountNamePlaceholder")} 
                    value={accountName}
                    onChange={(e) => setAccountName(e.target.value)}
                    className="w-full bg-slate-50 rounded-xl px-4 py-3 text-sm font-bold outline-none focus:ring-2 focus:ring-primary/20"
@@ -191,7 +191,7 @@ export default function StoreWalletPage() {
                    disabled={!amount || parseInt(amount) < 100 || parseInt(amount) > balance || isProcessing}
                    className="w-full py-5 bg-primary text-white rounded-2xl font-black uppercase tracking-widest shadow-2xl shadow-primary/30"
                 >
-                   {isProcessing ? "Processing..." : t("staff.wallet.confirmWithdraw")}
+                   {isProcessing ? t("rider.wallet.processing") : t("staff.wallet.confirmWithdraw")}
                 </Button>
                 <button 
                   onClick={closeModal}

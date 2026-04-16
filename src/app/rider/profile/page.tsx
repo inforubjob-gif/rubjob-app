@@ -141,7 +141,7 @@ export default function RiderProfilePage() {
              <SettingItem 
                 icon={<Icons.Globe size={20} />} 
                 label={t("rider.profile.language")} 
-                value={language === "th" ? "ไทย (TH)" : language === "en" ? "English (EN)" : "Chinese (ZH)"}
+                value={language === "th" ? "ไทย (TH)" : "English (EN)"}
                 onClick={() => setShowLanguageModal(true)}
              />
              <SettingItem 
@@ -152,7 +152,7 @@ export default function RiderProfilePage() {
              />
              <SettingItem 
                 icon={<Icons.Bike size={20} />} 
-                label={t("rider.vehicleType")} 
+                label={t("rider.profile.vehicleType") || t("rider.vehicleType")} 
                 value={prefs?.vehicleType || t("common.notSet")} 
                 onClick={() => router.push("/rider/profile/vehicle-type")}
              />
@@ -199,7 +199,6 @@ export default function RiderProfilePage() {
                 {[
                   { key: "th", label: "ภาษาไทย", sub: "Thai (TH)" },
                   { key: "en", label: "English", sub: "English (EN)" },
-                  { key: "zh", label: "中文", sub: "Chinese (ZH)" },
                 ].map((lang) => (
                   <button
                     key={lang.key}
@@ -219,7 +218,7 @@ export default function RiderProfilePage() {
                     </div>
                     {language === lang.key && (
                       <div className="w-6 h-6 bg-primary rounded-full flex items-center justify-center text-slate-900 shadow-lg">
-                        <Icons.Back size={14} className="rotate-180" strokeWidth={4} />
+                        <Icons.Check size={14} className="text-slate-100" strokeWidth={4} />
                       </div>
                     )}
                   </button>

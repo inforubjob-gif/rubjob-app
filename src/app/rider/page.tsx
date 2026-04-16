@@ -123,10 +123,10 @@ export default function RiderDashboard() {
         // Clean refresh to sync all stats
         window.location.reload();
       } else {
-        alert(data.error || "Failed to accept job");
+        alert(data.error || t("rider.acceptJobError"));
       }
     } catch (err) {
-      alert("Network error");
+      alert(t("rider.networkError"));
     } finally {
       setIsLoading(false);
     }
@@ -212,7 +212,7 @@ export default function RiderDashboard() {
               activeTab === "available" ? "bg-white text-primary shadow-lg scale-[1.02]" : "text-slate-400 hover:text-slate-600"
             }`}
           >
-            {t("rider.availableJobs") || "Available Pickups"}
+            {t("rider.availablePickups")}
           </button>
           <button
             onClick={() => setActiveTab("active")}
@@ -220,7 +220,7 @@ export default function RiderDashboard() {
               activeTab === "active" ? "bg-white text-primary shadow-lg scale-[1.02]" : "text-slate-400 hover:text-slate-600"
             }`}
           >
-            {t("rider.myJobs") || "My Deliveries"}
+            {t("rider.activeDeliveries")}
           </button>
         </div>
       </div>
@@ -245,15 +245,17 @@ export default function RiderDashboard() {
                  <div className="w-24 h-24 bg-white/20 backdrop-blur-xl rounded-[2.5rem] flex items-center justify-center text-white border border-white/30 shadow-2xl mb-8 relative">
                     <Icons.Logo variant="icon" size={48} />
                  </div>
-                 <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight">ร่วมเป็นฮีโร่กับ RUBJOB</h2>
+                 <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight">{t("rider.intro.heroTitle")}</h2>
                  <p className="text-sm text-slate-500 font-bold mt-3 leading-relaxed max-w-[280px]">
-                   ร่วมเป็นส่วนหนึ่งของทีมส่งผ้ามืออาชีพ<br/>หารายได้ง่ายๆ ในเวลาที่คุณเลือกเอง
+                   {t("rider.intro.heroDesc").split("\n").map((line, i) => (
+                     <span key={i}>{line}{i === 0 && <br/>}</span>
+                   ))}
                  </p>
                  <Button 
                    onClick={() => router.push("/rider/setup")}
                    className="mt-8 bg-slate-900 text-white px-8 py-5 rounded-2xl font-black uppercase tracking-widest shadow-xl active:scale-95 transition-all"
                  >
-                   สมัครเป็นไรเดอร์เลย
+                   {t("rider.intro.applyBtn")}
                  </Button>
                </>
              ) : (
@@ -265,12 +267,12 @@ export default function RiderDashboard() {
                     </div>
                  </div>
                  <h2 className="text-xl font-black text-slate-900 uppercase tracking-tight">
-                   {verificationStatus === "pending" ? "อยู่ระหว่างตรวจสอบ" : "เอกสารไม่ผ่านการอนุมัติ"}
+                   {verificationStatus === "pending" ? t("rider.status.pending") : t("rider.status.rejected")}
                  </h2>
                  <p className="text-sm text-slate-500 font-bold mt-3 leading-relaxed max-w-[280px]">
                    {verificationStatus === "pending" 
-                     ? "ทีมงานกำลังตรวจสอบเอกสารของคุณครับ\nกรุณารอสักครู่ (ไม่เกิน 24 ชม.)" 
-                     : "ขออภัยครับ เอกสารของคุณไม่ผ่านการตรวจสอบ\nกรุณาติดต่อเจ้าหน้าที่ @RUBJOB_HELP"}
+                     ? t("rider.status.pendingDesc") 
+                     : t("rider.status.rejectedDesc")}
                  </p>
                  <div className="flex flex-col gap-3 w-full max-w-[200px] mt-8">
                    {verificationStatus === "rejected" && (
@@ -278,7 +280,7 @@ export default function RiderDashboard() {
                        onClick={() => router.push("/rider/documents")}
                        className="w-full bg-primary text-white py-4 rounded-2xl font-black uppercase tracking-widest shadow-xl"
                      >
-                       แก้ไขเอกสาร
+                       {t("rider.status.editDocs")}
                      </Button>
                    )}
                    <Button 
@@ -286,7 +288,7 @@ export default function RiderDashboard() {
                      className="w-full bg-white border border-slate-200 text-slate-900 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest"
                      onClick={() => window.location.reload()}
                    >
-                     Refresh Status
+                     {t("common.refresh")}
                    </Button>
                  </div>
                </>
@@ -329,7 +331,7 @@ export default function RiderDashboard() {
                    <div className="w-10 h-10 bg-black rounded-xl border-4 border-white shadow-xl flex items-center justify-center text-white">
                       <Icons.Logo size={20} variant="icon" />
                    </div>
-                   <p className="text-[10px] font-black mt-2 uppercase tracking-tighter opacity-50">Store</p>
+                   <p className="text-[10px] font-black mt-2 uppercase tracking-tighter opacity-50">{t("common.store")}</p>
                 </div>
 
                 <div className="flex-1 px-4 relative">
@@ -345,7 +347,7 @@ export default function RiderDashboard() {
                    <div className="w-10 h-10 bg-primary rounded-xl border-4 border-white shadow-xl flex items-center justify-center text-slate-800">
                       <Icons.MapPin size={20} strokeWidth={3} />
                    </div>
-                   <p className="text-[10px] font-black mt-2 uppercase tracking-tighter opacity-50">User</p>
+                   <p className="text-[10px] font-black mt-2 uppercase tracking-tighter opacity-50">{t("common.user")}</p>
                 </div>
              </div>
 
@@ -362,7 +364,7 @@ export default function RiderDashboard() {
                   </div>
                   <div className="text-right">
                      <p className="text-xl font-black text-slate-900 leading-none">฿{selectedJob.riderEarn || selectedJob.deliveryFee}</p>
-                     <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">รายได้ที่จะได้รับ</p>
+                     <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">{t("rider.earnAmountLabel")}</p>
                   </div>
                </div>
 
@@ -371,15 +373,15 @@ export default function RiderDashboard() {
                     <Icons.Navigation size={18} className="text-primary shrink-0 mt-0.5" />
                     <div className="flex-1">
                        <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest mb-1">{t("rider.pickup")}</p>
-                       <p className="text-xs font-bold text-slate-700 leading-relaxed">{selectedJob.storeName || selectedJob.store || "Unknown Store"}</p>
+                       <p className="text-xs font-bold text-slate-700 leading-relaxed">{selectedJob.storeName || selectedJob.store || t("rider.unknownStore")}</p>
                     </div>
                   </div>
                  <div className="flex gap-4">
                     <Icons.MapPin size={18} className="text-primary shrink-0 mt-0.5" />
                     <div className="flex-1">
                        <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest mb-1">{t("rider.delivery")}</p>
-                       <p className="text-xs font-black text-slate-900 leading-relaxed">{selectedJob.customerName || selectedJob.customer || "Unknown Customer"}</p>
-                       <p className="text-[10px] text-slate-400 font-bold mt-1">{selectedJob.address || "No address provided"}</p>
+                       <p className="text-xs font-black text-slate-900 leading-relaxed">{selectedJob.customerName || selectedJob.customer || t("rider.unknownCustomer")}</p>
+                       <p className="text-[10px] text-slate-400 font-bold mt-1">{selectedJob.address || t("rider.orderDetail.noAddress")}</p>
                     </div>
                  </div>
                </div>
@@ -422,7 +424,7 @@ function AvailableDeliveries({ t, router, jobs, onAccept, onViewDetails }: { t: 
            <div className="w-20 h-20 bg-slate-50 rounded-[2rem] flex items-center justify-center mb-4 transition-all hover:scale-105 border border-slate-100 grayscale opacity-40">
               <Icons.Logo variant="icon" size={40} />
            </div>
-           <p className="text-[10px] font-black text-slate-300 uppercase tracking-[0.2em]">{t("rider.noJobs") || "No new jobs nearby"}</p>
+           <p className="text-[10px] font-black text-slate-300 uppercase tracking-[0.2em]">{t("rider.noJobsNearby")}</p>
         </div>
       ) : (
         jobs.map((job) => (
@@ -434,12 +436,12 @@ function AvailableDeliveries({ t, router, jobs, onAccept, onViewDetails }: { t: 
               <div className="flex-1">
                 <div className="flex items-center gap-1.5 mb-1">
                   <span className={`text-[8px] font-black px-1.5 py-0.5 rounded uppercase tracking-tighter ${job.status === 'pending' ? 'bg-blue-100 text-blue-700' : 'bg-orange-100 text-orange-700'}`}>
-                    {job.status === 'pending' ? 'Pickup Leg' : 'Delivery Leg'}
+                    {job.status === 'pending' ? t("rider.flow.pickupLeg") : t("rider.flow.deliveryLeg")}
                   </span>
                   <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{job.id}</span>
                 </div>
                 <h3 className="font-bold text-slate-900 mb-1 leading-tight">
-                  {job.status === 'pending' ? 'Customer → Store' : 'Store → Customer'}
+                  {job.status === 'pending' ? t("rider.flow.customerToStore") : t("rider.flow.storeToCustomer")}
                 </h3>
                 <div className="flex items-center gap-3 text-[11px] text-slate-500 font-medium">
                   <span className="flex items-center gap-1"><Icons.MapPin size={12} className="text-primary" /> {job.distanceKm || "0.5"} {t("rider.nearby")}</span>
@@ -478,7 +480,7 @@ function ActiveDeliveries({ t, router, activeJobs }: { t: any, router: any, acti
            <div className="w-20 h-20 bg-slate-50 rounded-[2rem] flex items-center justify-center mb-4 transition-all hover:scale-105 border border-slate-100 grayscale opacity-40">
               <Icons.Logo variant="icon" size={40} />
            </div>
-           <p className="text-[10px] font-black text-slate-300 uppercase tracking-[0.2em]">{t("rider.noJobs") || "No active jobs"}</p>
+           <p className="text-[10px] font-black text-slate-300 uppercase tracking-[0.2em]">{t("rider.noActiveJobs")}</p>
         </div>
       ) : (
         activeJobs.map((job) => (

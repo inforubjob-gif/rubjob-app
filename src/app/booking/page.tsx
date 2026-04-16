@@ -267,7 +267,7 @@ function BookingFlow() {
 
   async function handleConfirm() {
     if (isBelowMinOrder) {
-      showToast(`ยอดสั่งซื้อขั้นต่ำคือ ฿${minOrderAmount} กรุณาเพิ่มบริการอื่นเพิ่มเติม`, "error");
+      showToast(t("booking.errors.minOrder").replace("{amount}", minOrderAmount.toString()), "error");
       return;
     }
 
@@ -280,12 +280,12 @@ function BookingFlow() {
     setIsSubmitting(true);
     try {
       if (!profile?.userId) {
-        showToast("Please login first to confirm your booking.", "error");
+        showToast(t("booking.loginRequired"), "error");
         setIsSubmitting(false);
         return;
       }
       if (!selectedStore?.id || !selectedService) {
-        showToast("Please select a service and store to process your booking.", "error");
+        showToast(t("booking.selectServiceStore"), "error");
         setIsSubmitting(false);
         return;
       }
@@ -295,7 +295,7 @@ function BookingFlow() {
         userId,
         storeId: selectedStore.id,
         serviceId: selectedService,
-        items: [{ name: `Bag ${bagSize}`, qty: 1 }],
+        items: [{ name: `${t("booking.bag")} ${bagSize}`, qty: 1 }],
         address: selectedAddress,
         paymentMethod: selectedPayment,
         laundryFee,
@@ -303,7 +303,7 @@ function BookingFlow() {
         distanceKm,
         totalPrice,
         pickupDateTime: `${pickupDate} ${pickupSlot}`,
-        scheduledDate: deliverySpeed === "express" ? "ด่วนพิเศษ (6 ชม.)" : "มาตรฐาน (24 ชม.)"
+        scheduledDate: deliverySpeed === "express" ? t("booking.speed.expressShort") : t("booking.speed.standardShort")
       };
 
       // 1. Create Booking
@@ -340,7 +340,7 @@ function BookingFlow() {
       }
     } catch (error: any) {
       console.error(error);
-      showToast(`Error: ${error.message}`, "error");
+      showToast(`${t("common.error")}: ${error.message}`, "error");
     } finally {
       setIsSubmitting(false);
     }
@@ -353,17 +353,18 @@ function BookingFlow() {
         <div className="w-24 h-24 bg-white rounded-[2.5rem] shadow-xl flex items-center justify-center mb-8 border border-slate-100">
            <Icons.Settings size={48} className="text-slate-300 animate-spin-slow" />
         </div>
-        <h2 className="text-2xl font-black text-slate-900 tracking-tight">ขออภัย ระบบปิดให้บริการชั่วคราว</h2>
+        <h2 className="text-2xl font-black text-slate-900 tracking-tight">{t("booking.errors.systemClosedTitle")}</h2>
         <p className="text-slate-500 mt-3 font-medium leading-relaxed">
-          ขณะนี้แอดมินกำลังปรับปรุงระบบ หรือนอกเวลาทำการ <br/>
-          กรุณากลับมาใหม่อีกครั้งในภายหลังครับ
+          {t("booking.errors.systemClosedDesc").split("\n").map((line, i) => (
+            <span key={i}>{line}{i === 0 && <br/>}</span>
+          ))}
         </p>
         <Button 
           variant="outline" 
           className="mt-10 rounded-2xl border-2 font-black px-10"
           onClick={() => router.push("/")}
         >
-          กลับหน้าหลัก
+          {t("common.goHome")}
         </Button>
       </div>
     );
@@ -465,7 +466,7 @@ function BookingFlow() {
               </div>
               <div className="space-y-2">
                 {dbAddresses.length === 0 && (
-                  <p className="text-center py-4 text-xs text-muted italic">No saved addresses. Please add one in profile.</p>
+                  <p className="text-center py-4 text-xs text-muted italic">{t("booking.noAddress")}</p>
                 )}
                 {dbAddresses.map((addr) => (
                   <Card
@@ -507,7 +508,7 @@ function BookingFlow() {
             {/* Pickup Info — always show date/time picker (no instant option) */}
             <section>
               <h3 className="text-sm font-bold text-foreground mb-2 flex items-center gap-2">
-                <Icons.Bell size={18} className="text-primary" /> เลือกวันและเวลาเข้ารับผ้า (7:00–17:00)
+                <Icons.Bell size={18} className="text-primary" /> {t("booking.pickupSelectTime")}
               </h3>
               
               <div className="p-3 bg-slate-50/80 rounded-xl space-y-4 animate-fade-in border border-slate-100">
@@ -547,8 +548,8 @@ function BookingFlow() {
               <div className="space-y-2">
                 <label className={`flex items-center justify-between p-3.5 rounded-xl border-2 cursor-pointer transition-all ${deliverySpeed === "standard" ? "border-primary bg-primary/5 shadow-md shadow-primary/5" : "border-slate-100 bg-white hover:bg-slate-50"}`} onClick={() => setDeliverySpeed("standard")}>
                   <div className="flex flex-col">
-                    <span className="text-sm font-bold text-foreground">มาตรฐาน (บริการรอบมาตรฐาน)</span>
-                    <span className="text-xs text-muted block mt-0.5">รับผ้าภายใน 24 ชม. (ค่าส่ง ฿{39 + distanceExtra})</span>
+                    <span className="text-sm font-bold text-foreground">{t("booking.speed.standardTitle")}</span>
+                    <span className="text-xs text-muted block mt-0.5">{t("booking.speed.standardDesc").replace("{fee}", (39 + distanceExtra).toString())}</span>
                   </div>
                   <div className={`w-5 h-5 rounded-full flex items-center justify-center transition-colors ${deliverySpeed === "standard" ? "bg-primary text-white" : "border-2 border-slate-200"}`}>
                     {deliverySpeed === "standard" && <span className="text-xs font-bold leading-none translate-y-[0.5px]">✓</span>}
@@ -557,22 +558,22 @@ function BookingFlow() {
 
                 <label className={`flex items-center justify-between p-3.5 rounded-xl border-2 cursor-pointer transition-all ${deliverySpeed === "express" ? "border-[#ff9800] bg-[#fff8e1] shadow-md shadow-[#ff9800]/10" : "border-slate-100 bg-white hover:bg-slate-50"}`} onClick={() => setDeliverySpeed("express")}>
                   <div className="flex flex-col">
-                    <span className="text-sm font-bold text-[#ff9800]">ด่วนพิเศษ (บริการด่วนภายในวัน) ⚡</span>
-                    <span className="text-xs text-[#ff9800]/80 block mt-0.5">รับผ้าภายใน 6 ชม. (ค่าส่ง ฿{59 + distanceExtra})</span>
+                    <span className="text-sm font-bold text-[#ff9800]">{t("booking.speed.expressTitle")}</span>
+                    <span className="text-xs text-[#ff9800]/80 block mt-0.5">{t("booking.speed.expressDesc").replace("{fee}", (59 + distanceExtra).toString())}</span>
                   </div>
                   <div className={`w-5 h-5 rounded-full flex items-center justify-center transition-colors ${deliverySpeed === "express" ? "bg-[#ff9800] text-white" : "border-2 border-slate-200"}`}>
                     {deliverySpeed === "express" && <span className="text-xs font-bold leading-none translate-y-[0.5px]">✓</span>}
                   </div>
                 </label>
               </div>
-              {distanceExtra > 0 && <span className="text-[10px] text-muted block mt-2 ml-1">* ค่าจัดส่งคำนวณรวมระยะทางเพิ่ม ({distanceKm.toFixed(1)} กม.) แล้ว</span>}
+              {distanceExtra > 0 && <span className="text-[10px] text-muted block mt-2 ml-1">{t("booking.distanceNote").replace("{distance}", distanceKm.toFixed(1))}</span>}
             </section>
 
             {/* Luggage Size & Folding Option */}
             <section>
               <h3 className="text-sm font-bold text-foreground mb-2 flex items-center gap-2">
                 <Icons.FileText size={18} className="text-primary" /> 
-                ขนาดสัมภาระ (Luggage Size)
+                {t("booking.bagSizeTitle")}
               </h3>
               
               <div className="grid grid-cols-2 gap-2 mb-4">
@@ -586,14 +587,14 @@ function BookingFlow() {
 
               <h3 className="text-sm font-bold text-foreground mb-2 flex items-center gap-2">
                 <Icons.Tasks size={18} className="text-primary" /> 
-                บริการเสริมพับผ้า
+                {t("booking.foldingServiceTitle")}
               </h3>
               
               <Card className="overflow-hidden mb-2">
                 <label className="flex items-center justify-between p-4 cursor-pointer hover:bg-slate-50 transition-colors border-b border-border" onClick={() => setWithFolding(false)}>
                   <div className="flex flex-col">
-                    <span className="text-sm font-bold text-foreground">ส่งคืนแบบไม่พับ</span>
-                    <span className="text-xs text-muted">ใส่ถุงรวมคืนให้แบบเรียบร้อย</span>
+                    <span className="text-sm font-bold text-foreground">{t("booking.options.noFolding")}</span>
+                    <span className="text-xs text-muted">{t("booking.options.noFoldingDesc")}</span>
                   </div>
                   <div className={`w-5 h-5 rounded-full flex items-center justify-center transition-colors ${!withFolding ? "bg-primary text-white shadow-md shadow-primary/30" : "border-2 border-slate-200"}`}>
                     {!withFolding && <span className="text-xs font-bold leading-none translate-y-[0.5px]">✓</span>}
@@ -602,7 +603,7 @@ function BookingFlow() {
 
                 <label className="flex items-center justify-between p-4 cursor-pointer hover:bg-slate-50 transition-colors" onClick={() => setWithFolding(true)}>
                   <div className="flex flex-col">
-                    <span className="text-sm font-bold text-foreground">พับผ้าเรียบร้อย</span>
+                    <span className="text-sm font-bold text-foreground">{t("booking.options.withFolding")}</span>
                     <span className="text-xs text-primary-dark font-medium">+฿{bagSize === "28kg" ? 35 : bagSize === "18kg" ? 25 : 20}</span>
                   </div>
                   <div className={`w-5 h-5 rounded-full flex items-center justify-center transition-colors ${withFolding ? "bg-primary text-white shadow-md shadow-primary/30" : "border-2 border-slate-200"}`}>
@@ -615,14 +616,14 @@ function BookingFlow() {
             {/* Discount & Points */}
             <section className="animate-fade-in">
               <h3 className="text-sm font-bold text-foreground mb-2 flex items-center gap-2 mt-6">
-                <Icons.Ticket size={18} className="text-primary" /> ส่วนลดและคะแนน
+                <Icons.Ticket size={18} className="text-primary" /> {t("booking.discountsTitle")}
               </h3>
               
               <Card className="p-4 mb-4">
                 <div className="flex gap-2 mb-4">
                   <input 
                     type="text" 
-                    placeholder="กรอกโค้ดส่วนลด" 
+                    placeholder={t("booking.couponPlaceholder")} 
                     value={couponCode}
                     onChange={(e) => setCouponCode(e.target.value)}
                     className="flex-1 bg-slate-100 border-none rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 font-bold uppercase"
@@ -639,36 +640,35 @@ function BookingFlow() {
                         const data = await res.json();
                         if (res.ok && data.success) {
                           setAppliedCoupon({ code: data.coupon.code, discount: data.coupon.discount });
-                          showToast(`✅ ใช้คูปองส่วนลด ฿${data.coupon.discount} สำเร็จ!`, "success");
+                          showToast(t("booking.couponSuccess").replace("{amount}", data.coupon.discount.toString()), "success");
                         } else {
-                          showToast(`❌ ${data.error || "คูปองไม่ถูกต้อง"}`, "error");
-                          setAppliedCoupon(null);
-                        }
-                      } catch (err) {
-                        console.error("Coupon validation error:", err);
-                        showToast("❌ เกิดข้อผิดพลาดในการตรวจสอบคูปอง", "error");
+                          showToast(`❌ ${data.error || t("booking.couponErrorGeneric")}`, "error");
                       }
+                    } catch (err) {
+                      console.error("Coupon validation error:", err);
+                      showToast(`❌ ${t("booking.couponErrorGeneric")}`, "error");
+                    }
                     }}
                     className="min-w-[80px] rounded-xl text-xs font-black shadow-md shadow-primary/20"
                   >
-                    ใช้คูปอง
+                    {t("booking.applyCoupon")}
                   </Button>
                 </div>
                 
                 {appliedCoupon && (
                   <div className="bg-emerald-50 text-emerald-600 text-[11px] font-bold px-3 py-2.5 rounded-xl flex items-center justify-between mb-4 border border-emerald-100 shadow-sm">
-                    <span className="flex items-center gap-1.5">✅ ใช้คูปอง {appliedCoupon.code} สำเร็จ</span>
-                    <button onClick={() => { setAppliedCoupon(null); setCouponCode(""); }} className="text-emerald-700 underline underline-offset-2">นำออก</button>
+                    <span className="flex items-center gap-1.5">{t("booking.couponApplied").replace("{code}", appliedCoupon.code)}</span>
+                    <button onClick={() => { setAppliedCoupon(null); setCouponCode(""); }} className="text-emerald-700 underline underline-offset-2">{t("common.remove")}</button>
                   </div>
                 )}
 
                 <label className="flex items-center justify-between cursor-pointer border-t border-slate-100 pt-4" onClick={() => setUsePoints(!usePoints)}>
                   <div className="flex flex-col">
                     <div className="flex items-center gap-2">
-                      <span className="text-sm font-bold text-foreground">ใช้คะแนนสะสม</span>
+                      <span className="text-sm font-bold text-foreground">{t("booking.usePoints")}</span>
                       <span className="text-[10px] bg-amber-100 text-amber-700 px-2 py-0.5 rounded-md font-black">{availablePoints} Pts</span>
                     </div>
-                    <span className="text-xs text-muted mt-0.5">ใช้ 500 คะแนน แลกส่วนลด ฿50</span>
+                    <span className="text-xs text-muted mt-0.5">{t("booking.pointsDesc")}</span>
                   </div>
                   <div className={`w-[42px] h-[24px] rounded-full p-[2px] transition-colors duration-300 flex items-center ${usePoints ? "bg-primary" : "bg-slate-200"}`}>
                     <div className={`w-5 h-5 rounded-full bg-white transition-transform duration-300 shadow-sm ${usePoints ? "translate-x-[18px]" : "translate-x-0"}`} />
@@ -678,7 +678,7 @@ function BookingFlow() {
 
               {/* Billing Summary */}
               <h3 className="text-sm font-bold text-foreground mb-2 flex items-center gap-2 mt-6">
-                <Icons.FileText size={18} className="text-primary" /> สรุปยอดชำระ
+                <Icons.FileText size={18} className="text-primary" /> {t("booking.summaryTitle")}
               </h3>
               <Card className="p-5">
                 <div className="space-y-4 mb-4 text-xs font-medium text-slate-600">
@@ -687,28 +687,28 @@ function BookingFlow() {
                   <div>
                     <div className="flex items-center gap-1.5 mb-2 text-primary-dark font-bold">
                       <span className="text-sm leading-none pt-0.5">🏪</span>
-                      <span>ส่วนของร้านซักรีด{selectedStore ? ` (${selectedStore.name})` : ""}</span>
+                      <span>{t("booking.summary.storeSection")}{selectedStore ? ` (${selectedStore.name})` : ""}</span>
                     </div>
                     <div className="space-y-2 pl-5">
                       <div className="flex items-center justify-between">
-                        <span>แพ็กเกจ {service?.name || "ซักรีด"}</span>
+                        <span>{t("booking.summary.package")} {t(`orders.services.${service?.id}`) || service?.name}</span>
                         <span className="font-bold text-slate-800">฿{service?.basePrice || 0}</span>
                       </div>
                       {bagSizeExtra > 0 && (
                         <div className="flex items-center justify-between">
-                          <span>น้ำหนักกระเป๋าพิเศษ ({bagSize})</span>
+                          <span>{t("booking.summary.extraBag")} ({bagSize})</span>
                           <span className="font-bold text-slate-800">+฿{bagSizeExtra}</span>
                         </div>
                       )}
                       {foldingFee > 0 && (
                         <div className="flex items-center justify-between">
-                          <span>บริการเสริมพับผ้า</span>
+                          <span>{t("booking.foldingServiceTitle")}</span>
                           <span className="font-bold text-slate-800">+฿{foldingFee}</span>
                         </div>
                       )}
                     </div>
                     <div className="flex items-center justify-between mt-3 pt-2 border-t border-slate-100 pl-5 text-[11px]">
-                      <span className="text-slate-400 font-bold uppercase tracking-wider">รวมค่าซักรีด</span>
+                      <span className="text-slate-400 font-bold uppercase tracking-wider">{t("booking.summary.subtotalLaundry")}</span>
                       <span className="font-black text-slate-700">฿{laundryFee}</span>
                     </div>
                   </div>
@@ -717,11 +717,11 @@ function BookingFlow() {
                   <div className="pt-3 border-t border-dashed border-slate-200">
                     <div className="flex items-center gap-1.5 mb-2 text-blue-600 font-bold">
                       <span className="text-sm leading-none pt-0.5">🛵</span>
-                      <span>ส่วนของค่าจัดส่ง (ไรเดอร์)</span>
+                      <span>{t("booking.summary.riderSection")}</span>
                     </div>
                     <div className="space-y-2 pl-5">
                       <div className="flex items-center justify-between">
-                        <span>ค่าจัดส่ง ({deliverySpeed === "express" ? "ด่วนพิเศษ" : "มาตรฐาน"})</span>
+                        <span>{t("booking.summary.deliveryFee")} ({deliverySpeed === "express" ? t("booking.speed.expressShort") : t("booking.speed.standardShort")})</span>
                         <span className="font-bold text-slate-800">+฿{deliveryFee}</span>
                       </div>
                     </div>
@@ -732,13 +732,13 @@ function BookingFlow() {
                     <div className="pt-3 border-t border-dashed border-slate-200 space-y-2">
                        {couponDiscount > 0 && (
                          <div className="flex items-center justify-between text-emerald-600 font-bold bg-emerald-50/50 px-2.5 py-1.5 rounded-lg">
-                           <span className="flex items-center gap-1"><Icons.Ticket size={12} /> ส่วนลดคูปอง</span>
+                           <span className="flex items-center gap-1"><Icons.Ticket size={12} /> {t("booking.summary.discountCoupon")}</span>
                            <span>-฿{couponDiscount}</span>
                          </div>
                        )}
                        {pointsDiscount > 0 && (
                          <div className="flex items-center justify-between text-emerald-600 font-bold bg-emerald-50/50 px-2.5 py-1.5 rounded-lg">
-                           <span className="flex items-center gap-1"><Icons.Guarantee size={12} /> ส่วนลดคะแนนสะสม</span>
+                           <span className="flex items-center gap-1"><Icons.Guarantee size={12} /> {t("booking.summary.discountPoints")}</span>
                            <span>-฿{pointsDiscount}</span>
                          </div>
                        )}
@@ -749,8 +749,8 @@ function BookingFlow() {
                 {/* Total */}
                 <div className="flex items-end justify-between border-t border-slate-200 pt-4 bg-slate-50/50 -mx-5 -mb-5 px-5 pb-5 rounded-b-2xl">
                   <div>
-                    <span className="block text-sm font-black text-foreground">ยอดรวมสุทธิ</span>
-                    <span className="block text-[10px] text-muted font-bold tracking-tight mt-0.5">รวมภาษีมูลค่าเพิ่มแล้ว</span>
+                    <span className="block text-sm font-black text-foreground">{t("booking.summary.total")}</span>
+                    <span className="block text-[10px] text-muted font-bold tracking-tight mt-0.5">{t("booking.summary.taxIncluded")}</span>
                   </div>
                   <div className="flex flex-col items-end">
                     {(couponDiscount > 0 || pointsDiscount > 0) && <span className="text-[11px] text-slate-400 line-through font-bold">฿{subTotal}</span>}
@@ -782,18 +782,18 @@ function BookingFlow() {
                 </div>
 
                 <div className="bg-slate-50/50 p-3.5 rounded-2xl space-y-2.5 border border-slate-100">
-                  <Row icon={<Icons.MapPin size={12} />} label={t("booking.pickupLocation")} value={selectedAddress?.label || ""} />
-                  <Row icon={<Icons.Bell size={12} />} label={t("booking.pickupDate")} value={`${pickupDate} ${TIME_SLOTS.find(s => s.id === pickupSlot)?.label || pickupSlot}`} />
+                  <Row icon={<Icons.MapPin size={12} />} label={t("booking.confirm.pickupLocation")} value={selectedAddress?.label || ""} />
+                  <Row icon={<Icons.Bell size={12} />} label={t("booking.confirm.pickupDate")} value={`${pickupDate} ${TIME_SLOTS.find(s => s.id === pickupSlot)?.label || pickupSlot}`} />
                   <Row
                     icon={<Icons.Truck size={12} />}
-                    label="บริการจัดส่ง"
-                    value={deliverySpeed === "express" ? "ด่วนพิเศษ (6 ชม.)" : "มาตรฐาน (24 ชม.)"}
+                    label={t("booking.confirm.deliveryService")}
+                    value={deliverySpeed === "express" ? t("booking.speed.expressShort") : t("booking.speed.standardShort")}
                   />
                   {selectedStore && (
-                    <Row icon={<Icons.Home size={12} />} label="ร้านซักรีด" value={`${selectedStore.name} (${distanceKm.toFixed(1)} กม.)`} />
+                    <Row icon={<Icons.Home size={12} />} label={t("common.store")} value={`${selectedStore.name} (${distanceKm.toFixed(1)} ${t("booking.km")})`} />
                   )}
-                  <Row icon={<Icons.FileText size={11} />} label="ขนาดสัมภาระ" value={`${bagSize} ${bagSizeExtra > 0 ? `(+฿${bagSizeExtra})` : ""}`} />
-                  <Row icon={<Icons.Tasks size={11} />} label="บริการเสริม" value={withFolding ? `พับผ้า (+฿${foldingFee})` : "ไม่พับผ้า"} />
+                  <Row icon={<Icons.FileText size={11} />} label={t("booking.confirm.bagSize")} value={`${bagSize} ${bagSizeExtra > 0 ? `(+฿${bagSizeExtra})` : ""}`} />
+                  <Row icon={<Icons.Tasks size={11} />} label={t("booking.confirm.extraService")} value={withFolding ? `${t("booking.options.withFoldingShort")} (+฿${foldingFee})` : t("booking.options.noFoldingShort")} />
                 </div>
               </Card>
             </section>
@@ -839,7 +839,7 @@ function BookingFlow() {
                     <span className="text-2xl font-black text-foreground">฿{totalPrice}.00</span>
                   </div>
                   <p className="text-[10px] text-primary-dark font-bold mt-1 uppercase tracking-wider">
-                    {paymentQR ? "กดปุ่มด้านล่างหลังชำระเงินเสร็จสิ้น" : t("booking.instantConfirmation")}
+                    {paymentQR ? t("booking.paymentDoneNote") : t("booking.instantConfirmation")}
                   </p>
                 </div>
               </Card>
@@ -863,7 +863,9 @@ function BookingFlow() {
                <Icons.Info size={16} />
             </div>
             <p className="text-[11px] font-black text-rose-600 uppercase tracking-tight">
-              ยอดสั่งซื้อขั้นต่ำคือ ฿{minOrderAmount} (ยังขาดอีก ฿{minOrderAmount - totalPrice})
+              {t("booking.errors.minOrderRemaining")
+                .replace("{amount}", minOrderAmount.toString())
+                .replace("{needed}", (minOrderAmount - totalPrice).toString())}
             </p>
           </div>
         )}
@@ -882,7 +884,7 @@ function BookingFlow() {
           <div className="space-y-3">
             {!profile?.phone && (
               <div className="bg-amber-50 border border-amber-100 p-3 rounded-2xl">
-                <p className="text-[11px] font-bold text-amber-700 mb-2">ระบุเบอร์โทรศัพท์เพื่อติดต่อรับผ้า</p>
+                <p className="text-[11px] font-bold text-amber-700 mb-2">{t("booking.identifyPhone")}</p>
                 <input 
                   type="tel" 
                   placeholder="081-234-5678" 
@@ -935,8 +937,8 @@ function BookingFlow() {
             onClick={handleConfirm}
             className={isBelowMinOrder ? "bg-slate-300 text-slate-500 shadow-none border-transparent" : ""}
           >
-            {isSubmitting ? t("common.loading") : isBelowMinOrder ? `สั่งซื้อไม่ได้ (ขั้นต่ำ ฿${minOrderAmount})` : 
-             paymentQR ? "ดูประวัติการสั่งซื้อ" : `${t("booking.placeOrder")} — ฿${totalPrice}`}
+            {isSubmitting ? t("common.loading") : isBelowMinOrder ? t("booking.errors.cannotPlaceOrder").replace("{amount}", minOrderAmount.toString()) : 
+             paymentQR ? t("booking.viewMyOrders") : `${t("booking.placeOrder")} — ฿${totalPrice}`}
           </Button>
         )}
       </div>
@@ -946,7 +948,7 @@ function BookingFlow() {
 
 export default function BookingPage() {
   return (
-    <Suspense fallback={<div className="flex h-screen items-center justify-center p-4">Loading booking flow...</div>}>
+    <Suspense fallback={<div className="flex h-screen items-center justify-center p-4">{t("common.loading")}</div>}>
       <BookingFlow />
     </Suspense>
   );

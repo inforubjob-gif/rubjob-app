@@ -57,7 +57,7 @@ export default function RiderWalletPage() {
 
   const handleWithdraw = async () => {
     if (!amount || !bankName || !accountNumber) {
-      alert("กรุณากรอกข้อมูลธนาคารให้ครบถ้วน");
+      alert(t("rider.wallet.alertBankInfo"));
       return;
     }
     setIsProcessing(true);
@@ -95,7 +95,7 @@ export default function RiderWalletPage() {
       <header className="bg-primary text-white px-5 pt-12 pb-10 rounded-b-[3rem] shadow-xl relative overflow-hidden text-center">
         <div className="absolute top-0 right-0 w-40 h-40 bg-white/20 rounded-full -mr-20 -mt-20 blur-3xl" />
         <div className="relative z-10">
-          <p className="text-[10px] font-black text-white/50 uppercase tracking-[0.2em] mb-2">{t("rider.wallet.balance") || t("staff.wallet.availableBalance")}</p>
+          <p className="text-[10px] font-black text-white/50 uppercase tracking-[0.2em] mb-2">{t("rider.wallet.balance")}</p>
           <div className="flex items-baseline justify-center gap-2 mb-8 text-white">
             <span className="text-5xl font-black tracking-tight drop-shadow-md">฿{Math.floor(balance).toLocaleString()}</span>
             <span className="text-lg font-bold opacity-50">.{(balance % 1).toFixed(2).split('.')[1]}</span>
@@ -105,7 +105,7 @@ export default function RiderWalletPage() {
                onClick={() => setIsModalOpen(true)}
                className="flex-1 bg-white/20 backdrop-blur-lg text-white border border-white/40 shadow-xl py-4 font-black text-sm uppercase tracking-widest active:scale-95 transition-all"
              >
-                <Icons.Payment size={18} className="mr-2" /> {t("rider.wallet.withdraw") || t("staff.wallet.withdraw")}
+                <Icons.Payment size={18} className="mr-2" /> {t("rider.wallet.withdraw")}
              </Button>
              <button className="w-14 h-14 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/20 active:scale-95 transition-transform shadow-lg">
                 <Icons.Clock size={20} className="text-white" />
@@ -116,7 +116,7 @@ export default function RiderWalletPage() {
 
       <div className="flex-1 px-5 py-8 space-y-6 pb-24 animate-fade-in">
         <section>
-          <h2 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-4 px-1">{t("rider.wallet.history") || t("staff.wallet.history")}</h2>
+          <h2 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-4 px-1">{t("rider.wallet.history")}</h2>
           <div className="space-y-3">
             {transactions.map((trx) => (
               <div key={trx.id} className="bg-white p-4 rounded-[2rem] border border-slate-100 shadow-sm flex items-center gap-4">
@@ -124,14 +124,14 @@ export default function RiderWalletPage() {
                   {trx.amount > 0 ? <Icons.Payment size={20} /> : <Icons.Clock size={20} />}
                 </div>
                 <div className="flex-1">
-                  <p className="text-sm font-bold text-slate-900">{trx.type}</p>
+                  <p className="text-sm font-bold text-slate-900">{t(`rider.wallet.types.${trx.type}`) || trx.type}</p>
                   <p className="text-[10px] text-slate-400 font-medium uppercase">{trx.date}</p>
                 </div>
                 <div className="text-right">
                   <p className={`text-sm font-black ${trx.amount > 0 ? 'text-green-600' : 'text-slate-900'}`}>
                     {trx.amount > 0 ? `+฿${trx.amount}` : `-฿${Math.abs(trx.amount)}`}
                   </p>
-                  <p className="text-[9px] font-bold text-slate-400 uppercase">{trx.status}</p>
+                  <p className="text-[9px] font-bold text-slate-400 uppercase">{t(`rider.wallet.statuses.${trx.status}`) || trx.status}</p>
                 </div>
               </div>
             ))}
@@ -139,8 +139,8 @@ export default function RiderWalletPage() {
         </section>
 
         <Card className="p-6 bg-orange-50 border-2 border-orange-100 shadow-sm">
-            <h3 className="text-sm font-black text-primary mb-2 uppercase tracking-tight">{t("staff.wallet.commissionRate")}</h3>
-            <p className="text-xs text-slate-500 leading-relaxed mb-4 font-bold">{t("staff.wallet.commissionDesc")}</p>
+            <h3 className="text-sm font-black text-primary mb-2 uppercase tracking-tight">{t("rider.wallet.commissionRate")}</h3>
+            <p className="text-xs text-slate-500 leading-relaxed mb-4 font-bold">{t("rider.wallet.commissionDesc")}</p>
             <div className="h-1.5 bg-white rounded-full overflow-hidden border border-orange-100">
                 <div className="h-full bg-primary w-[85%] shadow-[0_0_8px_rgba(255,159,28,0.5)]" />
             </div>
@@ -150,7 +150,7 @@ export default function RiderWalletPage() {
       <Modal 
         isOpen={isModalOpen} 
         onClose={closeModal} 
-        title={isSuccess ? t("staff.wallet.withdrawSuccess") : t("staff.wallet.withdrawAmount")}
+        title={isSuccess ? t("rider.wallet.withdrawSuccess") : t("rider.wallet.withdrawAmount")}
       >
         {!isSuccess ? (
           <div className="w-full space-y-8 h-full flex flex-col items-center">
@@ -171,21 +171,21 @@ export default function RiderWalletPage() {
               <div className="w-full grid grid-cols-1 gap-3">
                  <input 
                    type="text" 
-                   placeholder="Bank Name (e.g. Kasikorn)" 
+                   placeholder={t("rider.wallet.bankNamePlaceholder")} 
                    value={bankName}
                    onChange={(e) => setBankName(e.target.value)}
                    className="w-full bg-slate-50 rounded-xl px-4 py-3 text-sm font-bold outline-none focus:ring-2 focus:ring-primary/20"
                  />
                  <input 
                    type="text" 
-                   placeholder="Account Number" 
+                   placeholder={t("rider.wallet.accountNumberPlaceholder")} 
                    value={accountNumber}
                    onChange={(e) => setAccountNumber(e.target.value)}
                    className="w-full bg-slate-50 rounded-xl px-4 py-3 text-sm font-bold outline-none focus:ring-2 focus:ring-primary/20"
                  />
                  <input 
                    type="text" 
-                   placeholder="Account Holder Name" 
+                   placeholder={t("rider.wallet.accountNamePlaceholder")} 
                    value={accountName}
                    onChange={(e) => setAccountName(e.target.value)}
                    className="w-full bg-slate-50 rounded-xl px-4 py-3 text-sm font-bold outline-none focus:ring-2 focus:ring-primary/20"
@@ -194,7 +194,7 @@ export default function RiderWalletPage() {
              
              <div className="w-full space-y-4">
                 <div className="flex justify-between items-center px-4">
-                   <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t("staff.wallet.withdrawMin")}</p>
+                   <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t("rider.wallet.withdrawMin")}</p>
                    <p className="text-[10px] font-black text-primary uppercase tracking-widest cursor-pointer" onClick={() => setAmount(Math.floor(balance).toString())}>Max: ฿{Math.floor(balance)}</p>
                 </div>
                 
@@ -203,7 +203,7 @@ export default function RiderWalletPage() {
                    disabled={!amount || parseInt(amount) < 100 || parseInt(amount) > balance || isProcessing}
                    className="w-full py-5 bg-primary text-white rounded-2xl font-black uppercase tracking-widest shadow-2xl shadow-primary/30"
                 >
-                   {isProcessing ? "Processing..." : t("staff.wallet.confirmWithdraw")}
+                   {isProcessing ? t("rider.wallet.processing") : t("rider.wallet.confirmWithdraw")}
                 </Button>
                 <button 
                   onClick={closeModal}
@@ -219,7 +219,7 @@ export default function RiderWalletPage() {
                 <Icons.CheckCircle size={40} />
              </div>
              <p className="text-sm text-slate-500 font-bold leading-relaxed mb-10 max-w-[240px]">
-                {t("staff.wallet.withdrawSuccessDesc")}
+                {t("rider.wallet.withdrawSuccessDesc")}
              </p>
              <Button 
                onClick={closeModal}
@@ -230,6 +230,9 @@ export default function RiderWalletPage() {
           </div>
         )}
       </Modal>
+    </div>
+  );
+}
     </div>
   );
 }

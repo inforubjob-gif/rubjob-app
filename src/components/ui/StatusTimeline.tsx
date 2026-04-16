@@ -67,7 +67,7 @@ export default function StatusTimeline({ currentStatus }: StatusTimelineProps) {
                 )}
               </div>
               <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest leading-none">
-                {isDone ? "สำเร็จแล้ว" : isCurrent ? "กำลังดำเนินการ..." : "รอดำเนินการ"}
+                {isDone ? t("common.done") : isCurrent ? t("common.processing") : t("common.pending")}
               </p>
             </div>
 

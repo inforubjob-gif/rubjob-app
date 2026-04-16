@@ -49,7 +49,7 @@ export default function PromotionsPage() {
     e.stopPropagation();
     try {
       if (!process.env.NEXT_PUBLIC_LIFF_ID) {
-        alert("ส่งคำเชิญให้เพื่อนสำเร็จ! (ระบบจำลองเนื่องจากไม่มี LIFF_ID)");
+        alert(t("promotions.inviteSuccessMock"));
         return;
       }
 
@@ -59,7 +59,7 @@ export default function PromotionsPage() {
           const result = await liff.shareTargetPicker([
             {
               type: "flex",
-              altText: "ชวนเพื่อนมาใช้ Rubjob ด้วยกัน!",
+              altText: t("promotions.inviteAltText"),
               contents: {
                 type: "bubble",
                 hero: { type: "image", url: "https://images.unsplash.com/photo-1545173168-9f1967e49549?w=800&q=80", size: "full", aspectRatio: "20:13", aspectMode: "cover" },
@@ -67,24 +67,24 @@ export default function PromotionsPage() {
                   type: "box", layout: "vertical",
                   contents: [
                     { type: "text", text: "RUBJOB", weight: "bold", size: "xl" },
-                    { type: "text", text: "แอปซักรีดเดลิเวอรี่ 24 ชม. สมัครวันนี้รับฟรีคะแนนสะสม", wrap: true, color: "#666666", size: "sm" }
+                    { type: "text", text: t("promotions.inviteBody"), wrap: true, color: "#666666", size: "sm" }
                   ]
                 },
                 footer: {
                   type: "box", layout: "vertical",
                   contents: [
-                    { type: "button", style: "primary", color: "#ff9f1c", action: { type: "uri", label: "เปิดแอปพลิเคชัน", uri: `https://liff.line.me/${process.env.NEXT_PUBLIC_LIFF_ID}` } }
+                    { type: "button", style: "primary", color: "#ff9f1c", action: { type: "uri", label: t("promotions.openApp"), uri: `https://liff.line.me/${process.env.NEXT_PUBLIC_LIFF_ID}` } }
                   ]
                 }
               }
             }
           ]);
-          if (result) alert("ส่งคำเชิญให้เพื่อนสำเร็จ! รับคะแนนเมื่อเพื่อนสมัครใช้งาน");
-        } else alert("ไม่สามารถใช้ฟีเจอร์แชร์บนอุปกรณ์นี้ได้ครับ");
-      } else alert("กรุณาเข้าสู่ระบบผ่าน LINE ก่อนส่งคำเชิญครับ");
+          if (result) alert(t("promotions.inviteSuccess"));
+        } else alert(t("promotions.shareNotAvailable"));
+      } else alert(t("promotions.mustLogin"));
     } catch (err) {
       console.error(err);
-      alert("เกิดข้อผิดพลาดในการเชิญเพื่อน");
+      alert(t("promotions.inviteError"));
     }
   };
 
@@ -139,11 +139,11 @@ export default function PromotionsPage() {
                 <div>
                   <div className="flex items-center gap-1.5 mb-1">
                     <span className="text-xs font-black text-primary uppercase tracking-[0.1em]">RUBJOB</span>
-                    <span className="text-xs font-bold text-primary/80">สมาชิก</span>
+                    <span className="text-xs font-bold text-primary/80">{t("promotions.memberLabel")}</span>
                   </div>
                   <div className="flex items-baseline gap-2">
                     <span className="text-[56px] leading-none font-black text-white tracking-tighter drop-shadow-md">{totalPoints}</span>
-                    <span className="text-[11px] font-bold text-slate-300">คะแนนสะสม</span>
+                    <span className="text-[11px] font-bold text-slate-300">{t("promotions.pointsLabel")}</span>
                   </div>
                 </div>
                 <div className="w-14 h-14 bg-black/20 backdrop-blur-md rounded-[1.25rem] flex items-center justify-center text-primary shadow-inner border border-white/10">
@@ -154,10 +154,10 @@ export default function PromotionsPage() {
               <div className="space-y-4">
                 <div className="flex justify-between items-end">
                   <span className="text-[11px] font-bold text-slate-200">
-                    ระดับถัดไป: <span className="text-white font-black">{totalPoints >= 1500 ? "ไดมอนด์" : "โกลด์"}</span>
+                    {t("promotions.nextTier")} <span className="text-white font-black">{totalPoints >= 1500 ? t("tiers.diamond") : t("tiers.gold")}</span>
                   </span>
                   <span className="text-[10px] font-black text-white bg-white/20 px-2.5 py-1 rounded-lg backdrop-blur-md">
-                    อีก {pointsToGo} คะแนนสะสม
+                    {t("promotions.pointsToGo").replace("{points}", pointsToGo.toString())}
                   </span>
                 </div>
                 <div className="h-3 w-full bg-white/10 rounded-full overflow-hidden p-[2px] border border-white/5">
@@ -172,7 +172,7 @@ export default function PromotionsPage() {
                 onClick={handleInviteFriend}
                 className="w-full mt-8 py-4 bg-[#ff9f1c] text-black rounded-2xl text-[14px] font-black tracking-wide shadow-2xl shadow-[#ff9f1c]/30 active:scale-95 transition-all outline-none"
               >
-                เชิญเพื่อนเพื่อเก็บคะแนน
+                {t("promotions.inviteBtn")}
               </button>
             </div>
           </div>

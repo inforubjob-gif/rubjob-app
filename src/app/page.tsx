@@ -194,17 +194,16 @@ export default function HomePage() {
                 className="w-full h-full object-contain animate-bounce-slow" 
               />
             </div>
-            <h3 className="text-xl font-black text-slate-800 mb-2 tracking-tight">Coming Soon...</h3>
+            <h3 className="text-xl font-black text-slate-800 mb-2 tracking-tight">{t("common.comingSoon")}</h3>
             <p className="text-sm text-slate-500 font-medium mb-8 leading-relaxed">
-              บริการ <span className="text-primary-dark font-bold underline decoration-primary/30 underline-offset-4">{comingSoonModal}</span><br/>
-              กำลังอยู่ในช่วงเตรียมระบบ<br/>อดใจรออีกนิดนะครับ! ✨
+              {t("common.comingSoonDesc").replace("{service}", comingSoonModal!)}
             </p>
             <Button 
               fullWidth 
               onClick={() => setComingSoonModal(null)} 
               className="rounded-2xl shadow-lg shadow-primary/20"
             >
-              รับทราบ
+              {t("common.gotIt")}
             </Button>
           </div>
         </div>

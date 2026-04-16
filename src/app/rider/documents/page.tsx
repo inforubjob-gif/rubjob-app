@@ -24,7 +24,7 @@ export default function RiderDocumentsPage() {
 
   const handleSubmit = async () => {
     if (!profile?.userId || !idCard || !license || !vehicle) {
-      showToast("Please upload all required documents", "error");
+      showToast(t("rider.verification.errorAllDocs"), "error");
       return;
     }
 
@@ -50,11 +50,11 @@ export default function RiderDocumentsPage() {
         }, 3000);
       } else {
         const data = await res.json();
-        showToast(data.error || "Failed to submit documents", "error");
+        showToast(data.error || t("common.error"), "error");
       }
     } catch (err) {
       console.error(err);
-      showToast("An error occurred during submission", "error");
+      showToast(t("common.error"), "error");
     } finally {
       setIsSubmitting(false);
     }
@@ -66,9 +66,9 @@ export default function RiderDocumentsPage() {
         <div className="w-24 h-24 bg-emerald-50 text-emerald-500 rounded-[2.5rem] flex items-center justify-center mb-8 shadow-xl shadow-emerald-500/10 scale-110">
           <Icons.Shield size={48} strokeWidth={2.5} />
         </div>
-        <h1 className="text-2xl font-black text-slate-900 mb-2 uppercase tracking-tight">Application Submitted!</h1>
+        <h1 className="text-2xl font-black text-slate-900 mb-2 uppercase tracking-tight">{t("rider.verification.submittedTitle")}</h1>
         <p className="text-sm text-slate-500 font-bold max-w-[280px] leading-relaxed">
-          ขอบคุณสำหรับการยื่นใบสมัคร! ทีมงานกำลังตรวจสอบเอกสารของคุณ ภายใน 24 ชม. หากได้รับการอนุมัติ จะมีเจ้าหน้าที่ติดต่อกลับหรือเปิดระบบให้รับงานได้ครับ
+          {t("rider.verification.submittedDesc")}
         </p>
       </div>
     );
@@ -82,27 +82,27 @@ export default function RiderDocumentsPage() {
             <Icons.Back size={18} />
           </button>
           <div>
-            <h1 className="text-xl font-black text-slate-900 uppercase tracking-tight">Verification</h1>
-            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Verify your identity to start earning</p>
+            <h1 className="text-xl font-black text-slate-900 uppercase tracking-tight">{t("rider.verification.title")}</h1>
+            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{t("rider.verification.sub")}</p>
           </div>
         </div>
       </header>
 
       <div className="px-5 py-8 space-y-8 animate-fade-in max-w-lg mx-auto w-full">
         <PhotoUpload 
-          label="1. National ID Card" 
+          label={t("rider.verification.idCard")} 
           required 
           onPhotoCapture={(url) => setIdCard(url)} 
         />
         
         <PhotoUpload 
-          label="2. Driving License" 
+          label={t("rider.verification.license")} 
           required 
           onPhotoCapture={(url) => setLicense(url)} 
         />
 
         <PhotoUpload 
-          label="3. Vehicle Photo (with Plate)" 
+          label={t("rider.verification.vehicle")} 
           required 
           onPhotoCapture={(url) => setVehicle(url)} 
         />
@@ -116,10 +116,10 @@ export default function RiderDocumentsPage() {
             onClick={handleSubmit}
             className="bg-primary text-white py-5 rounded-2xl font-black uppercase tracking-[0.2em] shadow-xl shadow-primary/20 active:scale-95 transition-all disabled:opacity-50"
           >
-            Submit for Approval
+            {t("rider.verification.submit")}
           </Button>
           <p className="text-[9px] text-center text-slate-400 font-bold mt-4 uppercase tracking-widest px-4">
-            By submitting, you agree to our terms and confirm all documents are authentic.
+            {t("rider.verification.agreeTerms")}
           </p>
         </div>
       </div>

@@ -8,6 +8,7 @@ import {
 } from "@stripe/react-stripe-js";
 import { Icons } from "@/components/ui/Icons";
 import Button from "@/components/ui/Button";
+import { useTranslation } from "@/components/providers/LanguageProvider";
 
 interface PromptPayCheckoutProps {
   clientSecret: string;
@@ -16,6 +17,7 @@ interface PromptPayCheckoutProps {
 export default function PromptPayCheckout({ clientSecret }: PromptPayCheckoutProps) {
   const stripe = useStripe();
   const elements = useElements();
+  const { t } = useTranslation();
 
   const [message, setMessage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -57,9 +59,14 @@ export default function PromptPayCheckout({ clientSecret }: PromptPayCheckoutPro
            <Icons.Camera size={24} strokeWidth={2.5} />
         </div>
         <div className="space-y-1">
-          <p className="text-blue-900 font-black text-sm uppercase tracking-tight">ขั้นตอนการชำระเงิน</p>
+          <p className="text-blue-900 font-black text-sm uppercase tracking-tight">{t("orders.payment.promptPaySteps")}</p>
           <p className="text-blue-700 text-xs font-bold leading-relaxed">
-            แคปเจอร์หน้าจอที่มี <span className="font-black underline">QR Code</span> เพื่อนำไปสแกนจ่ายในแอปธนาคารของคุณ
+            {t("orders.payment.promptPayDesc").split("QR Code").map((part, i, arr) => (
+              <React.Fragment key={i}>
+                {part}
+                {i < arr.length - 1 && <span className="font-black underline">QR Code</span>}
+              </React.Fragment>
+            ))}
           </p>
         </div>
       </div>
@@ -88,7 +95,7 @@ export default function PromptPayCheckout({ clientSecret }: PromptPayCheckoutPro
           className="bg-primary text-white py-5 rounded-2xl font-black uppercase tracking-[0.1em] shadow-2xl shadow-primary/30 active:scale-95 transition-all text-sm"
           isLoading={isLoading}
         >
-          {isLoading ? "กำลังประมวลผล..." : "ยืนยันการชำระเงิน"}
+          {isLoading ? t("orders.payment.processing") : t("orders.payment.confirmPayment")}
         </Button>
 
         {/* Show any error or success messages */}

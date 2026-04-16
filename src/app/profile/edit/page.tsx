@@ -44,7 +44,7 @@ export default function EditProfilePage() {
 
   const handleSave = async () => {
     if (!isVerified) {
-      alert("Please verify your phone number first");
+      alert(t("profile.verifyPhoneFirst"));
       return;
     }
     setIsLoading(true);

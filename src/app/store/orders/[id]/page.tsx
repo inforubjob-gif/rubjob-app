@@ -80,7 +80,7 @@ export default function StoreOrderDetailPage() {
           </button>
           <div className="flex-1">
             <h1 className="text-lg font-bold text-slate-900">{t("store.manageTask")}</h1>
-            <p className="text-xs text-slate-400">Order #{id}</p>
+            <p className="text-xs text-slate-400">{t("orders.orderNo")} #{id}</p>
           </div>
           <Badge variant={statusToBadgeVariant(status as any)}>
             {t(`orders.status.${status}`)}
@@ -106,7 +106,7 @@ export default function StoreOrderDetailPage() {
                       <Icons.Bike size={24} strokeWidth={3} />
                    </div>
                    <div className="bg-primary text-[8px] font-black text-slate-800 px-2 py-0.5 rounded-full mt-2 shadow-md uppercase tracking-tighter">
-                     {(order?.pickupDriverName || order?.deliveryDriverName || "Rider")} Arriving
+                     {(order?.pickupDriverName || order?.deliveryDriverName || t("common.rider"))} {t("store.arriving")}
                    </div>
                 </div>
                 <div className="absolute top-[60%] left-[85%] -translate-y-1/2 -translate-x-1/2 z-10 flex flex-col items-center">
@@ -126,7 +126,7 @@ export default function StoreOrderDetailPage() {
                     <Icons.User size={24} />
                   </div>
                   <div className="flex-1">
-                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Customer</p>
+                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">{t("store.customer")}</p>
                     <h3 className="text-sm font-black text-slate-900 uppercase tracking-tight">
                       {order?.userName || t("common.guest")}
                     </h3>
@@ -142,10 +142,10 @@ export default function StoreOrderDetailPage() {
                   </div>
                   <div className="flex-1">
                     <h3 className="text-sm font-black text-slate-900 uppercase tracking-tight">
-                      {order?.pickupDriverName || order?.deliveryDriverName || "Not Assigned"}
+                      {order?.pickupDriverName || order?.deliveryDriverName || t("store.notAssigned")}
                     </h3>
                     <p className="text-[10px] text-primary font-black uppercase tracking-widest leading-none mt-1">
-                      Rider #{order?.pickupDriverId || order?.deliveryDriverId || "N/A"}
+                      {t("store.riderNo")} {order?.pickupDriverId || order?.deliveryDriverId || "N/A"}
                     </p>
                   </div>
                   <div className="flex gap-2">
@@ -219,21 +219,21 @@ export default function StoreOrderDetailPage() {
                   </Card>
               </div>
 
-              {/* Job Requirements */}
+               {/* Job Requirements */}
               <Card className="p-5 space-y-4 shadow-sm border border-slate-100">
-                  <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Laundry Requirements</h3>
+                  <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t("store.requirementsTitle")}</h3>
                   <div className="space-y-3">
                       <div className="flex items-center justify-between py-2 border-b border-slate-50">
-                          <span className="text-xs font-bold text-slate-500">Pickup Weight</span>
+                          <span className="text-xs font-bold text-slate-500">{t("store.pickupWeight")}</span>
                           <span className="text-xs font-black text-slate-900 tracking-tight">{weight} kg</span>
                       </div>
                       <div className="flex items-center justify-between py-2 border-b border-slate-50">
-                          <span className="text-xs font-bold text-slate-500">Pickup Items</span>
+                          <span className="text-xs font-bold text-slate-500">{t("store.pickupItems")}</span>
                           <span className="text-xs font-black text-slate-900 tracking-tight">{actualItems} pcs</span>
                       </div>
                       {order?.staffNote && (
                         <div className="bg-amber-50 p-3 rounded-2xl border border-amber-100 shadow-inner">
-                            <p className="text-[10px] font-black text-amber-600 uppercase tracking-widest mb-1 leading-none italic">Client Preferences</p>
+                            <p className="text-[10px] font-black text-amber-600 uppercase tracking-widest mb-1 leading-none italic">{t("store.clientPrefs")}</p>
                             <p className="text-xs text-amber-800 leading-relaxed font-bold">{order.staffNote}</p>
                         </div>
                       )}
@@ -241,8 +241,8 @@ export default function StoreOrderDetailPage() {
               </Card>
 
               {/* Store Actions */}
-              <div className="space-y-3">
-                <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Unit Workflow</h3>
+               <div className="space-y-3">
+                <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">{t("store.workflowTitle")}</h3>
                 {status === "delivering_to_store" && (
                   <Button fullWidth onClick={() => handleUpdateStatus("washing")} isLoading={isLoading} className="bg-primary text-white hover:bg-primary-dark shadow-xl shadow-primary/20 py-5 text-sm font-black italic rounded-[1.5rem] uppercase tracking-widest">
                     <Icons.Package size={20} className="mr-2" /> {t("staff.receiveFromDriver")}
@@ -250,12 +250,15 @@ export default function StoreOrderDetailPage() {
                 )}
                 {status === "washing" && (
                   <Button fullWidth onClick={() => handleUpdateStatus("ready_for_pickup")} isLoading={isLoading} className="bg-primary text-white hover:bg-primary-dark shadow-xl shadow-primary/20 py-5 text-sm font-black italic rounded-[1.5rem] uppercase tracking-widest">
-                    <Icons.Phone size={20} className="mr-2" /> {t("staff.callRider") || "เรียกคนขับ"}
+                    <Icons.Phone size={20} className="mr-2" /> {t("staff.callRider")}
                   </Button>
                 )}
                 {status === "ready_for_pickup" && (
                   <Button fullWidth onClick={() => handleUpdateStatus("completed")} isLoading={isLoading} className="bg-primary text-white hover:bg-primary-dark shadow-xl py-5 text-sm font-black italic rounded-[1.5rem] uppercase tracking-widest">
-                    <Icons.Check size={20} className="mr-2" strokeWidth={4} /> {t("store.handoverToDriver") || "ส่งผ้าให้คนขับเรียบร้อย"}
+                    <Icons.Check size={20} className="mr-2" strokeWidth={4} /> {t("store.handoverToDriver")}
+                  </Button>
+                )}
+�บร้อย"}
                   </Button>
                 )}
                 {status === "completed" && (

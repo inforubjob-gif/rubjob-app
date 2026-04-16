@@ -118,7 +118,7 @@ export default function OrderDetailPage() {
             <p className="text-xs text-muted">{order.id}</p>
           </div>
           <Badge variant={statusToBadgeVariant(order.status)}>
-            {statusLabel(order.status)}
+            {t(`orders.status.${order.status}`)}
           </Badge>
         </div>
       </header>

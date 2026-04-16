@@ -90,7 +90,7 @@ export default function StoreDashboard() {
               <Icons.Logo size={36} variant="icon" />
             </div>
             <div className="min-w-0">
-              <p className="text-[10px] text-white/70 font-black uppercase tracking-[0.2em] leading-none mb-1 shadow-sm">STORE UNIT #{profile?.assignedStoreId?.split('-')[1] || '001'}</p>
+              <p className="text-[10px] text-white/70 font-black uppercase tracking-[0.2em] leading-none mb-1 shadow-sm">{t("store.unitNo")} {profile?.assignedStoreId?.split('-')[1] || '001'}</p>
               <h1 className="text-2xl font-black text-white tracking-tight truncate drop-shadow-md">{profile?.displayName || t("common.guest")}</h1>
             </div>
           </div>
@@ -170,7 +170,7 @@ export default function StoreDashboard() {
                         </Badge>
                       </div>
                       <h3 className="font-black text-slate-800 leading-tight text-sm truncate">
-                        {String(t(`orders.services.${order.serviceId}`) || order.serviceName || "Unknown Service")}
+                        {String(t(`orders.services.${order.serviceId}`) || order.serviceName || t("rider.unknownStore"))}
                       </h3>
                       <div className="flex items-center gap-2 mt-1.5 grayscale opacity-60">
                         <div className="w-5 h-5 rounded-full bg-slate-200" />

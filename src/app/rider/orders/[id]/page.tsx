@@ -70,7 +70,7 @@ export default function RiderOrderDetailPage() {
 
   const handleUpdateStatus = async (nextStatus: string) => {
     if (currentPhotoStep && !photo) {
-      alert(t("rider.photoRequired") || "Photo required for this step");
+      alert(t("rider.photoStepDesc"));
       return;
     }
 
@@ -132,7 +132,7 @@ export default function RiderOrderDetailPage() {
           </button>
           <div className="flex-1">
             <h1 className="text-lg font-bold text-slate-900">{t("rider.manageTask")}</h1>
-            <p className="text-xs text-slate-400">Order #{id}</p>
+            <p className="text-xs text-slate-400">{t("orders.orderNo")} #{id}</p>
           </div>
           <Badge variant={statusToBadgeVariant(status as any)}>
             {t(`orders.status.${status}`)}

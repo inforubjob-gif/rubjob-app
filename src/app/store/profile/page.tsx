@@ -185,7 +185,6 @@ export default function StoreProfilePage() {
                {[
                  { key: "th", label: "ภาษาไทย", sub: "Thai (TH)" },
                  { key: "en", label: "English", sub: "English (EN)" },
-                 { key: "zh", label: "中文", sub: "Chinese (ZH)" },
                ].map((lang) => (
                  <button
                    key={lang.key}
@@ -205,7 +204,7 @@ export default function StoreProfilePage() {
                    </div>
                    {language === lang.key && (
                      <div className="w-6 h-6 bg-primary rounded-full flex items-center justify-center text-slate-900 shadow-lg">
-                       <Icons.Search size={14} strokeWidth={4} />
+                       <Icons.Check size={14} strokeWidth={4} className="text-white" />
                      </div>
                    )}
                  </button>

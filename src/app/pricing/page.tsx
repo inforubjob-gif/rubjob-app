@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useTranslation } from "@/components/providers/LanguageProvider";
 
 const WASH_PRICES = [
   { size: 9, cold: 40, warm: 50, hot: 60 },
@@ -16,6 +17,8 @@ const DRY_PRICES = [
 
 export default function PricingPage() {
   const router = useRouter();
+  const { t } = useTranslation();
+
   return (
     <div className="flex flex-col min-h-dvh bg-gradient-to-br from-primary via-amber-400 to-primary-dark">
       {/* ─── Header ─── */}
@@ -34,18 +37,18 @@ export default function PricingPage() {
           <span className="text-white text-xs font-semibold tracking-wide">RUBJOB</span>
         </div>
         <h1 className="text-white text-xl font-bold leading-snug mb-2">
-          ค่าจัดส่งจากการให้บริการ
-          <br />
-          รับ–ส่งซักผ้า
+          {t("pricing.title").split("\n").map((line, i) => (
+            <span key={i}>{line}{i === 0 && <br/>}</span>
+          ))}
         </h1>
 
         <div className="mt-4 bg-white/15 backdrop-blur rounded-2xl px-5 py-4 mx-auto max-w-xs">
-          <p className="text-white text-sm font-bold mb-2">ประเภทบริการ (หลัก, เสริม)</p>
+          <p className="text-white text-sm font-bold mb-2">{t("pricing.serviceTypes")}</p>
           <ul className="text-white/90 text-sm space-y-1 text-left list-disc list-inside">
-            <li>ผ้าทั่วไป</li>
-            <li>ผ้านวม</li>
-            <li>ผ้าห่ม</li>
-            <li>ท็อปเปอร์</li>
+            <li>{t("items.general")}</li>
+            <li>{t("items.duvet")}</li>
+            <li>{t("items.blanket")}</li>
+            <li>{t("items.topper")}</li>
           </ul>
         </div>
       </header>
@@ -58,13 +61,13 @@ export default function PricingPage() {
           {/* Section Title */}
           <div className="flex justify-center mb-4">
             <div className="bg-white rounded-full px-6 py-2 shadow-md">
-              <h2 className="text-primary-dark font-bold text-base">ราคาซักผ้า</h2>
+              <h2 className="text-primary-dark font-bold text-base">{t("pricing.washTitle")}</h2>
             </div>
           </div>
 
           {/* Tab-like header */}
           <div className="flex gap-1.5 mb-4 justify-center">
-            {["ขนาดเครื่อง", "น้ำเย็น", "น้ำอุ่น", "น้ำร้อน"].map((label, i) => (
+            {[t("pricing.machineSize"), t("pricing.cold"), t("pricing.warm"), t("pricing.hot")].map((label, i) => (
               <span
                 key={label}
                 className={`text-[11px] font-semibold px-3 py-1.5 rounded-full ${
@@ -89,13 +92,13 @@ export default function PricingPage() {
                 <div className="flex flex-col items-center">
                   <span className="text-2xl">🫧</span>
                   <span className="text-[10px] font-bold text-primary-dark mt-0.5">
-                    {row.size} กก.
+                    {row.size} {t("pricing.kg")}
                   </span>
                 </div>
                 {/* Prices */}
-                <PriceCell value={row.cold} />
-                <PriceCell value={row.warm} />
-                <PriceCell value={row.hot} />
+                <PriceCell value={row.cold} unit={t("pricing.baht")} />
+                <PriceCell value={row.warm} unit={t("pricing.baht")} />
+                <PriceCell value={row.hot} unit={t("pricing.baht")} />
               </div>
             ))}
           </div>
@@ -105,13 +108,13 @@ export default function PricingPage() {
         <section className="bg-white/10 backdrop-blur-md rounded-3xl p-4 shadow-xl shadow-black/5">
           <div className="flex justify-center mb-4">
             <div className="bg-white rounded-full px-6 py-2 shadow-md">
-              <h2 className="text-primary-dark font-bold text-base">ราคาอบผ้า</h2>
+              <h2 className="text-primary-dark font-bold text-base">{t("pricing.dryTitle")}</h2>
             </div>
           </div>
 
           {/* Tab-like header */}
           <div className="flex gap-1.5 mb-4 justify-center">
-            {["ขนาดเครื่อง", "ราคาเริ่มต้น", "ราคาต่อเวลา"].map((label, i) => (
+            {[t("pricing.machineSize"), t("pricing.startPrice"), t("pricing.extraPrice")].map((label, i) => (
               <span
                 key={label}
                 className={`text-[11px] font-semibold px-3 py-1.5 rounded-full ${
@@ -135,7 +138,7 @@ export default function PricingPage() {
                 <div className="flex flex-col items-center shrink-0 w-16">
                   <span className="text-3xl">🌀</span>
                   <span className="text-xs font-bold text-primary-dark mt-1">
-                    {item.size} กก.
+                    {item.size} {t("pricing.kg")}
                   </span>
                 </div>
 
@@ -144,16 +147,16 @@ export default function PricingPage() {
                   <span className="text-2xl font-extrabold text-foreground">
                     {item.basePrice}
                   </span>
-                  <p className="text-xs text-muted font-semibold">บาท</p>
+                  <p className="text-xs text-muted font-semibold">{t("pricing.baht")}</p>
                 </div>
 
                 {/* Extra per-time price */}
                 <div className="flex-1 text-center">
                   <span className="text-lg font-bold text-primary-dark">
-                    {item.extraPrice} บาท
+                    {item.extraPrice} {t("pricing.baht")}
                   </span>
                   <p className="text-[11px] text-muted font-medium">
-                    + {item.extraMinutes} นาที
+                    + {item.extraMinutes} {t("pricing.minutes")}
                   </p>
                 </div>
               </div>
@@ -165,27 +168,27 @@ export default function PricingPage() {
         <section className="bg-white/10 backdrop-blur-md rounded-3xl p-4 shadow-xl shadow-black/5">
           <div className="flex justify-center mb-4">
             <div className="bg-white rounded-full px-6 py-2 shadow-md">
-              <h2 className="text-primary-dark font-bold text-base">ราคาค่าส่ง</h2>
+              <h2 className="text-primary-dark font-bold text-base">{t("pricing.deliveryTitle")}</h2>
             </div>
           </div>
 
           <div className="bg-white rounded-2xl p-5 shadow-sm text-center">
             {/* Highlight badge */}
             <div className="inline-block bg-primary-dark text-white text-xs font-bold px-4 py-1.5 rounded-full mb-3">
-              ค่าส่งเพียง
+              {t("pricing.deliveryOnly")}
             </div>
 
             {/* Big price */}
             <div className="mb-3">
               <span className="text-5xl font-extrabold text-foreground leading-none">39</span>
-              <p className="text-lg font-bold text-muted mt-1">บาท</p>
+              <p className="text-lg font-bold text-muted mt-1">{t("pricing.baht")}</p>
             </div>
 
-            <p className="text-sm text-muted font-medium mb-4">ต่อ 1 ออเดอร์</p>
+            <p className="text-sm text-muted font-medium mb-4">{t("pricing.perOrder")}</p>
 
             {/* Size chips */}
             <div className="flex flex-wrap gap-2 justify-center mb-3">
-              {["จะซัก 9 กก.", "หรือ 14 กก."].map((text) => (
+              {[t("pricing.size9"), t("pricing.size14")].map((text) => (
                 <span
                   key={text}
                   className="bg-amber-50 text-primary-dark text-xs font-semibold px-3 py-1.5 rounded-full shadow-sm"
@@ -196,13 +199,13 @@ export default function PricingPage() {
             </div>
 
             <p className="text-primary-dark text-sm font-bold">
-              หรือมากกว่า!
+              {t("pricing.orMore")}
               <br />
-              <span className="text-xs font-medium text-muted">ค่าส่งก็เท่าเดิม</span>
+              <span className="text-xs font-medium text-muted">{t("pricing.sameFee")}</span>
             </p>
 
             <p className="text-[10px] text-muted/60 mt-3">
-              *ค่าส่ง 39 บาททุกกรณี (ต่อหนึ่งออเดอร์)
+              {t("pricing.deliveryNote")}
             </p>
           </div>
         </section>
@@ -212,11 +215,11 @@ export default function PricingPage() {
 }
 
 /* ─── Helper ─── */
-function PriceCell({ value }: { value: number }) {
+function PriceCell({ value, unit }: { value: number, unit: string }) {
   return (
     <div className="text-center">
       <span className="text-lg font-extrabold text-foreground">{value}</span>
-      <p className="text-[10px] text-muted font-semibold">บาท</p>
+      <p className="text-[10px] text-muted font-semibold">{unit}</p>
     </div>
   );
 }

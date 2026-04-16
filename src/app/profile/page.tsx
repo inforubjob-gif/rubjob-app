@@ -24,7 +24,7 @@ export default function ProfilePage() {
     { 
       icon: <Icons.Globe size={20} />, 
       label: t("profile.language"), 
-      description: language === "th" ? "ไทย (TH)" : language === "en" ? "English (EN)" : "中文 (ZH)",
+      description: language === "th" ? "ไทย (TH)" : "English (EN)",
       onClick: () => setShowLanguageModal(true)
     },
     { icon: <Icons.FileText size={20} />, label: t("profile.termsOfService"), description: t("profile.termsOfServiceDesc"), href: "/profile/tos" },
@@ -76,7 +76,6 @@ export default function ProfilePage() {
   const languages: { key: Language; label: string; sub: string }[] = [
     { key: "th", label: "ภาษาไทย", sub: "Thai (TH)" },
     { key: "en", label: "English", sub: "English (EN)" },
-    { key: "zh", label: "中文", sub: "Chinese (ZH)" },
   ];
 
   return (
@@ -144,7 +143,7 @@ export default function ProfilePage() {
               href="/profile/addresses" 
               className="text-[10px] font-bold text-primary bg-white px-3 py-1.5 rounded-full shadow-sm active:scale-95 transition-transform"
             >
-              เพิ่มที่อยู่ใหม่
+              {t("profile.addNewAddress")}
             </Link>
           </div>
           <div className="space-y-2">
@@ -248,7 +247,7 @@ export default function ProfilePage() {
                 <button
                   key={lang.key}
                   onClick={() => {
-                    setLanguage(lang.key);
+                    setLanguage(lang.key as any);
                     setShowLanguageModal(false);
                   }}
                   className={`w-full p-5 rounded-2xl flex items-center justify-between transition-all ${
@@ -263,7 +262,7 @@ export default function ProfilePage() {
                   </div>
                   {language === lang.key && (
                     <div className="w-6 h-6 bg-primary rounded-full flex items-center justify-center text-slate-900 shadow-lg">
-                      <Icons.Search size={14} strokeWidth={4} />
+                      <Icons.Check size={14} strokeWidth={4} className="text-white" />
                     </div>
                   )}
                 </button>

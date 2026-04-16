@@ -128,7 +128,7 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
                {/* Language Switcher */}
                <div className="mt-4 pt-4 border-t border-white/5">
                   <div className="bg-slate-900 rounded-2xl p-1 flex gap-1 shadow-inner ring-1 ring-white/5">
-                     {(['th', 'en'] as const).map((l) => (
+                     {(['th', 'en', 'zh'] as const).map((l) => (
                        <button
                          key={l}
                          onClick={() => setLanguage(l)}
@@ -138,15 +138,6 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
                        </button>
                      ))}
                   </div>
-                  <div className="mt-4 flex flex-col gap-1 px-1">
-                    <div className="flex items-center justify-between">
-                      <span className="text-[8px] font-black text-slate-700 uppercase tracking-widest">{language} mode</span>
-                      <span className="text-[8px] font-black text-primary-light uppercase tracking-tighter bg-primary/10 px-2 py-0.5 rounded-full">v1.5-Nuclear</span>
-                    </div>
-                    {/* Direct Diagnostic: Bypassing t() to check if th block is loaded */}
-                    <div className="text-[7px] font-bold text-slate-400 truncate opacity-50">
-                       TEST-TH: {RUBJOB_I18N?.th?.admin?.nav?.dashboard || "MISSING"}
-                    </div>
                   </div>
                </div>
            </div>
