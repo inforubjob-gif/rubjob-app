@@ -30,19 +30,30 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const t = (path: string): string => {
     try {
       const keys = path.split(".");
-      let current: any = (translations as any)[language];
       
-      for (const key of keys) {
-        if (!current || current[key] === undefined) return path;
-        current = current[key];
+      // Smart Fallback: if language is "en-US", try "en". If not found, use "th" as ultimate fallback.
+      const baseLang = language.split("-")[0] as Language;
+      const langsToTry = [language, baseLang, "th" as Language];
+      
+      for (const lang of langsToTry) {
+        let current: any = (translations as any)[lang];
+        if (!current) continue;
+        
+        let found = true;
+        for (const key of keys) {
+          if (!current || current[key] === undefined) {
+            found = false;
+            break;
+          }
+          current = current[key];
+        }
+        
+        if (found && typeof current === 'string') {
+          return current;
+        }
       }
       
-      // Ensure we return a string, never an object (which crashes React 19)
-      if (typeof current !== 'string') {
-        return path;
-      }
-      
-      return current;
+      return path;
     } catch (err) {
       console.error("Translation error for path:", path, err);
       return path;
