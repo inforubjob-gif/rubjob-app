@@ -314,304 +314,395 @@ function SettingsContent() {
       )}
 
       {activeTab === "admins" ? (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 animate-fade-in relative z-10">
-          <div className="lg:col-span-1">
-            <Card className="p-8 bg-white border border-slate-100 shadow-xl rounded-[2.5rem] sticky top-8">
-              <h3 className="text-xl font-black text-slate-900 mb-6 font-sans">{t("admin.settings.authTitle")}</h3>
-              <form onSubmit={handleAddAdmin} className="space-y-4">
-                <div className="space-y-1.5">
-                  <label className="text-[10px] uppercase tracking-widest font-black text-slate-400 ml-1">{t("admin.settings.authLabelName")}</label>
-                  <input type="text" value={newAdmin.name} onChange={e => setNewAdmin({...newAdmin, name: e.target.value})} placeholder={t("admin.settings.authLabelName")} className="w-full bg-slate-50 border-none rounded-2xl px-5 py-4 text-sm font-bold focus:ring-2 focus:ring-primary/20 transition-all font-mono" />
-                </div>
-                <div className="space-y-1.5">
-                  <label className="text-[10px] uppercase tracking-widest font-black text-slate-400 ml-1">{t("admin.settings.authLabelEmail")}</label>
-                  <input type="email" value={newAdmin.email} onChange={e => setNewAdmin({...newAdmin, email: e.target.value})} placeholder="admin@email.com" className="w-full bg-slate-50 border-none rounded-2xl px-5 py-4 text-sm font-bold focus:ring-2 focus:ring-primary/20 transition-all font-mono" />
-                </div>
-                <div className="space-y-1.5">
-                  <label className="text-[10px] uppercase tracking-widest font-black text-slate-400 ml-1">{t("admin.settings.authLabelPassword")}</label>
-                  <input type="password" value={newAdmin.password} onChange={e => setNewAdmin({...newAdmin, password: e.target.value})} placeholder="••••••••" className="w-full bg-slate-50 border-none rounded-2xl px-5 py-4 text-sm font-bold focus:ring-2 focus:ring-primary/20 transition-all font-mono" />
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 animate-fade-in relative z-10 pb-20">
+          <div className="lg:col-span-4">
+            <Card className="p-8 bg-white border border-slate-100 shadow-2xl rounded-[3rem] sticky top-8">
+              <div className="flex items-center gap-3 mb-8">
+                 <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
+                    <Icons.User size={20} />
+                 </div>
+                 <h3 className="text-xl font-black text-slate-900 tracking-tight">{t("admin.settings.authTitle")}</h3>
+              </div>
+              
+              <form onSubmit={handleAddAdmin} className="space-y-6">
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <label className="text-[10px] uppercase tracking-widest font-black text-slate-400 ml-1">{t("admin.settings.authLabelName")}</label>
+                    <input type="text" value={newAdmin.name} onChange={e => setNewAdmin({...newAdmin, name: e.target.value})} placeholder={t("admin.settings.authLabelName")} className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-5 py-4 text-sm font-black focus:border-primary transition-all outline-none" />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] uppercase tracking-widest font-black text-slate-400 ml-1">{t("admin.settings.authLabelEmail")}</label>
+                    <input type="email" value={newAdmin.email} onChange={e => setNewAdmin({...newAdmin, email: e.target.value})} placeholder="admin@email.com" className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-5 py-4 text-sm font-black focus:border-primary transition-all outline-none" />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] uppercase tracking-widest font-black text-slate-400 ml-1">{t("admin.settings.authLabelPassword")}</label>
+                    <input type="password" value={newAdmin.password} onChange={e => setNewAdmin({...newAdmin, password: e.target.value})} placeholder="••••••••" className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-5 py-4 text-sm font-black focus:border-primary transition-all outline-none" />
+                  </div>
                 </div>
 
-                <div className="space-y-3 pt-2">
+                <div className="space-y-4 pt-2 border-t border-slate-100">
                   <label className="text-[10px] uppercase tracking-widest font-black text-slate-400 ml-1">{t("admin.settings.authLabelRole")}</label>
-                  <select 
-                    value={newAdmin.role} 
-                    onChange={e => setNewAdmin({...newAdmin, role: e.target.value as any})}
-                    className="w-full bg-slate-50 border-none rounded-2xl px-5 py-4 text-sm font-bold shadow-sm outline-none appearance-none"
-                  >
-                    <option value="admin">{t("admin.settings.authRoleStandard")}</option>
-                    <option value="super_admin">{t("admin.settings.authRoleMaster")}</option>
-                  </select>
+                  <div className="flex gap-2">
+                     {(['admin', 'super_admin'] as const).map((r) => (
+                        <button
+                          key={r}
+                          type="button"
+                          onClick={() => setNewAdmin({...newAdmin, role: r})}
+                          className={`flex-1 py-3 text-[10px] font-black uppercase rounded-xl border transition-all ${newAdmin.role === r ? 'bg-slate-900 text-white border-slate-900 shadow-lg shadow-slate-900/20' : 'bg-white text-slate-400 border-slate-100 hover:border-slate-200'}`}
+                        >
+                          {r === 'super_admin' ? 'Super' : 'Staff'}
+                        </button>
+                      ))}
+                  </div>
 
                   {newAdmin.role === 'admin' && (
-                    <div className="grid grid-cols-2 gap-2 mt-4 p-4 bg-slate-50 rounded-3xl border border-slate-100">
-                       {MODULES.map(mod => (
-                         <button
-                           key={mod.id}
-                           type="button"
-                           onClick={() => togglePermission(mod.id)}
-                           className={`flex items-center gap-2 px-3 py-2.5 rounded-xl text-[10px] font-black uppercase transition-all ${newAdmin.permissions.includes(mod.id) ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'bg-white text-slate-400 border border-slate-100'}`}
-                         >
-                           {newAdmin.permissions.includes(mod.id) ? <Icons.Check size={12} /> : <div className="w-3 h-3 rounded-md border border-slate-200" />}
-                           {mod.label}
-                         </button>
-                       ))}
+                    <div className="space-y-3">
+                       <p className="text-[9px] font-black text-slate-300 uppercase tracking-widest ml-1">Module Permissions</p>
+                       <div className="grid grid-cols-2 gap-2 p-1.5 bg-slate-50 rounded-2xl border border-slate-100">
+                          {MODULES.map(mod => (
+                            <button
+                              key={mod.id}
+                              type="button"
+                              onClick={() => togglePermission(mod.id)}
+                              className={`flex items-center gap-2 px-3 py-2 rounded-xl text-[9px] font-black uppercase transition-all ${newAdmin.permissions.includes(mod.id) ? 'bg-white text-primary shadow-sm border border-primary/10' : 'text-slate-400 hover:text-slate-500'}`}
+                            >
+                              <div className={`w-3 h-3 rounded-md border flex items-center justify-center ${newAdmin.permissions.includes(mod.id) ? 'bg-primary border-primary text-white' : 'border-slate-300'}`}>
+                                 {newAdmin.permissions.includes(mod.id) && <Icons.Check size={8} />}
+                              </div>
+                              <span className="truncate">{mod.label}</span>
+                            </button>
+                          ))}
+                       </div>
                     </div>
                   )}
                 </div>
 
-                <button disabled={isSaving} className="w-full bg-primary text-white py-4 rounded-2xl font-black text-sm shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all mt-4 uppercase tracking-widest">
+                <button disabled={isSaving} className="w-full bg-primary text-white py-5 rounded-2xl font-black text-sm shadow-2xl shadow-primary/30 hover:scale-[1.02] active:scale-[0.98] transition-all mt-4 uppercase tracking-[0.2em]">
                   {isSaving ? t("admin.settings.authBtnAuthorizing") : t("admin.settings.authBtnGrant")}
                 </button>
               </form>
             </Card>
           </div>
 
-          <div className="lg:col-span-2">
-            <h3 className="text-xl font-black text-slate-900 mb-6 px-2">{t("admin.settings.agentsTitle")}</h3>
+          <div className="lg:col-span-8">
+            <div className="flex items-center justify-between mb-8 px-2">
+               <h3 className="text-xl font-black text-slate-900 tracking-tight">{t("admin.settings.agentsTitle")}</h3>
+               <div className="px-4 py-1.5 bg-slate-100 text-slate-400 rounded-full text-[10px] font-black uppercase tracking-widest border border-slate-200">
+                  {admins.length} Personnel Active
+               </div>
+            </div>
+            
             {isLoading ? (
-               <div className="p-20 flex justify-center bg-white rounded-[2.5rem] border border-slate-50 shadow-sm">
+               <div className="p-20 flex justify-center bg-white rounded-[3rem] border border-slate-100 shadow-sm border-dashed">
                   <div className="w-10 h-10 border-4 border-slate-100 border-t-primary rounded-full animate-spin" />
                </div>
             ) : (
-               <div className="space-y-4 pb-20">
+               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pb-20">
                   {admins.map(adminItem => {
                     const permissions = adminItem.permissions ? JSON.parse(adminItem.permissions) : [];
+                    const isSelf = admin?.id === adminItem.id;
+                    const isSuper = adminItem.role === 'super_admin';
+
                     return (
-                      <Card key={adminItem.id} className="p-6 bg-white border border-slate-100 flex items-center justify-between group rounded-[2.5rem] hover:shadow-2xl hover:shadow-slate-100 transition-all">
-                         <div className="flex items-center gap-4">
-                            <div className="w-14 h-14 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center font-black shadow-inner overflow-hidden border border-indigo-100 ring-4 ring-slate-50">
-                               {adminItem.avatarUrl ? <img src={adminItem.avatarUrl} className="w-full h-full object-cover" /> : adminItem.name?.[0]?.toUpperCase()}
+                      <Card key={adminItem.id} className="p-7 bg-white border border-slate-100 flex flex-col group rounded-[2.5rem] hover:shadow-2xl hover:shadow-slate-200/50 transition-all relative overflow-hidden">
+                         <div className={`absolute top-0 right-0 w-24 h-24 blur-3xl -mr-12 -mt-12 transition-colors ${isSuper ? 'bg-rose-500/10' : 'bg-primary/10'}`} />
+                         
+                         <div className="flex items-start justify-between mb-6 relative z-10">
+                            <div className="flex items-center gap-4">
+                               <div className={`w-16 h-16 rounded-[1.5rem] flex items-center justify-center font-black shadow-inner overflow-hidden border-4 border-white ring-1 ring-slate-100 ${isSuper ? 'bg-rose-50 text-rose-600' : 'bg-indigo-50 text-indigo-600'}`}>
+                                  {adminItem.avatarUrl ? <img src={adminItem.avatarUrl} className="w-full h-full object-cover" /> : adminItem.name?.[0]?.toUpperCase()}
+                               </div>
+                               <div>
+                                  <div className="flex items-center gap-2 mb-1">
+                                     <p className="font-black text-slate-900 tracking-tight">{adminItem.name}</p>
+                                     {isSelf && <div className="px-1.5 py-0.5 bg-primary/10 text-primary rounded-md text-[8px] font-black uppercase">YOU</div>}
+                                  </div>
+                                  <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{adminItem.email}</p>
+                               </div>
                             </div>
-                            <div>
-                               <div className="flex items-center gap-3">
-                                  <p className="font-black text-slate-900 tracking-tight text-lg">{adminItem.name}</p>
-                                  <span className={`px-2 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest ${adminItem.role === 'super_admin' ? 'bg-rose-50 text-rose-600 border border-rose-100' : 'bg-blue-50 text-blue-600 border border-blue-100'}`}>
-                                    {adminItem.role === 'super_admin' ? t("admin.settings.authRoleMaster").split(' (')[0] : t("admin.settings.authRoleStandard")}
-                                  </span>
-                               </div>
-                               <p className="text-xs text-slate-400 font-bold mb-2">{adminItem.email}</p>
-                               <div className="flex flex-wrap gap-1.5">
-                                  {adminItem.role === 'super_admin' ? (
-                                    <span className="text-[9px] font-black text-slate-300 uppercase tracking-[0.2em] px-1">Unrestricted Intelligence Bound</span>
-                                  ) : (
-                                    permissions.map((p: string) => (
-                                      <span key={p} className="px-2 py-0.5 bg-slate-50 text-slate-400 text-[9px] font-black uppercase rounded-lg border border-slate-100">{p}</span>
-                                    ))
-                                  )}
-                               </div>
+                            
+                            {!isSelf && (
+                              <button onClick={() => handleDeleteAdmin(adminItem.id, adminItem.email)} className="w-10 h-10 bg-slate-50 text-slate-300 hover:text-rose-500 hover:bg-rose-50 rounded-xl transition-all flex items-center justify-center">
+                                 <Icons.Trash size={16} />
+                              </button>
+                            )}
+                         </div>
+
+                         <div className="pt-6 border-t border-slate-50 relative z-10">
+                            <div className="flex items-center justify-between mb-3">
+                               <span className="text-[9px] font-black text-slate-300 uppercase tracking-widest">Authority Level</span>
+                               <span className={`px-2 py-0.5 rounded-lg text-[9px] font-black uppercase tracking-widest ${isSuper ? 'bg-rose-500 text-white shadow-lg shadow-rose-500/20' : 'bg-slate-900 text-white shadow-lg shadow-slate-900/20'}`}>
+                                 {isSuper ? t("admin.settings.authRoleMaster").split(' (')[0] : t("admin.settings.authRoleStandard")}
+                               </span>
+                            </div>
+
+                            <div className="flex flex-wrap gap-1.5">
+                               {isSuper ? (
+                                 <div className="flex items-center gap-2 py-1 px-3 bg-rose-50 text-rose-600 rounded-xl border border-rose-100">
+                                    <Icons.Lock size={12} />
+                                    <span className="text-[9px] font-black uppercase tracking-widest">Unrestricted Identity</span>
+                                 </div>
+                               ) : (
+                                 permissions.length > 0 ? (
+                                   permissions.map((p: string) => (
+                                     <span key={p} className="px-2.5 py-1 bg-slate-50 text-slate-500 text-[9px] font-black uppercase rounded-lg border border-slate-100 group-hover:bg-white group-hover:border-slate-200 transition-colors">{p}</span>
+                                   ))
+                                 ) : (
+                                   <span className="text-[9px] font-black text-rose-400 italic">No Modules Assigned</span>
+                                 )
+                               )}
                             </div>
                          </div>
-                         {admin?.id !== adminItem.id && (
-                           <button onClick={() => handleDeleteAdmin(adminItem.id, adminItem.email)} className="p-4 text-slate-300 hover:text-rose-500 hover:bg-rose-50 rounded-2xl transition-all opacity-0 group-hover:opacity-100">
-                              <Icons.Trash size={20} />
-                           </button>
-                         )}
                       </Card>
                     );
                   })}
                </div>
             )}
           </div>
-        </div>
       ) : activeTab === "profile" ? (
-        <div className="max-w-3xl mx-auto animate-fade-in relative z-10">
-           <Card className="p-10 bg-white border border-slate-100 shadow-2xl rounded-[3rem] overflow-hidden">
-              <div className="flex flex-col md:flex-row items-center gap-8 mb-12">
-                 <div className="relative group">
-                    <div className="w-32 h-32 rounded-[2.5rem] bg-slate-50 border-4 border-white shadow-xl flex items-center justify-center overflow-hidden ring-1 ring-slate-100">
-                       {profileForm.avatarUrl ? <img src={profileForm.avatarUrl} className="w-full h-full object-cover" /> : <Icons.User size={48} className="text-slate-200" />}
+        <div className="max-w-4xl mx-auto animate-fade-in relative z-10 pb-20">
+           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+              {/* Identity Sidebar */}
+              <div className="lg:col-span-4 transition-all">
+                 <Card className="p-8 bg-white border border-slate-100 shadow-2xl rounded-[3rem] text-center sticky top-8 relative overflow-hidden group">
+                    <div className={`absolute top-0 left-0 w-full h-2 ${admin?.role === 'super_admin' ? 'bg-rose-500' : 'bg-primary'}`} />
+                    
+                    <div className="relative inline-block mb-6 pt-4">
+                       <div className={`w-32 h-32 rounded-[2.5rem] bg-slate-50 border-4 border-white shadow-2xl flex items-center justify-center overflow-hidden ring-4 ${admin?.role === 'super_admin' ? 'ring-rose-50' : 'ring-primary/5'}`}>
+                          {profileForm.avatarUrl ? <img src={profileForm.avatarUrl} className="w-full h-full object-cover" /> : <Icons.User size={48} className="text-slate-200" />}
+                       </div>
+                       <label className={`absolute -bottom-2 -right-2 w-10 h-10 ${admin?.role === 'super_admin' ? 'bg-rose-500' : 'bg-primary'} text-white rounded-2xl flex items-center justify-center shadow-xl border-4 border-white cursor-pointer hover:scale-110 active:scale-95 transition-all`}>
+                          <Icons.Camera size={18} />
+                          <input type="file" className="hidden" accept="image/*" onChange={handleImageUpload} />
+                       </label>
                     </div>
-                    <label className="absolute -bottom-2 -right-2 w-10 h-10 bg-primary text-white rounded-2xl flex items-center justify-center shadow-lg border-4 border-white cursor-pointer hover:scale-110 active:scale-95 transition-all">
-                       <Icons.Camera size={18} />
-                       <input 
-                         type="file" 
-                         className="hidden" 
-                         accept="image/*"
-                         onChange={handleImageUpload}
-                       />
-                    </label>
-                 </div>
-                 <div className="text-center md:text-left">
-                    <h2 className="text-3xl font-black text-slate-900 tracking-tight">{admin?.name}</h2>
-                    <p className="text-slate-400 font-bold flex items-center justify-center md:justify-start gap-2 mt-1 uppercase text-xs tracking-widest">
-                       <Badge variant={admin?.role === 'super_admin' ? 'danger' : 'info'}>{admin?.role === 'super_admin' ? t("admin.settings.authRoleMaster").split(' (')[0] : t("admin.settings.authRoleStandard")}</Badge>
-                       <span className="w-1 h-1 rounded-full bg-slate-300" />
-                       {admin?.email}
-                    </p>
-                 </div>
+
+                    <h2 className="text-2xl font-black text-slate-900 tracking-tight mb-1">{admin?.name}</h2>
+                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-6">{admin?.email}</p>
+                    
+                    <div className="flex flex-col gap-2">
+                       <span className={`px-4 py-2 rounded-2xl text-[10px] font-black uppercase tracking-widest ${admin?.role === 'super_admin' ? 'bg-rose-50 text-rose-600 border border-rose-100' : 'bg-indigo-50 text-indigo-600 border border-indigo-100'}`}>
+                          {admin?.role === 'super_admin' ? t("admin.settings.authRoleMaster").split(' (')[0] : t("admin.settings.authRoleStandard")}
+                       </span>
+                    </div>
+
+                    <div className="mt-8 pt-8 border-t border-slate-50 space-y-4">
+                       <div className="flex items-center justify-between px-2">
+                          <span className="text-[9px] font-black text-slate-300 uppercase tracking-widest">Account Status</span>
+                          <span className="flex items-center gap-1.5 text-[9px] font-black text-emerald-500 uppercase tracking-widest">
+                             <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                             Verified
+                          </span>
+                       </div>
+                       <div className="flex items-center justify-between px-2">
+                          <span className="text-[9px] font-black text-slate-300 uppercase tracking-widest">Language</span>
+                          <span className="text-[9px] font-black text-slate-600 uppercase tracking-widest">{language === 'th' ? 'TH (ไทย)' : 'EN (Global)'}</span>
+                       </div>
+                    </div>
+                 </Card>
               </div>
 
-              <form onSubmit={handleUpdateProfile} className="space-y-6">
-                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                       <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t("admin.settings.profileLabelPersona")}</label>
-                       <input type="text" value={profileForm.name} onChange={e => setProfileForm({...profileForm, name: e.target.value})} className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-6 py-4.5 text-sm font-black focus:border-primary transition-all outline-none" />
+              {/* Main Content Areas */}
+              <div className="lg:col-span-8 flex flex-col gap-8">
+                 {/* Identity & Preferences */}
+                 <Card className="p-10 bg-white border border-slate-100 shadow-xl rounded-[3rem]">
+                    <div className="flex items-center gap-3 mb-10">
+                       <div className="w-10 h-10 rounded-xl bg-slate-50 text-slate-400 flex items-center justify-center">
+                          <Icons.Settings size={20} />
+                       </div>
+                       <h3 className="text-xl font-black text-slate-900 tracking-tight">Personnel Credentials</h3>
                     </div>
-                    <div className="space-y-2">
-                       <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t("admin.settings.authLabelEmail")}</label>
-                       <input type="email" value={profileForm.email} onChange={e => setProfileForm({...profileForm, email: e.target.value})} className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-6 py-4.5 text-sm font-black focus:border-primary transition-all outline-none" />
-                    </div>
-                 </div>
 
-                 <div className="space-y-2">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Avatar Image URL (Optional)</label>
-                    <input type="text" value={profileForm.avatarUrl} onChange={e => setProfileForm({...profileForm, avatarUrl: e.target.value})} placeholder="https://..." className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-6 py-4.5 text-sm font-black focus:border-primary transition-all outline-none" />
-                 </div>
+                    <form onSubmit={handleUpdateProfile} className="space-y-8">
+                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                          <div className="space-y-2">
+                             <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t("admin.settings.profileLabelPersona")}</label>
+                             <input type="text" value={profileForm.name} onChange={e => setProfileForm({...profileForm, name: e.target.value})} className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-6 py-4 text-sm font-black focus:border-primary transition-all outline-none" />
+                          </div>
+                          <div className="space-y-2">
+                             <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t("admin.settings.authLabelEmail")}</label>
+                             <input type="email" value={profileForm.email} onChange={e => setProfileForm({...profileForm, email: e.target.value})} className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-6 py-4 text-sm font-black focus:border-primary transition-all outline-none" />
+                          </div>
+                       </div>
 
-                 <div className="p-6 bg-slate-50 rounded-[2rem] border border-slate-100 space-y-4">
-                    <div className="flex items-center gap-2 mb-2">
-                       <Icons.Lock size={16} className="text-slate-400" />
-                       <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t("admin.settings.profileLabelSecurity")}</span>
-                    </div>
-                    <div className="space-y-2">
-                       <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t("admin.settings.profileLabelNewPassword")}</label>
-                       <input type="password" value={profileForm.password} onChange={e => setProfileForm({...profileForm, password: e.target.value})} placeholder="••••••••" className="w-full bg-white border-2 border-slate-100 rounded-2xl px-6 py-4.5 text-sm font-black focus:border-primary transition-all outline-none" />
-                    </div>
-                 </div>
-
-                 <div className="p-8 border-2 border-slate-100 border-dashed rounded-[2.5rem] bg-slate-50/30">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
-                       <div className="space-y-4 flex-1">
-                          <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">System Language</label>
-                          <div className="flex gap-2">
+                       <div className="space-y-4">
+                          <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Interface Language Preferences</label>
+                          <div className="grid grid-cols-2 gap-4">
                              {(['th', 'en'] as const).map((l) => (
                                <button
                                  key={l}
                                  type="button"
                                  onClick={() => setLanguage(l)}
-                                 className={`flex-1 py-3 text-xs font-black uppercase rounded-2xl border transition-all ${language === l ? 'bg-primary text-white border-primary shadow-lg shadow-primary/20' : 'bg-white text-slate-400 border-slate-200 hover:border-slate-300'}`}
+                                 className={`flex items-center justify-center gap-3 py-4 text-[10px] font-black uppercase rounded-2xl border-2 transition-all ${language === l ? 'bg-primary/5 text-primary border-primary shadow-sm' : 'bg-white text-slate-300 border-slate-100 hover:border-slate-200'}`}
                                >
-                                 {l === 'th' ? 'ไทย' : 'English'}
+                                 <div className={`w-3 h-3 rounded-full border-2 transition-all ${language === l ? 'bg-primary border-primary ring-4 ring-primary/10' : 'bg-white border-slate-200'}`} />
+                                 {l === 'th' ? 'ไทย (TH)' : 'English (EN)'}
                                </button>
                              ))}
                           </div>
                        </div>
-                       
-                       <div className="pt-2 sm:pt-0 sm:border-l sm:border-slate-200 sm:pl-8">
+
+                       <div className="space-y-6 pt-8 border-t border-slate-50">
+                          <div className="flex items-center gap-2 mb-4">
+                             <Icons.Lock size={16} className="text-slate-400" />
+                             <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t("admin.settings.profileLabelSecurity")}</span>
+                          </div>
+                          <div className="space-y-2">
+                             <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t("admin.settings.profileLabelNewPassword")}</label>
+                             <input type="password" value={profileForm.password} onChange={e => setProfileForm({...profileForm, password: e.target.value})} placeholder="••••••••" className="w-full bg-slate-100/50 border-2 border-slate-100 rounded-2xl px-6 py-4 text-sm font-black focus:border-primary transition-all outline-none" />
+                          </div>
+                       </div>
+
+                       <div className="flex items-center gap-4 pt-6">
+                          <button disabled={isSaving} className="flex-1 bg-primary text-white py-5 rounded-2xl font-black text-xs shadow-2xl shadow-primary/30 hover:scale-[1.01] active:scale-[0.98] transition-all uppercase tracking-[0.2em] relative overflow-hidden group">
+                             <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
+                             {isSaving ? t("admin.settings.profileUpdating") : t("admin.settings.profileBtnUpdate")}
+                          </button>
+                          
                           <button 
                             type="button"
                             onClick={logout}
-                            className="w-full sm:w-auto px-8 py-4 bg-rose-500 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl shadow-rose-500/20 hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-3"
+                            className="bg-rose-50 text-rose-500 px-6 py-5 rounded-2xl font-black text-[10px] uppercase tracking-widest border border-rose-100 hover:bg-rose-500 hover:text-white transition-all shadow-sm"
                           >
-                            <Icons.Lock size={14} />
-                            {t("rider.profile.logout")}
+                             {t("rider.profile.logout")}
                           </button>
                        </div>
-                    </div>
-                 </div>
-
-                 <button disabled={isSaving} className="w-full bg-primary text-white py-5 rounded-2xl font-black text-sm shadow-2xl shadow-primary/30 hover:scale-[1.01] active:scale-[0.98] transition-all uppercase tracking-[0.2em]">
-                    {isSaving ? t("admin.settings.profileUpdating") : t("admin.settings.profileBtnUpdate")}
-                 </button>
-              </form>
-           </Card>
+                    </form>
+                 </Card>
+              </div>
+           </div>
         </div>
       ) : (
-        <div className="space-y-6 animate-fade-in relative z-10">
-          <section className="bg-white rounded-[2.5rem] p-8 md:p-10 border border-slate-100 shadow-xl shadow-slate-200/20">
-            <div className="flex items-center gap-4 mb-10">
-              <div className="w-14 h-14 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center shadow-inner">
-                <Icons.Settings size={28} />
-              </div>
-              <div>
-                <h2 className="text-2xl font-black text-slate-900 tracking-tight">{t("admin.settings.systemOpsTitle")}</h2>
-                <p className="text-sm text-slate-400 font-medium">{t("admin.settings.systemOpsSub")}</p>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div className="space-y-3">
-                <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">{t("admin.settings.systemLabelStatus")}</label>
-                <div className="grid grid-cols-2 gap-2 bg-slate-50 p-1.5 rounded-3xl">
-                   <button 
-                     onClick={() => updateLocalSetting("is_open", "true")}
-                     className={`py-3.5 rounded-2xl text-xs font-black uppercase tracking-widest transition-all ${getSetting("is_open") === "true" ? "bg-white text-emerald-600 shadow-sm" : "text-slate-400"}`}
-                   >
-                     {t("admin.settings.systemStatusOnline")}
-                   </button>
-                   <button 
-                     onClick={() => updateLocalSetting("is_open", "false")}
-                     className={`py-3.5 rounded-2xl text-xs font-black uppercase tracking-widest transition-all ${getSetting("is_open") === "false" ? "bg-white text-rose-600 shadow-sm" : "text-slate-400"}`}
-                   >
-                     {t("admin.settings.systemStatusOffline")}
-                   </button>
-                </div>
-              </div>
-
-              <div className="space-y-3">
-                <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">{t("admin.settings.systemLabelRadius")}</label>
-                <div className="relative">
-                  <div className="absolute left-6 top-1/2 -translate-y-1/2 w-10 h-10 bg-slate-200/50 rounded-xl flex items-center justify-center text-slate-500">
-                    <Icons.MapPin size={20} />
+        <div className="space-y-8 animate-fade-in relative z-10 pb-20">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {/* Platform Status Card */}
+            <Card className="p-10 bg-white border border-slate-100 shadow-xl rounded-[3rem] relative overflow-hidden group">
+               <div className={`absolute top-0 right-0 w-32 h-32 blur-[80px] -mr-16 -mt-16 transition-all duration-700 ${getSetting("is_open") === "true" ? "bg-emerald-500/20 group-hover:bg-emerald-500/30" : "bg-rose-500/20 group-hover:bg-rose-500/30"}`} />
+               
+               <div className="flex items-center gap-4 mb-10 relative z-10">
+                  <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shadow-inner ${getSetting("is_open") === "true" ? "bg-emerald-50 text-emerald-600" : "bg-rose-50 text-rose-600"}`}>
+                    <Icons.Settings size={28} />
                   </div>
-                  <input 
-                    type="number" 
-                    className="w-full bg-slate-50 border-none rounded-[1.75rem] pl-20 pr-6 py-5 text-xl text-slate-900 font-black focus:ring-4 focus:ring-primary/10 transition-all font-mono"
-                    placeholder="5"
-                    value={getSetting("radius_km")}
-                    onChange={(e) => updateLocalSetting("radius_km", e.target.value)}
-                  />
-                  <div className="absolute right-6 top-1/2 -translate-y-1/2 text-slate-300 font-black text-sm uppercase">KM</div>
-                </div>
-              </div>
-            </div>
-          </section>
+                  <div>
+                    <h2 className="text-xl font-black text-slate-900 tracking-tight">{t("admin.settings.systemOpsTitle")}</h2>
+                    <div className="flex items-center gap-2 mt-0.5">
+                       <div className={`w-2 h-2 rounded-full ${getSetting("is_open") === "true" ? "bg-emerald-500 animate-pulse" : "bg-rose-500"}`} />
+                       <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Live Infrastructure</p>
+                    </div>
+                  </div>
+               </div>
 
-          <section className="bg-white rounded-[2.5rem] p-8 md:p-10 border border-slate-100 shadow-xl shadow-slate-200/20 relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-50/50 rounded-full blur-[100px] -mr-32 -mt-32" />
-            <div className="flex items-center gap-4 mb-10 relative z-10">
-              <div className="w-14 h-14 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center shadow-inner">
-                <Icons.Wallet size={28} />
-              </div>
-              <div>
-                <h2 className="text-2xl font-black text-slate-900 tracking-tight">{t("admin.settings.financeTitle")}</h2>
-                <p className="text-sm text-slate-400 font-medium">{t("admin.settings.financeSub")}</p>
-              </div>
-            </div>
+               <div className="space-y-8 relative z-10">
+                  <div className="space-y-4">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t("admin.settings.systemLabelStatus")}</label>
+                    <div className="grid grid-cols-2 gap-3 bg-slate-50 p-2 rounded-[1.75rem] border border-slate-100">
+                       <button 
+                         onClick={() => updateLocalSetting("is_open", "true")}
+                         className={`py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all ${getSetting("is_open") === "true" ? "bg-white text-emerald-600 shadow-lg shadow-emerald-500/10 border border-emerald-100" : "text-slate-400 hover:text-slate-500"}`}
+                       >
+                         {t("admin.settings.systemStatusOnline")}
+                       </button>
+                       <button 
+                         onClick={() => updateLocalSetting("is_open", "false")}
+                         className={`py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all ${getSetting("is_open") === "false" ? "bg-white text-rose-600 shadow-lg shadow-rose-500/10 border border-rose-100" : "text-slate-400 hover:text-slate-500"}`}
+                       >
+                         {t("admin.settings.systemStatusOffline")}
+                       </button>
+                    </div>
+                  </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative z-10 mb-10">
-              <div className="space-y-3">
-                <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">{t("admin.settings.financeLabelStoreGP")}</label>
-                <div className="relative">
-                  <div className="absolute left-6 top-1/2 -translate-y-1/2 text-indigo-600 font-black text-lg">%</div>
-                  <input 
-                    type="number" 
-                    className="w-full bg-indigo-50/30 border-none rounded-[1.5rem] pl-14 pr-6 py-5 text-2xl text-slate-900 font-black focus:ring-4 focus:ring-indigo-100 font-mono"
-                    placeholder="20"
-                    value={getSetting("gp_store_percent")}
-                    onChange={(e) => updateLocalSetting("gp_store_percent", e.target.value)}
-                  />
-                </div>
-              </div>
-              <div className="space-y-3">
-                <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">{t("admin.settings.financeLabelRiderGP")}</label>
-                <div className="relative">
-                  <div className="absolute left-6 top-1/2 -translate-y-1/2 text-orange-600 font-black text-lg">%</div>
-                  <input 
-                    type="number" 
-                    className="w-full bg-orange-50/30 border-none rounded-[1.5rem] pl-14 pr-6 py-5 text-2xl text-slate-900 font-black focus:ring-4 focus:ring-orange-100 font-mono"
-                    placeholder="10"
-                    value={getSetting("gp_rider_percent")}
-                    onChange={(e) => updateLocalSetting("gp_rider_percent", e.target.value)}
-                  />
-                </div>
-              </div>
-              <div className="space-y-3">
-                <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">{t("admin.settings.financeLabelBasePayout")}</label>
-                <div className="relative">
-                  <div className="absolute left-6 top-1/2 -translate-y-1/2 text-emerald-600 font-black text-lg">฿</div>
-                  <input 
-                    type="number" 
-                    className="w-full bg-emerald-50/30 border-none rounded-[1.5rem] pl-14 pr-6 py-5 text-2xl text-slate-900 font-black focus:ring-4 focus:ring-emerald-100 font-mono"
-                    placeholder="25"
-                    value={getSetting("rider_base_payout")}
-                    onChange={(e) => updateLocalSetting("rider_base_payout", e.target.value)}
-                  />
-                </div>
-              </div>
-            </div>
-          </section>
+                  <div className="space-y-4">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t("admin.settings.systemLabelRadius")}</label>
+                    <div className="flex items-center gap-4">
+                       <div className="flex-1 relative">
+                          <input 
+                            type="number" 
+                            className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl pl-6 pr-16 py-4.5 text-xl text-slate-900 font-black focus:border-primary transition-all outline-none font-mono"
+                            placeholder="5"
+                            value={getSetting("radius_km")}
+                            onChange={(e) => updateLocalSetting("radius_km", e.target.value)}
+                          />
+                          <div className="absolute right-6 top-1/2 -translate-y-1/2 text-slate-300 font-black text-xs uppercase">KM</div>
+                       </div>
+                       <div className="w-12 h-12 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400">
+                          <Icons.MapPin size={20} />
+                       </div>
+                    </div>
+                  </div>
+               </div>
+            </Card>
+
+            {/* Finance Card */}
+            <Card className="p-10 bg-white border border-slate-100 shadow-xl rounded-[3rem] relative overflow-hidden group">
+               <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 blur-[80px] -mr-16 -mt-16 group-hover:bg-indigo-500/20 transition-all duration-700" />
+               
+               <div className="flex items-center gap-4 mb-10 relative z-10">
+                  <div className="w-14 h-14 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center shadow-inner">
+                    <Icons.Wallet size={28} />
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-black text-slate-900 tracking-tight">{t("admin.settings.financeTitle")}</h2>
+                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mt-0.5">{t("admin.settings.financeSub")}</p>
+                  </div>
+               </div>
+
+               <div className="space-y-8 relative z-10">
+                  <div className="grid grid-cols-2 gap-6">
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between px-1">
+                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t("admin.settings.financeLabelStoreGP")}</label>
+                        <span className="text-[10px] font-black text-indigo-500">PROFIT</span>
+                      </div>
+                      <div className="relative group/input">
+                        <input 
+                          type="number" 
+                          className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-6 py-4.5 text-2xl text-slate-900 font-black focus:border-indigo-500 transition-all outline-none font-mono text-center"
+                          placeholder="20"
+                          value={getSetting("gp_store_percent")}
+                          onChange={(e) => updateLocalSetting("gp_store_percent", e.target.value)}
+                        />
+                        <div className="absolute right-4 top-1/2 -translate-y-1/2 text-indigo-600 font-black text-lg opacity-30">%</div>
+                      </div>
+                    </div>
+
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between px-1">
+                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t("admin.settings.financeLabelRiderGP")}</label>
+                        <span className="text-[10px] font-black text-orange-500">SHARE</span>
+                      </div>
+                      <div className="relative group/input">
+                        <input 
+                          type="number" 
+                          className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-6 py-4.5 text-2xl text-slate-900 font-black focus:border-orange-500 transition-all outline-none font-mono text-center"
+                          placeholder="10"
+                          value={getSetting("gp_rider_percent")}
+                          onChange={(e) => updateLocalSetting("gp_rider_percent", e.target.value)}
+                        />
+                        <div className="absolute right-4 top-1/2 -translate-y-1/2 text-orange-600 font-black text-lg opacity-30">%</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t("admin.settings.financeLabelBasePayout")}</label>
+                    <div className="relative">
+                      <div className="absolute left-6 top-1/2 -translate-y-1/2 text-emerald-600 font-black text-xl">฿</div>
+                      <input 
+                        type="number" 
+                        className="w-full bg-emerald-50/30 border-2 border-emerald-100/50 rounded-[1.75rem] pl-16 pr-6 py-6 text-3xl text-slate-900 font-black focus:border-emerald-500 transition-all outline-none font-mono"
+                        placeholder="25"
+                        value={getSetting("rider_base_payout")}
+                        onChange={(e) => updateLocalSetting("rider_base_payout", e.target.value)}
+                      />
+                      <div className="absolute right-8 top-1/2 -translate-y-1/2 flex items-center gap-2">
+                        <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                        <span className="text-[10px] font-black text-emerald-600 uppercase tracking-widest">Fixed Rate</span>
+                      </div>
+                    </div>
+                  </div>
+               </div>
+            </Card>
+          </div>
         </div>
       )}
 
