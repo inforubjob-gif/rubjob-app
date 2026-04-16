@@ -1,4 +1,8 @@
+"use client";
+
+import { useState } from "react";
 import { useAdmin } from "@/components/providers/AdminProvider";
+import { Icons } from "@/components/ui/Icons";
 
 export default function AdminAuthGate({ children }: { children: React.ReactNode }) {
   const { admin, isLoading, refreshAdmin } = useAdmin();

@@ -1,4 +1,14 @@
+"use client";
+
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useAdmin } from "@/components/providers/AdminProvider";
+import { Icons } from "@/components/ui/Icons";
+
+interface AdminSidebarProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
 
 export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
   const pathname = usePathname();
