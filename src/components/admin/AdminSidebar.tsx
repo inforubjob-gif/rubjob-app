@@ -48,7 +48,7 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
             <Icons.Logo size={36} variant="white" />
             <span className="ml-4 font-black text-white tracking-[0.2em] leading-tight uppercase">
               RUBJOB<br/>
-              <span className="text-[10px] text-primary-light font-black uppercase">Admin Portal</span>
+              <span className="text-[10px] text-primary-light font-black uppercase">{t("admin.nav.portal")}</span>
             </span>
           </div>
           
@@ -109,13 +109,13 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
                       {t("admin.nav.settings").slice(0, 5)}
                     </Link>
                   )}
-                  <Link 
-                    href="/"
-                    className="flex flex-col items-center justify-center gap-1.5 p-2.5 rounded-2xl bg-white/5 text-slate-400 hover:text-white hover:bg-white/10 text-[10px] font-black uppercase transition-all"
-                  >
-                    <Icons.Back size={18} />
-                    UI
-                  </Link>
+                    <Link 
+                      href="/"
+                      className="flex flex-col items-center justify-center gap-1.5 p-2.5 rounded-2xl bg-white/5 text-slate-400 hover:text-white hover:bg-white/10 text-[10px] font-black uppercase transition-all"
+                    >
+                      <Icons.Back size={18} />
+                      {t("admin.nav.ui")}
+                    </Link>
                   <button 
                     onClick={logout}
                     className="col-span-2 flex items-center justify-center gap-2 mt-1 p-2.5 rounded-2xl bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 text-[10px] font-black uppercase tracking-widest transition-all"

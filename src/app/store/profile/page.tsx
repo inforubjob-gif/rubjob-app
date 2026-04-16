@@ -104,19 +104,19 @@ export default function StoreProfilePage() {
                 <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-500 flex items-center justify-center border border-emerald-100 shadow-sm shadow-emerald-500/10">
                     <Icons.Shield size={22} />
                 </div>
-                <div>
-                    <h3 className="text-sm font-black text-slate-900 uppercase tracking-tight">{t("store.profile.workStatus")}</h3>
-                    <p className="text-[10px] text-emerald-500 font-bold uppercase">{workStatus ? t("store.profile.receivingJobs") : t("store.profile.notReceiving")}</p>
-                </div>
-             </div>
-             <button 
-                onClick={() => setWorkStatus(!workStatus)}
-                className={`w-14 h-8 rounded-full p-1 transition-all duration-300 ${workStatus ? 'bg-primary shadow-lg shadow-primary/30' : 'bg-slate-200'}`}
-             >
-                <div className={`w-6 h-6 rounded-full bg-white shadow-md transition-all duration-300 ${workStatus ? 'transform translate-x-6' : ''}`} />
-             </button>
-           </div>
-        </Card>
+          <div>
+            <h3 className="text-sm font-black text-slate-900 uppercase tracking-tight">{t("store.profile.workStatus")}</h3>
+            <p className="text-[10px] text-emerald-500 font-bold uppercase">{workStatus ? t("store.profile.receivingJobs") : t("store.profile.notReceiving")}</p>
+          </div>
+        </div>
+        <button 
+          onClick={handleToggleWorkStatus}
+          className={`w-14 h-8 rounded-full p-1 transition-all duration-300 ${workStatus ? 'bg-primary shadow-lg shadow-primary/30' : 'bg-slate-200'}`}
+        >
+          <div className={`w-6 h-6 rounded-full bg-white shadow-md transition-all duration-300 ${workStatus ? 'transform translate-x-6' : ''}`} />
+        </button>
+      </div>
+    </Card>
 
         <section>
           <p className="text-[10px] font-black text-slate-300 uppercase tracking-[0.25em] mb-4 pl-1">{t("store.profile.settings")}</p>
@@ -130,31 +130,31 @@ export default function StoreProfilePage() {
              <SettingItem 
                 icon={<Icons.MapPin size={20} />} 
                 label={t("store.profile.serviceArea")} 
-                value={prefs?.serviceArea || "Not Set"} 
+                value={prefs?.serviceArea || t("common.notSet")} 
                 onClick={() => router.push("/store/profile/service-area")}
              />
               <SettingItem 
                  icon={<Icons.Clipboard size={20} />} 
-                 label="Laundry Services" 
-                 value="Configure Prices & Toggle" 
+                 label={t("store.laundryService")} 
+                 value={t("store.manageTask")} 
                  onClick={() => router.push("/store/services")}
               />
               <SettingItem 
                  icon={<Icons.Clock size={20} />} 
                  label={t("store.profile.activeHours")} 
-                 value={prefs?.activeHours || "Not Set"} 
+                 value={prefs?.activeHours || t("common.notSet")} 
                  onClick={() => router.push("/store/profile/active-hours")}
               />
              <SettingItem 
                 icon={<Icons.Truck size={20} />} 
                 label={t("store.profile.vehicleType")} 
-                value={prefs?.vehicleType || "Not Set"} 
+                value={prefs?.vehicleType || t("common.notSet")} 
                 onClick={() => router.push("/store/profile/vehicle-type")}
              />
              <SettingItem 
                 icon={<Icons.Payment size={20} />} 
                 label={t("store.profile.payoutMethod")} 
-                value={prefs?.payoutMethod ? `${prefs.payoutMethod.bank ? prefs.payoutMethod.bank.toUpperCase() : 'Account'} ***${prefs.payoutMethod.account?.slice(-4) || ''}` : "Not Set"} 
+                value={prefs?.payoutMethod ? `${prefs.payoutMethod.bank ? prefs.payoutMethod.bank.toUpperCase() : 'Account'} ***${String(prefs.payoutMethod.account || '').slice(-4)}` : t("common.notSet")} 
                 onClick={() => router.push("/store/profile/payout-method")}
              />
           </div>
@@ -180,7 +180,7 @@ export default function StoreProfilePage() {
             <div className="absolute inset-0 bg-primary-dark/40 backdrop-blur-md" onClick={() => setShowLanguageModal(false)} />
             <div className="bg-white w-full max-w-lg rounded-t-[3rem] sm:rounded-[3rem] p-8 pb-12 relative z-10 animate-slide-up shadow-2xl">
               <div className="w-12 h-1.5 bg-orange-100 rounded-full mx-auto mb-8 sm:hidden" />
-             <h3 className="text-xl font-black text-slate-900 mb-6 text-center">{t("profile.selectLanguage")}</h3>
+             <h3 className="text-xl font-black text-slate-900 mb-6 text-center">{t("store.profile.selectLanguage")}</h3>
              <div className="space-y-3">
                {[
                  { key: "th", label: "ภาษาไทย", sub: "Thai (TH)" },

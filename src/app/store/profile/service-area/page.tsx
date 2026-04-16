@@ -59,7 +59,7 @@ export default function ServiceAreaPage() {
           >
             <Icons.Back size={18} />
           </button>
-          <h1 className="text-lg font-black text-slate-900 tracking-tight">{t("staff.profile.serviceArea")}</h1>
+          <h1 className="text-lg font-black text-slate-900 tracking-tight">{t("store.profile.serviceArea")}</h1>
         </div>
         {location && (
           <Button 
@@ -81,7 +81,7 @@ export default function ServiceAreaPage() {
           <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'radial-gradient(#000 1px, transparent 1px)', backgroundSize: '20px 20px' }} />
           <div className="text-center p-8 opacity-20 transform scale-150">
              <div className="text-8xl mb-8 grayscale">🗺️</div>
-             <p className="text-slate-900 text-xl font-black uppercase tracking-[0.3em]">{t("staff.nearby")}</p>
+             <p className="text-slate-900 text-xl font-black uppercase tracking-[0.3em]">{t("store.nearby")}</p>
           </div>
           
           {/* Pulse Effect for Center */}
@@ -103,7 +103,7 @@ export default function ServiceAreaPage() {
            <div className="bg-white/90 backdrop-blur-md px-4 py-2 rounded-full shadow-xl border border-white/50 flex items-center gap-2">
               <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
               <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">
-                {location ? t("profile.pinned") : t("profile.pinLocation")}
+                 {location ? t("store.profile.pinned") : t("store.profile.pinLocation")}
               </p>
            </div>
         </div>
@@ -114,8 +114,8 @@ export default function ServiceAreaPage() {
               <div className="flex gap-4 mb-6">
                  <div className="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center text-3xl shadow-inner">📍</div>
                  <div className="flex-1">
-                    <p className="text-sm font-black text-slate-900 uppercase tracking-tight mb-1">{location ? t("profile.pinned") : t("profile.pinLocation")}</p>
-                    <p className="text-xs text-slate-500 font-medium">{location ? "Lat: 13.7563, Lng: 100.5018" : t("profile.bangkokThailand")}</p>
+                    <p className="text-sm font-black text-slate-900 uppercase tracking-tight mb-1">{location ? t("store.profile.pinned") : t("store.profile.pinLocation")}</p>
+                    <p className="text-xs text-slate-500 font-medium">{location ? "Lat: 13.7563, Lng: 100.5018" : t("store.profile.bangkokThailand")}</p>
                  </div>
               </div>
               
@@ -124,12 +124,12 @@ export default function ServiceAreaPage() {
                   onClick={confirmLocation}
                   className="w-full py-5 bg-primary text-white rounded-[1.5rem] text-sm font-black uppercase tracking-[0.2em] shadow-xl shadow-primary/30 active:scale-[0.98] transition-all"
                 >
-                  {t("profile.confirmLocation")}
+                  {t("store.profile.confirmLocation")}
                 </button>
               ) : (
                 <div className="bg-emerald-50 text-emerald-600 p-4 rounded-2xl flex items-center justify-center gap-3 border border-emerald-100 italic font-black uppercase tracking-widest text-xs">
                   <Icons.CheckCircle size={18} />
-                   {t("profile.pinned")}
+                   {t("store.profile.pinned")}
                 </div>
               )}
            </Card>

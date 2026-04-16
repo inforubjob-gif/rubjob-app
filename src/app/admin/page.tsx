@@ -72,7 +72,7 @@ export default function AdminDashboard() {
                </div>
                <div className="flex items-center justify-between mb-1">
                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t("admin.dashboard.totalUsers")}</p>
-                 <span className="text-[9px] font-bold text-slate-300">Total</span>
+                 <span className="text-[9px] font-bold text-slate-300">{t("admin.dashboard.totalLabel")}</span>
                </div>
                <h2 className="text-3xl font-black text-slate-900 leading-none">{Number(stats.users).toLocaleString()}</h2>
             </Card>
