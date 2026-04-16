@@ -14,6 +14,7 @@ export default function AdminDashboard() {
     gpStore: 20, gpRider: 10,
     totalRiders: 0, activeRiders: 0,
     tables: [] as string[],
+    inventory: {} as Record<string, number>,
     connection: "WAITING"
   });
   const [isLoading, setIsLoading] = useState(true);
@@ -43,6 +44,7 @@ export default function AdminDashboard() {
             totalRiders: data.totalRiders || 0,
             activeRiders: data.activeRiders || 0,
             tables: data.tables || [],
+            inventory: data.inventory || {},
             connection: data.connection || "CONNECTED"
           });
         }
@@ -109,8 +111,12 @@ export default function AdminDashboard() {
                </div>
                <div className="mt-2 flex flex-wrap justify-center md:justify-start gap-2">
                   {stats.tables.length > 0 ? stats.tables.map(t => (
-                    <span key={t} className="px-2 py-1 bg-white/5 border border-white/5 rounded-lg text-[10px] text-slate-400 font-mono font-bold">
+                    <span key={t} className="px-3 py-1 bg-white/5 border border-white/10 rounded-xl text-[10px] text-slate-300 font-bold group hover:border-primary/50 transition-colors">
+                      <span className="text-slate-500 mr-2 font-mono">#</span>
                       {t}
+                      <span className="ml-2 px-1.5 py-0.5 bg-primary/20 text-primary rounded-md text-[9px]">
+                        {stats.inventory?.[t] ?? '?'}
+                      </span>
                     </span>
                   )) : (
                     <span className="text-rose-400 text-xs font-bold animate-pulse">No tables found! Database might be fresh or misconfigured.</span>

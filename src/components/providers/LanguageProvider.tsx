@@ -1,7 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { Language, translations } from "@/lib/i18n";
+import { RUBJOB_I18N, Language } from "@/lib/i18n";
 
 interface LanguageContextType {
   language: Language;
@@ -16,6 +16,10 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
 
   // Load saved preference if any
   useEffect(() => {
+    console.log("RUBJOB_I18N Initialized:", {
+      keys: Object.keys(RUBJOB_I18N || {}),
+      th_dashboard: RUBJOB_I18N?.th?.admin?.nav?.dashboard
+    });
     const saved = localStorage.getItem("rubjob_lang") as Language;
     if (saved && (saved === "th" || saved === "en" || saved === "zh")) {
       setLanguage(saved);
@@ -34,7 +38,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
       
       // Look up helper
       const lookup = (lang: string) => {
-        let current: any = (translations as any)[lang];
+        let current: any = (RUBJOB_I18N as any)[lang];
         if (!current) return null;
         
         for (const key of keys) {

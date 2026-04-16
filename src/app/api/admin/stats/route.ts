@@ -87,10 +87,25 @@ export async function GET(req: Request) {
     const riderEarnings = (totalDelivery * gpRider) / 100;
     const totalPlatformEarnings = storeEarnings + riderEarnings;
 
+    // 2. Full Table Inventory (Count rows in every table)
+    const inventory: Record<string, number> = {};
+    const tableListResult = await db.prepare("SELECT name FROM sqlite_master WHERE type='table'").all();
+    const tableNamesList = tableListResult.results.map((r: any) => r.name).filter((n: string) => !n.startsWith('_'));
+    
+    // Batch query counts for efficiency
+    for (const tableName of tableNamesList) {
+      try {
+        const countRes = await db.prepare(`SELECT COUNT(*) as count FROM "${tableName}"`).first();
+        inventory[tableName] = (countRes as any)?.count || 0;
+      } catch (err) {
+        inventory[tableName] = -1; // Error marker
+      }
+    }
+
     return NextResponse.json({ 
       users: usersCount,
       rawUsers: rawUsersCount,
-      tables: tableNames,
+      tables: tableNamesList,
       connection: "D1_CONNECTED",
       stores: displayTotalStores,
       activeStores: activeStores,
@@ -100,7 +115,8 @@ export async function GET(req: Request) {
       gpStore,
       gpRider,
       totalRiders,
-      activeRiders
+      activeRiders,
+      inventory: inventory
     });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
