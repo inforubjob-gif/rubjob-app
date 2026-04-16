@@ -23,6 +23,12 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: "D1 Database binding 'DB' not found" }, { status: 500 });
     }
 
+    // Self-healing: Ensure required columns exist
+    try { await db.prepare("ALTER TABLE rider_users ADD COLUMN rider_number INTEGER").run(); } catch(e) {}
+    try { await db.prepare("ALTER TABLE rider_users ADD COLUMN bankName TEXT").run(); } catch(e) {}
+    try { await db.prepare("ALTER TABLE rider_users ADD COLUMN accountNumber TEXT").run(); } catch(e) {}
+    try { await db.prepare("ALTER TABLE rider_users ADD COLUMN accountName TEXT").run(); } catch(e) {}
+
     // Fetch Financial Settings for Calculation
     const settingsRows = await db.prepare(`
       SELECT key, value FROM system_settings 

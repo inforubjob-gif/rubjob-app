@@ -17,11 +17,18 @@ import Skeleton from "@/components/ui/Skeleton";
 export default function RiderDashboard() {
   const { t } = useTranslation();
   const router = useRouter();
+  const { profile } = useLiff();
   const [activeTab, setActiveTab] = useState<"available" | "active">("available");
   const [isLoading, setIsLoading] = useState(true);
   const [workStatus, setWorkStatus] = useState(true);
   const [selectedJob, setSelectedJob] = useState<any | null>(null);
   const [rider, setRider] = useState<any>(null);
+
+  useEffect(() => {
+    if (profile) {
+      setRider({ name: profile.displayName, id: profile.userId });
+    }
+  }, [profile]);
   
   // Lifted state
   const [availableJobs, setAvailableJobs] = useState<any[]>([]);
@@ -31,35 +38,52 @@ export default function RiderDashboard() {
   const [verificationStatus, setVerificationStatus] = useState<"active" | "pending" | "unregistered" | "rejected">("pending");
 
   useEffect(() => {
-    if (!profile?.userId) return;
-    
-    async function fetchRiderData() {
-      try {
-        const res = await fetch(`/api/rider/orders?riderId=${profile.userId}`);
-        const data = await res.json() as any;
-        
-        if (data.status === "unregistered") {
-          router.replace("/rider/setup");
-          return;
-        }
-
-        setVerificationStatus(data.status);
-        if (data.available) setAvailableJobs(data.available);
-        if (data.active) setActiveJobs(data.active);
-
-        // Fetch Balance
-        const walRes = await fetch(`/api/rider/wallet?riderId=${profile.userId}`);
-        const walData = await walRes.json();
-        if (walData.balance !== undefined) setBalance(walData.balance);
-      } catch (err) {
-        console.error("Failed to fetch rider dashboard data:", err);
-      } finally {
-        setIsLoading(false);
-      }
+    // 1. Check LIFF Profile
+    if (profile) {
+      setRider({ name: profile.displayName, id: profile.userId });
+      fetchRiderData(profile.userId);
+      return;
     }
 
-    fetchRiderData();
-  }, [profile, router]);
+    // 2. Fallback: Check Local Session (for email login)
+    const localSession = localStorage.getItem("rubjob_rider_session");
+    if (localSession) {
+      const parsed = JSON.parse(localSession);
+      setRider(parsed);
+      fetchRiderData(parsed.id);
+      return;
+    }
+
+    // 3. If neither, we might still be loading or unauthorized
+    setIsLoading(false); 
+  }, [profile]);
+
+  async function fetchRiderData(riderId: string) {
+    if (!riderId) return;
+    setIsLoading(true);
+    try {
+      const res = await fetch(`/api/rider/orders?riderId=${riderId}`);
+      const data = await res.json() as any;
+      
+      if (data.status === "unregistered") {
+        router.replace("/rider/setup");
+        return;
+      }
+
+      setVerificationStatus(data.status);
+      if (data.available) setAvailableJobs(data.available);
+      if (data.active) setActiveJobs(data.active);
+
+      // Fetch Balance
+      const walRes = await fetch(`/api/rider/wallet?riderId=${riderId}`);
+      const walData = await walRes.json();
+      if (walData.balance !== undefined) setBalance(walData.balance);
+    } catch (err) {
+      console.error("Failed to fetch rider dashboard data:", err);
+    } finally {
+      setIsLoading(false);
+    }
+  }
 
   const handleAcceptJob = async (jobId: string) => {
     if (!rider?.id) return;

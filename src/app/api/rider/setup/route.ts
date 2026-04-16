@@ -19,6 +19,13 @@ export async function POST(req: Request) {
     if (phone) validatePhone(phone);
 
     const db = getRequestContext().env.DB;
+    if (!db) return NextResponse.json({ error: "D1 not found" }, { status: 500 });
+    
+    // Self-healing: Ensure required columns exist
+    try { await db.prepare("ALTER TABLE rider_users ADD COLUMN rider_number INTEGER").run(); } catch(e) {}
+    try { await db.prepare("ALTER TABLE rider_users ADD COLUMN bankName TEXT").run(); } catch(e) {}
+    try { await db.prepare("ALTER TABLE rider_users ADD COLUMN accountNumber TEXT").run(); } catch(e) {}
+    try { await db.prepare("ALTER TABLE rider_users ADD COLUMN accountName TEXT").run(); } catch(e) {}
 
     // 1. Create or Update Rider User record
     // We use rider_users table (id matches users.id)
