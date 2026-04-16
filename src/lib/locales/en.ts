@@ -808,10 +808,9 @@ export const en = {
       sameFee: "Same fee applies",
       deliveryNote: "* ฿39 flat fee for all orders",
     },
-  },
-  success: {
-    title: "Payment Successful",
-    thanks: "Thank you for using RUBJOB",
-    desc: "We have received your payment. Get ready for premium cleaning service!",
-  },
+    success: {
+      title: "Payment Successful",
+      thanks: "Thank you for using RUBJOB",
+      desc: "We have received your payment. Get ready for premium cleaning service!",
+    },
 };
