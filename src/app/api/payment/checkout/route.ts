@@ -1,16 +1,16 @@
 import { getRequestContext } from "@cloudflare/next-on-pages";
 import { NextResponse } from "next/server";
-import { createOmiseCharge } from "@/lib/payment";
+import Stripe from "stripe";
 
 export const runtime = "edge";
 
 /**
  * POST /api/payment/checkout
- * Creates an Omise Charge (PromptPay) for an order
+ * Creates a Stripe PaymentIntent for PromptPay
  */
 export async function POST(req: Request) {
   try {
-    const { orderId, amount, paymentMethod } = await req.json() as any;
+    const { orderId, amount } = await req.json() as { orderId: string, amount: number };
 
     if (!orderId || !amount) {
       return NextResponse.json({ error: "Order ID and Amount required" }, { status: 400 });
@@ -18,38 +18,30 @@ export async function POST(req: Request) {
 
     // Access Env from Cloudflare context
     const env = getRequestContext().env;
+    const stripeSecretKey = env?.STRIPE_SECRET_KEY;
     const db = env?.DB;
-    const secretKey = env?.OMISE_SECRET_KEY;
 
-    if (!db || !secretKey) {
-      return NextResponse.json({ error: "Missing DB or Omise Configuration" }, { status: 500 });
+    if (!db || !stripeSecretKey) {
+      return NextResponse.json({ error: "Missing DB or Stripe Configuration" }, { status: 500 });
     }
 
-    // 1. Create Source for PromptPay (or other methods)
-    let chargeParams: any = {
-      amount: Math.round(amount * 100), // Satang
+    // Initialize Stripe
+    const stripe = new Stripe(stripeSecretKey, {
+      apiVersion: "2025-01-27.acacia", // Use latest stable version compatible with Edge
+      httpClient: Stripe.createFetchHttpClient(), // Required for Edge Runtime
+    });
+
+    // 1. Create PaymentIntent for PromptPay
+    // Amount must be in satang (THB * 100)
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: Math.round(amount * 100),
       currency: "thb",
+      payment_method_types: ["promptpay"],
       description: `Payment for Rubjob Order ${orderId}`,
       metadata: { orderId },
-    };
+    });
 
-    if (paymentMethod === "promptpay") {
-      chargeParams.source = {
-        type: "promptpay"
-      };
-    } else if (paymentMethod === "rabbit_linepay") {
-      chargeParams.source = {
-        type: "rabbit_linepay"
-      };
-    } else {
-      // Default to PromptPay for now if not specified
-      chargeParams.source = { type: "promptpay" };
-    }
-
-    // 2. Create Charge in Omise
-    const charge = await createOmiseCharge(chargeParams, secretKey);
-
-    // 3. Update Order in D1 with Charge ID and Pay Details
+    // 2. Update Order in D1 with PaymentIntent ID
     await db.prepare(`
       UPDATE orders 
       SET paymentStatus = 'pending', 
@@ -57,16 +49,15 @@ export async function POST(req: Request) {
       WHERE id = ?
     `).bind(orderId).run();
 
-    // 4. Return the source details (QR Code for PromptPay)
+    // 3. Return the clientSecret for the frontend to render the QR code
     return NextResponse.json({
       success: true,
-      chargeId: charge.id,
-      paymentData: charge.source?.scannable_code?.image?.download_uri || charge.authorize_uri,
-      method: paymentMethod
+      clientSecret: paymentIntent.client_secret,
+      paymentIntentId: paymentIntent.id
     });
 
   } catch (error: any) {
-    console.error("Checkout error:", error);
+    console.error("Stripe Checkout error:", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
