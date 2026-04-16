@@ -13,6 +13,7 @@ database_name = "rubjob-db"
 database_id = "617d4342-c1c3-4216-8e83-03cc1a6bd57d"
 migrations_dir = "db"
 
+# R2 Bucket for profile images and documents (User created manually)
 [[r2_buckets]]
 binding = "UPLOADS"
 bucket_name = "rubjob-uploads"
