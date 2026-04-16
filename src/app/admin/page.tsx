@@ -6,6 +6,7 @@ import Card from "@/components/ui/Card";
 import { Icons } from "@/components/ui/Icons";
 import { useTranslation } from "@/components/providers/LanguageProvider";
 
+export default function AdminDashboard() {
   const { t } = useTranslation();
   const [stats, setStats] = useState({ 
     users: 0, stores: 0, activeStores: 0, 
