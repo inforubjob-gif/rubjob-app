@@ -61,7 +61,12 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
   const hasPermission = (permission: string) => {
     if (!admin) return false;
     if (admin.role === 'super_admin') return true;
-    if (!admin.permissions) return false;
+    
+    // Hardened check: ensure permissions is an array
+    if (!admin.permissions || !Array.isArray(admin.permissions)) {
+      return false;
+    }
+    
     return admin.permissions.includes(permission);
   };
 

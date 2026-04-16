@@ -170,7 +170,7 @@ export default function StoreDashboard() {
                         </Badge>
                       </div>
                       <h3 className="font-black text-slate-800 leading-tight text-sm truncate">
-                        {t(`orders.services.${order.serviceId}`) || order.serviceName}
+                        {String(t(`orders.services.${order.serviceId}`) || order.serviceName || "Unknown Service")}
                       </h3>
                       <div className="flex items-center gap-2 mt-1.5 grayscale opacity-60">
                         <div className="w-5 h-5 rounded-full bg-slate-200" />

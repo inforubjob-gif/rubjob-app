@@ -28,15 +28,25 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
   };
 
   const t = (path: string): string => {
-    const keys = path.split(".");
-    let current: any = (translations as any)[language];
-    
-    for (const key of keys) {
-      if (current[key] === undefined) return path;
-      current = current[key];
+    try {
+      const keys = path.split(".");
+      let current: any = (translations as any)[language];
+      
+      for (const key of keys) {
+        if (!current || current[key] === undefined) return path;
+        current = current[key];
+      }
+      
+      // Ensure we return a string, never an object (which crashes React 19)
+      if (typeof current !== 'string') {
+        return path;
+      }
+      
+      return current;
+    } catch (err) {
+      console.error("Translation error for path:", path, err);
+      return path;
     }
-    
-    return current;
   };
 
   return (
