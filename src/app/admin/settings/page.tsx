@@ -7,10 +7,16 @@ import Badge from "@/components/ui/Badge";
 import { useAdmin } from "@/components/providers/AdminProvider";
 import { useTranslation } from "@/components/providers/LanguageProvider";
 
-export default function SettingsAdminPage() {
-  const { t } = useTranslation();
-  const [activeTab, setActiveTab] = useState<"admins" | "system" | "profile">("system");
-  const { admin, refreshAdmin } = useAdmin();
+import { useSearchParams } from "next/navigation";
+import { Suspense } from "react";
+
+function SettingsContent() {
+  const { t, language, setLanguage } = useTranslation();
+  const searchParams = useSearchParams();
+  const initialTab = (searchParams.get("tab") as any) || "system";
+  
+  const [activeTab, setActiveTab] = useState<"admins" | "system" | "profile">(initialTab);
+  const { admin, refreshAdmin, logout } = useAdmin();
   
   const [admins, setAdmins] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -464,6 +470,37 @@ export default function SettingsAdminPage() {
                     </div>
                  </div>
 
+                 <div className="p-8 border-2 border-slate-100 border-dashed rounded-[2.5rem] bg-slate-50/30">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+                       <div className="space-y-4 flex-1">
+                          <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">System Language</label>
+                          <div className="flex gap-2">
+                             {(['th', 'en'] as const).map((l) => (
+                               <button
+                                 key={l}
+                                 type="button"
+                                 onClick={() => setLanguage(l)}
+                                 className={`flex-1 py-3 text-xs font-black uppercase rounded-2xl border transition-all ${language === l ? 'bg-primary text-white border-primary shadow-lg shadow-primary/20' : 'bg-white text-slate-400 border-slate-200 hover:border-slate-300'}`}
+                               >
+                                 {l === 'th' ? 'ไทย' : 'English'}
+                               </button>
+                             ))}
+                          </div>
+                       </div>
+                       
+                       <div className="pt-2 sm:pt-0 sm:border-l sm:border-slate-200 sm:pl-8">
+                          <button 
+                            type="button"
+                            onClick={logout}
+                            className="w-full sm:w-auto px-8 py-4 bg-rose-500 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl shadow-rose-500/20 hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-3"
+                          >
+                            <Icons.Lock size={14} />
+                            {t("rider.profile.logout")}
+                          </button>
+                       </div>
+                    </div>
+                 </div>
+
                  <button disabled={isSaving} className="w-full bg-primary text-white py-5 rounded-2xl font-black text-sm shadow-2xl shadow-primary/30 hover:scale-[1.01] active:scale-[0.98] transition-all uppercase tracking-[0.2em]">
                     {isSaving ? t("admin.settings.profileUpdating") : t("admin.settings.profileBtnUpdate")}
                  </button>
@@ -601,6 +638,17 @@ export default function SettingsAdminPage() {
             </div>
         </div>
       )}
-    </div>
+  );
+}
+
+export default function SettingsAdminPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex items-center justify-center py-32">
+        <div className="w-12 h-12 border-4 border-primary/10 border-t-primary rounded-full animate-spin shadow-lg" />
+      </div>
+    }>
+      <SettingsContent />
+    </Suspense>
   );
 }

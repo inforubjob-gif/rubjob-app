@@ -86,53 +86,32 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
           })}
         </nav>
 
-        {/* Profile Card & Settings Area */}
+        {/* Unified Account & Settings Card */}
         <div className="p-4 border-t border-white/5 bg-slate-950/20 shrink-0">
-           <div className="bg-white/5 rounded-3xl p-4 border border-white/5 shadow-inner">
-              <div className="flex items-center gap-3 mb-4">
-                 <div className="w-10 h-10 rounded-xl bg-primary/20 border border-primary/30 flex items-center justify-center text-primary overflow-hidden shrink-0 shadow-sm font-black">
-                    {admin?.avatarUrl ? <img src={admin.avatarUrl} className="w-full h-full object-cover" /> : admin?.name?.[0]?.toUpperCase()}
+           <Link 
+             href="/admin/settings?tab=profile"
+             onClick={() => {
+               if (window.innerWidth < 1024) onClose();
+             }}
+             className={`block group bg-white/5 rounded-[2rem] p-4 border border-white/5 shadow-inner transition-all hover:bg-white/10 hover:border-white/10 ${pathname === '/admin/settings' ? 'ring-2 ring-primary ring-offset-2 ring-offset-slate-900 bg-white/10' : ''}`}
+           >
+              <div className="flex items-center justify-between gap-3">
+                 <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-2xl bg-primary/20 border border-primary/30 flex items-center justify-center text-primary overflow-hidden shrink-0 shadow-lg group-hover:scale-105 transition-transform font-black">
+                       {admin?.avatarUrl ? <img src={admin.avatarUrl} className="w-full h-full object-cover" /> : admin?.name?.[0]?.toUpperCase()}
+                    </div>
+                    <div className="min-w-0">
+                       <p className="font-black text-white text-xs truncate uppercase tracking-tight leading-none mb-1.5">{admin?.name}</p>
+                       <div className="flex items-center gap-2">
+                          <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{admin?.role?.replace('_', ' ')}</span>
+                       </div>
+                    </div>
                  </div>
-                 <div className="min-w-0">
-                    <p className="font-black text-white text-xs truncate uppercase tracking-tight">{admin?.name}</p>
-                    <p className="text-[10px] font-bold text-slate-500 uppercase truncate">{admin?.role?.replace('_', ' ')}</p>
+                 <div className="w-8 h-8 rounded-xl bg-white/5 flex items-center justify-center text-slate-500 group-hover:text-primary group-hover:bg-primary/10 transition-all">
+                    <Icons.Settings size={18} />
                  </div>
               </div>
-
-              <div className="flex flex-col gap-2">
-                  {hasPermission("settings") && (
-                    <Link 
-                      href="/admin/settings"
-                      className={`flex flex-col items-center justify-center gap-1.5 p-2.5 rounded-2xl text-[10px] font-black uppercase transition-all ${pathname === '/admin/settings' ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'bg-white/5 text-slate-400 hover:text-white hover:bg-white/10'}`}
-                    >
-                      <Icons.Settings size={18} />
-                      {t("admin.nav.settings").slice(0, 5)}
-                    </Link>
-                  )}
-                  <button 
-                    onClick={logout}
-                    className="flex items-center justify-center gap-2 mt-1 p-2.5 rounded-2xl bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 text-[10px] font-black uppercase tracking-widest transition-all"
-                  >
-                    <Icons.Lock size={14} />
-                    {t("rider.profile.logout")}
-                  </button>
-               </div>
-
-               {/* Language Switcher */}
-               <div className="mt-4 pt-4 border-t border-white/5">
-                  <div className="bg-slate-900 rounded-2xl p-1 flex gap-1 shadow-inner ring-1 ring-white/5">
-                     {(['th', 'en'] as const).map((l) => (
-                       <button
-                         key={l}
-                         onClick={() => setLanguage(l)}
-                         className={`flex-1 py-2 text-[10px] font-black uppercase rounded-xl transition-all ${language === l ? 'bg-primary text-white shadow-lg' : 'text-slate-500 hover:text-slate-300'}`}
-                       >
-                         {l}
-                       </button>
-                     ))}
-                  </div>
-               </div>
-           </div>
+           </Link>
         </div>
       </aside>
     </>
