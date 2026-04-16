@@ -114,6 +114,7 @@ export default function RiderManagementAdminPage() {
       </header>
 
       <Card className="bg-white border border-slate-200/60 shadow-xl shadow-slate-200/20 rounded-2xl overflow-hidden">
+        {isLoading ? (
           <div className="flex justify-center py-32">
             <div className="w-12 h-12 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
           </div>
