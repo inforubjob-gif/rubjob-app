@@ -3,12 +3,12 @@
 export const runtime = "edge";
 
 import { useState, useEffect, use } from "react";
-import { useLanguage } from "@/lib/contexts/LanguageContext";
+import { useTranslation } from "@/components/providers/LanguageProvider";
 import StoreForm from "@/components/admin/StoreForm";
 
 export default function EditStorePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
-  const { t } = useLanguage();
+  const { t } = useTranslation();
   const [storeData, setStoreData] = useState<any | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 

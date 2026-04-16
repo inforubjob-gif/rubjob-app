@@ -3,12 +3,12 @@
 export const runtime = "edge";
 
 import { useState, useEffect, use } from "react";
-import { useLanguage } from "@/lib/contexts/LanguageContext";
+import { useTranslation } from "@/components/providers/LanguageProvider";
 import RiderForm from "@/components/admin/RiderForm";
 
 export default function EditRiderPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
-  const { t } = useLanguage();
+  const { t } = useTranslation();
   const [riderData, setRiderData] = useState<any | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 

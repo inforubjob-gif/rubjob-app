@@ -1,10 +1,10 @@
 "use client";
 
-import { useLanguage } from "@/lib/contexts/LanguageContext";
+import { useTranslation } from "@/components/providers/LanguageProvider";
 import RiderForm from "@/components/admin/RiderForm";
 
 export default function NewRiderPage() {
-  const { t } = useLanguage();
+  const { t } = useTranslation();
 
   return (
     <div className="max-w-7xl mx-auto py-8">

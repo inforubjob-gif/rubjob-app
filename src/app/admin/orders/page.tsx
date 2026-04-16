@@ -4,10 +4,10 @@ import { useState, useEffect } from "react";
 import Card from "@/components/ui/Card";
 import Badge, { statusToBadgeVariant } from "@/components/ui/Badge";
 import { Icons } from "@/components/ui/Icons";
-import { useLanguage } from "@/lib/contexts/LanguageContext";
+import { useTranslation } from "@/components/providers/LanguageProvider";
 
 export default function AdminOrdersPage() {
-  const { t } = useLanguage();
+  const { t } = useTranslation();
   const [orders, setOrders] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 

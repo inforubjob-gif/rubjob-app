@@ -3,10 +3,10 @@
 import { Icons } from "@/components/ui/Icons";
 import Card from "@/components/ui/Card";
 import { useState } from "react";
-import { useLanguage } from "@/lib/contexts/LanguageContext";
+import { useTranslation } from "@/components/providers/LanguageProvider";
 
 export default function InvestorCostsPage() {
-   const { t } = useLanguage();
+   const { t } = useTranslation();
    const [scale, setScale] = useState(1000); // Monthly Order Projection
 
    const infrastructureCosts = [

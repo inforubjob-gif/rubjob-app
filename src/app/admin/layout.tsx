@@ -8,7 +8,7 @@ import { ToastProvider } from "@/components/providers/ToastProvider";
 import { AdminProvider, useAdmin } from "@/components/providers/AdminProvider";
 import { usePathname, useRouter } from "next/navigation";
 import { LanguageProvider } from "@/components/providers/LanguageProvider";
-import { useLanguage } from "@/lib/contexts/LanguageContext";
+import { useTranslation } from "@/components/providers/LanguageProvider";
 
 function PermissionGate({ children }: { children: React.ReactNode }) {
   const { admin, hasPermission, isLoading } = useAdmin();
@@ -44,7 +44,7 @@ function PermissionGate({ children }: { children: React.ReactNode }) {
 }
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
-  const { t } = useLanguage();
+  const { t } = useTranslation();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   return (

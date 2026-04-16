@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useLanguage } from "@/lib/contexts/LanguageContext";
+import { useTranslation } from "@/components/providers/LanguageProvider";
 import { Icons } from "@/components/ui/Icons";
 import Card from "@/components/ui/Card";
 import AdminDocumentUpload from "./AdminDocumentUpload";
@@ -25,7 +25,7 @@ const DOCUMENT_TYPES = [
 
 export default function RiderForm({ initialData, isEdit }: RiderFormProps) {
   const router = useRouter();
-  const { t } = useLanguage();
+  const { t } = useTranslation();
   const [isSaving, setIsSaving] = useState(false);
   
   const [formData, setFormData] = useState({

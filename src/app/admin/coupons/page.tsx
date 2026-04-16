@@ -5,10 +5,10 @@ import Card from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 import { Icons } from "@/components/ui/Icons";
 import Modal from "@/components/ui/Modal";
-import { useLanguage } from "@/lib/contexts/LanguageContext";
+import { useTranslation } from "@/components/providers/LanguageProvider";
 
 export default function CouponsAdminPage() {
-  const { t } = useLanguage();
+  const { t } = useTranslation();
   const [coupons, setCoupons] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);

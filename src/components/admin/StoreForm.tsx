@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useLanguage } from "@/lib/contexts/LanguageContext";
+import { useTranslation } from "@/components/providers/LanguageProvider";
 import dynamic from "next/dynamic";
 import { Icons } from "@/components/ui/Icons";
 import Card from "@/components/ui/Card";
@@ -20,7 +20,7 @@ interface StoreFormProps {
 
 export default function StoreForm({ initialData, isEdit }: StoreFormProps) {
   const router = useRouter();
-  const { t } = useLanguage();
+  const { t } = useTranslation();
   const { showToast } = useToast();
   const [isSaving, setIsSaving] = useState(false);
   const [allServices, setAllServices] = useState<any[]>([]);

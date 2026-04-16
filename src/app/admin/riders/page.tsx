@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { useLanguage } from "@/lib/contexts/LanguageContext";
+import { useTranslation } from "@/components/providers/LanguageProvider";
 import Card from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 import { Icons } from "@/components/ui/Icons";
@@ -10,7 +10,7 @@ import { useToast } from "@/components/providers/ToastProvider";
 import Skeleton from "@/components/ui/Skeleton";
 
 export default function RiderManagementAdminPage() {
-  const { t } = useLanguage();
+  const { t } = useTranslation();
   const { showToast } = useToast();
   const [riders, setRiders] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);

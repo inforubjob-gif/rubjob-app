@@ -1,10 +1,10 @@
 "use client";
 
-import { useLanguage } from "@/lib/contexts/LanguageContext";
+import { useTranslation } from "@/components/providers/LanguageProvider";
 import StoreForm from "@/components/admin/StoreForm";
 
 export default function NewStorePage() {
-  const { t } = useLanguage();
+  const { t } = useTranslation();
 
   return (
     <div className="max-w-7xl mx-auto py-8">

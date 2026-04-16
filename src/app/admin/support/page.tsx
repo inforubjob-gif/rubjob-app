@@ -3,10 +3,10 @@
 import { useState, useEffect, useRef } from "react";
 import Card from "@/components/ui/Card";
 import { Icons } from "@/components/ui/Icons";
-import { useLanguage } from "@/lib/contexts/LanguageContext";
+import { useTranslation } from "@/components/providers/LanguageProvider";
 
 export default function SupportCenterPage() {
-  const { t } = useLanguage();
+  const { t } = useTranslation();
   const [tickets, setTickets] = useState<any[]>([]);
   const [selectedTicketId, setSelectedTicketId] = useState<string | null>(null);
   const [messages, setMessages] = useState<any[]>([]);
