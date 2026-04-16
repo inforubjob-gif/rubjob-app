@@ -12,7 +12,9 @@ export default function AdminDashboard() {
     users: 0, rawUsers: 0, stores: 0, activeStores: 0, 
     orders: 0, revenue: 0, earnings: 0, 
     gpStore: 20, gpRider: 10,
-    totalRiders: 0, activeRiders: 0
+    totalRiders: 0, activeRiders: 0,
+    tables: [] as string[],
+    connection: "WAITING"
   });
   const [isLoading, setIsLoading] = useState(true);
   const [errorCount, setErrorCount] = useState(0);
@@ -39,7 +41,9 @@ export default function AdminDashboard() {
             gpStore: data.gpStore || 20,
             gpRider: data.gpRider || 10,
             totalRiders: data.totalRiders || 0,
-            activeRiders: data.activeRiders || 0
+            activeRiders: data.activeRiders || 0,
+            tables: data.tables || [],
+            connection: data.connection || "CONNECTED"
           });
         }
       } catch (err) {
@@ -88,6 +92,37 @@ export default function AdminDashboard() {
            </div>
         </div>
       )}
+
+      {/* Database Diagnostic Panel */}
+      <div className="mb-8 p-6 bg-slate-900 rounded-[2.5rem] border border-white/10 shadow-2xl relative overflow-hidden">
+         <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl -mr-32 -mt-32" />
+         <div className="flex flex-col md:flex-row items-center gap-6 relative z-10">
+            <div className={`w-16 h-16 rounded-2xl flex items-center justify-center shadow-inner ${stats.connection === 'D1_CONNECTED' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-slate-800 text-slate-500'}`}>
+               <Icons.Lock size={32} />
+            </div>
+            <div className="flex-1 text-center md:text-left">
+               <div className="flex items-center justify-center md:justify-start gap-3">
+                  <h3 className="text-white font-black text-xl tracking-tight">Database Infrastructure Diagnostic</h3>
+                  <span className={`px-2 py-0.5 rounded-full text-[8px] font-black uppercase tracking-widest ${stats.connection === 'D1_CONNECTED' ? 'bg-emerald-500 text-white' : 'bg-slate-700 text-slate-400'}`}>
+                    {stats.connection}
+                  </span>
+               </div>
+               <div className="mt-2 flex flex-wrap justify-center md:justify-start gap-2">
+                  {stats.tables.length > 0 ? stats.tables.map(t => (
+                    <span key={t} className="px-2 py-1 bg-white/5 border border-white/5 rounded-lg text-[10px] text-slate-400 font-mono font-bold">
+                      {t}
+                    </span>
+                  )) : (
+                    <span className="text-rose-400 text-xs font-bold animate-pulse">No tables found! Database might be fresh or misconfigured.</span>
+                  )}
+               </div>
+            </div>
+            <div className="px-6 py-3 bg-white/5 rounded-2xl border border-white/10">
+               <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest text-center">Environment</p>
+               <p className="text-white font-black text-sm mt-1">Cloudflare Pages Edge</p>
+            </div>
+         </div>
+      </div>
 
       {isLoading ? (
         <div className="flex items-center justify-center py-20">

@@ -16,12 +16,14 @@ export async function GET(req: Request) {
       db.prepare("SELECT SUM(totalPrice) as revenue, SUM(laundryFee) as totalLaundry, SUM(deliveryFee) as totalDelivery FROM orders WHERE status = 'completed'"),
       db.prepare("SELECT key, value FROM system_settings WHERE key IN ('gp_store_percent', 'gp_rider_percent')"),
       db.prepare("SELECT COUNT(*) as total FROM users"), // Raw Unfiltered Count
+      db.prepare("SELECT name FROM sqlite_master WHERE type='table'"), // Diagnostic
     ]);
 
     const usersCount = coreStats[0].results?.[0]?.total || 0;
     const storesCount = coreStats[1].results?.[0]?.total || 0;
     const ordersCount = coreStats[2].results?.[0]?.total || 0;
     const rawUsersCount = coreStats[5].results?.[0]?.total || 0;
+    const tableNames = (coreStats[6].results || []).map((r: any) => r.name);
 
     const revResult = coreStats[3].results?.[0] || {};
     const grossRevenue = revResult.revenue || 0;
@@ -88,6 +90,8 @@ export async function GET(req: Request) {
     return NextResponse.json({ 
       users: usersCount,
       rawUsers: rawUsersCount,
+      tables: tableNames,
+      connection: "D1_CONNECTED",
       stores: displayTotalStores,
       activeStores: activeStores,
       orders: ordersCount,

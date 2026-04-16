@@ -138,9 +138,15 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
                        </button>
                      ))}
                   </div>
-                  <div className="mt-4 flex items-center justify-between px-1">
-                    <span className="text-[8px] font-black text-slate-700 uppercase tracking-widest">{language} mode</span>
-                    <span className="text-[8px] font-black text-primary-light uppercase tracking-tighter bg-primary/10 px-2 py-0.5 rounded-full">v1.3-Admin-Audit</span>
+                  <div className="mt-4 flex flex-col gap-1 px-1">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[8px] font-black text-slate-700 uppercase tracking-widest">{language} mode</span>
+                      <span className="text-[8px] font-black text-primary-light uppercase tracking-tighter bg-primary/10 px-2 py-0.5 rounded-full">v1.4-Diagnostic</span>
+                    </div>
+                    {/* Direct Diagnostic: Bypassing t() to check if th block is loaded */}
+                    <div className="text-[7px] font-bold text-slate-400 truncate opacity-50">
+                       TEST-TH: {translations?.th?.admin?.nav?.dashboard || "MISSING"}
+                    </div>
                   </div>
                </div>
            </div>
