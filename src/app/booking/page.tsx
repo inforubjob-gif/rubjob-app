@@ -350,7 +350,7 @@ function BookingFlow() {
   if (isLoaded && systemSettings.is_open === "false") {
     return (
       <div className="flex flex-col items-center justify-center min-h-dvh px-10 text-center animate-fade-in bg-slate-50">
-        <div className="w-24 h-24 bg-white rounded-[2.5rem] shadow-xl flex items-center justify-center mb-8 border border-slate-100">
+        <div className="w-24 h-24 bg-white rounded-2xl shadow-xl flex items-center justify-center mb-8 border border-slate-100">
            <Icons.Settings size={48} className="text-slate-300 animate-spin-slow" />
         </div>
         <h2 className="text-2xl font-black text-slate-900 tracking-tight">{t("booking.errors.systemClosedTitle")}</h2>
@@ -421,7 +421,7 @@ function BookingFlow() {
                     : "border-slate-100 hover:border-slate-200"
                 }`}
               >
-                <div className={`w-14 h-14 rounded-[1.25rem] flex items-center justify-center shrink-0 transition-colors ${
+                <div className={`w-14 h-14 rounded-xl flex items-center justify-center shrink-0 transition-colors ${
                   selectedService === svc.id ? "bg-primary text-white shadow-md shadow-primary/30" : "bg-primary-light text-primary-dark"
                 }`}>
                   {getServiceIcon(svc.id, { size: 28 })}
@@ -818,7 +818,7 @@ function BookingFlow() {
                   <span className="text-base font-black text-white tracking-tight">PromptPay</span>
                 </div>
                 
-                <div className="bg-white p-4 rounded-[2rem] shadow-inner border border-slate-100 relative overflow-hidden">
+                <div className="bg-white p-4 rounded-2xl shadow-inner border border-slate-100 relative overflow-hidden">
                   <img 
                     src={paymentQR || `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=00020101021129370016A000000677010111011300660000000005802TH5303764580215${totalPrice}.006304`}
                     alt="PromptPay QR" 

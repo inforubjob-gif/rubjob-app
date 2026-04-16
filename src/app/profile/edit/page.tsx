@@ -85,7 +85,7 @@ export default function EditProfilePage() {
         {/* Profile Image Section */}
         <div className="flex flex-col items-center gap-4">
           <div className="relative group cursor-pointer" onClick={handlePhotoClick}>
-            <div className="w-28 h-28 rounded-[2.5rem] bg-white p-1.5 shadow-2xl relative overflow-hidden transition-transform active:scale-95 ring-4 ring-white/30">
+            <div className="w-28 h-28 rounded-2xl bg-white p-1.5 shadow-2xl relative overflow-hidden transition-transform active:scale-95 ring-4 ring-white/30">
               {photoUrl ? (
                 <img src={photoUrl} alt="Profile" className="w-full h-full object-cover rounded-[2.1rem]" />
               ) : (
@@ -192,7 +192,7 @@ export default function EditProfilePage() {
           <button
             onClick={handleSave}
             disabled={!isVerified || isLoading}
-            className="w-full py-5 bg-primary text-slate-950 rounded-[1.8rem] font-[1000] uppercase tracking-[0.25em] shadow-2xl shadow-primary/30 disabled:bg-slate-200 disabled:text-slate-400 disabled:shadow-none active:scale-[0.98] transition-all flex items-center justify-center gap-3"
+            className="w-full py-5 bg-primary text-slate-950 rounded-2xl font-[1000] uppercase tracking-[0.25em] shadow-2xl shadow-primary/30 disabled:bg-slate-200 disabled:text-slate-400 disabled:shadow-none active:scale-[0.98] transition-all flex items-center justify-center gap-3"
           >
             {isLoading ? (
               <div className="w-6 h-6 border-4 border-slate-950/20 border-t-slate-950 rounded-full animate-spin" />

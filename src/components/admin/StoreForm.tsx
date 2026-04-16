@@ -10,7 +10,7 @@ import { useToast } from "@/components/providers/ToastProvider";
 
 const MapPicker = dynamic(() => import("@/components/ui/MapPicker"), { 
   ssr: false,
-  loading: () => <div className="h-[400px] w-full bg-slate-100 animate-pulse rounded-3xl flex items-center justify-center font-bold text-slate-400">Initializing Map Picker...</div>
+  loading: () => <div className="h-[400px] w-full bg-slate-100 animate-pulse rounded-2xl flex items-center justify-center font-bold text-slate-400">Initializing Map Picker...</div>
 });
 
 interface StoreFormProps {
@@ -173,7 +173,7 @@ export default function StoreForm({ initialData, isEdit }: StoreFormProps) {
   return (
     <form onSubmit={handleSave} className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
       {initialData?.status === 'pending' && (
-        <div className="bg-primary/5 border-2 border-primary/20 rounded-[2.5rem] p-6 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xl shadow-primary/5">
+        <div className="bg-primary/5 border-2 border-primary/20 rounded-2xl p-6 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xl shadow-primary/5">
            <div className="flex items-center gap-4">
               <div className="w-12 h-12 bg-primary rounded-2xl flex items-center justify-center text-slate-900 animate-pulse">
                  <Icons.Shield size={24} />
@@ -272,7 +272,7 @@ export default function StoreForm({ initialData, isEdit }: StoreFormProps) {
                   {['business_license', 'owner_id', 'storefront'].map(docType => {
                      const doc = formData.documents.find((d: any) => d.type === docType) || { status: 'none', url: '', notes: '' };
                      return (
-                        <div key={docType} className="p-6 rounded-3xl border-2 border-slate-50 bg-slate-50/20 space-y-4">
+                        <div key={docType} className="p-6 rounded-2xl border-2 border-slate-50 bg-slate-50/20 space-y-4">
                            <div className="flex items-center justify-between">
                               <span className="text-sm font-black text-slate-900 uppercase tracking-tight">{docType.replace('_', ' ').toUpperCase()}</span>
                               <select 
@@ -321,7 +321,7 @@ export default function StoreForm({ initialData, isEdit }: StoreFormProps) {
                  <h2 className="text-xl font-black text-slate-900 uppercase tracking-tight">{t('admin.stores.form.servicesPricing')}</h2>
               </div>
               
-              <div className="overflow-hidden border border-slate-100 rounded-3xl">
+              <div className="overflow-hidden border border-slate-100 rounded-2xl">
                  <table className="w-full text-left">
                     <thead className="bg-slate-50 border-b border-slate-100">
                        <tr>
@@ -521,7 +521,7 @@ export default function StoreForm({ initialData, isEdit }: StoreFormProps) {
               <button 
                 type="submit"
                 disabled={isSaving}
-                className="w-full bg-slate-900 text-white py-6 rounded-3xl font-black text-xs uppercase tracking-[0.3em] shadow-2xl shadow-slate-300 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50"
+                className="w-full bg-slate-900 text-white py-6 rounded-2xl font-black text-xs uppercase tracking-[0.3em] shadow-2xl shadow-slate-300 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50"
               >
                 {isSaving ? t('admin.stores.form.syncing') : isEdit ? t('admin.stores.form.updateBtn') : t('admin.stores.form.establishBtn')}
               </button>

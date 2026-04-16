@@ -121,7 +121,7 @@ export default function VehicleTypePage() {
            ))}
         </div>
 
-        <div className="p-5 bg-orange-50 rounded-[2.5rem] border border-orange-100 mt-4">
+        <div className="p-5 bg-orange-50 rounded-2xl border border-orange-100 mt-4">
             <div className="flex items-start gap-3">
                 <Icons.Shield size={20} className="text-primary mt-1" />
                 <div className="flex-1">

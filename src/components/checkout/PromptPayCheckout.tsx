@@ -54,7 +54,7 @@ export default function PromptPayCheckout({ clientSecret }: PromptPayCheckoutPro
   return (
     <div className="w-full max-w-md mx-auto space-y-6 animate-fade-in">
       {/* 📱 Specialized Mobile UX for LINE Mini-app */}
-      <div className="bg-blue-50 border-2 border-blue-100 rounded-3xl p-5 flex items-start gap-4 shadow-sm">
+      <div className="bg-blue-50 border-2 border-blue-100 rounded-2xl p-5 flex items-start gap-4 shadow-sm">
         <div className="w-12 h-12 bg-blue-600 text-white rounded-2xl flex items-center justify-center shrink-0 shadow-lg shadow-blue-600/20">
            <Icons.Camera size={24} strokeWidth={2.5} />
         </div>
@@ -72,7 +72,7 @@ export default function PromptPayCheckout({ clientSecret }: PromptPayCheckoutPro
       </div>
 
       <form id="payment-form" onSubmit={handleSubmit} className="space-y-6">
-        <div className="bg-white rounded-[2.5rem] p-6 border border-slate-100 shadow-xl shadow-slate-200/50">
+        <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-xl shadow-slate-200/50">
            <PaymentElement 
             id="payment-element" 
             options={{

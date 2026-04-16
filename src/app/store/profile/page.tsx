@@ -13,7 +13,7 @@ function SettingItem({ icon, label, value, onClick }: { icon: React.ReactNode, l
   return (
     <button 
       onClick={onClick}
-      className="w-full bg-white p-4 rounded-[1.5rem] border border-slate-100 flex items-center justify-between group active:scale-[0.98] transition-all shadow-sm"
+      className="w-full bg-white p-4 rounded-xl border border-slate-100 flex items-center justify-between group active:scale-[0.98] transition-all shadow-sm"
     >
       <div className="flex items-center gap-3">
           <div className="w-10 h-10 bg-orange-50 text-primary rounded-xl flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all duration-300">
@@ -80,7 +80,7 @@ export default function StoreProfilePage() {
         <div className="absolute top-0 left-0 w-32 h-32 bg-white/20 rounded-full -ml-16 -mt-16 blur-2xl" />
         <div className="flex items-center gap-4">
             <div className="relative">
-              <div className="w-16 h-16 rounded-3xl bg-white shadow-xl flex items-center justify-center p-1 border-2 border-orange-100/50">
+              <div className="w-16 h-16 rounded-2xl bg-white shadow-xl flex items-center justify-center p-1 border-2 border-orange-100/50">
                 <div className="w-full h-full rounded-2xl bg-orange-50 flex items-center justify-center text-primary overflow-hidden font-black text-xl">
                     {store?.name?.[0] || "S"}
                 </div>
@@ -98,7 +98,7 @@ export default function StoreProfilePage() {
 
       <div className="flex-1 px-5 pt-6 space-y-7 pb-24 animate-fade-in">
         {/* Toggle Status */}
-        <Card className="p-5 border-none shadow-sm shadow-primary/5 rounded-[2.5rem] bg-white border border-primary/10">
+        <Card className="p-5 border-none shadow-sm shadow-primary/5 rounded-2xl bg-white border border-primary/10">
            <div className="flex items-center justify-between">
              <div className="flex items-center gap-4">
                 <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-500 flex items-center justify-center border border-emerald-100 shadow-sm shadow-emerald-500/10">
@@ -164,7 +164,7 @@ export default function StoreProfilePage() {
           <p className="text-[10px] font-black text-slate-300 uppercase tracking-[0.25em] mb-4 pl-1">{t("store.profile.account")}</p>
           <button 
             onClick={() => logout("/store")}
-            className="w-full p-5 bg-white rounded-[2rem] border border-slate-100 flex items-center gap-4 active:scale-95 transition-all shadow-sm"
+            className="w-full p-5 bg-white rounded-2xl border border-slate-100 flex items-center gap-4 active:scale-95 transition-all shadow-sm"
           >
              <div className="w-10 h-10 rounded-xl bg-red-50 text-red-500 flex items-center justify-center">
                 <Icons.LogOut size={20} />
@@ -178,7 +178,7 @@ export default function StoreProfilePage() {
         {showLanguageModal && (
           <div className="fixed inset-0 z-[110] flex items-end sm:items-center justify-center animate-fade-in">
             <div className="absolute inset-0 bg-primary-dark/40 backdrop-blur-md" onClick={() => setShowLanguageModal(false)} />
-            <div className="bg-white w-full max-w-lg rounded-t-[3rem] sm:rounded-[3rem] p-8 pb-12 relative z-10 animate-slide-up shadow-2xl">
+            <div className="bg-white w-full max-w-lg rounded-t-[3rem] sm:rounded-2xl p-8 pb-12 relative z-10 animate-slide-up shadow-2xl">
               <div className="w-12 h-1.5 bg-orange-100 rounded-full mx-auto mb-8 sm:hidden" />
              <h3 className="text-xl font-black text-slate-900 mb-6 text-center">{t("store.profile.selectLanguage")}</h3>
              <div className="space-y-3">
@@ -225,7 +225,7 @@ export default function StoreProfilePage() {
 
 function SettingsLink({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
     return (
-        <button className="w-full bg-white p-4 rounded-[1.5rem] border border-slate-100 flex items-center justify-between group active:scale-[0.98] transition-all">
+        <button className="w-full bg-white p-4 rounded-xl border border-slate-100 flex items-center justify-between group active:scale-[0.98] transition-all">
             <div className="flex items-center gap-3">
                 <div className="w-9 h-9 bg-slate-50 text-slate-400 rounded-xl flex items-center justify-center group-hover:text-primary transition-colors">
                     {icon}

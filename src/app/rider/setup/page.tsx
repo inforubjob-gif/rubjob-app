@@ -72,7 +72,7 @@ export default function RiderSetupPage() {
       </header>
 
       <div className="relative z-10 px-5 flex-1 max-w-lg mx-auto w-full">
-        <Card className="p-6 space-y-6 shadow-2xl shadow-primary-dark/10 border border-white rounded-[2.5rem] bg-white">
+        <Card className="p-6 space-y-6 shadow-2xl shadow-primary-dark/10 border border-white rounded-2xl bg-white">
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
               <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t("rider.setup.fullName")}</label>

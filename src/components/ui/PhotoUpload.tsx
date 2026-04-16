@@ -34,7 +34,7 @@ export default function PhotoUpload({ onPhotoCapture, label, required }: PhotoUp
       
       <div 
         onClick={() => fileInputRef.current?.click()}
-        className={`relative aspect-video rounded-[2.5rem] border-4 border-dashed transition-all cursor-pointer overflow-hidden flex flex-col items-center justify-center gap-2 ${
+        className={`relative aspect-video rounded-2xl border-4 border-dashed transition-all cursor-pointer overflow-hidden flex flex-col items-center justify-center gap-2 ${
           preview ? 'border-primary bg-primary/5' : 'border-slate-100 bg-slate-50 hover:bg-slate-100/50'
         }`}
       >

@@ -81,7 +81,7 @@ export default function StoreServicesPage() {
           </div>
         ) : (
           services.map((svc) => (
-            <Card key={svc.id} className={`p-5 rounded-[2.5rem] border-2 transition-all ${svc.isEnabled ? 'border-primary/20 bg-white shadow-xl shadow-primary/5' : 'border-slate-100 bg-slate-50 opacity-70'}`}>
+            <Card key={svc.id} className={`p-5 rounded-2xl border-2 transition-all ${svc.isEnabled ? 'border-primary/20 bg-white shadow-xl shadow-primary/5' : 'border-slate-100 bg-slate-50 opacity-70'}`}>
               <div className="flex items-center gap-4 mb-5">
                 <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shadow-inner ${svc.isEnabled ? 'bg-primary/10 text-primary' : 'bg-slate-200 text-slate-400'}`}>
                   {getServiceIcon(svc.id, { size: 28 })}

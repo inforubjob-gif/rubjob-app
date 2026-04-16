@@ -207,7 +207,7 @@ export default function LiffProvider({ children }: { children: ReactNode }) {
       
       {/* 🛠️ Debug Mock UI (Visible only in development) */}
       {process.env.NODE_ENV === "development" && !ctx.isLoggedIn && (
-        <div className="fixed bottom-6 right-6 z-[9999] bg-white rounded-3xl shadow-2xl border border-slate-100 p-4 space-y-3 stagger animate-fade-in translate-y-0">
+        <div className="fixed bottom-6 right-6 z-[9999] bg-white rounded-2xl shadow-2xl border border-slate-100 p-4 space-y-3 stagger animate-fade-in translate-y-0">
            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Debug Switcher</p>
            <div className="flex flex-col gap-2">
               <button 

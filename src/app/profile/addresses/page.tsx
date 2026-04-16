@@ -248,7 +248,7 @@ export default function ManageAddressesPage() {
                   <div className="flex items-center gap-2">
                     <p className="text-sm font-bold text-slate-900">{addr.label}</p>
                     {addr.isDefault && (
-                       <span className="text-[10px] bg-primary/10 text-primary-dark px-1.5 py-0.5 rounded font-bold">{t("common.confirm")}</span>
+                       <span className="text-[10px] bg-primary/10 text-primary-dark px-1.5 py-0.5 rounded-lg font-bold">{t("common.confirm")}</span>
                     )}
                        <span className="text-[10px] text-emerald-500 font-black flex items-center gap-1">
                          <Icons.MapPin size={10} strokeWidth={4} /> {t("profile.pinned")}

@@ -53,12 +53,12 @@ export default function AdminAuthGate({ children }: { children: React.ReactNode 
   if (!admin) {
     return (
       <div className="flex h-screen w-full items-center justify-center bg-slate-50 absolute inset-0 z-[100]">
-        <div className="bg-white rounded-[2.5rem] w-full max-w-md p-10 shadow-2xl relative overflow-hidden border border-slate-100">
+        <div className="bg-white rounded-2xl w-full max-w-md p-10 shadow-2xl relative overflow-hidden border border-slate-100">
           {/* Header Brand Line */}
           <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-primary via-primary-dark to-primary" />
           
           <div className="flex justify-center mb-8">
-            <div className="w-24 h-24 bg-primary-light rounded-[2rem] flex items-center justify-center ring-8 ring-primary-light/50 transition-transform hover:scale-105 duration-500">
+            <div className="w-24 h-24 bg-primary-light rounded-2xl flex items-center justify-center ring-8 ring-primary-light/50 transition-transform hover:scale-105 duration-500">
               <Icons.Logo size={60} variant="color" />
             </div>
           </div>

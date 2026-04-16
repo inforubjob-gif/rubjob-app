@@ -8,7 +8,7 @@ export default function Skeleton({ className = "", variant = "rect" }: SkeletonP
   const variantClasses = {
     rect: "rounded-lg",
     circle: "rounded-full",
-    text: "rounded h-3 w-full",
+    text: "rounded-lg h-3 w-full",
   };
 
   return (

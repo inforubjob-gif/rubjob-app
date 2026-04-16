@@ -91,7 +91,7 @@ export default function HomePage() {
 
       <div className="relative z-10 px-5 space-y-7 pt-2 pb-24 animate-fade-in">
         {/* ─── Hero Ads ─── */}
-        <section className="relative w-full rounded-[2.5rem] overflow-hidden shadow-2xl shadow-primary/20 group active:scale-[0.98] transition-all duration-500 bg-white border-4 border-white/50">
+        <section className="relative w-full rounded-2xl overflow-hidden shadow-2xl shadow-primary/20 group active:scale-[0.98] transition-all duration-500 bg-white border-4 border-white/50">
           <img 
             src="/images/ads/Cover-app.png" 
             alt="Rubjob Promotion"
@@ -186,7 +186,7 @@ export default function HomePage() {
       {comingSoonModal && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-5 animate-fade-in">
           <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={() => setComingSoonModal(null)} />
-          <div className="bg-white rounded-[2rem] p-8 w-full max-w-[320px] relative z-10 shadow-2xl animate-scale-in flex flex-col items-center text-center">
+          <div className="bg-white rounded-2xl p-8 w-full max-w-[320px] relative z-10 shadow-2xl animate-scale-in flex flex-col items-center text-center">
             <div className="w-28 h-28 bg-amber-50 rounded-full flex items-center justify-center p-4 mb-6 shrink-0 shadow-inner">
               <img 
                 src="/images/icon/icon-Under-maintenance..png" 

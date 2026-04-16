@@ -152,7 +152,7 @@ export default function CouponsAdminPage() {
                          <div className="flex items-center gap-2">
                             <span className="text-sm font-black text-slate-900 tracking-tight">{coupon.code}</span>
                             {coupon.isVisible === 1 && (
-                               <span className="text-[8px] font-black text-indigo-500 uppercase bg-indigo-50 px-1 py-0.5 rounded leading-none">{t('admin.coupons.status.wallet')}</span>
+                               <span className="text-[8px] font-black text-indigo-500 uppercase bg-indigo-50 px-1 py-0.5 rounded-lg leading-none">{t('admin.coupons.status.wallet')}</span>
                             )}
                          </div>
                          <p className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">
@@ -221,7 +221,7 @@ export default function CouponsAdminPage() {
       {/* New Coupon Modal */}
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title={t('admin.coupons.modal.title')}>
          <form onSubmit={handleCreate} className="space-y-6 pt-2 h-[80vh] overflow-y-auto px-1 custom-scrollbar">
-            <div className="p-4 bg-indigo-50 rounded-3xl border border-indigo-100">
+            <div className="p-4 bg-indigo-50 rounded-2xl border border-indigo-100">
                <label className="flex items-center gap-3 cursor-pointer">
                   <div className={`w-12 h-6 rounded-full transition-colors relative ${formData.isVisible ? 'bg-indigo-500' : 'bg-slate-300'}`}>
                      <input 
@@ -309,7 +309,7 @@ export default function CouponsAdminPage() {
 
             <button 
               disabled={isSaving}
-              className="w-full bg-slate-900 text-white py-5 rounded-3xl font-black text-xs uppercase tracking-[0.2em] shadow-xl shadow-slate-200 hover:scale-[1.01] active:scale-[0.98] transition-all disabled:opacity-50"
+              className="w-full bg-slate-900 text-white py-5 rounded-2xl font-black text-xs uppercase tracking-[0.2em] shadow-xl shadow-slate-200 hover:scale-[1.01] active:scale-[0.98] transition-all disabled:opacity-50"
             >
               {isSaving ? t('admin.coupons.modal.syncing') : t('admin.coupons.modal.deploy')}
             </button>

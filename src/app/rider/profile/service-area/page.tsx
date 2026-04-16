@@ -132,7 +132,7 @@ export default function RiderServiceAreaPage() {
 
         {/* Address card at bottom */}
         <div className="absolute bottom-10 left-5 right-5 z-20">
-           <Card className="p-6 shadow-[0_20px_50px_rgba(0,0,0,0.15)] border-none bg-white/95 backdrop-blur-xl rounded-[2.5rem]">
+           <Card className="p-6 shadow-[0_20px_50px_rgba(0,0,0,0.15)] border-none bg-white/95 backdrop-blur-xl rounded-2xl">
               <div className="flex gap-4">
                  <div className="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center text-3xl shadow-inner shrink-0">📍</div>
                  <div className="flex-1 overflow-hidden">
@@ -149,7 +149,7 @@ export default function RiderServiceAreaPage() {
               <button 
                 onClick={handleSave}
                 disabled={!hasPinned || isSaving}
-                className="w-full mt-6 py-5 bg-primary text-white rounded-[1.5rem] text-sm font-black uppercase tracking-[0.2em] shadow-xl shadow-primary/30 active:scale-[0.98] transition-all disabled:opacity-50"
+                className="w-full mt-6 py-5 bg-primary text-white rounded-xl text-sm font-black uppercase tracking-[0.2em] shadow-xl shadow-primary/30 active:scale-[0.98] transition-all disabled:opacity-50"
               >
                  {isSaving ? "Saving..." : "Confirm Support Area"}
               </button>

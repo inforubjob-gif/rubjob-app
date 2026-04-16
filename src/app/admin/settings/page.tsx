@@ -272,10 +272,10 @@ function SettingsContent() {
         </div>
       </header>
       
-      <div className="flex bg-slate-100 p-1.5 rounded-[2rem] w-full sm:w-fit overflow-x-auto no-scrollbar whitespace-nowrap">
+      <div className="flex bg-slate-100 p-1.5 rounded-2xl w-full sm:w-fit overflow-x-auto no-scrollbar whitespace-nowrap">
         <button 
           onClick={() => setActiveTab("system")}
-          className={`flex-1 sm:flex-none px-6 md:px-8 py-3.5 text-xs md:text-sm font-black rounded-[1.75rem] transition-all ${activeTab === 'system' ? 'bg-white text-primary shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
+          className={`flex-1 sm:flex-none px-6 md:px-8 py-3.5 text-xs md:text-sm font-black rounded-xl transition-all ${activeTab === 'system' ? 'bg-white text-primary shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
         >
           <div className="flex items-center justify-center gap-2">
             <Icons.Settings size={18} />
@@ -284,7 +284,7 @@ function SettingsContent() {
         </button>
         <button 
           onClick={() => setActiveTab("admins")}
-          className={`flex-1 sm:flex-none px-6 md:px-8 py-3.5 text-xs md:text-sm font-black rounded-[1.75rem] transition-all ${activeTab === 'admins' ? 'bg-white text-primary shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
+          className={`flex-1 sm:flex-none px-6 md:px-8 py-3.5 text-xs md:text-sm font-black rounded-xl transition-all ${activeTab === 'admins' ? 'bg-white text-primary shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
         >
           <div className="flex items-center justify-center gap-2">
             <Icons.User size={18} />
@@ -293,7 +293,7 @@ function SettingsContent() {
         </button>
         <button 
           onClick={() => setActiveTab("profile")}
-          className={`flex-1 sm:flex-none px-6 md:px-8 py-3.5 text-xs md:text-sm font-black rounded-[1.75rem] transition-all ${activeTab === 'profile' ? 'bg-white text-primary shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
+          className={`flex-1 sm:flex-none px-6 md:px-8 py-3.5 text-xs md:text-sm font-black rounded-xl transition-all ${activeTab === 'profile' ? 'bg-white text-primary shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
         >
           <div className="flex items-center justify-center gap-2">
              <div className="w-5 h-5 rounded-full bg-slate-200 border border-slate-300 overflow-hidden ring-2 ring-white">
@@ -305,7 +305,7 @@ function SettingsContent() {
       </div>
 
       {(error || success) && (
-        <div className={`p-5 rounded-3xl font-bold text-sm animate-fade-in flex items-center gap-3 border shadow-sm ${error ? 'bg-rose-50 text-rose-600 border-rose-100' : 'bg-emerald-50 text-emerald-600 border-emerald-100'}`}>
+        <div className={`p-5 rounded-2xl font-bold text-sm animate-fade-in flex items-center gap-3 border shadow-sm ${error ? 'bg-rose-50 text-rose-600 border-rose-100' : 'bg-emerald-50 text-emerald-600 border-emerald-100'}`}>
           <div className={`w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 ${error ? 'bg-rose-100' : 'bg-emerald-100'}`}>
              {error ? <Icons.Close size={18} /> : <Icons.Check size={18} />}
           </div>
@@ -316,7 +316,7 @@ function SettingsContent() {
       {activeTab === "admins" ? (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 animate-fade-in relative z-10 pb-20">
           <div className="lg:col-span-4">
-            <Card className="p-8 bg-white border border-slate-100 shadow-2xl rounded-[3rem] sticky top-8">
+            <Card className="p-8 bg-white border border-slate-100 shadow-2xl rounded-2xl sticky top-8">
               <div className="flex items-center gap-3 mb-8">
                  <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
                     <Icons.User size={20} />
@@ -387,13 +387,13 @@ function SettingsContent() {
           <div className="lg:col-span-8">
             <div className="flex items-center justify-between mb-8 px-2">
                <h3 className="text-xl font-black text-slate-900 tracking-tight">{t("admin.settings.agentsTitle")}</h3>
-               <div className="px-4 py-1.5 bg-slate-100 text-slate-400 rounded-full text-[10px] font-black uppercase tracking-widest border border-slate-200">
+               <div className="px-4 py-1.5 bg-slate-100 text-slate-400 rounded-lg text-[10px] font-black uppercase tracking-widest border border-slate-200">
                   {admins.length} {t("admin.settings.personnelActive")}
                </div>
             </div>
             
             {isLoading ? (
-               <div className="p-20 flex justify-center bg-white rounded-[3rem] border border-slate-100 shadow-sm border-dashed">
+               <div className="p-20 flex justify-center bg-white rounded-2xl border border-slate-100 shadow-sm border-dashed">
                   <div className="w-10 h-10 border-4 border-slate-100 border-t-primary rounded-full animate-spin" />
                </div>
             ) : (
@@ -404,12 +404,12 @@ function SettingsContent() {
                     const isSuper = adminItem.role === 'super_admin';
 
                     return (
-                      <Card key={adminItem.id} className="p-7 bg-white border border-slate-100 flex flex-col group rounded-[2.5rem] hover:shadow-2xl hover:shadow-slate-200/50 transition-all relative overflow-hidden">
+                      <Card key={adminItem.id} className="p-7 bg-white border border-slate-100 flex flex-col group rounded-2xl hover:shadow-2xl hover:shadow-slate-200/50 transition-all relative overflow-hidden">
                          <div className={`absolute top-0 right-0 w-24 h-24 blur-3xl -mr-12 -mt-12 transition-colors ${isSuper ? 'bg-rose-500/10' : 'bg-primary/10'}`} />
                          
                          <div className="flex items-start justify-between mb-6 relative z-10">
                             <div className="flex items-center gap-4">
-                               <div className={`w-16 h-16 rounded-[1.5rem] flex items-center justify-center font-black shadow-inner overflow-hidden border-4 border-white ring-1 ring-slate-100 ${isSuper ? 'bg-rose-50 text-rose-600' : 'bg-indigo-50 text-indigo-600'}`}>
+                               <div className={`w-16 h-16 rounded-xl flex items-center justify-center font-black shadow-inner overflow-hidden border-4 border-white ring-1 ring-slate-100 ${isSuper ? 'bg-rose-50 text-rose-600' : 'bg-indigo-50 text-indigo-600'}`}>
                                   {adminItem.avatarUrl ? <img src={adminItem.avatarUrl} className="w-full h-full object-cover" /> : adminItem.name?.[0]?.toUpperCase()}
                                </div>
                                <div>
@@ -465,11 +465,11 @@ function SettingsContent() {
            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
               {/* Identity Sidebar */}
               <div className="lg:col-span-4 transition-all">
-                 <Card className="p-8 bg-white border border-slate-100 shadow-2xl rounded-[3rem] text-center sticky top-8 relative overflow-hidden group">
+                 <Card className="p-8 bg-white border border-slate-100 shadow-2xl rounded-2xl text-center sticky top-8 relative overflow-hidden group">
                     <div className={`absolute top-0 left-0 w-full h-2 ${admin?.role === 'super_admin' ? 'bg-rose-500' : 'bg-primary'}`} />
                     
                     <div className="relative inline-block mb-6 pt-4">
-                       <div className={`w-32 h-32 rounded-[2.5rem] bg-slate-50 border-4 border-white shadow-2xl flex items-center justify-center overflow-hidden ring-4 ${admin?.role === 'super_admin' ? 'ring-rose-50' : 'ring-primary/5'}`}>
+                       <div className={`w-32 h-32 rounded-2xl bg-slate-50 border-4 border-white shadow-2xl flex items-center justify-center overflow-hidden ring-4 ${admin?.role === 'super_admin' ? 'ring-rose-50' : 'ring-primary/5'}`}>
                           {profileForm.avatarUrl ? <img src={profileForm.avatarUrl} className="w-full h-full object-cover" /> : <Icons.User size={48} className="text-slate-200" />}
                        </div>
                        <label className={`absolute -bottom-2 -right-2 w-10 h-10 ${admin?.role === 'super_admin' ? 'bg-rose-500' : 'bg-primary'} text-white rounded-2xl flex items-center justify-center shadow-xl border-4 border-white cursor-pointer hover:scale-110 active:scale-95 transition-all`}>
@@ -506,7 +506,7 @@ function SettingsContent() {
               {/* Main Content Areas */}
               <div className="lg:col-span-8 flex flex-col gap-8">
                  {/* Identity & Preferences */}
-                 <Card className="p-10 bg-white border border-slate-100 shadow-xl rounded-[3rem]">
+                 <Card className="p-10 bg-white border border-slate-100 shadow-xl rounded-2xl">
                     <div className="flex items-center gap-3 mb-10">
                        <div className="w-10 h-10 rounded-xl bg-slate-50 text-slate-400 flex items-center justify-center">
                           <Icons.Settings size={20} />
@@ -577,7 +577,7 @@ function SettingsContent() {
         <div className="space-y-8 animate-fade-in relative z-10 pb-20">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {/* Platform Status Card */}
-            <Card className="p-10 bg-white border border-slate-100 shadow-xl rounded-[3rem] relative overflow-hidden group">
+            <Card className="p-10 bg-white border border-slate-100 shadow-xl rounded-2xl relative overflow-hidden group">
                <div className={`absolute top-0 right-0 w-32 h-32 blur-[80px] -mr-16 -mt-16 transition-all duration-700 ${getSetting("is_open") === "true" ? "bg-emerald-500/20 group-hover:bg-emerald-500/30" : "bg-rose-500/20 group-hover:bg-rose-500/30"}`} />
                
                <div className="flex items-center gap-4 mb-10 relative z-10">
@@ -596,7 +596,7 @@ function SettingsContent() {
                <div className="space-y-8 relative z-10">
                   <div className="space-y-4">
                     <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t("admin.settings.systemLabelStatus")}</label>
-                    <div className="grid grid-cols-2 gap-3 bg-slate-50 p-2 rounded-[1.75rem] border border-slate-100">
+                    <div className="grid grid-cols-2 gap-3 bg-slate-50 p-2 rounded-2xl border border-slate-100">
                        <button 
                          onClick={() => updateLocalSetting("is_open", "true")}
                          className={`py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all ${getSetting("is_open") === "true" ? "bg-white text-emerald-600 shadow-lg shadow-emerald-500/10 border border-emerald-100" : "text-slate-400 hover:text-slate-500"}`}
@@ -634,7 +634,7 @@ function SettingsContent() {
             </Card>
 
             {/* Finance Card */}
-            <Card className="p-10 bg-white border border-slate-100 shadow-xl rounded-[3rem] relative overflow-hidden group">
+            <Card className="p-10 bg-white border border-slate-100 shadow-xl rounded-2xl relative overflow-hidden group">
                <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 blur-[80px] -mr-16 -mt-16 group-hover:bg-indigo-500/20 transition-all duration-700" />
                
                <div className="flex items-center gap-4 mb-10 relative z-10">
@@ -690,7 +690,7 @@ function SettingsContent() {
                       <div className="absolute left-6 top-1/2 -translate-y-1/2 text-emerald-600 font-black text-xl">฿</div>
                       <input 
                         type="number" 
-                        className="w-full bg-emerald-50/30 border-2 border-emerald-100/50 rounded-[1.75rem] pl-16 pr-6 py-6 text-3xl text-slate-900 font-black focus:border-emerald-500 transition-all outline-none font-mono"
+                        className="w-full bg-emerald-50/30 border-2 border-emerald-100/50 rounded-2xl pl-16 pr-6 py-6 text-3xl text-slate-900 font-black focus:border-emerald-500 transition-all outline-none font-mono"
                         placeholder="25"
                         value={getSetting("rider_base_payout")}
                         onChange={(e) => updateLocalSetting("rider_base_payout", e.target.value)}
@@ -710,7 +710,7 @@ function SettingsContent() {
       {/* Floating Save Bar for System Settings */}
       {activeTab === 'system' && (
         <div className={`fixed bottom-8 left-4 right-4 md:left-1/2 md:-translate-x-1/2 md:right-auto z-50 transition-all duration-500 ${hasChanges ? 'translate-y-0 opacity-100 scale-100' : 'translate-y-20 opacity-0 scale-95 pointer-events-none'}`}>
-            <div className="bg-slate-900 border border-white/10 shadow-[0_25px_70px_-15px_rgba(0,0,0,0.6)] rounded-[2rem] md:rounded-full px-4 md:px-5 py-3 md:py-4 flex flex-col md:flex-row items-center gap-4 md:gap-8 backdrop-blur-2xl">
+            <div className="bg-slate-900 border border-white/10 shadow-[0_25px_70px_-15px_rgba(0,0,0,0.6)] rounded-2xl md:rounded-full px-4 md:px-5 py-3 md:py-4 flex flex-col md:flex-row items-center gap-4 md:gap-8 backdrop-blur-2xl">
                <div className="flex items-center gap-3 md:pl-4">
                   <div className="w-10 h-10 md:w-12 md:h-12 bg-amber-400 rounded-xl md:rounded-2xl flex items-center justify-center animate-pulse shadow-[0_0_20px_rgba(251,191,36,0.3)] shrink-0">
                      <Icons.Settings size={20} className="text-slate-900" />
@@ -723,7 +723,7 @@ function SettingsContent() {
                <button 
                   onClick={handleSaveSettings}
                   disabled={isSaving}
-                  className="bg-primary text-white h-12 md:h-14 px-8 md:px-12 rounded-xl md:rounded-[1.25rem] font-black text-xs md:text-sm shadow-2xl shadow-primary/30 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3 group w-full md:w-auto"
+                  className="bg-primary text-white h-12 md:h-14 px-8 md:px-12 rounded-xl md:rounded-xl font-black text-xs md:text-sm shadow-2xl shadow-primary/30 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3 group w-full md:w-auto"
                >
                   {isSaving ? <Icons.Refresh size={18} className="animate-spin" /> : <span className="uppercase tracking-widest">{t("admin.settings.floatingBtnDeploy")}</span>}
                </button>

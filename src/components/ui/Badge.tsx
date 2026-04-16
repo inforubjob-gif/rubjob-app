@@ -51,13 +51,11 @@ export default function Badge({
   className = "",
 }: BadgeProps) {
   return (
-    <span
       className={`
-        inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold
+        inline-flex items-center px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest
         ${variantStyles[variant]}
         ${className}
       `}
-    >
       {children}
     </span>
   );

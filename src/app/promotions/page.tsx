@@ -130,8 +130,8 @@ export default function PromotionsPage() {
       <div className="relative z-10 px-5 space-y-7 pt-2 pb-24 animate-fade-in stagger">
         {/* Membership Card (High Contrast Premium) */}
         <div className="relative group animate-slide-up -mt-2">
-          <div className="absolute -inset-1 bg-gradient-to-r from-primary to-primary-dark rounded-[2.5rem] blur opacity-20 group-hover:opacity-40 transition duration-1000"></div>
-          <div className="p-6 relative overflow-hidden shadow-2xl rounded-[2rem] border border-white/20 bg-gradient-to-br from-[#ae8b5b] to-[#806642] backdrop-blur-xl">
+          <div className="absolute -inset-1 bg-gradient-to-r from-primary to-primary-dark rounded-2xl blur opacity-20 group-hover:opacity-40 transition duration-1000"></div>
+          <div className="p-6 relative overflow-hidden shadow-2xl rounded-2xl border border-white/20 bg-gradient-to-br from-[#ae8b5b] to-[#806642] backdrop-blur-xl">
             <div className="absolute top-[-20%] right-[-10%] w-48 h-48 bg-primary/20 rounded-full blur-3xl pointer-events-none" />
             
             <div className="relative z-10">
@@ -146,7 +146,7 @@ export default function PromotionsPage() {
                     <span className="text-[11px] font-bold text-slate-300">{t("promotions.pointsLabel")}</span>
                   </div>
                 </div>
-                <div className="w-14 h-14 bg-black/20 backdrop-blur-md rounded-[1.25rem] flex items-center justify-center text-primary shadow-inner border border-white/10">
+                <div className="w-14 h-14 bg-black/20 backdrop-blur-md rounded-xl flex items-center justify-center text-primary shadow-inner border border-white/10">
                   <Icons.Guarantee size={28} strokeWidth={2.5} />
                 </div>
               </div>

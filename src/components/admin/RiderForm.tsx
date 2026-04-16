@@ -106,7 +106,7 @@ export default function RiderForm({ initialData, isEdit }: RiderFormProps) {
   return (
     <form onSubmit={handleSave} className="space-y-8 pb-20 animate-in fade-in slide-in-from-bottom-4 duration-500">
       {initialData?.status === 'pending' && (
-        <div className="bg-amber-50 border-2 border-amber-200 rounded-[2rem] p-6 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xl shadow-amber-500/5">
+        <div className="bg-amber-50 border-2 border-amber-200 rounded-2xl p-6 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xl shadow-amber-500/5">
            <div className="flex items-center gap-4">
               <div className="w-12 h-12 bg-amber-500 rounded-2xl flex items-center justify-center text-white animate-pulse">
                  <Icons.Shield size={24} />
@@ -245,7 +245,7 @@ export default function RiderForm({ initialData, isEdit }: RiderFormProps) {
                  {DOCUMENT_TYPES.map(docType => {
                     const doc = formData.documents.find((d: any) => d.type === docType.id) || { status: 'none', url: '', notes: '' };
                     return (
-                       <div key={docType.id} className="p-6 rounded-3xl border-2 border-slate-50 bg-slate-50/20 space-y-4">
+                       <div key={docType.id} className="p-6 rounded-2xl border-2 border-slate-50 bg-slate-50/20 space-y-4">
                           <div className="flex items-center justify-between">
                              <div className="flex items-center gap-3">
                                 <div className="p-2 bg-white rounded-lg shadow-sm text-slate-400">
@@ -408,7 +408,7 @@ export default function RiderForm({ initialData, isEdit }: RiderFormProps) {
            <div className="pt-4">
               <button 
                 disabled={isSaving}
-                className="w-full bg-slate-900 text-white py-6 rounded-3xl font-black text-xs uppercase tracking-[0.3em] shadow-2xl shadow-slate-300 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50"
+                className="w-full bg-slate-900 text-white py-6 rounded-2xl font-black text-xs uppercase tracking-[0.3em] shadow-2xl shadow-slate-300 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50"
               >
                 {isSaving ? t('admin.riders.form.syncing') : isEdit ? t('admin.riders.form.updateBtn') : t('admin.riders.form.authorizeBtn')}
               </button>
@@ -422,7 +422,7 @@ export default function RiderForm({ initialData, isEdit }: RiderFormProps) {
            </div>
            
            {isEdit && (
-              <div className="mt-8 p-6 bg-slate-50 rounded-3xl space-y-3">
+              <div className="mt-8 p-6 bg-slate-50 rounded-2xl space-y-3">
                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t('admin.riders.form.statusControl')}</p>
                  <select 
                    value={formData.status}

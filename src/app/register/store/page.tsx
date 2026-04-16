@@ -9,7 +9,7 @@ import Button from "@/components/ui/Button";
 
 const MapPicker = dynamic(() => import("@/components/ui/MapPicker"), { 
   ssr: false,
-  loading: () => <div className="h-[250px] w-full bg-slate-900 animate-pulse rounded-3xl flex items-center justify-center font-bold text-slate-700">Loading Intelligence...</div>
+  loading: () => <div className="h-[250px] w-full bg-slate-900 animate-pulse rounded-2xl flex items-center justify-center font-bold text-slate-700">Loading Intelligence...</div>
 });
 
 export default function StoreRegisterPage() {
@@ -71,7 +71,7 @@ export default function StoreRegisterPage() {
   if (step === 4) {
     return (
       <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-6 text-center">
-        <div className="w-24 h-24 bg-primary rounded-[2.5rem] flex items-center justify-center text-slate-900 mb-8 shadow-2xl shadow-primary/20 animate-in zoom-in duration-500">
+        <div className="w-24 h-24 bg-primary rounded-2xl flex items-center justify-center text-slate-900 mb-8 shadow-2xl shadow-primary/20 animate-in zoom-in duration-500">
           <Icons.Store size={48} strokeWidth={2.5} />
         </div>
         <h1 className="text-3xl font-black text-slate-900 mb-3 uppercase tracking-tighter">Welcome to the Network</h1>
@@ -115,7 +115,7 @@ export default function StoreRegisterPage() {
                   required
                   value={formData.name}
                   onChange={e => setFormData({...formData, name: e.target.value})}
-                  className="w-full bg-slate-50 border-2 border-slate-100 rounded-3xl p-5 font-black text-sm focus:outline-none focus:border-primary/50 transition-all"
+                  className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl p-5 font-black text-sm focus:outline-none focus:border-primary/50 transition-all"
                   placeholder="e.g. Sukhumvit Laundry Loft"
                 />
              </div>
@@ -126,14 +126,14 @@ export default function StoreRegisterPage() {
                   type="tel"
                   value={formData.phone}
                   onChange={e => setFormData({...formData, phone: e.target.value})}
-                  className="w-full bg-slate-50 border-2 border-slate-100 rounded-3xl p-5 font-mono text-sm focus:outline-none focus:border-primary/50 transition-all font-bold"
+                  className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl p-5 font-mono text-sm focus:outline-none focus:border-primary/50 transition-all font-bold"
                   placeholder="08X-XXX-XXXX"
                 />
              </div>
              
              <div className="space-y-2">
                 <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Interactive Map Pin</label>
-                <div className="rounded-3xl overflow-hidden border-2 border-slate-100 shadow-inner">
+                <div className="rounded-2xl overflow-hidden border-2 border-slate-100 shadow-inner">
                    <MapPicker 
                      lat={formData.lat} 
                      lng={formData.lng} 
@@ -149,7 +149,7 @@ export default function StoreRegisterPage() {
                   rows={3}
                   value={formData.address}
                   onChange={e => setFormData({...formData, address: e.target.value})}
-                  className="w-full bg-slate-50 border-2 border-slate-100 rounded-3xl p-5 font-bold text-sm focus:outline-none focus:border-primary/50 transition-all"
+                  className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl p-5 font-bold text-sm focus:outline-none focus:border-primary/50 transition-all"
                   placeholder="Street, District, Province..."
                 />
              </div>
@@ -164,7 +164,7 @@ export default function StoreRegisterPage() {
 
         {step === 2 && (
           <div className="space-y-6 animate-in slide-in-from-right-4 duration-500">
-             <div className="bg-primary/10 border-2 border-primary/20 rounded-[2.5rem] p-8 mb-8">
+             <div className="bg-primary/10 border-2 border-primary/20 rounded-2xl p-8 mb-8">
                 <div className="flex items-center gap-4 mb-4">
                    <div className="w-12 h-12 bg-primary rounded-2xl flex items-center justify-center text-slate-900">
                       <Icons.Wallet size={24} />
@@ -180,7 +180,7 @@ export default function StoreRegisterPage() {
                    <select 
                       value={formData.bankName}
                       onChange={e => setFormData({...formData, bankName: e.target.value})}
-                      className="w-full bg-slate-50 border-2 border-slate-100 rounded-3xl p-5 font-black text-sm focus:outline-none focus:border-primary/50 transition-all"
+                      className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl p-5 font-black text-sm focus:outline-none focus:border-primary/50 transition-all"
                    >
                        <option value="">Select Target Bank</option>
                        <option value="PromptPay">PromptPay (Universal)</option>
@@ -198,7 +198,7 @@ export default function StoreRegisterPage() {
                         required
                         value={formData.accountNumber}
                         onChange={e => setFormData({...formData, accountNumber: e.target.value})}
-                        className="w-full bg-slate-50 border-2 border-slate-100 rounded-3xl p-5 font-mono text-sm focus:outline-none focus:border-primary/50 transition-all font-bold"
+                        className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl p-5 font-mono text-sm focus:outline-none focus:border-primary/50 transition-all font-bold"
                         placeholder="000-0-00000-0"
                       />
                    </div>
@@ -208,7 +208,7 @@ export default function StoreRegisterPage() {
                         required
                         value={formData.accountName}
                         onChange={e => setFormData({...formData, accountName: e.target.value})}
-                        className="w-full bg-slate-50 border-2 border-slate-100 rounded-3xl p-5 font-black text-sm focus:outline-none focus:border-primary/50 transition-all"
+                        className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl p-5 font-black text-sm focus:outline-none focus:border-primary/50 transition-all"
                         placeholder="Full Legal Name"
                       />
                    </div>
@@ -238,7 +238,7 @@ export default function StoreRegisterPage() {
                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{doc.label}</label>
                      <div 
                        onClick={() => document.getElementById(`file-${doc.id}`)?.click()}
-                       className={`relative aspect-[16/5] rounded-[2rem] border-2 border-dashed transition-all cursor-pointer overflow-hidden flex flex-col items-center justify-center ${getDocPreview(doc.id) ? 'border-primary bg-primary/5' : 'border-slate-100 bg-slate-50'}`}
+                       className={`relative aspect-[16/5] rounded-2xl border-2 border-dashed transition-all cursor-pointer overflow-hidden flex flex-col items-center justify-center ${getDocPreview(doc.id) ? 'border-primary bg-primary/5' : 'border-slate-100 bg-slate-50'}`}
                      >
                         {getDocPreview(doc.id) ? (
                           <img src={getDocPreview(doc.id)} className="w-full h-full object-cover" />

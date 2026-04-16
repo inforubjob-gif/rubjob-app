@@ -91,7 +91,7 @@ export default function AdminDashboard() {
       </header>
 
       {apiError && (
-        <div className="mb-8 p-6 bg-rose-50 border border-rose-100 rounded-[2rem] flex items-center gap-5 animate-fade-in shadow-xl shadow-rose-900/5">
+        <div className="mb-8 p-6 bg-rose-50 border border-rose-100 rounded-2xl flex items-center gap-5 animate-fade-in shadow-xl shadow-rose-900/5">
            <div className="w-12 h-12 rounded-2xl bg-rose-500 text-white flex items-center justify-center shrink-0 shadow-lg shadow-rose-500/20">
               <Icons.Lock size={24} />
            </div>
@@ -202,7 +202,7 @@ export default function AdminDashboard() {
             </Card>
 
             {/* Platform Earnings Card - PREMIUM CI REDESIGN */}
-            <Card className="col-span-1 md:col-span-2 lg:col-span-3 xl:col-span-2 p-8 bg-gradient-to-br from-primary to-primary-dark text-white shadow-2xl shadow-primary/30 relative overflow-hidden group hover:scale-[1.01] transition-transform duration-500 rounded-[2.5rem]">
+            <Card className="col-span-1 md:col-span-2 lg:col-span-3 xl:col-span-2 p-8 bg-gradient-to-br from-primary to-primary-dark text-white shadow-2xl shadow-primary/30 relative overflow-hidden group hover:scale-[1.01] transition-transform duration-500 rounded-2xl">
                <div className="absolute top-0 right-0 w-64 h-64 bg-white/20 rounded-full blur-3xl -mr-32 -mt-32 group-hover:bg-white/30 transition-all duration-700" />
                <div className="absolute bottom-0 left-0 w-48 h-48 bg-black/10 rounded-full blur-2xl -ml-24 -mb-24" />
                
@@ -231,7 +231,7 @@ export default function AdminDashboard() {
             </Card>
 
             {/* Quick Insights Placeholder */}
-            <Card className="col-span-1 md:col-span-2 lg:col-span-3 p-8 bg-slate-50/50 border border-slate-100 border-dashed rounded-[2.5rem] flex flex-col items-center justify-center text-center group hover:bg-white hover:border-solid hover:shadow-card transition-all duration-500">
+            <Card className="col-span-1 md:col-span-2 lg:col-span-3 p-8 bg-slate-50/50 border border-slate-100 border-dashed rounded-2xl flex flex-col items-center justify-center text-center group hover:bg-white hover:border-solid hover:shadow-card transition-all duration-500">
                <div className="w-16 h-16 bg-white rounded-2xl shadow-sm text-slate-200 flex items-center justify-center mb-6 group-hover:text-primary group-hover:scale-110 transition-all">
                   <Icons.Finance size={32} />
                </div>
@@ -240,7 +240,7 @@ export default function AdminDashboard() {
             </Card>
             
             {/* Quick Actions Card */}
-            <Card className="col-span-1 md:col-span-2 lg:col-span-3 xl:col-span-2 p-8 bg-white border border-slate-100 shadow-card rounded-[2.5rem]">
+            <Card className="col-span-1 md:col-span-2 lg:col-span-3 xl:col-span-2 p-8 bg-white border border-slate-100 shadow-card rounded-2xl">
                <h3 className="text-xl font-black text-slate-900 mb-8 flex items-center gap-3">
                   <div className="w-2 h-6 bg-primary rounded-full" />
                   {t("admin.dashboard.quickActions")}

@@ -103,13 +103,13 @@ export default function StoreDashboard() {
         </div>
 
         <div className="grid grid-cols-2 gap-4 text-center">
-          <div className="bg-white/10 backdrop-blur-lg p-5 rounded-[2.5rem] border border-white/20 shadow-lg shadow-primary-dark/20 text-white">
+          <div className="bg-white/10 backdrop-blur-lg p-5 rounded-2xl border border-white/20 shadow-lg shadow-primary-dark/20 text-white">
             <p className="text-[10px] font-black text-white/50 uppercase tracking-[0.15em]">{t("store.navOrders")}</p>
             <p className="text-3xl font-black mt-1 tracking-tighter">
               {incomingOrders.length + washingOrders.length + readyOrders.length}
             </p>
           </div>
-          <div className="bg-white/10 backdrop-blur-lg p-5 rounded-[2.5rem] border border-white/20 shadow-lg shadow-primary-dark/20 text-white">
+          <div className="bg-white/10 backdrop-blur-lg p-5 rounded-2xl border border-white/20 shadow-lg shadow-primary-dark/20 text-white">
             <p className="text-[10px] font-black text-white/50 uppercase tracking-[0.15em]">{t("store.wallet.availableBalance")}</p>
             <p className="text-3xl font-black mt-1 tracking-tighter flex items-center justify-center gap-1">
               <span className="text-sm">฿</span>{Math.floor(balance).toLocaleString()}
@@ -119,7 +119,7 @@ export default function StoreDashboard() {
       </header>
 
       <div className="relative z-10 px-5 space-y-7 pt-2 animate-fade-in">
-        <div className="bg-white/40 backdrop-blur-xl p-1.5 rounded-[1.8rem] flex shadow-lg shadow-primary-dark/10 border border-white/40">
+        <div className="bg-white/40 backdrop-blur-xl p-1.5 rounded-2xl flex shadow-lg shadow-primary-dark/10 border border-white/40">
           {(["incoming", "washing", "ready"] as const).map((tab) => (
             <button
               key={tab}
@@ -138,7 +138,7 @@ export default function StoreDashboard() {
         {isLoading ? (
           <div className="space-y-4 px-5">
              {[1, 2, 3].map((i) => (
-               <div key={i} className="bg-white p-5 rounded-[2.5rem] border border-slate-100 flex items-center gap-4">
+               <div key={i} className="bg-white p-5 rounded-2xl border border-slate-100 flex items-center gap-4">
                  <Skeleton variant="circle" className="w-14 h-14" />
                  <div className="flex-1 space-y-2">
                     <Skeleton variant="text" className="w-24 h-4" />
@@ -150,7 +150,7 @@ export default function StoreDashboard() {
         ) : (
           <div className="space-y-4">
             {(activeTab === "incoming" ? incomingOrders : activeTab === "washing" ? washingOrders : readyOrders).length === 0 ? (
-              <div className="text-center py-20 bg-white rounded-[2.5rem] border-2 border-dashed border-slate-100 flex flex-col items-center justify-center gap-3">
+              <div className="text-center py-20 bg-white rounded-2xl border-2 border-dashed border-slate-100 flex flex-col items-center justify-center gap-3">
                  <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center text-slate-200">
                     <Icons.FileText size={32} />
                  </div>
@@ -160,7 +160,7 @@ export default function StoreDashboard() {
               </div>
             ) : (
               (activeTab === "incoming" ? incomingOrders : activeTab === "washing" ? washingOrders : readyOrders).map((order) => (
-                <Card key={order.id} className="p-4 border border-slate-100 shadow-sm hover:shadow-xl transition-all duration-300 group rounded-[2rem]">
+                <Card key={order.id} className="p-4 border border-slate-100 shadow-sm hover:shadow-xl transition-all duration-300 group rounded-2xl">
                   <div className="flex items-start gap-4">
                     <div className="w-12 h-12 bg-slate-50 border border-slate-100 rounded-2xl flex items-center justify-center text-slate-400 shrink-0 group-hover:bg-primary/5 transition-colors">
                       {getServiceIcon(order.serviceId as any, { size: 24, className: "group-hover:text-primary transition-colors" })}

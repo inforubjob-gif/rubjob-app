@@ -114,7 +114,7 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
         <div className="absolute -bottom-6 -left-10 w-32 h-32 bg-white/10 rounded-full" />
 
         <div className="relative z-10">
-          <div className="w-20 h-20 bg-white/20 backdrop-blur-md rounded-[2.5rem] flex items-center justify-center mx-auto mb-4 shadow-xl shadow-amber-500/20 ring-4 ring-white/30 overflow-hidden">
+          <div className="w-20 h-20 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-xl shadow-amber-500/20 ring-4 ring-white/30 overflow-hidden">
             <Icons.Logo size={80} variant="icon" />
           </div>
           <h1 className="text-xl font-black text-white tracking-tight">

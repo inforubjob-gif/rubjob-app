@@ -114,10 +114,10 @@ export default function UsersAdminPage() {
     <div className="space-y-6 max-w-7xl mx-auto pb-20">
       <header className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
-           <h1 className="text-2xl md:text-3xl font-black text-slate-900 tracking-tight">{t("admin.users.title")}</h1>
+           <h1 className="text-2xl md:text-3xl font-black text-slate-900 tracking-tight lowercase">{t("admin.users.title")}</h1>
            <p className="text-slate-500 text-sm md:text-base font-medium mt-1">{t("admin.users.subtitle")}</p>
         </div>
-        <div className="flex bg-white border border-slate-200 rounded-[1.25rem] overflow-hidden shadow-sm w-full md:w-80 group focus-within:ring-4 focus-within:ring-primary/10 transition-all">
+        <div className="flex bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm w-full md:w-80 group focus-within:ring-4 focus-within:ring-primary/10 transition-all">
            <div className="px-5 py-3 bg-slate-50 border-r border-slate-100 text-slate-400 group-focus-within:text-primary transition-colors flex items-center shrink-0">
              <Icons.Search size={18} />
            </div>
@@ -131,7 +131,7 @@ export default function UsersAdminPage() {
         </div>
       </header>
 
-      <Card className="bg-white border border-slate-200/60 shadow-xl shadow-slate-200/20 rounded-[2.5rem] overflow-hidden">
+      <Card className="bg-white border border-slate-200/60 shadow-xl shadow-slate-200/20 rounded-2xl overflow-hidden">
         {isLoading ? (
           <div className="flex justify-center py-32">
             <div className="w-12 h-12 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
@@ -151,18 +151,18 @@ export default function UsersAdminPage() {
               <tbody className="divide-y divide-slate-50">
                 {filteredUsers.map(user => (
                   <tr key={user.id} className="hover:bg-slate-50/50 transition-all group">
-                    <td className="px-8 py-5">
+                    <td className="px-8 py-6">
                       <div className="flex items-center gap-4">
                          <div className="w-12 h-12 rounded-2xl bg-slate-100 border border-slate-200 flex items-center justify-center overflow-hidden shrink-0 shadow-sm ring-4 ring-white">
                            {user.pictureUrl ? <img src={user.pictureUrl} alt="" className="w-full h-full object-cover" /> : <Icons.User size={20} className="text-slate-300" />}
                          </div>
                          <div>
                             <div className="font-black text-slate-900 tracking-tight">{user.displayName || t("common.guest")}</div>
-                            <div className="text-[10px] font-bold text-slate-400 mt-0.5 font-mono">{user.id.substring(0, 12)}...</div>
+                            <div className="text-[10px] font-bold text-slate-400 mt-0.5 font-mono italic">{user.id.substring(0, 12)}...</div>
                          </div>
                       </div>
                     </td>
-                    <td className="px-8 py-5">
+                    <td className="px-8 py-6">
                        <select 
                          value={user.role || 'user'} 
                          onChange={(e) => handleRoleChange(user.id, e.target.value)}
@@ -174,7 +174,7 @@ export default function UsersAdminPage() {
                           <option value="driver">{t("admin.users.roleRider")}</option>
                        </select>
                     </td>
-                    <td className="px-8 py-5">
+                    <td className="px-8 py-6">
                        <div className="flex items-center gap-2">
                           <div className="bg-amber-50 text-amber-600 w-8 h-8 rounded-lg flex items-center justify-center border border-amber-100 shadow-sm font-black text-xs">
                              <Icons.Ticket size={14} />
@@ -182,13 +182,13 @@ export default function UsersAdminPage() {
                           <span className="font-black text-slate-900">{user.points || 0}</span>
                        </div>
                     </td>
-                    <td className="px-8 py-5">
+                    <td className="px-8 py-6">
                        <div className="flex flex-col">
                           <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest">{t("admin.users.joinedDate")}</span>
                           <span className="text-xs font-bold text-slate-600 mt-0.5">{new Date(user.createdAt).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })}</span>
                        </div>
                     </td>
-                    <td className="px-8 py-5 text-right">
+                    <td className="px-8 py-6">
                        <div className="flex items-center justify-end gap-2">
                           <button 
                             onClick={() => handleDeleteUser(user.id, user.displayName)}
@@ -210,7 +210,7 @@ export default function UsersAdminPage() {
             </table>
             {filteredUsers.length === 0 && (
               <div className="py-20 text-center">
-                 <div className="w-16 h-16 bg-slate-50 text-slate-200 rounded-[2rem] flex items-center justify-center mx-auto mb-4 border border-slate-100">
+                 <div className="w-16 h-16 bg-slate-50 text-slate-200 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-slate-100">
                     <Icons.Search size={32} />
                  </div>
                  <p className="text-slate-400 font-black text-sm uppercase tracking-widest">{t("admin.users.noUsers")}</p>
@@ -229,15 +229,15 @@ export default function UsersAdminPage() {
       >
         {selectedUser && (
           <div className="space-y-8 py-2">
-             <div className="flex items-center gap-6 p-6 bg-slate-50 rounded-[2rem] border border-slate-100 relative overflow-hidden">
+             <div className="flex items-center gap-6 p-6 bg-slate-50 rounded-2xl border border-slate-100 relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -mr-16 -mt-16 blur-3xl" />
-                <div className="w-24 h-24 rounded-[2rem] bg-white border-2 border-primary/20 flex items-center justify-center overflow-hidden shrink-0 shadow-xl relative z-10">
+                <div className="w-24 h-24 rounded-2xl bg-white border-2 border-primary/20 flex items-center justify-center overflow-hidden shrink-0 shadow-xl relative z-10">
                    {selectedUser.pictureUrl ? <img src={selectedUser.pictureUrl} alt="" className="w-full h-full object-cover" /> : <Icons.User size={40} className="text-slate-200" />}
                 </div>
                 <div className="relative z-10">
                    <h2 className="text-2xl font-black text-slate-900 tracking-tight">{selectedUser.displayName || t("common.guest")}</h2>
                    <p className="text-xs font-bold text-slate-400 uppercase tracking-[0.2em] mt-1">{t("admin.users.labelAccountId")}</p>
-                   <code className="text-[10px] bg-white px-2 py-0.5 rounded border border-slate-100 mt-1.5 block w-fit font-mono font-bold text-primary">{selectedUser.id}</code>
+                   <code className="text-[10px] bg-white px-2 py-0.5 rounded-lg border border-slate-100 mt-1.5 block w-fit font-mono font-bold text-primary">{selectedUser.id}</code>
                 </div>
              </div>
 
@@ -267,7 +267,7 @@ export default function UsersAdminPage() {
                 </div>
              </div>
 
-             <div className="bg-indigo-50/50 p-6 rounded-[2rem] border border-indigo-100/50 flex flex-col md:flex-row items-center justify-between gap-6">
+             <div className="bg-indigo-50/50 p-6 rounded-2xl border border-indigo-100/50 flex flex-col md:flex-row items-center justify-between gap-6">
                 <div className="text-center md:text-left">
                    <p className="text-[10px] font-black text-indigo-400 uppercase tracking-widest">{t("admin.users.labelRole")}</p>
                    <p className="text-lg font-black text-slate-900 mt-1 uppercase tracking-tight">

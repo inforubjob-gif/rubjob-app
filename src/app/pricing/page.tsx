@@ -57,7 +57,7 @@ export default function PricingPage() {
       <div className="px-4 pb-28 space-y-5 animate-fade-in">
 
         {/* ━━━ ราคาซักผ้า ━━━ */}
-        <section className="bg-white/10 backdrop-blur-md rounded-3xl p-4 shadow-xl shadow-black/5">
+        <section className="bg-white/10 backdrop-blur-md rounded-2xl p-4 shadow-xl shadow-black/5">
           {/* Section Title */}
           <div className="flex justify-center mb-4">
             <div className="bg-white rounded-full px-6 py-2 shadow-md">
@@ -105,7 +105,7 @@ export default function PricingPage() {
         </section>
 
         {/* ━━━ ราคาอบผ้า ━━━ */}
-        <section className="bg-white/10 backdrop-blur-md rounded-3xl p-4 shadow-xl shadow-black/5">
+        <section className="bg-white/10 backdrop-blur-md rounded-2xl p-4 shadow-xl shadow-black/5">
           <div className="flex justify-center mb-4">
             <div className="bg-white rounded-full px-6 py-2 shadow-md">
               <h2 className="text-primary-dark font-bold text-base">{t("pricing.dryTitle")}</h2>
@@ -165,7 +165,7 @@ export default function PricingPage() {
         </section>
 
         {/* ━━━ ราคาค่าส่ง ━━━ */}
-        <section className="bg-white/10 backdrop-blur-md rounded-3xl p-4 shadow-xl shadow-black/5">
+        <section className="bg-white/10 backdrop-blur-md rounded-2xl p-4 shadow-xl shadow-black/5">
           <div className="flex justify-center mb-4">
             <div className="bg-white rounded-full px-6 py-2 shadow-md">
               <h2 className="text-primary-dark font-bold text-base">{t("pricing.deliveryTitle")}</h2>

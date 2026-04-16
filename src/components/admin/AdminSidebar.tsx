@@ -93,7 +93,7 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
              onClick={() => {
                if (window.innerWidth < 1024) onClose();
              }}
-             className={`block group bg-white/5 rounded-[2rem] p-4 border border-white/5 shadow-inner transition-all hover:bg-white/10 hover:border-white/10 ${pathname === '/admin/settings' ? 'ring-2 ring-primary ring-offset-2 ring-offset-slate-900 bg-white/10' : ''}`}
+             className={`block group bg-white/5 rounded-2xl p-4 border border-white/5 shadow-inner transition-all hover:bg-white/10 hover:border-white/10 ${pathname === '/admin/settings' ? 'ring-2 ring-primary ring-offset-2 ring-offset-slate-900 bg-white/10' : ''}`}
            >
               <div className="flex items-center justify-between gap-3">
                  <div className="flex items-center gap-3">

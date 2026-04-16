@@ -71,7 +71,7 @@ export default function HelpPage() {
           <Icons.Back size={20} />
         </button>
         <div className="text-center">
-           <div className="w-16 h-16 bg-white/20 backdrop-blur-md rounded-[1.5rem] flex items-center justify-center mx-auto mb-4 border border-white/30">
+           <div className="w-16 h-16 bg-white/20 backdrop-blur-md rounded-xl flex items-center justify-center mx-auto mb-4 border border-white/30">
              <Icons.Chat size={32} className="text-white" />
            </div>
            <h1 className="text-2xl font-black text-white tracking-tight">ศูนย์ช่วยเหลือ</h1>
@@ -81,7 +81,7 @@ export default function HelpPage() {
 
       <div className="px-5 -mt-6">
         <form onSubmit={handleSubmit} className="space-y-6">
-          <Card className="p-6 border-slate-100 shadow-xl shadow-slate-200/50 rounded-[2rem]">
+          <Card className="p-6 border-slate-100 shadow-xl shadow-slate-200/50 rounded-2xl">
             <div className="space-y-5">
               <div className="space-y-1.5">
                 <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">หัวข้อที่ต้องการแจ้ง</label>
@@ -123,7 +123,7 @@ export default function HelpPage() {
             ส่งเรื่องให้แอดมิน 🚀
           </Button>
 
-          <div className="p-6 bg-indigo-50 rounded-[2rem] border border-indigo-100 flex gap-4">
+          <div className="p-6 bg-indigo-50 rounded-2xl border border-indigo-100 flex gap-4">
              <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-indigo-500 shrink-0 shadow-sm">
                 <Icons.Chat size={24} />
              </div>

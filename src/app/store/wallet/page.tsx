@@ -107,7 +107,7 @@ export default function StoreWalletPage() {
           <h2 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-4 px-1">{t("staff.wallet.history")}</h2>
           <div className="space-y-3">
             {transactions.map((trx) => (
-              <div key={trx.id} className="bg-white p-4 rounded-[2rem] border border-slate-100 shadow-sm flex items-center gap-4">
+              <div key={trx.id} className="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex items-center gap-4">
                 <div className={`w-11 h-11 rounded-full flex items-center justify-center ${trx.amount > 0 ? 'bg-green-50 text-green-600' : 'bg-slate-100 text-slate-600'}`}>
                   {trx.amount > 0 ? <Icons.Payment size={20} /> : <Icons.Clock size={20} />}
                 </div>
@@ -203,7 +203,7 @@ export default function StoreWalletPage() {
           </div>
         ) : (
           <div className="flex flex-col items-center text-center animate-fade-in">
-             <div className="w-20 h-20 bg-emerald-50 text-emerald-500 rounded-[2rem] flex items-center justify-center mb-6 shadow-lg shadow-emerald-500/10 scale-110">
+             <div className="w-20 h-20 bg-emerald-50 text-emerald-500 rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-emerald-500/10 scale-110">
                 <Icons.CheckCircle size={40} />
              </div>
              <p className="text-sm text-slate-500 font-bold leading-relaxed mb-10 max-w-[240px]">

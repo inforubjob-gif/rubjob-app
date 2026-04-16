@@ -72,7 +72,7 @@ export default function StoreOrderDetailPage() {
       </header>
 
       <div className="flex-1 px-5 py-6">
-        <Card className="p-6 mb-6 border-none shadow-sm bg-white overflow-hidden relative rounded-[2.5rem]">
+        <Card className="p-6 mb-6 border-none shadow-sm bg-white overflow-hidden relative rounded-2xl">
           <div className="flex justify-between items-start mb-6">
             <div>
               <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest leading-none mb-1.5">{t("orders.tracking")} #{id.slice(-6)}</p>
@@ -117,7 +117,7 @@ export default function StoreOrderDetailPage() {
               </Card>
 
               {status === "washing" && (
-                 <Card className={`p-6 border-none shadow-2xl ${isExpress ? 'bg-red-600 shadow-red-200' : 'bg-primary shadow-primary/20'} text-white relative overflow-hidden rounded-[2.5rem]`}>
+                 <Card className={`p-6 border-none shadow-2xl ${isExpress ? 'bg-red-600 shadow-red-200' : 'bg-primary shadow-primary/20'} text-white relative overflow-hidden rounded-2xl`}>
                     <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 blur-2xl" />
                     <div className="relative z-10 flex items-center justify-between">
                         <div>
@@ -176,22 +176,22 @@ export default function StoreOrderDetailPage() {
 
               <div className="space-y-3">
                 {status === "delivering_to_store" && (
-                  <Button fullWidth onClick={() => handleUpdateStatus("washing")} isLoading={isUpdating} className="bg-primary text-white hover:bg-primary-dark shadow-xl shadow-primary/20 py-5 text-sm font-black italic rounded-[1.5rem] uppercase tracking-widest">
+                  <Button fullWidth onClick={() => handleUpdateStatus("washing")} isLoading={isUpdating} className="bg-primary text-white hover:bg-primary-dark shadow-xl shadow-primary/20 py-5 text-sm font-black italic rounded-xl uppercase tracking-widest">
                     <Icons.Package size={20} className="mr-2" /> {t("staff.receiveFromDriver")}
                   </Button>
                 )}
                 {status === "washing" && (
-                  <Button fullWidth onClick={() => handleUpdateStatus("ready_for_pickup")} isLoading={isUpdating} className="bg-primary text-white hover:bg-primary-dark shadow-xl shadow-primary/20 py-5 text-sm font-black italic rounded-[1.5rem] uppercase tracking-widest">
+                  <Button fullWidth onClick={() => handleUpdateStatus("ready_for_pickup")} isLoading={isUpdating} className="bg-primary text-white hover:bg-primary-dark shadow-xl shadow-primary/20 py-5 text-sm font-black italic rounded-xl uppercase tracking-widest">
                     <Icons.Phone size={20} className="mr-2" /> {t("staff.callRider")}
                   </Button>
                 )}
                 {status === "ready_for_pickup" && (
-                  <Button fullWidth onClick={() => handleUpdateStatus("completed")} isLoading={isUpdating} className="bg-primary text-white hover:bg-primary-dark shadow-xl py-5 text-sm font-black italic rounded-[1.5rem] uppercase tracking-widest">
+                  <Button fullWidth onClick={() => handleUpdateStatus("completed")} isLoading={isUpdating} className="bg-primary text-white hover:bg-primary-dark shadow-xl py-5 text-sm font-black italic rounded-xl uppercase tracking-widest">
                     <Icons.Check size={20} className="mr-2" strokeWidth={4} /> {t("store.handoverToDriver")}
                   </Button>
                 )}
                 {status === "completed" && (
-                  <div className="p-10 bg-orange-50 rounded-[2.5rem] border-4 border-dashed border-orange-200 flex flex-col items-center justify-center gap-4 text-center animate-bounce-slow">
+                  <div className="p-10 bg-orange-50 rounded-2xl border-4 border-dashed border-orange-200 flex flex-col items-center justify-center gap-4 text-center animate-bounce-slow">
                       <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center text-white shadow-2xl shadow-orange-200">
                           <Icons.Check size={32} strokeWidth={4} />
                       </div>

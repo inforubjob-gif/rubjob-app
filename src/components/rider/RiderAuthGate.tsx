@@ -82,7 +82,7 @@ export default function RiderAuthGate({ children }: { children: React.ReactNode 
             </p>
           </div>
 
-          <form onSubmit={handleLogin} className="space-y-5 bg-white/40 backdrop-blur-md p-2 rounded-[2rem] border border-white/20 shadow-xl shadow-slate-200/40">
+          <form onSubmit={handleLogin} className="space-y-5 bg-white/40 backdrop-blur-md p-2 rounded-2xl border border-white/20 shadow-xl shadow-slate-200/40">
             <div className="bg-white rounded-[1.75rem] p-6 space-y-5 shadow-sm border border-slate-50">
               <div className="space-y-2">
                 <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">อีเมลผู้ใช้งาน</label>
