@@ -264,22 +264,22 @@ export default function UsersAdminPage() {
                 </div>
              </div>
 
-             <div className="bg-indigo-50/50 p-6 rounded-[2rem] border border-indigo-100/50 flex flex-col sm:flex-row items-center justify-between gap-4">
-                <div>
+             <div className="bg-indigo-50/50 p-6 rounded-[2rem] border border-indigo-100/50 flex flex-col md:flex-row items-center justify-between gap-6">
+                <div className="text-center md:text-left">
                    <p className="text-[10px] font-black text-indigo-400 uppercase tracking-widest">Linked Role</p>
                    <p className="text-lg font-black text-slate-900 mt-1 uppercase tracking-tight">{selectedUser.role?.replace('_', ' ') || 'Customer'}</p>
                 </div>
-                <div className="flex items-center gap-3 w-full sm:w-auto">
+                <div className="flex flex-wrap items-center justify-center gap-3 w-full md:w-auto">
                     <button 
                       onClick={() => handleDeleteUser(selectedUser.id, selectedUser.displayName)}
-                      className="flex-1 sm:flex-none border-2 border-rose-100 text-rose-500 hover:bg-rose-50 px-6 py-4 rounded-2xl font-black text-sm transition-all uppercase tracking-widest"
+                      className="flex-1 md:flex-none border-2 border-rose-100 text-rose-500 hover:bg-rose-50 px-5 py-3.5 rounded-2xl font-black text-xs transition-all uppercase tracking-widest"
                     >
                       Delete Account
                     </button>
                     <button 
                       onClick={() => handleUpdateUser({ displayName: selectedUser.displayName, points: selectedUser.points })}
                       disabled={isSaving}
-                      className="flex-1 sm:flex-none bg-primary hover:bg-primary-dark text-white px-8 py-4 rounded-2xl font-black text-sm shadow-xl shadow-primary/20 transition-all active:scale-95 disabled:opacity-50 uppercase tracking-widest"
+                      className="flex-1 md:flex-none bg-primary hover:bg-primary-dark text-white px-6 py-3.5 rounded-2xl font-black text-xs shadow-xl shadow-primary/20 transition-all active:scale-95 disabled:opacity-50 uppercase tracking-widest whitespace-nowrap"
                     >
                       {isSaving ? "Saving..." : "Update Intelligence"}
                     </button>
