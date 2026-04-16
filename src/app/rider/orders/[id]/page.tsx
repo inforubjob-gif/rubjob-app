@@ -70,7 +70,7 @@ export default function RiderOrderDetailPage() {
 
   const handleUpdateStatus = async (nextStatus: string) => {
     if (currentPhotoStep && !photo) {
-      alert(t("rider.photoRequired"));
+      alert(t("rider.photoRequired") || "Photo required for this step");
       return;
     }
 
@@ -103,9 +103,9 @@ export default function RiderOrderDetailPage() {
   // Helper to determine active destination
   const getActiveDestination = () => {
     if (status === "delivering_to_store" || status === "ready_for_pickup") {
-      return { pos: storePos, label: "Store" };
+      return { pos: storePos, label: t("admin.nav.stores") };
     }
-    return { pos: userPos, label: "User" };
+    return { pos: userPos, label: t("admin.nav.users") };
   };
 
   const activeDest = getActiveDestination();
@@ -155,7 +155,7 @@ export default function RiderOrderDetailPage() {
                 onClick={() => window.open(`https://www.google.com/maps/dir/?api=1&destination=${activeDest.pos.lat},${activeDest.pos.lng}`, "_blank")}
                 className="bg-white/90 backdrop-blur-md px-4 py-2 rounded-2xl border border-slate-200 shadow-xl text-primary font-black text-[10px] uppercase tracking-widest flex items-center gap-2 active:scale-95 transition-all"
               >
-                 <Icons.MapPin size={14} strokeWidth={3} /> {t("rider.navigate")} TO {activeDest.label}
+                 <Icons.MapPin size={14} strokeWidth={3} /> {t("rider.navigate")} {activeDest.label}
               </button>
            </div>
         </div>
@@ -175,9 +175,14 @@ export default function RiderOrderDetailPage() {
                     </div>
                 </div>
                 <div className="flex gap-2">
-                   <button className="w-11 h-11 rounded-[1rem] bg-blue-50 text-blue-600 flex items-center justify-center border border-blue-100 shadow-lg shadow-blue-500/10 active:scale-90 transition-transform">
-                       <Icons.Phone size={20} />
-                   </button>
+                   {order?.phone && (
+                     <button 
+                       onClick={() => window.open(`tel:${order.phone}`)}
+                       className="w-11 h-11 rounded-[1rem] bg-blue-50 text-blue-600 flex items-center justify-center border border-blue-100 shadow-lg shadow-blue-500/10 active:scale-90 transition-transform"
+                     >
+                         <Icons.Phone size={20} />
+                     </button>
+                   )}
                    <button 
                      onClick={() => window.open(`https://www.google.com/maps/dir/?api=1&destination=${order?.lat || 13.7563},${order?.lng || 100.5018}`, "_blank")}
                      className="w-11 h-11 rounded-[1rem] bg-orange-50 text-primary flex items-center justify-center border border-orange-100 shadow-lg shadow-primary/10 active:scale-90 transition-transform"
@@ -194,16 +199,16 @@ export default function RiderOrderDetailPage() {
                       <div className="w-0.5 h-10 bg-gradient-to-b from-slate-200 to-transparent rounded-full" />
                    </div>
                    <div className="flex-1">
-                      <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest mb-1">Pick up from</p>
-                      <p className="text-xs font-bold text-slate-700">{order?.storeName || "Assigned Store"}</p>
+                      <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest mb-1">{t("rider.orderDetail.pickupFrom")}</p>
+                      <p className="text-xs font-bold text-slate-700">{order?.storeName || t("rider.orderDetail.assignedStore")}</p>
                    </div>
                 </div>
                 <div className="flex items-start gap-4">
                    <div className="w-2.5 h-2.5 rounded-full bg-primary border-2 border-white mt-1 shadow-[0_0_5px_rgba(255,159,28,0.5)]" />
                    <div className="flex-1">
-                      <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest mb-1">Deliver to</p>
+                      <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest mb-1">{t("rider.orderDetail.deliverTo")}</p>
                       <p className="text-xs font-black text-slate-900 leading-relaxed">
-                        {typeof order?.address === 'string' ? order.address : (order?.address?.details || "No address provided")}
+                        {typeof order?.address === 'string' ? order.address : (order?.address?.details || t("rider.orderDetail.noAddress"))}
                       </p>
                    </div>
                 </div>
@@ -226,12 +231,12 @@ export default function RiderOrderDetailPage() {
         <div className="fixed bottom-0 left-0 right-0 p-5 bg-white/80 backdrop-blur-2xl border-t border-slate-100/50 z-40">
            {status === "washing" ? (
              <div className="text-center p-4 bg-slate-50 rounded-3xl border-2 border-dashed border-slate-200">
-                <p className="text-xs font-black text-slate-400 uppercase tracking-widest">{t("staff.processing")}</p>
-                <p className="text-[10px] text-slate-400 mt-1 uppercase font-bold italic">Waiting for store completion...</p>
+                <p className="text-xs font-black text-slate-400 uppercase tracking-widest">{t("store.processing")}</p>
+                <p className="text-[10px] text-slate-400 mt-1 uppercase font-bold italic">{t("rider.orderDetail.waitingStore")}</p>
              </div>
            ) : status === "completed" ? (
              <div className="p-4 bg-green-50 rounded-3xl border-2 border-green-200 flex items-center justify-center gap-2 text-green-600 font-black italic">
-                <Icons.Check size={20} /> WORK COMPLETED
+                <Icons.Check size={20} /> {t("rider.orderDetail.workCompleted")}
              </div>
            ) : (
              <Button 
@@ -240,10 +245,10 @@ export default function RiderOrderDetailPage() {
                 isLoading={isUpdating}
                 className="bg-primary text-white hover:bg-primary-dark shadow-2xl shadow-primary/30 py-6 text-base font-black italic rounded-[2rem] uppercase tracking-widest"
              >
-                {status === "picking_up" ? "Confirm Pickup" : 
-                 status === "delivering_to_store" ? "Handover to Store" : 
-                 status === "ready_for_pickup" ? "Pickup from Store" : 
-                 status === "delivering_to_customer" ? "Finish Delivery" : "Update Task"}
+                {status === "picking_up" ? t("rider.orderDetail.btnPickup") : 
+                 status === "delivering_to_store" ? t("rider.orderDetail.btnHandover") : 
+                 status === "ready_for_pickup" ? t("rider.orderDetail.btnPickupStore") : 
+                 status === "delivering_to_customer" ? t("rider.orderDetail.btnFinish") : t("rider.orderDetail.btnUpdateTask")}
              </Button>
            )}
         </div>

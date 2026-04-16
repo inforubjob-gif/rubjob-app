@@ -5,8 +5,10 @@ import { Icons } from "@/components/ui/Icons";
 import Card from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 import { useAdmin } from "@/components/providers/AdminProvider";
+import { useTranslation } from "@/components/providers/LanguageProvider";
 
 export default function SettingsAdminPage() {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<"admins" | "system" | "profile">("system");
   const { admin, refreshAdmin } = useAdmin();
   
@@ -32,15 +34,15 @@ export default function SettingsAdminPage() {
   });
 
   const MODULES = [
-    { id: "dashboard", label: "Dashboard" },
-    { id: "orders", label: "Orders" },
-    { id: "users", label: "Users & Roles" },
-    { id: "stores", label: "Stores" },
-    { id: "riders", label: "Riders" },
-    { id: "coupons", label: "Coupons" },
-    { id: "finance", label: "Finance" },
-    { id: "support", label: "Support" },
-    { id: "settings", label: "Settings" },
+    { id: "dashboard", label: t("admin.nav.dashboard") },
+    { id: "orders", label: t("admin.nav.orders") },
+    { id: "users", label: t("admin.nav.users") },
+    { id: "stores", label: t("admin.nav.stores") },
+    { id: "riders", label: t("admin.nav.riders") },
+    { id: "coupons", label: t("admin.nav.coupons") },
+    { id: "finance", label: t("admin.nav.finance") },
+    { id: "support", label: t("admin.nav.support") },
+    { id: "settings", label: t("admin.nav.settings") },
   ];
 
   useEffect(() => {
@@ -66,7 +68,7 @@ export default function SettingsAdminPage() {
       const data = await res.json();
       if (data.admins) setAdmins(data.admins);
     } catch (err) {
-      setError("Failed to fetch admin list.");
+      setError(t("common.error"));
     } finally {
       setIsLoading(false);
     }
@@ -75,7 +77,7 @@ export default function SettingsAdminPage() {
   const handleAddAdmin = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newAdmin.name || !newAdmin.email || !newAdmin.password) {
-      setError("Please fill in all fields.");
+      setError(t("admin.users.deleteError") || "Missing fields"); // Fallback check
       return;
     }
 
@@ -88,16 +90,16 @@ export default function SettingsAdminPage() {
         body: JSON.stringify(newAdmin)
       });
       if (res.ok) {
-        setSuccess("Authorized personnel created successfully!");
+        setSuccess(t("admin.settings.profileSuccess"));
         setNewAdmin({ name: "", email: "", password: "", role: "admin", permissions: ["dashboard", "orders", "users"] });
         fetchAdmins();
         setTimeout(() => setSuccess(""), 3000);
       } else {
         const data = await res.json();
-        setError(data.error || "Failed to authorize personnel.");
+        setError(data.error || t("common.error"));
       }
     } catch (err) {
-      setError("Connection error.");
+      setError(t("common.error"));
     } finally {
       setIsSaving(false);
     }
@@ -118,15 +120,15 @@ export default function SettingsAdminPage() {
         })
       });
       if (res.ok) {
-        setSuccess("Profile intelligence updated!");
+        setSuccess(t("admin.settings.profileSuccess"));
         await refreshAdmin();
         setTimeout(() => setSuccess(""), 3000);
       } else {
         const data = await res.json();
-        setError(data.error || "Profile update failed.");
+        setError(data.error || t("common.error"));
       }
     } catch (err) {
-      setError("Connection error.");
+      setError(t("common.error"));
     } finally {
       setIsSaving(false);
     }
@@ -137,7 +139,7 @@ export default function SettingsAdminPage() {
     if (!file) return;
 
     setIsSaving(true);
-    setSuccess("Uploading image...");
+    setSuccess(t("common.loading"));
     const formData = new FormData();
     formData.append("file", file);
 
@@ -149,13 +151,13 @@ export default function SettingsAdminPage() {
       const data = await res.json();
       if (res.ok && data.url) {
         setProfileForm(prev => ({ ...prev, avatarUrl: data.url }));
-        setSuccess("Image uploaded successfully!");
+        setSuccess(t("common.success"));
         setTimeout(() => setSuccess(""), 2000);
       } else {
-        setError(data.error || "Image upload failed.");
+        setError(data.error || t("common.error"));
       }
     } catch (err) {
-      setError("Upload error.");
+      setError(t("common.error"));
     } finally {
       setIsSaving(false);
     }
@@ -171,7 +173,7 @@ export default function SettingsAdminPage() {
   };
 
   const handleDeleteAdmin = async (id: string, email: string) => {
-    if (!confirm(`Are you sure you want to de-authorize ${email}?`)) return;
+    if (!confirm(t("admin.users.deleteConfirm").replace("{name}", email))) return;
     try {
       const res = await fetch("/api/admin/admins", {
         method: "DELETE",
@@ -179,12 +181,12 @@ export default function SettingsAdminPage() {
         body: JSON.stringify({ id })
       });
       if (res.ok) {
-        setSuccess("Personnel de-authorized.");
+        setSuccess(t("admin.settings.agentsDeauthorized"));
         fetchAdmins();
         setTimeout(() => setSuccess(""), 3000);
       }
     } catch (err) {
-      setError("Deletion failed.");
+      setError(t("common.error"));
     }
   };
 
@@ -232,14 +234,14 @@ export default function SettingsAdminPage() {
 
       if (res.ok) {
         setHasChanges(false);
-        setSuccess("System configuration deployed successfully!");
+        setSuccess(t("admin.settings.floatingBtnDeploy") + " " + t("common.success"));
         setTimeout(() => setSuccess(""), 3000);
         fetchSettings();
       } else {
-        setError("Configuration deployment failed.");
+        setError(t("common.error"));
       }
     } catch (err) {
-      setError("Engine connection error.");
+      setError(t("common.error"));
     } finally {
       setIsSaving(false);
     }
@@ -253,14 +255,14 @@ export default function SettingsAdminPage() {
         <div>
           <h1 className="text-3xl md:text-4xl font-black text-slate-900 tracking-tight flex items-center gap-3">
              {activeTab === 'profile' ? <Icons.User size={36} className="text-primary" /> : <Icons.Settings size={36} className="text-primary" />}
-             {activeTab === 'profile' ? "My Profile" : "Platform Engine"}
+             {activeTab === 'profile' ? t("admin.settings.profileTitle") : t("admin.settings.engineTitle")}
           </h1>
           <p className="text-slate-500 text-sm md:text-base font-medium tracking-tight">
-             {activeTab === 'profile' ? "Manage your persona and security credentials" : "Configure core operations and personnel logic"}
+             {activeTab === 'profile' ? t("admin.settings.profileSub") : t("admin.settings.engineSub")}
           </p>
         </div>
         <div className="w-fit bg-white px-4 py-2 rounded-2xl border border-slate-100 shadow-sm text-[10px] font-black uppercase tracking-widest text-slate-400">
-            Admin Engine v2.5
+            {t("admin.nav.settings")} v2.5
         </div>
       </header>
       
@@ -271,7 +273,7 @@ export default function SettingsAdminPage() {
         >
           <div className="flex items-center justify-center gap-2">
             <Icons.Settings size={18} />
-            System
+            {t("admin.settings.tabSystem")}
           </div>
         </button>
         <button 
@@ -280,7 +282,7 @@ export default function SettingsAdminPage() {
         >
           <div className="flex items-center justify-center gap-2">
             <Icons.User size={18} />
-            Admins
+            {t("admin.settings.tabAdmins")}
           </div>
         </button>
         <button 
@@ -291,7 +293,7 @@ export default function SettingsAdminPage() {
              <div className="w-5 h-5 rounded-full bg-slate-200 border border-slate-300 overflow-hidden ring-2 ring-white">
                 {admin?.avatarUrl ? <img src={admin.avatarUrl} className="w-full h-full object-cover" /> : <Icons.User size={14} />}
              </div>
-             Profile
+             {t("admin.settings.tabProfile")}
           </div>
         </button>
       </div>
@@ -309,30 +311,30 @@ export default function SettingsAdminPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 animate-fade-in relative z-10">
           <div className="lg:col-span-1">
             <Card className="p-8 bg-white border border-slate-100 shadow-xl rounded-[2.5rem] sticky top-8">
-              <h3 className="text-xl font-black text-slate-900 mb-6 font-sans">Authorize Personnel</h3>
+              <h3 className="text-xl font-black text-slate-900 mb-6 font-sans">{t("admin.settings.authTitle")}</h3>
               <form onSubmit={handleAddAdmin} className="space-y-4">
                 <div className="space-y-1.5">
-                  <label className="text-[10px] uppercase tracking-widest font-black text-slate-400 ml-1">Full Name</label>
-                  <input type="text" value={newAdmin.name} onChange={e => setNewAdmin({...newAdmin, name: e.target.value})} placeholder="Full name" className="w-full bg-slate-50 border-none rounded-2xl px-5 py-4 text-sm font-bold focus:ring-2 focus:ring-primary/20 transition-all font-mono" />
+                  <label className="text-[10px] uppercase tracking-widest font-black text-slate-400 ml-1">{t("admin.settings.authLabelName")}</label>
+                  <input type="text" value={newAdmin.name} onChange={e => setNewAdmin({...newAdmin, name: e.target.value})} placeholder={t("admin.settings.authLabelName")} className="w-full bg-slate-50 border-none rounded-2xl px-5 py-4 text-sm font-bold focus:ring-2 focus:ring-primary/20 transition-all font-mono" />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-[10px] uppercase tracking-widest font-black text-slate-400 ml-1">Email (Identity)</label>
+                  <label className="text-[10px] uppercase tracking-widest font-black text-slate-400 ml-1">{t("admin.settings.authLabelEmail")}</label>
                   <input type="email" value={newAdmin.email} onChange={e => setNewAdmin({...newAdmin, email: e.target.value})} placeholder="admin@email.com" className="w-full bg-slate-50 border-none rounded-2xl px-5 py-4 text-sm font-bold focus:ring-2 focus:ring-primary/20 transition-all font-mono" />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-[10px] uppercase tracking-widest font-black text-slate-400 ml-1">Secure Password</label>
+                  <label className="text-[10px] uppercase tracking-widest font-black text-slate-400 ml-1">{t("admin.settings.authLabelPassword")}</label>
                   <input type="password" value={newAdmin.password} onChange={e => setNewAdmin({...newAdmin, password: e.target.value})} placeholder="••••••••" className="w-full bg-slate-50 border-none rounded-2xl px-5 py-4 text-sm font-bold focus:ring-2 focus:ring-primary/20 transition-all font-mono" />
                 </div>
 
                 <div className="space-y-3 pt-2">
-                  <label className="text-[10px] uppercase tracking-widest font-black text-slate-400 ml-1">Access Level</label>
+                  <label className="text-[10px] uppercase tracking-widest font-black text-slate-400 ml-1">{t("admin.settings.authLabelRole")}</label>
                   <select 
                     value={newAdmin.role} 
                     onChange={e => setNewAdmin({...newAdmin, role: e.target.value as any})}
                     className="w-full bg-slate-50 border-none rounded-2xl px-5 py-4 text-sm font-bold shadow-sm outline-none appearance-none"
                   >
-                    <option value="admin">Standard Operative</option>
-                    <option value="super_admin">Master Controller (Full Access)</option>
+                    <option value="admin">{t("admin.settings.authRoleStandard")}</option>
+                    <option value="super_admin">{t("admin.settings.authRoleMaster")}</option>
                   </select>
 
                   {newAdmin.role === 'admin' && (
@@ -353,14 +355,14 @@ export default function SettingsAdminPage() {
                 </div>
 
                 <button disabled={isSaving} className="w-full bg-primary text-white py-4 rounded-2xl font-black text-sm shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all mt-4 uppercase tracking-widest">
-                  {isSaving ? "Authorizing..." : "Grant Master Key"}
+                  {isSaving ? t("admin.settings.authBtnAuthorizing") : t("admin.settings.authBtnGrant")}
                 </button>
               </form>
             </Card>
           </div>
 
           <div className="lg:col-span-2">
-            <h3 className="text-xl font-black text-slate-900 mb-6 px-2">Authorized Agents</h3>
+            <h3 className="text-xl font-black text-slate-900 mb-6 px-2">{t("admin.settings.agentsTitle")}</h3>
             {isLoading ? (
                <div className="p-20 flex justify-center bg-white rounded-[2.5rem] border border-slate-50 shadow-sm">
                   <div className="w-10 h-10 border-4 border-slate-100 border-t-primary rounded-full animate-spin" />
@@ -379,7 +381,7 @@ export default function SettingsAdminPage() {
                                <div className="flex items-center gap-3">
                                   <p className="font-black text-slate-900 tracking-tight text-lg">{adminItem.name}</p>
                                   <span className={`px-2 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest ${adminItem.role === 'super_admin' ? 'bg-rose-50 text-rose-600 border border-rose-100' : 'bg-blue-50 text-blue-600 border border-blue-100'}`}>
-                                    {adminItem.role?.replace('_', ' ')}
+                                    {adminItem.role === 'super_admin' ? t("admin.settings.authRoleMaster").split(' (')[0] : t("admin.settings.authRoleStandard")}
                                   </span>
                                </div>
                                <p className="text-xs text-slate-400 font-bold mb-2">{adminItem.email}</p>
@@ -427,7 +429,7 @@ export default function SettingsAdminPage() {
                  <div className="text-center md:text-left">
                     <h2 className="text-3xl font-black text-slate-900 tracking-tight">{admin?.name}</h2>
                     <p className="text-slate-400 font-bold flex items-center justify-center md:justify-start gap-2 mt-1 uppercase text-xs tracking-widest">
-                       <Badge variant={admin?.role === 'super_admin' ? 'danger' : 'info'}>{admin?.role?.replace('_', ' ')}</Badge>
+                       <Badge variant={admin?.role === 'super_admin' ? 'danger' : 'info'}>{admin?.role === 'super_admin' ? t("admin.settings.authRoleMaster").split(' (')[0] : t("admin.settings.authRoleStandard")}</Badge>
                        <span className="w-1 h-1 rounded-full bg-slate-300" />
                        {admin?.email}
                     </p>
@@ -437,11 +439,11 @@ export default function SettingsAdminPage() {
               <form onSubmit={handleUpdateProfile} className="space-y-6">
                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
-                       <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Persona Name</label>
+                       <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t("admin.settings.profileLabelPersona")}</label>
                        <input type="text" value={profileForm.name} onChange={e => setProfileForm({...profileForm, name: e.target.value})} className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-6 py-4.5 text-sm font-black focus:border-primary transition-all outline-none" />
                     </div>
                     <div className="space-y-2">
-                       <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Email Identity</label>
+                       <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t("admin.settings.authLabelEmail")}</label>
                        <input type="email" value={profileForm.email} onChange={e => setProfileForm({...profileForm, email: e.target.value})} className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-6 py-4.5 text-sm font-black focus:border-primary transition-all outline-none" />
                     </div>
                  </div>
@@ -454,16 +456,16 @@ export default function SettingsAdminPage() {
                  <div className="p-6 bg-slate-50 rounded-[2rem] border border-slate-100 space-y-4">
                     <div className="flex items-center gap-2 mb-2">
                        <Icons.Lock size={16} className="text-slate-400" />
-                       <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Security Update</span>
+                       <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t("admin.settings.profileLabelSecurity")}</span>
                     </div>
                     <div className="space-y-2">
-                       <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">New Password (Leave blank to keep current)</label>
+                       <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t("admin.settings.profileLabelNewPassword")}</label>
                        <input type="password" value={profileForm.password} onChange={e => setProfileForm({...profileForm, password: e.target.value})} placeholder="••••••••" className="w-full bg-white border-2 border-slate-100 rounded-2xl px-6 py-4.5 text-sm font-black focus:border-primary transition-all outline-none" />
                     </div>
                  </div>
 
                  <button disabled={isSaving} className="w-full bg-primary text-white py-5 rounded-2xl font-black text-sm shadow-2xl shadow-primary/30 hover:scale-[1.01] active:scale-[0.98] transition-all uppercase tracking-[0.2em]">
-                    {isSaving ? "Synchronizing..." : "Update Persona Intelligence"}
+                    {isSaving ? t("admin.settings.profileUpdating") : t("admin.settings.profileBtnUpdate")}
                  </button>
               </form>
            </Card>
@@ -476,32 +478,32 @@ export default function SettingsAdminPage() {
                 <Icons.Settings size={28} />
               </div>
               <div>
-                <h2 className="text-2xl font-black text-slate-900 tracking-tight">Business & Operations</h2>
-                <p className="text-sm text-slate-400 font-medium">Core platform status and search configuration</p>
+                <h2 className="text-2xl font-black text-slate-900 tracking-tight">{t("admin.settings.systemOpsTitle")}</h2>
+                <p className="text-sm text-slate-400 font-medium">{t("admin.settings.systemOpsSub")}</p>
               </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div className="space-y-3">
-                <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">Platform Status</label>
+                <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">{t("admin.settings.systemLabelStatus")}</label>
                 <div className="grid grid-cols-2 gap-2 bg-slate-50 p-1.5 rounded-3xl">
                    <button 
                      onClick={() => updateLocalSetting("is_open", "true")}
                      className={`py-3.5 rounded-2xl text-xs font-black uppercase tracking-widest transition-all ${getSetting("is_open") === "true" ? "bg-white text-emerald-600 shadow-sm" : "text-slate-400"}`}
                    >
-                     Online
+                     {t("admin.settings.systemStatusOnline")}
                    </button>
                    <button 
                      onClick={() => updateLocalSetting("is_open", "false")}
                      className={`py-3.5 rounded-2xl text-xs font-black uppercase tracking-widest transition-all ${getSetting("is_open") === "false" ? "bg-white text-rose-600 shadow-sm" : "text-slate-400"}`}
                    >
-                     Offline
+                     {t("admin.settings.systemStatusOffline")}
                    </button>
                 </div>
               </div>
 
               <div className="space-y-3">
-                <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">Default Service Radius (km)</label>
+                <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">{t("admin.settings.systemLabelRadius")}</label>
                 <div className="relative">
                   <div className="absolute left-6 top-1/2 -translate-y-1/2 w-10 h-10 bg-slate-200/50 rounded-xl flex items-center justify-center text-slate-500">
                     <Icons.MapPin size={20} />
@@ -526,14 +528,14 @@ export default function SettingsAdminPage() {
                 <Icons.Wallet size={28} />
               </div>
               <div>
-                <h2 className="text-2xl font-black text-slate-900 tracking-tight">Financial Engine</h2>
-                <p className="text-sm text-slate-400 font-medium">Configure GP splits and minimum order rules</p>
+                <h2 className="text-2xl font-black text-slate-900 tracking-tight">{t("admin.settings.financeTitle")}</h2>
+                <p className="text-sm text-slate-400 font-medium">{t("admin.settings.financeSub")}</p>
               </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative z-10 mb-10">
               <div className="space-y-3">
-                <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">Store GP (%)</label>
+                <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">{t("admin.settings.financeLabelStoreGP")}</label>
                 <div className="relative">
                   <div className="absolute left-6 top-1/2 -translate-y-1/2 text-indigo-600 font-black text-lg">%</div>
                   <input 
@@ -546,7 +548,7 @@ export default function SettingsAdminPage() {
                 </div>
               </div>
               <div className="space-y-3">
-                <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">Rider GP (%)</label>
+                <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">{t("admin.settings.financeLabelRiderGP")}</label>
                 <div className="relative">
                   <div className="absolute left-6 top-1/2 -translate-y-1/2 text-orange-600 font-black text-lg">%</div>
                   <input 
@@ -559,7 +561,7 @@ export default function SettingsAdminPage() {
                 </div>
               </div>
               <div className="space-y-3">
-                <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">Rider Base Payout (฿)</label>
+                <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">{t("admin.settings.financeLabelBasePayout")}</label>
                 <div className="relative">
                   <div className="absolute left-6 top-1/2 -translate-y-1/2 text-emerald-600 font-black text-lg">฿</div>
                   <input 
@@ -585,8 +587,8 @@ export default function SettingsAdminPage() {
                      <Icons.Settings size={20} className="text-slate-900" />
                   </div>
                   <div>
-                     <p className="text-[10px] md:text-[11px] font-black text-white uppercase tracking-widest leading-none">Unsaved Intelligence</p>
-                     <p className="hidden md:block text-[9px] font-medium text-slate-400 mt-2">New operations formula ready</p>
+                     <p className="text-[10px] md:text-[11px] font-black text-white uppercase tracking-widest leading-none">{t("admin.settings.floatingUnsaved")}</p>
+                     <p className="hidden md:block text-[9px] font-medium text-slate-400 mt-2">{t("admin.settings.floatingReady")}</p>
                   </div>
                </div>
                <button 
@@ -594,7 +596,7 @@ export default function SettingsAdminPage() {
                   disabled={isSaving}
                   className="bg-primary text-white h-12 md:h-14 px-8 md:px-12 rounded-xl md:rounded-[1.25rem] font-black text-xs md:text-sm shadow-2xl shadow-primary/30 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3 group w-full md:w-auto"
                >
-                  {isSaving ? <Icons.Refresh size={18} className="animate-spin" /> : <span className="uppercase tracking-widest">Deploy Synchronization</span>}
+                  {isSaving ? <Icons.Refresh size={18} className="animate-spin" /> : <span className="uppercase tracking-widest">{t("admin.settings.floatingBtnDeploy")}</span>}
                </button>
             </div>
         </div>

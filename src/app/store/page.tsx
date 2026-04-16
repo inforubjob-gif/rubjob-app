@@ -101,13 +101,13 @@ export default function StoreDashboard() {
 
         <div className="grid grid-cols-2 gap-4 text-center">
           <div className="bg-white/10 backdrop-blur-lg p-5 rounded-[2.5rem] border border-white/20 shadow-lg shadow-primary-dark/20 text-white">
-            <p className="text-[10px] font-black text-white/50 uppercase tracking-[0.15em]">Orders</p>
+            <p className="text-[10px] font-black text-white/50 uppercase tracking-[0.15em]">{t("store.navOrders")}</p>
             <p className="text-3xl font-black mt-1 tracking-tighter">
               {incomingOrders.length + washingOrders.length + readyOrders.length}
             </p>
           </div>
           <div className="bg-white/10 backdrop-blur-lg p-5 rounded-[2.5rem] border border-white/20 shadow-lg shadow-primary-dark/20 text-white">
-            <p className="text-[10px] font-black text-white/50 uppercase tracking-[0.15em]">Balance</p>
+            <p className="text-[10px] font-black text-white/50 uppercase tracking-[0.15em]">{t("store.wallet.availableBalance")}</p>
             <p className="text-3xl font-black mt-1 tracking-tighter flex items-center justify-center gap-1">
               <span className="text-sm">฿</span>{Math.floor(balance).toLocaleString()}
             </p>
@@ -125,7 +125,7 @@ export default function StoreDashboard() {
                 activeTab === tab ? "bg-white text-primary shadow-lg shadow-primary/20 scale-[1.02]" : "text-white/70"
               }`}
             >
-              {tab === "incoming" ? "Incoming" : tab === "washing" ? "Washing" : "Ready"}
+              {tab === "incoming" ? t("store.incomingFromRider") : tab === "washing" ? t("store.processing") : t("store.readyForRider")}
               {tab === "incoming" && incomingOrders.length > 0 && <span className="ml-1 opacity-50">({incomingOrders.length})</span>}
             </button>
           ))}
@@ -152,7 +152,7 @@ export default function StoreDashboard() {
                     <Icons.FileText size={32} />
                  </div>
                  <p className="text-xs font-black text-slate-400 uppercase tracking-widest leading-tight">
-                    No orders in this stage
+                    {t("store.noJobs")}
                  </p>
               </div>
             ) : (
@@ -174,7 +174,7 @@ export default function StoreDashboard() {
                       </h3>
                       <div className="flex items-center gap-2 mt-1.5 grayscale opacity-60">
                         <div className="w-5 h-5 rounded-full bg-slate-200" />
-                        <span className="text-[10px] font-bold text-slate-500">{order.userName || "Customer"}</span>
+                        <span className="text-[10px] font-bold text-slate-500">{order.userName || t("common.guest")}</span>
                       </div>
                     </div>
                   </div>
@@ -185,7 +185,7 @@ export default function StoreDashboard() {
                       className="flex-1 rounded-xl text-[10px] font-black uppercase tracking-widest py-3 border-2"
                       onClick={() => router.push(`/store/orders/${order.id}`)}
                     >
-                      Details
+                      {t("common.details")}
                     </Button>
                     {activeTab === "incoming" && (
                       <Button 
@@ -193,7 +193,7 @@ export default function StoreDashboard() {
                         isLoading={isSubmitting}
                         onClick={() => handleUpdateStatus(order.id, "washing")}
                       >
-                        Receive
+                        {t("store.receiveFromDriver")}
                       </Button>
                     )}
                     {activeTab === "washing" && (
@@ -202,7 +202,7 @@ export default function StoreDashboard() {
                         isLoading={isSubmitting}
                         onClick={() => handleUpdateStatus(order.id, "ready_for_pickup")}
                       >
-                        Finish Wash
+                        {t("common.confirm")}
                       </Button>
                     )}
                     {activeTab === "ready" && (
@@ -211,7 +211,7 @@ export default function StoreDashboard() {
                         isLoading={isSubmitting}
                         onClick={() => handleUpdateStatus(order.id, "completed")}
                       >
-                        Handover
+                        {t("store.handoverToDriver")}
                       </Button>
                     )}
                   </div>
@@ -223,4 +223,3 @@ export default function StoreDashboard() {
       </div>
     );
 }
-

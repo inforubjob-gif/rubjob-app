@@ -104,10 +104,10 @@ export default function RiderProfilePage() {
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-1.5 opacity-80">
                  <Icons.Logo variant="icon" size={16} className="grayscale brightness-[100] invert" />
-                 <p className="text-[10px] font-black uppercase tracking-[0.2em]">{t("rider.hero") || "Rubjob Rider"}</p>
+                 <p className="text-[10px] font-black uppercase tracking-[0.2em]">{t("rider.hero")}</p>
               </div>
-              <h1 className="text-2xl font-black text-white tracking-tight truncate drop-shadow-lg">{profile?.displayName || "Rubjob Rider"}</h1>
-              <p className="text-[10px] text-white/60 font-bold uppercase tracking-[0.1em] mt-1">Verified Hero #0012</p>
+              <h1 className="text-2xl font-black text-white tracking-tight truncate drop-shadow-lg">{profile?.displayName || t("common.guest")}</h1>
+              <p className="text-[10px] text-white/60 font-bold uppercase tracking-[0.1em] mt-1">{t("rider.profile.verifiedHero")} #0012</p>
             </div>
         </div>
       </header>
@@ -126,7 +126,7 @@ export default function RiderProfilePage() {
                 </div>
              </div>
              <button 
-                onClick={() => setWorkStatus(!workStatus)}
+                onClick={handleToggleWorkStatus}
                 className={`w-14 h-8 rounded-full p-1 transition-all duration-300 ${workStatus ? 'bg-primary shadow-lg shadow-primary/30' : 'bg-slate-200'}`}
              >
                 <div className={`w-6 h-6 rounded-full bg-white shadow-md transition-all duration-300 ${workStatus ? 'transform translate-x-6' : ''}`} />
@@ -147,25 +147,25 @@ export default function RiderProfilePage() {
              <SettingItem 
                 icon={<Icons.MapPin size={20} />} 
                 label={t("rider.profile.serviceArea")} 
-                value={prefs?.serviceArea || "Not Set"} 
+                value={prefs?.serviceArea || t("common.notSet")} 
                 onClick={() => router.push("/rider/profile/service-area")}
              />
              <SettingItem 
                 icon={<Icons.Bike size={20} />} 
                 label={t("rider.vehicleType")} 
-                value={prefs?.vehicleType || "Not Set"} 
+                value={prefs?.vehicleType || t("common.notSet")} 
                 onClick={() => router.push("/rider/profile/vehicle-type")}
              />
              <SettingItem 
                 icon={<Icons.Clock size={20} />} 
                 label={t("rider.profile.activeHours")} 
-                value={prefs?.activeHours || "Not Set"} 
+                value={prefs?.activeHours || t("common.notSet")} 
                 onClick={() => router.push("/rider/profile/active-hours")}
              />
              <SettingItem 
                 icon={<Icons.Payment size={20} />} 
                 label={t("rider.profile.payoutMethod")} 
-                value={prefs?.payoutMethod ? `${prefs.payoutMethod.bank ? prefs.payoutMethod.bank.toUpperCase() : 'Account'} ***${prefs.payoutMethod.account?.slice(-4) || ''}` : "Not Set"} 
+                value={prefs?.payoutMethod ? `${prefs.payoutMethod.bank ? prefs.payoutMethod.bank.toUpperCase() : 'Account'} ***${prefs.payoutMethod.account?.slice(-4) || ''}` : t("common.notSet")} 
                 onClick={() => router.push("/rider/profile/payout-method")}
              />
           </div>
@@ -236,21 +236,4 @@ export default function RiderProfilePage() {
        )}
     </div>
   );
-}
-
-function SettingsLink({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
-    return (
-        <button className="w-full bg-white p-4 rounded-[1.5rem] border border-slate-100 flex items-center justify-between group active:scale-[0.98] transition-all shadow-sm">
-            <div className="flex items-center gap-3">
-                <div className="w-9 h-9 bg-slate-50 text-slate-400 rounded-xl flex items-center justify-center group-hover:text-primary transition-colors">
-                    {icon}
-                </div>
-                <div className="text-left">
-                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">{label}</p>
-                    <p className="text-sm font-bold text-slate-900">{value}</p>
-                </div>
-            </div>
-            <Icons.Back size={16} className="text-slate-200 rotate-180" />
-        </button>
-    )
 }
