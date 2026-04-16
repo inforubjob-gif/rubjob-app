@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useLanguage } from "@/lib/contexts/LanguageContext";
 import Card from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 import { Icons } from "@/components/ui/Icons";
@@ -9,6 +10,7 @@ import { useToast } from "@/components/providers/ToastProvider";
 import Skeleton from "@/components/ui/Skeleton";
 
 export default function StoresAdminPage() {
+  const { t } = useLanguage();
   const { showToast } = useToast();
   const [stores, setStores] = useState<any[]>([]);
   const [allServices, setAllServices] = useState<any[]>([]);
@@ -50,7 +52,7 @@ export default function StoresAdminPage() {
         body: JSON.stringify({ id, isActive: currentStatus === 1 ? 0 : 1 })
       });
       setStores(prev => prev.map(s => s.id === id ? { ...s, isActive: currentStatus === 1 ? 0 : 1 } : s));
-      showToast(`Store ${currentStatus === 1 ? 'suspended' : 'activated'} successfully`, "success");
+      showToast(currentStatus === 1 ? t('admin.riders.form.suspended') : t('admin.riders.form.verified'), "success");
     } catch (err) {
       console.error("Failed to toggle status", err);
       showToast("Failed to update store status", "error");
@@ -58,7 +60,7 @@ export default function StoresAdminPage() {
   }
 
   async function deleteStore(id: string) {
-    if (!window.confirm("Are you sure you want to PERMANENTLY delete this store? This cannot be undone.")) return;
+    if (!window.confirm(t('common.confirm'))) return;
     
     try {
       const res = await fetch("/api/admin/stores", {
@@ -81,14 +83,14 @@ export default function StoresAdminPage() {
     <div className="space-y-6 max-w-7xl mx-auto">
       <header className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl md:text-2xl font-black text-slate-900 tracking-tight">Partner Stores</h1>
-          <p className="text-slate-500 text-sm md:text-base font-medium mt-1">Manage physical store locations and their specialized services</p>
+          <h1 className="text-xl md:text-2xl font-black text-slate-900 tracking-tight">{t('admin.stores.list.title')}</h1>
+          <p className="text-slate-500 text-sm md:text-base font-medium mt-1">{t('admin.stores.list.subtitle')}</p>
         </div>
         <Link 
           href="/admin/stores/new"
           className="px-5 py-3 bg-slate-900 text-white rounded-xl text-sm font-bold shadow-lg flex items-center justify-center gap-2 hover:bg-slate-800 transition-all active:scale-95 w-full sm:w-auto"
         >
-          <Icons.Plus size={16} /> New Store
+          <Icons.Plus size={16} /> {t('admin.stores.list.newBtn')}
         </Link>
       </header>
 
@@ -102,20 +104,20 @@ export default function StoresAdminPage() {
             <div className="w-20 h-20 bg-slate-50 rounded-3xl flex items-center justify-center text-slate-300 mb-4">
                <Icons.Office size={40} />
             </div>
-            <p className="text-slate-400 font-bold uppercase tracking-widest text-xs">No stores registered yet.</p>
-            <Link href="/admin/stores/new" className="mt-4 text-primary font-black text-sm uppercase tracking-tight hover:underline">Register first branch →</Link>
+            <p className="text-slate-400 font-bold uppercase tracking-widest text-xs">{t('admin.stores.list.empty')}</p>
+            <Link href="/admin/stores/new" className="mt-4 text-primary font-black text-sm uppercase tracking-tight hover:underline">{t('admin.stores.list.emptyAction')}</Link>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm whitespace-nowrap">
               <thead className="bg-slate-50 text-slate-500 font-bold uppercase text-[10px] tracking-wider border-b border-slate-200">
                 <tr>
-                  <th className="px-6 py-4">Store</th>
-                  <th className="px-6 py-4">Location & Contact</th>
-                  <th className="px-6 py-4">Services</th>
-                  <th className="px-6 py-4">Base Delivery</th>
-                  <th className="px-6 py-4">Status</th>
-                  <th className="px-6 py-4 text-right">Actions</th>
+                  <th className="px-6 py-4">{t('admin.stores.list.table.store')}</th>
+                  <th className="px-6 py-4">{t('admin.stores.list.table.location')}</th>
+                  <th className="px-6 py-4">{t('admin.stores.list.table.services')}</th>
+                  <th className="px-6 py-4">{t('admin.stores.list.table.delivery')}</th>
+                  <th className="px-6 py-4">{t('admin.stores.list.table.status')}</th>
+                  <th className="px-6 py-4 text-right">{t('admin.stores.list.table.actions')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
@@ -162,9 +164,9 @@ export default function StoresAdminPage() {
                          store.status === 'pending' ? "warning" : 
                          "danger"
                        }>
-                          {store.status === 'active' ? 'Active' : 
-                           store.status === 'pending' ? 'Pending Review' : 
-                           'Suspended'}
+                          {store.status === 'active' ? t('admin.riders.form.verified') : 
+                           store.status === 'pending' ? t('admin.riders.form.pendingReview') : 
+                           t('admin.riders.form.rejected')}
                        </Badge>
                     </td>
                     <td className="px-6 py-4 text-right">

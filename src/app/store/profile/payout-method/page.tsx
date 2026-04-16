@@ -7,13 +7,13 @@ import Button from "@/components/ui/Button";
 import { Icons } from "@/components/ui/Icons";
 import { useTranslation } from "@/components/providers/LanguageProvider";
 
-import { useLiff } from "@/components/providers/LiffProvider";
+import { useStoreAuth } from "@/components/providers/StoreProvider";
 import { useEffect } from "react";
 
 export default function PayoutMethodPage() {
   const router = useRouter();
   const { t } = useTranslation();
-  const { profile } = useLiff();
+  const { store } = useStoreAuth();
   const [method, setMethod] = useState<"bank" | "promptpay">("bank");
   const [accountNumber, setAccountNumber] = useState("");
   const [bankName, setBankName] = useState("");
@@ -21,8 +21,8 @@ export default function PayoutMethodPage() {
   const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
-    if (!profile?.userId) return;
-    fetch(`/api/users/preferences?userId=${profile.userId}`)
+    if (!store?.id) return;
+    fetch(`/api/store/preferences?storeId=${store.id}`)
       .then(res => res.json())
       .then((data: any) => {
          const p = data.preferences?.payoutMethod;
@@ -33,16 +33,16 @@ export default function PayoutMethodPage() {
            setAccountHolder(p.holder || "");
          }
       });
-  }, [profile?.userId]);
+  }, [store?.id]);
 
   const handleSave = async () => {
-    if (!profile?.userId) return;
+    if (!store?.id) return;
     setIsSaving(true);
-    await fetch("/api/users/preferences", {
+    await fetch("/api/store/preferences", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ 
-        userId: profile.userId, 
+        storeId: store.id, 
         payoutMethod: { type: method, account: accountNumber, bank: method === "bank" ? bankName : "PromptPay", holder: accountHolder } 
       })
     });

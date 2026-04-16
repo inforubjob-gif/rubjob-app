@@ -73,14 +73,14 @@ export default function AdminDashboard() {
                {t("admin.dashboard.gpLabel")}: {stats.gpStore}% / {stats.gpRider}%
              </div>
              <p className="text-slate-400 text-sm font-bold tracking-tight">
-               Rubjob Network Operations Centre
+               {t("admin.dashboard.noc")}
              </p>
           </div>
         </div>
         {errorCount > 0 ? (
           <div className="w-fit bg-rose-50 text-rose-600 px-5 py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-widest border border-rose-100 italic shadow-sm flex items-center gap-2 animate-pulse">
             <div className="w-2 h-2 bg-rose-500 rounded-full" />
-            Connection Alert
+            {t("admin.dashboard.connAlert")}
           </div>
         ) : (
           <div className="w-fit bg-white text-emerald-500 px-5 py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-widest border border-slate-100 shadow-sm flex items-center gap-2 group hover:border-emerald-200 transition-colors">
@@ -96,7 +96,7 @@ export default function AdminDashboard() {
               <Icons.Lock size={24} />
            </div>
            <div>
-              <p className="text-[10px] font-black uppercase text-rose-500 tracking-widest leading-none mb-1">System Exception Detected</p>
+              <p className="text-[10px] font-black uppercase text-rose-500 tracking-widest leading-none mb-1">{t("admin.dashboard.sysException")}</p>
               <p className="text-sm font-bold text-rose-900">{apiError}</p>
            </div>
         </div>
@@ -105,7 +105,7 @@ export default function AdminDashboard() {
       {isLoading ? (
         <div className="flex flex-col items-center justify-center py-32 space-y-4">
           <div className="w-12 h-12 border-4 border-primary/10 border-t-primary rounded-full animate-spin shadow-lg" />
-          <p className="text-slate-400 text-xs font-black uppercase tracking-widest animate-pulse">Synchronizing Global Ops...</p>
+          <p className="text-slate-400 text-xs font-black uppercase tracking-widest animate-pulse">{t("admin.dashboard.syncing")}</p>
         </div>
       ) : (
         <div className="stagger">
@@ -124,7 +124,7 @@ export default function AdminDashboard() {
                </h2>
                <div className="mt-4 flex items-center gap-1.5 font-bold text-[10px] text-slate-300">
                   <span className="w-1 h-1 bg-slate-200 rounded-full" />
-                  Authenticated Customers
+                  {t("admin.dashboard.authCustomers")}
                </div>
             </Card>
 
@@ -180,7 +180,7 @@ export default function AdminDashboard() {
                <h2 className="text-4xl font-black text-slate-900 leading-none tracking-tighter">{Number(stats.orders).toLocaleString()}</h2>
                <div className="mt-4 flex items-center gap-1.5 font-bold text-[10px] text-slate-300">
                   <span className="w-1 h-1 bg-slate-200 rounded-full" />
-                  Processed Volume
+                  {t("admin.dashboard.processedVol")}
                </div>
             </Card>
 
@@ -197,7 +197,7 @@ export default function AdminDashboard() {
                </h2>
                <div className="mt-4 flex items-center gap-1.5 font-bold text-[10px] text-slate-300">
                   <span className="w-1 h-1 bg-slate-200 rounded-full" />
-                  Overall Sales
+                  {t("admin.dashboard.overallSales")}
                </div>
             </Card>
 
@@ -212,7 +212,7 @@ export default function AdminDashboard() {
                        <Icons.Wallet size={28} />
                     </div>
                     <div className="bg-white/20 backdrop-blur-md px-4 py-1.5 rounded-2xl text-[10px] font-black tracking-widest uppercase border border-white/20 shadow-sm">
-                      GP SHARE: S-{stats.gpStore}% / R-{stats.gpRider}%
+                      {t("admin.dashboard.gpShare").replace("{store}", String(stats.gpStore)).replace("{rider}", String(stats.gpRider))}
                     </div>
                   </div>
                   
@@ -224,7 +224,7 @@ export default function AdminDashboard() {
                     </h2>
                     <p className="mt-4 text-primary-light/60 text-[10px] font-bold uppercase tracking-widest flex items-center gap-2">
                        <Icons.Logo size={12} variant="white" className="opacity-50" />
-                       Net platform commission after payouts
+                       {t("admin.dashboard.netCommission")}
                     </p>
                   </div>
                </div>

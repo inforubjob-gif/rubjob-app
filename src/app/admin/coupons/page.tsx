@@ -5,8 +5,10 @@ import Card from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 import { Icons } from "@/components/ui/Icons";
 import Modal from "@/components/ui/Modal";
+import { useLanguage } from "@/lib/contexts/LanguageContext";
 
 export default function CouponsAdminPage() {
+  const { t } = useLanguage();
   const [coupons, setCoupons] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -109,14 +111,14 @@ export default function CouponsAdminPage() {
     <div className="space-y-6 max-w-7xl mx-auto">
       <header className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl md:text-2xl font-black text-slate-900 tracking-tight">Coupon Management</h1>
-          <p className="text-slate-500 text-sm md:text-base font-medium mt-1">Create marketing codes and wallet-based promotions</p>
+          <h1 className="text-xl md:text-2xl font-black text-slate-900 tracking-tight">{t('admin.coupons.title')}</h1>
+          <p className="text-slate-500 text-sm md:text-base font-medium mt-1">{t('admin.coupons.subtitle')}</p>
         </div>
         <button 
           onClick={() => setIsModalOpen(true)}
           className="px-5 py-3 bg-slate-900 text-white rounded-xl text-sm font-bold shadow-lg flex items-center justify-center gap-2 hover:bg-slate-800 transition-all active:scale-95 w-full sm:w-auto"
         >
-          <Icons.Plus size={16} /> New Coupon
+          <Icons.Plus size={16} /> {t('admin.coupons.newBtn')}
         </button>
       </header>
 
@@ -127,19 +129,19 @@ export default function CouponsAdminPage() {
           </div>
         ) : coupons.length === 0 ? (
           <div className="text-center py-20 bg-white rounded-2xl border border-slate-100 italic text-slate-400">
-             No coupons found. Create your first one to boost sales!
+             {t('admin.coupons.empty')}
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm whitespace-nowrap">
               <thead className="bg-slate-50 text-slate-500 font-bold uppercase text-[10px] tracking-wider border-b border-slate-200">
                 <tr>
-                  <th className="px-6 py-4">Promo Code</th>
-                  <th className="px-6 py-4">Discount</th>
-                  <th className="px-6 py-4">Claims / Limit</th>
-                  <th className="px-6 py-4">Expiration</th>
-                  <th className="px-6 py-4">Status</th>
-                  <th className="px-6 py-4 text-right">Actions</th>
+                  <th className="px-6 py-4">{t('admin.coupons.table.promoCode')}</th>
+                  <th className="px-6 py-4">{t('admin.coupons.table.discount')}</th>
+                  <th className="px-6 py-4">{t('admin.coupons.table.usage')}</th>
+                  <th className="px-6 py-4">{t('admin.coupons.table.expiry')}</th>
+                  <th className="px-6 py-4">{t('admin.coupons.table.status')}</th>
+                  <th className="px-6 py-4 text-right">{t('admin.coupons.table.actions')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
@@ -150,11 +152,11 @@ export default function CouponsAdminPage() {
                          <div className="flex items-center gap-2">
                             <span className="text-sm font-black text-slate-900 tracking-tight">{coupon.code}</span>
                             {coupon.isVisible === 1 && (
-                               <span className="text-[8px] font-black text-indigo-500 uppercase bg-indigo-50 px-1 py-0.5 rounded leading-none">Wallet</span>
+                               <span className="text-[8px] font-black text-indigo-500 uppercase bg-indigo-50 px-1 py-0.5 rounded leading-none">{t('admin.coupons.status.wallet')}</span>
                             )}
                          </div>
                          <p className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">
-                            {coupon.isVisible === 1 ? "Public Visibility" : "Exclusive Code"}
+                            {coupon.isVisible === 1 ? t('admin.coupons.status.public') : t('admin.coupons.status.exclusive')}
                          </p>
                       </div>
                     </td>
@@ -178,11 +180,11 @@ export default function CouponsAdminPage() {
                        </div>
                     </td>
                     <td className="px-6 py-4 font-medium text-xs text-slate-500">
-                       {coupon.expiryDate ? new Date(coupon.expiryDate).toLocaleDateString() : "Never Expires"}
+                       {coupon.expiryDate ? new Date(coupon.expiryDate).toLocaleDateString() : t('admin.coupons.noExpiry')}
                     </td>
                     <td className="px-6 py-4">
                        <Badge variant={coupon.isActive === 1 ? "success" : "danger"}>
-                          {coupon.isActive === 1 ? 'Active' : 'Disabled'}
+                          {coupon.isActive === 1 ? t('admin.coupons.status.active') : t('admin.coupons.status.disabled')}
                        </Badge>
                     </td>
                     <td className="px-6 py-4 text-right">
@@ -198,7 +200,7 @@ export default function CouponsAdminPage() {
                             onClick={() => toggleStatus(coupon.id, coupon.isActive)}
                             className={`px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-tight transition-all active:scale-95 ${coupon.isActive === 1 ? 'bg-rose-50 text-rose-600 hover:bg-rose-100' : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100'}`}
                           >
-                            {coupon.isActive === 1 ? 'Lock' : 'Unlock'}
+                            {coupon.isActive === 1 ? t('admin.coupons.lock') : t('admin.coupons.unlock')}
                           </button>
                           <button 
                             onClick={() => handleDelete(coupon.id, coupon.code)}
@@ -217,7 +219,7 @@ export default function CouponsAdminPage() {
       </Card>
 
       {/* New Coupon Modal */}
-      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Create Marketing Coupon">
+      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title={t('admin.coupons.modal.title')}>
          <form onSubmit={handleCreate} className="space-y-6 pt-2 h-[80vh] overflow-y-auto px-1 custom-scrollbar">
             <div className="p-4 bg-indigo-50 rounded-3xl border border-indigo-100">
                <label className="flex items-center gap-3 cursor-pointer">
@@ -231,15 +233,15 @@ export default function CouponsAdminPage() {
                      <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${formData.isVisible ? 'left-7' : 'left-1'}`} />
                   </div>
                   <div className="flex flex-col">
-                     <span className="text-xs font-black text-slate-900 uppercase tracking-tight">Public Wallet Visibility</span>
-                     <span className="text-[10px] text-slate-500 font-medium">If enabled, this coupon will show up in every customer's coupon list.</span>
+                     <span className="text-xs font-black text-slate-900 uppercase tracking-tight">{t('admin.coupons.modal.visibilityTitle')}</span>
+                     <span className="text-[10px] text-slate-500 font-medium">{t('admin.coupons.modal.visibilitySub')}</span>
                   </div>
                </label>
             </div>
 
             <div className="space-y-4">
                <div>
-                  <label className="text-[10px] uppercase font-black text-slate-400 tracking-widest block mb-1.5 ml-1">Coupon Code</label>
+                  <label className="text-[10px] uppercase font-black text-slate-400 tracking-widest block mb-1.5 ml-1">{t('admin.coupons.modal.code')}</label>
                   <input 
                     required
                     value={formData.code}
@@ -250,18 +252,18 @@ export default function CouponsAdminPage() {
                </div>
                <div className="grid grid-cols-2 gap-4">
                   <div>
-                     <label className="text-[10px] uppercase font-black text-slate-400 tracking-widest block mb-1.5 ml-1">Discount Type</label>
+                     <label className="text-[10px] uppercase font-black text-slate-400 tracking-widest block mb-1.5 ml-1">{t('admin.coupons.modal.type')}</label>
                      <select 
                        value={formData.type}
                        onChange={e => setFormData({...formData, type: e.target.value})}
                        className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-3 py-3 text-sm font-bold focus:outline-none focus:border-primary/50"
                      >
-                        <option value="percentage">Percentage (%)</option>
-                        <option value="fixed">Fixed Amount (฿)</option>
+                        <option value="percentage">{t('admin.coupons.modal.typePercent')}</option>
+                        <option value="fixed">{t('admin.coupons.modal.typeFixed')}</option>
                      </select>
                   </div>
                   <div>
-                     <label className="text-[10px] uppercase font-black text-slate-400 tracking-widest block mb-1.5 ml-1">Value</label>
+                     <label className="text-[10px] uppercase font-black text-slate-400 tracking-widest block mb-1.5 ml-1">{t('admin.coupons.modal.value')}</label>
                      <input 
                        required type="number"
                        value={formData.value}
@@ -274,7 +276,7 @@ export default function CouponsAdminPage() {
                
                <div className="grid grid-cols-2 gap-4">
                   <div>
-                     <label className="text-[10px] uppercase font-black text-slate-400 tracking-widest block mb-1.5 ml-1">Min order setup ฿</label>
+                     <label className="text-[10px] uppercase font-black text-slate-400 tracking-widest block mb-1.5 ml-1">{t('admin.coupons.modal.minOrder')}</label>
                      <input 
                        type="number"
                        value={formData.minOrder}
@@ -283,7 +285,7 @@ export default function CouponsAdminPage() {
                      />
                   </div>
                   <div>
-                     <label className="text-[10px] uppercase font-black text-slate-400 tracking-widest block mb-1.5 ml-1">Max uses (Overall)</label>
+                     <label className="text-[10px] uppercase font-black text-slate-400 tracking-widest block mb-1.5 ml-1">{t('admin.coupons.modal.maxUses')}</label>
                      <input 
                        type="number"
                        value={formData.usageLimit}
@@ -295,7 +297,7 @@ export default function CouponsAdminPage() {
                </div>
 
                <div>
-                  <label className="text-[10px] uppercase font-black text-slate-400 tracking-widest block mb-1.5 ml-1">Expiration Date</label>
+                  <label className="text-[10px] uppercase font-black text-slate-400 tracking-widest block mb-1.5 ml-1">{t('admin.coupons.modal.expiration')}</label>
                   <input 
                     type="date"
                     value={formData.expiryDate}
@@ -309,7 +311,7 @@ export default function CouponsAdminPage() {
               disabled={isSaving}
               className="w-full bg-slate-900 text-white py-5 rounded-3xl font-black text-xs uppercase tracking-[0.2em] shadow-xl shadow-slate-200 hover:scale-[1.01] active:scale-[0.98] transition-all disabled:opacity-50"
             >
-              {isSaving ? "Syncing Promo..." : "Deploy Promotional Code"}
+              {isSaving ? t('admin.coupons.modal.syncing') : t('admin.coupons.modal.deploy')}
             </button>
          </form>
       </Modal>

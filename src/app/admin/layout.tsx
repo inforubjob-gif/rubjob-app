@@ -8,6 +8,7 @@ import { ToastProvider } from "@/components/providers/ToastProvider";
 import { AdminProvider, useAdmin } from "@/components/providers/AdminProvider";
 import { usePathname, useRouter } from "next/navigation";
 import { LanguageProvider } from "@/components/providers/LanguageProvider";
+import { useLanguage } from "@/lib/contexts/LanguageContext";
 
 function PermissionGate({ children }: { children: React.ReactNode }) {
   const { admin, hasPermission, isLoading } = useAdmin();
@@ -43,6 +44,7 @@ function PermissionGate({ children }: { children: React.ReactNode }) {
 }
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
+  const { t } = useLanguage();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   return (
@@ -59,7 +61,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                  </div>
                  <span className="font-black text-white text-xs tracking-widest uppercase">
                    Rubjob<br/>
-                   <span className="text-[8px] text-primary-light">Admin</span>
+                   <span className="text-[8px] text-primary-light">{t('admin.common.adminBadge')}</span>
                  </span>
               </div>
               

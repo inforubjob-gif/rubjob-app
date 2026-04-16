@@ -7,25 +7,25 @@ import Button from "@/components/ui/Button";
 import { Icons } from "@/components/ui/Icons";
 import { useTranslation } from "@/components/providers/LanguageProvider";
 
-import { useLiff } from "@/components/providers/LiffProvider";
+import { useStoreAuth } from "@/components/providers/StoreProvider";
 import { useEffect } from "react";
 
 export default function ServiceAreaPage() {
   const router = useRouter();
   const { t } = useTranslation();
-  const { profile } = useLiff();
+  const { store } = useStoreAuth();
   const [isSelectingLocation, setIsSelectingLocation] = useState(true);
   const [location, setLocation] = useState<{lat: number, lng: number} | null>(null);
   const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
-    if (!profile?.userId) return;
-    fetch(`/api/users/preferences?userId=${profile.userId}`)
+    if (!store?.id) return;
+    fetch(`/api/store/preferences?storeId=${store.id}`)
       .then(res => res.json())
       .then((data: any) => {
          if (data.preferences?.serviceAreaCoords) setLocation(data.preferences.serviceAreaCoords);
       });
-  }, [profile?.userId]);
+  }, [store?.id]);
 
   const confirmLocation = () => {
     // Simulated coordinate selection
@@ -33,13 +33,13 @@ export default function ServiceAreaPage() {
   };
 
   const handleSave = async () => {
-    if (!profile?.userId || !location) return;
+    if (!store?.id || !location) return;
     setIsSaving(true);
-    await fetch("/api/users/preferences", {
+    await fetch("/api/store/preferences", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ 
-        userId: profile.userId, 
+        storeId: store.id, 
         serviceArea: "Wattana, Bangkok", 
         serviceAreaCoords: location 
       })

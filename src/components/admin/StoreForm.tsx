@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useLanguage } from "@/lib/contexts/LanguageContext";
 import dynamic from "next/dynamic";
 import { Icons } from "@/components/ui/Icons";
 import Card from "@/components/ui/Card";
@@ -19,13 +20,16 @@ interface StoreFormProps {
 
 export default function StoreForm({ initialData, isEdit }: StoreFormProps) {
   const router = useRouter();
+  const { t } = useLanguage();
   const { showToast } = useToast();
   const [isSaving, setIsSaving] = useState(false);
   const [allServices, setAllServices] = useState<any[]>([]);
   
   const [formData, setFormData] = useState({
     name: initialData?.name || "",
-    ownerId: initialData?.ownerId || "auto",
+    ownerId: initialData?.ownerId || "system",
+    email: initialData?.email || "",
+    password: initialData?.password || "",
     address: initialData?.address || "",
     lat: initialData?.lat?.toString() || "13.7563",
     lng: initialData?.lng?.toString() || "100.5018",
@@ -104,7 +108,8 @@ export default function StoreForm({ initialData, isEdit }: StoreFormProps) {
     // 🛡️ Final Validation
     if (!formData.name.trim()) return showToast("Store Name is required", "error");
     if (!formData.address.trim()) return showToast("Physical Address is required", "error");
-    if (!formData.ownerId.trim()) return showToast("Store Owner Binding (User ID) is required", "error");
+    if (!formData.email.trim()) return showToast("Store Login Email is required", "error");
+    if (!isEdit && !formData.password.trim()) return showToast("Initial Password is required", "error");
     if (formData.services.length === 0) return showToast("Please select at least one service", "error");
 
     setIsSaving(true);
@@ -174,7 +179,7 @@ export default function StoreForm({ initialData, isEdit }: StoreFormProps) {
                  <Icons.Shield size={24} />
               </div>
               <div>
-                 <h3 className="font-black text-slate-900 uppercase tracking-tight">Partner Application Pending</h3>
+                 <h3 className="font-black text-slate-900 uppercase tracking-tight">{t('admin.stores.form.pendingApplication')}</h3>
                  <p className="text-xs font-bold text-slate-500 uppercase">Review business documentation before activation</p>
               </div>
            </div>
@@ -185,7 +190,7 @@ export default function StoreForm({ initialData, isEdit }: StoreFormProps) {
                 disabled={isSaving}
                 className="flex-1 sm:flex-none px-8 py-4 bg-slate-900 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-slate-800 transition-all shadow-lg"
               >
-                {isSaving ? 'Processing...' : 'Verify & Authorize'}
+                {isSaving ? t('common.processing') : t('admin.stores.form.verifyBtn')}
               </button>
            </div>
         </div>
@@ -199,12 +204,12 @@ export default function StoreForm({ initialData, isEdit }: StoreFormProps) {
                  <div className="w-10 h-10 rounded-xl bg-slate-900 text-white flex items-center justify-center">
                     <Icons.Office size={20} />
                  </div>
-                 <h2 className="text-xl font-black text-slate-900 uppercase tracking-tight">Branch Identity</h2>
+                 <h2 className="text-xl font-black text-slate-900 uppercase tracking-tight">{t('admin.stores.form.branchIdentity')}</h2>
               </div>
               
               <div className="space-y-6">
                  <div>
-                    <label className="text-[10px] uppercase font-black text-slate-400 tracking-widest block mb-2 ml-1">Store Name</label>
+                    <label className="text-[10px] uppercase font-black text-slate-400 tracking-widest block mb-2 ml-1">{t('admin.stores.form.storeName')}</label>
                     <input 
                       required
                       value={formData.name}
@@ -214,7 +219,7 @@ export default function StoreForm({ initialData, isEdit }: StoreFormProps) {
                     />
                  </div>
                  <div>
-                    <label className="text-[10px] uppercase font-black text-slate-400 tracking-widest block mb-2 ml-1">Pin Location on Map</label>
+                    <label className="text-[10px] uppercase font-black text-slate-400 tracking-widest block mb-2 ml-1">{t('admin.stores.form.pinMap')}</label>
                     <MapPicker 
                       lat={parseFloat(formData.lat)} 
                       lng={parseFloat(formData.lng)} 
@@ -232,7 +237,7 @@ export default function StoreForm({ initialData, isEdit }: StoreFormProps) {
                     </div>
                  </div>
                  <div>
-                    <label className="text-[10px] uppercase font-black text-slate-400 tracking-widest block mb-2 ml-1">Physical Address Detail</label>
+                    <label className="text-[10px] uppercase font-black text-slate-400 tracking-widest block mb-2 ml-1">{t('admin.stores.form.addressDetail')}</label>
                     <textarea 
                       required
                       rows={3}
@@ -243,7 +248,7 @@ export default function StoreForm({ initialData, isEdit }: StoreFormProps) {
                     />
                  </div>
                  <div>
-                    <label className="text-[10px] uppercase font-black text-slate-400 tracking-widest block mb-2 ml-1">Contact Phone Number</label>
+                    <label className="text-[10px] uppercase font-black text-slate-400 tracking-widest block mb-2 ml-1">{t('admin.stores.form.phone')}</label>
                     <input 
                       type="tel"
                       value={formData.phone}
@@ -260,7 +265,7 @@ export default function StoreForm({ initialData, isEdit }: StoreFormProps) {
                   <div className="w-10 h-10 rounded-xl bg-orange-50 text-orange-600 flex items-center justify-center">
                      <Icons.Shield size={20} />
                   </div>
-                  <h2 className="text-xl font-black text-slate-900 uppercase tracking-tight">Business Documentation</h2>
+                  <h2 className="text-xl font-black text-slate-900 uppercase tracking-tight">{t('admin.stores.form.docs')}</h2>
                </div>
                
                <div className="space-y-6">
@@ -313,16 +318,16 @@ export default function StoreForm({ initialData, isEdit }: StoreFormProps) {
                  <div className="w-10 h-10 rounded-xl bg-orange-50 text-orange-600 flex items-center justify-center">
                     <Icons.Ticket size={20} />
                  </div>
-                 <h2 className="text-xl font-black text-slate-900 uppercase tracking-tight">Service Availability & Pricing</h2>
+                 <h2 className="text-xl font-black text-slate-900 uppercase tracking-tight">{t('admin.stores.form.servicesPricing')}</h2>
               </div>
               
               <div className="overflow-hidden border border-slate-100 rounded-3xl">
                  <table className="w-full text-left">
                     <thead className="bg-slate-50 border-b border-slate-100">
                        <tr>
-                          <th className="px-6 py-4 text-[10px] font-black uppercase text-slate-400 tracking-widest">Service</th>
-                          <th className="px-6 py-4 text-[10px] font-black uppercase text-slate-400 tracking-widest">Master Price</th>
-                          <th className="px-6 py-4 text-[10px] font-black uppercase text-slate-400 tracking-widest text-right">Store Price Override (฿)</th>
+                          <th className="px-6 py-4 text-[10px] font-black uppercase text-slate-400 tracking-widest">{t('admin.stores.form.service')}</th>
+                          <th className="px-6 py-4 text-[10px] font-black uppercase text-slate-400 tracking-widest">{t('admin.stores.form.masterPrice')}</th>
+                          <th className="px-6 py-4 text-[10px] font-black uppercase text-slate-400 tracking-widest text-right">{t('admin.stores.form.storePrice')}</th>
                        </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-50">
@@ -361,7 +366,7 @@ export default function StoreForm({ initialData, isEdit }: StoreFormProps) {
                                          />
                                       </div>
                                    ) : (
-                                      <span className="text-[10px] font-black text-slate-300 uppercase italic">Not Authorized</span>
+                                      <span className="text-[10px] font-black text-slate-300 uppercase italic">{t('admin.stores.form.notAuthorized')}</span>
                                    )}
                                 </td>
                              </tr>
@@ -380,13 +385,13 @@ export default function StoreForm({ initialData, isEdit }: StoreFormProps) {
                  <div className="w-10 h-10 rounded-xl bg-white/10 text-white flex items-center justify-center">
                     <Icons.Navigation size={20} />
                  </div>
-                 <h2 className="text-xl font-black uppercase tracking-tight">Zone Logistics</h2>
+                 <h2 className="text-xl font-black uppercase tracking-tight">{t('admin.stores.form.logistics')}</h2>
               </div>
               
               <div className="space-y-8">
                  <div>
                     <div className="flex justify-between items-center mb-4">
-                       <label className="text-[10px] uppercase font-black text-white/50 tracking-widest">Service Radius</label>
+                       <label className="text-[10px] uppercase font-black text-white/50 tracking-widest">{t('admin.stores.form.radius')}</label>
                        <span className="px-3 py-1 bg-white/10 rounded-lg text-xs font-black">{formData.serviceRadiusKm} km</span>
                     </div>
                     <input 
@@ -399,7 +404,7 @@ export default function StoreForm({ initialData, isEdit }: StoreFormProps) {
                  
                  <div className="grid grid-cols-1 gap-6">
                     <div>
-                       <label className="text-[10px] uppercase font-black text-white/50 tracking-widest block mb-2">Base Delivery Fee</label>
+                       <label className="text-[10px] uppercase font-black text-white/50 tracking-widest block mb-2">{t('admin.stores.form.baseFee')}</label>
                        <div className="relative">
                           <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30 font-black">฿</span>
                           <input 
@@ -411,7 +416,7 @@ export default function StoreForm({ initialData, isEdit }: StoreFormProps) {
                        </div>
                     </div>
                     <div>
-                       <label className="text-[10px] uppercase font-black text-white/50 tracking-widest block mb-2">Extra fee per KM</label>
+                       <label className="text-[10px] uppercase font-black text-white/50 tracking-widest block mb-2">{t('admin.stores.form.extraFee')}</label>
                        <div className="relative">
                           <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30 font-black">฿</span>
                           <input 
@@ -431,7 +436,7 @@ export default function StoreForm({ initialData, isEdit }: StoreFormProps) {
                  <div className="w-10 h-10 rounded-xl bg-primary/5 text-primary flex items-center justify-center">
                     <Icons.Wallet size={20} />
                  </div>
-                 <h2 className="text-xl font-black text-slate-900 uppercase tracking-tight">Payout Information</h2>
+                 <h2 className="text-xl font-black text-slate-900 uppercase tracking-tight">{t('admin.riders.form.payoutInfo')}</h2>
               </div>
               
               <div className="space-y-5">
@@ -474,28 +479,43 @@ export default function StoreForm({ initialData, isEdit }: StoreFormProps) {
            </Card>
 
            <Card className="p-8 bg-white border border-slate-200/60 shadow-sm">
-              <label className="text-[10px] uppercase font-black text-slate-400 tracking-widest block mb-2 ml-1">Store Owner Binding</label>
-              {formData.ownerId === "auto" ? (
-                <div className="w-full bg-slate-50 border-2 border-dashed border-slate-200 rounded-2xl px-5 py-4 flex items-center gap-3">
-                   <Icons.Shield size={20} className="text-primary" />
-                   <span className="text-sm font-black text-primary uppercase">Auto-generated by System</span>
-                </div>
-              ) : (
-                <input 
-                  required
-                  value={formData.ownerId}
-                  onChange={e => setFormData({...formData, ownerId: e.target.value})}
-                  placeholder="LINE ID or 'system'"
-                  className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-5 py-4 text-sm font-bold focus:outline-none focus:border-primary/50 transition-all text-slate-400"
-                />
-              )}
-              <p className="text-[10px] text-slate-400 font-medium mt-4 leading-relaxed">
-                 {formData.ownerId === "auto" 
-                   ? "The system will automatically generate a secure Owner account for this branch." 
-                   : "All orders from this branch will be linked to this User ID for reporting and store-specific notifications."
-                 }
-              </p>
-           </Card>
+               <div className="flex items-center gap-3 mb-6">
+                  <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
+                     <Icons.Lock size={20} />
+                  </div>
+                  <h2 className="text-xl font-black text-slate-900 uppercase tracking-tight">Store Credentials</h2>
+               </div>
+               
+               <div className="space-y-4">
+                  <div>
+                     <label className="text-[10px] uppercase font-black text-slate-400 tracking-widest block mb-2 ml-1">Login Email</label>
+                     <input 
+                       required
+                       type="email"
+                       value={formData.email}
+                       onChange={e => setFormData({...formData, email: e.target.value})}
+                       placeholder="branch-email@rubjob.com"
+                       className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-5 py-4 text-sm font-bold focus:outline-none focus:border-primary/50 transition-all"
+                     />
+                  </div>
+                  <div>
+                     <label className="text-[10px] uppercase font-black text-slate-400 tracking-widest block mb-2 ml-1">
+                        {isEdit ? "New Password (Leave blank to keep current)" : "Initial Password"}
+                     </label>
+                     <input 
+                       required={!isEdit}
+                       type="text"
+                       value={formData.password}
+                       onChange={e => setFormData({...formData, password: e.target.value})}
+                       placeholder="••••••••"
+                       className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-5 py-4 text-sm font-bold focus:outline-none focus:border-primary/50 transition-all font-mono"
+                     />
+                  </div>
+               </div>
+               <p className="text-[10px] text-slate-400 font-medium mt-6 leading-relaxed">
+                  These credentials will allow the branch manager to login to the **Merchant Portal** to manage incoming orders and laundry operations.
+               </p>
+            </Card>
 
            <div className="pt-4">
               <button 
@@ -503,14 +523,14 @@ export default function StoreForm({ initialData, isEdit }: StoreFormProps) {
                 disabled={isSaving}
                 className="w-full bg-slate-900 text-white py-6 rounded-3xl font-black text-xs uppercase tracking-[0.3em] shadow-2xl shadow-slate-300 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50"
               >
-                {isSaving ? "Syncing..." : isEdit ? "Update Branch Core Data" : "Establish New Branch"}
+                {isSaving ? t('admin.stores.form.syncing') : isEdit ? t('admin.stores.form.updateBtn') : t('admin.stores.form.establishBtn')}
               </button>
               <button 
                 type="button"
                 onClick={() => router.back()}
                 className="w-full mt-4 bg-white border border-slate-200 text-slate-400 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:text-slate-900 transition-all"
               >
-                Discard Changes & Back
+                {t('admin.stores.form.discard')}
               </button>
            </div>
         </div>

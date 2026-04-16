@@ -3,8 +3,10 @@
 import { useState, useEffect, useRef } from "react";
 import Card from "@/components/ui/Card";
 import { Icons } from "@/components/ui/Icons";
+import { useLanguage } from "@/lib/contexts/LanguageContext";
 
 export default function SupportCenterPage() {
+  const { t } = useLanguage();
   const [tickets, setTickets] = useState<any[]>([]);
   const [selectedTicketId, setSelectedTicketId] = useState<string | null>(null);
   const [messages, setMessages] = useState<any[]>([]);
@@ -83,20 +85,20 @@ export default function SupportCenterPage() {
       {/* ─── Sidebar: Ticket List ─── */}
       <div className="w-80 flex flex-col gap-4 h-full">
         <header>
-          <h1 className="text-2xl font-black text-slate-900 tracking-tight">Support Center</h1>
-          <p className="text-xs text-slate-500 font-bold uppercase tracking-wider mt-1">Live Inbox • Omni-channel</p>
+          <h1 className="text-2xl font-black text-slate-900 tracking-tight">{t('admin.support.title')}</h1>
+          <p className="text-xs text-slate-500 font-bold uppercase tracking-wider mt-1">{t('admin.support.subtitle')}</p>
         </header>
 
         <Card className="flex-1 overflow-hidden flex flex-col bg-white border border-slate-200/60 shadow-sm rounded-[2rem]">
           <div className="p-5 border-b border-slate-50 bg-slate-50/30 flex items-center justify-between">
-            <span className="text-xs font-black text-slate-400 uppercase tracking-widest">Active Chats</span>
+            <span className="text-xs font-black text-slate-400 uppercase tracking-widest">{t('admin.support.activeChats')}</span>
             <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
           </div>
           <div className="flex-1 overflow-y-auto divide-y divide-slate-50">
             {isLoading ? (
               <div className="p-10 flex justify-center"><div className="w-6 h-6 border-2 border-slate-200 border-t-primary rounded-full animate-spin" /></div>
             ) : tickets.length === 0 ? (
-              <div className="p-10 text-center text-slate-400 font-medium text-xs">No active tickets.</div>
+              <div className="p-10 text-center text-slate-400 font-medium text-xs">{t('admin.support.empty')}</div>
             ) : (
               tickets.map((t) => (
                 <button
@@ -120,13 +122,13 @@ export default function SupportCenterPage() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex justify-between items-start mb-0.5">
-                      <p className="font-black text-slate-900 truncate text-sm">{t.userName || "Customer"}</p>
+                      <p className="font-black text-slate-900 truncate text-sm">{t.userName || t('admin.common.customer')}</p>
                       <span className="text-[9px] font-bold text-slate-400 whitespace-nowrap">
                         {t.lastMessageAt ? new Date(t.lastMessageAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
                       </span>
                     </div>
                     <p className="text-xs text-slate-500 truncate leading-relaxed">
-                      {t.lastMessage || "Opening ticket..."}
+                      {t.lastMessage || t('admin.support.openingTicket')}
                     </p>
                   </div>
                 </button>
@@ -147,7 +149,7 @@ export default function SupportCenterPage() {
                    {selectedTicket?.userName?.[0]?.toUpperCase() || 'C'}
                  </div>
                  <div>
-                   <h2 className="font-black text-slate-900 tracking-tight">Chat with {selectedTicket?.userName || "Customer"}</h2>
+                   <h2 className="font-black text-slate-900 tracking-tight">{t('admin.support.chatWith').replace('{name}', selectedTicket?.userName || t('admin.common.customer'))}</h2>
                    <div className="flex items-center gap-2 mt-0.5">
                       <span className={`w-1.5 h-1.5 rounded-full ${selectedTicket?.status === 'open' ? 'bg-emerald-500' : 'bg-amber-500'}`} />
                       <span className="text-[10px] font-black uppercase tracking-[0.15em] text-slate-400">
@@ -158,7 +160,7 @@ export default function SupportCenterPage() {
               </div>
               <div className="flex items-center gap-2">
                 <button className="p-3 text-slate-400 hover:bg-slate-50 rounded-2xl transition-all"><Icons.FileText size={20} /></button>
-                <button className="bg-emerald-50 text-emerald-600 px-5 py-2.5 rounded-xl font-bold text-xs hover:bg-emerald-100 transition-all">Resolve Ticket</button>
+                <button className="bg-emerald-50 text-emerald-600 px-5 py-2.5 rounded-xl font-bold text-xs hover:bg-emerald-100 transition-all">{t('admin.support.resolveBtn')}</button>
               </div>
             </header>
 
@@ -175,7 +177,7 @@ export default function SupportCenterPage() {
                       {m.content}
                     </div>
                     <p className={`text-[10px] font-bold text-slate-400 mt-1.5 px-2 ${m.senderType === 'admin' ? 'text-right' : 'text-left'}`}>
-                      {m.senderType === 'admin' ? 'You' : (selectedTicket?.userName || 'Customer')} • {new Date(m.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      {m.senderType === 'admin' ? t('admin.support.you') : (selectedTicket?.userName || t('admin.common.customer'))} • {new Date(m.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </p>
                   </div>
                 </div>
@@ -191,7 +193,7 @@ export default function SupportCenterPage() {
                     value={replyText}
                     onChange={e => setReplyText(e.target.value)}
                     onKeyDown={e => e.key === 'Enter' && handleSendReply()}
-                    placeholder="Type your message here..."
+                    placeholder={t('admin.support.typePlaceholder')}
                     className="flex-1 bg-transparent border-none focus:ring-0 text-sm font-bold text-slate-700 placeholder:text-slate-400"
                   />
                   <button 
@@ -209,8 +211,8 @@ export default function SupportCenterPage() {
             <div className="w-24 h-24 bg-slate-100 rounded-full flex items-center justify-center mb-6 text-slate-300">
                <Icons.Chat size={48} />
             </div>
-            <h3 className="text-xl font-black text-slate-900">No Chat Selected</h3>
-            <p className="text-sm text-slate-500 max-w-xs mx-auto mt-2 font-medium">Select a customer from the left to start providing world-class support.</p>
+            <h3 className="text-xl font-black text-slate-900">{t('admin.support.noSelect')}</h3>
+            <p className="text-sm text-slate-500 max-w-xs mx-auto mt-2 font-medium">{t('admin.support.selectSub')}</p>
           </div>
         )}
       </div>

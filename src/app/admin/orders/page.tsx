@@ -4,8 +4,10 @@ import { useState, useEffect } from "react";
 import Card from "@/components/ui/Card";
 import Badge, { statusToBadgeVariant } from "@/components/ui/Badge";
 import { Icons } from "@/components/ui/Icons";
+import { useLanguage } from "@/lib/contexts/LanguageContext";
 
 export default function AdminOrdersPage() {
+  const { t } = useLanguage();
   const [orders, setOrders] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -28,8 +30,8 @@ export default function AdminOrdersPage() {
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
       <header className="mb-6">
-         <h1 className="text-xl md:text-2xl font-black text-slate-900 tracking-tight">Active Orders</h1>
-         <p className="text-slate-500 text-sm md:text-base font-medium mt-1">Monitor real-time operational status across all stores</p>
+         <h1 className="text-xl md:text-2xl font-black text-slate-900 tracking-tight">{t('admin.orders.title')}</h1>
+         <p className="text-slate-500 text-sm md:text-base font-medium mt-1">{t('admin.orders.subtitle')}</p>
       </header>
 
       <Card className="bg-white border border-slate-200/60 shadow-sm overflow-hidden">
@@ -39,19 +41,19 @@ export default function AdminOrdersPage() {
           </div>
         ) : orders.length === 0 ? (
           <div className="text-center py-20">
-             <p className="text-slate-400 font-medium">No recent orders found.</p>
+             <p className="text-slate-400 font-medium">{t('admin.orders.empty')}</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm whitespace-nowrap">
               <thead className="bg-slate-50 text-slate-500 font-bold uppercase text-[10px] tracking-wider border-b border-slate-200">
                 <tr>
-                  <th className="px-6 py-4">Order ID</th>
-                  <th className="px-6 py-4">Date</th>
-                  <th className="px-6 py-4">Status</th>
-                  <th className="px-6 py-4">Customer</th>
-                  <th className="px-6 py-4 text-right">Total</th>
-                  <th className="px-6 py-4 text-center">Actions</th>
+                  <th className="px-6 py-4">{t('admin.orders.table.id')}</th>
+                  <th className="px-6 py-4">{t('admin.orders.table.date')}</th>
+                  <th className="px-6 py-4">{t('admin.orders.table.status')}</th>
+                  <th className="px-6 py-4">{t('admin.orders.table.customer')}</th>
+                  <th className="px-6 py-4 text-right">{t('admin.orders.table.total')}</th>
+                  <th className="px-6 py-4 text-center">{t('admin.orders.table.actions')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
@@ -65,7 +67,7 @@ export default function AdminOrdersPage() {
                     <td className="px-6 py-4 text-slate-700 font-medium">{order.userId.slice(0, 10)}...</td>
                     <td className="px-6 py-4 text-right font-black">฿{order.totalPrice}</td>
                     <td className="px-6 py-4 text-center">
-                       <button className="text-primary font-bold text-xs hover:underline">View JSON</button>
+                       <button className="text-primary font-bold text-xs hover:underline">{t('admin.orders.viewJson')}</button>
                     </td>
                   </tr>
                 ))}

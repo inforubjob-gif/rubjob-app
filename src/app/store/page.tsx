@@ -7,7 +7,7 @@ import Badge, { statusToBadgeVariant } from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
 import { Icons, getServiceIcon } from "@/components/ui/Icons";
 import { useTranslation } from "@/components/providers/LanguageProvider";
-import { useLiff } from "@/components/providers/LiffProvider";
+import { useStoreAuth } from "@/components/providers/StoreProvider";
 import CountdownTimer from "@/components/ui/CountdownTimer";
 import Skeleton from "@/components/ui/Skeleton";
 
@@ -15,7 +15,7 @@ import Skeleton from "@/components/ui/Skeleton";
 
 export default function StoreDashboard() {
   const { t } = useTranslation();
-  const { profile } = useLiff();
+  const { store, logout } = useStoreAuth();
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<"incoming" | "washing" | "ready">("incoming");
   const [isLoading, setIsLoading] = useState(true);
@@ -29,7 +29,7 @@ export default function StoreDashboard() {
   const [balance, setBalance] = useState(0);
 
   const fetchStoreData = async () => {
-    const storeId = profile?.assignedStoreId;
+    const storeId = store?.id;
     if (!storeId) return;
     try {
       const res = await fetch(`/api/store/orders?storeId=${storeId}`);
@@ -53,13 +53,13 @@ export default function StoreDashboard() {
   };
 
   useEffect(() => {
-    if (profile) {
+    if (store) {
       fetchStoreData();
     } else {
       const timer = setTimeout(() => setIsLoading(false), 800);
       return () => clearTimeout(timer);
     }
-  }, [profile]);
+  }, [store]);
 
   const handleUpdateStatus = async (orderId: string, newStatus: string) => {
     setIsSubmitting(true);
@@ -90,12 +90,15 @@ export default function StoreDashboard() {
               <Icons.Logo size={36} variant="icon" />
             </div>
             <div className="min-w-0">
-              <p className="text-[10px] text-white/70 font-black uppercase tracking-[0.2em] leading-none mb-1 shadow-sm">{t("store.unitNo")} {profile?.assignedStoreId?.split('-')[1] || '001'}</p>
-              <h1 className="text-2xl font-black text-white tracking-tight truncate drop-shadow-md">{profile?.displayName || t("common.guest")}</h1>
+               <p className="text-[10px] text-white/70 font-black uppercase tracking-[0.2em] leading-none mb-1 shadow-sm">{t("store.unitNo")} {store?.id?.split('-')[1] || '001'}</p>
+               <h1 className="text-2xl font-black text-white tracking-tight truncate drop-shadow-md">{store?.name || t("common.guest")}</h1>
             </div>
           </div>
-          <button className="w-11 h-11 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/30 shadow-lg shadow-white/5 active:scale-90 transition-transform text-white">
-            <Icons.Bell size={22} />
+          <button 
+            onClick={logout}
+            className="w-11 h-11 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/30 shadow-lg shadow-white/5 active:scale-90 transition-transform text-white"
+          >
+            <Icons.Lock size={22} />
           </button>
         </div>
 

@@ -6,11 +6,11 @@ import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import { Icons, getServiceIcon } from "@/components/ui/Icons";
 import { useTranslation } from "@/components/providers/LanguageProvider";
-import { useLiff } from "@/components/providers/LiffProvider";
+import { useStoreAuth } from "@/components/providers/StoreProvider";
 
 export default function StoreServicesPage() {
   const { t } = useTranslation();
-  const { profile } = useLiff();
+  const { store } = useStoreAuth();
   const router = useRouter();
 
   const [services, setServices] = useState<any[]>([]);
@@ -18,13 +18,13 @@ export default function StoreServicesPage() {
   const [isSaving, setIsSaving] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!profile?.assignedStoreId) return;
+    if (!store?.id) return;
     fetchServices();
-  }, [profile?.assignedStoreId]);
+  }, [store?.id]);
 
   const fetchServices = async () => {
     try {
-      const res = await fetch(`/api/store/services?storeId=${profile?.assignedStoreId}`);
+      const res = await fetch(`/api/store/services?storeId=${store?.id}`);
       const data = await res.json();
       if (data.services) setServices(data.services);
     } catch (err) {
@@ -41,7 +41,7 @@ export default function StoreServicesPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          storeId: profile?.assignedStoreId,
+          storeId: store?.id,
           serviceId,
           isEnabled,
           price

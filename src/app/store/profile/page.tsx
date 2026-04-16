@@ -5,8 +5,8 @@ import { useRouter } from "next/navigation";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import { Icons } from "@/components/ui/Icons";
-import { useLiff } from "@/components/providers/LiffProvider";
 import { useTranslation } from "@/components/providers/LanguageProvider";
+import { useStoreAuth } from "@/components/providers/StoreProvider";
 
 // Define SettingItem component for reuse
 function SettingItem({ icon, label, value, onClick }: { icon: React.ReactNode, label: string, value: string, onClick?: () => void }) {
@@ -31,7 +31,7 @@ function SettingItem({ icon, label, value, onClick }: { icon: React.ReactNode, l
 
 export default function StoreProfilePage() {
   const router = useRouter();
-  const { profile, logout } = useLiff();
+  const { store, logout } = useStoreAuth();
   const { language, setLanguage, t } = useTranslation();
   const [workStatus, setWorkStatus] = useState(true);
   const [showLanguageModal, setShowLanguageModal] = useState(false);
@@ -39,10 +39,10 @@ export default function StoreProfilePage() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    if (!profile?.userId) return;
+    if (!store?.id) return;
     async function fetchPrefs() {
       try {
-        const res = await fetch(`/api/users/preferences?userId=${profile?.userId}`);
+        const res = await fetch(`/api/store/preferences?storeId=${store?.id}`);
         const data = await res.json() as any;
         if (data.preferences) {
           setPrefs(data.preferences);
@@ -62,12 +62,12 @@ export default function StoreProfilePage() {
   const handleToggleWorkStatus = async () => {
     const nextStatus = !workStatus;
     setWorkStatus(nextStatus);
-    if (!profile?.userId) return;
+    if (!store?.id) return;
     try {
-      await fetch("/api/users/preferences", {
+      await fetch("/api/store/preferences", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId: profile.userId, workStatus: nextStatus })
+        body: JSON.stringify({ storeId: store.id, workStatus: nextStatus })
       });
     } catch (err) {
       console.error("Failed to update work status", err);
@@ -81,17 +81,17 @@ export default function StoreProfilePage() {
         <div className="flex items-center gap-4">
             <div className="relative">
               <div className="w-16 h-16 rounded-3xl bg-white shadow-xl flex items-center justify-center p-1 border-2 border-orange-100/50">
-                <div className="w-full h-full rounded-2xl bg-orange-50 flex items-center justify-center text-primary overflow-hidden">
-                    <img src={profile?.pictureUrl || "https://api.dicebear.com/7.x/avataaars/svg?seed=Rubjob"} alt="Avatar" className="w-full h-full object-cover" />
+                <div className="w-full h-full rounded-2xl bg-orange-50 flex items-center justify-center text-primary overflow-hidden font-black text-xl">
+                    {store?.name?.[0] || "S"}
                 </div>
               </div>
               <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-emerald-500 border-4 border-primary rounded-full shadow-sm" />
             </div>
             <div className="flex-1">
               <h1 className="text-xl font-extrabold tracking-tight truncate">
-                {profile?.displayName || t("common.guest")}
+                {store?.name || t("common.guest")}
               </h1>
-              <p className="text-[10px] text-white/80 font-black uppercase tracking-[0.2em]">{t("store.profile.verifiedHero")} #8812</p>
+              <p className="text-[10px] text-white/80 font-black uppercase tracking-[0.2em]">{t("store.profile.verifiedHero")} {store?.id}</p>
             </div>
         </div>
       </header>

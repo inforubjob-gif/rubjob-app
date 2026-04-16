@@ -6,11 +6,11 @@ import Button from "@/components/ui/Button";
 import Modal from "@/components/ui/Modal";
 import { Icons } from "@/components/ui/Icons";
 import { useTranslation } from "@/components/providers/LanguageProvider";
-import { useLiff } from "@/components/providers/LiffProvider";
+import { useStoreAuth } from "@/components/providers/StoreProvider";
 
 export default function StoreWalletPage() {
   const { t } = useTranslation();
-  const { profile } = useLiff();
+  const { store } = useStoreAuth();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [amount, setAmount] = useState("");
   const [bankName, setBankName] = useState("");
@@ -23,13 +23,13 @@ export default function StoreWalletPage() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    if (!profile?.assignedStoreId) return;
+    if (!store?.id) return;
     fetchWalletData();
-  }, [profile?.assignedStoreId]);
+  }, [store?.id]);
 
   const fetchWalletData = async () => {
     try {
-      const res = await fetch(`/api/store/wallet?storeId=${profile?.assignedStoreId}`);
+      const res = await fetch(`/api/store/wallet?storeId=${store?.id}`);
       const data = await res.json();
       if (data.balance !== undefined) setBalance(data.balance);
       if (data.transactions) setTransactions(data.transactions);
@@ -51,7 +51,7 @@ export default function StoreWalletPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          storeId: profile?.assignedStoreId,
+          storeId: store?.id,
           amount: parseFloat(amount),
           bankName,
           accountNumber,

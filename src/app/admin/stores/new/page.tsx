@@ -1,11 +1,16 @@
+"use client";
+
+import { useLanguage } from "@/lib/contexts/LanguageContext";
 import StoreForm from "@/components/admin/StoreForm";
 
 export default function NewStorePage() {
+  const { t } = useLanguage();
+
   return (
     <div className="max-w-7xl mx-auto py-8">
-      <header className="mb-10">
-        <h1 className="text-3xl font-black text-slate-900 tracking-tight uppercase">Register New Branch</h1>
-        <p className="text-slate-500 font-medium mt-2">Initialize a new physical location with its own geofence and pricing rules.</p>
+      <header className="mb-10 px-4 md:px-0">
+        <h1 className="text-3xl font-black text-slate-900 tracking-tight uppercase">{t('admin.stores.new.title')}</h1>
+        <p className="text-slate-500 font-medium mt-2">{t('admin.stores.new.subtitle')}</p>
       </header>
       
       <StoreForm />

@@ -7,7 +7,7 @@ import Button from "@/components/ui/Button";
 import { Icons } from "@/components/ui/Icons";
 import { useTranslation } from "@/components/providers/LanguageProvider";
 
-import { useLiff } from "@/components/providers/LiffProvider";
+import { useStoreAuth } from "@/components/providers/StoreProvider";
 import { useEffect } from "react";
 
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"] as const;
@@ -16,7 +16,7 @@ type Day = typeof DAYS[number];
 export default function ActiveHoursPage() {
   const router = useRouter();
   const { t } = useTranslation();
-  const { profile } = useLiff();
+  const { store } = useStoreAuth();
   const [isSaving, setIsSaving] = useState(false);
   
   const [workingHours, setWorkingHours] = useState<Record<Day, { start: string, end: string, isOpen: boolean }>>(
@@ -29,28 +29,23 @@ export default function ActiveHoursPage() {
   const [selectedDay, setSelectedDay] = useState<Day>("Mon");
 
   useEffect(() => {
-    if (!profile?.userId) return;
-    fetch(`/api/users/preferences?userId=${profile.userId}`)
+    if (!store?.id) return;
+    fetch(`/api/store/preferences?storeId=${store.id}`)
       .then(res => res.json())
       .then((data: any) => {
          if (data.preferences?.activeHoursObj) {
            setWorkingHours(data.preferences.activeHoursObj);
          }
       });
-  }, [profile?.userId]);
+  }, [store?.id]);
 
   const handleSave = async () => {
-    if (!profile?.userId) return;
-    setIsSaving(true);
-    
-    // Create a string representation for the main page (e.g., "09:00 - 20:00" from Monday)
-    const mon = workingHours["Mon"];
     const activeHoursStr = mon.isOpen ? `${mon.start} - ${mon.end}` : "Varies";
 
-    await fetch("/api/users/preferences", {
+    await fetch("/api/store/preferences", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ userId: profile.userId, activeHoursObj: workingHours, activeHours: activeHoursStr })
+      body: JSON.stringify({ storeId: store.id, activeHoursObj: workingHours, activeHours: activeHoursStr })
     });
     setIsSaving(false);
     router.back();

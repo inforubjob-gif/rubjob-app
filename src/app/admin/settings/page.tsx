@@ -357,7 +357,7 @@ function SettingsContent() {
 
                   {newAdmin.role === 'admin' && (
                     <div className="space-y-3">
-                       <p className="text-[9px] font-black text-slate-300 uppercase tracking-widest ml-1">Module Permissions</p>
+                       <p className="text-[9px] font-black text-slate-300 uppercase tracking-widest ml-1">{t("admin.settings.modulePermissions")}</p>
                        <div className="grid grid-cols-2 gap-2 p-1.5 bg-slate-50 rounded-2xl border border-slate-100">
                           {MODULES.map(mod => (
                             <button
@@ -388,7 +388,7 @@ function SettingsContent() {
             <div className="flex items-center justify-between mb-8 px-2">
                <h3 className="text-xl font-black text-slate-900 tracking-tight">{t("admin.settings.agentsTitle")}</h3>
                <div className="px-4 py-1.5 bg-slate-100 text-slate-400 rounded-full text-[10px] font-black uppercase tracking-widest border border-slate-200">
-                  {admins.length} Personnel Active
+                  {admins.length} {t("admin.settings.personnelActive")}
                </div>
             </div>
             
@@ -415,7 +415,7 @@ function SettingsContent() {
                                <div>
                                   <div className="flex items-center gap-2 mb-1">
                                      <p className="font-black text-slate-900 tracking-tight">{adminItem.name}</p>
-                                     {isSelf && <div className="px-1.5 py-0.5 bg-primary/10 text-primary rounded-md text-[8px] font-black uppercase">YOU</div>}
+                                     {isSelf && <div className="px-1.5 py-0.5 bg-primary/10 text-primary rounded-md text-[8px] font-black uppercase">{t("admin.settings.you")}</div>}
                                   </div>
                                   <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{adminItem.email}</p>
                                </div>
@@ -430,7 +430,7 @@ function SettingsContent() {
 
                          <div className="pt-6 border-t border-slate-50 relative z-10">
                             <div className="flex items-center justify-between mb-3">
-                               <span className="text-[9px] font-black text-slate-300 uppercase tracking-widest">Authority Level</span>
+                               <span className="text-[9px] font-black text-slate-300 uppercase tracking-widest">{t("admin.settings.authorityLevel")}</span>
                                <span className={`px-2 py-0.5 rounded-lg text-[9px] font-black uppercase tracking-widest ${isSuper ? 'bg-rose-500 text-white shadow-lg shadow-rose-500/20' : 'bg-slate-900 text-white shadow-lg shadow-slate-900/20'}`}>
                                  {isSuper ? t("admin.settings.authRoleMaster").split(' (')[0] : t("admin.settings.authRoleStandard")}
                                </span>
@@ -440,7 +440,7 @@ function SettingsContent() {
                                {isSuper ? (
                                  <div className="flex items-center gap-2 py-1 px-3 bg-rose-50 text-rose-600 rounded-xl border border-rose-100">
                                     <Icons.Lock size={12} />
-                                    <span className="text-[9px] font-black uppercase tracking-widest">Unrestricted Identity</span>
+                                    <span className="text-[9px] font-black uppercase tracking-widest">{t("admin.settings.unrestricted")}</span>
                                  </div>
                                ) : (
                                  permissions.length > 0 ? (
@@ -448,7 +448,7 @@ function SettingsContent() {
                                      <span key={p} className="px-2.5 py-1 bg-slate-50 text-slate-500 text-[9px] font-black uppercase rounded-lg border border-slate-100 group-hover:bg-white group-hover:border-slate-200 transition-colors">{p}</span>
                                    ))
                                  ) : (
-                                   <span className="text-[9px] font-black text-rose-400 italic">No Modules Assigned</span>
+                                   <span className="text-[9px] font-black text-rose-400 italic">{t("admin.settings.noModules")}</span>
                                  )
                                )}
                             </div>
@@ -489,14 +489,14 @@ function SettingsContent() {
 
                     <div className="mt-8 pt-8 border-t border-slate-50 space-y-4">
                        <div className="flex items-center justify-between px-2">
-                          <span className="text-[9px] font-black text-slate-300 uppercase tracking-widest">Account Status</span>
+                          <span className="text-[9px] font-black text-slate-300 uppercase tracking-widest">{t("admin.settings.accountStatus")}</span>
                           <span className="flex items-center gap-1.5 text-[9px] font-black text-emerald-500 uppercase tracking-widest">
                              <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                             Verified
+                             {t("admin.settings.verified")}
                           </span>
                        </div>
                        <div className="flex items-center justify-between px-2">
-                          <span className="text-[9px] font-black text-slate-300 uppercase tracking-widest">Language</span>
+                          <span className="text-[9px] font-black text-slate-300 uppercase tracking-widest">{t("admin.settings.language")}</span>
                           <span className="text-[9px] font-black text-slate-600 uppercase tracking-widest">{language === 'th' ? 'TH (ไทย)' : 'EN (Global)'}</span>
                        </div>
                     </div>
@@ -511,7 +511,7 @@ function SettingsContent() {
                        <div className="w-10 h-10 rounded-xl bg-slate-50 text-slate-400 flex items-center justify-center">
                           <Icons.Settings size={20} />
                        </div>
-                       <h3 className="text-xl font-black text-slate-900 tracking-tight">Personnel Credentials</h3>
+                       <h3 className="text-xl font-black text-slate-900 tracking-tight">{t("admin.settings.credentials")}</h3>
                     </div>
 
                     <form onSubmit={handleUpdateProfile} className="space-y-8">
@@ -527,7 +527,7 @@ function SettingsContent() {
                        </div>
 
                        <div className="space-y-4">
-                          <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Interface Language Preferences</label>
+                          <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t("admin.settings.languagePrefs")}</label>
                           <div className="grid grid-cols-2 gap-4">
                              {(['th', 'en'] as const).map((l) => (
                                <button
@@ -588,7 +588,7 @@ function SettingsContent() {
                     <h2 className="text-xl font-black text-slate-900 tracking-tight">{t("admin.settings.systemOpsTitle")}</h2>
                     <div className="flex items-center gap-2 mt-0.5">
                        <div className={`w-2 h-2 rounded-full ${getSetting("is_open") === "true" ? "bg-emerald-500 animate-pulse" : "bg-rose-500"}`} />
-                       <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Live Infrastructure</p>
+                       <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">{t("admin.settings.liveInfras")}</p>
                     </div>
                   </div>
                </div>
@@ -623,7 +623,7 @@ function SettingsContent() {
                             value={getSetting("radius_km")}
                             onChange={(e) => updateLocalSetting("radius_km", e.target.value)}
                           />
-                          <div className="absolute right-6 top-1/2 -translate-y-1/2 text-slate-300 font-black text-xs uppercase">KM</div>
+                          <div className="absolute right-6 top-1/2 -translate-y-1/2 text-slate-300 font-black text-xs uppercase">{t("admin.settings.km")}</div>
                        </div>
                        <div className="w-12 h-12 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400">
                           <Icons.MapPin size={20} />
@@ -652,7 +652,7 @@ function SettingsContent() {
                     <div className="space-y-4">
                       <div className="flex items-center justify-between px-1">
                         <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t("admin.settings.financeLabelStoreGP")}</label>
-                        <span className="text-[10px] font-black text-indigo-500">PROFIT</span>
+                        <span className="text-[10px] font-black text-indigo-500">{t("admin.settings.profit")}</span>
                       </div>
                       <div className="relative group/input">
                         <input 
@@ -669,7 +669,7 @@ function SettingsContent() {
                     <div className="space-y-4">
                       <div className="flex items-center justify-between px-1">
                         <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t("admin.settings.financeLabelRiderGP")}</label>
-                        <span className="text-[10px] font-black text-orange-500">SHARE</span>
+                        <span className="text-[10px] font-black text-orange-500">{t("admin.settings.share")}</span>
                       </div>
                       <div className="relative group/input">
                         <input 
@@ -697,7 +697,7 @@ function SettingsContent() {
                       />
                       <div className="absolute right-8 top-1/2 -translate-y-1/2 flex items-center gap-2">
                         <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                        <span className="text-[10px] font-black text-emerald-600 uppercase tracking-widest">Fixed Rate</span>
+                        <span className="text-[10px] font-black text-emerald-600 uppercase tracking-widest">{t("admin.settings.fixedRate")}</span>
                       </div>
                     </div>
                   </div>

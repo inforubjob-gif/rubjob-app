@@ -4,10 +4,12 @@ import { useState, useEffect } from "react";
 import Card from "@/components/ui/Card";
 import Badge, { statusToBadgeVariant } from "@/components/ui/Badge";
 import { Icons } from "@/components/ui/Icons";
+import { useLanguage } from "@/lib/contexts/LanguageContext";
 
 type TabType = 'revenue' | 'payouts';
 
 export default function FinanceAdminPage() {
+  const { t } = useLanguage();
   const [activeTab, setActiveTab] = useState<TabType>('revenue');
   const [transactions, setTransactions] = useState<any[]>([]);
   const [payouts, setPayouts] = useState<any[]>([]);
@@ -70,12 +72,12 @@ export default function FinanceAdminPage() {
     <div className="space-y-6 max-w-7xl mx-auto pb-20">
       <header className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-           <h1 className="text-2xl md:text-3xl font-black text-slate-900 tracking-tight uppercase">Accounting & Treasury</h1>
-           <p className="text-slate-500 text-sm md:text-base font-medium mt-1">Audit operational revenue and facilitate partner withdrawals</p>
+           <h1 className="text-2xl md:text-3xl font-black text-slate-900 tracking-tight uppercase">{t('admin.finance.title')}</h1>
+           <p className="text-slate-500 text-sm md:text-base font-medium mt-1">{t('admin.finance.subtitle')}</p>
         </div>
         <div className="flex gap-2 w-full sm:w-auto">
             <button className="px-5 py-3 bg-emerald-600 text-white rounded-xl text-sm font-bold shadow-lg shadow-emerald-200 flex items-center justify-center gap-2 hover:bg-emerald-700 transition-colors w-full sm:w-auto">
-               <Icons.FileText size={16} /> Export Report
+               <Icons.FileText size={16} /> {t('admin.finance.exportBtn')}
             </button>
         </div>
       </header>
@@ -84,22 +86,22 @@ export default function FinanceAdminPage() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
          <Card className="p-6 bg-white border border-slate-200/60 shadow-sm relative overflow-hidden">
             <div className="absolute top-0 right-0 p-4 opacity-10 text-slate-900"><Icons.DollarSign size={48} /></div>
-            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Total Gross Revenue</p>
+            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{t('admin.finance.stats.gross')}</p>
             <p className="text-2xl font-black text-slate-900">฿{totalGross.toLocaleString()}</p>
             <div className="mt-4 flex items-center gap-1.5 text-[10px] font-bold text-emerald-600 uppercase">
                <Icons.TrendingUp size={12} /> +12.5% vs Last Period
             </div>
          </Card>
          <Card className="p-6 bg-white border border-slate-200/60 shadow-sm">
-            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Estimated Partner Debt</p>
+            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{t('admin.finance.stats.partnerDebt')}</p>
             <p className="text-2xl font-black text-rose-600">฿{totalPartnerCut.toLocaleString()}</p>
             <p className="mt-4 text-[10px] font-bold text-slate-400 italic">Simulated 70:30 Split Ratio</p>
          </Card>
          <Card className="p-6 bg-slate-900 text-white shadow-2xl shadow-slate-300 border-none">
-            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Platform Commission (Net)</p>
+            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{t('admin.finance.stats.platformCom')}</p>
             <p className="text-2xl font-black text-emerald-400">฿{totalPlatformComission.toLocaleString()}</p>
             <div className="mt-4 flex flex-wrap gap-2">
-               <span className="text-[8px] font-black bg-white/10 px-2 py-0.5 rounded-full uppercase">Operational Profit</span>
+               <span className="text-[8px] font-black bg-white/10 px-2 py-0.5 rounded-full uppercase">{t('admin.finance.stats.profit')}</span>
             </div>
          </Card>
       </div>
@@ -110,14 +112,14 @@ export default function FinanceAdminPage() {
           onClick={() => setActiveTab('revenue')}
           className={`pb-4 text-[11px] font-black uppercase tracking-widest transition-all relative shrink-0 ${activeTab === 'revenue' ? 'text-slate-900' : 'text-slate-400 hover:text-slate-600'}`}
         >
-          Revenue Audit
+          {t('admin.finance.tabs.revenue')}
           {activeTab === 'revenue' && <div className="absolute bottom-0 left-0 right-0 h-1 bg-primary rounded-t-full shadow-lg shadow-primary/40 animate-in slide-in-from-bottom-1" />}
         </button>
         <button 
           onClick={() => setActiveTab('payouts')}
           className={`pb-4 text-[11px] font-black uppercase tracking-widest transition-all relative shrink-0 ${activeTab === 'payouts' ? 'text-slate-900' : 'text-slate-400 hover:text-slate-600'}`}
         >
-          Payout Requests
+          {t('admin.finance.tabs.payouts')}
           {activeTab === 'payouts' && <div className="absolute bottom-0 left-0 right-0 h-1 bg-primary rounded-t-full shadow-lg shadow-primary/40 animate-in slide-in-from-bottom-1" />}
         </button>
       </div>
@@ -127,24 +129,24 @@ export default function FinanceAdminPage() {
         {isLoading ? (
           <div className="flex flex-col items-center justify-center py-40">
             <div className="w-10 h-10 border-4 border-primary/20 border-t-primary rounded-full animate-spin mb-4" />
-            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Compiling Records...</p>
+            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t('admin.finance.loading')}</p>
           </div>
         ) : activeTab === 'revenue' ? (
            transactions.length === 0 ? (
              <div className="text-center py-40">
                 <Icons.FileText size={48} className="mx-auto text-slate-100 mb-4" />
-                <p className="text-slate-300 font-black uppercase tracking-widest text-xs">No matching revenue records</p>
+                <p className="text-slate-300 font-black uppercase tracking-widest text-xs">{t('admin.finance.empty.revenue')}</p>
              </div>
            ) : (
              <div className="overflow-x-auto">
                <table className="w-full text-left">
                  <thead className="bg-slate-50 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">
                    <tr>
-                     <th className="px-8 py-5">Transaction Core</th>
-                     <th className="px-8 py-5">Execution Date</th>
-                     <th className="px-8 py-5 text-right">Gross Amount</th>
-                     <th className="px-8 py-5 text-right">Commission (30%)</th>
-                     <th className="px-8 py-5 text-right">Actions</th>
+                     <th className="px-8 py-5">{t('admin.finance.table.txCore')}</th>
+                     <th className="px-8 py-5">{t('admin.finance.table.date')}</th>
+                     <th className="px-8 py-5 text-right">{t('admin.finance.table.gross')}</th>
+                     <th className="px-8 py-5 text-right">{t('admin.finance.table.commission')}</th>
+                     <th className="px-8 py-5 text-right">{t('admin.finance.table.actions')}</th>
                    </tr>
                  </thead>
                  <tbody className="divide-y divide-slate-50">
@@ -162,7 +164,7 @@ export default function FinanceAdminPage() {
                        <td className="px-8 py-5 text-right font-black text-slate-900">฿{tx.totalPrice.toLocaleString()}</td>
                        <td className="px-8 py-5 text-right font-black text-emerald-600">฿{(tx.totalPrice * 0.3).toFixed(2)}</td>
                        <td className="px-8 py-5 text-right">
-                          <button className="text-[9px] font-black uppercase tracking-widest text-primary hover:underline">Verify Receipt</button>
+                          <button className="text-[9px] font-black uppercase tracking-widest text-primary hover:underline">{t('admin.finance.action.verify')}</button>
                        </td>
                      </tr>
                    ))}
@@ -175,18 +177,18 @@ export default function FinanceAdminPage() {
            payouts.length === 0 ? (
              <div className="text-center py-40">
                 <Icons.CreditCard size={48} className="mx-auto text-slate-100 mb-4" />
-                <p className="text-slate-300 font-black uppercase tracking-widest text-xs">Awaiting payout requests</p>
+                <p className="text-slate-300 font-black uppercase tracking-widest text-xs">{t('admin.finance.empty.payouts')}</p>
              </div>
            ) : (
              <div className="overflow-x-auto">
                <table className="w-full text-left">
                  <thead className="bg-slate-50 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">
                    <tr>
-                     <th className="px-8 py-5">Requester</th>
-                     <th className="px-8 py-5">Payout Destination</th>
-                     <th className="px-8 py-5 text-right">Requested Amount</th>
-                     <th className="px-8 py-5">Status</th>
-                     <th className="px-8 py-5 text-right">Operations</th>
+                     <th className="px-8 py-5">{t('admin.finance.table.requester')}</th>
+                     <th className="px-8 py-5">{t('admin.finance.table.destination')}</th>
+                     <th className="px-8 py-5 text-right">{t('admin.finance.table.amount')}</th>
+                     <th className="px-8 py-5">{t('admin.finance.table.status')}</th>
+                     <th className="px-8 py-5 text-right">{t('admin.finance.table.operations')}</th>
                    </tr>
                  </thead>
                  <tbody className="divide-y divide-slate-50">
@@ -220,17 +222,17 @@ export default function FinanceAdminPage() {
                                   onClick={() => updatePayoutStatus(p.id, 'completed')}
                                   className="px-4 py-2 bg-emerald-600 text-white rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-emerald-700 active:scale-95 transition-all"
                                 >
-                                   Confirm Pay
+                                   {t('admin.finance.action.confirm')}
                                 </button>
                                 <button 
                                   onClick={() => updatePayoutStatus(p.id, 'rejected')}
                                   className="px-4 py-2 bg-white border border-slate-200 text-slate-400 rounded-xl text-[9px] font-black uppercase tracking-widest hover:text-rose-600 hover:border-rose-100 transition-all"
                                 >
-                                   Reject
+                                   {t('admin.finance.action.reject')}
                                 </button>
                              </div>
                           ) : (
-                             <span className="text-[9px] font-black text-slate-300 uppercase italic">Archived Sequence</span>
+                             <span className="text-[9px] font-black text-slate-300 uppercase italic">{t('admin.finance.status.archived')}</span>
                           )}
                        </td>
                      </tr>
