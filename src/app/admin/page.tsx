@@ -16,14 +16,19 @@ export default function AdminDashboard() {
   });
   const [isLoading, setIsLoading] = useState(true);
   const [errorCount, setErrorCount] = useState(0);
+  const [apiError, setApiError] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetchStats() {
       try {
         const res = await fetch("/api/admin/stats");
         const data = await res.json() as any;
-        if (!data.error) {
-          setStats({
+
+        if (!res.ok || data.error) {
+           setErrorCount(prev => prev + 1);
+           setApiError(data.error || `Server Error: ${res.status}`);
+        } else {
+           setStats({
             users: data.users || 0,
             stores: data.stores || 0,
             activeStores: data.activeStores || 0,
@@ -70,6 +75,18 @@ export default function AdminDashboard() {
           </div>
         )}
       </header>
+
+      {apiError && (
+        <div className="mb-6 p-4 bg-rose-50 border-2 border-rose-100 rounded-3xl flex items-center gap-4 animate-fade-in shadow-lg shadow-rose-900/5">
+           <div className="w-10 h-10 rounded-2xl bg-rose-500 text-white flex items-center justify-center shrink-0">
+              <Icons.Lock size={20} />
+           </div>
+           <div>
+              <p className="text-[10px] font-black uppercase text-rose-500 tracking-widest leading-none">System Exception</p>
+              <p className="text-sm font-bold text-rose-900 mt-1">{apiError}</p>
+           </div>
+        </div>
+      )}
 
       {isLoading ? (
         <div className="flex items-center justify-center py-20">
