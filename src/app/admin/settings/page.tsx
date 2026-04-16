@@ -638,6 +638,7 @@ function SettingsContent() {
             </div>
         </div>
       )}
+    </div>
   );
 }
 
