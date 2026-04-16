@@ -485,6 +485,20 @@ export const translations: any = {
       completePickup: "ยืนยันรับผ้าเรียบร้อย",
       completeDelivery: "ลายละเอียดส่งผ้าเรียบร้อย",
     },
+    staff: {
+      wallet: {
+        availableBalance: "ยอดเงินคงเหลือ",
+        withdraw: "ถอนเงิน",
+        history: "ประวัติรายได้สะสม",
+        commissionRate: "อัตราค่าธรรมเนียมแพลตฟอร์ม",
+        commissionDesc: "รายได้ของคุณจะถูกคำนวณหลังหักค่าธรรมเนียม 15% และจัดทำรายงานสรุปยอดให้ตรวจสอบได้ทุกวัน",
+        withdrawAmount: "จำนวนเงินที่ต้องการถอน",
+        confirmWithdraw: "ยืนยันการถอนเงิน",
+        withdrawSuccess: "ยื่นคำขอถอนเงินสำเร็จ",
+        withdrawSuccessDesc: "ทีมงานกำลังตรวจสอบคำขอของคุณ ยอดเงินจะเข้าบัญชีภายใน 24 ชั่วโมงครับ",
+        withdrawMin: "ยอดถอนขั้นต่ำสุด 100 บาท",
+      }
+    },
     admin: {
       nav: {
         dashboard: "ภาพรวมระบบ",

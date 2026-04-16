@@ -66,9 +66,9 @@ export default function RiderDocumentsPage() {
         <div className="w-24 h-24 bg-emerald-50 text-emerald-500 rounded-[2.5rem] flex items-center justify-center mb-8 shadow-xl shadow-emerald-500/10 scale-110">
           <Icons.Shield size={48} strokeWidth={2.5} />
         </div>
-        <h1 className="text-2xl font-black text-slate-900 mb-2 uppercase tracking-tight">Documents Submitted!</h1>
+        <h1 className="text-2xl font-black text-slate-900 mb-2 uppercase tracking-tight">Application Submitted!</h1>
         <p className="text-sm text-slate-500 font-bold max-w-[280px] leading-relaxed">
-          ขอบคุณสำหรับการส่งเอกสาร! ทีมงานกำลังตรวจสอบข้อมูลของคุณ ภายใน 24 ชม. คุณจะสามารถเริ่มรับงานได้ครับ
+          ขอบคุณสำหรับการยื่นใบสมัคร! ทีมงานกำลังตรวจสอบเอกสารของคุณ ภายใน 24 ชม. หากได้รับการอนุมัติ จะมีเจ้าหน้าที่ติดต่อกลับหรือเปิดระบบให้รับงานได้ครับ
         </p>
       </div>
     );

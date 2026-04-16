@@ -24,8 +24,18 @@ export default function VehicleTypePage() {
   const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
-    if (!profile?.userId) return;
-    fetch(`/api/users/preferences?userId=${profile.userId}`)
+    // 1. Get Effective User ID
+    let currentUserId = profile?.userId;
+    if (!currentUserId && typeof window !== "undefined") {
+      const localSession = localStorage.getItem("rubjob_rider_session");
+      if (localSession) {
+        currentUserId = JSON.parse(localSession).id;
+      }
+    }
+
+    if (!currentUserId) return;
+    
+    fetch(`/api/users/preferences?userId=${currentUserId}`)
       .then(res => res.json())
       .then((data: any) => {
          if (data.preferences?.vehicleType) setSelectedVehicle(data.preferences.vehicleType);
@@ -33,12 +43,21 @@ export default function VehicleTypePage() {
   }, [profile?.userId]);
 
   const handleSave = async () => {
-    if (!profile?.userId) return;
+    // Get Effective User ID
+    let currentUserId = profile?.userId;
+    if (!currentUserId && typeof window !== "undefined") {
+      const localSession = localStorage.getItem("rubjob_rider_session");
+      if (localSession) {
+        currentUserId = JSON.parse(localSession).id;
+      }
+    }
+
+    if (!currentUserId) return;
     setIsSaving(true);
     await fetch("/api/users/preferences", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ userId: profile.userId, vehicleType: selectedVehicle })
+      body: JSON.stringify({ userId: currentUserId, vehicleType: selectedVehicle })
     });
     setIsSaving(false);
     router.back();

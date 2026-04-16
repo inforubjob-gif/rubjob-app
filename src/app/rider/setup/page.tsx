@@ -67,8 +67,8 @@ export default function RiderSetupPage() {
       <div className="absolute top-0 left-0 right-0 h-[320px] bg-gradient-to-b from-primary to-transparent z-0" />
       
       <header className="relative z-10 px-5 pt-12 pb-6 text-white">
-        <h1 className="text-3xl font-black tracking-tight uppercase">Rider Onboarding</h1>
-        <p className="text-xs font-bold uppercase tracking-widest mt-1 opacity-80">Join our hero delivery fleet</p>
+        <h1 className="text-3xl font-black tracking-tight uppercase">Rider Application</h1>
+        <p className="text-xs font-bold uppercase tracking-widest mt-1 opacity-80">Apply to join our hero delivery fleet</p>
       </header>
 
       <div className="relative z-10 px-5 flex-1 max-w-lg mx-auto w-full">
@@ -149,7 +149,7 @@ export default function RiderSetupPage() {
                 isLoading={isSubmitting}
                 className="bg-primary text-white py-5 rounded-2xl font-black uppercase tracking-[0.2em] shadow-xl shadow-primary/20 active:scale-95 transition-all"
               >
-                Continue to Verification
+                Submit Application
               </Button>
             </div>
           </form>

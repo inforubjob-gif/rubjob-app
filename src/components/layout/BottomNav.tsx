@@ -36,7 +36,15 @@ export default function BottomNav() {
   const isRiderContext = subdomain === "rider" || pathname.startsWith("/rider");
   const isAdminContext = subdomain === "admin" || pathname.startsWith("/admin");
 
+  // Hide on Admin portal always
   if (isAdminContext) return null;
+
+  // Hide on Rider portal if not authenticated (Login screen)
+  if (isRiderContext) {
+    if (typeof window !== "undefined" && !localStorage.getItem("rubjob_rider_session")) {
+      return null;
+    }
+  }
 
   // Helper to get clean link for subdomains
   const getLink = (path: string, type: "store" | "rider" | "user") => {

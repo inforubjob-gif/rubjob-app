@@ -22,14 +22,29 @@ export default function RiderWalletPage() {
   const [transactions, setTransactions] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
+  const [effectiveUserId, setEffectiveUserId] = useState<string | null>(null);
+
   useEffect(() => {
-    if (!profile?.userId) return;
-    fetchWalletData();
+    // 1. Get Effective User ID
+    let currentUserId = profile?.userId;
+    if (!currentUserId && typeof window !== "undefined") {
+      const localSession = localStorage.getItem("rubjob_rider_session");
+      if (localSession) {
+        currentUserId = JSON.parse(localSession).id;
+      }
+    }
+    setEffectiveUserId(currentUserId || null);
   }, [profile?.userId]);
 
+  useEffect(() => {
+    if (!effectiveUserId) return;
+    fetchWalletData();
+  }, [effectiveUserId]);
+
   const fetchWalletData = async () => {
+    if (!effectiveUserId) return;
     try {
-      const res = await fetch(`/api/rider/wallet?riderId=${profile?.userId}`);
+      const res = await fetch(`/api/rider/wallet?riderId=${effectiveUserId}`);
       const data = await res.json();
       if (data.balance !== undefined) setBalance(data.balance);
       if (data.transactions) setTransactions(data.transactions);
@@ -51,7 +66,7 @@ export default function RiderWalletPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          riderId: profile?.userId,
+          riderId: effectiveUserId,
           amount: parseFloat(amount),
           bankName,
           accountNumber,

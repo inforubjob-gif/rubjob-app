@@ -20,6 +20,7 @@ export default function StoreDashboard() {
   const [activeTab, setActiveTab] = useState<"incoming" | "washing" | "ready">("incoming");
   const [isLoading, setIsLoading] = useState(true);
   const [workStatus, setWorkStatus] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Lifted state
   const [incomingOrders, setIncomingOrders] = useState<any[]>([]);
@@ -219,115 +220,6 @@ export default function StoreDashboard() {
             )}
           </div>
         )}
-    </div>
   );
 }
 
-function IncomingOrders({ t, router, orders, onReceive }: { t: any, router: any, orders: any[], onReceive: (id: string) => void }) {
-  return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between px-1 mb-2">
-        <h2 className="text-xs font-black text-slate-400 uppercase tracking-widest leading-none flex items-center gap-2">
-            <div className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
-            Rider Delivering to Store
-        </h2>
-      </div>
-
-      {orders.length === 0 ? (
-        <div className="text-center py-12 bg-white rounded-[2rem] border border-slate-100">
-           <div className="text-4xl mb-3">📦</div>
-           <p className="text-xs font-black text-slate-400 uppercase tracking-widest">{t("store.noJobs") || "No incoming orders"}</p>
-        </div>
-      ) : (
-        orders.map((job) => (
-          <Card key={job.id} className="p-4 border border-slate-100 shadow-sm hover:shadow-xl transition-all duration-300 group">
-            <div className="flex items-start gap-4">
-              <div className="w-14 h-14 bg-slate-50 border border-slate-100 rounded-2xl flex items-center justify-center text-slate-400 shrink-0 group-hover:bg-primary/5 transition-colors">
-                 {getServiceIcon(job.serviceId as any, { size: 30, className: "group-hover:text-primary transition-colors" })}
-              </div>
-              <div className="flex-1">
-                <div className="flex items-center justify-between mb-1.5">
-                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{job.id}</span>
-                  <Badge variant="info" className="scale-75 origin-right px-3 py-1 bg-blue-50 text-blue-600 font-black">
-                    {t(`orders.status.${job.status}`)}
-                  </Badge>
-                </div>
-                <h3 className="font-extrabold text-slate-800 mb-1.5 leading-tight text-base">
-                  {t(`orders.services.${job.serviceId}`)}
-                </h3>
-                <div className="flex items-center gap-2.5 text-[11px] text-slate-500 font-bold uppercase tracking-tight">
-                   <Icons.User size={14} className="text-primary" /> {job.userName}
-                </div>
-              </div>
-            </div>
-            <Button 
-              fullWidth 
-              className="mt-4 bg-primary text-white hover:bg-primary-dark shadow-xl shadow-primary/20 py-4 font-black uppercase tracking-widest text-xs rounded-2xl active:scale-95 transition-all" 
-              size="sm"
-              onClick={() => onReceive(job.id)}
-            >
-              <Icons.Check size={16} className="mr-2" strokeWidth={4} /> {t("store.receiveFromDriver")}
-            </Button>
-          </Card>
-        ))
-      )}
-    </div>
-  );
-}
-
-function ProcessingOrders({ t, router, orders, onHandover }: { t: any, router: any, orders: any[], onHandover: (id: string) => void }) {
-  return (
-    <div className="space-y-4">
-       <div className="flex items-center justify-between px-1 mb-2">
-        <h2 className="text-xs font-black text-slate-400 uppercase tracking-widest leading-none flex items-center gap-2">
-            <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-            Active Internal Processing
-        </h2>
-      </div>
-
-      {orders.length === 0 ? (
-        <div className="text-center py-12 bg-white rounded-[2rem] border border-slate-100">
-           <div className="text-4xl mb-3">🧼</div>
-           <p className="text-xs font-black text-slate-400 uppercase tracking-widest">{t("store.noJobs") || "No orders being processed"}</p>
-        </div>
-      ) : (
-        orders.map((job) => (
-          <Card key={job.id} className={`p-5 border-2 ${job.isExpress ? 'border-red-200 bg-red-50 shadow-red-100' : 'border-slate-100'} shadow-sm rounded-[2.5rem] transition-all hover:shadow-xl`}>
-            <div className="flex items-center gap-4">
-              <div className={`w-14 h-14 ${job.totalPrice > 100 ? 'bg-red-600 text-white' : 'bg-slate-100 text-slate-400'} rounded-2xl flex items-center justify-center shrink-0 shadow-lg shadow-black/5`}>
-                {getServiceIcon(job.serviceId as any, { size: 32 })}
-              </div>
-              <div className="flex-1 border-r border-slate-200 mr-2 pr-2">
-                <div className="flex items-center gap-2 mb-1.5">
-                    <p className="text-[10px] font-black text-slate-500/80 uppercase tracking-widest">{job.id}</p>
-                    {job.totalPrice > 200 && <Badge variant="danger" className="scale-[0.85] origin-left bg-red-700 text-white font-black italic px-2 tracking-tighter shadow-sm">PRIORITY</Badge>}
-                </div>
-                <h3 className="text-base font-black text-slate-900 leading-tight">
-                   {t(`orders.services.${job.serviceId}`)}
-                </h3>
-              </div>
-              <div className="text-right">
-                 <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Created</div>
-                 <div className="text-xs font-bold text-slate-600">
-                    {new Date(job.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                 </div>
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-3 mt-5">
-               <Button variant="outline" className="rounded-2xl border-2 font-black text-[10px] py-3.5" onClick={() => router.push(`/store/orders/${job.id}`)}>
-                 {t("common.details")}
-               </Button>
-               <Button 
-                className="bg-primary text-white hover:bg-primary-dark rounded-2xl shadow-xl shadow-primary/20 font-black text-[10px] py-3.5 tracking-widest uppercase active:scale-95 transition-all" 
-                size="sm"
-                onClick={() => onHandover(job.id)}
-              >
-                 {t("store.handoverToDriver")}
-               </Button>
-            </div>
-          </Card>
-        ))
-      )}
-    </div>
-  );
-}

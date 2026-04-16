@@ -21,8 +21,18 @@ export default function PayoutMethodPage() {
   const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
-    if (!profile?.userId) return;
-    fetch(`/api/users/preferences?userId=${profile.userId}`)
+    // 1. Get Effective User ID
+    let currentUserId = profile?.userId;
+    if (!currentUserId && typeof window !== "undefined") {
+      const localSession = localStorage.getItem("rubjob_rider_session");
+      if (localSession) {
+        currentUserId = JSON.parse(localSession).id;
+      }
+    }
+
+    if (!currentUserId) return;
+
+    fetch(`/api/users/preferences?userId=${currentUserId}`)
       .then(res => res.json())
       .then((data: any) => {
          const p = data.preferences?.payoutMethod;
@@ -36,13 +46,22 @@ export default function PayoutMethodPage() {
   }, [profile?.userId]);
 
   const handleSave = async () => {
-    if (!profile?.userId) return;
+    // Get Effective User ID
+    let currentUserId = profile?.userId;
+    if (!currentUserId && typeof window !== "undefined") {
+      const localSession = localStorage.getItem("rubjob_rider_session");
+      if (localSession) {
+        currentUserId = JSON.parse(localSession).id;
+      }
+    }
+
+    if (!currentUserId) return;
     setIsSaving(true);
     await fetch("/api/users/preferences", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ 
-        userId: profile.userId, 
+        userId: currentUserId, 
         payoutMethod: { type: method, account: accountNumber, bank: method === "bank" ? bankName : "PromptPay", holder: accountHolder } 
       })
     });

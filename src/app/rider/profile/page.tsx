@@ -38,11 +38,25 @@ export default function RiderProfilePage() {
   const [prefs, setPrefs] = useState<any>({});
   const [isLoading, setIsLoading] = useState(true);
 
+  const [effectiveUserId, setEffectiveUserId] = useState<string | null>(null);
+
   useEffect(() => {
-    if (!profile?.userId) return;
+    // 1. Get Effective User ID
+    let currentUserId = profile?.userId;
+    if (!currentUserId && typeof window !== "undefined") {
+      const localSession = localStorage.getItem("rubjob_rider_session");
+      if (localSession) {
+        currentUserId = JSON.parse(localSession).id;
+      }
+    }
+    setEffectiveUserId(currentUserId || null);
+  }, [profile?.userId]);
+
+  useEffect(() => {
+    if (!effectiveUserId) return;
     async function fetchPrefs() {
       try {
-        const res = await fetch(`/api/users/preferences?userId=${profile?.userId}`);
+        const res = await fetch(`/api/users/preferences?userId=${effectiveUserId}`);
         const data = await res.json() as any;
         if (data.preferences) {
           setPrefs(data.preferences);
@@ -62,12 +76,12 @@ export default function RiderProfilePage() {
   const handleToggleWorkStatus = async () => {
     const nextStatus = !workStatus;
     setWorkStatus(nextStatus);
-    if (!profile?.userId) return;
+    if (!effectiveUserId) return;
     try {
       await fetch("/api/users/preferences", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId: profile.userId, workStatus: nextStatus })
+        body: JSON.stringify({ userId: effectiveUserId, workStatus: nextStatus })
       });
     } catch (err) {
       console.error("Failed to update work status", err);

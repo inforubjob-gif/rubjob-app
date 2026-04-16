@@ -73,7 +73,8 @@ export default function RiderDashboard() {
       const data = await res.json() as any;
       
       if (data.status === "unregistered") {
-        router.replace("/rider/setup");
+        setVerificationStatus("unregistered");
+        setIsLoading(false);
         return;
       }
 
@@ -238,23 +239,58 @@ export default function RiderDashboard() {
              ))}
           </div>
         ) : verificationStatus !== "active" ? (
-          <div className="flex flex-col items-center justify-center py-20 px-6 text-center">
-             <div className="w-24 h-24 bg-white/20 backdrop-blur-xl rounded-[2.5rem] flex items-center justify-center text-white border border-white/30 shadow-2xl mb-8 relative">
-                <Icons.Shield size={48} />
-                <div className="absolute -bottom-2 -right-2 w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center border-4 border-slate-50 text-white animate-pulse">
-                   <Icons.Clock size={18} strokeWidth={4} />
-                </div>
-             </div>
-             <h2 className="text-xl font-black text-slate-900 uppercase tracking-tight">Verification Pending</h2>
-             <p className="text-sm text-slate-400 font-bold mt-2 leading-relaxed">
-               ทีมงานกำลังตรวจสอบเอกสารของคุณครับ<br/>กรุณารอสักครู่ (ไม่เกิน 24 ชม.)
-             </p>
-             <Button 
-               className="mt-10 bg-white border border-slate-200 text-slate-900 px-10 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest"
-               onClick={() => window.location.reload()}
-             >
-               Refresh Status
-             </Button>
+          <div className="flex flex-col items-center justify-center py-10 px-6 text-center animate-fade-in relative z-10 min-h-[50vh]">
+             {verificationStatus === "unregistered" ? (
+               <>
+                 <div className="w-24 h-24 bg-white/20 backdrop-blur-xl rounded-[2.5rem] flex items-center justify-center text-white border border-white/30 shadow-2xl mb-8 relative">
+                    <Icons.Logo variant="icon" size={48} />
+                 </div>
+                 <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight">ร่วมเป็นฮีโร่กับ RUBJOB</h2>
+                 <p className="text-sm text-slate-500 font-bold mt-3 leading-relaxed max-w-[280px]">
+                   ร่วมเป็นส่วนหนึ่งของทีมส่งผ้ามืออาชีพ<br/>หารายได้ง่ายๆ ในเวลาที่คุณเลือกเอง
+                 </p>
+                 <Button 
+                   onClick={() => router.push("/rider/setup")}
+                   className="mt-8 bg-slate-900 text-white px-8 py-5 rounded-2xl font-black uppercase tracking-widest shadow-xl active:scale-95 transition-all"
+                 >
+                   สมัครเป็นไรเดอร์เลย
+                 </Button>
+               </>
+             ) : (
+               <>
+                 <div className="w-24 h-24 bg-white/20 backdrop-blur-xl rounded-[2.5rem] flex items-center justify-center text-white border border-white/30 shadow-2xl mb-8 relative">
+                    <Icons.Shield size={48} />
+                    <div className="absolute -bottom-2 -right-2 w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center border-4 border-slate-50 text-white animate-pulse">
+                       <Icons.Clock size={18} strokeWidth={4} />
+                    </div>
+                 </div>
+                 <h2 className="text-xl font-black text-slate-900 uppercase tracking-tight">
+                   {verificationStatus === "pending" ? "อยู่ระหว่างตรวจสอบ" : "เอกสารไม่ผ่านการอนุมัติ"}
+                 </h2>
+                 <p className="text-sm text-slate-500 font-bold mt-3 leading-relaxed max-w-[280px]">
+                   {verificationStatus === "pending" 
+                     ? "ทีมงานกำลังตรวจสอบเอกสารของคุณครับ\nกรุณารอสักครู่ (ไม่เกิน 24 ชม.)" 
+                     : "ขออภัยครับ เอกสารของคุณไม่ผ่านการตรวจสอบ\nกรุณาติดต่อเจ้าหน้าที่ @RUBJOB_HELP"}
+                 </p>
+                 <div className="flex flex-col gap-3 w-full max-w-[200px] mt-8">
+                   {verificationStatus === "rejected" && (
+                     <Button 
+                       onClick={() => router.push("/rider/documents")}
+                       className="w-full bg-primary text-white py-4 rounded-2xl font-black uppercase tracking-widest shadow-xl"
+                     >
+                       แก้ไขเอกสาร
+                     </Button>
+                   )}
+                   <Button 
+                     variant="secondary"
+                     className="w-full bg-white border border-slate-200 text-slate-900 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest"
+                     onClick={() => window.location.reload()}
+                   >
+                     Refresh Status
+                   </Button>
+                 </div>
+               </>
+             )}
           </div>
         ) : (
           <>

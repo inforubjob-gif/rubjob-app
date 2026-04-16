@@ -74,7 +74,7 @@ export default function AdminDashboard() {
                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t("admin.dashboard.totalUsers")}</p>
                  <span className="text-[9px] font-bold text-slate-300">Total</span>
                </div>
-               <h2 className="text-3xl font-black text-slate-900 leading-none">{stats.users.toLocaleString()}</h2>
+               <h2 className="text-3xl font-black text-slate-900 leading-none">{Number(stats.users).toLocaleString()}</h2>
             </Card>
 
             <Card className="p-6 bg-white border border-slate-200/60 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
@@ -85,13 +85,13 @@ export default function AdminDashboard() {
                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t("admin.dashboard.totalRiders")}</p>
                  <div className="flex items-center gap-1.5 bg-emerald-50 text-emerald-600 px-2 py-0.5 rounded-full ring-1 ring-emerald-100">
                     <div className="w-1 h-1 bg-emerald-500 rounded-full animate-pulse" />
-                    <span className="text-[9px] font-black">{stats.activeRiders} {t("admin.dashboard.liveSync").split(' ')[0]}</span>
+                    <span className="text-[9px] font-black">{Number(stats.activeRiders)} {t("admin.dashboard.liveSync").split(' ')[0]}</span>
                  </div>
                </div>
                <h2 className="text-3xl font-black text-slate-900 leading-none">
-                 {stats.activeRiders}<span className="text-slate-200 text-xl font-bold mx-1">/</span>{stats.totalRiders}
+                 {Number(stats.activeRiders)}<span className="text-slate-200 text-xl font-bold mx-1">/</span>{Number(stats.totalRiders)}
                </h2>
-               <div className="absolute bottom-0 left-0 h-1 bg-emerald-500 transition-all duration-1000" style={{ width: `${(stats.activeRiders / (stats.totalRiders || 1)) * 100}%` }} />
+               <div className="absolute bottom-0 left-0 h-1 bg-emerald-500 transition-all duration-1000" style={{ width: `${(Number(stats.activeRiders) / (Number(stats.totalRiders) || 1)) * 100}%` }} />
             </Card>
 
             <Card className="p-6 bg-white border border-slate-200/60 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
@@ -102,13 +102,13 @@ export default function AdminDashboard() {
                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t("admin.nav.stores")}</p>
                  <div className="flex items-center gap-1.5 bg-emerald-50 text-emerald-600 px-2 py-0.5 rounded-full ring-1 ring-emerald-100">
                     <div className="w-1 h-1 bg-emerald-500 rounded-full animate-pulse" />
-                    <span className="text-[9px] font-black">{stats.activeStores} {t("admin.dashboard.liveSync").split(' ')[0]}</span>
+                    <span className="text-[9px] font-black">{Number(stats.activeStores)} {t("admin.dashboard.liveSync").split(' ')[0]}</span>
                  </div>
                </div>
                <h2 className="text-3xl font-black text-slate-900 leading-none">
-                 {stats.activeStores}<span className="text-slate-200 text-xl font-bold mx-1">/</span>{stats.stores}
+                 {Number(stats.activeStores)}<span className="text-slate-200 text-xl font-bold mx-1">/</span>{Number(stats.stores)}
                </h2>
-               <div className="absolute bottom-0 left-0 h-1 bg-orange-500 transition-all duration-1000" style={{ width: `${(stats.activeStores / (stats.stores || 1)) * 100}%` }} />
+               <div className="absolute bottom-0 left-0 h-1 bg-orange-500 transition-all duration-1000" style={{ width: `${(Number(stats.activeStores) / (Number(stats.stores) || 1)) * 100}%` }} />
             </Card>
 
             <Card className="p-6 bg-white border border-slate-200/60 shadow-sm hover:shadow-md transition-shadow">
@@ -116,7 +116,7 @@ export default function AdminDashboard() {
                   <Icons.FileText size={24} />
                </div>
                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{t("admin.dashboard.totalOrders")}</p>
-               <h2 className="text-3xl font-black text-slate-900 leading-none">{stats.orders.toLocaleString()}</h2>
+               <h2 className="text-3xl font-black text-slate-900 leading-none">{Number(stats.orders).toLocaleString()}</h2>
             </Card>
 
             <Card className="p-6 bg-white border border-slate-100 shadow-sm relative overflow-hidden group">
@@ -127,7 +127,7 @@ export default function AdminDashboard() {
                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 relative z-10">{t("admin.dashboard.grossRevenue")}</p>
                <h2 className="text-2xl font-black text-slate-900 leading-none relative z-10">
                  <span className="text-sm font-bold text-slate-300 mr-1">฿</span>
-                 {stats.revenue.toLocaleString()}
+                 {Number(stats.revenue).toLocaleString()}
                </h2>
             </Card>
 
@@ -144,7 +144,7 @@ export default function AdminDashboard() {
                </div>
                <h2 className="text-3xl font-black tracking-tighter relative z-10">
                  <span className="text-xl text-white/50 font-bold mr-1">฿</span>
-                 {stats.earnings.toLocaleString()}
+                 {Number(stats.earnings).toLocaleString()}
                </h2>
             </Card>
           </div>
