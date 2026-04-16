@@ -20,6 +20,9 @@ export async function GET(req: Request) {
           FOREIGN KEY (serviceId) REFERENCES services(id) ON DELETE CASCADE
         )
       `).run();
+    } catch (e) {}
+
+    try {
       await db.prepare(`
         CREATE TABLE IF NOT EXISTS store_documents (
           id TEXT PRIMARY KEY,
@@ -32,11 +35,12 @@ export async function GET(req: Request) {
           FOREIGN KEY (storeId) REFERENCES stores(id) ON DELETE CASCADE
         )
       `).run();
-      await db.prepare("ALTER TABLE stores ADD COLUMN status TEXT DEFAULT 'active'").run();
-      await db.prepare("ALTER TABLE stores ADD COLUMN bankName TEXT").run();
-      await db.prepare("ALTER TABLE stores ADD COLUMN accountNumber TEXT").run();
-      await db.prepare("ALTER TABLE stores ADD COLUMN accountName TEXT").run();
     } catch (e) {}
+
+    try { await db.prepare("ALTER TABLE stores ADD COLUMN status TEXT DEFAULT 'active'").run(); } catch(e) {}
+    try { await db.prepare("ALTER TABLE stores ADD COLUMN bankName TEXT").run(); } catch(e) {}
+    try { await db.prepare("ALTER TABLE stores ADD COLUMN accountNumber TEXT").run(); } catch(e) {}
+    try { await db.prepare("ALTER TABLE stores ADD COLUMN accountName TEXT").run(); } catch(e) {}
     
 
     const { results: stores } = await db.prepare(`
