@@ -10,7 +10,7 @@ export async function GET(req: Request) {
 
     // Step 1: Core Statistics (Always available tables)
     const coreStats = await db.batch([
-      db.prepare("SELECT COUNT(*) as total FROM users"),
+      db.prepare("SELECT COUNT(*) as total FROM users WHERE role IS NULL OR role = 'user'"),
       db.prepare("SELECT COUNT(*) as total FROM stores"),
       db.prepare("SELECT COUNT(*) as total FROM orders WHERE status != 'cancelled'"),
       db.prepare("SELECT SUM(totalPrice) as revenue, SUM(laundryFee) as totalLaundry, SUM(deliveryFee) as totalDelivery FROM orders WHERE status = 'completed'"),
@@ -34,53 +34,26 @@ export async function GET(req: Request) {
     const gpStore = Number(settings.find(s => s.key === 'gp_store_percent')?.value) || 20;
     const gpRider = Number(settings.find(s => s.key === 'gp_rider_percent')?.value) || 10;
 
-    // Step 2: Extended Stats (Potentially failing due to schema differences/JSON columns)
+    // Step 2: Extended Stats (Pulling from specialized tables)
     let totalRiders = 0;
     let activeRiders = 0;
-    let totalStoresFromRoles = 0;
     let activeStores = 0;
 
     try {
       const extended = await db.batch([
-        db.prepare("SELECT COUNT(*) as total FROM users WHERE role = 'rider'"),
-        db.prepare(`
-          SELECT COUNT(*) as total FROM users 
-          WHERE role = 'rider' 
-          AND (
-            JSON_EXTRACT(preferences, '$.workStatus') = 1 
-            OR JSON_EXTRACT(preferences, '$.workStatus') = 'true'
-            OR JSON_EXTRACT(preferences, '$.workStatus') IS TRUE
-          )
-        `),
-        db.prepare("SELECT COUNT(*) as total FROM users WHERE role = 'store'"),
-        db.prepare(`
-          SELECT COUNT(*) as total FROM users 
-          WHERE role = 'store' 
-          AND (
-            JSON_EXTRACT(preferences, '$.workStatus') = 1 
-            OR JSON_EXTRACT(preferences, '$.workStatus') = 'true'
-            OR JSON_EXTRACT(preferences, '$.workStatus') IS TRUE
-          )
-        `)
+        db.prepare("SELECT COUNT(*) as total FROM rider_users"),
+        db.prepare("SELECT COUNT(*) as total FROM rider_users WHERE status = 'active'"),
+        db.prepare("SELECT COUNT(*) as total FROM stores WHERE status = 'active'")
       ]);
       
       totalRiders = extended[0].results?.[0]?.total || 0;
       activeRiders = extended[1].results?.[0]?.total || 0;
-      totalStoresFromRoles = extended[2].results?.[0]?.total || 0;
-      activeStores = extended[3].results?.[0]?.total || 0;
+      activeStores = extended[2].results?.[0]?.total || 0;
     } catch (e: any) {
-      console.warn("Extended stats failed (likely missing preferences column):", e.message);
-      // Fallback: If roles exist, count them without checking workStatus
-      const fallback = await db.batch([
-        db.prepare("SELECT COUNT(*) as total FROM users WHERE role = 'rider'"),
-        db.prepare("SELECT COUNT(*) as total FROM users WHERE role = 'store'"),
-      ]);
-      totalRiders = fallback[0].results?.[0]?.total || 0;
-      totalStoresFromRoles = fallback[1].results?.[0]?.total || 0;
+      console.warn("Extended stats failed:", e.message);
     }
 
-    // Use the maximum of stores table count vs users with store role
-    const displayTotalStores = Math.max(storesCount, totalStoresFromRoles);
+    const displayTotalStores = storesCount;
 
     // Calculations
     const storeEarnings = (totalLaundry * gpStore) / 100;
