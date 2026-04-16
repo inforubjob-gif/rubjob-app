@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { useAdmin } from "@/components/providers/AdminProvider";
 import { Icons } from "@/components/ui/Icons";
 import { useTranslation } from "@/components/providers/LanguageProvider";
-import type { Language } from "@/lib/i18n";
+import { Language, translations } from "@/lib/i18n";
 
 interface AdminSidebarProps {
   isOpen: boolean;
