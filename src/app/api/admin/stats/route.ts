@@ -38,6 +38,8 @@ export async function GET(req: Request) {
       `)
     ]);
 
+    console.log("Admin Stats API Results:", stats.map(s => s.results?.[0]));
+
     const usersCount = stats[0].results?.[0]?.total || 0;
     const storesCount = stats[1].results?.[0]?.total || 0;
     const ordersCount = stats[2].results?.[0]?.total || 0;

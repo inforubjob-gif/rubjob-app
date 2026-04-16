@@ -15,6 +15,7 @@ export default function AdminDashboard() {
     totalRiders: 0, activeRiders: 0
   });
   const [isLoading, setIsLoading] = useState(true);
+  const [errorCount, setErrorCount] = useState(0);
 
   useEffect(() => {
     async function fetchStats() {
@@ -37,11 +38,15 @@ export default function AdminDashboard() {
         }
       } catch (err) {
         console.error("Failed to fetch admin stats:", err);
+        setErrorCount(prev => prev + 1);
       } finally {
         setIsLoading(false);
       }
     }
     fetchStats();
+    // Refresh every 30 seconds if successful
+    const interval = setInterval(fetchStats, 30000);
+    return () => clearInterval(interval);
   }, []);
 
   return (
@@ -53,10 +58,17 @@ export default function AdminDashboard() {
             {t("admin.dashboard.gpLabel")}: {t("admin.nav.stores")} {stats.gpStore}% / {t("admin.nav.riders")} {stats.gpRider}%
           </p>
         </div>
-        <div className="w-fit bg-emerald-50 text-emerald-600 px-4 py-2 rounded-2xl text-[10px] font-black uppercase tracking-widest border border-emerald-100 italic shadow-sm flex items-center gap-2">
-           <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
-           {t("admin.dashboard.liveSync")}
-        </div>
+        {errorCount > 0 ? (
+          <div className="w-fit bg-rose-50 text-rose-600 px-4 py-2 rounded-2xl text-[10px] font-black uppercase tracking-widest border border-rose-100 italic shadow-sm flex items-center gap-2">
+            <div className="w-1.5 h-1.5 bg-rose-500 rounded-full animate-pulse" />
+            Connection Error
+          </div>
+        ) : (
+          <div className="w-fit bg-emerald-50 text-emerald-600 px-4 py-2 rounded-2xl text-[10px] font-black uppercase tracking-widest border border-emerald-100 italic shadow-sm flex items-center gap-2">
+            <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
+            {t("admin.dashboard.liveSync")}
+          </div>
+        )}
       </header>
 
       {isLoading ? (
