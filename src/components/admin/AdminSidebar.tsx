@@ -99,7 +99,7 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
                  </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-2">
+              <div className="flex flex-col gap-2">
                   {hasPermission("settings") && (
                     <Link 
                       href="/admin/settings"
@@ -109,16 +109,9 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
                       {t("admin.nav.settings").slice(0, 5)}
                     </Link>
                   )}
-                    <Link 
-                      href="/"
-                      className="flex flex-col items-center justify-center gap-1.5 p-2.5 rounded-2xl bg-white/5 text-slate-400 hover:text-white hover:bg-white/10 text-[10px] font-black uppercase transition-all"
-                    >
-                      <Icons.Back size={18} />
-                      {t("admin.nav.ui")}
-                    </Link>
                   <button 
                     onClick={logout}
-                    className="col-span-2 flex items-center justify-center gap-2 mt-1 p-2.5 rounded-2xl bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 text-[10px] font-black uppercase tracking-widest transition-all"
+                    className="flex items-center justify-center gap-2 mt-1 p-2.5 rounded-2xl bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 text-[10px] font-black uppercase tracking-widest transition-all"
                   >
                     <Icons.Lock size={14} />
                     {t("rider.profile.logout")}
