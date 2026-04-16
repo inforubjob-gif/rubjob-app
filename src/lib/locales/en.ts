@@ -670,6 +670,7 @@ export const en = {
         errorAllDocs: "Please upload all required documents",
         successDesc: "Our team is reviewing your documents...",
     },
+  },
   staff: {
     wallet: {
       availableBalance: "Balance",
@@ -808,7 +809,8 @@ export const en = {
       sameFee: "Same fee applies",
       deliveryNote: "* ฿39 flat fee for all orders",
     },
-    success: {
+  },
+  success: {
       title: "Payment Successful",
       thanks: "Thank you for using RUBJOB",
       desc: "We have received your payment. Get ready for premium cleaning service!",
