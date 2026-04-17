@@ -63,7 +63,7 @@ export default function SupportCenterPage() {
         body: JSON.stringify({
           ticketId: selectedTicketId,
           text: replyText.trim(),
-          adminName: "System Admin"
+          adminName: t('admin.common.adminBadge')
         }),
       });
       if (res.ok) {
@@ -153,7 +153,7 @@ export default function SupportCenterPage() {
                    <div className="flex items-center gap-2 mt-0.5">
                       <span className={`w-1.5 h-1.5 rounded-full ${selectedTicket?.status === 'open' ? 'bg-emerald-500' : 'bg-amber-500'}`} />
                       <span className="text-[10px] font-black uppercase tracking-[0.15em] text-slate-400">
-                        {selectedTicket?.status} • {selectedTicket?.channel.replace('_', ' ')}
+                        {selectedTicket?.status === 'open' ? t('common.pending') : t('common.done')} • {selectedTicket?.channel.replace('_', ' ')}
                       </span>
                    </div>
                  </div>

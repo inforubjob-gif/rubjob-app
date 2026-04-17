@@ -62,7 +62,7 @@ export default function AdminOrdersPage() {
                     <td className="px-6 py-4 font-mono text-xs text-slate-500">{order.id}</td>
                     <td className="px-6 py-4 text-xs font-medium text-slate-500">{new Date(order.createdAt).toLocaleString()}</td>
                     <td className="px-6 py-4">
-                      <Badge variant={statusToBadgeVariant(order.status)}>{order.status.replace(/_/g, " ")}</Badge>
+                      <Badge variant={statusToBadgeVariant(order.status)}>{t(`orders.status.${order.status}`)}</Badge>
                     </td>
                     <td className="px-6 py-4 text-slate-700 font-medium">{order.userId.slice(0, 10)}...</td>
                     <td className="px-6 py-4 text-right font-black">฿{order.totalPrice}</td>

@@ -56,16 +56,15 @@ export default function RiderManagementAdminPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id, status: newStatus }),
       });
-      setRiders(prev => prev.map(r => r.id === id ? { ...r, status: newStatus } : r));
       showToast(newStatus === 'active' ? t('admin.riders.form.verified') : t('admin.riders.form.suspended'), "success");
     } catch (err) {
       console.error("Failed to update status", err);
-      showToast("Failed to update rider status", "error");
+      showToast(t('admin.common.toast.error'), "error");
     }
   }
 
   async function deleteRider(id: string) {
-    if (!window.confirm(t('common.confirm'))) return;
+    if (!window.confirm(t('admin.common.confirmDelete', { item: t('admin.common.rider') }))) return;
     
     try {
       const res = await fetch("/api/admin/riders", {
@@ -77,10 +76,10 @@ export default function RiderManagementAdminPage() {
       if (!res.ok) throw new Error("Failed to delete");
       
       setRiders(prev => prev.filter(r => r.id !== id));
-      showToast("Rider deleted permanently", "success");
+      showToast(t('admin.common.toast.deleted', { item: t('admin.common.rider') }), "success");
     } catch (err) {
       console.error(err);
-      showToast("Failed to delete rider", "error");
+      showToast(t('admin.common.toast.error'), "error");
     }
   }
 
@@ -148,8 +147,16 @@ export default function RiderManagementAdminPage() {
                   <tr key={rider.id} className="hover:bg-slate-50/50 transition-all group">
                     <td className="px-8 py-6">
                       <div className="flex items-center gap-4">
-                         <div className="w-12 h-12 rounded-2xl bg-slate-900 text-white flex items-center justify-center shrink-0 shadow-sm overflow-hidden font-black ring-4 ring-white">
-                            {rider.name?.[0]?.toUpperCase() || 'R'}
+                         <div className="w-12 h-12 rounded-2xl bg-slate-900 text-white flex items-center justify-center shrink-0 shadow-sm overflow-hidden font-black ring-4 ring-white relative group/avatar">
+                            {rider.pictureUrl ? (
+                               <img 
+                                 src={rider.pictureUrl.startsWith('data:') ? rider.pictureUrl : `/api/admin/documents/${rider.pictureUrl}`} 
+                                 alt={rider.name} 
+                                 className="w-full h-full object-cover transition-transform group-hover/avatar:scale-110" 
+                               />
+                            ) : (
+                               rider.name?.[0]?.toUpperCase() || 'R'
+                            )}
                          </div>
                          <div className="flex flex-col">
                             <span className="font-black text-slate-900 tracking-tight">{rider.name}</span>
@@ -167,19 +174,25 @@ export default function RiderManagementAdminPage() {
                        </div>
                     </td>
                     <td className="px-8 py-6">
-                       <div className="flex gap-2 transform group-hover:scale-110 origin-left transition-transform">
-                          {['id_card', 'license', 'insurance'].map(type => {
-                             const doc = rider.documents?.find((d: any) => d.type === type);
+                       <div className="flex gap-2 transform group-hover:translate-x-1 transition-transform">
+                          {[
+                            { type: 'id_card', icon: <Icons.User size={10} />, label: 'ID' },
+                            { type: 'license', icon: <Icons.Shield size={10} />, label: 'DL' },
+                            { type: 'vehicle_front', icon: <Icons.Bike size={10} />, label: 'VH' }
+                          ].map(docCfg => {
+                             const doc = rider.documents?.find((d: any) => d.type === docCfg.type);
                              return (
                                 <div 
-                                  key={type} 
-                                  title={`${type.replace('_', ' ').toUpperCase()}: ${doc?.status || 'none'}`}
-                                  className={`w-3 h-3 rounded-full border-2 border-white ring-2 ${
-                                    doc?.status === 'verified' ? 'bg-emerald-500 ring-emerald-100' :
-                                    doc?.status === 'pending' ? 'bg-amber-500 ring-amber-100' :
-                                    'bg-slate-200 ring-slate-100'
+                                  key={docCfg.type} 
+                                  title={`${docCfg.label}: ${doc?.status || 'missing'}`}
+                                  className={`w-5 h-5 rounded-lg flex items-center justify-center border transition-colors ${
+                                    doc?.status === 'verified' ? 'bg-emerald-50 border-emerald-100 text-emerald-500' :
+                                    doc?.status === 'pending' ? 'bg-amber-50 border-amber-100 text-amber-500' :
+                                    'bg-slate-50 border-slate-100 text-slate-300'
                                   }`}
-                                />
+                                >
+                                   {docCfg.icon}
+                                </div>
                              );
                           })}
                        </div>
@@ -206,19 +219,19 @@ export default function RiderManagementAdminPage() {
                            >
                              <Icons.Edit size={18} />
                            </Link>
-                           <button 
-                             onClick={() => toggleStatus(rider.id, rider.status)}
-                             className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all active:scale-95 shadow-sm border ${rider.status === 'active' ? 'bg-rose-50 border-rose-100 text-rose-600 hover:bg-rose-100' : 'bg-emerald-50 border-emerald-100 text-emerald-600 hover:bg-emerald-100'}`}
-                           >
-                             {rider.status === 'active' ? 'Suspend' : rider.status === 'pending' ? 'Review Application' : 'Activate'}
-                           </button>
-                           <button 
-                             onClick={() => deleteRider(rider.id)}
-                             className="w-10 h-10 bg-slate-50 hover:bg-rose-50 text-slate-300 hover:text-rose-500 rounded-xl flex items-center justify-center transition-all group-hover:bg-rose-50/50"
-                             title="Delete Rider"
-                           >
-                             <Icons.Trash size={18} />
-                           </button>
+                            <button 
+                              onClick={() => toggleStatus(rider.id, rider.status)}
+                              className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all active:scale-95 shadow-sm border ${rider.status === 'active' ? 'bg-rose-50 border-rose-100 text-rose-600 hover:bg-rose-100' : 'bg-emerald-50 border-emerald-100 text-emerald-600 hover:bg-emerald-100'}`}
+                            >
+                              {rider.status === 'active' ? t('common.suspend') : rider.status === 'pending' ? t('common.review') : t('common.activate')}
+                            </button>
+                            <button 
+                              onClick={() => deleteRider(rider.id)}
+                              className="w-10 h-10 bg-slate-50 hover:bg-rose-50 text-slate-300 hover:text-rose-500 rounded-xl flex items-center justify-center transition-all group-hover:bg-rose-50/50"
+                              title={t('common.delete')}
+                            >
+                              <Icons.Trash size={18} />
+                            </button>
                         </div>
                     </td>
                   </tr>

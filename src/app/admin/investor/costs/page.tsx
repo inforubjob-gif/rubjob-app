@@ -9,17 +9,17 @@ export default function InvestorCostsPage() {
    const { t } = useTranslation();
    const [scale, setScale] = useState(1000); // Monthly Order Projection
 
-   const infrastructureCosts = [
-      { name: "Edge Hosting", provider: "Cloudflare Business", cost: 7000, icon: <Icons.Globe size={24} />, detail: "รับประกัน Uptime 100% พร้อม WAF ระดับ Enterprise" },
-      { name: "High-Scale Database", provider: "Cloudflare D1 + KV", cost: 1800, icon: <Icons.Shield size={24} />, detail: "รองรับธุรกรรมนับล้านรายการแบบไร้เซิร์ฟเวอร์" },
-      { name: "Premium Messaging", provider: "LINE Official Pro", cost: 1500, icon: <Icons.Line size={24} />, detail: "ระบบแจ้งเตือนอัตโนมัติแบบ Pro-Active" },
-      { name: "Smart Routing", provider: "Google Maps API", cost: 15000, icon: <Icons.Navigation size={24} />, detail: "คุณภาพพิกัดและความแม่นยำสูงสุดในตลาด" },
-   ];
+    const infrastructureCosts = [
+      { name: t('admin.investor.costs.infrastructure.edgeHosting.name'), provider: "Cloudflare Business", cost: 7000, icon: <Icons.Globe size={24} />, detail: t('admin.investor.costs.infrastructure.edgeHosting.detail') },
+      { name: t('admin.investor.costs.infrastructure.database.name'), provider: "Cloudflare D1 + KV", cost: 1800, icon: <Icons.Shield size={24} />, detail: t('admin.investor.costs.infrastructure.database.detail') },
+      { name: t('admin.investor.costs.infrastructure.messaging.name'), provider: "LINE Official Pro", cost: 1500, icon: <Icons.Line size={24} />, detail: t('admin.investor.costs.infrastructure.messaging.detail') },
+      { name: t('admin.investor.costs.infrastructure.routing.name'), provider: "Google Maps API", cost: 15000, icon: <Icons.Navigation size={24} />, detail: t('admin.investor.costs.infrastructure.routing.detail') },
+    ];
 
-   const totalFixedCost = infrastructureCosts.reduce((acc, curr) => acc + curr.cost, 0);
-   const costPerOrder = totalFixedCost / scale;
+    const totalFixedCost = infrastructureCosts.reduce((acc, curr) => acc + curr.cost, 0);
+    const costPerOrder = totalFixedCost / scale;
 
-   return (
+    return (
       <div className="min-h-screen bg-[#0B0F19] text-white p-4 md:p-12 font-sans selection:bg-primary/30">
          <div className="max-w-6xl mx-auto space-y-12">
             
@@ -31,9 +31,9 @@ export default function InvestorCostsPage() {
                      {t('admin.investor.costs.tag')}
                   </div>
                   <h1 className="text-4xl md:text-6xl font-black tracking-tight leading-tight">
-                     โครงสร้างระบบ<br/>
+                     {t('admin.investor.costs.titleMain')}<br/>
                      <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-orange-400 to-primary-light">
-                        ระดับ High-Scale
+                        {t('admin.investor.costs.titleSub')}
                      </span>
                   </h1>
                </div>
@@ -54,7 +54,7 @@ export default function InvestorCostsPage() {
                         </div>
                         <div>
                            <h3 className="text-xl font-black uppercase tracking-tighter">{t('admin.investor.costs.fixedBreakdown')}</h3>
-                           <p className="text-slate-500 text-xs font-bold uppercase tracking-widest">ต้นทุนคงที่รายเดือนสำหรับโครงสร้างพื้นฐาน</p>
+                           <p className="text-slate-500 text-xs font-bold uppercase tracking-widest">{t('admin.investor.costs.fixedDesc')}</p>
                         </div>
                      </div>
                      <div className="flex items-baseline gap-4">
@@ -80,7 +80,7 @@ export default function InvestorCostsPage() {
                      <Icons.Wallet size={48} strokeWidth={3} />
                      <h3 className="mt-6 text-3xl font-black tracking-tighter uppercase leading-none">{t('admin.investor.costs.scalability')}<br/>{t('admin.investor.costs.efficiency')}</h3>
                      <p className="mt-4 text-xs font-bold uppercase tracking-widest leading-relaxed opacity-70">
-                        ต้นทุนต่อออเดอร์จะลดลงอย่างมหาศาลเมื่อระบบขยายตัว (Economies of Scale)
+                        {t('admin.investor.costs.efficiencySub')}
                      </p>
                   </div>
                   <div className="mt-12 pt-6 border-t border-black/10">
@@ -117,11 +117,11 @@ export default function InvestorCostsPage() {
                <div className="flex flex-col md:flex-row items-center justify-between gap-12">
                   <div className="flex-1 space-y-6">
                      <div className="flex items-baseline gap-3">
-                        <h2 className="text-3xl font-black uppercase tracking-tight">จำลองสเกลธุกิจ</h2>
+                        <h2 className="text-3xl font-black uppercase tracking-tight">{t('admin.investor.costs.growthProjection')}</h2>
                         <span className="text-indigo-400 text-xs font-black uppercase tracking-widest tracking-widest">{t('admin.investor.costs.growthProjection')}</span>
                      </div>
                      <p className="text-slate-400 text-sm font-medium leading-relaxed max-w-lg">
-                        Rubjob ใช้สถาปัตยกรรมแบบ **Edge Computing** ที่ไม่ต้องปรับแต่งระบบ (Zero Configuration) แม้จะมีผู้ใช้งานเพิ่มขึ้นนับแสนราย ต้นทุนคงที่ยังคงอยู่ในระดับที่ควบคุมได้
+                        {t('admin.investor.costs.growthDesc')}
                      </p>
                      
                      <div className="space-y-4 pt-4">
@@ -181,5 +181,5 @@ export default function InvestorCostsPage() {
 
          </div>
       </div>
-   );
+    );
 }

@@ -6,9 +6,11 @@ import Badge from "@/components/ui/Badge";
 import { Icons } from "@/components/ui/Icons";
 import Modal from "@/components/ui/Modal";
 import { useTranslation } from "@/components/providers/LanguageProvider";
+import { useToast } from "@/components/providers/ToastProvider";
 
 export default function CouponsAdminPage() {
   const { t } = useTranslation();
+  const { showToast } = useToast();
   const [coupons, setCoupons] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -58,10 +60,10 @@ export default function CouponsAdminPage() {
         fetchCoupons();
       } else {
         const err = await res.json();
-        alert(err.error || "Failed to create coupon");
+        showToast(err.error || t('admin.common.toast.error'), "error");
       }
     } catch (err) {
-      alert("Network error");
+      showToast(t('admin.common.toast.error'), "error");
     } finally {
       setIsSaving(false);
     }
@@ -94,7 +96,7 @@ export default function CouponsAdminPage() {
   }
 
   async function handleDelete(id: string, code: string) {
-    if (!confirm(`Delete coupon ${code}?`)) return;
+    if (!confirm(t('admin.common.confirmDelete', { item: `${t('admin.coupons.modal.code')} ${code}` }))) return;
     try {
       await fetch("/api/admin/coupons", {
         method: "DELETE",

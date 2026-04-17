@@ -34,6 +34,11 @@ export const th = {
       done: "สำเร็จแล้ว",
       processing: "กำลังดำเนินการ...",
       pending: "รอดำเนินการ",
+      delete: "ลบ",
+      edit: "แก้ไข",
+      activate: "เปิดใช้งาน",
+      suspend: "ระงับการใช้งาน",
+      review: "ตรวจสอบ",
     },
     home: {
       activeOrders: "ออเดอร์ปัจจุบัน",
@@ -58,6 +63,58 @@ export const th = {
       navBook: "จอง",
       navPromotions: "โปรโมชั่น",
       navProfile: "โปรไฟล์",
+    },
+    investor: {
+      title: "นักลงทุน",
+      subtitle: "รายงานการเติบโตและข้อมูลทางการเงิน",
+      costs: {
+        tag: "สรุปต้นทุนโครงสร้างพื้นฐาน",
+        assetVal: "มูลค่าสินทรัพย์ทางดิจิทัล",
+        priceless: "ประเมินค่าไม่ได้",
+        titleMain: "โครงสร้างระบบ",
+        titleSub: "ระดับ High-Scale",
+        fixedBreakdown: "แจกแจงต้นทุนคงที่",
+        fixedDesc: "ต้นทุนคงที่รายเดือนสำหรับโครงสร้างพื้นฐาน",
+        perMonth: "เดือน",
+        maxCapacity: "ขีดความสามารถสูงสุด",
+        reliability: "ความเสถียรของเครือข่าย",
+        scalability: "ความสามารถในการขยาย",
+        efficiency: "ประสิทธิภาพการจัดการ",
+        efficiencySub: "ต้นทุนต่อออเดอร์จะลดลงอย่างมหาศาลเมื่อระบบขยายตัว (Economies of Scale)",
+        cloudCostPerOrder: "ต้นทุนคลาวด์ต่อออเดอร์",
+        perOrder: "ออเดอร์",
+        growthProjection: "จำลองการเติบโตของธุรกิจ",
+        growthDesc: "Rubjob ใช้สถาปัตยกรรมแบบ Edge Computing ที่ไม่ต้องปรับแต่งระบบ (Zero Configuration) แม้จะมีผู้ใช้งานเพิ่มขึ้นนับแสนราย ต้นทุนคงที่ยังคงอยู่ในระดับที่ควบคุมได้",
+        orderInputLabel: "ปริมาณออเดอร์ต่อเดือน",
+        mvpStage: "ช่วงเริ่มต้น (MVP)",
+        growthStage: "ช่วงเติบโต",
+        marketLeader: "ผู้นำตลาด",
+        efficiencyGain: "ประสิทธิภาพที่เพิ่มขึ้น",
+        costReduction: "การลดลงของต้นทุนคลาวด์",
+        fixedCap: "ขีดจำกัดเครื่องเซิร์ฟเวอร์",
+        unlimited: "ไม่จำกัด",
+        securityRank: "ระดับความปลอดภัย",
+        latency: "ความหน่วงของเครือข่าย",
+        footerTag: "RUBJOB — ออกแบบมาเพื่อการเติบโตที่ไร้ขีดจำกัด",
+        infrastructure: {
+          edgeHosting: {
+            name: "Edge Hosting",
+            detail: "รับประกัน Uptime 100% พร้อม WAF ระดับ Enterprise",
+          },
+          database: {
+            name: "High-Scale Database",
+            detail: "รองรับธุรกรรมนับล้านรายการแบบไร้เซิร์ฟเวอร์",
+          },
+          messaging: {
+            name: "Premium Messaging",
+            detail: "ระบบแจ้งเตือนอัตโนมัติแบบ Pro-Active",
+          },
+          routing: {
+            name: "Smart Routing",
+            detail: "คุณภาพพิกัดและความแม่นยำสูงสุดในตลาด",
+          }
+        }
+      }
     },
     profile: {
       title: "โปรไฟล์",
@@ -700,6 +757,13 @@ export const th = {
         customer: "ลูกค้า",
         rider: "ไรเดอร์",
         store: "ร้านค้า",
+        toast: {
+          success: "ดำเนินการสำเร็จ",
+          error: "ดำเนินการไม่สำเร็จ",
+          deleted: "ลบข้อมูล {item} ถาวรเรียบร้อยแล้ว",
+          updated: "อัปเดตสถานะ {item} เรียบร้อยแล้ว",
+        },
+        confirmDelete: "คุณแน่ใจหรือไม่ว่าต้องการลบ {item} นี้?",
       },
       nav: {
         dashboard: "แผงควบคุม",

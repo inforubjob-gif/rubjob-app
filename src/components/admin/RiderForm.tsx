@@ -42,6 +42,7 @@ export default function RiderForm({ initialData, isEdit }: RiderFormProps) {
     accountNumber: initialData?.accountNumber || "",
     accountName: initialData?.accountName || "",
     status: initialData?.status || "active",
+    pictureUrl: initialData?.pictureUrl || "",
     documents: initialData?.documents || [] as any[] // [{ type, url, status, notes }]
   });
 
@@ -54,7 +55,14 @@ export default function RiderForm({ initialData, isEdit }: RiderFormProps) {
       } else {
         newDocs = [...prev.documents, { type, status: 'pending', url: '', notes: '', [field]: value }];
       }
-      return { ...prev, documents: newDocs };
+      
+      // Sync pictureUrl if type is profile_photo
+      const updates: any = { documents: newDocs };
+      if (type === 'profile_photo' && field === 'url') {
+        updates.pictureUrl = value;
+      }
+      
+      return { ...prev, ...updates };
     });
   };
 

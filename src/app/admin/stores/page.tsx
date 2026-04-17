@@ -67,16 +67,15 @@ export default function StoresAdminPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id, isActive: currentStatus === 1 ? 0 : 1 })
       });
-      setStores(prev => prev.map(s => s.id === id ? { ...s, isActive: currentStatus === 1 ? 0 : 1 } : s));
       showToast(currentStatus === 1 ? t('admin.riders.form.suspended') : t('admin.riders.form.verified'), "success");
     } catch (err) {
       console.error("Failed to toggle status", err);
-      showToast("Failed to update store status", "error");
+      showToast(t('admin.common.toast.error'), "error");
     }
   }
 
   async function deleteStore(id: string) {
-    if (!window.confirm(t('common.confirm'))) return;
+    if (!window.confirm(t('admin.common.confirmDelete', { item: t('admin.common.store') }))) return;
     
     try {
       const res = await fetch("/api/admin/stores", {
@@ -88,10 +87,10 @@ export default function StoresAdminPage() {
       if (!res.ok) throw new Error("Failed to delete");
       
       setStores(prev => prev.filter(s => s.id !== id));
-      showToast("Store deleted permanently", "success");
+      showToast(t('admin.common.toast.deleted', { item: t('admin.common.store') }), "success");
     } catch (err) {
       console.error(err);
-      showToast("Failed to delete store", "error");
+      showToast(t('admin.common.toast.error'), "error");
     }
   }
 
@@ -221,12 +220,12 @@ export default function StoresAdminPage() {
                              onClick={() => toggleStoreStatus(store.id, store.isActive)}
                              className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all active:scale-95 shadow-sm border ${store.isActive === 1 ? 'bg-rose-50 border-rose-100 text-rose-600 hover:bg-rose-100' : 'bg-emerald-50 border-emerald-100 text-emerald-600 hover:bg-emerald-100'}`}
                            >
-                             {store.status === 'active' ? 'Suspend' : store.status === 'pending' ? 'Review & Approve' : 'Activate' }
+                             {store.status === 'active' ? t('common.suspend') : store.status === 'pending' ? t('common.review') : t('common.activate') }
                            </button>
                            <button 
                              onClick={() => deleteStore(store.id)}
                              className="w-10 h-10 bg-slate-50 hover:bg-rose-50 text-slate-300 hover:text-rose-500 rounded-xl flex items-center justify-center transition-all group-hover:bg-rose-50/50"
-                             title="Delete Store"
+                             title={t('common.delete')}
                            >
                              <Icons.Trash size={18} />
                            </button>

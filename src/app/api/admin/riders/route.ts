@@ -10,6 +10,7 @@ export async function GET(req: Request) {
 
     // Self-healing: Ensure required columns and tables exist
     try { await db.prepare("ALTER TABLE rider_users ADD COLUMN rider_number INTEGER").run(); } catch(e) {}
+    try { await db.prepare("ALTER TABLE rider_users ADD COLUMN pictureUrl TEXT").run(); } catch(e) {}
     try { await db.prepare("ALTER TABLE rider_users ADD COLUMN bankName TEXT").run(); } catch(e) {}
     try { await db.prepare("ALTER TABLE rider_users ADD COLUMN accountNumber TEXT").run(); } catch(e) {}
     try { await db.prepare("ALTER TABLE rider_users ADD COLUMN accountName TEXT").run(); } catch(e) {}
@@ -59,6 +60,7 @@ export async function POST(req: Request) {
 
     // Self-healing: Ensure required columns exist
     try { await db.prepare("ALTER TABLE rider_users ADD COLUMN rider_number INTEGER").run(); } catch(e) {}
+    try { await db.prepare("ALTER TABLE rider_users ADD COLUMN pictureUrl TEXT").run(); } catch(e) {}
     try { await db.prepare("ALTER TABLE rider_users ADD COLUMN bankName TEXT").run(); } catch(e) {}
     try { await db.prepare("ALTER TABLE rider_users ADD COLUMN accountNumber TEXT").run(); } catch(e) {}
     try { await db.prepare("ALTER TABLE rider_users ADD COLUMN accountName TEXT").run(); } catch(e) {}
@@ -72,11 +74,11 @@ export async function POST(req: Request) {
     const id = `RDR-${Math.random().toString(36).substr(2, 6).toUpperCase()}`;
 
     await db.prepare(`
-      INSERT INTO rider_users (id, email, password, name, phone, vehicleType, address, idNumber, licensePlate, emergencyContact, status, rider_number, bankName, accountNumber, accountName)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'active', ?, ?, ?, ?)
+      INSERT INTO rider_users (id, email, password, name, phone, vehicleType, address, idNumber, licensePlate, emergencyContact, status, rider_number, bankName, accountNumber, accountName, pictureUrl)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'active', ?, ?, ?, ?, ?)
     `).bind(
       id, email, password, name, phone || "", vehicleType || "bike", address || "", idNumber || "", licensePlate || "", emergencyContact || "", nextNumber,
-      bankName || "", accountNumber || "", accountName || ""
+      bankName || "", accountNumber || "", accountName || "", payload.pictureUrl || ""
     ).run();
 
     return NextResponse.json({ success: true, id, displayId });
@@ -110,11 +112,12 @@ export async function PUT(req: Request) {
           emergencyContact = COALESCE(?, emergencyContact),
           bankName = COALESCE(?, bankName),
           accountNumber = COALESCE(?, accountNumber),
-          accountName = COALESCE(?, accountName)
+          accountName = COALESCE(?, accountName),
+          pictureUrl = COALESCE(?, pictureUrl)
       WHERE id = ?
     `).bind(
       status || null, name || null, phone || null, vehicleType || null, address || null, idNumber || null, licensePlate || null, emergencyContact || null, 
-      bankName || null, accountNumber || null, accountName || null, id
+      bankName || null, accountNumber || null, accountName || null, payload.pictureUrl || null, id
     ).run();
 
     // Handle documents if provided

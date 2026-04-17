@@ -212,7 +212,7 @@ export default function FinanceAdminPage() {
                        <td className="px-8 py-5 text-right font-black text-slate-900 text-lg">฿{p.amount.toLocaleString()}</td>
                        <td className="px-8 py-5">
                           <Badge variant={p.status === 'completed' ? 'success' : p.status === 'pending' ? 'warning' : 'danger'}>
-                             {p.status}
+                             {p.status === 'completed' ? t('common.done') : p.status === 'pending' ? t('common.pending') : t('common.error')}
                           </Badge>
                        </td>
                        <td className="px-8 py-5 text-right">
