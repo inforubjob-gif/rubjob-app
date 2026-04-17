@@ -952,6 +952,7 @@ export const en = {
         unlimited: "Unlimited",
         expiration: "Expiry Date",
         deploy: "Deploy Promo Code",
+        update: "Update Promo Code",
         syncing: "Syncing promotions...",
       },
     },

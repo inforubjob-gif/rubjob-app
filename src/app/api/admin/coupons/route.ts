@@ -47,25 +47,57 @@ export async function POST(req: Request) {
 
 export async function PUT(req: Request) {
   try {
-    const { id, isActive, isVisible } = await req.json() as any;
+    const { id, code, type, value, minOrder, maxDiscount, expiryDate, usageLimit, isActive, isVisible } = await req.json() as any;
     const db = getRequestContext().env.DB;
     if (!db) return NextResponse.json({ error: "D1 not found" }, { status: 500 });
 
     if (!id) return NextResponse.json({ error: "Missing ID" }, { status: 400 });
 
-    await db.prepare(`
-      UPDATE coupons 
-      SET isActive = COALESCE(?, isActive),
-          isVisible = COALESCE(?, isVisible)
-      WHERE id = ?
-    `).bind(
-      isActive !== undefined ? (isActive ? 1 : 0) : null,
-      isVisible !== undefined ? (isVisible ? 1 : 0) : null,
-      id
-    ).run();
+    // Handle full update vs partial toggle
+    if (code !== undefined || type !== undefined || value !== undefined) {
+      await db.prepare(`
+        UPDATE coupons 
+        SET code = ?,
+            type = ?,
+            value = ?,
+            minOrder = ?,
+            maxDiscount = ?,
+            expiryDate = ?,
+            usageLimit = ?,
+            isActive = COALESCE(?, isActive),
+            isVisible = COALESCE(?, isVisible)
+        WHERE id = ?
+      `).bind(
+        code?.toUpperCase(),
+        type,
+        value,
+        minOrder,
+        maxDiscount || null,
+        expiryDate || null,
+        usageLimit || null,
+        isActive !== undefined ? (isActive ? 1 : 0) : null,
+        isVisible !== undefined ? (isVisible ? 1 : 0) : null,
+        id
+      ).run();
+    } else {
+      // Partial toggle for performance/legacy
+      await db.prepare(`
+        UPDATE coupons 
+        SET isActive = COALESCE(?, isActive),
+            isVisible = COALESCE(?, isVisible)
+        WHERE id = ?
+      `).bind(
+        isActive !== undefined ? (isActive ? 1 : 0) : null,
+        isVisible !== undefined ? (isVisible ? 1 : 0) : null,
+        id
+      ).run();
+    }
 
     return NextResponse.json({ success: true });
   } catch (error: any) {
+    if (error.message.includes("UNIQUE constraint failed")) {
+      return NextResponse.json({ error: "Coupon code already exists" }, { status: 400 });
+    }
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

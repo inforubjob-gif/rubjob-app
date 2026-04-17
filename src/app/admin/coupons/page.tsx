@@ -15,6 +15,7 @@ export default function CouponsAdminPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
   
   // Form State
   const [formData, setFormData] = useState({
@@ -45,17 +46,23 @@ export default function CouponsAdminPage() {
     }
   }
 
-  const handleCreate = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSaving(true);
     try {
-      const res = await fetch("/api/admin/coupons", {
-        method: "POST",
+      const url = "/api/admin/coupons";
+      const method = editingId ? "PUT" : "POST";
+      const payload = editingId ? { ...formData, id: editingId } : formData;
+
+      const res = await fetch(url, {
+        method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(payload)
       });
+      
       if (res.ok) {
         setIsModalOpen(false);
+        setEditingId(null);
         setFormData({ code: "", type: "percentage", value: "", minOrder: "0", maxDiscount: "", expiryDate: "", usageLimit: "", isVisible: false });
         fetchCoupons();
       } else {
@@ -67,6 +74,21 @@ export default function CouponsAdminPage() {
     } finally {
       setIsSaving(false);
     }
+  };
+
+  const handleEdit = (coupon: any) => {
+    setEditingId(coupon.id);
+    setFormData({
+      code: coupon.code,
+      type: coupon.type,
+      value: coupon.value.toString(),
+      minOrder: (coupon.minOrder || 0).toString(),
+      maxDiscount: (coupon.maxDiscount || "").toString(),
+      expiryDate: coupon.expiryDate ? new Date(coupon.expiryDate).toISOString().split('T')[0] : "",
+      usageLimit: (coupon.usageLimit || "").toString(),
+      isVisible: coupon.isVisible === 1
+    });
+    setIsModalOpen(true);
   };
 
   async function toggleStatus(id: string, currentStatus: number) {
@@ -117,7 +139,11 @@ export default function CouponsAdminPage() {
           <p className="text-slate-500 text-sm md:text-base font-medium mt-1">{t('admin.coupons.subtitle')}</p>
         </div>
         <button 
-          onClick={() => setIsModalOpen(true)}
+          onClick={() => {
+            setEditingId(null);
+            setFormData({ code: "", type: "percentage", value: "", minOrder: "0", maxDiscount: "", expiryDate: "", usageLimit: "", isVisible: false });
+            setIsModalOpen(true);
+          }}
           className="px-5 py-3 bg-slate-900 text-white rounded-xl text-sm font-bold shadow-lg flex items-center justify-center gap-2 hover:bg-slate-800 transition-all active:scale-95 w-full sm:w-auto"
         >
           <Icons.Plus size={16} /> {t('admin.coupons.newBtn')}
@@ -190,17 +216,24 @@ export default function CouponsAdminPage() {
                        </Badge>
                     </td>
                     <td className="px-6 py-4 text-right">
-                       <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                       <div className="flex justify-end items-center gap-2 opacity-100 transition-opacity">
+                          <button 
+                            onClick={() => handleEdit(coupon)}
+                            className="p-1.5 text-indigo-500 hover:bg-indigo-50 border border-transparent hover:border-indigo-100 rounded-lg transition-all"
+                            title="Edit Coupon"
+                          >
+                            <Icons.Settings size={16} />
+                          </button>
                           <button 
                             onClick={() => toggleVisibility(coupon.id, coupon.isVisible)}
                             title={coupon.isVisible === 1 ? "Hide from customer wallet" : "Show in customer wallet"}
-                            className={`p-1.5 rounded-lg transition-colors border ${coupon.isVisible === 1 ? 'text-indigo-500 border-indigo-100 bg-indigo-50' : 'text-slate-400 border-slate-100 hover:bg-slate-50'}`}
+                            className={`p-1.5 rounded-lg transition-colors border ${coupon.isVisible === 1 ? 'text-emerald-500 border-emerald-100 bg-emerald-50' : 'text-slate-400 border-slate-100 hover:bg-slate-50'}`}
                           >
-                            {coupon.isVisible === 1 ? <Icons.Check size={16} /> : <Icons.Settings size={16} />}
+                            <Icons.Check size={16} />
                           </button>
                           <button 
                             onClick={() => toggleStatus(coupon.id, coupon.isActive)}
-                            className={`px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-tight transition-all active:scale-95 ${coupon.isActive === 1 ? 'bg-rose-50 text-rose-600 hover:bg-rose-100' : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100'}`}
+                            className={`px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-tight transition-all active:scale-95 ${coupon.isActive === 1 ? 'bg-rose-50 text-rose-600 hover:bg-rose-100' : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100'}`}
                           >
                             {coupon.isActive === 1 ? t('admin.coupons.lock') : t('admin.coupons.unlock')}
                           </button>
@@ -221,8 +254,8 @@ export default function CouponsAdminPage() {
       </Card>
 
       {/* New Coupon Modal */}
-      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title={t('admin.coupons.modal.title')}>
-         <form onSubmit={handleCreate} className="space-y-6 pt-2 h-[80vh] overflow-y-auto px-1 custom-scrollbar">
+      <Modal isOpen={isModalOpen} onClose={() => { setIsModalOpen(false); setEditingId(null); }} title={editingId ? t('admin.coupons.modal.titleEdit') || "Edit Coupon" : t('admin.coupons.modal.title')}>
+         <form onSubmit={handleSubmit} className="space-y-6 pt-2 h-[80vh] overflow-y-auto px-1 custom-scrollbar">
             <div className="p-4 bg-indigo-50 rounded-2xl border border-indigo-100">
                <label className="flex items-center gap-3 cursor-pointer">
                   <div className={`w-12 h-6 rounded-full transition-colors relative ${formData.isVisible ? 'bg-indigo-500' : 'bg-slate-300'}`}>
@@ -313,7 +346,7 @@ export default function CouponsAdminPage() {
               disabled={isSaving}
               className="w-full bg-slate-900 text-white py-5 rounded-2xl font-black text-xs uppercase tracking-[0.2em] shadow-xl shadow-slate-200 hover:scale-[1.01] active:scale-[0.98] transition-all disabled:opacity-50"
             >
-              {isSaving ? t('admin.coupons.modal.syncing') : t('admin.coupons.modal.deploy')}
+              {isSaving ? t('admin.coupons.modal.syncing') : (editingId ? t('admin.coupons.modal.update') : t('admin.coupons.modal.deploy'))}
             </button>
          </form>
       </Modal>
