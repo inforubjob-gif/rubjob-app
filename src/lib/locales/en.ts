@@ -357,7 +357,6 @@ export const en = {
       statusSent: "Information sent to LINE chat",
       msgTemplate: "Order {id} Status: {status}",
     },
-    },
     payment: {
       title: "Payment",
       method: "Payment Method",
