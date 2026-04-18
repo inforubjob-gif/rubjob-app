@@ -1,6 +1,6 @@
 import { getRequestContext } from "@cloudflare/next-on-pages";
 import { NextResponse } from "next/server";
-import { getAdminSession } from "@/lib/auth-server";
+import { getAdminSession, getRiderSession } from "@/lib/auth-server";
 
 export const runtime = "edge";
 
@@ -13,8 +13,9 @@ export async function GET(
   req: Request,
   { params }: { params: { id: string } }
 ) {
-  const session = await getAdminSession();
-  if (!session) return new Response("Unauthorized", { status: 401 });
+  const adminSession = await getAdminSession();
+  const riderSession = await getRiderSession();
+  if (!adminSession && !riderSession) return new Response("Unauthorized", { status: 401 });
 
   try {
     const { id } = params;

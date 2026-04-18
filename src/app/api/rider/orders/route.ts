@@ -51,8 +51,8 @@ export async function GET(req: Request) {
       return (deliveryFee - commission) + riderBasePayout;
     };
 
-    // 0. Fetch Rider Profile status
-    const riderProfile = await db.prepare("SELECT status FROM rider_users WHERE id = ?").bind(riderId).first() as any;
+    // 0. Fetch Rider Profile status and pictureUrl
+    const riderProfile = await db.prepare("SELECT status, pictureUrl FROM rider_users WHERE id = ?").bind(riderId).first() as any;
     const verificationStatus = riderProfile?.status || "unregistered";
 
     // 1. Available Jobs: 
@@ -79,6 +79,7 @@ export async function GET(req: Request) {
 
     return NextResponse.json({ 
       status: verificationStatus,
+      pictureUrl: riderProfile?.pictureUrl,
       available: availableJobs.results.map((r: any) => ({
         ...r,
         riderEarn: calculateRiderEarn(r.deliveryFee || 0),

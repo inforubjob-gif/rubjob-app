@@ -19,7 +19,7 @@ export async function POST(req: Request) {
 
     // Check Rider Database
     const rider = await db.prepare(`
-      SELECT id, email, name, status FROM rider_users WHERE email = ? AND password = ?
+      SELECT id, email, name, status, pictureUrl FROM rider_users WHERE email = ? AND password = ?
     `).bind(email, password).first();
 
     if (rider) {
@@ -41,7 +41,8 @@ export async function POST(req: Request) {
         rider: {
           id: rider.id,
           name: rider.name,
-          email: rider.email
+          email: rider.email,
+          pictureUrl: rider.pictureUrl
         }
       });
     } else {

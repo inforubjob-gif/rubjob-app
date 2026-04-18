@@ -64,6 +64,15 @@ export default function RiderDashboard() {
       }
 
       setVerificationStatus(data.status);
+
+      if (data.pictureUrl && data.pictureUrl !== rider?.pictureUrl) {
+        setRider((prev: any) => ({ ...prev, pictureUrl: data.pictureUrl }));
+        try {
+          const session = JSON.parse(localStorage.getItem("rubjob_rider_session") || "{}");
+          localStorage.setItem("rubjob_rider_session", JSON.stringify({ ...session, pictureUrl: data.pictureUrl }));
+        } catch(e) {}
+      }
+
       if (data.available) setAvailableJobs(data.available);
       if (data.active) setActiveJobs(data.active);
 
