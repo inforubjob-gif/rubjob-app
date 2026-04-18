@@ -143,13 +143,13 @@ CREATE TABLE IF NOT EXISTS addresses (
 
 -- Initial Services Data
 INSERT OR REPLACE INTO services (id, name, category, description, basePrice, unit, icon, estimatedDays) VALUES
-('wash_fold', 'Wash & Fold', 'laundry', 'Everyday laundry, washed and neatly folded', 59, 'piece', 'wash_fold', 2),
-('dry_clean', 'Dry Clean', 'laundry', 'Premium care for delicate fabrics & suits', 129, 'piece', 'dry_clean', 3),
-('iron_only', 'Iron Only', 'laundry', 'Perfectly pressed, ready to wear', 39, 'piece', 'iron_only', 1),
-('wash_iron', 'Wash & Iron', 'laundry', 'Full service wash with professional pressing', 89, 'piece', 'wash_iron', 2),
-('home_cleaning', 'Home Cleaning', 'cleaning', 'Professional deep cleaning for your home', 500, 'session', 'home_cleaning', 1),
-('personal_assistant', 'Personal Assistant', 'personal', 'Secretarial tasks, errands, or just accompaniment', 300, 'hour', 'personal_assistant', 0),
-('companionship', 'Companionship', 'friend', 'Going to the doctor or sharing a meal together', 200, 'hour', 'companionship', 0);
+('wash_fold', 'Wash & Fold', 'laundry', 'Everyday laundry, washed and neatly folded', 59, 'piece', 'wash_fold', 2, 1),
+('dry_clean', 'Dry Clean', 'laundry', 'Premium care for delicate fabrics & suits', 129, 'piece', 'dry_clean', 3, 1),
+('iron_only', 'Iron Only', 'laundry', 'Perfectly pressed, ready to wear', 39, 'piece', 'iron_only', 1, 1),
+('wash_iron', 'Wash & Iron', 'laundry', 'Full service wash with professional pressing', 89, 'piece', 'wash_iron', 2, 1),
+('home_cleaning', 'Home Cleaning', 'cleaning', 'Professional deep cleaning for your home', 500, 'session', 'home_cleaning', 1, 0),
+('personal_assistant', 'Personal Assistant', 'personal', 'Secretarial tasks, errands, or just accompaniment', 300, 'hour', 'personal_assistant', 0, 0),
+('companionship', 'Companionship', 'friend', 'Going to the doctor or sharing a meal together', 200, 'hour', 'companionship', 0, 0);
 
 -- Coupons Table
 CREATE TABLE IF NOT EXISTS coupons (

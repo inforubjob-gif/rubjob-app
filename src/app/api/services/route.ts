@@ -17,7 +17,7 @@ export async function GET(req: Request) {
 
     const { results } = await db.prepare(`
       SELECT * FROM services 
-      WHERE isActive = 1
+      WHERE isActive = 1 AND category = 'laundry'
       ORDER BY category ASC, name ASC
     `).all();
 

@@ -19,8 +19,8 @@ export async function GET(req: Request) {
     const db = getRequestContext().env.DB;
     if (!db) return NextResponse.json({ error: "D1 not found" }, { status: 500 });
 
-    // Fetch all master services
-    const { results: masterServices } = await db.prepare("SELECT * FROM services WHERE isActive = 1").all();
+    // Fetch all master laundry services
+    const { results: masterServices } = await db.prepare("SELECT * FROM services WHERE isActive = 1 AND category = 'laundry'").all();
     
     // Fetch store overrides
     const { results: overrides } = await db.prepare("SELECT * FROM store_services WHERE storeId = ?").bind(storeId).all();

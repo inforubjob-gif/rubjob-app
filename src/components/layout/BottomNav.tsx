@@ -16,25 +16,9 @@ export default function BottomNav() {
   const pathname = usePathname();
   const { t } = useTranslation();
   
-  // State to handle subdomain detection on client side
-  const [subdomain, setSubdomain] = useState<string>("");
-
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const hostname = window.location.hostname;
-      if (hostname.includes("lvh.me")) {
-        setSubdomain(hostname.split(".lvh.me")[0] || "");
-      } else if (hostname.includes("rubjob.com")) {
-        setSubdomain(hostname.split(".rubjob.com")[0] || "");
-      } else if (hostname.includes("rubjob-app.pages.dev")) {
-        setSubdomain(hostname.split(".rubjob-app.pages.dev")[0] || "");
-      }
-    }
-  }, []);
-
-  const isStoreContext = subdomain === "store" || pathname.startsWith("/store");
-  const isRiderContext = subdomain === "rider" || pathname.startsWith("/rider");
-  const isAdminContext = subdomain === "admin" || pathname.startsWith("/admin");
+  const isStoreContext = pathname.startsWith("/store");
+  const isRiderContext = pathname.startsWith("/rider");
+  const isAdminContext = pathname.startsWith("/admin");
 
   // Hide on Admin portal always
   if (isAdminContext) return null;
@@ -43,16 +27,6 @@ export default function BottomNav() {
   if (pathname === "/store/login" || pathname === "/rider/login" || pathname.startsWith("/admin/login")) {
     return null;
   }
-
-  // Helper to get clean link for subdomains
-  const getLink = (path: string, type: "store" | "rider" | "user") => {
-    if (subdomain === type) {
-      // If we are on the subdomain, remove the prefix
-      // e.g. /store/orders -> /orders
-      return path.replace(`/${type}`, "") || "/";
-    }
-    return path;
-  };
 
   const USER_TABS: Tab[] = [
     {
@@ -111,22 +85,22 @@ export default function BottomNav() {
 
   const STORE_TABS: Tab[] = [
     {
-      href: getLink("/store", "store"),
+      href: "/store",
       label: t("store.navDashboard") || "Dashboard",
       icon: (active) => <Icons.Tasks size={24} strokeWidth={active ? 3 : 2} />,
     },
     {
-      href: getLink("/store/orders", "store"),
+      href: "/store/orders",
       label: t("store.navOrders") || "Orders",
       icon: (active) => <Icons.FileText size={24} strokeWidth={active ? 3 : 2} />,
     },
     {
-      href: getLink("/store/wallet", "store"),
+      href: "/store/wallet",
       label: t("store.navWallet") || "Wallet",
       icon: (active) => <Icons.Wallet size={24} strokeWidth={active ? 3 : 2} />,
     },
     {
-      href: getLink("/store/profile", "store"),
+      href: "/store/profile",
       label: t("store.navProfile") || "Profile",
       icon: (active) => <Icons.UserCog size={24} strokeWidth={active ? 3 : 2} />,
     },
@@ -134,22 +108,22 @@ export default function BottomNav() {
 
   const RIDER_TABS: Tab[] = [
     {
-      href: getLink("/rider", "rider"),
+      href: "/rider",
       label: t("rider.navDashboard") || "Tasks",
       icon: (active) => <Icons.Tasks size={24} strokeWidth={active ? 3 : 2} />,
     },
     {
-      href: getLink("/rider/orders", "rider"),
+      href: "/rider/orders",
       label: t("rider.navOrders") || "Orders",
       icon: (active) => <Icons.FileText size={24} strokeWidth={active ? 3 : 2} />,
     },
     {
-      href: getLink("/rider/wallet", "rider"),
+      href: "/rider/wallet",
       label: t("rider.navWallet") || "Earnings",
       icon: (active) => <Icons.Wallet size={24} strokeWidth={active ? 3 : 2} />,
     },
     {
-      href: getLink("/rider/profile", "rider"),
+      href: "/rider/profile",
       label: t("rider.navProfile") || "Profile",
       icon: (active) => <Icons.UserCog size={24} strokeWidth={active ? 3 : 2} />,
     },
@@ -161,7 +135,6 @@ export default function BottomNav() {
     <nav className={`fixed bottom-0 left-0 right-0 z-50 bg-primary border-primary-dark/20 border-t shadow-[0_-8px_30px_rgba(255,159,28,0.25)] pb-[env(safe-area-inset-bottom,0px)]`}>
       <div className={`flex items-center justify-around h-16 max-w-lg mx-auto px-2 text-white/70`}>
         {tabs.map((tab) => {
-          // Fix active state logic for subdomains
           const isActive = (tab.href === "/" || tab.href === "/store" || tab.href === "/rider") 
             ? pathname === tab.href 
             : pathname.startsWith(tab.href);
@@ -175,7 +148,7 @@ export default function BottomNav() {
               className={`relative flex flex-col items-center justify-center gap-1 flex-1 h-full transition-all duration-300 ${
                 isActive 
                   ? "text-white drop-shadow-md" 
-                  : "text-white/70 hover:text-white/90"
+                   : "text-white/70 hover:text-white/90"
               }`}
             >
               <div className={`flex items-center justify-center p-1.5 rounded-2xl transition-all ${
