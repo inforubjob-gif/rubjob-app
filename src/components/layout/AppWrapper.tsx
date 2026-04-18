@@ -14,7 +14,14 @@ export default function AppWrapper({ children }: { children: React.ReactNode }) 
   const isBackoffice = typeof window !== "undefined" && (
     window.location.pathname.startsWith("/admin") || 
     window.location.pathname.startsWith("/rider") || 
-    window.location.pathname.startsWith("/store")
+    window.location.pathname.startsWith("/store") ||
+    window.location.hostname.startsWith("admin.") ||
+    window.location.hostname.startsWith("rider.") ||
+    window.location.hostname.startsWith("store.") ||
+    // Support lvh.me for local development
+    window.location.hostname.includes("admin.lvh.me") ||
+    window.location.hostname.includes("rider.lvh.me") ||
+    window.location.hostname.includes("store.lvh.me")
   );
 
   // Check if user has completed onboarding (has phone + at least 1 address)

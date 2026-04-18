@@ -117,7 +117,10 @@ export default function RiderDashboard() {
     }
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    try {
+      await fetch("/api/rider/logout", { method: "POST" });
+    } catch (e) {}
     localStorage.removeItem("rubjob_rider_session");
     router.push("/rider/login");
   };

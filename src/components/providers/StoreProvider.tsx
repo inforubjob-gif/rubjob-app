@@ -33,6 +33,8 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       if (res.ok) {
         const data = await res.json();
         setStore(data.store);
+        // Inject for backward compatibility with old store UI components
+        localStorage.setItem("rubjob_store_session", JSON.stringify(data.store));
       } else {
         setStore(null);
       }
@@ -45,13 +47,12 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   }
 
   const logout = async () => {
-    // Clear the token cookie by setting a blank cookie or just redirecting 
-    // to a route that handles logout if we had one.
-    // For now, we'll just clear the state and redirect.
-    // We could add an /api/store/logout if needed.
+    try {
+      await fetch("/api/store/logout", { method: "POST" });
+    } catch (e) {}
+    localStorage.removeItem("rubjob_store_session");
     setStore(null);
-    router.push("/");
-    window.location.reload();
+    router.push("/store/login");
   };
 
   return (

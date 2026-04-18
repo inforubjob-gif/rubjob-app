@@ -167,7 +167,10 @@ export default function RiderProfilePage() {
         <section>
           <p className="text-[10px] font-black text-slate-300 uppercase tracking-[0.25em] mb-4 pl-1">{t("rider.profile.account")}</p>
           <button 
-            onClick={() => {
+            onClick={async () => {
+              try {
+                await fetch("/api/rider/logout", { method: "POST" });
+              } catch (e) {}
               localStorage.removeItem("rubjob_rider_session");
               router.push("/rider/login");
             }}

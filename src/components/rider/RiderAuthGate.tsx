@@ -17,6 +17,9 @@ export default function RiderAuthGate({ children }: { children: React.ReactNode 
       try {
         const res = await fetch("/api/rider/me");
         if (res.ok) {
+          const data = await res.json() as { rider: any };
+          // Inject session into localStorage for backward compatibility with rider UI components
+          localStorage.setItem("rubjob_rider_session", JSON.stringify(data.rider));
           setIsAuthenticated(true);
         } else {
           setIsAuthenticated(false);
