@@ -7,7 +7,7 @@ import AppWrapper from "@/components/layout/AppWrapper";
 import BottomNav from "@/components/layout/BottomNav";
 
 export const metadata: Metadata = {
-  title: "RUBJOB — Laundry & Life Service",
+  title: "Rubjob - ผู้จัดการชีวิต Life Operator",
   description:
     "Professional laundry pickup & delivery. Book, track, and manage your laundry from LINE.",
   keywords: ["laundry", "pickup", "delivery", "LINE", "RUBJOB"],

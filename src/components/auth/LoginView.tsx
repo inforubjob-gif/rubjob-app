@@ -43,7 +43,7 @@ export default function LoginView() {
       {/* Footer to match Rider look */}
       <div className="absolute bottom-8 left-0 right-0 text-center px-6">
         <p className="text-xs text-slate-400 font-bold uppercase leading-relaxed drop-shadow-sm">
-          RUBJOB — LAUNDRY & LIFE SERVICE
+          RUBJOB - ผู้จัดการชีวิต LIFE OPERATOR
         </p>
       </div>
     </div>
