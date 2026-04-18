@@ -173,6 +173,7 @@ export default function RiderDashboard() {
                   </div>
                   <div>
                       <p className="text-xs font-black text-white/50 uppercase tracking-widest leading-none mb-1">{t("rider.profile.workStatus")}</p>
+                      <p className="text-sm font-black uppercase tracking-tight">
                         {workStatus ? t("rider.profile.receivingJobs") : t("rider.profile.notReceiving")}
                       </p>
                   </div>

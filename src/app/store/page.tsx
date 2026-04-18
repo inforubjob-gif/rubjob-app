@@ -230,6 +230,35 @@ export default function StoreDashboard() {
                   <div className="flex gap-2 mt-4 pt-4 border-t border-slate-50">
                     <Button 
                       variant="outline" 
+                      className="flex-1 rounded-xl text-xs font-black uppercase tracking-widest py-3 border-2"
+                      onClick={() => router.push(`/store/orders/${order.id}`)}
+                    >
+                      {t("common.details")}
+                    </Button>
+                    {activeTab === "incoming" && (
+                      <Button 
+                        className="flex-[2] bg-blue-600 text-white rounded-xl text-xs font-black uppercase tracking-widest py-3"
+                        isLoading={isSubmitting}
+                        onClick={() => handleUpdateStatus(order.id, "washing")}
+                      >
+                        {t("store.receiveFromDriver")}
+                      </Button>
+                    )}
+                    {activeTab === "washing" && (
+                      <Button 
+                        className="flex-[2] bg-primary text-white rounded-xl text-xs font-black uppercase tracking-widest py-3"
+                        isLoading={isSubmitting}
+                        onClick={() => handleUpdateStatus(order.id, "ready_for_pickup")}
+                      >
+                        {t("common.confirm")}
+                      </Button>
+                    )}
+                    {activeTab === "ready" && (
+                      <Button 
+                        className="flex-[2] bg-emerald-600 text-white rounded-xl text-xs font-black uppercase tracking-widest py-3"
+                        isLoading={isSubmitting}
+                        onClick={() => handleUpdateStatus(order.id, "completed")}
+                      >
                         {t("store.handoverToDriver")}
                       </Button>
                     )}
