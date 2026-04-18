@@ -136,6 +136,9 @@ export default function RiderDashboard() {
 
   return (
     <div className="flex flex-col min-h-screen bg-slate-50 relative overflow-hidden">
+      {/* Background Gradient Layer */}
+      <div className="absolute top-0 left-0 right-0 h-[380px] bg-gradient-to-b from-primary via-primary to-slate-50 z-0" />
+
       {/* Dashboard Mascot Accent */}
       <div className="fixed -bottom-20 -right-20 w-80 opacity-[0.04] pointer-events-none select-none z-0 rotate-12 group hover:opacity-[0.08] transition-opacity">
         <img src="/images/มาสคอต-ขี่รถ.png" alt="" />
@@ -147,11 +150,11 @@ export default function RiderDashboard() {
           <div className="flex items-center gap-4">
             <Icons.Logo variant="icon-white" size={56} />
             <div className="min-w-0">
-              <p className="text-[10px] text-white font-black uppercase tracking-[0.25em] leading-tight mb-2 flex items-center gap-2">
+              <p className="text-xs text-white font-black uppercase tracking-[0.25em] leading-tight mb-2 flex items-center gap-2">
                 <span className="w-1.5 h-1.5 rounded-full bg-white/50 animate-pulse" />
                 {t("rider.hero")}
               </p>
-              <h1 className="text-2xl font-black text-white tracking-tight truncate drop-shadow-md leading-none">{rider?.name || t("common.guest")}</h1>
+              <h1 className="text-3xl font-black text-white tracking-tight truncate drop-shadow-md leading-none">{rider?.name || t("common.guest")}</h1>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -169,8 +172,7 @@ export default function RiderDashboard() {
                       <Icons.Shield size={20} />
                   </div>
                   <div>
-                      <p className="text-[10px] font-black text-white/50 uppercase tracking-widest leading-none mb-1">{t("rider.profile.workStatus")}</p>
-                      <p className="text-sm font-black uppercase tracking-tight">
+                      <p className="text-xs font-black text-white/50 uppercase tracking-widest leading-none mb-1">{t("rider.profile.workStatus")}</p>
                         {workStatus ? t("rider.profile.receivingJobs") : t("rider.profile.notReceiving")}
                       </p>
                   </div>
@@ -186,12 +188,12 @@ export default function RiderDashboard() {
 
         <div className="grid grid-cols-2 gap-4 text-center">
           <div className="bg-white/10 backdrop-blur-md p-4 rounded-xl border border-white/10">
-            <p className="text-[10px] font-black text-white/50 uppercase tracking-widest">{t("rider.tasksToday")}</p>
+            <p className="text-xs font-black text-white/50 uppercase tracking-widest">{t("rider.tasksToday")}</p>
             <p className="text-2xl font-black mt-1 text-white">{activeJobs.length}</p>
           </div>
           <div className="bg-white/10 backdrop-blur-md p-4 rounded-xl border border-white/10">
-            <p className="text-[10px] font-black text-white/50 uppercase tracking-widest">{t("rider.earnings")}</p>
-            <p className="text-2xl font-black mt-1 text-white">
+            <p className="text-xs font-black text-white/50 uppercase tracking-widest">{t("rider.earnings")}</p>
+            <p className="text-3xl font-black mt-1 text-white">
               ฿{balance.toLocaleString()}
             </p>
           </div>
@@ -203,7 +205,7 @@ export default function RiderDashboard() {
         <div className="bg-slate-100 p-1.5 rounded-xl flex shadow-inner border border-slate-200/50">
           <button
             onClick={() => setActiveTab("available")}
-            className={`flex-1 py-3 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all ${
+            className={`flex-1 py-3 text-xs font-black uppercase tracking-widest rounded-xl transition-all ${
               activeTab === "available" ? "bg-white text-primary shadow-lg scale-[1.02]" : "text-slate-400 hover:text-slate-600"
             }`}
           >
@@ -211,7 +213,7 @@ export default function RiderDashboard() {
           </button>
           <button
             onClick={() => setActiveTab("active")}
-            className={`flex-1 py-3 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all ${
+            className={`flex-1 py-3 text-xs font-black uppercase tracking-widest rounded-xl transition-all ${
               activeTab === "active" ? "bg-white text-primary shadow-lg scale-[1.02]" : "text-slate-400 hover:text-slate-600"
             }`}
           >
@@ -326,7 +328,7 @@ export default function RiderDashboard() {
                    <div className="w-10 h-10 bg-black rounded-xl border-4 border-white shadow-xl flex items-center justify-center text-white">
                       <Icons.Logo size={20} variant="icon" />
                    </div>
-                   <p className="text-[10px] font-black mt-2 uppercase tracking-tighter opacity-50">{t("common.store")}</p>
+                   <p className="text-xs font-black mt-2 uppercase tracking-tighter opacity-50">{t("common.store")}</p>
                 </div>
 
                 <div className="flex-1 px-4 relative">
@@ -342,7 +344,7 @@ export default function RiderDashboard() {
                    <div className="w-10 h-10 bg-primary rounded-xl border-4 border-white shadow-xl flex items-center justify-center text-white">
                       <Icons.MapPin size={20} strokeWidth={3} />
                    </div>
-                   <p className="text-[10px] font-black mt-2 uppercase tracking-tighter opacity-50">{t("common.user")}</p>
+                   <p className="text-xs font-black mt-2 uppercase tracking-tighter opacity-50">{t("common.user")}</p>
                 </div>
              </div>
 
@@ -354,12 +356,12 @@ export default function RiderDashboard() {
                      </div>
                      <div>
                         <p className="text-sm font-black text-slate-900 uppercase">{selectedJob.userName || selectedJob.customer || t("common.guest")}</p>
-                        <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{selectedJob.id}</p>
+                        <p className="text-xs text-slate-400 font-bold uppercase tracking-widest">{selectedJob.id}</p>
                      </div>
                   </div>
                   <div className="text-right">
                      <p className="text-xl font-black text-slate-900 leading-none">฿{selectedJob.riderEarn || selectedJob.deliveryFee}</p>
-                     <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">{t("rider.earnAmountLabel")}</p>
+                     <p className="text-xs text-slate-400 font-bold uppercase tracking-widest mt-1">{t("rider.earnAmountLabel")}</p>
                   </div>
                </div>
 
@@ -376,7 +378,7 @@ export default function RiderDashboard() {
                     <div className="flex-1">
                        <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest mb-1">{t("rider.delivery")}</p>
                        <p className="text-xs font-black text-slate-900 leading-relaxed">{selectedJob.customerName || selectedJob.customer || t("rider.unknownCustomer")}</p>
-                       <p className="text-[10px] text-slate-400 font-bold mt-1">{selectedJob.address || t("rider.orderDetail.noAddress")}</p>
+                       <p className="text-xs text-slate-400 font-bold mt-1">{selectedJob.address || t("rider.orderDetail.noAddress")}</p>
                     </div>
                  </div>
                </div>
@@ -410,8 +412,8 @@ function AvailableDeliveries({ t, router, jobs, onAccept, onViewDetails }: { t: 
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between px-1">
-        <h2 className="text-sm font-black text-slate-400 uppercase tracking-widest">{t("rider.newRequests")}</h2>
-        <span className="text-[10px] font-bold bg-green-100 text-green-700 px-2 py-0.5 rounded-full">{jobs.length} {t("rider.nearby")}</span>
+        <h2 className="text-base font-black text-slate-400 uppercase tracking-widest">{t("rider.newRequests")}</h2>
+        <span className="text-xs font-bold bg-green-100 text-green-700 px-2 py-0.5 rounded-full">{jobs.length} {t("rider.nearby")}</span>
       </div>
 
       {jobs.length === 0 ? (
@@ -419,7 +421,7 @@ function AvailableDeliveries({ t, router, jobs, onAccept, onViewDetails }: { t: 
            <div className="w-20 h-20 bg-slate-50 rounded-xl flex items-center justify-center mb-4 transition-all hover:scale-105 border border-slate-100 grayscale opacity-40">
               <Icons.Logo variant="icon" size={40} />
            </div>
-           <p className="text-[10px] font-black text-slate-300 uppercase tracking-[0.2em]">{t("rider.noJobsNearby")}</p>
+           <p className="text-xs font-black text-slate-300 uppercase tracking-[0.2em]">{t("rider.noJobsNearby")}</p>
         </div>
       ) : (
         jobs.map((job) => (
@@ -430,10 +432,10 @@ function AvailableDeliveries({ t, router, jobs, onAccept, onViewDetails }: { t: 
               </div>
               <div className="flex-1">
                 <div className="flex items-center gap-1.5 mb-1">
-                  <span className={`text-[8px] font-black px-1.5 py-0.5 rounded-lg uppercase tracking-tighter ${job.status === 'pending' ? 'bg-blue-100 text-blue-700' : 'bg-orange-100 text-orange-700'}`}>
+                  <span className={`text-[11px] font-black px-1.5 py-0.5 rounded-lg uppercase tracking-tighter ${job.status === 'pending' ? 'bg-blue-100 text-blue-700' : 'bg-orange-100 text-orange-700'}`}>
                     {job.status === 'pending' ? t("rider.flow.pickupLeg") : t("rider.flow.deliveryLeg")}
                   </span>
-                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{job.id}</span>
+                  <span className="text-xs font-black text-slate-400 uppercase tracking-widest">{job.id}</span>
                 </div>
                 <h3 className="font-bold text-slate-900 mb-1 leading-tight">
                   {job.status === 'pending' ? t("rider.flow.customerToStore") : t("rider.flow.storeToCustomer")}
@@ -485,7 +487,7 @@ function ActiveDeliveries({ t, router, activeJobs }: { t: any, router: any, acti
                 {getServiceIcon(job.serviceId as any, { size: 24 })}
               </div>
               <div className="flex-1 border-r border-slate-100 mr-2 pr-2">
-                <p className="text-[10px] font-black text-slate-400 uppercase tracking-tighter">{job.id}</p>
+                <p className="text-xs font-black text-slate-400 uppercase tracking-tighter">{job.id}</p>
                 <h3 className="text-sm font-bold text-slate-900 leading-tight truncate">{job.storeName}</h3>
               </div>
               <div className="text-right min-w-[80px]">

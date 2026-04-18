@@ -35,6 +35,7 @@ export const en = {
     done: "Done",
     processing: "Washing / Processing...",
     pending: "Pending",
+    remove: "Remove",
   },
   home: {
     activeOrders: "Active Orders",
@@ -192,6 +193,20 @@ export const en = {
     pinned: "Pinned!",
     addressRequired: "Label and full address are required",
   },
+  customer: {
+    wallet: {
+      pin: {
+        title: "Security PIN",
+        setupTitle: "Set Your Security PIN",
+        enterTitle: "Enter PIN to Access Info",
+        error: "Incorrect PIN. Please try again.",
+        setupSuccess: "PIN Setup Successful",
+        confirmPin: "Confirm Your PIN",
+        mismatch: "PINs do not match",
+        instruction: "6-digit code for your personal security",
+      }
+    },
+  },
   booking: {
     pickupTitle: "Pickup Details",
     pickupAddress: "Pickup Address",
@@ -225,6 +240,9 @@ export const en = {
       systemClosedTitle: "System Closed",
       systemClosedDesc: "Maintenance or outside business hours.\nPlease come back later.",
     },
+    minSpend: "Min",
+    expires: "Expires",
+    off: "Off",
     pickupSelectTime: "Select Pickup Date & Time (7:00–17:00)",
     paymentDoneNote: "Press button below after payment is completed",
     identifyPhone: "Enter phone number for pickup contact",

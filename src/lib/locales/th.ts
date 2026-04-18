@@ -40,6 +40,7 @@ export const th = {
       activate: "เปิดใช้งาน",
       suspend: "ระงับการใช้งาน",
       review: "ตรวจสอบ",
+      remove: "นำออก",
     },
     home: {
       activeOrders: "ออเดอร์ปัจจุบัน",
@@ -251,6 +252,20 @@ export const th = {
       pinned: "ปักหมุดแล้ว!",
       addressRequired: "กรุณาระบุป้ายกำกับและที่อยู่ให้ครบถ้วน",
     },
+    customer: {
+      wallet: {
+        pin: {
+          title: "รหัสความปลอดภัย",
+          setupTitle: "ตั้งรหัส PIN ความปลอดภัย",
+          enterTitle: "กรุณาใส่รหัส PIN เพื่อเข้าถึงข้อมูล",
+          error: "รหัส PIN ไม่ถูกต้อง กรุณาลองอีกครั้ง",
+          setupSuccess: "ตั้งค่ารหัส PIN สำเร็จ",
+          confirmPin: "ยืนยันรหัส PIN อีกครั้ง",
+          mismatch: "รหัส PIN ไม่ตรงกัน",
+          instruction: "รหัส 6 หลักสำหรับความปลอดภัยส่วนตัว",
+        }
+      },
+    },
     booking: {
       pickupTitle: "รายละเอียดการรับผ้า",
       pickupAddress: "ที่อยู่รับผ้า",
@@ -282,6 +297,11 @@ export const th = {
         systemClosedTitle: "ขออภัย ระบบปิดให้บริการชั่วคราว",
         systemClosedDesc: "ขณะนี้แอดมินกำลังปรับปรุงระบบ หรือนอกเวลาทำการ\nกรุณากลับมาใหม่อีกครั้งในภายหลังครับ",
       },
+      selectCoupon: "เลือกใช้คูปองส่วนลด",
+      noCoupons: "ขณะนี้ยังไม่มีคูปองที่ใช้งานได้",
+      minSpend: "ขั้นต่ำ",
+      expires: "หมดอายุ",
+      off: "ส่วนลด",
       pickupSelectTime: "เลือกวันและเวลาเข้ารับผ้า (7:00–17:00)",
       paymentDoneNote: "กดปุ่มด้านล่างหลังชำระเงินเสร็จสิ้น",
       identifyPhone: "ระบุเบอร์โทรศัพท์เพื่อติดต่อรับผ้า",

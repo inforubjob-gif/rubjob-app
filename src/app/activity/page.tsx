@@ -32,9 +32,9 @@ export default function ActivityPage() {
 
   return (
     <div className="flex flex-col min-h-dvh">
-      <header className="bg-white px-5 pt-12 pb-4 border-b border-border sticky top-0 z-30">
-        <h1 className="text-xl font-bold text-foreground">Activity</h1>
-        <p className="text-xs text-muted mt-0.5">Your recent activity and history</p>
+      <header className="bg-white px-5 pt-6 pb-4 border-b border-border sticky top-0 z-30">
+        <h1 className="text-2xl font-black text-foreground">{t("home.navOrders")}</h1>
+        <p className="text-sm text-muted mt-0.5">{t("orders.noOrdersSub").replace("{tab}", "")}</p>
       </header>
 
       <div className="flex-1 px-5 py-4 space-y-3 animate-fade-in stagger">
@@ -52,15 +52,15 @@ export default function ActivityPage() {
                       {t(`orders.status.${order.status}`)}
                     </Badge>
                   </div>
-                  <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest leading-none">
-                    {time.toLocaleDateString("en", {
+                  <p className="text-xs text-slate-400 font-bold uppercase tracking-widest leading-none">
+                    {time.toLocaleDateString("th-TH", {
                       month: "short",
                       day: "numeric",
                       hour: "2-digit",
                       minute: "2-digit",
                     })}
                   </p>
-                  <p className="text-[11px] text-slate-500 font-medium">
+                  <p className="text-xs text-slate-500 font-medium">
                     {order.items.length} {t("orders.itemCount")} • ฿{order.totalPrice}
                   </p>
                 </div>

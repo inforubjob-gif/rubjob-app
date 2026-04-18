@@ -50,7 +50,7 @@ export default function OrdersPage() {
       <div className="absolute top-0 left-0 right-0 h-[300px] bg-gradient-to-b from-primary via-primary to-slate-50 z-0" />
 
       {/* Header */}
-      <header className="relative z-30 px-5 pt-12 pb-4 transition-all">
+      <header className="relative z-30 px-5 pt-6 pb-4 transition-all">
         <div className="flex items-center gap-3 mb-5">
           <button
             onClick={() => router.back()}

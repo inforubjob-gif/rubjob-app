@@ -380,7 +380,7 @@ function BookingFlow() {
   return (
     <div className="flex flex-col min-h-dvh">
       {/* Header */}
-      <header className="bg-white px-5 pt-12 pb-4 border-b border-border sticky top-0 z-30">
+      <header className="bg-white px-5 pt-6 pb-4 border-b border-border sticky top-0 z-30">
         <div className="flex items-center gap-3">
           <button
             onClick={() => {
@@ -437,10 +437,10 @@ function BookingFlow() {
                   <h3 className="text-base font-black text-foreground">{t(`orders.services.${svc.id}`) || svc.name}</h3>
                   <p className="text-xs text-muted mt-1 leading-relaxed opacity-90">{t(`serviceDesc.${svc.id}`) || svc.description}</p>
                   <div className="flex items-center gap-2 mt-2">
-                    <span className="text-[11px] font-black text-primary-dark bg-primary/10 px-2 py-0.5 rounded-md">
+                    <span className="text-xs font-black text-primary-dark bg-primary/10 px-2 py-0.5 rounded-md">
                       {t("booking.fromPrice")} ฿{svc.basePrice}/{unitLabel}
                     </span>
-                    <span className="text-[10px] font-bold text-slate-400">
+                    <span className="text-xs font-bold text-slate-400">
                       ~{svc.estimatedDays} {t("booking.dayTurnaround")}
                     </span>
                   </div>
@@ -626,6 +626,9 @@ function BookingFlow() {
                 <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
                   <Icons.Ticket size={18} className="text-primary" /> {t("booking.discountsTitle")}
                 </h3>
+              </div>
+              
+              <Card className="p-4 mb-4">
                 <button 
                   onClick={async () => {
                     setIsCouponModalOpen(true);
@@ -640,13 +643,19 @@ function BookingFlow() {
                       setIsLoadingCoupons(false);
                     }
                   }}
-                  className="text-xs font-bold text-primary active:opacity-60 transition-opacity"
+                  className="w-full mb-4 bg-primary/5 hover:bg-primary/10 border-2 border-dashed border-primary/20 rounded-xl p-3 flex items-center justify-between group transition-all"
                 >
-                  {t("booking.selectCoupon")}
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center shadow-sm text-primary group-active:scale-95 transition-transform">
+                      <Icons.Ticket size={20} />
+                    </div>
+                    <div className="text-left">
+                      <p className="text-[13px] font-black text-primary-dark uppercase tracking-tight leading-none">{t("booking.selectCoupon")}</p>
+                      <p className="text-[10px] text-primary/60 font-bold mt-1 uppercase leading-none">{t("booking.promoLabel")}</p>
+                    </div>
+                  </div>
+                  <Icons.ChevronRight size={18} className="text-primary/40 group-hover:text-primary transition-colors" />
                 </button>
-              </div>
-              
-              <Card className="p-4 mb-4">
                 <div className="flex gap-2 mb-4">
                   <input 
                     type="text" 
@@ -684,7 +693,7 @@ function BookingFlow() {
                 </div>
                 
                 {appliedCoupon && (
-                  <div className="bg-emerald-50 text-emerald-600 text-[11px] font-bold px-3 py-2.5 rounded-xl flex items-center justify-between mb-4 border border-emerald-100 shadow-sm">
+                  <div className="bg-emerald-50 text-emerald-600 text-[11px] font-bold px-3 py-2.5 rounded-xl flex items-center justify-between mb-4 border border-emerald-100 shadow-sm animate-in fade-in slide-in-from-top-2">
                     <span className="flex items-center gap-1.5">{t("booking.couponApplied").replace("{code}", appliedCoupon.code)}</span>
                     <button onClick={() => { setAppliedCoupon(null); setCouponCode(""); }} className="text-emerald-700 underline underline-offset-2">{t("common.remove")}</button>
                   </div>
@@ -694,7 +703,7 @@ function BookingFlow() {
                   <div className="flex flex-col">
                     <div className="flex items-center gap-2">
                       <span className="text-sm font-bold text-foreground">{t("booking.usePoints")}</span>
-                      <span className="text-[10px] bg-amber-100 text-amber-700 px-2 py-0.5 rounded-md font-black">{availablePoints} Pts</span>
+                      <span className="text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-md font-black">{availablePoints} Pts</span>
                     </div>
                     <span className="text-xs text-muted mt-0.5">{t("booking.pointsDesc")}</span>
                   </div>
@@ -736,7 +745,7 @@ function BookingFlow() {
                       )}
                     </div>
                     <div className="flex items-center justify-between mt-3 pt-2 border-t border-slate-100 pl-5 text-[11px]">
-                      <span className="text-slate-400 font-bold uppercase tracking-wider">{t("booking.summary.subtotalLaundry")}</span>
+                      <span className="text-xs text-slate-400 font-bold uppercase tracking-wider">{t("booking.summary.subtotalLaundry")}</span>
                       <span className="font-black text-slate-700">฿{laundryFee}</span>
                     </div>
                   </div>
@@ -805,7 +814,7 @@ function BookingFlow() {
                   </div>
                   <div>
                     <h3 className="text-sm font-bold text-foreground">{t(`orders.services.${service?.id}`) || service?.name}</h3>
-                    <p className="text-[11px] text-muted">~{service?.estimatedDays} {t("booking.dayTurnaround")}</p>
+                    <p className="text-xs text-muted">~{service?.estimatedDays} {t("booking.dayTurnaround")}</p>
                   </div>
                 </div>
 
@@ -863,10 +872,10 @@ function BookingFlow() {
                 
                 <div className="text-center">
                   <div className="flex items-baseline justify-center gap-1">
-                    <span className="text-xs font-bold text-muted">{t("booking.amountDue")}</span>
+                    <span className="text-sm font-bold text-muted">{t("booking.amountDue")}</span>
                     <span className="text-2xl font-black text-foreground">฿{totalPrice}.00</span>
                   </div>
-                  <p className="text-[10px] text-primary-dark font-bold mt-1 uppercase tracking-wider">
+                  <p className="text-xs text-primary-dark font-bold mt-1 uppercase tracking-wider">
                     {paymentQR ? t("booking.paymentDoneNote") : t("booking.instantConfirmation")}
                   </p>
                 </div>
@@ -875,7 +884,7 @@ function BookingFlow() {
 
             <div className="flex items-center justify-center gap-2 py-2 opacity-50 mt-4">
               <Icons.Shield size={14} className="text-green-600" />
-              <span className="text-[10px] font-bold uppercase tracking-widest text-foreground">{t("orders.payment.secure")}</span>
+              <span className="text-xs font-bold uppercase tracking-widest text-foreground">{t("orders.payment.secure")}</span>
             </div>
           </div>
         )}
@@ -890,7 +899,7 @@ function BookingFlow() {
             <div className="w-8 h-8 bg-rose-100 text-rose-600 rounded-full flex items-center justify-center shrink-0">
                <Icons.Info size={16} />
             </div>
-            <p className="text-[11px] font-black text-rose-600 uppercase tracking-tight">
+            <p className="text-xs font-black text-rose-600 uppercase tracking-tight">
               {t("booking.errors.minOrderRemaining")
                 .replace("{amount}", minOrderAmount.toString())
                 .replace("{needed}", (minOrderAmount - totalPrice).toString())}
@@ -912,7 +921,7 @@ function BookingFlow() {
           <div className="space-y-3">
             {!profile?.phone && (
               <div className="bg-amber-50 border border-amber-100 p-3 rounded-xl">
-                <p className="text-[11px] font-bold text-amber-700 mb-2">{t("booking.identifyPhone")}</p>
+                <p className="text-xs font-bold text-amber-700 mb-2">{t("booking.identifyPhone")}</p>
                 <input 
                   type="tel" 
                   placeholder="081-234-5678" 
@@ -970,15 +979,22 @@ function BookingFlow() {
       
       {/* Coupon Selection Modal */}
       <Modal isOpen={isCouponModalOpen} onClose={() => setIsCouponModalOpen(false)} title={t("booking.selectCoupon")}>
-         <div className="space-y-4 pt-2">
+         <div className="space-y-3 pt-2">
             {isLoadingCoupons && (
-               <div className="flex justify-center py-10">
-                  <div className="w-8 h-8 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
+               <div className="flex flex-col items-center justify-center py-20 gap-3">
+                  <div className="w-10 h-10 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
+                  <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">{t("common.loading")}</p>
                </div>
             )}
             {!isLoadingCoupons && availableCoupons.length === 0 && (
-               <div className="text-center py-10 text-slate-400 italic font-medium">
-                  {t("booking.noCoupons")}
+               <div className="text-center py-20 px-10 flex flex-col items-center gap-4">
+                  <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center text-slate-300">
+                    <Icons.Ticket size={32} />
+                  </div>
+                  <div>
+                    <p className="text-sm font-black text-slate-500">{t("booking.noCoupons")}</p>
+                    <p className="text-[11px] text-slate-400 mt-1">{t("promotions.subtitle")}</p>
+                  </div>
                </div>
             )}
             {availableCoupons.map((cpn) => (
@@ -987,7 +1003,6 @@ function BookingFlow() {
                   onClick={async () => {
                      setCouponCode(cpn.code);
                      setIsCouponModalOpen(false);
-                     // Auto-apply logic
                      try {
                         const res = await fetch("/api/coupons/validate", {
                            method: "POST",
@@ -1005,19 +1020,46 @@ function BookingFlow() {
                         showToast(`❌ ${t("booking.couponErrorGeneric")}`, "error");
                      }
                   }}
-                  className="w-full text-left"
+                  className="w-full relative group transition-transform active:scale-[0.98]"
                >
-                  <Card className="p-4 border-2 border-slate-100 hover:border-primary active:scale-[0.98] transition-all group">
-                     <div className="flex justify-between items-start mb-1">
-                        <span className="text-sm font-black text-slate-900">{cpn.title || cpn.code}</span>
-                        <span className="text-[10px] font-black text-primary uppercase bg-primary/5 px-2 py-0.5 rounded-lg">{cpn.code}</span>
-                     </div>
-                     <p className="text-xs text-slate-500 mb-3">{cpn.description || (cpn.type === 'percentage' ? `${cpn.value}% Off` : `฿${cpn.value} Off`)}</p>
-                     <div className="flex items-center justify-between text-[10px] font-bold text-slate-400">
-                        <span>Min Spend ฿{cpn.minOrder || 0}</span>
-                        {cpn.expiryDate && <span>Expires: {new Date(cpn.expiryDate).toLocaleDateString()}</span>}
-                     </div>
-                  </Card>
+                  {/* Ticket Container */}
+                  <div className="bg-white border-2 border-slate-100 rounded-2xl flex overflow-hidden shadow-sm group-hover:border-primary/30 transition-colors">
+                    {/* Left side: Discount Amount */}
+                    <div className="w-24 bg-primary/10 flex flex-col items-center justify-center border-r-2 border-dashed border-slate-100 relative">
+                      {/* Punch holes */}
+                      <div className="absolute top-0 right-0 translate-x-1/2 -translate-y-1/2 w-4 h-4 bg-white border-2 border-slate-100 rounded-full" />
+                      <div className="absolute bottom-0 right-0 translate-x-1/2 translate-y-1/2 w-4 h-4 bg-white border-2 border-slate-100 rounded-full" />
+                      
+                      <span className="text-xs font-black text-primary uppercase leading-none mb-1">{t("booking.off")}</span>
+                      <span className="text-2xl font-black text-primary-dark">
+                        {cpn.type === 'percentage' ? `${cpn.value}%` : `฿${cpn.value}`}
+                      </span>
+                    </div>
+
+                    {/* Right side: Details */}
+                    <div className="flex-1 p-4 text-left flex flex-col justify-between min-h-[100px]">
+                      <div>
+                        <div className="flex items-center justify-between mb-1">
+                          <h4 className="text-sm font-black text-slate-800 leading-tight">{cpn.title || cpn.code}</h4>
+                          <span className="text-[10px] font-black font-mono bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded uppercase">{cpn.code}</span>
+                        </div>
+                        <p className="text-[11px] font-bold text-slate-500 line-clamp-2">{cpn.description || t("promotions.subtitle")}</p>
+                      </div>
+
+                      <div className="flex items-center justify-between mt-3">
+                        <div className="flex flex-col">
+                          <span className="text-[9px] font-black text-slate-400 uppercase tracking-tighter leading-none">{t("booking.minSpend")}</span>
+                          <span className="text-[11px] font-black text-slate-600">฿{cpn.minOrder || 0}</span>
+                        </div>
+                        <div className="flex flex-col items-end">
+                          <span className="text-[9px] font-black text-slate-400 uppercase tracking-tighter leading-none">{t("booking.expires")}</span>
+                          <span className="text-[10px] font-bold text-amber-600">
+                            {cpn.expiryDate ? new Date(cpn.expiryDate).toLocaleDateString("th-TH", { day: 'numeric', month: 'short', year: '2-digit' }) : "∞"}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                </button>
             ))}
          </div>

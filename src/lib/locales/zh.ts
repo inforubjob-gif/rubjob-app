@@ -32,6 +32,7 @@ export const zh = {
     comingSoon: "敬请期待...",
     comingSoonDesc: "{service} 服务正在开发中，敬请期待！ ✨",
     gotIt: "知道了",
+    remove: "移除",
   },
   home: {
     activeOrders: "当前订单",
@@ -175,6 +176,20 @@ export const zh = {
     confirmLocation: "确认位置",
     pinned: "已标记！",
     addressRequired: "标签和详细地址是必填项",
+  },
+  customer: {
+    wallet: {
+      pin: {
+        title: "安全密码",
+        setupTitle: "设置您的安全密码",
+        enterTitle: "输入密码以访问信息",
+        error: "密码错误。请再试一次。",
+        setupSuccess: "密码设置成功",
+        confirmPin: "确认您的密码",
+        mismatch: "密码不匹配",
+        instruction: "6 位数字代码以保障您的个人隐私安全",
+      }
+    },
   },
   booking: {
     pickupTitle: "取件详情",

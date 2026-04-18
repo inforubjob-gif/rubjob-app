@@ -114,8 +114,8 @@ export default function StoreDashboard() {
           <div className="flex items-center gap-4">
             <Icons.Logo variant="icon-white" size={56} />
             <div className="min-w-0">
-               <p className="text-[10px] text-white/70 font-black uppercase tracking-[0.2em] leading-none mb-1 shadow-sm">{t("store.unitNo")} {store?.id?.split('-')[1] || '001'}</p>
-               <h1 className="text-2xl font-black text-white tracking-tight truncate drop-shadow-md">{store?.name || t("common.guest")}</h1>
+               <p className="text-xs text-white/70 font-black uppercase tracking-[0.2em] leading-none mb-1 shadow-sm">{t("store.unitNo")} {store?.id?.split('-')[1] || '001'}</p>
+               <h1 className="text-3xl font-black text-white tracking-tight truncate drop-shadow-md">{store?.name || t("common.guest")}</h1>
             </div>
           </div>
           <button 
@@ -129,13 +129,13 @@ export default function StoreDashboard() {
         <div className="grid grid-cols-2 gap-4 text-center">
           <div className="bg-white/10 backdrop-blur-lg p-5 rounded-xl border border-white/20 shadow-lg shadow-primary-dark/20 text-white">
             <p className="text-[10px] font-black text-white/50 uppercase tracking-[0.15em]">{t("store.navOrders")}</p>
-            <p className="text-3xl font-black mt-1 tracking-tighter">
+              <p className="text-4xl font-black mt-1 tracking-tighter">
               {incomingOrders.length + washingOrders.length + readyOrders.length}
             </p>
           </div>
           <div className="bg-white/10 backdrop-blur-lg p-5 rounded-xl border border-white/20 shadow-lg shadow-primary-dark/20 text-white">
             <p className="text-[10px] font-black text-white/50 uppercase tracking-[0.15em]">{t("store.wallet.availableBalance")}</p>
-            <p className="text-3xl font-black mt-1 tracking-tighter flex items-center justify-center gap-1">
+            <p className="text-4xl font-black mt-1 tracking-tighter flex items-center justify-center gap-1">
               <span className="text-sm">฿</span>{Math.floor(balance).toLocaleString()}
             </p>
           </div>
@@ -152,7 +152,7 @@ export default function StoreDashboard() {
                 </div>
           <div>
             <h3 className="text-sm font-black text-slate-900 uppercase tracking-tight">{t("store.profile.workStatus")}</h3>
-            <p className="text-[10px] text-emerald-500 font-bold uppercase">{workStatus ? t("store.profile.receivingJobs") : t("store.profile.notReceiving")}</p>
+            <p className="text-xs text-emerald-500 font-bold uppercase">{workStatus ? t("store.profile.receivingJobs") : t("store.profile.notReceiving")}</p>
           </div>
         </div>
         <button 
@@ -164,15 +164,15 @@ export default function StoreDashboard() {
       </div>
     </Card>
 
-        <div className="bg-white/40 backdrop-blur-xl p-1.5 rounded-xl flex shadow-lg shadow-primary-dark/10 border border-white/40">
+        <div className="bg-white/60 backdrop-blur-xl p-1.5 rounded-2xl flex shadow-xl shadow-primary-dark/5 border border-white/60">
           {(["incoming", "washing", "ready"] as const).map((tab) => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={`flex-1 flex items-center justify-center gap-1 py-3.5 text-[11px] leading-tight font-black uppercase tracking-[0.1em] rounded-[1.4rem] transition-all duration-500 ${
-                activeTab === tab ? "bg-white text-primary shadow-lg shadow-primary/20 scale-[1.02]" : "text-white/70"
-              }`}
-            >
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                className={`flex-1 flex items-center justify-center gap-1 py-3.5 text-xs leading-tight font-black uppercase tracking-[0.1em] rounded-[1.2rem] transition-all duration-500 ${
+                  activeTab === tab ? "bg-white text-primary shadow-xl shadow-primary/20 scale-[1.05]" : "text-primary-dark/40"
+                }`}
+              >
               <span>{tab === "incoming" ? t("store.incomingFromRider") : tab === "washing" ? t("store.processing") : t("store.readyForRider")}</span>
               {tab === "incoming" && incomingOrders.length > 0 && <span className="opacity-50">({incomingOrders.length})</span>}
             </button>
@@ -212,17 +212,17 @@ export default function StoreDashboard() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between mb-1">
-                        <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{order.id}</span>
+                        <span className="text-xs font-black text-slate-400 uppercase tracking-widest">{order.id}</span>
                         <Badge variant={statusToBadgeVariant(order.status)} className="scale-[0.8] origin-right">
                           {t(`orders.status.${order.status}`)}
                         </Badge>
                       </div>
-                      <h3 className="font-black text-slate-800 leading-tight text-sm truncate">
+                      <h3 className="font-black text-slate-800 leading-tight text-base truncate">
                         {String(t(`orders.services.${order.serviceId}`) || order.serviceName || t("rider.unknownStore"))}
                       </h3>
                       <div className="flex items-center gap-2 mt-1.5 grayscale opacity-60">
                         <div className="w-5 h-5 rounded-full bg-slate-200" />
-                        <span className="text-[10px] font-bold text-slate-500">{order.userName || t("common.guest")}</span>
+                        <span className="text-xs font-bold text-slate-500">{order.userName || t("common.guest")}</span>
                       </div>
                     </div>
                   </div>
@@ -230,35 +230,6 @@ export default function StoreDashboard() {
                   <div className="flex gap-2 mt-4 pt-4 border-t border-slate-50">
                     <Button 
                       variant="outline" 
-                      className="flex-1 rounded-xl text-[10px] font-black uppercase tracking-widest py-3 border-2"
-                      onClick={() => router.push(`/store/orders/${order.id}`)}
-                    >
-                      {t("common.details")}
-                    </Button>
-                    {activeTab === "incoming" && (
-                      <Button 
-                        className="flex-[2] bg-blue-600 text-white rounded-xl text-[10px] font-black uppercase tracking-widest py-3"
-                        isLoading={isSubmitting}
-                        onClick={() => handleUpdateStatus(order.id, "washing")}
-                      >
-                        {t("store.receiveFromDriver")}
-                      </Button>
-                    )}
-                    {activeTab === "washing" && (
-                      <Button 
-                        className="flex-[2] bg-primary text-white rounded-xl text-[10px] font-black uppercase tracking-widest py-3"
-                        isLoading={isSubmitting}
-                        onClick={() => handleUpdateStatus(order.id, "ready_for_pickup")}
-                      >
-                        {t("common.confirm")}
-                      </Button>
-                    )}
-                    {activeTab === "ready" && (
-                      <Button 
-                        className="flex-[2] bg-emerald-600 text-white rounded-xl text-[10px] font-black uppercase tracking-widest py-3"
-                        isLoading={isSubmitting}
-                        onClick={() => handleUpdateStatus(order.id, "completed")}
-                      >
                         {t("store.handoverToDriver")}
                       </Button>
                     )}

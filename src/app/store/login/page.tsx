@@ -47,77 +47,85 @@ export default function StoreLoginPage() {
   };
 
   return (
-    <div className="flex min-h-dvh w-full items-center justify-center bg-gradient-to-b from-primary via-primary to-slate-50 relative overflow-hidden p-6">
+    <div className="flex flex-col min-h-dvh bg-gradient-to-b from-primary via-primary to-slate-50 relative overflow-hidden p-6 pt-6">
       {/* Decorative Background */}
       <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-[100px] -mr-48 -mt-48" />
       <div className="absolute bottom-0 left-0 w-96 h-96 bg-black/5 rounded-full blur-[100px] -ml-48 -mb-48" />
 
-      <div className="bg-white rounded-[2.5rem] w-full max-w-md p-10 shadow-2xl relative overflow-hidden animate-in fade-in slide-in-from-bottom-8 duration-700">
-        
-        <div className="flex justify-center mb-8">
-          <Icons.Logo variant="icon-white" size={80} className="drop-shadow-xl" />
-        </div>
-        
-        <div className="text-center mb-10">
-          <h1 className="text-4xl font-black text-slate-900 tracking-tight leading-none drop-shadow-sm">
+      <div className="relative z-10 w-full max-w-sm mx-auto space-y-10">
+        <div className="text-center px-4">
+          <div className="mb-8 flex justify-center">
+            <Icons.Logo variant="icon-white" size={80} className="drop-shadow-2xl" />
+          </div>
+          <h1 className="text-5xl font-black text-white tracking-tight leading-none drop-shadow-lg">
             {t("store.loginPage.title")}
           </h1>
-          <p className="text-[10px] text-slate-400 mt-4 font-black uppercase tracking-[0.2em] bg-slate-50 py-1.5 px-6 rounded-full inline-block border border-slate-100 italic">
+          <p className="text-xs text-white/70 font-black uppercase tracking-[0.25em] mt-6 bg-white/10 backdrop-blur-sm py-1.5 px-6 rounded-full inline-block border border-white/10 italic">
             {t("store.loginPage.portal")}
           </p>
         </div>
 
-        <form onSubmit={handleLogin} className="space-y-6">
-          <div className="space-y-1.5">
-            <label className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] block ml-1">
-              {t("store.loginPage.emailLabel")}
-            </label>
-            <div className="relative">
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="branch@store.com"
-                className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-5 py-4 text-sm focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all font-bold text-slate-700"
-              />
+        <form onSubmit={handleLogin} className="space-y-5 bg-white/10 backdrop-blur-md p-2 rounded-2xl border border-white/20 shadow-2xl shadow-primary-dark/20">
+          <div className="bg-white rounded-[1.75rem] p-8 space-y-6 shadow-sm">
+            <div className="space-y-2">
+              <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">
+                {t("store.loginPage.emailLabel")}
+              </label>
+              <div className="relative">
+                <Icons.User size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" />
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="branch@store.com"
+                  className="w-full bg-slate-50 border-none rounded-xl pl-12 pr-4 py-4 text-base font-bold placeholder:text-slate-300 focus:ring-2 focus:ring-primary/20 transition-all text-slate-700"
+                />
+              </div>
             </div>
-          </div>
-          
-          <div className="space-y-1.5">
-            <label className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] block ml-1">
-              {t("store.loginPage.passwordLabel")}
-            </label>
-            <div className="relative">
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-5 py-4 text-sm focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all font-bold text-slate-700"
-              />
+            
+            <div className="space-y-2">
+              <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">
+                {t("store.loginPage.passwordLabel")}
+              </label>
+              <div className="relative">
+                <Icons.Lock size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" />
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  className="w-full bg-slate-50 border-none rounded-xl pl-12 pr-4 py-4 text-base font-bold placeholder:text-slate-300 focus:ring-2 focus:ring-primary/20 transition-all text-slate-700"
+                />
+              </div>
             </div>
-          </div>
 
-          {error && (
-            <div className="bg-rose-50 text-rose-600 p-4 rounded-xl flex items-center gap-3 border border-rose-100 animate-in fade-in duration-300">
-              <div className="w-2 h-2 rounded-full bg-rose-500 animate-pulse" />
-              <p className="text-xs font-bold">{error}</p>
-            </div>
-          )}
+            {error && (
+              <div className="bg-rose-50 text-rose-500 text-xs font-bold p-4 rounded-xl text-center border border-rose-100 animate-shake shadow-inner">
+                {error}
+              </div>
+            )}
 
-          <button
-            type="submit"
-            disabled={isLoggingIn}
-            className="w-full bg-slate-900 hover:bg-black text-white rounded-xl py-5 text-sm font-black shadow-xl shadow-slate-200 transition-all active:scale-[0.98] disabled:opacity-50 mt-4 uppercase tracking-[0.25em]"
-          >
-            {isLoggingIn ? t("common.processing") : t("store.loginPage.button")}
-          </button>
+            <button
+              type="submit"
+              disabled={isLoggingIn}
+              className="w-full bg-slate-900 hover:bg-black text-white rounded-xl py-5 text-base font-black uppercase tracking-widest shadow-xl shadow-slate-900/20 transition-all active:scale-95 disabled:opacity-50 mt-2 flex items-center justify-center gap-3 group"
+            >
+              {isLoggingIn ? (
+                <Icons.Refresh size={20} className="animate-spin" />
+              ) : (
+                <>
+                  <span>{t("store.loginPage.button")}</span>
+                  <Icons.ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+                </>
+              )}
+            </button>
+          </div>
         </form>
         
-        <div className="mt-10 text-center border-t border-slate-50 pt-8">
-           <p className="text-[10px] uppercase tracking-[0.2em] font-black text-slate-300 italic">
-             {t("store.loginPage.authorizedOnly")}
-           </p>
+        <div className="text-center pb-8 sticky bottom-0">
+          <p className="text-xs text-slate-400 font-bold uppercase tracking-[0.2em] leading-relaxed drop-shadow-sm">
+            {t("store.loginPage.authorizedOnly")}
+          </p>
         </div>
       </div>
     </div>
