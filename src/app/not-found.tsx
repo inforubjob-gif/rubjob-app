@@ -9,28 +9,49 @@ export default function NotFound() {
   const { t } = useTranslation();
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-dvh bg-slate-50 px-6 text-center">
-      <div className="text-[120px] font-black text-slate-100 leading-none mb-4 select-none">404</div>
-      
-      <div className="relative -mt-20">
-        <div className="w-24 h-24 bg-primary/10 text-primary rounded-xl flex items-center justify-center mb-8 mx-auto shadow-xl shadow-primary/5">
-          <Icons.MapPin size={48} strokeWidth={2.5} />
+    <div className="flex flex-col items-center justify-center min-h-dvh bg-gradient-to-b from-white to-orange-50/30 px-6 text-center overflow-hidden">
+      {/* Decorative Orbs */}
+      <div className="absolute top-0 right-0 w-96 h-96 bg-primary/5 rounded-full blur-[100px] -mr-48 -mt-48" />
+      <div className="absolute bottom-0 left-0 w-96 h-96 bg-primary/10 rounded-full blur-[100px] -ml-48 -mb-48" />
+
+      <div className="relative z-10 w-full max-w-lg mx-auto">
+        <div className="mb-2 relative">
+          <img 
+            src="/images/มาสคอต-404.png" 
+            alt="Confused Mascot 404" 
+            className="w-full max-w-[320px] mx-auto animate-float drop-shadow-2xl"
+          />
+          <div className="absolute -top-10 -right-4 w-20 h-20 bg-white/40 backdrop-blur-xl rounded-full flex items-center justify-center text-4xl shadow-xl border border-white/40 animate-bounce">
+            ❓
+          </div>
         </div>
-        
-        <h1 className="text-2xl font-black text-slate-900 mb-2 uppercase tracking-tight">{t("common.notFoundTitle")}</h1>
-        <p className="text-sm text-slate-500 font-bold max-w-[280px] leading-relaxed mb-10 mx-auto">
-          {t("common.notFoundDesc").split("\n").map((line, i) => (
-            <span key={i}>{line}{i === 0 && <br/>}</span>
-          ))}
-        </p>
+
+        <div className="space-y-2 mb-10">
+          <h1 className="text-4xl font-black text-slate-900 tracking-tight leading-tight">
+            Oops! <span className="text-primary tracking-tighter">404</span>
+          </h1>
+          <p className="text-sm font-bold text-slate-400 uppercase tracking-[0.2em] bg-white py-1 px-4 rounded-full inline-block border border-slate-100 italic shadow-sm">
+            {t("common.notFoundTitle")}
+          </p>
+          <p className="text-sm text-slate-500 font-bold max-w-[280px] leading-relaxed mx-auto pt-4">
+            {t("common.notFoundDesc").split("\n").map((line, i) => (
+              <span key={i} className="block">{line}</span>
+            ))}
+          </p>
+        </div>
 
         <Link href="/">
           <Button 
-            className="px-10 bg-primary text-white py-4 rounded-xl font-black uppercase tracking-widest"
+            className="px-12 bg-slate-900 hover:bg-black text-white py-5 rounded-2xl font-black uppercase tracking-widest shadow-2xl shadow-slate-900/20 transition-all active:scale-95 flex items-center gap-3 mx-auto"
           >
-            {t("common.goHome")}
+            <span>{t("common.goHome")}</span>
+            <Icons.ArrowRight size={20} />
           </Button>
         </Link>
+      </div>
+
+      <div className="absolute bottom-10 left-0 right-0 text-center opacity-20">
+        <Icons.Logo variant="color" size={120} className="mx-auto grayscale" />
       </div>
     </div>
   );

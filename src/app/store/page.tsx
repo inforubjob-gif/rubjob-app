@@ -103,6 +103,11 @@ export default function StoreDashboard() {
       {/* Background Gradient Layer */}
       <div className="absolute top-0 left-0 right-0 h-[480px] bg-gradient-to-b from-primary via-primary-dark to-slate-50 z-0" />
       
+      {/* Dashboard Mascot Accent */}
+      <div className="fixed -bottom-10 -right-10 w-64 opacity-[0.04] pointer-events-none select-none z-0 rotate-6 hidden sm:block">
+        <img src="/images/มาสคอต-ตากผ้า.png" alt="" />
+      </div>
+
       {/* Store Header */}
       <header className="relative z-10 px-5 pt-6 pb-6">
         <div className="flex items-center justify-between mb-8">

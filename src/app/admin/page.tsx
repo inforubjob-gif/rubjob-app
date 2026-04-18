@@ -62,8 +62,13 @@ export default function AdminDashboard() {
   }, []);
 
   return (
-    <div className="space-y-8 max-w-7xl mx-auto animate-fade-in">
-      <header className="mb-10 flex flex-col sm:flex-row sm:items-end justify-between gap-6 border-b border-slate-100 pb-8">
+    <div className="space-y-8 max-w-7xl mx-auto animate-fade-in relative">
+       {/* Ambient Background Mascot */}
+      <div className="absolute -top-10 -right-20 w-[400px] opacity-[0.03] pointer-events-none select-none -z-10 blur-sm overflow-hidden hidden lg:block">
+        <img src="/images/มาสคอต-เงิน.png" alt="" className="scale-125 rotate-12" />
+      </div>
+
+      <header className="mb-10 flex flex-col sm:flex-row sm:items-end justify-between gap-6 border-b border-slate-100 pb-8 bg-white/50 backdrop-blur-md sticky top-0 z-20">
         <div>
           <h1 className="text-3xl md:text-4xl font-black text-slate-900 tracking-tight mb-2">
             {t("admin.dashboard.title")}
@@ -109,24 +114,34 @@ export default function AdminDashboard() {
         </div>
       ) : (
         <div className="stagger">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
-            {/* Users Card */}
-            <Card className="p-7 bg-white border border-slate-100 shadow-card hover:shadow-card-hover hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group">
-               <div className="absolute top-0 right-0 w-24 h-24 bg-blue-50/50 rounded-full blur-3xl -mr-12 -mt-12 group-hover:bg-blue-100/50 transition-colors" />
-               <div className="w-14 h-14 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center mb-6 shadow-inner group-hover:scale-110 transition-transform">
-                  <Icons.User size={28} />
-               </div>
-               <div className="flex items-center justify-between mb-2">
-                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.15em]">{t("admin.dashboard.totalUsers")}</p>
-               </div>
-               <h2 className="text-4xl font-black text-slate-900 leading-none tracking-tighter">
-                 {Number(stats.users).toLocaleString()}
-               </h2>
-               <div className="mt-4 flex items-center gap-1.5 font-bold text-[10px] text-slate-300">
-                  <span className="w-1 h-1 bg-slate-200 rounded-full" />
-                  {t("admin.dashboard.authCustomers")}
-               </div>
-            </Card>
+          <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="md:col-span-2 lg:col-span-1 group">
+              <Card className="h-full relative overflow-hidden bg-slate-900 border-slate-800 text-white shadow-2xl shadow-slate-900/20 group-hover:-translate-y-1 transition-all duration-500">
+                <div className="relative z-10 p-6">
+                  <div className="flex items-center justify-between mb-8">
+                    <div className="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center text-primary backdrop-blur-sm border border-white/10">
+                      <Icons.User size={24} />
+                    </div>
+                    <div className="text-[10px] font-black uppercase tracking-widest text-white/50 bg-white/5 px-2 py-1 rounded-md border border-white/5 italic">
+                      Operator Live
+                    </div>
+                  </div>
+                  <p className="text-[11px] font-black uppercase text-white/40 tracking-[0.2em] mb-1">
+                    {t("admin.dashboard.totalUsers")}
+                  </p>
+                  <div className="flex items-end gap-3">
+                    <h3 className="text-4xl font-black tracking-tight">{stats.users.toLocaleString()}</h3>
+                    <span className="text-[10px] font-bold text-emerald-400 mb-2 bg-emerald-400/10 px-1.5 py-0.5 rounded border border-emerald-400/20">
+                      Active
+                    </span>
+                  </div>
+                </div>
+                {/* Background Illustration */}
+                <div className="absolute -bottom-6 -right-6 w-32 h-32 opacity-15 grayscale brightness-200 pointer-events-none group-hover:scale-110 group-hover:-rotate-6 transition-transform duration-700">
+                   <img src="/images/มาสคอต-เงิน.png" alt="" />
+                </div>
+              </Card>
+            </div>
 
             {/* Riders Card */}
             <Card className="p-7 bg-white border border-slate-100 shadow-card hover:shadow-card-hover hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group">

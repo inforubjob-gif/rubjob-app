@@ -135,9 +135,11 @@ export default function RiderDashboard() {
   };
 
   return (
-    <div className="flex flex-col min-h-dvh bg-slate-50 relative overflow-hidden">
-      {/* Background Gradient Layer */}
-      <div className="absolute top-0 left-0 right-0 h-[450px] bg-gradient-to-b from-primary via-primary to-slate-50 z-0" />
+    <div className="flex flex-col min-h-screen bg-slate-50 relative overflow-hidden">
+      {/* Dashboard Mascot Accent */}
+      <div className="fixed -bottom-20 -right-20 w-80 opacity-[0.04] pointer-events-none select-none z-0 rotate-12 group hover:opacity-[0.08] transition-opacity">
+        <img src="/images/มาสคอต-ขี่รถ.png" alt="" />
+      </div>
 
       {/* Rider Header */}
       <header className="relative z-10 px-5 pt-6 pb-6">
