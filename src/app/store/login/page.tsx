@@ -4,8 +4,10 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Icons } from "@/components/ui/Icons";
 import { useStoreAuth } from "@/components/providers/StoreProvider";
+import { useTranslation } from "@/components/providers/LanguageProvider";
 
 export default function StoreLoginPage() {
+  const { t } = useTranslation();
   const router = useRouter();
   const { refreshStore } = useStoreAuth();
   const [email, setEmail] = useState("");
@@ -16,7 +18,7 @@ export default function StoreLoginPage() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || !password) {
-      setError("กรุณากรอกอีเมลและรหัสผ่าน");
+      setError(t("common.error"));
       return;
     }
 
@@ -35,39 +37,41 @@ export default function StoreLoginPage() {
         await refreshStore();
         router.replace("/store");
       } else {
-        setError(data.error || "เข้าสู่ระบบไม่สำเร็จ");
+        setError(data.error || t("common.error"));
       }
     } catch (err) {
-      setError("เกิดข้อผิดพลาดในการเชื่อมต่อ");
+      setError(t("common.error"));
     } finally {
       setIsLoggingIn(false);
     }
   };
 
   return (
-    <div className="flex min-h-dvh w-full items-center justify-center bg-slate-50 relative overflow-hidden p-6">
-      {/* Dynamic Background */}
-      <div className="absolute top-0 right-0 w-96 h-96 bg-blue-500/5 rounded-full blur-[100px] -mr-48 -mt-48" />
-      <div className="absolute bottom-0 left-0 w-96 h-96 bg-primary/5 rounded-full blur-[100px] -ml-48 -mb-48" />
+    <div className="flex min-h-dvh w-full items-center justify-center bg-gradient-to-b from-primary via-primary to-slate-50 relative overflow-hidden p-6">
+      {/* Decorative Background */}
+      <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-[100px] -mr-48 -mt-48" />
+      <div className="absolute bottom-0 left-0 w-96 h-96 bg-black/5 rounded-full blur-[100px] -ml-48 -mb-48" />
 
-      <div className="bg-white rounded-[2.5rem] w-full max-w-md p-10 shadow-2xl relative overflow-hidden border border-slate-100 animate-in fade-in slide-in-from-bottom-8 duration-700">
-        {/* Header Brand Line */}
-        <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-blue-500 via-primary to-blue-500" />
+      <div className="bg-white rounded-[2.5rem] w-full max-w-md p-10 shadow-2xl relative overflow-hidden animate-in fade-in slide-in-from-bottom-8 duration-700">
         
         <div className="flex justify-center mb-8">
-          <div className="w-24 h-24 bg-blue-50 rounded-xl flex items-center justify-center ring-8 ring-blue-50 transition-transform hover:scale-105 duration-500">
-            <Icons.Logo size={60} variant="color" />
-          </div>
+          <Icons.Logo variant="icon-white" size={80} className="drop-shadow-xl" />
         </div>
         
         <div className="text-center mb-10">
-          <h1 className="text-3xl font-black text-slate-900 tracking-tight">ระบบจัดการร้านค้า</h1>
-          <p className="text-sm text-slate-500 mt-2 font-medium">RUBJOB Merchant Portal</p>
+          <h1 className="text-4xl font-black text-slate-900 tracking-tight leading-none drop-shadow-sm">
+            {t("store.loginPage.title")}
+          </h1>
+          <p className="text-[10px] text-slate-400 mt-4 font-black uppercase tracking-[0.2em] bg-slate-50 py-1.5 px-6 rounded-full inline-block border border-slate-100 italic">
+            {t("store.loginPage.portal")}
+          </p>
         </div>
 
         <form onSubmit={handleLogin} className="space-y-6">
           <div className="space-y-1.5">
-            <label className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] block ml-1">อีเมลร้านค้า (Store Email)</label>
+            <label className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] block ml-1">
+              {t("store.loginPage.emailLabel")}
+            </label>
             <div className="relative">
               <input
                 type="email"
@@ -80,7 +84,9 @@ export default function StoreLoginPage() {
           </div>
           
           <div className="space-y-1.5">
-            <label className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] block ml-1">รหัสผ่าน (Password)</label>
+            <label className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] block ml-1">
+              {t("store.loginPage.passwordLabel")}
+            </label>
             <div className="relative">
               <input
                 type="password"
@@ -102,14 +108,16 @@ export default function StoreLoginPage() {
           <button
             type="submit"
             disabled={isLoggingIn}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-xl py-4.5 text-sm font-black shadow-xl shadow-blue-200 transition-all active:scale-[0.98] disabled:opacity-50 mt-4 uppercase tracking-widest"
+            className="w-full bg-slate-900 hover:bg-black text-white rounded-xl py-5 text-sm font-black shadow-xl shadow-slate-200 transition-all active:scale-[0.98] disabled:opacity-50 mt-4 uppercase tracking-[0.25em]"
           >
-            {isLoggingIn ? "กำลังประมวลผล..." : "เข้าสู่ระบบร้านค้า"}
+            {isLoggingIn ? t("common.processing") : t("store.loginPage.button")}
           </button>
         </form>
         
         <div className="mt-10 text-center border-t border-slate-50 pt-8">
-           <p className="text-[10px] uppercase tracking-[0.2em] font-black text-slate-300">AUTHORIZED STORES ONLY</p>
+           <p className="text-[10px] uppercase tracking-[0.2em] font-black text-slate-300 italic">
+             {t("store.loginPage.authorizedOnly")}
+           </p>
         </div>
       </div>
     </div>

@@ -645,8 +645,12 @@ export const th = {
         storeLogisticsDesc: "ยานพาหนะนี้จะใช้สำหรับงานรับและส่งผ้าที่ร้านจัดการเอง โปรดตรวจสอบเอกสารให้เป็นปัจจุบันเสมอ",
       },
       loginPage: {
-        portal: "ระบบจัดการร้านค้า RUBJOB",
-        authorizedOnly: "สำหรับร้านค้าที่ได้รับอนุญาตเท่านั้น",
+        title: "ระบบจัดการร้านค้า",
+        portal: "RUBJOB Merchant Portal",
+        emailLabel: "อีเมลร้านค้า (Store Email)",
+        passwordLabel: "รหัสผ่าน (Password)",
+        button: "เข้าสู่ระบบร้านค้า",
+        authorizedOnly: "AUTHORIZED STORES ONLY",
       },
       servicesPage: {
         configure: "ตั้งค่าบริการของร้านคุณ",
@@ -866,6 +870,13 @@ export const th = {
         errorAllDocs: "กรุณาอัปโหลดเอกสารให้ครบทุกช่อง",
         successDesc: "ทีมงานกำลังตรวจสอบเอกสารของคุณครับ...",
       },
+      login: {
+        title: "เข้าสู่ระบบไรเดอร์",
+        emailLabel: "อีเมลผู้ใช้งาน",
+        passwordLabel: "รหัสผ่านลับ",
+        button: "เข้าสู่ระบบเพื่อเริ่มงาน",
+        footer: "สำหรับไรเดอร์ที่ลงทะเบียนแล้วเท่านั้น\nพบปัญหาติดต่อ @RUBJOB_HELP",
+      }
     },
     staff: {
       wallet: {

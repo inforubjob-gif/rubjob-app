@@ -768,8 +768,15 @@ export const en = {
         agreeTerms: "By submitting, you agree to our terms and confirm all documents are authentic.",
         errorAllDocs: "Please upload all required documents",
         successDesc: "Our team is reviewing your documents...",
+      },
+      login: {
+        title: "Rider Login",
+        emailLabel: "Username / Email",
+        passwordLabel: "Password",
+        button: "Login to Start Working",
+        footer: "For registered riders only.\nContact @RUBJOB_HELP if you have issues.",
+      }
     },
-  },
   staff: {
     wallet: {
       availableBalance: "Balance",
