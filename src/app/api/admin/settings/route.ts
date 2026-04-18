@@ -16,6 +16,9 @@ const DEFAULT_SETTINGS = [
   { key: "line_secret_regular", value: "", type: "string", description: "Channel Secret for the Regular LINE OA." },
   { key: "line_token_help", value: "", type: "string", description: "Channel Access Token for the Help Support LINE OA." },
   { key: "line_secret_help", value: "", type: "string", description: "Channel Secret for the Help Support LINE OA." },
+  { key: "stripe_publishable_key", value: "", type: "string", description: "Stripe Publishable Key (pk_test_...)" },
+  { key: "stripe_secret_key", value: "", type: "string", description: "Stripe Secret Key (sk_test_...)" },
+  { key: "stripe_webhook_secret", value: "", type: "string", description: "Stripe Webhook Signing Secret (whsec_...)" },
 ];
 
 /**
