@@ -63,6 +63,24 @@ export async function GET(
       }
     } catch (e) { /* leave as is */ }
  
+    // Fetch Financial Settings for Calculation
+    const settingsRows = await db.prepare(`
+      SELECT key, value FROM system_settings 
+      WHERE key IN ('gp_rider_percent', 'rider_base_payout')
+    `).all();
+    
+    const settings: Record<string, string> = {};
+    settingsRows.results.forEach((row: any) => {
+      settings[row.key] = row.value;
+    });
+
+    const gpRiderPercent = parseFloat(settings.gp_rider_percent || "10");
+    const riderBasePayout = parseFloat(settings.rider_base_payout || "0");
+
+    const deliveryFee = order.deliveryFee || 0;
+    const commission = (deliveryFee * gpRiderPercent) / 100;
+    order.riderEarn = (deliveryFee - commission) + riderBasePayout;
+
     return NextResponse.json({ order });
   } catch (error: any) {
     console.error("Fetch order detail error:", error);

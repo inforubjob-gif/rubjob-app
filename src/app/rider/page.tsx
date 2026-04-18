@@ -361,9 +361,9 @@ export default function RiderDashboard() {
                      </div>
                   </div>
                   <div className="text-right">
-                     <p className="text-xl font-black text-slate-900 leading-none">฿{selectedJob.riderEarn || selectedJob.deliveryFee}</p>
+                     <p className="text-xl font-black text-slate-900 leading-none">฿{selectedJob.riderEarn}</p>
                      <p className="text-xs text-slate-400 font-bold uppercase mt-1">{t("rider.earnAmountLabel")}</p>
-                  </div>
+                   </div>
                </div>
 
                <div className="space-y-4 pt-2">
@@ -441,10 +441,10 @@ function AvailableDeliveries({ t, router, jobs, onAccept, onViewDetails }: { t: 
                 <h3 className="font-bold text-slate-900 mb-1 leading-tight">
                   {job.status === 'pending' ? t("rider.flow.customerToStore") : t("rider.flow.storeToCustomer")}
                 </h3>
-                <div className="flex items-center gap-3 text-[11px] text-slate-500 font-medium">
-                  <span className="flex items-center gap-1"><Icons.MapPin size={12} className="text-primary" /> {job.distanceKm || "0.5"} {t("rider.nearby")}</span>
-                  <span className="flex items-center gap-1"><Icons.ArrowRight size={12} className="text-primary" /> {t("rider.earnAmount")}</span>
-                </div>
+                 <div className="flex items-center gap-3 text-[11px] text-slate-500 font-medium">
+                   <span className="flex items-center gap-1"><Icons.MapPin size={12} className="text-primary" /> {job.distanceKm || "0.5"} {t("rider.nearby")}</span>
+                   <span className="flex items-center gap-1"><Icons.ArrowRight size={12} className="text-primary" /> {t("rider.earnAmount")} ฿{job.riderEarn}</span>
+                 </div>
               </div>
             </div>
             <div className="grid grid-cols-2 gap-2 mt-4">

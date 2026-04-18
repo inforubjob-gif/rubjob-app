@@ -182,31 +182,49 @@ export default function RiderOrderDetailPage() {
         </div>
 
         <div className="px-5 pt-2 space-y-6">
-          <Card className="p-6 border-none shadow-xl shadow-primary/5 rounded-xl bg-white relative overflow-hidden">
+          {/* Rider Earning Highlight Card */}
+          <Card className="p-5 border-none shadow-2xl shadow-primary/20 rounded-[2rem] bg-gradient-to-br from-primary to-primary-dark text-white relative overflow-hidden group">
+             <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 blur-2xl group-hover:scale-150 transition-transform duration-700" />
+             <div className="relative z-10 flex items-center justify-between">
+                <div>
+                   <p className="text-[10px] font-black text-white/60 uppercase tracking-widest mb-1">{t("rider.earnAmountLabel")}</p>
+                   <h2 className="text-4xl font-black italic">฿{order?.riderEarn?.toFixed(0)}</h2>
+                </div>
+                <div className="w-14 h-14 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center border border-white/30">
+                   <Icons.Logo variant="icon-white" size={32} />
+                </div>
+             </div>
+             <div className="mt-4 pt-4 border-t border-white/10 flex items-center justify-between text-[10px] font-bold text-white/50 uppercase">
+                <span>{t("booking.standardTitle")}</span>
+                <span>{t("booking.instantConfirmation")}</span>
+             </div>
+          </Card>
+
+          <Card className="p-6 border-none shadow-xl shadow-primary/5 rounded-[2rem] bg-white relative overflow-hidden">
              <div className="absolute top-0 right-0 w-32 h-32 bg-orange-50 rounded-full -mr-16 -mt-16 blur-3xl opacity-50" />
              <div className="flex items-center gap-4 mb-6 relative z-10">
-                <div className="w-14 h-14 rounded-xl bg-slate-50 flex items-center justify-center text-slate-600 border border-slate-100 shadow-inner">
+                <div className="w-14 h-14 rounded-2xl bg-slate-50 flex items-center justify-center text-slate-600 border border-slate-100 shadow-inner">
                     <Icons.User size={30} />
                 </div>
                 <div className="flex-1">
                     <h3 className="text-base font-black text-slate-900 uppercase">{order?.userName || t("common.guest")}</h3>
                     <div className="flex items-center gap-1.5 mt-1">
                        <span className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_5px_rgba(16,185,129,0.5)]" />
-                       <p className="text-xs text-slate-500 font-bold uppercase">{t("rider.profile.verifiedHero")}</p>
+                       <p className="text-xs text-slate-500 font-bold uppercase">{t("rider.profile.verifiedHero")} — {t("tiers.silver")}</p>
                     </div>
                 </div>
                 <div className="flex gap-2">
                    {order?.phone && (
                      <button 
                        onClick={() => window.open(`tel:${order.phone}`)}
-                       className="w-11 h-11 rounded-[1rem] bg-blue-50 text-blue-600 flex items-center justify-center border border-blue-100 shadow-lg shadow-blue-500/10 active:scale-90 transition-transform"
+                       className="w-11 h-11 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center border border-blue-100 shadow-lg shadow-blue-500/10 active:scale-90 transition-transform"
                      >
                          <Icons.Phone size={20} />
                      </button>
                    )}
                    <button 
                      onClick={() => window.open(`https://www.google.com/maps/dir/?api=1&destination=${order?.lat || 13.7563},${order?.lng || 100.5018}`, "_blank")}
-                     className="w-11 h-11 rounded-[1rem] bg-orange-50 text-primary flex items-center justify-center border border-orange-100 shadow-lg shadow-primary/10 active:scale-90 transition-transform"
+                     className="w-11 h-11 rounded-2xl bg-orange-50 text-primary flex items-center justify-center border border-orange-100 shadow-lg shadow-primary/10 active:scale-90 transition-transform"
                    >
                        <Icons.MapPin size={20} />
                    </button>
@@ -228,16 +246,43 @@ export default function RiderOrderDetailPage() {
                    <div className="w-2.5 h-2.5 rounded-full bg-primary border-2 border-white mt-1 shadow-[0_0_5px_rgba(255,159,28,0.5)]" />
                    <div className="flex-1">
                       <p className="text-[10px] font-black text-slate-300 uppercase mb-1">{t("rider.orderDetail.deliverTo")}</p>
-                      <p className="text-xs font-black text-slate-900 leading-relaxed">
+                      <p className="text-xs font-black text-slate-900 leading-relaxed mb-1">
                         {typeof order?.address === 'string' ? order.address : (order?.address?.details || t("rider.orderDetail.noAddress"))}
                       </p>
+                      {/* Note for Driver */}
+                      {order?.address?.note && (
+                        <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-red-50 text-red-500 rounded-lg border border-red-100 mt-1 animate-pulse">
+                           <Icons.Alert size={12} strokeWidth={3} />
+                           <p className="text-[10px] font-black uppercase text-red-600">{order.address.note}</p>
+                        </div>
+                      )}
                    </div>
                 </div>
              </div>
           </Card>
 
+          {/* Items & Price Breakdown */}
+          <Card className="p-6 border-none shadow-xl shadow-primary/5 rounded-[2rem] bg-white">
+             <div className="flex items-center justify-between mb-4">
+                <h3 className="text-sm font-black text-slate-900 uppercase tracking-wider">{t("orders.items")}</h3>
+                <span className="text-[10px] font-black bg-slate-100 text-slate-500 px-2 py-0.5 rounded-lg uppercase">{order?.items?.length || 0} {t("orders.itemCount")}</span>
+             </div>
+             <div className="space-y-3">
+                {order?.items?.map((item: any, i: number) => (
+                  <div key={i} className="flex items-center justify-between text-xs font-bold">
+                    <span className="text-slate-400">{item.name} × {item.quantity}</span>
+                    <span className="text-slate-900 italic">฿{item.pricePerUnit * item.quantity}</span>
+                  </div>
+                ))}
+                <div className="pt-3 mt-3 border-t border-dashed border-slate-100 flex items-center justify-between">
+                   <span className="text-xs font-black text-slate-900 uppercase">{t("orders.total")}</span>
+                   <span className="text-lg font-black text-primary italic">฿{order?.totalPrice}</span>
+                </div>
+             </div>
+          </Card>
+
           {currentPhotoStep && (
-             <Card className="p-6 border-none shadow-xl shadow-primary/5 rounded-xl bg-white border border-primary/10 relative overflow-hidden group">
+             <Card className="p-6 border-none shadow-xl shadow-primary/5 rounded-[2rem] bg-white border border-primary/10 relative overflow-hidden group">
                 <div className="absolute -top-10 -right-10 w-32 h-32 bg-primary/5 rounded-full blur-2xl transition-all group-hover:bg-primary/10" />
                 <PhotoUpload 
                   onPhotoCapture={(url) => setPhoto(url)} 
