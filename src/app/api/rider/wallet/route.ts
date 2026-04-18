@@ -1,5 +1,6 @@
 import { getRequestContext } from "@cloudflare/next-on-pages";
 import { NextResponse } from "next/server";
+import { getRiderSession } from "@/lib/auth-server";
 import { nanoid } from "nanoid";
 
 export const runtime = "edge";
@@ -9,6 +10,8 @@ export const runtime = "edge";
  * Fetch rider balance and transaction history
  */
 export async function GET(req: Request) {
+  const session = await getRiderSession();
+  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   try {
     const { searchParams } = new URL(req.url);
     const riderId = searchParams.get("riderId");
@@ -99,6 +102,8 @@ export async function GET(req: Request) {
  * Handle rider withdrawal request
  */
 export async function POST(req: Request) {
+  const session = await getRiderSession();
+  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   try {
     const { riderId, amount, bankName, accountNumber, accountName } = await req.json() as any;
     const db = getRequestContext().env.DB;

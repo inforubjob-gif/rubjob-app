@@ -6,11 +6,9 @@ import Button from "@/components/ui/Button";
 import Modal from "@/components/ui/Modal";
 import { Icons } from "@/components/ui/Icons";
 import { useTranslation } from "@/components/providers/LanguageProvider";
-import { useLiff } from "@/components/providers/LiffProvider";
 
 export default function RiderWalletPage() {
   const { t } = useTranslation();
-  const { profile } = useLiff();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [amount, setAmount] = useState("");
   const [bankName, setBankName] = useState("");
@@ -22,29 +20,28 @@ export default function RiderWalletPage() {
   const [transactions, setTransactions] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  const [effectiveUserId, setEffectiveUserId] = useState<string | null>(null);
+  const [riderSession, setRiderSession] = useState<any>(null);
 
   useEffect(() => {
-    // 1. Get Effective User ID
-    let currentUserId = profile?.userId;
-    if (!currentUserId && typeof window !== "undefined") {
-      const localSession = localStorage.getItem("rubjob_rider_session");
-      if (localSession) {
-        currentUserId = JSON.parse(localSession).id;
-      }
+    const localSession = localStorage.getItem("rubjob_rider_session");
+    if (localSession) {
+      const parsed = JSON.parse(localSession);
+      setRiderSession(parsed);
+    } else {
+      window.location.href = "/rider/login";
     }
-    setEffectiveUserId(currentUserId || null);
-  }, [profile?.userId]);
+  }, []);
 
   useEffect(() => {
-    if (!effectiveUserId) return;
-    fetchWalletData();
-  }, [effectiveUserId]);
+    if (riderSession?.id) {
+      fetchWalletData();
+    }
+  }, [riderSession]);
 
   const fetchWalletData = async () => {
-    if (!effectiveUserId) return;
+    if (!riderSession?.id) return;
     try {
-      const res = await fetch(`/api/rider/wallet?riderId=${effectiveUserId}`);
+      const res = await fetch(`/api/rider/wallet?riderId=${riderSession.id}`);
       const data = await res.json();
       if (data.balance !== undefined) setBalance(data.balance);
       if (data.transactions) setTransactions(data.transactions);
@@ -66,7 +63,7 @@ export default function RiderWalletPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          riderId: effectiveUserId,
+          riderId: riderSession.id,
           amount: parseFloat(amount),
           bankName,
           accountNumber,

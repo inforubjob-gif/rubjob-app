@@ -7,7 +7,6 @@ import Badge, { statusToBadgeVariant, statusLabel } from "@/components/ui/Badge"
 import Button from "@/components/ui/Button";
 import { Icons, getServiceIcon } from "@/components/ui/Icons";
 import { useTranslation } from "@/components/providers/LanguageProvider";
-import { useLiff } from "@/components/providers/LiffProvider";
 
 import Modal from "@/components/ui/Modal";
 import Skeleton from "@/components/ui/Skeleton";
@@ -17,19 +16,13 @@ import Skeleton from "@/components/ui/Skeleton";
 export default function RiderDashboard() {
   const { t } = useTranslation();
   const router = useRouter();
-  const { profile } = useLiff();
+  
   const [activeTab, setActiveTab] = useState<"available" | "active">("available");
   const [isLoading, setIsLoading] = useState(true);
   const [workStatus, setWorkStatus] = useState(true);
   const [selectedJob, setSelectedJob] = useState<any | null>(null);
   const [rider, setRider] = useState<any>(null);
 
-  useEffect(() => {
-    if (profile) {
-      setRider({ name: profile.displayName, id: profile.userId });
-    }
-  }, [profile]);
-  
   // Lifted state
   const [availableJobs, setAvailableJobs] = useState<any[]>([]);
   const [activeJobs, setActiveJobs] = useState<any[]>([]);
@@ -38,25 +31,17 @@ export default function RiderDashboard() {
   const [verificationStatus, setVerificationStatus] = useState<"active" | "pending" | "unregistered" | "rejected">("pending");
 
   useEffect(() => {
-    // 1. Check LIFF Profile
-    if (profile) {
-      setRider({ name: profile.displayName, id: profile.userId });
-      fetchRiderData(profile.userId);
-      return;
-    }
-
-    // 2. Fallback: Check Local Session (for email login)
+    // Check Local Session (Unified identity for riders)
     const localSession = localStorage.getItem("rubjob_rider_session");
     if (localSession) {
       const parsed = JSON.parse(localSession);
       setRider(parsed);
       fetchRiderData(parsed.id);
-      return;
+    } else {
+      setIsLoading(false); 
+      router.push("/rider/login");
     }
-
-    // 3. If neither, we might still be loading or unauthorized
-    setIsLoading(false); 
-  }, [profile]);
+  }, [router]);
 
   async function fetchRiderData(riderId: string) {
     if (!riderId) return;
@@ -132,11 +117,9 @@ export default function RiderDashboard() {
     }
   };
 
-  const { logout } = useLiff();
-
   const handleLogout = () => {
     localStorage.removeItem("rubjob_rider_session");
-    logout("/rider");
+    router.push("/rider/login");
   };
 
   return (

@@ -1,5 +1,6 @@
 import { getRequestContext } from "@cloudflare/next-on-pages";
 import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
 
 export const runtime = "edge";
 
@@ -25,6 +26,16 @@ export async function POST(req: Request) {
       if (rider.status === 'suspended') {
         return NextResponse.json({ success: false, error: "บัญชีของคุณมีความเคลื่อนไหวที่ผิดปกติ หรือถูกระงับชั่วคราว" }, { status: 403 });
       }
+
+      const cookieStore = await cookies();
+      cookieStore.set("rider_token", String(rider.id), {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        path: "/",
+        maxAge: 60 * 60 * 24 * 7 // 1 week
+      });
+
       return NextResponse.json({ 
         success: true, 
         rider: {

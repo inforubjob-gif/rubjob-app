@@ -1,5 +1,6 @@
 import { getRequestContext } from "@cloudflare/next-on-pages";
 import { NextResponse } from "next/server";
+import { getRiderSession } from "@/lib/auth-server";
 import { transitionOrderStatus } from "@/lib/order-logic";
 
 export const runtime = "edge";
@@ -9,6 +10,8 @@ export const runtime = "edge";
  * Update order status by rider with optional photo proof
  */
 export async function POST(req: Request, { params }: { params: { id: string } }) {
+  const session = await getRiderSession();
+  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   try {
     const id = params.id;
     const { status, photo } = await req.json() as any;

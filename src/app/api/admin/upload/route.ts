@@ -1,9 +1,12 @@
 import { getRequestContext } from "@cloudflare/next-on-pages";
 import { NextResponse } from "next/server";
+import { getAdminSession } from "@/lib/auth-server";
 
 export const runtime = "edge";
 
 export async function POST(req: Request) {
+  const session = await getAdminSession();
+  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   try {
     const formData = await req.formData();
     const file = formData.get("file") as File;

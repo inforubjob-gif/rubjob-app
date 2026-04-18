@@ -6,8 +6,6 @@ import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import { Icons } from "@/components/ui/Icons";
 import { useTranslation } from "@/components/providers/LanguageProvider";
-
-import { useLiff } from "@/components/providers/LiffProvider";
 import { useEffect } from "react";
 
 import dynamic from "next/dynamic";
@@ -20,35 +18,39 @@ const MapPicker = dynamic(() => import("@/components/ui/MapPicker"), {
 export default function RiderServiceAreaPage() {
   const router = useRouter();
   const { t } = useTranslation();
-  const { profile } = useLiff();
+  
   const [location, setLocation] = useState<{lat: number, lng: number}>({ lat: 13.7563, lng: 100.5018 });
   const [hasPinned, setHasPinned] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [riderId, setRiderId] = useState<string | null>(null);
 
   useEffect(() => {
     // 1. Get Effective User ID
-    let currentUserId = profile?.userId;
-    if (!currentUserId && typeof window !== "undefined") {
-      const localSession = localStorage.getItem("rubjob_rider_session");
-      if (localSession) {
-        currentUserId = JSON.parse(localSession).id;
-      }
+    const localSession = localStorage.getItem("rubjob_rider_session");
+    if (localSession) {
+      const parsed = JSON.parse(localSession);
+      setRiderId(parsed.id);
+      fetchPrefs(parsed.id);
+    } else {
+      router.push("/rider/login");
     }
+  }, [router]);
 
-    if (!currentUserId) return;
-
-    fetch(`/api/users/preferences?userId=${currentUserId}`)
-      .then(res => res.json())
-      .then((data: any) => {
-         if (data.preferences?.serviceAreaCoords) {
-           const coords = typeof data.preferences.serviceAreaCoords === 'string' 
-             ? JSON.parse(data.preferences.serviceAreaCoords) 
-             : data.preferences.serviceAreaCoords;
-           setLocation(coords);
-           setHasPinned(true);
-         }
-      });
-  }, [profile?.userId]);
+  async function fetchPrefs(id: string) {
+    try {
+      const res = await fetch(`/api/users/preferences?userId=${id}`);
+      const data = await res.json();
+      if (data.preferences?.serviceAreaCoords) {
+        const coords = typeof data.preferences.serviceAreaCoords === 'string' 
+          ? JSON.parse(data.preferences.serviceAreaCoords) 
+          : data.preferences.serviceAreaCoords;
+        setLocation(coords);
+        setHasPinned(true);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  }
 
   const handleLocationChange = (lat: number, lng: number) => {
     setLocation({ lat, lng });
@@ -56,23 +58,14 @@ export default function RiderServiceAreaPage() {
   };
 
   const handleSave = async () => {
-    // Get Effective User ID
-    let currentUserId = profile?.userId;
-    if (!currentUserId && typeof window !== "undefined") {
-      const localSession = localStorage.getItem("rubjob_rider_session");
-      if (localSession) {
-        currentUserId = JSON.parse(localSession).id;
-      }
-    }
-
-    if (!currentUserId || !location) return;
+    if (!riderId || !location) return;
     setIsSaving(true);
     try {
       await fetch("/api/users/preferences", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ 
-          userId: currentUserId, 
+          userId: riderId, 
           serviceAreaCoords: location 
         })
       });

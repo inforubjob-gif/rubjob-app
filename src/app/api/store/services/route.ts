@@ -1,5 +1,6 @@
 import { getRequestContext } from "@cloudflare/next-on-pages";
 import { NextResponse } from "next/server";
+import { getStoreSession } from "@/lib/auth-server";
 
 export const runtime = "edge";
 
@@ -8,6 +9,8 @@ export const runtime = "edge";
  * Fetch store-specific services and their prices
  */
 export async function GET(req: Request) {
+  const session = await getStoreSession();
+  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   try {
     const { searchParams } = new URL(req.url);
     const storeId = searchParams.get("storeId");
@@ -42,6 +45,8 @@ export async function GET(req: Request) {
  * Toggle service or update price
  */
 export async function POST(req: Request) {
+  const session = await getStoreSession();
+  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   try {
     const { storeId, serviceId, isEnabled, price } = await req.json() as any;
     const db = getRequestContext().env.DB;

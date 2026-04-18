@@ -1,5 +1,6 @@
 import { getRequestContext } from "@cloudflare/next-on-pages";
 import { NextResponse } from "next/server";
+import { getAdminSession } from "@/lib/auth-server";
 
 export const runtime = "edge";
 
@@ -8,6 +9,8 @@ export const runtime = "edge";
  * List tickets or get specific ticket messages
  */
 export async function GET(req: Request) {
+  const session = await getAdminSession();
+  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   try {
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id"); // Ticket ID

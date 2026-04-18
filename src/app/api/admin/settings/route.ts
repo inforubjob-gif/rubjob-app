@@ -1,5 +1,6 @@
 import { getRequestContext } from "@cloudflare/next-on-pages";
 import { NextResponse } from "next/server";
+import { getAdminSession } from "@/lib/auth-server";
 
 export const runtime = "edge";
 

@@ -6,13 +6,11 @@ import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import { Icons } from "@/components/ui/Icons";
 import { useTranslation } from "@/components/providers/LanguageProvider";
-import { useLiff } from "@/components/providers/LiffProvider";
 import { useToast } from "@/components/providers/ToastProvider";
 import PhotoUpload from "@/components/ui/PhotoUpload";
 
 export default function RiderDocumentsPage() {
   const { t } = useTranslation();
-  const { profile } = useLiff();
   const { showToast } = useToast();
   const router = useRouter();
 
@@ -23,7 +21,10 @@ export default function RiderDocumentsPage() {
   const [isSuccess, setIsSuccess] = useState(false);
 
   const handleSubmit = async () => {
-    if (!profile?.userId || !idCard || !license || !vehicle) {
+    const localSession = localStorage.getItem("rubjob_rider_session");
+    const riderId = localSession ? JSON.parse(localSession).id : null;
+
+    if (!riderId || !idCard || !license || !vehicle) {
       showToast(t("rider.verification.errorAllDocs"), "error");
       return;
     }
@@ -34,7 +35,7 @@ export default function RiderDocumentsPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          userId: profile.userId,
+          userId: riderId,
           documents: [
             { type: "id_card", url: idCard },
             { type: "license", url: license },

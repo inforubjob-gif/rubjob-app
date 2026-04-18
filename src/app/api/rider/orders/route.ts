@@ -1,5 +1,6 @@
 import { getRequestContext } from "@cloudflare/next-on-pages";
 import { NextResponse } from "next/server";
+import { getRiderSession } from "@/lib/auth-server";
 import { transitionOrderStatus } from "@/lib/order-logic";
 
 export const runtime = "edge";
@@ -9,6 +10,8 @@ export const runtime = "edge";
  * Fetches available and active orders for a rider
  */
 export async function GET(req: Request) {
+  const session = await getRiderSession();
+  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   try {
     const { searchParams } = new URL(req.url);
     const riderId = searchParams.get("riderId");
@@ -100,6 +103,8 @@ export async function GET(req: Request) {
  * Rider accepts a job
  */
 export async function PUT(req: Request) {
+  const session = await getRiderSession();
+  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   try {
     const { orderId, riderId } = await req.json();
 
@@ -111,8 +116,8 @@ export async function PUT(req: Request) {
     if (!db) return NextResponse.json({ error: "D1 not found" }, { status: 500 });
 
     // Use transitionOrderStatus to handle update and notification
-    // Fetch rider name first
-    const rider = await db.prepare("SELECT displayName FROM users WHERE id = ?").bind(riderId).first() as any;
+    // Fetch rider name first from rider_users
+    const rider = await db.prepare("SELECT name as displayName FROM rider_users WHERE id = ?").bind(riderId).first() as any;
     
     // Attempt assignment first to ensure idempotency/concurrency safety
     const assignmentResult = await db.prepare(`

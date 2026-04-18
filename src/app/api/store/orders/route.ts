@@ -1,5 +1,6 @@
 import { getRequestContext } from "@cloudflare/next-on-pages";
 import { NextResponse } from "next/server";
+import { getStoreSession } from "@/lib/auth-server";
 import { transitionOrderStatus } from "@/lib/order-logic";
 import { OrderStatus } from "@/types";
 
@@ -10,6 +11,8 @@ export const runtime = "edge";
  * Fetches orders for a specific store
  */
 export async function GET(req: Request) {
+  const session = await getStoreSession();
+  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   try {
     const { searchParams } = new URL(req.url);
     const storeId = searchParams.get("storeId");
@@ -52,6 +55,8 @@ export async function GET(req: Request) {
  * Store updates status (e.g. washing, ready_for_delivery)
  */
 export async function PUT(req: Request) {
+  const session = await getStoreSession();
+  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   try {
     const { orderId, status } = await req.json();
 

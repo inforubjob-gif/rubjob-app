@@ -1,5 +1,6 @@
 import { getRequestContext } from "@cloudflare/next-on-pages";
 import { NextResponse } from "next/server";
+import { getAdminSession } from "@/lib/auth-server";
 
 export const runtime = "edge";
 
@@ -8,6 +9,8 @@ export const runtime = "edge";
  * Admin replies to a ticket (sends LINE push message)
  */
 export async function POST(req: Request) {
+  const session = await getAdminSession();
+  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   try {
     const { ticketId, text, adminName } = (await req.json()) as { ticketId: string; text: string; adminName: string };
     

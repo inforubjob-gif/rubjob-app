@@ -6,8 +6,6 @@ import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import { Icons } from "@/components/ui/Icons";
 import { useTranslation } from "@/components/providers/LanguageProvider";
-
-import { useLiff } from "@/components/providers/LiffProvider";
 import { useEffect } from "react";
 
 const VEHICLES = [
@@ -19,48 +17,48 @@ const VEHICLES = [
 export default function VehicleTypePage() {
   const router = useRouter();
   const { t } = useTranslation();
-  const { profile } = useLiff();
   const [selectedVehicle, setSelectedVehicle] = useState("motorcycle");
   const [isSaving, setIsSaving] = useState(false);
+  const [riderId, setRiderId] = useState<string | null>(null);
 
   useEffect(() => {
-    // 1. Get Effective User ID
-    let currentUserId = profile?.userId;
-    if (!currentUserId && typeof window !== "undefined") {
-      const localSession = localStorage.getItem("rubjob_rider_session");
-      if (localSession) {
-        currentUserId = JSON.parse(localSession).id;
-      }
+    const localSession = localStorage.getItem("rubjob_rider_session");
+    if (localSession) {
+      const parsed = JSON.parse(localSession);
+      setRiderId(parsed.id);
+      fetchPrefs(parsed.id);
+    } else {
+      router.push("/rider/login");
     }
+  }, [router]);
 
-    if (!currentUserId) return;
-    
-    fetch(`/api/users/preferences?userId=${currentUserId}`)
-      .then(res => res.json())
-      .then((data: any) => {
-         if (data.preferences?.vehicleType) setSelectedVehicle(data.preferences.vehicleType);
-      });
-  }, [profile?.userId]);
+  async function fetchPrefs(id: string) {
+    try {
+      const res = await fetch(`/api/users/preferences?userId=${id}`);
+      const data = await res.json();
+      if (data.preferences?.vehicleType) {
+        setSelectedVehicle(data.preferences.vehicleType);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  }
 
   const handleSave = async () => {
-    // Get Effective User ID
-    let currentUserId = profile?.userId;
-    if (!currentUserId && typeof window !== "undefined") {
-      const localSession = localStorage.getItem("rubjob_rider_session");
-      if (localSession) {
-        currentUserId = JSON.parse(localSession).id;
-      }
-    }
-
-    if (!currentUserId) return;
+    if (!riderId) return;
     setIsSaving(true);
-    await fetch("/api/users/preferences", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ userId: currentUserId, vehicleType: selectedVehicle })
-    });
-    setIsSaving(false);
-    router.back();
+    try {
+      await fetch("/api/users/preferences", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: riderId, vehicleType: selectedVehicle })
+      });
+      router.back();
+    } catch (error) {
+      console.error("Failed to save vehicle type:", error);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (

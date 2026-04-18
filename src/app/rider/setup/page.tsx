@@ -6,12 +6,10 @@ import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import { Icons } from "@/components/ui/Icons";
 import { useTranslation } from "@/components/providers/LanguageProvider";
-import { useLiff } from "@/components/providers/LiffProvider";
 import { useToast } from "@/components/providers/ToastProvider";
 
 export default function RiderSetupPage() {
   const { t } = useTranslation();
-  const { profile } = useLiff();
   const { showToast } = useToast();
   const router = useRouter();
 
@@ -22,14 +20,23 @@ export default function RiderSetupPage() {
   const [idNumber, setIdNumber] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const [riderId, setRiderId] = useState<string | null>(null);
+
   useEffect(() => {
-    if (profile?.displayName) setName(profile.displayName);
-    if (profile?.phone) setPhone(profile.phone);
-  }, [profile]);
+    const localSession = localStorage.getItem("rubjob_rider_session");
+    if (localSession) {
+      const parsed = JSON.parse(localSession);
+      setRiderId(parsed.id);
+      if (parsed.name) setName(parsed.name);
+      if (parsed.phone) setPhone(parsed.phone);
+    } else {
+      router.push("/rider/login");
+    }
+  }, [router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!profile?.userId) return;
+    if (!riderId) return;
 
     setIsSubmitting(true);
     try {
@@ -37,7 +44,7 @@ export default function RiderSetupPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          userId: profile.userId,
+          userId: riderId,
           name,
           phone,
           vehicleType,

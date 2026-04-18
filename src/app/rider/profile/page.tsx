@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import { Icons } from "@/components/ui/Icons";
-import { useLiff } from "@/components/providers/LiffProvider";
 import { useTranslation } from "@/components/providers/LanguageProvider";
 
 // Define SettingItem component for reuse
@@ -31,57 +30,51 @@ function SettingItem({ icon, label, value, onClick }: { icon: React.ReactNode, l
 
 export default function RiderProfilePage() {
   const router = useRouter();
-  const { profile, logout } = useLiff();
   const { language, setLanguage, t } = useTranslation();
   const [workStatus, setWorkStatus] = useState(true);
   const [showLanguageModal, setShowLanguageModal] = useState(false);
   const [prefs, setPrefs] = useState<any>({});
   const [isLoading, setIsLoading] = useState(true);
 
-  const [effectiveUserId, setEffectiveUserId] = useState<string | null>(null);
+  const [riderSession, setRiderSession] = useState<any>(null);
 
   useEffect(() => {
-    // 1. Get Effective User ID
-    let currentUserId = profile?.userId;
-    if (!currentUserId && typeof window !== "undefined") {
-      const localSession = localStorage.getItem("rubjob_rider_session");
-      if (localSession) {
-        currentUserId = JSON.parse(localSession).id;
-      }
+    const localSession = localStorage.getItem("rubjob_rider_session");
+    if (localSession) {
+      const parsed = JSON.parse(localSession);
+      setRiderSession(parsed);
+      fetchPrefs(parsed.id);
+    } else {
+      router.push("/rider/login");
     }
-    setEffectiveUserId(currentUserId || null);
-  }, [profile?.userId]);
+  }, [router]);
 
-  useEffect(() => {
-    if (!effectiveUserId) return;
-    async function fetchPrefs() {
-      try {
-        const res = await fetch(`/api/users/preferences?userId=${effectiveUserId}`);
-        const data = await res.json() as any;
-        if (data.preferences) {
-          setPrefs(data.preferences);
-          if (data.preferences.workStatus !== undefined) {
-             setWorkStatus(data.preferences.workStatus);
-          }
+  async function fetchPrefs(riderId: string) {
+    try {
+      const res = await fetch(`/api/users/preferences?userId=${riderId}`);
+      const data = await res.json() as any;
+      if (data.preferences) {
+        setPrefs(data.preferences);
+        if (data.preferences.workStatus !== undefined) {
+           setWorkStatus(data.preferences.workStatus);
         }
-      } catch (err) {
-        console.error("Failed to fetch preferences", err);
-      } finally {
-        setIsLoading(false);
       }
+    } catch (err) {
+      console.error("Failed to fetch preferences", err);
+    } finally {
+      setIsLoading(false);
     }
-    fetchPrefs();
-  }, [profile?.userId]);
+  }
 
   const handleToggleWorkStatus = async () => {
     const nextStatus = !workStatus;
     setWorkStatus(nextStatus);
-    if (!effectiveUserId) return;
+    if (!riderSession?.id) return;
     try {
       await fetch("/api/users/preferences", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId: effectiveUserId, workStatus: nextStatus })
+        body: JSON.stringify({ userId: riderSession.id, workStatus: nextStatus })
       });
     } catch (err) {
       console.error("Failed to update work status", err);
@@ -96,7 +89,7 @@ export default function RiderProfilePage() {
             <div className="relative">
               <div className="w-20 h-20 rounded-2xl bg-white flex items-center justify-center p-1.5 shadow-2xl border-4 border-white/20 ring-8 ring-primary/5">
                 <div className="w-full h-full rounded-xl bg-orange-50 flex items-center justify-center overflow-hidden border border-orange-100">
-                    <img src={profile?.pictureUrl || "https://api.dicebear.com/7.x/avataaars/svg?seed=Rubjob"} alt="Avatar" className="w-full h-full object-cover" />
+                    <img src={riderSession?.pictureUrl || "https://api.dicebear.com/7.x/avataaars/svg?seed=Rubjob"} alt="Avatar" className="w-full h-full object-cover" />
                 </div>
               </div>
               <div className="absolute -bottom-1 -right-1 w-7 h-7 bg-emerald-500 border-4 border-primary rounded-full shadow-lg" />
@@ -106,8 +99,8 @@ export default function RiderProfilePage() {
                  <Icons.Logo variant="icon" size={16} className="grayscale brightness-[100] invert" />
                  <p className="text-[10px] font-black uppercase tracking-[0.2em]">{t("rider.hero")}</p>
               </div>
-              <h1 className="text-2xl font-black text-white tracking-tight truncate drop-shadow-lg">{profile?.displayName || t("common.guest")}</h1>
-              <p className="text-[10px] text-white/60 font-bold uppercase tracking-[0.1em] mt-1">{t("rider.profile.verifiedHero")} #0012</p>
+              <h1 className="text-2xl font-black text-white tracking-tight truncate drop-shadow-lg">{riderSession?.name || t("common.guest")}</h1>
+              <p className="text-[10px] text-white/60 font-bold uppercase tracking-[0.1em] mt-1">{t("rider.profile.verifiedHero")} #{riderSession?.id?.slice(-4)}</p>
             </div>
         </div>
       </header>
@@ -176,7 +169,7 @@ export default function RiderProfilePage() {
           <button 
             onClick={() => {
               localStorage.removeItem("rubjob_rider_session");
-              logout("/rider");
+              router.push("/rider/login");
             }}
             className="w-full p-5 bg-white rounded-xl border border-slate-100 flex items-center gap-4 active:scale-95 transition-all shadow-sm"
           >

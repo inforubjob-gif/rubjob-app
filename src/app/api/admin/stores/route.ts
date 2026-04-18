@@ -1,9 +1,12 @@
 import { getRequestContext } from "@cloudflare/next-on-pages";
 import { NextResponse } from "next/server";
+import { getAdminSession } from "@/lib/auth-server";
 
 export const runtime = "edge";
 
 export async function GET(req: Request) {
+  const session = await getAdminSession();
+  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   try {
     const db = getRequestContext().env.DB;
     if (!db) return NextResponse.json({ error: "D1 not found" }, { status: 500 });
@@ -80,6 +83,8 @@ export async function GET(req: Request) {
 }
 
 export async function POST(req: Request) {
+  const session = await getAdminSession();
+  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   try {
     const payload = await req.json() as any;
     const { name, ownerId, email, password, address, lat, lng, serviceRadiusKm, baseDeliveryFee, extraFeePerKm, phone, services, bankName, accountNumber, accountName } = payload;
@@ -129,6 +134,8 @@ export async function POST(req: Request) {
 }
 
 export async function PUT(req: Request) {
+  const session = await getAdminSession();
+  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   try {
     const payload = await req.json() as any;
     const { id, name, ownerId, email, password, address, lat, lng, serviceRadiusKm, baseDeliveryFee, extraFeePerKm, phone, isActive, status, services, bankName, accountNumber, accountName, documents } = payload;
@@ -188,6 +195,8 @@ export async function PUT(req: Request) {
 }
 
 export async function DELETE(req: Request) {
+  const session = await getAdminSession();
+  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   try {
     const { id } = await req.json() as any;
     if (!id) return NextResponse.json({ error: "Missing ID" }, { status: 400 });

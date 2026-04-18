@@ -7,6 +7,8 @@ import Button from "@/components/ui/Button";
 import { TIME_SLOTS } from "@/lib/constants";
 import type { ServiceType, Address, Store } from "@/types";
 
+import { Icons, getServiceIcon } from "@/components/ui/Icons";
+
 function getDistanceKm(lat1: number, lon1: number, lat2: number, lon2: number) {
   const R = 6371; 
   const dLat = (lat2 - lat1) * (Math.PI / 180);
@@ -947,8 +949,9 @@ function BookingFlow() {
 }
 
 export default function BookingPage() {
+  const { t } = useTranslation();
   return (
-    <Suspense fallback={<div className="flex h-screen items-center justify-center p-4">{t("common.loading")}</div>}>
+    <Suspense fallback={<div className="flex h-screen items-center justify-center p-4 text-slate-400 font-bold animate-pulse">Loading...</div>}>
       <BookingFlow />
     </Suspense>
   );
