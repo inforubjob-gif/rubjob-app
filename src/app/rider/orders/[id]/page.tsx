@@ -91,6 +91,13 @@ export default function RiderOrderDetailPage() {
       });
       setStatus(nextStatus);
       setPhoto(null);
+      
+      // Auto-redirection for states that end the current rider leg
+      if (nextStatus === "washing" || nextStatus === "completed") {
+        setTimeout(() => {
+          router.push("/rider");
+        }, 2000);
+      }
     } catch (err) {
       console.error("Update rider status failed:", err);
     } finally {
@@ -171,12 +178,16 @@ export default function RiderOrderDetailPage() {
              userLng={userPos.lng}
            />
            
-           <div className="absolute bottom-4 right-4 z-20 flex gap-2">
+           <div className="absolute bottom-4 right-4 z-20 flex flex-col items-end gap-2">
+              <div className="bg-white px-4 py-2 rounded-xl shadow-2xl border border-primary/20 flex flex-col">
+                 <p className="text-[10px] font-black text-primary uppercase tracking-wider">{t("rider.availableRequests") || "NEXT DESTINATION"}</p>
+                 <p className="text-xs font-black text-slate-800">{activeDest.label === t("admin.nav.stores") ? order?.storeName : order?.userName}</p>
+              </div>
               <button 
                 onClick={() => window.open(`https://www.google.com/maps/dir/?api=1&destination=${activeDest.pos.lat},${activeDest.pos.lng}`, "_blank")}
-                className="bg-white/90 backdrop-blur-md px-4 py-2 rounded-xl border border-slate-200 shadow-xl text-primary font-black text-[10px] uppercase flex items-center gap-2 active:scale-95 transition-all"
+                className="bg-primary hover:bg-primary-dark text-white px-5 py-2.5 rounded-xl border border-primary-dark/20 shadow-xl font-black text-[11px] uppercase flex items-center gap-2 active:scale-95 transition-all"
               >
-                 <Icons.MapPin size={14} strokeWidth={3} /> {t("rider.navigate")} {activeDest.label}
+                 <Icons.MapPin size={16} strokeWidth={3} /> {t("rider.navigate")}
               </button>
            </div>
         </div>
