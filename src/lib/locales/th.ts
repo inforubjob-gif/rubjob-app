@@ -666,7 +666,7 @@ export const th = {
       },
       loginPage: {
         title: "ระบบจัดการร้านค้า",
-        portal: "RUBJOB Merchant Portal",
+        portal: "ระบบร้านค้า",
         emailLabel: "อีเมลร้านค้า (Store Email)",
         passwordLabel: "รหัสผ่าน (Password)",
         button: "เข้าสู่ระบบร้านค้า",
@@ -895,7 +895,7 @@ export const th = {
         emailLabel: "อีเมลผู้ใช้งาน",
         passwordLabel: "รหัสผ่านลับ",
         button: "เข้าสู่ระบบเพื่อเริ่มงาน",
-        footer: "สำหรับไรเดอร์ที่ลงทะเบียนแล้วเท่านั้น\nพบปัญหาติดต่อ @RUBJOB_HELP",
+        footer: "ระบบไรเดอร์\nพบปัญหาติดต่อ @RUBJOB_HELP",
       }
     },
     staff: {
