@@ -136,6 +136,8 @@ export default function RiderOrderDetailPage() {
             <h1 className="text-lg font-bold text-slate-900">{t("rider.manageTask")}</h1>
             <p className="text-xs text-slate-400">{t("orders.orderNo")} #{id}</p>
           </div>
+          <Badge variant={statusToBadgeVariant(status as any)}>
+            {t(`orders.status.${status}`)}
           </Badge>
           <button
             onClick={() => setIsIssueModalOpen(true)}

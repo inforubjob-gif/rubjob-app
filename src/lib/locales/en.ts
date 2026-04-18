@@ -741,8 +741,7 @@ export const en = {
         name: "Van / Pickup",
         desc: "Large (Unlimited)"
       }
-    }
-  },
+    },
     verification: {
         title: "ID Verification",
         sub: "Submit documents to start earning",
