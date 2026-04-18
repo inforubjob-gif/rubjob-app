@@ -57,10 +57,10 @@ export default function StoreLoginPage() {
           <div className="mb-10 flex justify-center">
             <Icons.Logo variant="white" size={140} className="drop-shadow-2xl" />
           </div>
-        </div>
           <p className="text-xl text-white font-black uppercase mt-6 bg-white/10 backdrop-blur-sm py-3 px-10 rounded-full inline-block border border-white/20">
             {t("store.loginPage.portal")}
           </p>
+        </div>
 
         <form onSubmit={handleLogin} className="space-y-5 bg-white/10 backdrop-blur-md p-2 rounded-2xl border border-white/20 shadow-2xl shadow-primary-dark/20">
           <div className="bg-white rounded-[1.75rem] p-8 space-y-6 shadow-sm">
