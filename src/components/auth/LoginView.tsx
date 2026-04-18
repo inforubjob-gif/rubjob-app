@@ -7,7 +7,7 @@ export default function LoginView() {
   const { login, isReady } = useLiff();
 
   return (
-    <div className="min-h-[100dvh] bg-gradient-to-b from-primary via-primary to-slate-50 flex flex-col items-center px-6 pt-6 pb-12 transition-all duration-700 relative overflow-hidden font-sans">
+    <div className="min-h-[100dvh] bg-gradient-to-b from-primary via-primary to-slate-50 flex flex-col items-center justify-center px-6 py-12 transition-all duration-700 relative overflow-hidden font-sans">
       {/* Decorative Background */}
       <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-[100px] -mr-48 -mt-48" />
       <div className="absolute bottom-0 left-0 w-96 h-96 bg-black/5 rounded-full blur-[100px] -ml-48 -mb-48" />

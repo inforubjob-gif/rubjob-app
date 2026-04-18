@@ -54,7 +54,7 @@ export default function RiderLoginPage() {
   };
 
   return (
-    <div className="flex flex-col min-h-dvh bg-gradient-to-b from-primary via-primary to-slate-50 relative overflow-hidden p-6 pt-3">
+    <div className="flex flex-col min-h-dvh bg-gradient-to-b from-primary via-primary to-slate-50 relative overflow-hidden p-6 justify-center">
       {/* Decorative Background */}
       <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-[100px] -mr-48 -mt-48" />
       <div className="absolute bottom-0 left-0 w-96 h-96 bg-black/5 rounded-full blur-[100px] -ml-48 -mb-48" />
