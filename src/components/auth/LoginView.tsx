@@ -14,15 +14,12 @@ export default function LoginView() {
       
       <main className="relative z-10 w-full max-w-sm mx-auto flex flex-col items-center">
         {/* Simple Logo (Standardized with other portals) */}
-        <div className="mb-12 flex justify-center">
-          <Icons.Logo size={100} variant="icon-white" className="drop-shadow-2xl" />
+        <div className="mb-14 flex justify-center">
+          <Icons.Logo size={42} variant="white" className="drop-shadow-2xl" />
         </div>
 
         <div className="w-full space-y-8 text-center">
           <div className="space-y-4">
-            <h2 className="text-5xl font-black text-white leading-none drop-shadow-lg">
-              rubjob
-            </h2>
             <p className="text-xs text-white/70 font-black uppercase bg-white/10 backdrop-blur-sm py-1.5 px-6 rounded-full inline-block border border-white/10">
               กรุณาเข้าสู่ระบบ
             </p>
