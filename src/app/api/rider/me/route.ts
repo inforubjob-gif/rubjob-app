@@ -18,7 +18,7 @@ export async function GET(req: Request) {
     }
 
     const rider = await db.prepare(`
-      SELECT id, name, email, status FROM rider_users WHERE id = ?
+      SELECT id, name, email, status, pictureUrl, phone FROM rider_users WHERE id = ?
     `).bind(riderId).first();
 
     if (rider) {
@@ -28,7 +28,9 @@ export async function GET(req: Request) {
           id: rider.id,
           name: rider.name,
           email: rider.email,
-          status: rider.status
+          status: rider.status,
+          pictureUrl: rider.pictureUrl,
+          phone: rider.phone
         }
       });
     } else {

@@ -599,6 +599,7 @@ export const en = {
       logout: "Logout",
       verifiedHero: "Verified Rider",
       selectLanguage: "Select Language",
+      vehicleType: "Vehicle Info",
     },
     payoutMethodPage: {
       title: "Payout Method",

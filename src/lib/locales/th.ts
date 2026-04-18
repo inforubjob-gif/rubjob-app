@@ -559,7 +559,7 @@ export const th = {
         language: "ภาษา",
         serviceArea: "พื้นที่ให้บริการ",
         activeHours: "เวลาทำการ",
-        vehicleType: "ข้อมูยานพาหนะ",
+        vehicleType: "ข้อมูลยานพาหนะ",
         payoutMethod: "ช่องทางการรับเงิน",
         account: "บัญชี",
         logout: "ออกจากระบบ",
@@ -639,7 +639,7 @@ export const th = {
       navOrders: "ประวัติงาน",
       navWallet: "รายได้",
       navProfile: "โปรไฟล์",
-      vehicleType: "ข้อมูยานพาหนะ",
+      vehicleType: "ข้อมูลยานพาหนะ",
       takePhoto: "ถ่ายรูปเพื่อยืนยัน",
       photoRequired: "ต้องถ่ายรูปก่อนยืนยัน",
       photoStep: {
@@ -661,6 +661,7 @@ export const th = {
         logout: "ออกจากระบบ",
         verifiedHero: "ไรเดอร์ระดับ",
         selectLanguage: "เลือกภาษา",
+        vehicleType: "ข้อมูลยานพาหนะ",
       },
       payoutMethodPage: {
         title: "ช่องทางการรับเงิน",
