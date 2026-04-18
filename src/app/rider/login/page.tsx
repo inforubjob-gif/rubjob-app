@@ -65,7 +65,7 @@ export default function RiderLoginPage() {
             <Icons.Logo variant="white" size={140} className="drop-shadow-2xl" />
           </div>
         </div>
-          <p className="text-xs text-white/70 font-black uppercase mt-6 bg-white/10 backdrop-blur-sm py-1.5 px-6 rounded-full inline-block border border-white/10">
+          <p className="text-xl text-white font-black uppercase mt-6 bg-white/10 backdrop-blur-sm py-3 px-10 rounded-full inline-block border border-white/20">
             {t("rider.login.footer").split('\n')[0]}
           </p>
 
