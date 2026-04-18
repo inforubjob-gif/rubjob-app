@@ -231,7 +231,7 @@ export default function StoreSupportPage() {
 
       <div className="flex-1 px-5 pt-6 pb-24 space-y-4">
         <section className="space-y-2">
-          <p className="text-[10px] font-black text-slate-300 uppercase tracking-[0.25em] pl-1">เทมเพลตยอดนิยมสำหรับร้านค้า</p>
+          <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.25em] pl-1">เทมเพลตยอดนิยมสำหรับร้านค้า</p>
           <div className="flex gap-2 overflow-x-auto pb-1">
             {templateOptions.map((tpl) => (
               <button
@@ -263,7 +263,7 @@ export default function StoreSupportPage() {
         </button>
 
         <section className="space-y-2 mt-2">
-          <p className="text-[10px] font-black text-slate-300 uppercase tracking-[0.25em] pl-1">Q&A พื้นฐาน</p>
+          <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.25em] pl-1">Q&A พื้นฐาน</p>
           {faqItems.map((faq) => (
             <div key={faq.q} className="bg-white rounded-xl border border-slate-100 p-3">
               <p className="text-xs font-black text-slate-800">{faq.q}</p>
@@ -282,12 +282,12 @@ export default function StoreSupportPage() {
             <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-5">
               <Icons.Chat size={36} className="text-slate-300" />
             </div>
-            <p className="text-sm font-bold text-slate-400">{t("support.emptyTickets") || "ยังไม่มีรายการ"}</p>
-            <p className="text-xs text-slate-300 mt-1">{t("support.emptyTicketsDesc") || "เมื่อคุณแจ้งเรื่อง จะปรากฏที่นี่"}</p>
+            <p className="text-sm font-bold text-slate-500">{t("support.emptyTickets") || "ยังไม่มีรายการ"}</p>
+            <p className="text-xs text-slate-400 mt-1">{t("support.emptyTicketsDesc") || "เมื่อคุณแจ้งเรื่อง จะปรากฏที่นี่"}</p>
           </div>
         ) : (
           <div className="space-y-3">
-            <p className="text-[10px] font-black text-slate-300 uppercase tracking-[0.25em] pl-1">{t("support.myTickets") || "รายการของฉัน"}</p>
+            <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.25em] pl-1">{t("support.myTickets") || "รายการของฉัน"}</p>
             {tickets.map((ticket) => (
               <button
                 key={ticket.id}
@@ -311,7 +311,7 @@ export default function StoreSupportPage() {
                     <span className={`text-[8px] font-black uppercase px-2 py-0.5 rounded-full ${getStatusColor(ticket.status)}`}>
                       {getStatusLabel(ticket.status)}
                     </span>
-                    <span className="text-[9px] text-slate-300 font-bold">
+                    <span className="text-[9px] text-slate-400 font-bold">
                       {ticket.lastMessageAt ? new Date(ticket.lastMessageAt).toLocaleDateString() : ""}
                     </span>
                   </div>

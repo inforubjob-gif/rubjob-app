@@ -1,6 +1,5 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import { Icons } from "@/components/ui/Icons";
@@ -8,7 +7,6 @@ import { useTranslation } from "@/components/providers/LanguageProvider";
 import { SUPPORT_FAQS, SUPPORT_TEMPLATES } from "@/lib/support-content";
 
 export default function SupportPage() {
-  const router = useRouter();
   const { t } = useTranslation();
   const faqs = SUPPORT_FAQS.customer;
   const templates = SUPPORT_TEMPLATES.customer;
@@ -19,8 +17,8 @@ export default function SupportPage() {
       <div className="absolute top-0 left-0 right-0 h-[400px] bg-gradient-to-b from-primary via-primary to-slate-50 z-0" />
 
       <header className="relative z-10 px-5 pt-12 pb-8">
-        <h1 className="text-3xl font-black text-white tracking-tight mb-2 drop-shadow-sm">Help Center</h1>
-        <p className="text-white/70 text-sm font-medium">How can we help you today?</p>
+        <h1 className="text-3xl font-black text-white tracking-tight mb-2 drop-shadow-sm">{t("support.title")}</h1>
+        <p className="text-white/90 text-sm font-semibold">{t("support.subtitle")}</p>
         
         {/* Search Bar */}
         <div className="mt-8 bg-white/20 backdrop-blur-md rounded-2xl px-4 py-4 flex items-center gap-3 text-white border border-white/20 shadow-xl">
@@ -40,15 +38,15 @@ export default function SupportPage() {
                 <div className="w-12 h-12 rounded-2xl bg-green-50 text-green-600 flex items-center justify-center">
                     <Icons.Line size={24} />
                 </div>
-                <h3 className="text-sm font-bold">Chat with Us</h3>
-                <p className="text-[10px] text-slate-400 font-black uppercase">LINE Official</p>
+                <h3 className="text-sm font-bold text-slate-900">{t("support.contactAdmin")}</h3>
+                <p className="text-[10px] text-slate-500 font-black uppercase">LINE Official</p>
             </Card>
             <Card className="p-5 flex flex-col items-center text-center gap-3" hoverable>
                 <div className="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center">
                     <Icons.Phone size={24} />
                 </div>
-                <h3 className="text-sm font-bold">Call Support</h3>
-                <p className="text-[10px] text-slate-400 font-black uppercase">24/7 Available</p>
+                <h3 className="text-sm font-bold text-slate-900">Call Support</h3>
+                <p className="text-[10px] text-slate-500 font-black uppercase">24/7 Available</p>
             </Card>
         </section>
 
@@ -67,7 +65,7 @@ export default function SupportPage() {
                   </div>
                   <button
                     onClick={() => navigator.clipboard.writeText(`Subject: ${tpl.subject}\n\n${tpl.message}`)}
-                    className="text-[10px] font-black px-2.5 py-1.5 rounded-lg bg-slate-100 text-slate-500"
+                    className="text-[10px] font-black px-2.5 py-1.5 rounded-lg bg-primary/10 text-primary-dark"
                   >
                     {t("common.copy")}
                   </button>
@@ -80,7 +78,7 @@ export default function SupportPage() {
         {/* FAQs */}
         <section>
           <div className="flex items-center justify-between mb-5">
-            <h2 className="text-base font-bold text-foreground">Frequently Asked Questions</h2>
+            <h2 className="text-base font-bold text-foreground">Q&A</h2>
           </div>
           <div className="space-y-4">
             {faqs.map((faq, i) => (
@@ -100,8 +98,8 @@ export default function SupportPage() {
             <Card className="p-6 bg-slate-900 text-white border-none shadow-2xl relative overflow-hidden group">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-primary/20 rounded-full -mr-16 -mt-16 blur-3xl group-hover:bg-primary/30 transition-colors" />
                 <h3 className="text-lg font-black mb-3 relative z-10">Report a Problem</h3>
-                <p className="text-xs text-slate-400 leading-relaxed mb-6 relative z-10">Having issues with your order or the app? Let us know and we'll fix it immediately.</p>
-                <Button fullWidth className="bg-primary text-slate-900 border-none font-black text-xs uppercase tracking-widest relative z-10">
+                <p className="text-xs text-slate-200 leading-relaxed mb-6 relative z-10">Having issues with your order or the app? Let us know and we&apos;ll fix it immediately.</p>
+                <Button fullWidth className="bg-primary text-white border-none font-black text-xs uppercase tracking-widest relative z-10">
                     Open Support Ticket
                 </Button>
             </Card>
