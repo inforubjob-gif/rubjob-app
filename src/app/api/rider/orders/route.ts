@@ -31,6 +31,7 @@ export async function GET(req: Request) {
     try { await db.prepare("ALTER TABLE rider_users ADD COLUMN bankName TEXT").run(); } catch(e) {}
     try { await db.prepare("ALTER TABLE rider_users ADD COLUMN accountNumber TEXT").run(); } catch(e) {}
     try { await db.prepare("ALTER TABLE rider_users ADD COLUMN accountName TEXT").run(); } catch(e) {}
+    try { await db.prepare("ALTER TABLE rider_users ADD COLUMN lineUserId TEXT").run(); } catch(e) {}
 
     // Fetch Financial Settings for Calculation
     const settingsRows = await db.prepare(`

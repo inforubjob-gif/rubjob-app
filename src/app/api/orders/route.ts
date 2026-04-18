@@ -83,7 +83,7 @@ export async function POST(req: Request) {
 
     const orderId = `RJ-${Math.random().toString(36).substring(2, 10).toUpperCase()}`;
 
-    await db.prepare(`
+    const result = await db.prepare(`
       INSERT INTO orders (
         id, userId, storeId, serviceId, status, 
         laundryFee, deliveryFee, totalPrice, 
@@ -103,6 +103,54 @@ export async function POST(req: Request) {
       JSON.stringify(address || {}), 
       scheduledDate || null
     ).run();
+
+    // 🤖 Automation: Notify Store and Available Riders via LINE
+    const env = getRequestContext().env;
+    const accessToken = env.LINE_CHANNEL_ACCESS_TOKEN;
+    
+    if (accessToken) {
+      const { 
+        sendLinePush, 
+        riderNewJobFlex, 
+        storeOrderAlertFlex 
+      } = await import("@/lib/line");
+
+      // 1. Notify Store Owner
+      const storeData = await db.prepare("SELECT lineUserId FROM stores WHERE id = ?").bind(storeId).first() as any;
+      if (storeData?.lineUserId) {
+        await sendLinePush(storeData.lineUserId, [storeOrderAlertFlex(orderId)], accessToken).catch(() => {});
+      }
+
+      // 2. Broadcast to Online Riders
+      // We look for riders who have linked LINE and have workStatus = true in preferences
+      const riders = await db.prepare(`
+        SELECT ru.lineUserId, u.preferences
+        FROM rider_users ru
+        JOIN users u ON ru.id = u.id
+        WHERE ru.lineUserId IS NOT NULL
+      `).all();
+
+      // Fetch System Settings for Earnings Calculation
+      const settingsRows = await db.prepare(`
+        SELECT key, value FROM system_settings WHERE key IN ('gp_rider_percent', 'rider_base_payout')
+      `).all();
+      const settings: any = {};
+      settingsRows.results.forEach((r: any) => settings[r.key] = r.value);
+      
+      const gpRiderPercent = parseFloat(settings.gp_rider_percent || "10");
+      const riderBasePayout = parseFloat(settings.rider_base_payout || "0");
+      const commission = (deliveryFee * gpRiderPercent) / 100;
+      const legEarn = ((deliveryFee - commission) + riderBasePayout) * 0.5;
+
+      for (const r of (riders.results as any[])) {
+        try {
+          const prefs = JSON.parse(r.preferences || "{}");
+          if (prefs.workStatus === true) {
+            await sendLinePush(r.lineUserId, [riderNewJobFlex(orderId, 'pending', legEarn)], accessToken).catch(() => {});
+          }
+        } catch (e) {}
+      }
+    }
 
     return NextResponse.json({ success: true, orderId });
   } catch (error: any) {

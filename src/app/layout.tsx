@@ -11,6 +11,12 @@ export const metadata: Metadata = {
   description:
     "Professional laundry pickup & delivery. Book, track, and manage your laundry from LINE.",
   keywords: ["laundry", "pickup", "delivery", "LINE", "RUBJOB"],
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Rubjob",
+  },
   icons: {
     icon: "/images/rubjob-complete_logo-color.png",
     apple: "/images/rubjob-complete_logo-color.png",

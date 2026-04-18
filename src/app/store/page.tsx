@@ -140,6 +140,52 @@ export default function StoreDashboard() {
             </p>
           </div>
         </div>
+
+        {/* PWA & LINE Connectivity Alert */}
+        <div className="mt-8 space-y-4">
+          {!store?.lineUserId && (
+            <Card className="bg-gradient-to-r from-green-600 to-emerald-500 border-none text-white p-5 shadow-xl shadow-green-900/20">
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center shrink-0">
+                  <Icons.Bell className="text-white" size={24} />
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-black text-base uppercase leading-tight">รับแจ้งออเดอร์ทาง LINE</h3>
+                  <p className="text-xs text-white/80 font-bold mt-1 leading-relaxed">รับแจ้งเตือนทันทีที่มีลูกค้าสั่งของ หรือไรเดอร์กำลังเอาผ้ามาส่งครับ</p>
+                  <Button 
+                    variant="secondary" 
+                    size="sm" 
+                    className="mt-4 bg-white text-emerald-600 font-black uppercase text-[10px] py-2 px-6 rounded-lg shadow-lg active:scale-95 transition-all"
+                    onClick={async () => {
+                      try {
+                        const res = await fetch(`/api/auth/link-line?accountId=${store.id}`);
+                        const { token } = await res.json();
+                        const liffId = process.env.NEXT_PUBLIC_LIFF_ID;
+                        window.location.href = `https://liff.line.me/${liffId}/auth/link-line?type=store&id=${store.id}&token=${token}`;
+                      } catch (e) {
+                        alert("เกิดข้อผิดพลาดในการสร้างลิงก์เชื่อมต่อ");
+                      }
+                    }}
+                  >
+                    เชื่อมต่อตอนนี้
+                  </Button>
+                </div>
+              </div>
+            </Card>
+          )}
+
+          <Card className="bg-slate-900/40 backdrop-blur-xl border border-white/10 text-white p-5">
+            <div className="flex items-start gap-4">
+              <div className="w-10 h-10 bg-primary/20 rounded-xl flex items-center justify-center shrink-0">
+                <Icons.Logo variant="icon" size={20} />
+              </div>
+              <div className="flex-1 min-w-0">
+                <h3 className="font-black text-sm uppercase leading-tight">เพิ่มแอปตัวจัดการร้านค้าลงหน้าจอ</h3>
+                <p className="text-[10px] text-white/50 font-bold mt-1 leading-relaxed">กดที่ปุ่ม 'แชร์' บนเบราว์เซอร์ แล้วเลือก 'เพิ่มลงในหน้าจอโฮม' เพื่อการใช้งานที่รวดเร็วครับ</p>
+              </div>
+            </div>
+          </Card>
+        </div>
       </header>
 
       <div className="relative z-10 px-5 space-y-7 pt-2 animate-fade-in">

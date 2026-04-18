@@ -47,6 +47,7 @@ export async function GET(req: Request) {
     try { await db.prepare("ALTER TABLE stores ADD COLUMN email TEXT").run(); } catch(e) {}
     try { await db.prepare("ALTER TABLE stores ADD COLUMN password TEXT").run(); } catch(e) {}
     try { await db.prepare("ALTER TABLE stores ADD COLUMN preferences TEXT").run(); } catch(e) {}
+    try { await db.prepare("ALTER TABLE stores ADD COLUMN lineUserId TEXT").run(); } catch(e) {}
     
 
     const { results: stores } = await db.prepare(`

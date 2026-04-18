@@ -1,0 +1,17 @@
+{
+  "name": "Rubjob - Life Operator",
+  "short_name": "Rubjob",
+  "description": "Professional laundry pickup & delivery. Book, track, and manage your laundry from LINE.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ff9f1c",
+  "icons": [
+    {
+      "src": "/images/rubjob-complete_logo-color.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

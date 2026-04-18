@@ -278,6 +278,28 @@ export const deliveringToCustomerFlex = (orderId: string) =>
   orderStatusUpdateFlex(orderId, "กำลังนำผ้าไปส่งคืน", `ไรเดอร์ได้รับผ้าสะอาดของคุณแล้ว และกำลังเดินทางไปส่งคืนให้คุณที่บ้านครับ`, "#10b981");
 
 /**
+ * Flex Message for New Job Available (For Riders)
+ */
+export const riderNewJobFlex = (orderId: string, type: string, earn: number) => 
+  orderStatusUpdateFlex(
+    orderId, 
+    "💸 มีงานใหม่เข้า!", 
+    `ประเภท: ${type === 'pending' ? 'รับผ้าจากลูกค้า' : 'ส่งผ้าคืนลูกค้า'}\nรายได้: ฿${earn}\nกดเข้าแอปเพื่อรับงานด่วน!`, 
+    "#f59e0b"
+  );
+
+/**
+ * Flex Message for New Order Received (For Stores)
+ */
+export const storeOrderAlertFlex = (orderId: string) => 
+  orderStatusUpdateFlex(
+    orderId, 
+    "🧺 ออเดอร์ใหม่เข้า!", 
+    `มีลูกค้าสั่งบริการใหม่ครับ ตรวจสอบรายละเอียดและเตรียมรับผ้าจากไรเดอร์ได้เลย`, 
+    "#6366f1"
+  );
+
+/**
  * Flex Message for Completed
  */
 export const orderCompletedFlex = (orderId: string) => ({

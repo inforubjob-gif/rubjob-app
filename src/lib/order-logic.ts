@@ -61,6 +61,37 @@ export async function transitionOrderStatus(
         break;
       case "ready_for_pickup":
         flexMessage = readyForDeliveryFlex(orderId);
+        
+        // 🤖 Automation: Also broadcast to ALL Online Riders for the delivery leg
+        const riders = await db.prepare(`
+          SELECT ru.lineUserId, u.preferences
+          FROM rider_users ru
+          JOIN users u ON ru.id = u.id
+          WHERE ru.lineUserId IS NOT NULL
+        `).all();
+
+        // Calculate Earnings (Leg 2)
+        const settingsRows = await db.prepare(`
+          SELECT key, value FROM system_settings WHERE key IN ('gp_rider_percent', 'rider_base_payout')
+        `).all();
+        const settings: any = {};
+        settingsRows.results.forEach((r: any) => settings[r.key] = r.value);
+        
+        const gpRiderPercent = parseFloat(settings.gp_rider_percent || "10");
+        const riderBasePayout = parseFloat(settings.rider_base_payout || "0");
+        const deliveryFee = order.deliveryFee || 0;
+        const commission = (deliveryFee * gpRiderPercent) / 100;
+        const legEarn = ((deliveryFee - commission) + riderBasePayout) * 0.5;
+
+        const { riderNewJobFlex } = await import("./line");
+        for (const r of (riders.results as any[])) {
+          try {
+            const prefs = JSON.parse(r.preferences || "{}");
+            if (prefs.workStatus === true) {
+              await sendLinePush(r.lineUserId, [riderNewJobFlex(orderId, 'ready_for_pickup', legEarn)], accessToken).catch(() => {});
+            }
+          } catch (e) {}
+        }
         break;
       case "delivering_to_customer":
         flexMessage = deliveringToCustomerFlex(orderId);
