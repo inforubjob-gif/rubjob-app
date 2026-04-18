@@ -405,9 +405,26 @@ export const zh = {
     pointsToGo: "还需 {points} 积分",
     inviteBtn: "邀请好友赚取积分",
   },
-  success: {
-    title: "支付成功",
-    thanks: "感谢您使用 RUBJOB",
-    desc: "我们已收到您的付款。准备好享受高质的服务吧！",
-  },
+  rider: {
+    hero: "骑手",
+    vehicleType: "车辆类型",
+    vehicleTypePage: {
+      subtitle: "管理您的送货车辆",
+      choosePrimary: "选择您的主要车辆",
+      verificationTitle: "需要验证",
+      verificationDesc: "更改车辆类型可能需要重新审核文件。如有需要，我们的团队会与您联系。",
+      motorcycle: {
+        name: "摩托车",
+        desc: "快捷灵活 (最重 10kg)"
+      },
+      smallCar: {
+        name: "小型车",
+        desc: "标准 (最重 30kg)"
+      },
+      vanPickup: {
+        name: "货车 / 皮卡",
+        desc: "大型 (无限制)"
+      }
+    }
+  }
 };

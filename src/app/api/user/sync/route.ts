@@ -47,9 +47,17 @@ export async function POST(req: Request) {
         assignedStoreId TEXT,
         points INTEGER DEFAULT 0,
         preferences TEXT,
+        walletPin TEXT,
         createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
       )
     `).run();
+
+    // Migrations: Add walletPin column if missing
+    try {
+      await db.prepare(`ALTER TABLE users ADD COLUMN walletPin TEXT`).run();
+    } catch (e) {
+      // Column might already exist
+    }
 
     // Upsert User (include phone if provided)
     if (phone) {

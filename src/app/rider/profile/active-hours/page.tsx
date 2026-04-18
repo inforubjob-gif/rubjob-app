@@ -111,7 +111,7 @@ export default function RiderActiveHoursPage() {
           </button>
           <div className="flex-1">
             <h1 className="text-lg font-bold text-slate-900">{t("rider.profile.activeHours")}</h1>
-            <p className="text-xs text-slate-400">Set availability for each day</p>
+            <p className="text-xs text-slate-400">{t("rider.activeHoursPage.subtitle")}</p>
           </div>
           <Button 
             size="sm" 
@@ -128,7 +128,7 @@ export default function RiderActiveHoursPage() {
       <div className="p-5 space-y-6 animate-fade-in">
         {/* Day Selector Tabs */}
         <section>
-          <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest pl-1 mb-4">Select Day to Configure</p>
+          <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest pl-1 mb-4">{t("rider.activeHoursPage.selectDay")}</p>
           <div className="flex overflow-x-auto gap-2 pb-2 no-scrollbar">
              {DAYS.map(day => (
                  <button
@@ -136,13 +136,13 @@ export default function RiderActiveHoursPage() {
                     onClick={() => setSelectedDay(day)}
                     className={`min-w-[70px] py-4 rounded-xl border-2 font-black text-xs transition-all flex flex-col items-center gap-2 ${
                         selectedDay === day 
-                            ? 'bg-primary border-primary text-slate-900 shadow-lg shadow-primary/20 scale-[1.05]' 
+                            ? 'bg-primary border-primary text-white shadow-lg shadow-primary/20 scale-[1.05]' 
                             : workingHours[day].isOpen 
                                 ? 'bg-white border-primary/20 text-primary' 
                                 : 'bg-slate-100 border-transparent text-slate-400 opacity-50'
                     }`}
                  >
-                    {day}
+                    {t(`rider.activeHoursPage.days.${day}`)}
                     <div className={`w-1.5 h-1.5 rounded-full ${workingHours[day].isOpen ? 'bg-emerald-500' : 'bg-slate-300'}`} />
                  </button>
              ))}
@@ -155,8 +155,8 @@ export default function RiderActiveHoursPage() {
            
            <div className="flex items-center justify-between mb-8 relative z-10">
               <div>
-                 <h3 className="text-2xl font-black text-slate-900 uppercase tracking-tight">{selectedDay}</h3>
-                 <p className="text-xs text-slate-400 font-bold uppercase tracking-widest mt-1">Configure Availability</p>
+                 <h3 className="text-2xl font-black text-slate-900 uppercase tracking-tight">{t(`rider.activeHoursPage.days.${selectedDay}`)}</h3>
+                 <p className="text-xs text-slate-400 font-bold uppercase tracking-widest mt-1">{t("rider.activeHoursPage.configureAvailability")}</p>
               </div>
               <button 
                 onClick={() => toggleDay(selectedDay)}
@@ -168,9 +168,9 @@ export default function RiderActiveHoursPage() {
 
            {workingHours[selectedDay].isOpen ? (
              <div className="space-y-6 relative z-10">
-                <div className="grid grid-cols-2 gap-4">
+                 <div className="grid grid-cols-2 gap-4">
                    <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 flex flex-col items-center">
-                      <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Start Time</span>
+                      <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">{t("rider.activeHoursPage.startTime")}</span>
                       <input 
                          type="time" 
                          value={workingHours[selectedDay].start}
@@ -179,7 +179,7 @@ export default function RiderActiveHoursPage() {
                       />
                    </div>
                    <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 flex flex-col items-center">
-                      <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">End Time</span>
+                      <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">{t("rider.activeHoursPage.endTime")}</span>
                       <input 
                          type="time" 
                          value={workingHours[selectedDay].end}
@@ -197,13 +197,13 @@ export default function RiderActiveHoursPage() {
                      className="rounded-xl py-4 border-2 font-black text-[10px] uppercase tracking-widest flex items-center justify-center gap-2"
                      onClick={applyToAll}
                    >
-                      <Icons.Clock size={16} /> Apply to all days
+                      <Icons.Clock size={16} /> {t("rider.activeHoursPage.applyToAll")}
                    </Button>
                 </div>
              </div>
            ) : (
              <div className="py-8 text-center bg-slate-50 rounded-xl border-2 border-dashed border-slate-200">
-                <p className="text-sm font-black text-slate-400 uppercase tracking-widest">Off-duty on {selectedDay}</p>
+                <p className="text-sm font-black text-slate-400 uppercase tracking-widest">{t("rider.activeHoursPage.offDuty").replace("{day}", t(`rider.activeHoursPage.days.${selectedDay}`))}</p>
              </div>
            )}
         </Card>
@@ -213,7 +213,7 @@ export default function RiderActiveHoursPage() {
             <div className="flex items-start gap-3">
                 <Icons.Shield size={16} className="text-primary mt-0.5" />
                 <p className="text-[10px] text-orange-700 font-bold leading-relaxed uppercase">
-                    Our algorithm prioritizes riders based on their declared active hours. Stay active to earn more!
+                    {t("rider.activeHoursPage.reminder")}
                 </p>
             </div>
         </div>

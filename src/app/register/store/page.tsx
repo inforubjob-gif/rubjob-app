@@ -71,7 +71,7 @@ export default function StoreRegisterPage() {
   if (step === 4) {
     return (
       <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-6 text-center">
-        <div className="w-24 h-24 bg-primary rounded-xl flex items-center justify-center text-slate-900 mb-8 shadow-2xl shadow-primary/20 animate-in zoom-in duration-500">
+        <div className="w-24 h-24 bg-primary rounded-xl flex items-center justify-center text-white mb-8 shadow-2xl shadow-primary/20 animate-in zoom-in duration-500">
           <Icons.Store size={48} strokeWidth={2.5} />
         </div>
         <h1 className="text-3xl font-black text-slate-900 mb-3 uppercase tracking-tighter">Welcome to the Network</h1>
@@ -166,7 +166,7 @@ export default function StoreRegisterPage() {
           <div className="space-y-6 animate-in slide-in-from-right-4 duration-500">
              <div className="bg-primary/10 border-2 border-primary/20 rounded-xl p-8 mb-8">
                 <div className="flex items-center gap-4 mb-4">
-                   <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center text-slate-900">
+                   <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center text-white">
                       <Icons.Wallet size={24} />
                    </div>
                    <h3 className="font-black text-xl uppercase tracking-tighter">Treasury Setup</h3>
@@ -262,7 +262,7 @@ export default function StoreRegisterPage() {
                  onClick={handleSubmit} 
                  isLoading={isSubmitting}
                  disabled={formData.documents.length < 3}
-                 className="w-full bg-primary text-slate-900 py-7 rounded-full font-black text-sm uppercase tracking-[0.4em] shadow-2xl shadow-primary/30 transform transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-50"
+                 className="w-full bg-primary text-white py-7 rounded-full font-black text-sm uppercase tracking-[0.4em] shadow-2xl shadow-primary/30 transform transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-50"
                >
                   Authorize Partnership
                </Button>

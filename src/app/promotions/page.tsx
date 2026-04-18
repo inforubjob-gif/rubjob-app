@@ -208,7 +208,7 @@ export default function PromotionsPage() {
                                 <Button 
                                     size="sm" 
                                     onClick={handleUseNow}
-                                    className="px-6 bg-primary text-slate-900 border-none font-black text-[10px] uppercase tracking-widest"
+                                    className="px-6 bg-primary text-white border-none font-black text-[10px] uppercase tracking-widest"
                                 >
                                     {t("common.useNow")}
                                 </Button>

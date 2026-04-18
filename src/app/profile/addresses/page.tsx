@@ -226,7 +226,7 @@ export default function ManageAddressesPage() {
                    <button 
                      onClick={handleAddAddress}
                      disabled={isSaving}
-                     className={`flex-1 py-3.5 bg-primary text-slate-900 rounded-xl text-sm font-bold shadow-lg shadow-primary/20 active:scale-95 transition-transform ${isSaving ? 'opacity-50' : ''}`}
+                     className={`flex-1 py-3.5 bg-primary text-white rounded-xl text-sm font-bold shadow-lg shadow-primary/20 active:scale-95 transition-transform ${isSaving ? 'opacity-50' : ''}`}
                    >
                      {isSaving ? t("common.confirm") + "..." : t("profile.saveAddress")}
                    </button>

@@ -119,7 +119,7 @@ export default function ActiveHoursPage() {
                     onClick={() => setSelectedDay(day)}
                     className={`min-w-[70px] py-4 rounded-xl border-2 font-black text-xs transition-all flex flex-col items-center gap-2 ${
                         selectedDay === day 
-                            ? 'bg-primary border-primary text-slate-900 shadow-lg shadow-primary/20 scale-[1.05]' 
+                            ? 'bg-primary border-primary text-white shadow-lg shadow-primary/20 scale-[1.05]' 
                             : workingHours[day].isOpen 
                                 ? 'bg-white border-primary/20 text-primary' 
                                 : 'bg-slate-100 border-transparent text-slate-400 opacity-50'

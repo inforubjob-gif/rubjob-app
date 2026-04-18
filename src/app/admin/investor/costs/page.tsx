@@ -74,7 +74,7 @@ export default function InvestorCostsPage() {
                   </div>
                </div>
 
-               <div className="bg-primary rounded-xl p-10 flex flex-col justify-between text-slate-900 relative overflow-hidden">
+               <div className="bg-primary rounded-xl p-10 flex flex-col justify-between text-white relative overflow-hidden">
                   <div className="absolute bottom-0 right-0 w-32 h-32 bg-black/5 rounded-full translate-y-1/4 translate-x-1/4" />
                   <div className="relative z-10">
                      <Icons.Wallet size={48} strokeWidth={3} />
@@ -97,7 +97,7 @@ export default function InvestorCostsPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                {infrastructureCosts.map((item, idx) => (
                   <Card key={idx} className="bg-slate-900/40 border-slate-800/50 hover:border-primary/50 p-8 rounded-xl transition-all duration-300 group">
-                     <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center text-slate-400 mb-6 group-hover:bg-primary group-hover:text-slate-900 transition-all duration-500 shadow-xl shadow-black/50">
+                     <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center text-slate-400 mb-6 group-hover:bg-primary group-hover:text-white transition-all duration-500 shadow-xl shadow-black/50">
                         {item.icon}
                      </div>
                      <h4 className="text-sm font-black uppercase tracking-widest text-slate-400 mb-1">{item.name}</h4>

@@ -261,7 +261,7 @@ export default function ProfilePage() {
                     <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{lang.sub}</p>
                   </div>
                   {language === lang.key && (
-                    <div className="w-6 h-6 bg-primary rounded-full flex items-center justify-center text-slate-900 shadow-lg">
+                    <div className="w-6 h-6 bg-primary rounded-full flex items-center justify-center text-white shadow-lg">
                       <Icons.Check size={14} strokeWidth={4} className="text-white" />
                     </div>
                   )}

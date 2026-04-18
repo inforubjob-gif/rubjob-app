@@ -98,7 +98,7 @@ export default function EditProfilePage() {
                 <Icons.Camera size={24} className="text-white" />
               </div>
             </div>
-            <div className="absolute -bottom-1 -right-1 w-10 h-10 bg-primary text-slate-900 rounded-xl flex items-center justify-center shadow-xl border-[4px] border-slate-50">
+            <div className="absolute -bottom-1 -right-1 w-10 h-10 bg-primary text-white rounded-xl flex items-center justify-center shadow-xl border-[4px] border-slate-50">
               <Icons.Edit size={18} />
             </div>
             <input 
@@ -192,7 +192,7 @@ export default function EditProfilePage() {
           <button
             onClick={handleSave}
             disabled={!isVerified || isLoading}
-            className="w-full py-5 bg-primary text-slate-950 rounded-xl font-[1000] uppercase tracking-[0.25em] shadow-2xl shadow-primary/30 disabled:bg-slate-200 disabled:text-slate-400 disabled:shadow-none active:scale-[0.98] transition-all flex items-center justify-center gap-3"
+            className="w-full py-5 bg-primary text-white rounded-xl font-[1000] uppercase tracking-[0.25em] shadow-2xl shadow-primary/30 disabled:bg-slate-200 disabled:text-slate-400 disabled:shadow-none active:scale-[0.98] transition-all flex items-center justify-center gap-3"
           >
             {isLoading ? (
               <div className="w-6 h-6 border-4 border-slate-950/20 border-t-slate-950 rounded-full animate-spin" />

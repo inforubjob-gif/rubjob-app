@@ -137,7 +137,7 @@ export default function RiderRegisterPage() {
                 />
              </div>
              <div className="pt-4">
-               <Button onClick={() => setStep(2)} disabled={!formData.name || !formData.phone} className="w-full bg-primary text-slate-950 py-6 rounded-xl font-black text-xs uppercase tracking-[0.3em] shadow-2xl shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all">
+               <Button onClick={() => setStep(2)} disabled={!formData.name || !formData.phone} className="w-full bg-primary text-white py-6 rounded-xl font-black text-xs uppercase tracking-[0.3em] shadow-2xl shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all">
                   Next Step
                </Button>
              </div>
@@ -187,7 +187,7 @@ export default function RiderRegisterPage() {
                <Button onClick={() => setStep(1)} className="w-full bg-slate-900 text-slate-400 py-6 rounded-xl font-black text-xs uppercase tracking-widest">
                   Back
                </Button>
-               <Button onClick={() => setStep(3)} disabled={!formData.licensePlate || !formData.idNumber} className="w-full bg-primary text-slate-950 py-6 rounded-xl font-black text-xs uppercase tracking-widest shadow-2xl shadow-primary/20">
+               <Button onClick={() => setStep(3)} disabled={!formData.licensePlate || !formData.idNumber} className="w-full bg-primary text-white py-6 rounded-xl font-black text-xs uppercase tracking-widest shadow-2xl shadow-primary/20">
                   Almost Done
                </Button>
              </div>
@@ -237,7 +237,7 @@ export default function RiderRegisterPage() {
                  onClick={handleSubmit} 
                  isLoading={isSubmitting}
                  disabled={formData.documents.length < 3}
-                 className="w-full bg-primary text-slate-950 py-7 rounded-full font-black text-sm uppercase tracking-[0.4em] shadow-2xl shadow-primary/30 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50"
+                 className="w-full bg-primary text-white py-7 rounded-full font-black text-sm uppercase tracking-[0.4em] shadow-2xl shadow-primary/30 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50"
                >
                   Submit Application
                </Button>

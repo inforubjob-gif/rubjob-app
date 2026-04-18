@@ -147,7 +147,7 @@ export default function RiderDashboard() {
               <Icons.Logo variant="icon" size={36} />
             </div>
             <div className="min-w-0">
-              <p className="text-[10px] text-white/70 font-black uppercase tracking-[0.25em] leading-tight mb-2 flex items-center gap-2">
+              <p className="text-[10px] text-white font-black uppercase tracking-[0.25em] leading-tight mb-2 flex items-center gap-2">
                 <span className="w-1.5 h-1.5 rounded-full bg-white/50 animate-pulse" />
                 {t("rider.hero")}
               </p>
@@ -339,7 +339,7 @@ export default function RiderDashboard() {
                 </div>
 
                 <div className="relative z-10 flex flex-col items-center">
-                   <div className="w-10 h-10 bg-primary rounded-xl border-4 border-white shadow-xl flex items-center justify-center text-slate-800">
+                   <div className="w-10 h-10 bg-primary rounded-xl border-4 border-white shadow-xl flex items-center justify-center text-white">
                       <Icons.MapPin size={20} strokeWidth={3} />
                    </div>
                    <p className="text-[10px] font-black mt-2 uppercase tracking-tighter opacity-50">{t("common.user")}</p>

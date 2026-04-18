@@ -443,6 +443,16 @@ export const en = {
       withdrawSuccessDesc: "Funds will be transferred within 24h.",
       alertBankInfo: "Please fill in all bank information.",
       withdrawError: "Withdrawal failed",
+      pin: {
+        title: "Security PIN",
+        setupTitle: "Set Your Wallet PIN",
+        enterTitle: "Enter PIN to Access Wallet",
+        error: "Incorrect PIN. Please try again.",
+        setupSuccess: "PIN setup successfully.",
+        confirmPin: "Confirm PIN",
+        mismatch: "PINs do not match",
+        instruction: "6-digit code for financial security",
+      }
     },
     navigate: "Navigate",
     pickup: "Pickup",
@@ -595,6 +605,16 @@ export const en = {
         pending: "Pending",
         completed: "Success",
         failed: "Failed",
+      },
+      pin: {
+        title: "Security PIN",
+        setupTitle: "Set Your Wallet PIN",
+        enterTitle: "Enter PIN to Access Wallet",
+        error: "Incorrect PIN. Please try again.",
+        setupSuccess: "PIN setup successfully.",
+        confirmPin: "Confirm PIN",
+        mismatch: "PINs do not match",
+        instruction: "6-digit code for financial security",
       }
     },
     navDashboard: "Accept",
@@ -689,6 +709,25 @@ export const en = {
         truck: "Truck",
       }
     },
+    vehicleTypePage: {
+      subtitle: "Manage your delivery vehicle",
+      choosePrimary: "Choose your primary vehicle",
+      verificationTitle: "Verification Required",
+      verificationDesc: "Changing your vehicle type may require a new document review. Our team will contact you if needed.",
+      motorcycle: {
+        name: "Motorcycle",
+        desc: "Fast & Agile (Up to 10kg)"
+      },
+      smallCar: {
+        name: "Small Car",
+        desc: "Standard (Up to 30kg)"
+      },
+      vanPickup: {
+        name: "Van / Pickup",
+        desc: "Large (Unlimited)"
+      }
+    }
+  },
     verification: {
         title: "ID Verification",
         sub: "Submit documents to start earning",

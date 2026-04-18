@@ -175,7 +175,7 @@ export default function StoreForm({ initialData, isEdit }: StoreFormProps) {
       {initialData?.status === 'pending' && (
         <div className="bg-primary/5 border-2 border-primary/20 rounded-xl p-6 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xl shadow-primary/5">
            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center text-slate-900 animate-pulse">
+              <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center text-white animate-pulse">
                  <Icons.Shield size={24} />
               </div>
               <div>

@@ -26,6 +26,7 @@ export const th = {
       tryAgain: "ลองใหม่อีกครั้ง",
       success: "สำเร็จ",
       refresh: "รีเฟรช",
+      loadingMap: "กำลังโหลดแผนที่...",
       store: "ร้านค้า",
       user: "ผู้ใช้",
       comingSoon: "เร็วๆ นี้...",
@@ -502,6 +503,16 @@ export const th = {
         withdrawSuccessDesc: "ยอดเงินจะถูกโอนเข้าบัญชีของคุณภายใน 24 ชม.",
         alertBankInfo: "กรุณากรอกข้อมูลธนาคารให้ครบถ้วน",
         withdrawError: "ถอนเงินไม่สำเร็จ",
+        pin: {
+          title: "รหัสความปลอดภัย",
+          setupTitle: "ตั้งรหัส PIN กระเป๋าเงินของคุณ",
+          enterTitle: "กรุณาใส่รหัส PIN เพื่อเข้าถึงกระเป๋าเงิน",
+          error: "รหัส PIN ไม่ถูกต้อง กรุณาลองอีกครั้ง",
+          setupSuccess: "ตั้งค่ารหัส PIN สำเร็จ",
+          confirmPin: "ยืนยันรหัส PIN อีกครั้ง",
+          mismatch: "รหัส PIN ไม่ตรงกัน",
+          instruction: "รหัส 6 หลักสำหรับความปลอดภัยในการเงิน",
+        }
       },
       navigate: "นำทาง",
       pickup: "รับผ้า",
@@ -599,10 +610,20 @@ export const th = {
         outsideHoursNotice: "ออเดอร์ที่มานอกเวลาทำการ จะถูกจัดคิวสำหรับวันถัดไปโดยอัตโนมัติ",
       },
       vehicleTypePage: {
-        manageStoreDeliveryVehicles: "จัดการยานพาหนะสำหรับงานรับ-ส่งของร้าน",
+        manageStoreDeliveryVehicles: "จัดการยานพาหนะสำหรับการรับส่งของร้าน",
         selectPrimaryStoreVehicle: "เลือกยานพาหนะหลักของร้าน",
-        storeLogistics: "โลจิสติกส์ร้าน",
+        storeLogistics: "โลจิสติกส์ของร้าน",
         storeLogisticsDesc: "ยานพาหนะนี้จะใช้สำหรับงานรับและส่งผ้าที่ร้านจัดการเอง โปรดตรวจสอบเอกสารให้เป็นปัจจุบันเสมอ",
+      },
+      loginPage: {
+        portal: "ระบบจัดการร้านค้า RUBJOB",
+        authorizedOnly: "สำหรับร้านค้าที่ได้รับอนุญาตเท่านั้น",
+      },
+      servicesPage: {
+        configure: "ตั้งค่าบริการของร้านคุณ",
+      },
+      orderDetail: {
+        serviceLevel: "ระดับบริการ",
       }
     },
     rider: {
@@ -657,6 +678,16 @@ export const th = {
           pending: "รอดำเนินการ",
           completed: "สำเร็จ",
           failed: "ไม่สำเร็จ",
+        },
+        pin: {
+          title: "รหัสความปลอดภัย",
+          setupTitle: "ตั้งรหัส PIN กระเป๋าเงินของคุณ",
+          enterTitle: "กรุณาใส่รหัส PIN เพื่อเข้าถึงกระเป๋าเงิน",
+          error: "รหัส PIN ไม่ถูกต้อง กรุณาลองอีกครั้ง",
+          setupSuccess: "ตั้งค่ารหัส PIN สำเร็จ",
+          confirmPin: "ยืนยันรหัส PIN อีกครั้ง",
+          mismatch: "รหัส PIN ไม่ตรงกัน",
+          instruction: "รหัส 6 หลักสำหรับความปลอดภัยในการเงิน",
         }
       },
       navDashboard: "รับงาน",
@@ -749,6 +780,43 @@ export const th = {
           bike: "มอเตอร์ไซค์",
           car: "รถยนต์",
           truck: "รถกระบะ",
+        }
+      },
+      vehicleTypePage: {
+        subtitle: "จัดการยานพาหนะสำหรับการรับส่ง",
+        choosePrimary: "เลือกยานพาหนะหลักของคุณ",
+        verificationTitle: "จำเป็นต้องมีการตรวจสอบ",
+        verificationDesc: "การเปลี่ยนประเภทรถอาจต้องมีการตรวจสอบเอกสารใหม่ ทีมงานจะติดต่อคุณหากจำเป็น",
+        motorcycle: {
+          name: "รถจักรยานยนต์",
+          desc: "รวดเร็วและคล่องตัว (สูงสุด 10 กก.)"
+        },
+        smallCar: {
+          name: "รถยนต์ขนาดเล็ก",
+          desc: "มาตรฐาน (สูงสุด 30 กก.)"
+        },
+        vanPickup: {
+          name: "รถตู้ / รถกระบะ",
+          desc: "ขนาดใหญ่ (ไม่จำกัด)"
+        }
+      },
+      activeHoursPage: {
+        subtitle: "ตั้งค่าเวลาทำการรายวัน",
+        selectDay: "เลือกวันเพื่อตั้งค่า",
+        configureAvailability: "ตั้งค่าเวลาทำการ",
+        startTime: "เวลาเริ่มต้น",
+        endTime: "เวลาสิ้นสุด",
+        applyToAll: "ใช้กับทุกวัน",
+        offDuty: "ปิดทำการวัน{day}",
+        reminder: "ระบบจะเลือกงานให้ไรเดอร์ตามเวลาทำการที่ระบุไว้ ยิ่งเปิดรับมากยิ่งเพิ่มโอกาสสร้างรายได้!",
+        days: {
+          Mon: "จันทร์",
+          Tue: "อังคาร",
+          Wed: "พุธ",
+          Thu: "พฤหัสบดี",
+          Fri: "ศุกร์",
+          Sat: "เสาร์",
+          Sun: "อาทิตย์"
         }
       },
       earnAmountLabel: "รายได้ที่จะได้รับ",
