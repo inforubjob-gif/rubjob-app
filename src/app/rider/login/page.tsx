@@ -126,6 +126,26 @@ export default function RiderLoginPage() {
           </div>
         </form>
 
+        <div className="flex flex-col items-center gap-6 mt-4 animate-in fade-in slide-in-from-bottom-4 duration-1000">
+          <button 
+            onClick={() => alert(t("common.forgotPasswordMessage"))}
+            className="text-white/60 hover:text-white text-xs font-black uppercase transition-colors tracking-widest border-b border-white/20 pb-0.5"
+          >
+            {t("common.forgotPassword")}
+          </button>
+          
+          <a 
+            href="https://line.me/R/ti/p/@rubjob" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="flex items-center gap-3 bg-white/10 hover:bg-white/20 backdrop-blur-md px-6 py-3 rounded-full border border-white/20 transition-all active:scale-95 group"
+          >
+            <Icons.Line size={20} className="text-[#06C755]" />
+            <span className="text-white text-xs font-black uppercase">{t("common.contactAdmin")}</span>
+            <Icons.ExternalLink size={14} className="text-white/40 group-hover:text-white/70 transition-colors" />
+          </a>
+        </div>
+
         <div className="text-center pb-8 sticky bottom-0">
           <p className="text-xs text-slate-400 font-bold uppercase leading-relaxed drop-shadow-sm">
             {t("rider.login.footer")}

@@ -38,6 +38,18 @@ export default function LoginView() {
             </div>
           </div>
         </div>
+
+        <div className="mt-8 animate-in fade-in slide-in-from-bottom-4 duration-1000">
+          <a 
+            href="https://line.me/R/ti/p/@rubjob" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="flex items-center gap-3 bg-white/5 hover:bg-white/10 backdrop-blur-sm px-6 py-2.5 rounded-full border border-white/10 transition-all active:scale-95 group"
+          >
+            <Icons.Line size={18} className="text-[#06C755]" />
+            <span className="text-white/60 text-[10px] font-black uppercase tracking-widest group-hover:text-white transition-colors">{t("common.contactAdmin")}</span>
+          </a>
+        </div>
       </main>
 
       {/* Footer to match Rider look */}
