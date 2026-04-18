@@ -39,11 +39,9 @@ export default function BottomNav() {
   // Hide on Admin portal always
   if (isAdminContext) return null;
 
-  // Hide on Rider portal if not authenticated (Login screen)
-  if (isRiderContext) {
-    if (typeof window !== "undefined" && !localStorage.getItem("rubjob_rider_session")) {
-      return null;
-    }
+  // Hide on Authentication screens
+  if (pathname === "/store/login" || pathname === "/rider/login" || pathname.startsWith("/admin/login")) {
+    return null;
   }
 
   // Helper to get clean link for subdomains
