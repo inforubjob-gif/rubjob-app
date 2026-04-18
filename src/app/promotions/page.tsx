@@ -19,6 +19,9 @@ export default function PromotionsPage() {
     setTimeout(() => setCopiedCode(null), 2000);
   };
 
+  const [isLoadingCoupons, setIsLoadingCoupons] = useState(true);
+  const [dbCoupons, setDbCoupons] = useState<any[]>([]);
+
   const handleUseNow = () => {
     router.push("/");
   };
@@ -39,6 +42,21 @@ export default function PromotionsPage() {
     }
     fetchOrders();
   }, [profile?.userId]);
+
+  useEffect(() => {
+    async function fetchCoupons() {
+      try {
+        const res = await fetch("/api/coupons");
+        const data = await res.json() as any;
+        if (data.coupons) setDbCoupons(data.coupons);
+      } catch (err) {
+        console.error("Failed to fetch coupons:", err);
+      } finally {
+        setIsLoadingCoupons(false);
+      }
+    }
+    fetchCoupons();
+  }, []);
 
   const totalPoints = orders.reduce((acc, order) => acc + (order.totalPrice || 0), 0);
   const nextTierPoints = 1500;
@@ -88,29 +106,15 @@ export default function PromotionsPage() {
     }
   };
 
-  const deals = [
-    { 
-        title: t("promotions.deals.songkranTitle"), 
-        desc: t("promotions.deals.songkranDesc"),
-        code: "SONGKRAN20",
-        color: "bg-blue-500",
-        expires: t("promotions.deals.songkranExpires"),
-    },
-    { 
-        title: t("promotions.deals.newUserTitle"), 
-        desc: t("promotions.deals.newUserDesc"),
-        code: "WELCOME50",
-        color: "bg-orange-500",
-        expires: t("promotions.deals.newUserExpires"),
-    },
-    { 
-        title: t("promotions.deals.flashTitle"), 
-        desc: t("promotions.deals.flashDesc"),
-        code: "HOMEFLASH",
-        color: "bg-violet-600",
-        expires: t("promotions.deals.flashExpires"),
-    },
-  ];
+  const couponColors = ["bg-blue-500", "bg-orange-500", "bg-violet-600", "bg-emerald-500", "bg-rose-500", "bg-indigo-500"];
+  
+  const deals = dbCoupons.map((cpn, idx) => ({
+    title: cpn.title || t(`admin.coupons.modal.code`) + " " + cpn.code,
+    desc: cpn.description || (cpn.type === 'percentage' ? `${cpn.value}% ${t('promotions.discount') || 'Discount'}` : `฿${cpn.value} ${t('promotions.discount') || 'Discount'}`),
+    code: cpn.code,
+    color: couponColors[idx % couponColors.length],
+    expires: cpn.expiryDate ? new Date(cpn.expiryDate).toLocaleDateString() : t("promotions.deals.newUserExpires")
+  }));
 
   return (
     <div className="flex flex-col min-h-dvh bg-slate-50 relative overflow-hidden">
@@ -180,6 +184,16 @@ export default function PromotionsPage() {
 
         {/* Coupon Grid */}
         <div className="grid grid-cols-1 gap-6">
+            {isLoadingCoupons && (
+              <div className="flex justify-center py-10">
+                <div className="w-8 h-8 border-4 border-white/20 border-t-white rounded-full animate-spin" />
+              </div>
+            )}
+            {!isLoadingCoupons && deals.length === 0 && (
+              <Card className="p-10 text-center bg-white/10 backdrop-blur-md border border-white/20">
+                <p className="text-white/60 font-bold italic">{t("booking.noCoupons")}</p>
+              </Card>
+            )}
             {deals.map((deal, i) => (
                 <Card key={i} className="p-0 overflow-hidden relative group" hoverable>
                     <div className="flex">

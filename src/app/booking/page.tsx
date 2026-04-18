@@ -8,6 +8,7 @@ import { TIME_SLOTS } from "@/lib/constants";
 import type { ServiceType, Address, Store } from "@/types";
 
 import { Icons, getServiceIcon } from "@/components/ui/Icons";
+import Modal from "@/components/ui/Modal";
 
 function getDistanceKm(lat1: number, lon1: number, lat2: number, lon2: number) {
   const R = 6371; 
@@ -196,6 +197,9 @@ function BookingFlow() {
   // Discounts
   const [couponCode, setCouponCode] = useState("");
   const [appliedCoupon, setAppliedCoupon] = useState<{ code: string, discount: number } | null>(null);
+  const [isCouponModalOpen, setIsCouponModalOpen] = useState(false);
+  const [availableCoupons, setAvailableCoupons] = useState<any[]>([]);
+  const [isLoadingCoupons, setIsLoadingCoupons] = useState(false);
   const [usePoints, setUsePoints] = useState(false);
   const availablePoints = 500;
   const pointsDiscount = usePoints ? 50 : 0;
@@ -618,9 +622,29 @@ function BookingFlow() {
 
             {/* Discount & Points */}
             <section className="animate-fade-in">
-              <h3 className="text-sm font-bold text-foreground mb-2 flex items-center gap-2 mt-6">
-                <Icons.Ticket size={18} className="text-primary" /> {t("booking.discountsTitle")}
-              </h3>
+              <div className="flex items-center justify-between mb-2 mt-6">
+                <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
+                  <Icons.Ticket size={18} className="text-primary" /> {t("booking.discountsTitle")}
+                </h3>
+                <button 
+                  onClick={async () => {
+                    setIsCouponModalOpen(true);
+                    setIsLoadingCoupons(true);
+                    try {
+                      const res = await fetch("/api/coupons");
+                      const data = await res.json() as any;
+                      if (data.coupons) setAvailableCoupons(data.coupons);
+                    } catch (err) {
+                      console.error("Failed to fetch coupons", err);
+                    } finally {
+                      setIsLoadingCoupons(false);
+                    }
+                  }}
+                  className="text-xs font-bold text-primary active:opacity-60 transition-opacity"
+                >
+                  {t("booking.selectCoupon")}
+                </button>
+              </div>
               
               <Card className="p-4 mb-4">
                 <div className="flex gap-2 mb-4">
@@ -644,6 +668,7 @@ function BookingFlow() {
                         if (res.ok && data.success) {
                           setAppliedCoupon({ code: data.coupon.code, discount: data.coupon.discount });
                           showToast(t("booking.couponSuccess").replace("{amount}", data.coupon.discount.toString()), "success");
+                          setCouponCode(data.coupon.code);
                         } else {
                           showToast(`❌ ${data.error || t("booking.couponErrorGeneric")}`, "error");
                       }
@@ -942,6 +967,61 @@ function BookingFlow() {
           </Button>
         )}
       </div>
+      
+      {/* Coupon Selection Modal */}
+      <Modal isOpen={isCouponModalOpen} onClose={() => setIsCouponModalOpen(false)} title={t("booking.selectCoupon")}>
+         <div className="space-y-4 pt-2">
+            {isLoadingCoupons && (
+               <div className="flex justify-center py-10">
+                  <div className="w-8 h-8 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
+               </div>
+            )}
+            {!isLoadingCoupons && availableCoupons.length === 0 && (
+               <div className="text-center py-10 text-slate-400 italic font-medium">
+                  {t("booking.noCoupons")}
+               </div>
+            )}
+            {availableCoupons.map((cpn) => (
+               <button 
+                  key={cpn.id}
+                  onClick={async () => {
+                     setCouponCode(cpn.code);
+                     setIsCouponModalOpen(false);
+                     // Auto-apply logic
+                     try {
+                        const res = await fetch("/api/coupons/validate", {
+                           method: "POST",
+                           headers: { "Content-Type": "application/json" },
+                           body: JSON.stringify({ code: cpn.code, subtotal: laundryFee + deliveryFee })
+                        });
+                        const data = await res.json();
+                        if (res.ok && data.success) {
+                           setAppliedCoupon({ code: data.coupon.code, discount: data.coupon.discount });
+                           showToast(t("booking.couponSuccess").replace("{amount}", data.coupon.discount.toString()), "success");
+                        } else {
+                           showToast(`❌ ${data.error || t("booking.couponErrorGeneric")}`, "error");
+                        }
+                     } catch (err) {
+                        showToast(`❌ ${t("booking.couponErrorGeneric")}`, "error");
+                     }
+                  }}
+                  className="w-full text-left"
+               >
+                  <Card className="p-4 border-2 border-slate-100 hover:border-primary active:scale-[0.98] transition-all group">
+                     <div className="flex justify-between items-start mb-1">
+                        <span className="text-sm font-black text-slate-900">{cpn.title || cpn.code}</span>
+                        <span className="text-[10px] font-black text-primary uppercase bg-primary/5 px-2 py-0.5 rounded-lg">{cpn.code}</span>
+                     </div>
+                     <p className="text-xs text-slate-500 mb-3">{cpn.description || (cpn.type === 'percentage' ? `${cpn.value}% Off` : `฿${cpn.value} Off`)}</p>
+                     <div className="flex items-center justify-between text-[10px] font-bold text-slate-400">
+                        <span>Min Spend ฿{cpn.minOrder || 0}</span>
+                        {cpn.expiryDate && <span>Expires: {new Date(cpn.expiryDate).toLocaleDateString()}</span>}
+                     </div>
+                  </Card>
+               </button>
+            ))}
+         </div>
+      </Modal>
     </div>
   );
 }

@@ -26,7 +26,9 @@ export default function CouponsAdminPage() {
     maxDiscount: "",
     expiryDate: "",
     usageLimit: "",
-    isVisible: false
+    isVisible: false,
+    title: "",
+    description: ""
   });
 
   useEffect(() => {
@@ -63,7 +65,7 @@ export default function CouponsAdminPage() {
       if (res.ok) {
         setIsModalOpen(false);
         setEditingId(null);
-        setFormData({ code: "", type: "percentage", value: "", minOrder: "0", maxDiscount: "", expiryDate: "", usageLimit: "", isVisible: false });
+        setFormData({ code: "", type: "percentage", value: "", minOrder: "0", maxDiscount: "", expiryDate: "", usageLimit: "", isVisible: false, title: "", description: "" });
         fetchCoupons();
       } else {
         const err = await res.json();
@@ -86,7 +88,9 @@ export default function CouponsAdminPage() {
       maxDiscount: (coupon.maxDiscount || "").toString(),
       expiryDate: coupon.expiryDate ? new Date(coupon.expiryDate).toISOString().split('T')[0] : "",
       usageLimit: (coupon.usageLimit || "").toString(),
-      isVisible: coupon.isVisible === 1
+      isVisible: coupon.isVisible === 1,
+      title: coupon.title || "",
+      description: coupon.description || ""
     });
     setIsModalOpen(true);
   };
@@ -141,7 +145,7 @@ export default function CouponsAdminPage() {
         <button 
           onClick={() => {
             setEditingId(null);
-            setFormData({ code: "", type: "percentage", value: "", minOrder: "0", maxDiscount: "", expiryDate: "", usageLimit: "", isVisible: false });
+            setFormData({ code: "", type: "percentage", value: "", minOrder: "0", maxDiscount: "", expiryDate: "", usageLimit: "", isVisible: false, title: "", description: "" });
             setIsModalOpen(true);
           }}
           className="px-5 py-3 bg-slate-900 text-white rounded-xl text-sm font-bold shadow-lg flex items-center justify-center gap-2 hover:bg-slate-800 transition-all active:scale-95 w-full sm:w-auto"
@@ -285,6 +289,28 @@ export default function CouponsAdminPage() {
                     className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-4 py-3 text-sm font-bold focus:outline-none focus:border-primary/50"
                   />
                </div>
+
+               <div>
+                  <label className="text-[10px] uppercase font-black text-slate-400 tracking-widest block mb-1.5 ml-1">{t('admin.coupons.modal.titleLabel') || "Coupon Title (Public)"}</label>
+                  <input 
+                    value={formData.title}
+                    onChange={e => setFormData({...formData, title: e.target.value})}
+                    placeholder="e.g. Songkran Big Sale!"
+                    className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-4 py-3 text-sm font-bold focus:outline-none focus:border-primary/50"
+                  />
+               </div>
+
+               <div>
+                  <label className="text-[10px] uppercase font-black text-slate-400 tracking-widest block mb-1.5 ml-1">{t('admin.coupons.modal.descLabel') || "Description"}</label>
+                  <textarea 
+                    value={formData.description}
+                    onChange={e => setFormData({...formData, description: e.target.value})}
+                    placeholder="e.g. Get 20% off all laundry services..."
+                    rows={2}
+                    className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-4 py-3 text-sm font-bold focus:outline-none focus:border-primary/50 resize-none"
+                  />
+               </div>
+
                <div className="grid grid-cols-2 gap-4">
                   <div>
                      <label className="text-[10px] uppercase font-black text-slate-400 tracking-widest block mb-1.5 ml-1">{t('admin.coupons.modal.type')}</label>

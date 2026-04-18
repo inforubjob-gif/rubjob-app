@@ -246,6 +246,8 @@ export const th = {
       pinLocation: "ปักหมุดที่ตั้ง",
       bangkokThailand: "กรุงเทพมหานคร, ประเทศไทย",
       confirmLocation: "ยืนยันพิกัดที่ตั้ง",
+      selectCoupon: "เลือกจากคูปองที่มี",
+      noCoupons: "ไม่มีคูปองที่ใช้งานได้ในขณะนี้",
       pinned: "ปักหมุดแล้ว!",
       addressRequired: "กรุณาระบุป้ายกำกับและที่อยู่ให้ครบถ้วน",
     },
@@ -1106,6 +1108,8 @@ export const th = {
           deploy: "ปรับใช้รหัสส่งเสริมการขาย",
           update: "อัปเดตตัวลดราคา",
           syncing: "กำลังซิงค์โปรโมชั่น...",
+          titleLabel: "ชื่อหัวข้อโปรโมชั่น",
+          descLabel: "รายละเอียดส่วนลด/คูปอง",
         },
       },
       orders: {
