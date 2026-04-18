@@ -151,7 +151,7 @@ export default function RiderDashboard() {
                 <span className="w-1.5 h-1.5 rounded-full bg-white/50 animate-pulse" />
                 {t("rider.hero")}
               </p>
-              <h1 className="text-2xl font-black text-slate-900 tracking-tight truncate drop-shadow-sm leading-none">{rider?.name || t("common.guest")}</h1>
+              <h1 className="text-2xl font-black text-white tracking-tight truncate drop-shadow-md leading-none">{rider?.name || t("common.guest")}</h1>
             </div>
           </div>
           <div className="flex items-center gap-2">

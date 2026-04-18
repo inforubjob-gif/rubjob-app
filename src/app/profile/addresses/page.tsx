@@ -282,7 +282,7 @@ export default function ManageAddressesPage() {
           <div className="pt-6 pb-2">
             <button 
               onClick={() => setIsAdding(true)}
-              className="w-full py-4 bg-primary text-black rounded-xl text-[14px] font-black tracking-wide shadow-2xl shadow-primary/30 active:scale-95 transition-all outline-none"
+              className="w-full py-4 bg-primary text-white rounded-xl text-[14px] font-black tracking-wide shadow-2xl shadow-primary/30 active:scale-95 transition-all outline-none"
             >
               {t("profile.addNewAddress")}
             </button>
