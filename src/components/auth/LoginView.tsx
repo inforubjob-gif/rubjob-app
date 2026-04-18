@@ -41,7 +41,6 @@ export default function LoginView() {
           </div>
         </div>
 
-        </div>
       </main>
 
       {/* Footer to match Rider look */}
