@@ -284,7 +284,7 @@ export default function AdminDashboard() {
                   </Link>
                </div>
             </Card>
-          </div>
+          </section>
         </div>
       )}
     </div>
