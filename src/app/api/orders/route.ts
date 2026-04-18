@@ -22,16 +22,24 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: "D1 Database binding 'DB' not found" }, { status: 500 });
     }
 
-    const { results } = await db.prepare(`
-      SELECT o.*, s.name as serviceName, s.icon as serviceIcon
+    let query = `
+      SELECT o.*, s.name as serviceName, s.icon as serviceIcon, u.displayName as userDisplayName
       FROM orders o
       JOIN services s ON o.serviceId = s.id
-      WHERE o.userId = ?
-      ORDER BY o.createdAt DESC
-    `).bind(userId).all();
+      LEFT JOIN users u ON o.userId = u.id
+    `;
+    
+    let rawResults;
+    if (userId === "all") {
+      const { results } = await db.prepare(`${query} ORDER BY o.createdAt DESC`).all();
+      rawResults = results;
+    } else {
+      const { results } = await db.prepare(`${query} WHERE o.userId = ? ORDER BY o.createdAt DESC`).bind(userId).all();
+      rawResults = results;
+    }
 
     // Parse JSON strings back to objects
-    const orders = results.map((row: any) => ({
+    const orders = (rawResults || []).map((row: any) => ({
       ...row,
       items: JSON.parse(row.items || "[]"),
       address: JSON.parse(row.address || "{}")
