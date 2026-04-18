@@ -79,7 +79,7 @@ export default function RiderSetupPage() {
       </header>
 
       <div className="relative z-10 px-5 flex-1 max-w-lg mx-auto w-full">
-        <Card className="p-6 space-y-6 shadow-2xl shadow-primary-dark/10 border border-white rounded-2xl bg-white">
+        <Card className="p-6 space-y-6 shadow-2xl shadow-primary-dark/10 border border-white rounded-xl bg-white">
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
               <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t("rider.setup.fullName")}</label>
@@ -92,7 +92,7 @@ export default function RiderSetupPage() {
                   required
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full bg-slate-50 rounded-2xl pl-12 pr-4 py-4 text-sm font-black text-slate-900 border-2 border-transparent focus:border-primary/20 focus:bg-white outline-none transition-all"
+                  className="w-full bg-slate-50 rounded-xl pl-12 pr-4 py-4 text-sm font-black text-slate-900 border-2 border-transparent focus:border-primary/20 focus:bg-white outline-none transition-all"
                   placeholder={t("rider.setup.fullNamePlaceholder")}
                 />
               </div>
@@ -109,7 +109,7 @@ export default function RiderSetupPage() {
                   required
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
-                  className="w-full bg-slate-50 rounded-2xl pl-12 pr-4 py-4 text-sm font-black text-slate-900 border-2 border-transparent focus:border-primary/20 focus:bg-white outline-none transition-all"
+                  className="w-full bg-slate-50 rounded-xl pl-12 pr-4 py-4 text-sm font-black text-slate-900 border-2 border-transparent focus:border-primary/20 focus:bg-white outline-none transition-all"
                   placeholder={t("rider.setup.phonePlaceholder")}
                 />
               </div>
@@ -123,7 +123,7 @@ export default function RiderSetupPage() {
                     key={type}
                     type="button"
                     onClick={() => setVehicleType(type)}
-                    className={`py-4 rounded-2xl border-2 transition-all flex flex-col items-center gap-1 ${
+                    className={`py-4 rounded-xl border-2 transition-all flex flex-col items-center gap-1 ${
                       vehicleType === type 
                         ? "border-primary bg-primary/5 text-primary" 
                         : "border-slate-100 bg-slate-50 text-slate-400"
@@ -143,7 +143,7 @@ export default function RiderSetupPage() {
                 required
                 value={licensePlate}
                 onChange={(e) => setLicensePlate(e.target.value)}
-                className="w-full bg-slate-50 rounded-2xl px-4 py-4 text-sm font-black text-slate-900 border-2 border-transparent focus:border-primary/20 focus:bg-white outline-none transition-all"
+                className="w-full bg-slate-50 rounded-xl px-4 py-4 text-sm font-black text-slate-900 border-2 border-transparent focus:border-primary/20 focus:bg-white outline-none transition-all"
                 placeholder={t("rider.setup.licensePlatePlaceholder")}
               />
             </div>
@@ -154,7 +154,7 @@ export default function RiderSetupPage() {
                 fullWidth 
                 size="lg" 
                 isLoading={isSubmitting}
-                className="bg-primary text-white py-5 rounded-2xl font-black uppercase tracking-[0.2em] shadow-xl shadow-primary/20 active:scale-95 transition-all"
+                className="bg-primary text-white py-5 rounded-xl font-black uppercase tracking-[0.2em] shadow-xl shadow-primary/20 active:scale-95 transition-all"
               >
                 {t("rider.setup.submit")}
               </Button>

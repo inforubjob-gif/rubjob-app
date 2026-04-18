@@ -81,9 +81,9 @@ export default function StoreServicesPage() {
           </div>
         ) : (
           services.map((svc) => (
-            <Card key={svc.id} className={`p-5 rounded-2xl border-2 transition-all ${svc.isEnabled ? 'border-primary/20 bg-white shadow-xl shadow-primary/5' : 'border-slate-100 bg-slate-50 opacity-70'}`}>
+            <Card key={svc.id} className={`p-5 rounded-xl border-2 transition-all ${svc.isEnabled ? 'border-primary/20 bg-white shadow-xl shadow-primary/5' : 'border-slate-100 bg-slate-50 opacity-70'}`}>
               <div className="flex items-center gap-4 mb-5">
-                <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shadow-inner ${svc.isEnabled ? 'bg-primary/10 text-primary' : 'bg-slate-200 text-slate-400'}`}>
+                <div className={`w-14 h-14 rounded-xl flex items-center justify-center shadow-inner ${svc.isEnabled ? 'bg-primary/10 text-primary' : 'bg-slate-200 text-slate-400'}`}>
                   {getServiceIcon(svc.id, { size: 28 })}
                 </div>
                 <div className="flex-1">
@@ -119,7 +119,7 @@ export default function StoreServicesPage() {
                           handleToggle(svc.id, true, newPrice);
                         }
                       }}
-                      className="w-full bg-slate-50 rounded-2xl px-6 py-4 text-xl font-black text-slate-900 border-2 border-transparent focus:border-primary/20 focus:bg-white outline-none transition-all"
+                      className="w-full bg-slate-50 rounded-xl px-6 py-4 text-xl font-black text-slate-900 border-2 border-transparent focus:border-primary/20 focus:bg-white outline-none transition-all"
                     />
                     <div className="absolute right-6 top-1/2 -translate-y-1/2 text-slate-300 font-black">
                       per {svc.unit}

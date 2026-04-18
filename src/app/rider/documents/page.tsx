@@ -64,7 +64,7 @@ export default function RiderDocumentsPage() {
   if (isSuccess) {
     return (
       <div className="flex flex-col items-center justify-center min-h-dvh px-5 text-center bg-slate-50">
-        <div className="w-24 h-24 bg-emerald-50 text-emerald-500 rounded-2xl flex items-center justify-center mb-8 shadow-xl shadow-emerald-500/10 scale-110">
+        <div className="w-24 h-24 bg-emerald-50 text-emerald-500 rounded-xl flex items-center justify-center mb-8 shadow-xl shadow-emerald-500/10 scale-110">
           <Icons.Shield size={48} strokeWidth={2.5} />
         </div>
         <h1 className="text-2xl font-black text-slate-900 mb-2 uppercase tracking-tight">{t("rider.verification.submittedTitle")}</h1>
@@ -115,7 +115,7 @@ export default function RiderDocumentsPage() {
             isLoading={isSubmitting}
             disabled={!idCard || !license || !vehicle}
             onClick={handleSubmit}
-            className="bg-primary text-white py-5 rounded-2xl font-black uppercase tracking-[0.2em] shadow-xl shadow-primary/20 active:scale-95 transition-all disabled:opacity-50"
+            className="bg-primary text-white py-5 rounded-xl font-black uppercase tracking-[0.2em] shadow-xl shadow-primary/20 active:scale-95 transition-all disabled:opacity-50"
           >
             {t("rider.verification.submit")}
           </Button>

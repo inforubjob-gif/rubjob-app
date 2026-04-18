@@ -134,7 +134,7 @@ export default function RiderDashboard() {
       <header className="relative z-10 px-5 pt-12 pb-6">
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-white flex items-center justify-center p-2.5 shadow-xl shadow-primary-dark/20 border-2 border-white/50 ring-4 ring-primary/10">
+            <div className="w-14 h-14 rounded-xl bg-white flex items-center justify-center p-2.5 shadow-xl shadow-primary-dark/20 border-2 border-white/50 ring-4 ring-primary/10">
               <Icons.Logo variant="icon" size={36} />
             </div>
             <div className="min-w-0">
@@ -146,14 +146,14 @@ export default function RiderDashboard() {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <button className="w-10 h-10 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/20 shadow-md shadow-primary-dark/10 active:scale-90 transition-transform">
+            <button className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/20 shadow-md shadow-primary-dark/10 active:scale-90 transition-transform">
               <Icons.Bell size={20} className="text-white" />
             </button>
           </div>
         </div>
 
         {/* Work Status Toggle (Dashboard Version) */}
-        <Card className="mb-6 bg-white/10 backdrop-blur-xl border border-white/20 shadow-xl shadow-primary-dark/20 rounded-2xl p-4 text-white">
+        <Card className="mb-6 bg-white/10 backdrop-blur-xl border border-white/20 shadow-xl shadow-primary-dark/20 rounded-xl p-4 text-white">
            <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                   <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${workStatus ? 'bg-emerald-500 text-white' : 'bg-white/20 text-white/60'}`}>
@@ -176,11 +176,11 @@ export default function RiderDashboard() {
         </Card>
 
         <div className="grid grid-cols-2 gap-4 text-center">
-          <div className="bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-white/10">
+          <div className="bg-white/10 backdrop-blur-md p-4 rounded-xl border border-white/10">
             <p className="text-[10px] font-black text-white/50 uppercase tracking-widest">{t("rider.tasksToday")}</p>
             <p className="text-2xl font-black mt-1 text-white">{activeJobs.length}</p>
           </div>
-          <div className="bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-white/10">
+          <div className="bg-white/10 backdrop-blur-md p-4 rounded-xl border border-white/10">
             <p className="text-[10px] font-black text-white/50 uppercase tracking-widest">{t("rider.earnings")}</p>
             <p className="text-2xl font-black mt-1 text-white">
               ฿{balance.toLocaleString()}
@@ -191,7 +191,7 @@ export default function RiderDashboard() {
 
       <div className="relative z-10 px-5 space-y-7 pt-2 animate-fade-in">
         {/* Tabs */}
-        <div className="bg-slate-100 p-1.5 rounded-2xl flex shadow-inner border border-slate-200/50">
+        <div className="bg-slate-100 p-1.5 rounded-xl flex shadow-inner border border-slate-200/50">
           <button
             onClick={() => setActiveTab("available")}
             className={`flex-1 py-3 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all ${
@@ -215,7 +215,7 @@ export default function RiderDashboard() {
         {isLoading ? (
           <div className="space-y-4">
              {[1, 2, 3].map((i) => (
-               <div key={i} className="bg-white p-5 rounded-2xl border border-slate-100 flex items-center gap-4">
+               <div key={i} className="bg-white p-5 rounded-xl border border-slate-100 flex items-center gap-4">
                  <Skeleton variant="circle" className="w-14 h-14" />
                  <div className="flex-1 space-y-2">
                     <Skeleton variant="text" className="w-24 h-4" />
@@ -228,7 +228,7 @@ export default function RiderDashboard() {
           <div className="flex flex-col items-center justify-center py-10 px-6 text-center animate-fade-in relative z-10 min-h-[50vh]">
              {verificationStatus === "unregistered" ? (
                <>
-                 <div className="w-24 h-24 bg-white/20 backdrop-blur-xl rounded-2xl flex items-center justify-center text-white border border-white/30 shadow-2xl mb-8 relative">
+                 <div className="w-24 h-24 bg-white/20 backdrop-blur-xl rounded-xl flex items-center justify-center text-white border border-white/30 shadow-2xl mb-8 relative">
                     <Icons.Logo variant="icon" size={48} />
                  </div>
                  <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight">{t("rider.intro.heroTitle")}</h2>
@@ -239,14 +239,14 @@ export default function RiderDashboard() {
                  </p>
                  <Button 
                    onClick={() => router.push("/rider/setup")}
-                   className="mt-8 bg-slate-900 text-white px-8 py-5 rounded-2xl font-black uppercase tracking-widest shadow-xl active:scale-95 transition-all"
+                   className="mt-8 bg-slate-900 text-white px-8 py-5 rounded-xl font-black uppercase tracking-widest shadow-xl active:scale-95 transition-all"
                  >
                    {t("rider.intro.applyBtn")}
                  </Button>
                </>
              ) : (
                <>
-                 <div className="w-24 h-24 bg-white/20 backdrop-blur-xl rounded-2xl flex items-center justify-center text-white border border-white/30 shadow-2xl mb-8 relative">
+                 <div className="w-24 h-24 bg-white/20 backdrop-blur-xl rounded-xl flex items-center justify-center text-white border border-white/30 shadow-2xl mb-8 relative">
                     <Icons.Shield size={48} />
                     <div className="absolute -bottom-2 -right-2 w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center border-4 border-slate-50 text-white animate-pulse">
                        <Icons.Clock size={18} strokeWidth={4} />
@@ -264,14 +264,14 @@ export default function RiderDashboard() {
                    {verificationStatus === "rejected" && (
                      <Button 
                        onClick={() => router.push("/rider/documents")}
-                       className="w-full bg-primary text-white py-4 rounded-2xl font-black uppercase tracking-widest shadow-xl"
+                       className="w-full bg-primary text-white py-4 rounded-xl font-black uppercase tracking-widest shadow-xl"
                      >
                        {t("rider.status.editDocs")}
                      </Button>
                    )}
                    <Button 
                      variant="secondary"
-                     className="w-full bg-white border border-slate-200 text-slate-900 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest"
+                     className="w-full bg-white border border-slate-200 text-slate-900 py-4 rounded-xl font-black text-[10px] uppercase tracking-widest"
                      onClick={() => window.location.reload()}
                    >
                      {t("common.refresh")}
@@ -310,7 +310,7 @@ export default function RiderDashboard() {
         {selectedJob && (
           <div className="w-full space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
              {/* Virtual Route Connection */}
-             <div className="relative h-24 bg-slate-50 rounded-2xl border-2 border-slate-100/50 flex items-center justify-between px-10 overflow-hidden">
+             <div className="relative h-24 bg-slate-50 rounded-xl border-2 border-slate-100/50 flex items-center justify-between px-10 overflow-hidden">
                 <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(#000 1px, transparent 1px)', backgroundSize: '20px 20px' }} />
                 
                 <div className="relative z-10 flex flex-col items-center">
@@ -384,7 +384,7 @@ export default function RiderDashboard() {
                 </Button>
                 <Button 
                    fullWidth 
-                   className="bg-green-600 hover:bg-green-700 text-white shadow-xl shadow-green-100 rounded-xl py-5 font-black uppercase text-xs tracking-[0.2em] active:scale-95 transition-all"
+                   className="bg-primary hover:bg-primary-dark text-white shadow-xl shadow-primary/20 rounded-xl py-5 font-black uppercase text-xs tracking-[0.2em] active:scale-95 transition-all"
                    onClick={() => handleAcceptJob(selectedJob.id)}
                 >
                    {t("rider.acceptJob")}
@@ -406,8 +406,8 @@ function AvailableDeliveries({ t, router, jobs, onAccept, onViewDetails }: { t: 
       </div>
 
       {jobs.length === 0 ? (
-        <div className="text-center py-16 bg-white rounded-2xl border border-slate-100 shadow-sm flex flex-col items-center">
-           <div className="w-20 h-20 bg-slate-50 rounded-2xl flex items-center justify-center mb-4 transition-all hover:scale-105 border border-slate-100 grayscale opacity-40">
+        <div className="text-center py-16 bg-white rounded-xl border border-slate-100 shadow-sm flex flex-col items-center">
+           <div className="w-20 h-20 bg-slate-50 rounded-xl flex items-center justify-center mb-4 transition-all hover:scale-105 border border-slate-100 grayscale opacity-40">
               <Icons.Logo variant="icon" size={40} />
            </div>
            <p className="text-[10px] font-black text-slate-300 uppercase tracking-[0.2em]">{t("rider.noJobsNearby")}</p>
@@ -416,7 +416,7 @@ function AvailableDeliveries({ t, router, jobs, onAccept, onViewDetails }: { t: 
         jobs.map((job) => (
           <Card key={job.id} className="p-4 border-2 border-transparent hover:border-primary/20 transition-all">
             <div className="flex items-start gap-4">
-              <div className="w-14 h-14 bg-slate-100 rounded-2xl flex items-center justify-center text-slate-400 shrink-0">
+              <div className="w-14 h-14 bg-slate-100 rounded-xl flex items-center justify-center text-slate-400 shrink-0">
                 {getServiceIcon(job.serviceId as any, { size: 28 })}
               </div>
               <div className="flex-1">
@@ -462,8 +462,8 @@ function ActiveDeliveries({ t, router, activeJobs }: { t: any, router: any, acti
       </div>
 
       {activeJobs.length === 0 ? (
-        <div className="text-center py-16 bg-white rounded-2xl border border-slate-100 shadow-sm flex flex-col items-center">
-           <div className="w-20 h-20 bg-slate-50 rounded-2xl flex items-center justify-center mb-4 transition-all hover:scale-105 border border-slate-100 grayscale opacity-40">
+        <div className="text-center py-16 bg-white rounded-xl border border-slate-100 shadow-sm flex flex-col items-center">
+           <div className="w-20 h-20 bg-slate-50 rounded-xl flex items-center justify-center mb-4 transition-all hover:scale-105 border border-slate-100 grayscale opacity-40">
               <Icons.Logo variant="icon" size={40} />
            </div>
            <p className="text-[10px] font-black text-slate-300 uppercase tracking-[0.2em]">{t("rider.noActiveJobs")}</p>

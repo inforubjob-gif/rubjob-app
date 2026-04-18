@@ -29,14 +29,14 @@ export default function RiderOrdersPage() {
         <div className="flex items-center gap-4 mb-6">
             <button 
                 onClick={() => router.push("/rider")}
-                className="w-10 h-10 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center text-white border border-white/20"
+                className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center text-white border border-white/20"
             >
                 <Icons.Back size={20} />
             </button>
             <h1 className="text-xl font-black text-white tracking-tight drop-shadow-sm">{t("rider.myJobs")}</h1>
         </div>
         
-        <div className="flex bg-white/20 p-1.5 rounded-2xl backdrop-blur-xl border border-white/20 shadow-lg shadow-primary-dark/10">
+        <div className="flex bg-white/20 p-1.5 rounded-xl backdrop-blur-xl border border-white/20 shadow-lg shadow-primary-dark/10">
            <button 
                 onClick={() => setFilter("active")}
                 className={`flex-1 py-3.5 text-[11px] font-black uppercase tracking-widest rounded-[1.4rem] transition-all duration-500 ${filter === "active" ? "bg-white text-primary shadow-lg shadow-primary/20 scale-[1.02]" : "text-white/60"}`}

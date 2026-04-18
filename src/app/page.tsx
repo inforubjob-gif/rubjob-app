@@ -87,7 +87,7 @@ export default function HomePage() {
         </div>
 
         {/* Search-like bar */}
-        <div className="bg-white/20 backdrop-blur-md rounded-2xl px-4 py-3.5 flex items-center gap-2 text-white/80 shadow-inner border border-white/10 mt-6">
+        <div className="bg-white/20 backdrop-blur-md rounded-xl px-4 py-3.5 flex items-center gap-2 text-white/80 shadow-inner border border-white/10 mt-6">
           <Icons.Search size={18} />
           <span className="text-sm font-medium">{t("common.searchHint")}</span>
         </div>
@@ -95,7 +95,7 @@ export default function HomePage() {
 
       <div className="relative z-10 px-5 space-y-7 pt-2 pb-24 animate-fade-in">
         {/* ─── Hero Ads ─── */}
-        <section className="relative w-full rounded-2xl overflow-hidden shadow-2xl shadow-primary/20 group active:scale-[0.98] transition-all duration-500 bg-white border-4 border-white/50">
+        <section className="relative w-full rounded-xl overflow-hidden shadow-2xl shadow-primary/20 group active:scale-[0.98] transition-all duration-500 bg-white border-4 border-white/50">
           <img 
             src="/images/ads/Cover-app.png" 
             alt="Rubjob Promotion"
@@ -168,7 +168,7 @@ export default function HomePage() {
         <section className="pb-4">
           <Card className="p-5 bg-gradient-to-r from-primary-light to-amber-50">
             <div className="flex items-center gap-3">
-              <div className="w-14 h-14 bg-amber-50 rounded-2xl flex items-center justify-center p-2.5 shrink-0 shadow-sm border border-amber-100 transition-transform active:scale-95 duration-300">
+              <div className="w-14 h-14 bg-amber-50 rounded-xl flex items-center justify-center p-2.5 shrink-0 shadow-sm border border-amber-100 transition-transform active:scale-95 duration-300">
                 <img 
                   src="/images/icon/icon-shield.png" 
                   alt={t("home.guaranteeTitle")} 
@@ -190,7 +190,7 @@ export default function HomePage() {
       {comingSoonModal && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-5 animate-fade-in">
           <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={() => setComingSoonModal(null)} />
-          <div className="bg-white rounded-2xl p-8 w-full max-w-[320px] relative z-10 shadow-2xl animate-scale-in flex flex-col items-center text-center">
+          <div className="bg-white rounded-xl p-8 w-full max-w-[320px] relative z-10 shadow-2xl animate-scale-in flex flex-col items-center text-center">
             <div className="w-28 h-28 bg-amber-50 rounded-full flex items-center justify-center p-4 mb-6 shrink-0 shadow-inner">
               <img 
                 src="/images/icon/icon-Under-maintenance..png" 
@@ -205,7 +205,7 @@ export default function HomePage() {
             <Button 
               fullWidth 
               onClick={() => setComingSoonModal(null)} 
-              className="rounded-2xl shadow-lg shadow-primary/20"
+              className="rounded-xl shadow-lg shadow-primary/20"
             >
               {t("common.gotIt")}
             </Button>
@@ -221,10 +221,10 @@ function ServiceCard({ svc, t, onComingSoon, className }: { svc: any, t: any, on
     return (
       <button onClick={() => onComingSoon(t(`orders.services.${svc.id}`) || svc.name)} className={className || "min-w-[145px] flex-shrink-0 snap-center"}>
         <Card className="p-5 h-full flex flex-col items-center justify-center text-center" hoverable>
-          <div className="w-12 h-12 bg-primary-light rounded-2xl flex items-center justify-center text-primary-dark mb-4 group-hover:scale-110 transition-transform">
+          <div className="w-12 h-12 bg-primary-light rounded-xl flex items-center justify-center text-primary-dark mb-4 group-hover:scale-110 transition-transform">
             {getServiceIcon(svc.id, { size: 24 })}
           </div>
-          <h3 className="text-[13px] font-black text-foreground whitespace-nowrap overflow-hidden text-ellipsis w-full">
+          <h3 className="text-[13px] font-black text-foreground leading-tight line-clamp-2 w-full">
             {t(`orders.services.${svc.id}`) || svc.name}
           </h3>
         </Card>
@@ -235,10 +235,10 @@ function ServiceCard({ svc, t, onComingSoon, className }: { svc: any, t: any, on
   return (
     <Link href={`/booking?service=${svc.id}`} className={className || "min-w-[145px] flex-shrink-0 snap-center"}>
       <Card className="p-5 h-full flex flex-col items-center justify-center text-center" hoverable>
-        <div className="w-12 h-12 bg-primary-light rounded-2xl flex items-center justify-center text-primary-dark mb-4 group-hover:scale-110 transition-transform">
+        <div className="w-12 h-12 bg-primary-light rounded-xl flex items-center justify-center text-primary-dark mb-4 group-hover:scale-110 transition-transform">
           {getServiceIcon(svc.id, { size: 24 })}
         </div>
-        <h3 className="text-[13px] font-black text-foreground whitespace-nowrap overflow-hidden text-ellipsis w-full">
+        <h3 className="text-[13px] font-black text-foreground leading-tight line-clamp-2 w-full">
           {t(`orders.services.${svc.id}`) || svc.name}
         </h3>
       </Card>

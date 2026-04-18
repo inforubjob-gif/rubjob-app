@@ -77,7 +77,7 @@ export default function AdminDocumentUpload({ value, onChange, label, variant = 
       
       <div 
         onClick={() => fileInputRef.current?.click()}
-        className={`relative rounded-2xl border-2 border-dashed transition-all cursor-pointer overflow-hidden flex flex-col items-center justify-center gap-2 ${
+        className={`relative rounded-xl border-2 border-dashed transition-all cursor-pointer overflow-hidden flex flex-col items-center justify-center gap-2 ${
           variant === 'square' ? 'aspect-square' : 'aspect-video'
         } ${
           displayUrl ? 'border-indigo-200 bg-indigo-50/30' : 'border-slate-100 bg-slate-50 hover:bg-slate-100/50'
@@ -87,7 +87,7 @@ export default function AdminDocumentUpload({ value, onChange, label, variant = 
           <>
             <img src={displayUrl} alt="Document Preview" className="w-full h-full object-cover" />
             <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
-               <div className="bg-white/20 backdrop-blur-md p-3 rounded-2xl border border-white/30 text-white font-black text-[10px] uppercase">
+               <div className="bg-white/20 backdrop-blur-md p-3 rounded-xl border border-white/30 text-white font-black text-[10px] uppercase">
                  Replace Document
                </div>
             </div>

@@ -111,7 +111,7 @@ export default function RiderRegisterPage() {
                   required
                   value={formData.name}
                   onChange={e => setFormData({...formData, name: e.target.value})}
-                  className="w-full bg-slate-900/50 border-2 border-slate-800 rounded-2xl p-5 font-black text-sm focus:outline-none focus:border-primary/50 transition-all"
+                  className="w-full bg-slate-900/50 border-2 border-slate-800 rounded-xl p-5 font-black text-sm focus:outline-none focus:border-primary/50 transition-all"
                   placeholder="e.g. John Wick"
                 />
              </div>
@@ -122,7 +122,7 @@ export default function RiderRegisterPage() {
                   type="tel"
                   value={formData.phone}
                   onChange={e => setFormData({...formData, phone: e.target.value})}
-                  className="w-full bg-slate-900/50 border-2 border-slate-800 rounded-2xl p-5 font-mono text-sm focus:outline-none focus:border-primary/50 transition-all font-bold"
+                  className="w-full bg-slate-900/50 border-2 border-slate-800 rounded-xl p-5 font-mono text-sm focus:outline-none focus:border-primary/50 transition-all font-bold"
                   placeholder="08X-XXX-XXXX"
                 />
              </div>
@@ -132,12 +132,12 @@ export default function RiderRegisterPage() {
                   type="email"
                   value={formData.email}
                   onChange={e => setFormData({...formData, email: e.target.value})}
-                  className="w-full bg-slate-900/50 border-2 border-slate-800 rounded-2xl p-5 font-bold text-sm focus:outline-none focus:border-primary/50 transition-all"
+                  className="w-full bg-slate-900/50 border-2 border-slate-800 rounded-xl p-5 font-bold text-sm focus:outline-none focus:border-primary/50 transition-all"
                   placeholder="john@example.com"
                 />
              </div>
              <div className="pt-4">
-               <Button onClick={() => setStep(2)} disabled={!formData.name || !formData.phone} className="w-full bg-primary text-slate-950 py-6 rounded-2xl font-black text-xs uppercase tracking-[0.3em] shadow-2xl shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all">
+               <Button onClick={() => setStep(2)} disabled={!formData.name || !formData.phone} className="w-full bg-primary text-slate-950 py-6 rounded-xl font-black text-xs uppercase tracking-[0.3em] shadow-2xl shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all">
                   Next Step
                </Button>
              </div>
@@ -153,7 +153,7 @@ export default function RiderRegisterPage() {
                       <div 
                         key={type}
                         onClick={() => setFormData({...formData, vehicleType: type})}
-                        className={`p-6 rounded-2xl border-2 transition-all flex flex-col items-center gap-2 cursor-pointer ${formData.vehicleType === type ? 'bg-primary/10 border-primary text-primary' : 'bg-slate-900/50 border-slate-800 text-slate-600'}`}
+                        className={`p-6 rounded-xl border-2 transition-all flex flex-col items-center gap-2 cursor-pointer ${formData.vehicleType === type ? 'bg-primary/10 border-primary text-primary' : 'bg-slate-900/50 border-slate-800 text-slate-600'}`}
                       >
                          {type === 'bike' && <Icons.Bike size={24} />}
                          {type === 'car' && <Icons.Truck size={24} />}
@@ -169,7 +169,7 @@ export default function RiderRegisterPage() {
                   required
                   value={formData.licensePlate}
                   onChange={e => setFormData({...formData, licensePlate: e.target.value})}
-                  className="w-full bg-slate-900/50 border-2 border-slate-800 rounded-2xl p-5 font-black text-sm focus:outline-none focus:border-primary/50 transition-all uppercase"
+                  className="w-full bg-slate-900/50 border-2 border-slate-800 rounded-xl p-5 font-black text-sm focus:outline-none focus:border-primary/50 transition-all uppercase"
                   placeholder="ABC-123 BKK"
                 />
              </div>
@@ -179,15 +179,15 @@ export default function RiderRegisterPage() {
                   required
                   value={formData.idNumber}
                   onChange={e => setFormData({...formData, idNumber: e.target.value})}
-                  className="w-full bg-slate-900/50 border-2 border-slate-800 rounded-2xl p-5 font-mono text-sm focus:outline-none focus:border-primary/50 transition-all font-bold"
+                  className="w-full bg-slate-900/50 border-2 border-slate-800 rounded-xl p-5 font-mono text-sm focus:outline-none focus:border-primary/50 transition-all font-bold"
                   placeholder="X-XXXX-XXXXX-XX-X"
                 />
              </div>
              <div className="pt-4 grid grid-cols-2 gap-4">
-               <Button onClick={() => setStep(1)} className="w-full bg-slate-900 text-slate-400 py-6 rounded-2xl font-black text-xs uppercase tracking-widest">
+               <Button onClick={() => setStep(1)} className="w-full bg-slate-900 text-slate-400 py-6 rounded-xl font-black text-xs uppercase tracking-widest">
                   Back
                </Button>
-               <Button onClick={() => setStep(3)} disabled={!formData.licensePlate || !formData.idNumber} className="w-full bg-primary text-slate-950 py-6 rounded-2xl font-black text-xs uppercase tracking-widest shadow-2xl shadow-primary/20">
+               <Button onClick={() => setStep(3)} disabled={!formData.licensePlate || !formData.idNumber} className="w-full bg-primary text-slate-950 py-6 rounded-xl font-black text-xs uppercase tracking-widest shadow-2xl shadow-primary/20">
                   Almost Done
                </Button>
              </div>
@@ -210,7 +210,7 @@ export default function RiderRegisterPage() {
                      <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">{doc.label}</label>
                      <div 
                        onClick={() => document.getElementById(`file-${doc.id}`)?.click()}
-                       className={`relative aspect-[16/6] rounded-2xl border-2 border-dashed transition-all cursor-pointer overflow-hidden flex flex-col items-center justify-center ${getDocPreview(doc.id) ? 'border-primary bg-primary/5' : 'border-slate-800 bg-slate-900/50'}`}
+                       className={`relative aspect-[16/6] rounded-xl border-2 border-dashed transition-all cursor-pointer overflow-hidden flex flex-col items-center justify-center ${getDocPreview(doc.id) ? 'border-primary bg-primary/5' : 'border-slate-800 bg-slate-900/50'}`}
                      >
                         {getDocPreview(doc.id) ? (
                           <img src={getDocPreview(doc.id)} className="w-full h-full object-cover opacity-50" />

@@ -45,11 +45,11 @@ export default function InvestorCostsPage() {
 
             {/* Main Stats Banner */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-               <div className="lg:col-span-2 bg-gradient-to-br from-slate-900 to-black border border-slate-800 rounded-2xl p-10 relative overflow-hidden group">
+               <div className="lg:col-span-2 bg-gradient-to-br from-slate-900 to-black border border-slate-800 rounded-xl p-10 relative overflow-hidden group">
                   <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl group-hover:bg-primary/10 transition-all duration-700" />
                   <div className="relative z-10 space-y-8">
                      <div className="flex items-center gap-4">
-                        <div className="w-14 h-14 bg-white/5 rounded-2xl flex items-center justify-center text-primary border border-white/10">
+                        <div className="w-14 h-14 bg-white/5 rounded-xl flex items-center justify-center text-primary border border-white/10">
                            <Icons.TrendingUp size={32} />
                         </div>
                         <div>
@@ -74,7 +74,7 @@ export default function InvestorCostsPage() {
                   </div>
                </div>
 
-               <div className="bg-primary rounded-2xl p-10 flex flex-col justify-between text-slate-900 relative overflow-hidden">
+               <div className="bg-primary rounded-xl p-10 flex flex-col justify-between text-slate-900 relative overflow-hidden">
                   <div className="absolute bottom-0 right-0 w-32 h-32 bg-black/5 rounded-full translate-y-1/4 translate-x-1/4" />
                   <div className="relative z-10">
                      <Icons.Wallet size={48} strokeWidth={3} />
@@ -96,8 +96,8 @@ export default function InvestorCostsPage() {
             {/* Service Breakdown Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                {infrastructureCosts.map((item, idx) => (
-                  <Card key={idx} className="bg-slate-900/40 border-slate-800/50 hover:border-primary/50 p-8 rounded-2xl transition-all duration-300 group">
-                     <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center text-slate-400 mb-6 group-hover:bg-primary group-hover:text-slate-900 transition-all duration-500 shadow-xl shadow-black/50">
+                  <Card key={idx} className="bg-slate-900/40 border-slate-800/50 hover:border-primary/50 p-8 rounded-xl transition-all duration-300 group">
+                     <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center text-slate-400 mb-6 group-hover:bg-primary group-hover:text-slate-900 transition-all duration-500 shadow-xl shadow-black/50">
                         {item.icon}
                      </div>
                      <h4 className="text-sm font-black uppercase tracking-widest text-slate-400 mb-1">{item.name}</h4>
@@ -113,7 +113,7 @@ export default function InvestorCostsPage() {
             </div>
 
             {/* Investor Projection Interaction */}
-            <div className="bg-gradient-to-r from-indigo-950 to-slate-950 border border-indigo-900/30 rounded-2xl p-10">
+            <div className="bg-gradient-to-r from-indigo-950 to-slate-950 border border-indigo-900/30 rounded-xl p-10">
                <div className="flex flex-col md:flex-row items-center justify-between gap-12">
                   <div className="flex-1 space-y-6">
                      <div className="flex items-baseline gap-3">
@@ -125,7 +125,7 @@ export default function InvestorCostsPage() {
                      </p>
                      
                      <div className="space-y-4 pt-4">
-                        <div className="flex justify-between items-center bg-white/5 p-4 rounded-2xl border border-white/5">
+                        <div className="flex justify-between items-center bg-white/5 p-4 rounded-xl border border-white/5">
                            <span className="text-[10px] font-black uppercase text-slate-500 tracking-widest">{t('admin.investor.costs.orderInputLabel')}</span>
                            <span className="text-lg font-mono font-black text-primary">{scale.toLocaleString()}</span>
                         </div>
@@ -143,7 +143,7 @@ export default function InvestorCostsPage() {
                      </div>
                   </div>
 
-                  <div className="w-full md:w-80 bg-black/40 border border-white/5 rounded-2xl p-8 space-y-8 backdrop-blur-xl">
+                  <div className="w-full md:w-80 bg-black/40 border border-white/5 rounded-xl p-8 space-y-8 backdrop-blur-xl">
                      <div>
                         <div className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-1">{t('admin.investor.costs.efficiencyGain')}</div>
                         <div className="text-4xl font-mono font-black italic color-indigo-400">

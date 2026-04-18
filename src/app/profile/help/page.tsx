@@ -81,7 +81,7 @@ export default function HelpPage() {
 
       <div className="px-5 -mt-6">
         <form onSubmit={handleSubmit} className="space-y-6">
-          <Card className="p-6 border-slate-100 shadow-xl shadow-slate-200/50 rounded-2xl">
+          <Card className="p-6 border-slate-100 shadow-xl shadow-slate-200/50 rounded-xl">
             <div className="space-y-5">
               <div className="space-y-1.5">
                 <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">หัวข้อที่ต้องการแจ้ง</label>
@@ -107,7 +107,7 @@ export default function HelpPage() {
                   onChange={e => setContent(e.target.value)}
                   placeholder="กรุณาระบุรายละเอียดปัญหาที่พบ..."
                   rows={5}
-                  className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-5 py-4 text-sm font-bold focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all resize-none"
+                  className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-5 py-4 text-sm font-bold focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all resize-none"
                 />
               </div>
             </div>
@@ -123,8 +123,8 @@ export default function HelpPage() {
             ส่งเรื่องให้แอดมิน 🚀
           </Button>
 
-          <div className="p-6 bg-indigo-50 rounded-2xl border border-indigo-100 flex gap-4">
-             <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-indigo-500 shrink-0 shadow-sm">
+          <div className="p-6 bg-indigo-50 rounded-xl border border-indigo-100 flex gap-4">
+             <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-indigo-500 shrink-0 shadow-sm">
                 <Icons.Chat size={24} />
              </div>
              <div>

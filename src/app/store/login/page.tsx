@@ -55,7 +55,7 @@ export default function StoreLoginPage() {
         <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-blue-500 via-primary to-blue-500" />
         
         <div className="flex justify-center mb-8">
-          <div className="w-24 h-24 bg-blue-50 rounded-2xl flex items-center justify-center ring-8 ring-blue-50 transition-transform hover:scale-105 duration-500">
+          <div className="w-24 h-24 bg-blue-50 rounded-xl flex items-center justify-center ring-8 ring-blue-50 transition-transform hover:scale-105 duration-500">
             <Icons.Logo size={60} variant="color" />
           </div>
         </div>
@@ -74,7 +74,7 @@ export default function StoreLoginPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="branch@store.com"
-                className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-5 py-4 text-sm focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all font-bold text-slate-700"
+                className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-5 py-4 text-sm focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all font-bold text-slate-700"
               />
             </div>
           </div>
@@ -87,13 +87,13 @@ export default function StoreLoginPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-5 py-4 text-sm focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all font-bold text-slate-700"
+                className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-5 py-4 text-sm focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all font-bold text-slate-700"
               />
             </div>
           </div>
 
           {error && (
-            <div className="bg-rose-50 text-rose-600 p-4 rounded-2xl flex items-center gap-3 border border-rose-100 animate-in fade-in duration-300">
+            <div className="bg-rose-50 text-rose-600 p-4 rounded-xl flex items-center gap-3 border border-rose-100 animate-in fade-in duration-300">
               <div className="w-2 h-2 rounded-full bg-rose-500 animate-pulse" />
               <p className="text-xs font-bold">{error}</p>
             </div>
@@ -102,7 +102,7 @@ export default function StoreLoginPage() {
           <button
             type="submit"
             disabled={isLoggingIn}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-2xl py-4.5 text-sm font-black shadow-xl shadow-blue-200 transition-all active:scale-[0.98] disabled:opacity-50 mt-4 uppercase tracking-widest"
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-xl py-4.5 text-sm font-black shadow-xl shadow-blue-200 transition-all active:scale-[0.98] disabled:opacity-50 mt-4 uppercase tracking-widest"
           >
             {isLoggingIn ? "กำลังประมวลผล..." : "เข้าสู่ระบบร้านค้า"}
           </button>

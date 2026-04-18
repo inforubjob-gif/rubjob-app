@@ -68,12 +68,12 @@ export default function MapPicker({ lat, lng, onChange }: MapPickerProps) {
     );
   }, [isMounted, lat, lng, onChange]);
 
-  if (!isMounted) return <div className="h-full w-full bg-slate-100 animate-pulse rounded-2xl flex items-center justify-center font-bold text-slate-400">Loading Map...</div>;
+  if (!isMounted) return <div className="h-full w-full bg-slate-100 animate-pulse rounded-xl flex items-center justify-center font-bold text-slate-400">Loading Map...</div>;
 
   const center: [number, number] = lat !== 0 && lng !== 0 ? [lat, lng] : [13.7563, 100.5018]; // Default to Bangkok
 
   return (
-    <div className="h-full w-full rounded-2xl overflow-hidden border-2 border-slate-100 z-0">
+    <div className="h-full w-full rounded-xl overflow-hidden border-2 border-slate-100 z-0">
       <MapContainer center={center} zoom={13} style={{ height: "100%", width: "100%" }}>
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'

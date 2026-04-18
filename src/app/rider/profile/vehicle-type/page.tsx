@@ -100,7 +100,7 @@ export default function VehicleTypePage() {
                 onClick={() => setSelectedVehicle(v.id)}
               >
                 <div className="flex items-center gap-4">
-                    <div className={`w-14 h-14 rounded-2xl flex items-center justify-center ${
+                    <div className={`w-14 h-14 rounded-xl flex items-center justify-center ${
                         selectedVehicle === v.id ? 'bg-primary text-white shadow-lg' : 'bg-slate-50 text-slate-400'
                     }`}>
                         {v.icon}
@@ -119,7 +119,7 @@ export default function VehicleTypePage() {
            ))}
         </div>
 
-        <div className="p-5 bg-orange-50 rounded-2xl border border-orange-100 mt-4">
+        <div className="p-5 bg-orange-50 rounded-xl border border-orange-100 mt-4">
             <div className="flex items-start gap-3">
                 <Icons.Shield size={20} className="text-primary mt-1" />
                 <div className="flex-1">

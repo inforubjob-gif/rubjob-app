@@ -9,7 +9,7 @@ import dynamic from "next/dynamic";
 
 const MapPicker = dynamic(() => import("@/components/ui/MapPicker"), {
   ssr: false,
-  loading: () => <div className="h-full w-full bg-slate-100 animate-pulse rounded-2xl flex items-center justify-center text-slate-400 text-sm font-bold">Loading Map...</div>,
+  loading: () => <div className="h-full w-full bg-slate-100 animate-pulse rounded-xl flex items-center justify-center text-slate-400 text-sm font-bold">Loading Map...</div>,
 });
 
 interface OnboardingFlowProps {
@@ -117,7 +117,7 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
         <div className="absolute -bottom-6 -left-10 w-32 h-32 bg-white/10 rounded-full" />
 
         <div className="relative z-10">
-          <div className="w-20 h-20 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-xl shadow-amber-500/20 ring-4 ring-white/30 overflow-hidden">
+          <div className="w-20 h-20 bg-white/20 backdrop-blur-md rounded-xl flex items-center justify-center mx-auto mb-4 shadow-xl shadow-amber-500/20 ring-4 ring-white/30 overflow-hidden">
             <Icons.Logo size={80} variant="icon" />
           </div>
           <h1 className="text-xl font-black text-white tracking-tight">
@@ -144,7 +144,7 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
           <div className="animate-fade-in space-y-5">
             <Card className="p-6 shadow-xl shadow-slate-200/50 border-slate-100 ring-1 ring-slate-100">
               <div className="flex items-center gap-3 mb-5">
-                <div className="w-11 h-11 bg-primary-light rounded-2xl flex items-center justify-center text-primary-dark shadow-sm">
+                <div className="w-11 h-11 bg-primary-light rounded-xl flex items-center justify-center text-primary-dark shadow-sm">
                   <Icons.Phone size={22} />
                 </div>
                 <div>
@@ -163,7 +163,7 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
                     setPhoneError("");
                   }}
                   placeholder="08X-XXX-XXXX"
-                  className={`w-full bg-slate-50 border-2 rounded-2xl px-5 py-4 text-lg font-bold text-center tracking-widest focus:outline-none focus:ring-4 transition-all duration-300 ${
+                  className={`w-full bg-slate-50 border-2 rounded-xl px-5 py-4 text-lg font-bold text-center tracking-widest focus:outline-none focus:ring-4 transition-all duration-300 ${
                     phoneError
                       ? "border-red-300 focus:ring-red-100 focus:border-red-400"
                       : "border-slate-100 focus:ring-primary/20 focus:border-primary"
@@ -198,7 +198,7 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
           <div className="animate-fade-in space-y-5">
             <Card className="p-6 shadow-xl shadow-slate-200/50 border-slate-100 ring-1 ring-slate-100">
               <div className="flex items-center gap-3 mb-5">
-                <div className="w-11 h-11 bg-primary-light rounded-2xl flex items-center justify-center text-primary-dark shadow-sm">
+                <div className="w-11 h-11 bg-primary-light rounded-xl flex items-center justify-center text-primary-dark shadow-sm">
                   <Icons.MapPin size={22} />
                 </div>
                 <div>
@@ -282,7 +282,7 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
             <div className="flex gap-3">
               <button
                 onClick={() => setStep(1)}
-                className="w-12 h-12 rounded-2xl bg-slate-100 flex items-center justify-center text-slate-500 active:scale-95 transition-transform shrink-0"
+                className="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center text-slate-500 active:scale-95 transition-transform shrink-0"
               >
                 <Icons.Back size={20} />
               </button>

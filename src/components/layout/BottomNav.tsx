@@ -57,7 +57,7 @@ export default function BottomNav() {
       href: "/booking",
       label: t("home.navBook") || "Book",
       icon: () => (
-        <div className="w-14 h-14 -mt-8 bg-white rounded-full flex items-center justify-center shadow-2xl shadow-primary/20 text-slate-900 border-4 border-white active:scale-90 transition-transform overflow-hidden p-1">
+        <div className="w-14 h-14 -mt-8 bg-white rounded-full flex items-center justify-center shadow-2xl shadow-primary/20 text-slate-900 border-4 border-white active:scale-90 transition-transform overflow-hidden p-1.5">
           <img 
             src="/images/rubjob-complete_logo-color.png" 
             alt="Book" 
@@ -151,12 +151,12 @@ export default function BottomNav() {
                    : "text-white/70 hover:text-white/90"
               }`}
             >
-              <div className={`flex items-center justify-center p-1.5 rounded-2xl transition-all ${
+              <div className={`flex items-center justify-center p-1.5 rounded-xl transition-all ${
                 isActive && !isBooking ? "bg-white/20 scale-110 shadow-inner" : ""
               }`}>
                 {tab.icon(isActive)}
               </div>
-              <span className={`text-[9px] font-black uppercase tracking-wider ${isActive ? "opacity-100" : "opacity-60"}`}>
+              <span className={`text-[10px] font-black uppercase tracking-wider leading-tight ${isActive ? "opacity-100" : "opacity-60"}`}>
                 {tab.label}
               </span>
             </Link>

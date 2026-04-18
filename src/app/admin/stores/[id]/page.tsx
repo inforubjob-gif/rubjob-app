@@ -54,7 +54,7 @@ export default function EditStorePage({ params }: { params: Promise<{ id: string
            <h1 className="text-3xl font-black text-slate-900 tracking-tight uppercase">{t('admin.stores.edit.title')}</h1>
            <p className="text-slate-500 font-medium mt-2">{t('admin.stores.edit.subtitle')} <span className="text-slate-900 font-bold">{storeData.name}</span>.</p>
         </div>
-        <div className="px-5 py-2.5 bg-slate-50 border border-slate-100 rounded-2xl">
+        <div className="px-5 py-2.5 bg-slate-50 border border-slate-100 rounded-xl">
            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-0.5">{t('admin.settings.refId')}</span>
            <span className="text-sm font-mono font-black text-slate-900">{storeData.id}</span>
         </div>

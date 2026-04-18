@@ -61,7 +61,7 @@ export default function PaymentMethodsPage() {
               </Card>
             ))
           ) : (
-             <div className="p-5 text-center border-2 border-dashed border-slate-200 rounded-2xl">
+             <div className="p-5 text-center border-2 border-dashed border-slate-200 rounded-xl">
                <p className="text-sm font-bold text-slate-400">{t("profile.paymentsPage.noSavedCards") || "No saved cards"}</p>
              </div>
           )}
@@ -79,7 +79,7 @@ export default function PaymentMethodsPage() {
             </div>
             <div className="w-5 h-5 rounded-full border-2 border-primary" />
           </Card>
-          <button className="w-full py-3.5 border-2 border-dashed border-slate-200 rounded-2xl text-slate-400 text-sm font-bold hover:border-primary hover:text-primary transition-colors">
+          <button className="w-full py-3.5 border-2 border-dashed border-slate-200 rounded-xl text-slate-400 text-sm font-bold hover:border-primary hover:text-primary transition-colors">
             {t("profile.paymentsPage.addNew")}
           </button>
         </section>

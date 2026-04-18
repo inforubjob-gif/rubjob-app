@@ -53,12 +53,12 @@ export default function AdminAuthGate({ children }: { children: React.ReactNode 
   if (!admin) {
     return (
       <div className="flex h-screen w-full items-center justify-center bg-slate-50 absolute inset-0 z-[100]">
-        <div className="bg-white rounded-2xl w-full max-w-md p-10 shadow-2xl relative overflow-hidden border border-slate-100">
+        <div className="bg-white rounded-xl w-full max-w-md p-10 shadow-2xl relative overflow-hidden border border-slate-100">
           {/* Header Brand Line */}
           <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-primary via-primary-dark to-primary" />
           
           <div className="flex justify-center mb-8">
-            <div className="w-24 h-24 bg-primary-light rounded-2xl flex items-center justify-center ring-8 ring-primary-light/50 transition-transform hover:scale-105 duration-500">
+            <div className="w-24 h-24 bg-primary-light rounded-xl flex items-center justify-center ring-8 ring-primary-light/50 transition-transform hover:scale-105 duration-500">
               <Icons.Logo size={60} variant="color" />
             </div>
           </div>
@@ -76,7 +76,7 @@ export default function AdminAuthGate({ children }: { children: React.ReactNode 
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="admin@rubjob.com"
-                className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-5 py-4 text-sm focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all font-bold text-slate-700"
+                className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-5 py-4 text-sm focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all font-bold text-slate-700"
               />
             </div>
             
@@ -87,12 +87,12 @@ export default function AdminAuthGate({ children }: { children: React.ReactNode 
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-5 py-4 text-sm focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all font-bold text-slate-700"
+                className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-5 py-4 text-sm focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all font-bold text-slate-700"
               />
             </div>
 
             {error && (
-              <div className="bg-rose-50 text-rose-600 p-4 rounded-2xl flex items-center gap-3 border border-rose-100 animate-fade-in">
+              <div className="bg-rose-50 text-rose-600 p-4 rounded-xl flex items-center gap-3 border border-rose-100 animate-fade-in">
                 <div className="w-2 h-2 rounded-full bg-rose-500 animate-pulse" />
                 <p className="text-xs font-bold">{error}</p>
               </div>
@@ -101,7 +101,7 @@ export default function AdminAuthGate({ children }: { children: React.ReactNode 
             <button
               type="submit"
               disabled={isLoggingIn}
-              className="w-full bg-primary hover:bg-primary-dark text-white rounded-2xl py-4.5 text-sm font-black shadow-xl shadow-primary/20 transition-all active:scale-[0.98] disabled:opacity-50 mt-4 uppercase tracking-widest"
+              className="w-full bg-primary hover:bg-primary-dark text-white rounded-xl py-4.5 text-sm font-black shadow-xl shadow-primary/20 transition-all active:scale-[0.98] disabled:opacity-50 mt-4 uppercase tracking-widest"
             >
               {isLoggingIn ? "กำลังประมวลผล..." : "เข้าสู่ระบบ (Login)"}
             </button>

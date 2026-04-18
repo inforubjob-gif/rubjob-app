@@ -13,7 +13,7 @@ export default function NotFound() {
       <div className="text-[120px] font-black text-slate-100 leading-none mb-4 select-none">404</div>
       
       <div className="relative -mt-20">
-        <div className="w-24 h-24 bg-primary/10 text-primary rounded-2xl flex items-center justify-center mb-8 mx-auto shadow-xl shadow-primary/5">
+        <div className="w-24 h-24 bg-primary/10 text-primary rounded-xl flex items-center justify-center mb-8 mx-auto shadow-xl shadow-primary/5">
           <Icons.MapPin size={48} strokeWidth={2.5} />
         </div>
         

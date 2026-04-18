@@ -34,7 +34,7 @@ export default function PhotoUpload({ onPhotoCapture, label, required }: PhotoUp
       
       <div 
         onClick={() => fileInputRef.current?.click()}
-        className={`relative aspect-video rounded-2xl border-4 border-dashed transition-all cursor-pointer overflow-hidden flex flex-col items-center justify-center gap-2 ${
+        className={`relative aspect-video rounded-xl border-4 border-dashed transition-all cursor-pointer overflow-hidden flex flex-col items-center justify-center gap-2 ${
           preview ? 'border-primary bg-primary/5' : 'border-slate-100 bg-slate-50 hover:bg-slate-100/50'
         }`}
       >
@@ -42,7 +42,7 @@ export default function PhotoUpload({ onPhotoCapture, label, required }: PhotoUp
           <>
             <img src={preview} alt="Verification" className="w-full h-full object-cover" />
             <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
-               <div className="bg-white/20 backdrop-blur-md p-3 rounded-2xl border border-white/30 text-white font-black text-[10px] uppercase">
+               <div className="bg-white/20 backdrop-blur-md p-3 rounded-xl border border-white/30 text-white font-black text-[10px] uppercase">
                  Change Photo
                </div>
             </div>

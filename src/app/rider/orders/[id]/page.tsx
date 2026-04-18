@@ -153,7 +153,7 @@ export default function RiderOrderDetailPage() {
            <div className="absolute bottom-4 right-4 z-20 flex gap-2">
               <button 
                 onClick={() => window.open(`https://www.google.com/maps/dir/?api=1&destination=${activeDest.pos.lat},${activeDest.pos.lng}`, "_blank")}
-                className="bg-white/90 backdrop-blur-md px-4 py-2 rounded-2xl border border-slate-200 shadow-xl text-primary font-black text-[10px] uppercase tracking-widest flex items-center gap-2 active:scale-95 transition-all"
+                className="bg-white/90 backdrop-blur-md px-4 py-2 rounded-xl border border-slate-200 shadow-xl text-primary font-black text-[10px] uppercase tracking-widest flex items-center gap-2 active:scale-95 transition-all"
               >
                  <Icons.MapPin size={14} strokeWidth={3} /> {t("rider.navigate")} {activeDest.label}
               </button>
@@ -161,7 +161,7 @@ export default function RiderOrderDetailPage() {
         </div>
 
         <div className="px-5 pt-2 space-y-6">
-          <Card className="p-6 border-none shadow-xl shadow-primary/5 rounded-2xl bg-white relative overflow-hidden">
+          <Card className="p-6 border-none shadow-xl shadow-primary/5 rounded-xl bg-white relative overflow-hidden">
              <div className="absolute top-0 right-0 w-32 h-32 bg-orange-50 rounded-full -mr-16 -mt-16 blur-3xl opacity-50" />
              <div className="flex items-center gap-4 mb-6 relative z-10">
                 <div className="w-14 h-14 rounded-xl bg-slate-50 flex items-center justify-center text-slate-600 border border-slate-100 shadow-inner">
@@ -216,7 +216,7 @@ export default function RiderOrderDetailPage() {
           </Card>
 
           {currentPhotoStep && (
-             <Card className="p-6 border-none shadow-xl shadow-primary/5 rounded-2xl bg-white border border-primary/10 relative overflow-hidden group">
+             <Card className="p-6 border-none shadow-xl shadow-primary/5 rounded-xl bg-white border border-primary/10 relative overflow-hidden group">
                 <div className="absolute -top-10 -right-10 w-32 h-32 bg-primary/5 rounded-full blur-2xl transition-all group-hover:bg-primary/10" />
                 <PhotoUpload 
                   onPhotoCapture={(url) => setPhoto(url)} 
@@ -230,12 +230,12 @@ export default function RiderOrderDetailPage() {
         {/* Action Button */}
         <div className="fixed bottom-0 left-0 right-0 p-5 bg-white/80 backdrop-blur-2xl border-t border-slate-100/50 z-40">
            {status === "washing" ? (
-             <div className="text-center p-4 bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200">
+             <div className="text-center p-4 bg-slate-50 rounded-xl border-2 border-dashed border-slate-200">
                 <p className="text-xs font-black text-slate-400 uppercase tracking-widest">{t("store.processing")}</p>
                 <p className="text-[10px] text-slate-400 mt-1 uppercase font-bold italic">{t("rider.orderDetail.waitingStore")}</p>
              </div>
            ) : status === "completed" ? (
-             <div className="p-4 bg-green-50 rounded-2xl border-2 border-green-200 flex items-center justify-center gap-2 text-green-600 font-black italic">
+             <div className="p-4 bg-green-50 rounded-xl border-2 border-green-200 flex items-center justify-center gap-2 text-green-600 font-black italic">
                 <Icons.Check size={20} /> {t("rider.orderDetail.workCompleted")}
              </div>
            ) : (
@@ -243,7 +243,7 @@ export default function RiderOrderDetailPage() {
                 fullWidth 
                 onClick={() => handleUpdateStatus(getNextStatus(status))}
                 isLoading={isUpdating}
-                className="bg-primary text-white hover:bg-primary-dark shadow-2xl shadow-primary/30 py-6 text-base font-black italic rounded-2xl uppercase tracking-widest"
+                className="bg-primary text-white hover:bg-primary-dark shadow-2xl shadow-primary/30 py-6 text-base font-black italic rounded-xl uppercase tracking-widest"
              >
                 {status === "picking_up" ? t("rider.orderDetail.btnPickup") : 
                  status === "delivering_to_store" ? t("rider.orderDetail.btnHandover") : 

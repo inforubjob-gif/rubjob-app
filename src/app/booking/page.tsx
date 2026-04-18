@@ -353,7 +353,7 @@ function BookingFlow() {
   if (isLoaded && systemSettings.is_open === "false") {
     return (
       <div className="flex flex-col items-center justify-center min-h-dvh px-10 text-center animate-fade-in bg-slate-50">
-        <div className="w-24 h-24 bg-white rounded-2xl shadow-xl flex items-center justify-center mb-8 border border-slate-100">
+        <div className="w-24 h-24 bg-white rounded-xl shadow-xl flex items-center justify-center mb-8 border border-slate-100">
            <Icons.Settings size={48} className="text-slate-300 animate-spin-slow" />
         </div>
         <h2 className="text-2xl font-black text-slate-900 tracking-tight">{t("booking.errors.systemClosedTitle")}</h2>
@@ -364,7 +364,7 @@ function BookingFlow() {
         </p>
         <Button 
           variant="outline" 
-          className="mt-10 rounded-2xl border-2 font-black px-10"
+          className="mt-10 rounded-xl border-2 font-black px-10"
           onClick={() => router.push("/")}
         >
           {t("common.goHome")}
@@ -555,17 +555,17 @@ function BookingFlow() {
                     <span className="text-xs text-muted block mt-0.5">{t("booking.speed.standardDesc").replace("{fee}", (39 + distanceExtra).toString())}</span>
                   </div>
                   <div className={`w-5 h-5 rounded-full flex items-center justify-center transition-colors ${deliverySpeed === "standard" ? "bg-primary text-white" : "border-2 border-slate-200"}`}>
-                    {deliverySpeed === "standard" && <span className="text-xs font-bold leading-none translate-y-[0.5px]">✓</span>}
+                    {deliverySpeed === "standard" && <span className="text-xs font-bold leading-none flex items-center justify-center pt-0.5">✓</span>}
                   </div>
                 </label>
 
-                <label className={`flex items-center justify-between p-3.5 rounded-xl border-2 cursor-pointer transition-all ${deliverySpeed === "express" ? "border-[#ff9800] bg-[#fff8e1] shadow-md shadow-[#ff9800]/10" : "border-slate-100 bg-white hover:bg-slate-50"}`} onClick={() => setDeliverySpeed("express")}>
+                <label className={`flex items-center justify-between p-3.5 rounded-xl border-2 cursor-pointer transition-all ${deliverySpeed === "express" ? "border-[ff9f1c] bg-[#fff8e1] shadow-md shadow-[ff9f1c]/10" : "border-slate-100 bg-white hover:bg-slate-50"}`} onClick={() => setDeliverySpeed("express")}>
                   <div className="flex flex-col">
-                    <span className="text-sm font-bold text-[#ff9800]">{t("booking.speed.expressTitle")}</span>
-                    <span className="text-xs text-[#ff9800]/80 block mt-0.5">{t("booking.speed.expressDesc").replace("{fee}", (59 + distanceExtra).toString())}</span>
+                    <span className="text-sm font-bold text-[ff9f1c]">{t("booking.speed.expressTitle")}</span>
+                    <span className="text-xs text-[ff9f1c]/80 block mt-0.5">{t("booking.speed.expressDesc").replace("{fee}", (59 + distanceExtra).toString())}</span>
                   </div>
-                  <div className={`w-5 h-5 rounded-full flex items-center justify-center transition-colors ${deliverySpeed === "express" ? "bg-[#ff9800] text-white" : "border-2 border-slate-200"}`}>
-                    {deliverySpeed === "express" && <span className="text-xs font-bold leading-none translate-y-[0.5px]">✓</span>}
+                  <div className={`w-5 h-5 rounded-full flex items-center justify-center transition-colors ${deliverySpeed === "express" ? "bg-[ff9f1c] text-white" : "border-2 border-slate-200"}`}>
+                    {deliverySpeed === "express" && <span className="text-xs font-bold leading-none flex items-center justify-center pt-0.5">✓</span>}
                   </div>
                 </label>
               </div>
@@ -600,7 +600,7 @@ function BookingFlow() {
                     <span className="text-xs text-muted">{t("booking.options.noFoldingDesc")}</span>
                   </div>
                   <div className={`w-5 h-5 rounded-full flex items-center justify-center transition-colors ${!withFolding ? "bg-primary text-white shadow-md shadow-primary/30" : "border-2 border-slate-200"}`}>
-                    {!withFolding && <span className="text-xs font-bold leading-none translate-y-[0.5px]">✓</span>}
+                    {!withFolding && <span className="text-xs font-bold leading-none flex items-center justify-center pt-0.5">✓</span>}
                   </div>
                 </label>
 
@@ -610,7 +610,7 @@ function BookingFlow() {
                     <span className="text-xs text-primary-dark font-medium">+฿{bagSize === "28kg" ? 35 : bagSize === "18kg" ? 25 : 20}</span>
                   </div>
                   <div className={`w-5 h-5 rounded-full flex items-center justify-center transition-colors ${withFolding ? "bg-primary text-white shadow-md shadow-primary/30" : "border-2 border-slate-200"}`}>
-                    {withFolding && <span className="text-xs font-bold leading-none translate-y-[0.5px]">✓</span>}
+                    {withFolding && <span className="text-xs font-bold leading-none flex items-center justify-center pt-0.5">✓</span>}
                   </div>
                 </label>
               </Card>
@@ -784,7 +784,7 @@ function BookingFlow() {
                   </div>
                 </div>
 
-                <div className="bg-slate-50/50 p-3.5 rounded-2xl space-y-2.5 border border-slate-100">
+                <div className="bg-slate-50/50 p-3.5 rounded-xl space-y-2.5 border border-slate-100">
                   <Row icon={<Icons.MapPin size={12} />} label={t("booking.confirm.pickupLocation")} value={selectedAddress?.label || ""} />
                   <Row icon={<Icons.Bell size={12} />} label={t("booking.confirm.pickupDate")} value={`${pickupDate} ${TIME_SLOTS.find(s => s.id === pickupSlot)?.label || pickupSlot}`} />
                   <Row
@@ -814,14 +814,14 @@ function BookingFlow() {
                 }`} 
                 onClick={() => setSelectedPayment("promptpay")}
               >
-                <div className="bg-[#1a3d6d] px-5 py-2.5 rounded-2xl flex items-center gap-3">
+                <div className="bg-[#1a3d6d] px-5 py-2.5 rounded-xl flex items-center gap-3">
                   <div className="w-7 h-7 bg-white rounded-lg flex items-center justify-center">
                     <span className="text-[11px] font-black text-[#1a3d6d]">PP</span>
                   </div>
                   <span className="text-base font-black text-white tracking-tight">PromptPay</span>
                 </div>
                 
-                <div className="bg-white p-4 rounded-2xl shadow-inner border border-slate-100 relative overflow-hidden">
+                <div className="bg-white p-4 rounded-xl shadow-inner border border-slate-100 relative overflow-hidden">
                   <img 
                     src={paymentQR || `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=00020101021129370016A000000677010111011300660000000005802TH5303764580215${totalPrice}.006304`}
                     alt="PromptPay QR" 
@@ -861,7 +861,7 @@ function BookingFlow() {
       {/* ─── Bottom CTA ─── */}
       <div className="sticky bottom-20 px-5 pb-4 space-y-3">
         {step === "payment" && isBelowMinOrder && (
-          <div className="bg-rose-50 border border-rose-100 p-3 rounded-2xl flex items-center gap-3 animate-bounce">
+          <div className="bg-rose-50 border border-rose-100 p-3 rounded-xl flex items-center gap-3 animate-bounce">
             <div className="w-8 h-8 bg-rose-100 text-rose-600 rounded-full flex items-center justify-center shrink-0">
                <Icons.Info size={16} />
             </div>
@@ -886,7 +886,7 @@ function BookingFlow() {
         {step === "details" && (
           <div className="space-y-3">
             {!profile?.phone && (
-              <div className="bg-amber-50 border border-amber-100 p-3 rounded-2xl">
+              <div className="bg-amber-50 border border-amber-100 p-3 rounded-xl">
                 <p className="text-[11px] font-bold text-amber-700 mb-2">{t("booking.identifyPhone")}</p>
                 <input 
                   type="tel" 

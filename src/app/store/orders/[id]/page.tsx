@@ -72,7 +72,7 @@ export default function StoreOrderDetailPage() {
       </header>
 
       <div className="flex-1 px-5 py-6">
-        <Card className="p-6 mb-6 border-none shadow-sm bg-white overflow-hidden relative rounded-2xl">
+        <Card className="p-6 mb-6 border-none shadow-sm bg-white overflow-hidden relative rounded-xl">
           <div className="flex justify-between items-start mb-6">
             <div>
               <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest leading-none mb-1.5">{t("orders.tracking")} #{id.slice(-6)}</p>
@@ -88,7 +88,7 @@ export default function StoreOrderDetailPage() {
 
           <div className="flex items-center gap-4 relative">
              <div className="absolute left-6 top-6 bottom-6 w-0.5 bg-dashed border-l-2 border-slate-100 border-dashed" />
-             <div className="relative z-10 w-12 h-12 rounded-2xl bg-slate-50 text-slate-400 flex items-center justify-center shadow-inner">
+             <div className="relative z-10 w-12 h-12 rounded-xl bg-slate-50 text-slate-400 flex items-center justify-center shadow-inner">
                 <Icons.User size={22} />
              </div>
              <div className="flex-1 min-w-0">
@@ -105,7 +105,7 @@ export default function StoreOrderDetailPage() {
               <Card className={`p-5 transition-all outline-dashed outline-2 ${status === 'delivering_to_store' ? 'outline-primary bg-primary/5 shadow-xl shadow-primary/10' : 'bg-white outline-slate-100'}`}>
                 <div className="flex items-center justify-between">
                    <div className="flex items-center gap-4">
-                       <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${status === 'delivering_to_store' ? 'bg-primary text-white shadow-lg' : 'bg-slate-50 text-slate-300'}`}>
+                       <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${status === 'delivering_to_store' ? 'bg-primary text-white shadow-lg' : 'bg-slate-50 text-slate-300'}`}>
                            <Icons.Truck size={22} />
                        </div>
                        <div>
@@ -117,7 +117,7 @@ export default function StoreOrderDetailPage() {
               </Card>
 
               {status === "washing" && (
-                 <Card className={`p-6 border-none shadow-2xl ${isExpress ? 'bg-red-600 shadow-red-200' : 'bg-primary shadow-primary/20'} text-white relative overflow-hidden rounded-2xl`}>
+                 <Card className={`p-6 border-none shadow-2xl ${isExpress ? 'bg-red-600 shadow-red-200' : 'bg-primary shadow-primary/20'} text-white relative overflow-hidden rounded-xl`}>
                     <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 blur-2xl" />
                     <div className="relative z-10 flex items-center justify-between">
                         <div>
@@ -126,7 +126,7 @@ export default function StoreOrderDetailPage() {
                                {isExpress ? t("store.flashExpress") : t("store.standardWash")}
                             </h3>
                         </div>
-                        <div className="bg-white/20 p-3.5 rounded-2xl backdrop-blur-md border border-white/30 shadow-inner">
+                        <div className="bg-white/20 p-3.5 rounded-xl backdrop-blur-md border border-white/30 shadow-inner">
                            <CountdownTimer seconds={isExpress ? 1200 : 3600} urgentThreshold={900} />
                         </div>
                     </div>
@@ -166,7 +166,7 @@ export default function StoreOrderDetailPage() {
                           <span className="text-xs font-black text-slate-900 tracking-tight">{actualItems} pcs</span>
                       </div>
                       {order?.staffNote && (
-                        <div className="bg-amber-50 p-3 rounded-2xl border border-amber-100 shadow-inner">
+                        <div className="bg-amber-50 p-3 rounded-xl border border-amber-100 shadow-inner">
                             <p className="text-[10px] font-black text-amber-600 uppercase tracking-widest mb-1 leading-none italic">{t("store.clientPrefs")}</p>
                             <p className="text-xs text-amber-800 leading-relaxed font-bold">{order.staffNote}</p>
                         </div>
@@ -191,7 +191,7 @@ export default function StoreOrderDetailPage() {
                   </Button>
                 )}
                 {status === "completed" && (
-                  <div className="p-10 bg-orange-50 rounded-2xl border-4 border-dashed border-orange-200 flex flex-col items-center justify-center gap-4 text-center animate-bounce-slow">
+                  <div className="p-10 bg-orange-50 rounded-xl border-4 border-dashed border-orange-200 flex flex-col items-center justify-center gap-4 text-center animate-bounce-slow">
                       <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center text-white shadow-2xl shadow-orange-200">
                           <Icons.Check size={32} strokeWidth={4} />
                       </div>

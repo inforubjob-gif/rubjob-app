@@ -85,11 +85,11 @@ export default function EditProfilePage() {
         {/* Profile Image Section */}
         <div className="flex flex-col items-center gap-4">
           <div className="relative group cursor-pointer" onClick={handlePhotoClick}>
-            <div className="w-28 h-28 rounded-2xl bg-white p-1.5 shadow-2xl relative overflow-hidden transition-transform active:scale-95 ring-4 ring-white/30">
+            <div className="w-28 h-28 rounded-xl bg-white p-1.5 shadow-2xl relative overflow-hidden transition-transform active:scale-95 ring-4 ring-white/30">
               {photoUrl ? (
-                <img src={photoUrl} alt="Profile" className="w-full h-full object-cover rounded-[2.1rem]" />
+                <img src={photoUrl} alt="Profile" className="w-full h-full object-cover rounded-xl" />
               ) : (
-                <div className="w-full h-full bg-slate-50 flex items-center justify-center text-slate-400 rounded-[2.1rem]">
+                <div className="w-full h-full bg-slate-50 flex items-center justify-center text-slate-400 rounded-xl">
                   <span className="text-3xl font-black uppercase">{name?.[0] || "U"}</span>
                 </div>
               )}
@@ -98,7 +98,7 @@ export default function EditProfilePage() {
                 <Icons.Camera size={24} className="text-white" />
               </div>
             </div>
-            <div className="absolute -bottom-1 -right-1 w-10 h-10 bg-primary text-slate-900 rounded-2xl flex items-center justify-center shadow-xl border-[4px] border-slate-50">
+            <div className="absolute -bottom-1 -right-1 w-10 h-10 bg-primary text-slate-900 rounded-xl flex items-center justify-center shadow-xl border-[4px] border-slate-50">
               <Icons.Edit size={18} />
             </div>
             <input 
@@ -120,7 +120,7 @@ export default function EditProfilePage() {
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full bg-white rounded-2xl pl-14 pr-6 py-5 font-extrabold text-slate-900 shadow-xl shadow-slate-200/40 outline-none focus:ring-4 focus:ring-primary/20 transition-all border-none"
+                className="w-full bg-white rounded-xl pl-14 pr-6 py-5 font-extrabold text-slate-900 shadow-xl shadow-slate-200/40 outline-none focus:ring-4 focus:ring-primary/20 transition-all border-none"
                 placeholder={t("profile.fullName")}
               />
               <div className="absolute left-5 top-1/2 -translate-y-1/2 w-8 h-8 bg-slate-50 rounded-lg flex items-center justify-center text-slate-400">
@@ -136,7 +136,7 @@ export default function EditProfilePage() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full bg-white rounded-2xl pl-14 pr-6 py-5 font-extrabold text-slate-900 shadow-xl shadow-slate-200/40 outline-none focus:ring-4 focus:ring-primary/20 transition-all border-none"
+                className="w-full bg-white rounded-xl pl-14 pr-6 py-5 font-extrabold text-slate-900 shadow-xl shadow-slate-200/40 outline-none focus:ring-4 focus:ring-primary/20 transition-all border-none"
                 placeholder="example@mail.com"
               />
               <div className="absolute left-5 top-1/2 -translate-y-1/2 w-8 h-8 bg-slate-50 rounded-lg flex items-center justify-center text-slate-400">
@@ -157,7 +157,7 @@ export default function EditProfilePage() {
                     if (val.length <= 10) setPhone(val);
                   }}
                   disabled={isVerified}
-                  className={`w-full bg-white rounded-2xl pl-14 pr-6 py-5 font-extrabold text-slate-900 shadow-xl shadow-slate-200/40 outline-none transition-all border-none ${isVerified ? 'bg-slate-50 text-slate-400' : 'focus:ring-4 focus:ring-primary/20'}`}
+                  className={`w-full bg-white rounded-xl pl-14 pr-6 py-5 font-extrabold text-slate-900 shadow-xl shadow-slate-200/40 outline-none transition-all border-none ${isVerified ? 'bg-slate-50 text-slate-400' : 'focus:ring-4 focus:ring-primary/20'}`}
                   placeholder="08X-XXX-XXXX"
                 />
                 <div className="absolute left-5 top-1/2 -translate-y-1/2 w-8 h-8 bg-slate-50 rounded-lg flex items-center justify-center">
@@ -174,7 +174,7 @@ export default function EditProfilePage() {
                 <button
                   onClick={handleVerify}
                   disabled={phone.length < 9}
-                  className="px-6 bg-slate-900 text-white rounded-2xl font-black text-xs uppercase tracking-widest disabled:opacity-20 disabled:grayscale transition-all shadow-xl active:scale-95"
+                  className="px-6 bg-slate-900 text-white rounded-xl font-black text-xs uppercase tracking-widest disabled:opacity-20 disabled:grayscale transition-all shadow-xl active:scale-95"
                 >
                   {t("profile.verify")}
                 </button>
@@ -192,7 +192,7 @@ export default function EditProfilePage() {
           <button
             onClick={handleSave}
             disabled={!isVerified || isLoading}
-            className="w-full py-5 bg-primary text-slate-950 rounded-2xl font-[1000] uppercase tracking-[0.25em] shadow-2xl shadow-primary/30 disabled:bg-slate-200 disabled:text-slate-400 disabled:shadow-none active:scale-[0.98] transition-all flex items-center justify-center gap-3"
+            className="w-full py-5 bg-primary text-slate-950 rounded-xl font-[1000] uppercase tracking-[0.25em] shadow-2xl shadow-primary/30 disabled:bg-slate-200 disabled:text-slate-400 disabled:shadow-none active:scale-[0.98] transition-all flex items-center justify-center gap-3"
           >
             {isLoading ? (
               <div className="w-6 h-6 border-4 border-slate-950/20 border-t-slate-950 rounded-full animate-spin" />
@@ -208,7 +208,7 @@ export default function EditProfilePage() {
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 animate-fade-in">
           <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-md" />
           <Card className="w-full max-w-sm bg-white p-8 relative z-10 flex flex-col items-center text-center shadow-2xl animate-scale-in">
-            <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center text-primary mb-6">
+            <div className="w-16 h-16 bg-primary/10 rounded-xl flex items-center justify-center text-primary mb-6">
               <Icons.Lock size={32} />
             </div>
             <h3 className="text-xl font-black text-slate-900 mb-2">{t("profile.otpTitle")}</h3>
@@ -224,7 +224,7 @@ export default function EditProfilePage() {
                 maxLength={4}
                 value={otp}
                 onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))}
-                className="w-full bg-slate-100 rounded-2xl px-4 py-5 text-3xl font-black text-center tracking-[0.5em] text-slate-900 outline-none focus:ring-4 focus:ring-primary/20 transition-all"
+                className="w-full bg-slate-100 rounded-xl px-4 py-5 text-3xl font-black text-center tracking-[0.5em] text-slate-900 outline-none focus:ring-4 focus:ring-primary/20 transition-all"
                 placeholder="0000"
               />
             </div>
@@ -232,7 +232,7 @@ export default function EditProfilePage() {
             <div className="flex flex-col w-full gap-3">
               <button 
                 onClick={confirmOtp}
-                className="w-full py-4 bg-slate-900 text-white rounded-2xl font-black uppercase tracking-widest active:scale-95 transition-all shadow-xl"
+                className="w-full py-4 bg-slate-900 text-white rounded-xl font-black uppercase tracking-widest active:scale-95 transition-all shadow-xl"
               >
                 {t("common.confirm")}
               </button>

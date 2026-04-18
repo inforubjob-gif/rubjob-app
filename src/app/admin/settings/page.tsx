@@ -267,12 +267,12 @@ function SettingsContent() {
              {activeTab === 'profile' ? t("admin.settings.profileSub") : t("admin.settings.engineSub")}
           </p>
         </div>
-        <div className="w-fit bg-white px-4 py-2 rounded-2xl border border-slate-100 shadow-sm text-[10px] font-black uppercase tracking-widest text-slate-400">
+        <div className="w-fit bg-white px-4 py-2 rounded-xl border border-slate-100 shadow-sm text-[10px] font-black uppercase tracking-widest text-slate-400">
             {t("admin.nav.settings")} v2.5
         </div>
       </header>
       
-      <div className="flex bg-slate-100 p-1.5 rounded-2xl w-full sm:w-fit overflow-x-auto no-scrollbar whitespace-nowrap">
+      <div className="flex bg-slate-100 p-1.5 rounded-xl w-full sm:w-fit overflow-x-auto no-scrollbar whitespace-nowrap">
         <button 
           onClick={() => setActiveTab("system")}
           className={`flex-1 sm:flex-none px-6 md:px-8 py-3.5 text-xs md:text-sm font-black rounded-xl transition-all ${activeTab === 'system' ? 'bg-white text-primary shadow-sm' : 'text-slate-400 hover:text-slate-600'}`}
@@ -305,8 +305,8 @@ function SettingsContent() {
       </div>
 
       {(error || success) && (
-        <div className={`p-5 rounded-2xl font-bold text-sm animate-fade-in flex items-center gap-3 border shadow-sm ${error ? 'bg-rose-50 text-rose-600 border-rose-100' : 'bg-emerald-50 text-emerald-600 border-emerald-100'}`}>
-          <div className={`w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 ${error ? 'bg-rose-100' : 'bg-emerald-100'}`}>
+        <div className={`p-5 rounded-xl font-bold text-sm animate-fade-in flex items-center gap-3 border shadow-sm ${error ? 'bg-rose-50 text-rose-600 border-rose-100' : 'bg-emerald-50 text-emerald-600 border-emerald-100'}`}>
+          <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${error ? 'bg-rose-100' : 'bg-emerald-100'}`}>
              {error ? <Icons.Close size={18} /> : <Icons.Check size={18} />}
           </div>
           {error || success}
@@ -316,7 +316,7 @@ function SettingsContent() {
       {activeTab === "admins" ? (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 animate-fade-in relative z-10 pb-20">
           <div className="lg:col-span-4">
-            <Card className="p-8 bg-white border border-slate-100 shadow-2xl rounded-2xl sticky top-8">
+            <Card className="p-8 bg-white border border-slate-100 shadow-2xl rounded-xl sticky top-8">
               <div className="flex items-center gap-3 mb-8">
                  <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
                     <Icons.User size={20} />
@@ -328,15 +328,15 @@ function SettingsContent() {
                 <div className="space-y-4">
                   <div className="space-y-2">
                     <label className="text-[10px] uppercase tracking-widest font-black text-slate-400 ml-1">{t("admin.settings.authLabelName")}</label>
-                    <input type="text" value={newAdmin.name} onChange={e => setNewAdmin({...newAdmin, name: e.target.value})} placeholder={t("admin.settings.authLabelName")} className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-5 py-4 text-sm font-black focus:border-primary transition-all outline-none" />
+                    <input type="text" value={newAdmin.name} onChange={e => setNewAdmin({...newAdmin, name: e.target.value})} placeholder={t("admin.settings.authLabelName")} className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-5 py-4 text-sm font-black focus:border-primary transition-all outline-none" />
                   </div>
                   <div className="space-y-2">
                     <label className="text-[10px] uppercase tracking-widest font-black text-slate-400 ml-1">{t("admin.settings.authLabelEmail")}</label>
-                    <input type="email" value={newAdmin.email} onChange={e => setNewAdmin({...newAdmin, email: e.target.value})} placeholder="admin@email.com" className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-5 py-4 text-sm font-black focus:border-primary transition-all outline-none" />
+                    <input type="email" value={newAdmin.email} onChange={e => setNewAdmin({...newAdmin, email: e.target.value})} placeholder="admin@email.com" className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-5 py-4 text-sm font-black focus:border-primary transition-all outline-none" />
                   </div>
                   <div className="space-y-2">
                     <label className="text-[10px] uppercase tracking-widest font-black text-slate-400 ml-1">{t("admin.settings.authLabelPassword")}</label>
-                    <input type="password" value={newAdmin.password} onChange={e => setNewAdmin({...newAdmin, password: e.target.value})} placeholder="••••••••" className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-5 py-4 text-sm font-black focus:border-primary transition-all outline-none" />
+                    <input type="password" value={newAdmin.password} onChange={e => setNewAdmin({...newAdmin, password: e.target.value})} placeholder="••••••••" className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-5 py-4 text-sm font-black focus:border-primary transition-all outline-none" />
                   </div>
                 </div>
 
@@ -358,7 +358,7 @@ function SettingsContent() {
                   {newAdmin.role === 'admin' && (
                     <div className="space-y-3">
                        <p className="text-[9px] font-black text-slate-300 uppercase tracking-widest ml-1">{t("admin.settings.modulePermissions")}</p>
-                       <div className="grid grid-cols-2 gap-2 p-1.5 bg-slate-50 rounded-2xl border border-slate-100">
+                       <div className="grid grid-cols-2 gap-2 p-1.5 bg-slate-50 rounded-xl border border-slate-100">
                           {MODULES.map(mod => (
                             <button
                               key={mod.id}
@@ -377,7 +377,7 @@ function SettingsContent() {
                   )}
                 </div>
 
-                <button disabled={isSaving} className="w-full bg-primary text-white py-5 rounded-2xl font-black text-sm shadow-2xl shadow-primary/30 hover:scale-[1.02] active:scale-[0.98] transition-all mt-4 uppercase tracking-[0.2em]">
+                <button disabled={isSaving} className="w-full bg-primary text-white py-5 rounded-xl font-black text-sm shadow-2xl shadow-primary/30 hover:scale-[1.02] active:scale-[0.98] transition-all mt-4 uppercase tracking-[0.2em]">
                   {isSaving ? t("admin.settings.authBtnAuthorizing") : t("admin.settings.authBtnGrant")}
                 </button>
               </form>
@@ -393,7 +393,7 @@ function SettingsContent() {
             </div>
             
             {isLoading ? (
-               <div className="p-20 flex justify-center bg-white rounded-2xl border border-slate-100 shadow-sm border-dashed">
+               <div className="p-20 flex justify-center bg-white rounded-xl border border-slate-100 shadow-sm border-dashed">
                   <div className="w-10 h-10 border-4 border-slate-100 border-t-primary rounded-full animate-spin" />
                </div>
             ) : (
@@ -404,7 +404,7 @@ function SettingsContent() {
                     const isSuper = adminItem.role === 'super_admin';
 
                     return (
-                      <Card key={adminItem.id} className="p-7 bg-white border border-slate-100 flex flex-col group rounded-2xl hover:shadow-2xl hover:shadow-slate-200/50 transition-all relative overflow-hidden">
+                      <Card key={adminItem.id} className="p-7 bg-white border border-slate-100 flex flex-col group rounded-xl hover:shadow-2xl hover:shadow-slate-200/50 transition-all relative overflow-hidden">
                          <div className={`absolute top-0 right-0 w-24 h-24 blur-3xl -mr-12 -mt-12 transition-colors ${isSuper ? 'bg-rose-500/10' : 'bg-primary/10'}`} />
                          
                          <div className="flex items-start justify-between mb-6 relative z-10">
@@ -465,14 +465,14 @@ function SettingsContent() {
            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
               {/* Identity Sidebar */}
               <div className="lg:col-span-4 transition-all">
-                 <Card className="p-8 bg-white border border-slate-100 shadow-2xl rounded-2xl text-center sticky top-8 relative overflow-hidden group">
+                 <Card className="p-8 bg-white border border-slate-100 shadow-2xl rounded-xl text-center sticky top-8 relative overflow-hidden group">
                     <div className={`absolute top-0 left-0 w-full h-2 ${admin?.role === 'super_admin' ? 'bg-rose-500' : 'bg-primary'}`} />
                     
                     <div className="relative inline-block mb-6 pt-4">
-                       <div className={`w-32 h-32 rounded-2xl bg-slate-50 border-4 border-white shadow-2xl flex items-center justify-center overflow-hidden ring-4 ${admin?.role === 'super_admin' ? 'ring-rose-50' : 'ring-primary/5'}`}>
+                       <div className={`w-32 h-32 rounded-xl bg-slate-50 border-4 border-white shadow-2xl flex items-center justify-center overflow-hidden ring-4 ${admin?.role === 'super_admin' ? 'ring-rose-50' : 'ring-primary/5'}`}>
                           {profileForm.avatarUrl ? <img src={profileForm.avatarUrl} className="w-full h-full object-cover" /> : <Icons.User size={48} className="text-slate-200" />}
                        </div>
-                       <label className={`absolute -bottom-2 -right-2 w-10 h-10 ${admin?.role === 'super_admin' ? 'bg-rose-500' : 'bg-primary'} text-white rounded-2xl flex items-center justify-center shadow-xl border-4 border-white cursor-pointer hover:scale-110 active:scale-95 transition-all`}>
+                       <label className={`absolute -bottom-2 -right-2 w-10 h-10 ${admin?.role === 'super_admin' ? 'bg-rose-500' : 'bg-primary'} text-white rounded-xl flex items-center justify-center shadow-xl border-4 border-white cursor-pointer hover:scale-110 active:scale-95 transition-all`}>
                           <Icons.Camera size={18} />
                           <input type="file" className="hidden" accept="image/*" onChange={handleImageUpload} />
                        </label>
@@ -482,7 +482,7 @@ function SettingsContent() {
                     <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-6">{admin?.email}</p>
                     
                     <div className="flex flex-col gap-2">
-                       <span className={`px-4 py-2 rounded-2xl text-[10px] font-black uppercase tracking-widest ${admin?.role === 'super_admin' ? 'bg-rose-50 text-rose-600 border border-rose-100' : 'bg-indigo-50 text-indigo-600 border border-indigo-100'}`}>
+                       <span className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest ${admin?.role === 'super_admin' ? 'bg-rose-50 text-rose-600 border border-rose-100' : 'bg-indigo-50 text-indigo-600 border border-indigo-100'}`}>
                           {admin?.role === 'super_admin' ? t("admin.settings.authRoleMaster").split(' (')[0] : t("admin.settings.authRoleStandard")}
                        </span>
                     </div>
@@ -506,7 +506,7 @@ function SettingsContent() {
               {/* Main Content Areas */}
               <div className="lg:col-span-8 flex flex-col gap-8">
                  {/* Identity & Preferences */}
-                 <Card className="p-10 bg-white border border-slate-100 shadow-xl rounded-2xl">
+                 <Card className="p-10 bg-white border border-slate-100 shadow-xl rounded-xl">
                     <div className="flex items-center gap-3 mb-10">
                        <div className="w-10 h-10 rounded-xl bg-slate-50 text-slate-400 flex items-center justify-center">
                           <Icons.Settings size={20} />
@@ -518,11 +518,11 @@ function SettingsContent() {
                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                           <div className="space-y-2">
                              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t("admin.settings.profileLabelPersona")}</label>
-                             <input type="text" value={profileForm.name} onChange={e => setProfileForm({...profileForm, name: e.target.value})} className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-6 py-4 text-sm font-black focus:border-primary transition-all outline-none" />
+                             <input type="text" value={profileForm.name} onChange={e => setProfileForm({...profileForm, name: e.target.value})} className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-6 py-4 text-sm font-black focus:border-primary transition-all outline-none" />
                           </div>
                           <div className="space-y-2">
                              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t("admin.settings.authLabelEmail")}</label>
-                             <input type="email" value={profileForm.email} onChange={e => setProfileForm({...profileForm, email: e.target.value})} className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-6 py-4 text-sm font-black focus:border-primary transition-all outline-none" />
+                             <input type="email" value={profileForm.email} onChange={e => setProfileForm({...profileForm, email: e.target.value})} className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-6 py-4 text-sm font-black focus:border-primary transition-all outline-none" />
                           </div>
                        </div>
 
@@ -534,7 +534,7 @@ function SettingsContent() {
                                  key={l}
                                  type="button"
                                  onClick={() => setLanguage(l)}
-                                 className={`flex items-center justify-center gap-3 py-4 text-[10px] font-black uppercase rounded-2xl border-2 transition-all ${language === l ? 'bg-primary/5 text-primary border-primary shadow-sm' : 'bg-white text-slate-300 border-slate-100 hover:border-slate-200'}`}
+                                 className={`flex items-center justify-center gap-3 py-4 text-[10px] font-black uppercase rounded-xl border-2 transition-all ${language === l ? 'bg-primary/5 text-primary border-primary shadow-sm' : 'bg-white text-slate-300 border-slate-100 hover:border-slate-200'}`}
                                >
                                  <div className={`w-3 h-3 rounded-full border-2 transition-all ${language === l ? 'bg-primary border-primary ring-4 ring-primary/10' : 'bg-white border-slate-200'}`} />
                                  {l === 'th' ? 'ไทย (TH)' : 'English (EN)'}
@@ -550,12 +550,12 @@ function SettingsContent() {
                           </div>
                           <div className="space-y-2">
                              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t("admin.settings.profileLabelNewPassword")}</label>
-                             <input type="password" value={profileForm.password} onChange={e => setProfileForm({...profileForm, password: e.target.value})} placeholder="••••••••" className="w-full bg-slate-100/50 border-2 border-slate-100 rounded-2xl px-6 py-4 text-sm font-black focus:border-primary transition-all outline-none" />
+                             <input type="password" value={profileForm.password} onChange={e => setProfileForm({...profileForm, password: e.target.value})} placeholder="••••••••" className="w-full bg-slate-100/50 border-2 border-slate-100 rounded-xl px-6 py-4 text-sm font-black focus:border-primary transition-all outline-none" />
                           </div>
                        </div>
 
                        <div className="flex items-center gap-4 pt-6">
-                          <button disabled={isSaving} className="flex-1 bg-primary text-white py-5 rounded-2xl font-black text-xs shadow-2xl shadow-primary/30 hover:scale-[1.01] active:scale-[0.98] transition-all uppercase tracking-[0.2em] relative overflow-hidden group">
+                          <button disabled={isSaving} className="flex-1 bg-primary text-white py-5 rounded-xl font-black text-xs shadow-2xl shadow-primary/30 hover:scale-[1.01] active:scale-[0.98] transition-all uppercase tracking-[0.2em] relative overflow-hidden group">
                              <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
                              {isSaving ? t("admin.settings.profileUpdating") : t("admin.settings.profileBtnUpdate")}
                           </button>
@@ -563,7 +563,7 @@ function SettingsContent() {
                           <button 
                             type="button"
                             onClick={logout}
-                            className="bg-rose-50 text-rose-500 px-6 py-5 rounded-2xl font-black text-[10px] uppercase tracking-widest border border-rose-100 hover:bg-rose-500 hover:text-white transition-all shadow-sm"
+                            className="bg-rose-50 text-rose-500 px-6 py-5 rounded-xl font-black text-[10px] uppercase tracking-widest border border-rose-100 hover:bg-rose-500 hover:text-white transition-all shadow-sm"
                           >
                              {t("rider.profile.logout")}
                           </button>
@@ -577,11 +577,11 @@ function SettingsContent() {
         <div className="space-y-8 animate-fade-in relative z-10 pb-20">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {/* Platform Status Card */}
-            <Card className="p-10 bg-white border border-slate-100 shadow-xl rounded-2xl relative overflow-hidden group">
+            <Card className="p-10 bg-white border border-slate-100 shadow-xl rounded-xl relative overflow-hidden group">
                <div className={`absolute top-0 right-0 w-32 h-32 blur-[80px] -mr-16 -mt-16 transition-all duration-700 ${getSetting("is_open") === "true" ? "bg-emerald-500/20 group-hover:bg-emerald-500/30" : "bg-rose-500/20 group-hover:bg-rose-500/30"}`} />
                
                <div className="flex items-center gap-4 mb-10 relative z-10">
-                  <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shadow-inner ${getSetting("is_open") === "true" ? "bg-emerald-50 text-emerald-600" : "bg-rose-50 text-rose-600"}`}>
+                  <div className={`w-14 h-14 rounded-xl flex items-center justify-center shadow-inner ${getSetting("is_open") === "true" ? "bg-emerald-50 text-emerald-600" : "bg-rose-50 text-rose-600"}`}>
                     <Icons.Settings size={28} />
                   </div>
                   <div>
@@ -596,16 +596,16 @@ function SettingsContent() {
                <div className="space-y-8 relative z-10">
                   <div className="space-y-4">
                     <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t("admin.settings.systemLabelStatus")}</label>
-                    <div className="grid grid-cols-2 gap-3 bg-slate-50 p-2 rounded-2xl border border-slate-100">
+                    <div className="grid grid-cols-2 gap-3 bg-slate-50 p-2 rounded-xl border border-slate-100">
                        <button 
                          onClick={() => updateLocalSetting("is_open", "true")}
-                         className={`py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all ${getSetting("is_open") === "true" ? "bg-white text-emerald-600 shadow-lg shadow-emerald-500/10 border border-emerald-100" : "text-slate-400 hover:text-slate-500"}`}
+                         className={`py-4 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${getSetting("is_open") === "true" ? "bg-white text-emerald-600 shadow-lg shadow-emerald-500/10 border border-emerald-100" : "text-slate-400 hover:text-slate-500"}`}
                        >
                          {t("admin.settings.systemStatusOnline")}
                        </button>
                        <button 
                          onClick={() => updateLocalSetting("is_open", "false")}
-                         className={`py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all ${getSetting("is_open") === "false" ? "bg-white text-rose-600 shadow-lg shadow-rose-500/10 border border-rose-100" : "text-slate-400 hover:text-slate-500"}`}
+                         className={`py-4 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${getSetting("is_open") === "false" ? "bg-white text-rose-600 shadow-lg shadow-rose-500/10 border border-rose-100" : "text-slate-400 hover:text-slate-500"}`}
                        >
                          {t("admin.settings.systemStatusOffline")}
                        </button>
@@ -618,7 +618,7 @@ function SettingsContent() {
                        <div className="flex-1 relative">
                           <input 
                             type="number" 
-                            className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl pl-6 pr-16 py-4.5 text-xl text-slate-900 font-black focus:border-primary transition-all outline-none font-mono"
+                            className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl pl-6 pr-16 py-4.5 text-xl text-slate-900 font-black focus:border-primary transition-all outline-none font-mono"
                             placeholder="5"
                             value={getSetting("radius_km")}
                             onChange={(e) => updateLocalSetting("radius_km", e.target.value)}
@@ -634,11 +634,11 @@ function SettingsContent() {
             </Card>
 
             {/* Finance Card */}
-            <Card className="p-10 bg-white border border-slate-100 shadow-xl rounded-2xl relative overflow-hidden group">
+            <Card className="p-10 bg-white border border-slate-100 shadow-xl rounded-xl relative overflow-hidden group">
                <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 blur-[80px] -mr-16 -mt-16 group-hover:bg-indigo-500/20 transition-all duration-700" />
                
                <div className="flex items-center gap-4 mb-10 relative z-10">
-                  <div className="w-14 h-14 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center shadow-inner">
+                  <div className="w-14 h-14 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center shadow-inner">
                     <Icons.Wallet size={28} />
                   </div>
                   <div>
@@ -657,7 +657,7 @@ function SettingsContent() {
                       <div className="relative group/input">
                         <input 
                           type="number" 
-                          className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-6 py-4.5 text-2xl text-slate-900 font-black focus:border-indigo-500 transition-all outline-none font-mono text-center"
+                          className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-6 py-4.5 text-2xl text-slate-900 font-black focus:border-indigo-500 transition-all outline-none font-mono text-center"
                           placeholder="20"
                           value={getSetting("gp_store_percent")}
                           onChange={(e) => updateLocalSetting("gp_store_percent", e.target.value)}
@@ -674,7 +674,7 @@ function SettingsContent() {
                       <div className="relative group/input">
                         <input 
                           type="number" 
-                          className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-6 py-4.5 text-2xl text-slate-900 font-black focus:border-orange-500 transition-all outline-none font-mono text-center"
+                          className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-6 py-4.5 text-2xl text-slate-900 font-black focus:border-orange-500 transition-all outline-none font-mono text-center"
                           placeholder="10"
                           value={getSetting("gp_rider_percent")}
                           onChange={(e) => updateLocalSetting("gp_rider_percent", e.target.value)}
@@ -690,7 +690,7 @@ function SettingsContent() {
                       <div className="absolute left-6 top-1/2 -translate-y-1/2 text-emerald-600 font-black text-xl">฿</div>
                       <input 
                         type="number" 
-                        className="w-full bg-emerald-50/30 border-2 border-emerald-100/50 rounded-2xl pl-16 pr-6 py-6 text-3xl text-slate-900 font-black focus:border-emerald-500 transition-all outline-none font-mono"
+                        className="w-full bg-emerald-50/30 border-2 border-emerald-100/50 rounded-xl pl-16 pr-6 py-6 text-3xl text-slate-900 font-black focus:border-emerald-500 transition-all outline-none font-mono"
                         placeholder="25"
                         value={getSetting("rider_base_payout")}
                         onChange={(e) => updateLocalSetting("rider_base_payout", e.target.value)}
@@ -710,9 +710,9 @@ function SettingsContent() {
       {/* Floating Save Bar for System Settings */}
       {activeTab === 'system' && (
         <div className={`fixed bottom-8 left-4 right-4 md:left-1/2 md:-translate-x-1/2 md:right-auto z-50 transition-all duration-500 ${hasChanges ? 'translate-y-0 opacity-100 scale-100' : 'translate-y-20 opacity-0 scale-95 pointer-events-none'}`}>
-            <div className="bg-slate-900 border border-white/10 shadow-[0_25px_70px_-15px_rgba(0,0,0,0.6)] rounded-2xl md:rounded-full px-4 md:px-5 py-3 md:py-4 flex flex-col md:flex-row items-center gap-4 md:gap-8 backdrop-blur-2xl">
+            <div className="bg-slate-900 border border-white/10 shadow-[0_25px_70px_-15px_rgba(0,0,0,0.6)] rounded-xl md:rounded-full px-4 md:px-5 py-3 md:py-4 flex flex-col md:flex-row items-center gap-4 md:gap-8 backdrop-blur-2xl">
                <div className="flex items-center gap-3 md:pl-4">
-                  <div className="w-10 h-10 md:w-12 md:h-12 bg-amber-400 rounded-xl md:rounded-2xl flex items-center justify-center animate-pulse shadow-[0_0_20px_rgba(251,191,36,0.3)] shrink-0">
+                  <div className="w-10 h-10 md:w-12 md:h-12 bg-amber-400 rounded-xl md:rounded-xl flex items-center justify-center animate-pulse shadow-[0_0_20px_rgba(251,191,36,0.3)] shrink-0">
                      <Icons.Settings size={20} className="text-slate-900" />
                   </div>
                   <div>

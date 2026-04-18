@@ -127,7 +127,7 @@ export default function OrderDetailPage() {
         {/* Service Info */}
         <Card className="p-4">
           <div className="flex items-center gap-3 mb-3">
-            <div className="w-12 h-12 bg-primary-light rounded-2xl flex items-center justify-center text-primary-dark shrink-0">
+            <div className="w-12 h-12 bg-primary-light rounded-xl flex items-center justify-center text-primary-dark shrink-0">
               {getServiceIcon(serviceId, { size: 24 })}
             </div>
             <div>

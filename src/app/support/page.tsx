@@ -21,7 +21,7 @@ export default function SupportPage() {
         <p className="text-white/90 text-sm font-semibold">{t("support.subtitle")}</p>
         
         {/* Search Bar */}
-        <div className="mt-8 bg-white/20 backdrop-blur-md rounded-2xl px-4 py-4 flex items-center gap-3 text-white border border-white/20 shadow-xl">
+        <div className="mt-8 bg-white/20 backdrop-blur-md rounded-xl px-4 py-4 flex items-center gap-3 text-white border border-white/20 shadow-xl">
            <Icons.Search size={20} />
            <input 
                 type="text" 
@@ -35,14 +35,14 @@ export default function SupportPage() {
         {/* Quick Contact */}
         <section className="grid grid-cols-2 gap-4">
             <Card className="p-5 flex flex-col items-center text-center gap-3" hoverable>
-                <div className="w-12 h-12 rounded-2xl bg-green-50 text-green-600 flex items-center justify-center">
+                <div className="w-12 h-12 rounded-xl bg-green-50 text-green-600 flex items-center justify-center">
                     <Icons.Line size={24} />
                 </div>
                 <h3 className="text-sm font-bold text-slate-900">{t("support.contactAdmin")}</h3>
                 <p className="text-[10px] text-slate-500 font-black uppercase">LINE Official</p>
             </Card>
             <Card className="p-5 flex flex-col items-center text-center gap-3" hoverable>
-                <div className="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center">
+                <div className="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
                     <Icons.Phone size={24} />
                 </div>
                 <h3 className="text-sm font-bold text-slate-900">Call Support</h3>

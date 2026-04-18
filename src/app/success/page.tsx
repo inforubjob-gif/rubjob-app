@@ -10,7 +10,7 @@ export default function SuccessPage() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-dvh bg-slate-50 px-6 text-center animate-fade-in">
-      <div className="w-24 h-24 bg-emerald-50 text-emerald-500 rounded-2xl flex items-center justify-center mb-10 shadow-xl shadow-emerald-500/10 animate-bounce">
+      <div className="w-24 h-24 bg-emerald-50 text-emerald-500 rounded-xl flex items-center justify-center mb-10 shadow-xl shadow-emerald-500/10 animate-bounce">
         <Icons.Check size={48} strokeWidth={3} />
       </div>
       
@@ -30,7 +30,7 @@ export default function SuccessPage() {
         <Link href="/">
           <Button 
             fullWidth 
-            className="bg-primary text-white py-4 rounded-2xl font-black uppercase tracking-widest shadow-2xl shadow-primary/30"
+            className="bg-primary text-white py-4 rounded-xl font-black uppercase tracking-widest shadow-2xl shadow-primary/30"
           >
             {t("common.goHome")}
           </Button>

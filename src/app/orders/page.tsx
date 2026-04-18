@@ -62,7 +62,7 @@ export default function OrdersPage() {
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-1 bg-white/10 backdrop-blur-md rounded-2xl p-1 border border-white/10">
+        <div className="flex gap-1 bg-white/10 backdrop-blur-md rounded-xl p-1 border border-white/10">
           {(["active", "completed"] as TabFilter[]).map((f) => (
             <button
               key={f}

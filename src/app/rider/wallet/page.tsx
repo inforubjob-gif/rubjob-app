@@ -104,7 +104,7 @@ export default function RiderWalletPage() {
              >
                 <Icons.Payment size={18} className="mr-2" /> {t("rider.wallet.withdraw")}
              </Button>
-             <button className="w-14 h-14 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/20 active:scale-95 transition-transform shadow-lg">
+             <button className="w-14 h-14 rounded-xl bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/20 active:scale-95 transition-transform shadow-lg">
                 <Icons.Clock size={20} className="text-white" />
              </button>
           </div>
@@ -116,7 +116,7 @@ export default function RiderWalletPage() {
           <h2 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-4 px-1">{t("rider.wallet.history")}</h2>
           <div className="space-y-3">
             {transactions.map((trx) => (
-              <div key={trx.id} className="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex items-center gap-4">
+              <div key={trx.id} className="bg-white p-4 rounded-xl border border-slate-100 shadow-sm flex items-center gap-4">
                 <div className={`w-11 h-11 rounded-full flex items-center justify-center ${trx.amount > 0 ? 'bg-green-50 text-green-600' : 'bg-slate-100 text-slate-600'}`}>
                   {trx.amount > 0 ? <Icons.Payment size={20} /> : <Icons.Clock size={20} />}
                 </div>
@@ -159,7 +159,7 @@ export default function RiderWalletPage() {
                     const val = e.target.value.replace(/\D/g, "");
                     setAmount(val);
                   }}
-                  className="w-full bg-slate-50 rounded-2xl px-8 py-6 text-3xl font-black text-center text-slate-900 outline-none focus:ring-4 focus:ring-primary/20 transition-all border-none"
+                  className="w-full bg-slate-50 rounded-xl px-8 py-6 text-3xl font-black text-center text-slate-900 outline-none focus:ring-4 focus:ring-primary/20 transition-all border-none"
                   placeholder="0.00"
                 />
                 <span className="absolute left-6 top-1/2 -translate-y-1/2 text-xl font-black text-slate-300 pointer-events-none">฿</span>
@@ -198,7 +198,7 @@ export default function RiderWalletPage() {
                 <Button 
                    onClick={handleWithdraw}
                    disabled={!amount || parseInt(amount) < 100 || parseInt(amount) > balance || isProcessing}
-                   className="w-full py-5 bg-primary text-white rounded-2xl font-black uppercase tracking-widest shadow-2xl shadow-primary/30"
+                   className="w-full py-5 bg-primary text-white rounded-xl font-black uppercase tracking-widest shadow-2xl shadow-primary/30"
                 >
                    {isProcessing ? t("rider.wallet.processing") : t("rider.wallet.confirmWithdraw")}
                 </Button>
@@ -212,7 +212,7 @@ export default function RiderWalletPage() {
           </div>
         ) : (
           <div className="flex flex-col items-center text-center animate-fade-in">
-             <div className="w-20 h-20 bg-emerald-50 text-emerald-500 rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-emerald-500/10 scale-110">
+             <div className="w-20 h-20 bg-emerald-50 text-emerald-500 rounded-xl flex items-center justify-center mb-6 shadow-lg shadow-emerald-500/10 scale-110">
                 <Icons.CheckCircle size={40} />
              </div>
              <p className="text-sm text-slate-500 font-bold leading-relaxed mb-10 max-w-[240px]">
@@ -220,7 +220,7 @@ export default function RiderWalletPage() {
              </p>
              <Button 
                onClick={closeModal}
-               className="w-full py-5 bg-slate-900 text-white rounded-2xl font-black uppercase tracking-widest"
+               className="w-full py-5 bg-slate-900 text-white rounded-xl font-black uppercase tracking-widest"
              >
                 {t("common.confirm")}
              </Button>

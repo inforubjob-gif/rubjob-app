@@ -87,7 +87,7 @@ export default function RiderProfilePage() {
         <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-32 -mt-32 blur-3xl" />
         <div className="flex items-center gap-5">
             <div className="relative">
-              <div className="w-20 h-20 rounded-2xl bg-white flex items-center justify-center p-1.5 shadow-2xl border-4 border-white/20 ring-8 ring-primary/5">
+              <div className="w-20 h-20 rounded-xl bg-white flex items-center justify-center p-1.5 shadow-2xl border-4 border-white/20 ring-8 ring-primary/5">
                 <div className="w-full h-full rounded-xl bg-orange-50 flex items-center justify-center overflow-hidden border border-orange-100">
                     <img src={riderSession?.pictureUrl || "https://api.dicebear.com/7.x/avataaars/svg?seed=Rubjob"} alt="Avatar" className="w-full h-full object-cover" />
                 </div>
@@ -107,10 +107,10 @@ export default function RiderProfilePage() {
 
       <div className="flex-1 px-5 pt-6 space-y-7 pb-24 animate-fade-in">
         {/* Toggle Status */}
-        <Card className="p-5 border-none shadow-sm shadow-primary/5 rounded-2xl bg-white border border-primary/10">
+        <Card className="p-5 border-none shadow-sm shadow-primary/5 rounded-xl bg-white border border-primary/10">
            <div className="flex items-center justify-between">
              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-500 flex items-center justify-center border border-emerald-100 shadow-sm shadow-emerald-500/10">
+                <div className="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-500 flex items-center justify-center border border-emerald-100 shadow-sm shadow-emerald-500/10">
                     <Icons.Shield size={22} />
                 </div>
                 <div>
@@ -195,7 +195,7 @@ export default function RiderProfilePage() {
         {showLanguageModal && (
           <div className="fixed inset-0 z-[110] flex items-end sm:items-center justify-center animate-fade-in">
             <div className="absolute inset-0 bg-primary-dark/40 backdrop-blur-md" onClick={() => setShowLanguageModal(false)} />
-            <div className="bg-white w-full max-w-lg rounded-t-[1.5rem] sm:rounded-2xl p-8 pb-12 relative z-10 animate-slide-up shadow-2xl">
+            <div className="bg-white w-full max-w-lg rounded-t-[1.5rem] sm:rounded-xl p-8 pb-12 relative z-10 animate-slide-up shadow-2xl">
               <div className="w-12 h-1.5 bg-orange-100 rounded-full mx-auto mb-8 sm:hidden" />
               <h3 className="text-xl font-black text-slate-900 mb-6 text-center">{t("profile.selectLanguage")}</h3>
               <div className="space-y-3">
@@ -209,7 +209,7 @@ export default function RiderProfilePage() {
                       setLanguage(lang.key as any);
                       setShowLanguageModal(false);
                     }}
-                    className={`w-full p-5 rounded-2xl flex items-center justify-between transition-all ${
+                    className={`w-full p-5 rounded-xl flex items-center justify-between transition-all ${
                       language === lang.key 
                         ? "bg-primary/5 border-2 border-primary" 
                         : "bg-slate-50 border-2 border-transparent"
@@ -229,7 +229,7 @@ export default function RiderProfilePage() {
               </div>
               <button 
                 onClick={() => setShowLanguageModal(false)}
-                className="w-full mt-8 py-4 bg-slate-100 text-slate-500 rounded-2xl text-[12px] font-black uppercase tracking-widest"
+                className="w-full mt-8 py-4 bg-slate-100 text-slate-500 rounded-xl text-[12px] font-black uppercase tracking-widest"
               >
                 {t("common.cancel")}
               </button>

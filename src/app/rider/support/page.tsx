@@ -163,7 +163,7 @@ export default function RiderSupportPage() {
             return (
               <div key={m.id} className={`flex ${isMe ? "justify-end" : "justify-start"} animate-fade-in`}>
                 <div className={`max-w-[80%]`}>
-                  <div className={`px-4 py-3 rounded-2xl text-sm font-medium leading-relaxed shadow-sm
+                  <div className={`px-4 py-3 rounded-xl text-sm font-medium leading-relaxed shadow-sm
                     ${isMe
                       ? "bg-primary text-white rounded-tr-sm"
                       : "bg-white text-slate-700 border border-slate-100 rounded-tl-sm"
@@ -183,7 +183,7 @@ export default function RiderSupportPage() {
 
         {/* Input */}
         <div className="fixed bottom-0 left-0 right-0 p-4 bg-white border-t border-slate-100 shadow-lg z-20">
-          <div className="bg-slate-50 rounded-2xl p-1.5 pl-5 flex items-center gap-2 border border-slate-100">
+          <div className="bg-slate-50 rounded-xl p-1.5 pl-5 flex items-center gap-2 border border-slate-100">
             <input
               type="text"
               value={newMessage}
@@ -251,9 +251,9 @@ export default function RiderSupportPage() {
         {/* New Ticket Button */}
         <button
           onClick={() => setShowNewTicket(true)}
-          className="w-full bg-white p-5 rounded-2xl border-2 border-dashed border-primary/20 flex items-center gap-4 hover:border-primary/40 active:scale-[0.98] transition-all group"
+          className="w-full bg-white p-5 rounded-xl border-2 border-dashed border-primary/20 flex items-center gap-4 hover:border-primary/40 active:scale-[0.98] transition-all group"
         >
-          <div className="w-12 h-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all">
+          <div className="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all">
             <Icons.Edit size={22} />
           </div>
           <div className="text-left">
@@ -292,7 +292,7 @@ export default function RiderSupportPage() {
               <button
                 key={ticket.id}
                 onClick={() => setSelectedTicketId(ticket.id)}
-                className="w-full bg-white p-4 rounded-2xl border border-slate-100 flex items-center gap-4 active:scale-[0.98] transition-all shadow-sm text-left"
+                className="w-full bg-white p-4 rounded-xl border border-slate-100 flex items-center gap-4 active:scale-[0.98] transition-all shadow-sm text-left"
               >
                 <div className="w-11 h-11 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
                   <Icons.Chat size={20} />
@@ -327,7 +327,7 @@ export default function RiderSupportPage() {
       {showNewTicket && (
         <div className="fixed inset-0 z-[120] flex items-end sm:items-center justify-center animate-fade-in">
           <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowNewTicket(false)} />
-          <div className="bg-white w-full max-w-lg rounded-t-[2rem] sm:rounded-2xl p-6 pb-8 relative z-10 animate-slide-up shadow-2xl">
+          <div className="bg-white w-full max-w-lg rounded-t-[2rem] sm:rounded-xl p-6 pb-8 relative z-10 animate-slide-up shadow-2xl">
             <div className="w-12 h-1.5 bg-orange-100 rounded-full mx-auto mb-6 sm:hidden" />
             <h3 className="text-lg font-black text-slate-900 mb-1">{t("support.newTicket") || "แจ้งเรื่องใหม่"}</h3>
             <p className="text-xs text-slate-400 font-bold mb-5">{t("support.newTicketModalDesc") || "กรอกหัวข้อและรายละเอียดที่ต้องการแจ้ง"}</p>

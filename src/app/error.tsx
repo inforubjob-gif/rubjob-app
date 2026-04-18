@@ -21,7 +21,7 @@ export default function Error({
 
   return (
     <div className="flex flex-col items-center justify-center min-h-dvh bg-slate-50 px-6 text-center">
-      <div className="w-24 h-24 bg-rose-50 text-rose-500 rounded-2xl flex items-center justify-center mb-8 shadow-xl shadow-rose-500/10 animate-bounce">
+      <div className="w-24 h-24 bg-rose-50 text-rose-500 rounded-xl flex items-center justify-center mb-8 shadow-xl shadow-rose-500/10 animate-bounce">
         <Icons.Lock size={48} strokeWidth={2.5} />
       </div>
       

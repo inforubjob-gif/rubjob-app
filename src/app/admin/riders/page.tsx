@@ -112,14 +112,14 @@ export default function RiderManagementAdminPage() {
         </div>
       </header>
 
-      <Card className="bg-white border border-slate-200/60 shadow-xl shadow-slate-200/20 rounded-2xl overflow-hidden">
+      <Card className="bg-white border border-slate-200/60 shadow-xl shadow-slate-200/20 rounded-xl overflow-hidden">
         {isLoading ? (
           <div className="flex justify-center py-32">
             <div className="w-12 h-12 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
           </div>
         ) : filteredRiders.length === 0 ? (
-          <div className="text-center py-24 bg-white rounded-2xl flex flex-col items-center">
-            <div className="w-20 h-20 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-200 mb-4 border border-slate-100">
+          <div className="text-center py-24 bg-white rounded-xl flex flex-col items-center">
+            <div className="w-20 h-20 bg-slate-50 rounded-xl flex items-center justify-center text-slate-200 mb-4 border border-slate-100">
                <Icons.Search size={40} />
             </div>
             <p className="text-slate-400 font-black uppercase tracking-widest text-xs">{search ? t('admin.users.noUsers') : t('admin.riders.list.empty')}</p>
@@ -147,7 +147,7 @@ export default function RiderManagementAdminPage() {
                   <tr key={rider.id} className="hover:bg-slate-50/50 transition-all group">
                     <td className="px-8 py-6">
                       <div className="flex items-center gap-4">
-                         <div className="w-12 h-12 rounded-2xl bg-slate-900 text-white flex items-center justify-center shrink-0 shadow-sm overflow-hidden font-black ring-4 ring-white relative group/avatar">
+                         <div className="w-12 h-12 rounded-xl bg-slate-900 text-white flex items-center justify-center shrink-0 shadow-sm overflow-hidden font-black ring-4 ring-white relative group/avatar">
                             {rider.pictureUrl ? (
                                <img 
                                  src={rider.pictureUrl.startsWith('data:') ? rider.pictureUrl : `/api/admin/documents/${rider.pictureUrl}`} 

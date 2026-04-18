@@ -117,7 +117,7 @@ export default function ActiveHoursPage() {
                  <button
                     key={day}
                     onClick={() => setSelectedDay(day)}
-                    className={`min-w-[70px] py-4 rounded-2xl border-2 font-black text-xs transition-all flex flex-col items-center gap-2 ${
+                    className={`min-w-[70px] py-4 rounded-xl border-2 font-black text-xs transition-all flex flex-col items-center gap-2 ${
                         selectedDay === day 
                             ? 'bg-primary border-primary text-slate-900 shadow-lg shadow-primary/20 scale-[1.05]' 
                             : workingHours[day].isOpen 
@@ -133,7 +133,7 @@ export default function ActiveHoursPage() {
         </section>
 
         {/* Selected Day Configuration */}
-        <Card className="p-6 border-none shadow-xl shadow-primary/5 rounded-2xl bg-white relative overflow-hidden">
+        <Card className="p-6 border-none shadow-xl shadow-primary/5 rounded-xl bg-white relative overflow-hidden">
            <div className="absolute top-0 right-0 w-32 h-32 bg-orange-50 rounded-full -mr-16 -mt-16 blur-3xl opacity-50" />
            
            <div className="flex items-center justify-between mb-8 relative z-10">
@@ -152,7 +152,7 @@ export default function ActiveHoursPage() {
            {workingHours[selectedDay].isOpen ? (
              <div className="space-y-6 relative z-10">
                 <div className="grid grid-cols-2 gap-4">
-                   <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100 flex flex-col items-center">
+                   <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 flex flex-col items-center">
                       <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">{t("store.activeHoursPage.open")}</span>
                       <input 
                          type="time" 
@@ -161,7 +161,7 @@ export default function ActiveHoursPage() {
                          className="text-xl font-black text-slate-900 bg-transparent focus:outline-none"
                       />
                    </div>
-                   <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100 flex flex-col items-center">
+                   <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 flex flex-col items-center">
                       <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">{t("store.activeHoursPage.close")}</span>
                       <input 
                          type="time" 
@@ -177,7 +177,7 @@ export default function ActiveHoursPage() {
                      variant="outline" 
                      fullWidth 
                      size="sm" 
-                     className="rounded-2xl py-4 border-2 font-black text-[10px] uppercase tracking-widest flex items-center justify-center gap-2"
+                     className="rounded-xl py-4 border-2 font-black text-[10px] uppercase tracking-widest flex items-center justify-center gap-2"
                      onClick={applyToAll}
                    >
                       <Icons.WashFold size={16} /> {t("store.activeHoursPage.applyToAllDays")}
@@ -185,7 +185,7 @@ export default function ActiveHoursPage() {
                 </div>
              </div>
            ) : (
-             <div className="py-8 text-center bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200">
+             <div className="py-8 text-center bg-slate-50 rounded-xl border-2 border-dashed border-slate-200">
                 <p className="text-sm font-black text-slate-400 uppercase tracking-widest">
                   {t("store.activeHoursPage.storeClosedOn").replace("{day}", selectedDay)}
                 </p>
@@ -194,7 +194,7 @@ export default function ActiveHoursPage() {
         </Card>
 
         {/* Global Reminder */}
-        <div className="p-4 bg-orange-50 rounded-2xl border border-orange-100 mt-4">
+        <div className="p-4 bg-orange-50 rounded-xl border border-orange-100 mt-4">
             <div className="flex items-start gap-3">
                 <Icons.Info size={16} className="text-primary mt-0.5" />
                 <p className="text-[10px] text-orange-700 font-bold leading-relaxed uppercase">

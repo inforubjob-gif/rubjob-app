@@ -42,7 +42,7 @@ export default function PricingPage() {
           ))}
         </h1>
 
-        <div className="mt-4 bg-white/15 backdrop-blur rounded-2xl px-5 py-4 mx-auto max-w-xs">
+        <div className="mt-4 bg-white/15 backdrop-blur rounded-xl px-5 py-4 mx-auto max-w-xs">
           <p className="text-white text-sm font-bold mb-2">{t("pricing.serviceTypes")}</p>
           <ul className="text-white/90 text-sm space-y-1 text-left list-disc list-inside">
             <li>{t("items.general")}</li>
@@ -57,7 +57,7 @@ export default function PricingPage() {
       <div className="px-4 pb-28 space-y-5 animate-fade-in">
 
         {/* ━━━ ราคาซักผ้า ━━━ */}
-        <section className="bg-white/10 backdrop-blur-md rounded-2xl p-4 shadow-xl shadow-black/5">
+        <section className="bg-white/10 backdrop-blur-md rounded-xl p-4 shadow-xl shadow-black/5">
           {/* Section Title */}
           <div className="flex justify-center mb-4">
             <div className="bg-white rounded-full px-6 py-2 shadow-md">
@@ -82,11 +82,11 @@ export default function PricingPage() {
           </div>
 
           {/* Pricing Grid */}
-          <div className="bg-white/90 rounded-2xl p-3 space-y-2">
+          <div className="bg-white/90 rounded-xl p-3 space-y-2">
             {WASH_PRICES.map((row) => (
               <div
                 key={row.size}
-                className="grid grid-cols-4 items-center gap-2 py-2.5 px-3 rounded-2xl bg-white shadow-sm"
+                className="grid grid-cols-4 items-center gap-2 py-2.5 px-3 rounded-xl bg-white shadow-sm"
               >
                 {/* Machine icon + size */}
                 <div className="flex flex-col items-center">
@@ -105,7 +105,7 @@ export default function PricingPage() {
         </section>
 
         {/* ━━━ ราคาอบผ้า ━━━ */}
-        <section className="bg-white/10 backdrop-blur-md rounded-2xl p-4 shadow-xl shadow-black/5">
+        <section className="bg-white/10 backdrop-blur-md rounded-xl p-4 shadow-xl shadow-black/5">
           <div className="flex justify-center mb-4">
             <div className="bg-white rounded-full px-6 py-2 shadow-md">
               <h2 className="text-primary-dark font-bold text-base">{t("pricing.dryTitle")}</h2>
@@ -132,7 +132,7 @@ export default function PricingPage() {
             {DRY_PRICES.map((item) => (
               <div
                 key={item.size}
-                className="bg-white rounded-2xl p-4 flex items-center gap-4 shadow-sm"
+                className="bg-white rounded-xl p-4 flex items-center gap-4 shadow-sm"
               >
                 {/* Machine icon */}
                 <div className="flex flex-col items-center shrink-0 w-16">
@@ -165,14 +165,14 @@ export default function PricingPage() {
         </section>
 
         {/* ━━━ ราคาค่าส่ง ━━━ */}
-        <section className="bg-white/10 backdrop-blur-md rounded-2xl p-4 shadow-xl shadow-black/5">
+        <section className="bg-white/10 backdrop-blur-md rounded-xl p-4 shadow-xl shadow-black/5">
           <div className="flex justify-center mb-4">
             <div className="bg-white rounded-full px-6 py-2 shadow-md">
               <h2 className="text-primary-dark font-bold text-base">{t("pricing.deliveryTitle")}</h2>
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl p-5 shadow-sm text-center">
+          <div className="bg-white rounded-xl p-5 shadow-sm text-center">
             {/* Highlight badge */}
             <div className="inline-block bg-primary-dark text-white text-xs font-bold px-4 py-1.5 rounded-full mb-3">
               {t("pricing.deliveryOnly")}

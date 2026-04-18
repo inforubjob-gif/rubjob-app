@@ -78,12 +78,12 @@ export default function AdminDashboard() {
           </div>
         </div>
         {errorCount > 0 ? (
-          <div className="w-fit bg-rose-50 text-rose-600 px-5 py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-widest border border-rose-100 italic shadow-sm flex items-center gap-2 animate-pulse">
+          <div className="w-fit bg-rose-50 text-rose-600 px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest border border-rose-100 italic shadow-sm flex items-center gap-2 animate-pulse">
             <div className="w-2 h-2 bg-rose-500 rounded-full" />
             {t("admin.dashboard.connAlert")}
           </div>
         ) : (
-          <div className="w-fit bg-white text-emerald-500 px-5 py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-widest border border-slate-100 shadow-sm flex items-center gap-2 group hover:border-emerald-200 transition-colors">
+          <div className="w-fit bg-white text-emerald-500 px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest border border-slate-100 shadow-sm flex items-center gap-2 group hover:border-emerald-200 transition-colors">
             <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse group-hover:scale-125 transition-transform" />
             {t("admin.dashboard.liveSync")}
           </div>
@@ -91,8 +91,8 @@ export default function AdminDashboard() {
       </header>
 
       {apiError && (
-        <div className="mb-8 p-6 bg-rose-50 border border-rose-100 rounded-2xl flex items-center gap-5 animate-fade-in shadow-xl shadow-rose-900/5">
-           <div className="w-12 h-12 rounded-2xl bg-rose-500 text-white flex items-center justify-center shrink-0 shadow-lg shadow-rose-500/20">
+        <div className="mb-8 p-6 bg-rose-50 border border-rose-100 rounded-xl flex items-center gap-5 animate-fade-in shadow-xl shadow-rose-900/5">
+           <div className="w-12 h-12 rounded-xl bg-rose-500 text-white flex items-center justify-center shrink-0 shadow-lg shadow-rose-500/20">
               <Icons.Lock size={24} />
            </div>
            <div>
@@ -113,7 +113,7 @@ export default function AdminDashboard() {
             {/* Users Card */}
             <Card className="p-7 bg-white border border-slate-100 shadow-card hover:shadow-card-hover hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group">
                <div className="absolute top-0 right-0 w-24 h-24 bg-blue-50/50 rounded-full blur-3xl -mr-12 -mt-12 group-hover:bg-blue-100/50 transition-colors" />
-               <div className="w-14 h-14 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mb-6 shadow-inner group-hover:scale-110 transition-transform">
+               <div className="w-14 h-14 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center mb-6 shadow-inner group-hover:scale-110 transition-transform">
                   <Icons.User size={28} />
                </div>
                <div className="flex items-center justify-between mb-2">
@@ -131,7 +131,7 @@ export default function AdminDashboard() {
             {/* Riders Card */}
             <Card className="p-7 bg-white border border-slate-100 shadow-card hover:shadow-card-hover hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group">
                <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-50/50 rounded-full blur-3xl -mr-12 -mt-12 group-hover:bg-emerald-100/50 transition-colors" />
-               <div className="w-14 h-14 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-6 shadow-inner group-hover:scale-110 transition-transform">
+               <div className="w-14 h-14 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-6 shadow-inner group-hover:scale-110 transition-transform">
                   <Icons.Car size={28} />
                </div>
                <div className="flex items-center justify-between mb-2">
@@ -152,7 +152,7 @@ export default function AdminDashboard() {
             {/* Stores Card */}
             <Card className="p-7 bg-white border border-slate-100 shadow-card hover:shadow-card-hover hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group">
                <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 rounded-full blur-3xl -mr-12 -mt-12 group-hover:bg-primary/10 transition-colors" />
-               <div className="w-14 h-14 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mb-6 shadow-inner group-hover:scale-110 transition-transform">
+               <div className="w-14 h-14 rounded-xl bg-primary/10 text-primary flex items-center justify-center mb-6 shadow-inner group-hover:scale-110 transition-transform">
                   <Icons.Office size={28} />
                </div>
                <div className="flex items-center justify-between mb-2">
@@ -173,7 +173,7 @@ export default function AdminDashboard() {
             {/* Orders Card */}
             <Card className="p-7 bg-white border border-slate-100 shadow-card hover:shadow-card-hover hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group">
                <div className="absolute top-0 right-0 w-24 h-24 bg-amber-50/50 rounded-full blur-3xl -mr-12 -mt-12 group-hover:bg-amber-100/50 transition-colors" />
-               <div className="w-14 h-14 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center mb-6 shadow-inner group-hover:scale-110 transition-transform">
+               <div className="w-14 h-14 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center mb-6 shadow-inner group-hover:scale-110 transition-transform">
                   <Icons.FileText size={28} />
                </div>
                <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.15em] mb-2">{t("admin.dashboard.totalOrders")}</p>
@@ -187,7 +187,7 @@ export default function AdminDashboard() {
             {/* Gross Revenue Card */}
             <Card className="p-7 bg-white border border-slate-100 shadow-card hover:shadow-card-hover hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group">
                <div className="absolute top-0 right-0 w-24 h-24 bg-slate-50 rounded-full blur-3xl -mr-12 -mt-12 group-hover:bg-slate-100 transition-colors" />
-               <div className="w-14 h-14 rounded-2xl bg-slate-900 text-white flex items-center justify-center mb-6 shadow-xl group-hover:scale-110 transition-transform">
+               <div className="w-14 h-14 rounded-xl bg-slate-900 text-white flex items-center justify-center mb-6 shadow-xl group-hover:scale-110 transition-transform">
                   <Icons.Finance size={28} />
                </div>
                <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.15em] mb-2">{t("admin.dashboard.grossRevenue")}</p>
@@ -202,16 +202,16 @@ export default function AdminDashboard() {
             </Card>
 
             {/* Platform Earnings Card - PREMIUM CI REDESIGN */}
-            <Card className="col-span-1 md:col-span-2 lg:col-span-3 xl:col-span-2 p-8 bg-gradient-to-br from-primary to-primary-dark text-white shadow-2xl shadow-primary/30 relative overflow-hidden group hover:scale-[1.01] transition-transform duration-500 rounded-2xl">
+            <Card className="col-span-1 md:col-span-2 lg:col-span-3 xl:col-span-2 p-8 bg-gradient-to-br from-primary to-primary-dark text-white shadow-2xl shadow-primary/30 relative overflow-hidden group hover:scale-[1.01] transition-transform duration-500 rounded-xl">
                <div className="absolute top-0 right-0 w-64 h-64 bg-white/20 rounded-full blur-3xl -mr-32 -mt-32 group-hover:bg-white/30 transition-all duration-700" />
                <div className="absolute bottom-0 left-0 w-48 h-48 bg-black/10 rounded-full blur-2xl -ml-24 -mb-24" />
                
                <div className="relative z-10 flex flex-col h-full">
                   <div className="flex items-center justify-between mb-8">
-                    <div className="w-14 h-14 rounded-2xl bg-white/20 text-white flex items-center justify-center shadow-lg backdrop-blur-md border border-white/30">
+                    <div className="w-14 h-14 rounded-xl bg-white/20 text-white flex items-center justify-center shadow-lg backdrop-blur-md border border-white/30">
                        <Icons.Wallet size={28} />
                     </div>
-                    <div className="bg-white/20 backdrop-blur-md px-4 py-1.5 rounded-2xl text-[10px] font-black tracking-widest uppercase border border-white/20 shadow-sm">
+                    <div className="bg-white/20 backdrop-blur-md px-4 py-1.5 rounded-xl text-[10px] font-black tracking-widest uppercase border border-white/20 shadow-sm">
                       {t("admin.dashboard.gpShare").replace("{store}", String(stats.gpStore)).replace("{rider}", String(stats.gpRider))}
                     </div>
                   </div>
@@ -231,8 +231,8 @@ export default function AdminDashboard() {
             </Card>
 
             {/* Quick Insights Placeholder */}
-            <Card className="col-span-1 md:col-span-2 lg:col-span-3 p-8 bg-slate-50/50 border border-slate-100 border-dashed rounded-2xl flex flex-col items-center justify-center text-center group hover:bg-white hover:border-solid hover:shadow-card transition-all duration-500">
-               <div className="w-16 h-16 bg-white rounded-2xl shadow-sm text-slate-200 flex items-center justify-center mb-6 group-hover:text-primary group-hover:scale-110 transition-all">
+            <Card className="col-span-1 md:col-span-2 lg:col-span-3 p-8 bg-slate-50/50 border border-slate-100 border-dashed rounded-xl flex flex-col items-center justify-center text-center group hover:bg-white hover:border-solid hover:shadow-card transition-all duration-500">
+               <div className="w-16 h-16 bg-white rounded-xl shadow-sm text-slate-200 flex items-center justify-center mb-6 group-hover:text-primary group-hover:scale-110 transition-all">
                   <Icons.Finance size={32} />
                </div>
                <h3 className="text-xl font-black text-slate-900 mb-2">{t("admin.dashboard.analytics")}</h3>
@@ -240,27 +240,27 @@ export default function AdminDashboard() {
             </Card>
             
             {/* Quick Actions Card */}
-            <Card className="col-span-1 md:col-span-2 lg:col-span-3 xl:col-span-2 p-8 bg-white border border-slate-100 shadow-card rounded-2xl">
+            <Card className="col-span-1 md:col-span-2 lg:col-span-3 xl:col-span-2 p-8 bg-white border border-slate-100 shadow-card rounded-xl">
                <h3 className="text-xl font-black text-slate-900 mb-8 flex items-center gap-3">
                   <div className="w-2 h-6 bg-primary rounded-full" />
                   {t("admin.dashboard.quickActions")}
                </h3>
                <div className="space-y-4">
-                  <Link href="/admin/finance" className="w-full py-5 px-6 bg-slate-50 hover:bg-primary/5 hover:scale-[1.02] active:scale-[0.98] text-slate-700 hover:text-primary font-black rounded-2xl flex items-center justify-between transition-all group border border-transparent hover:border-primary/20">
+                  <Link href="/admin/finance" className="w-full py-5 px-6 bg-slate-50 hover:bg-primary/5 hover:scale-[1.02] active:scale-[0.98] text-slate-700 hover:text-primary font-black rounded-xl flex items-center justify-between transition-all group border border-transparent hover:border-primary/20">
                      <span className="flex items-center gap-4">
                         <Icons.Wallet size={20} className="text-slate-400 group-hover:text-primary" />
                         {t("admin.dashboard.processPayouts")}
                      </span>
                      <Icons.ArrowRight size={18} className="text-slate-300 group-hover:text-primary group-hover:translate-x-1 transition-all" />
                   </Link>
-                  <Link href="/admin/stores" className="w-full py-5 px-6 bg-slate-50 hover:bg-primary/5 hover:scale-[1.02] active:scale-[0.98] text-slate-700 hover:text-primary font-black rounded-2xl flex items-center justify-between transition-all group border border-transparent hover:border-primary/20">
+                  <Link href="/admin/stores" className="w-full py-5 px-6 bg-slate-50 hover:bg-primary/5 hover:scale-[1.02] active:scale-[0.98] text-slate-700 hover:text-primary font-black rounded-xl flex items-center justify-between transition-all group border border-transparent hover:border-primary/20">
                      <span className="flex items-center gap-4">
                         <Icons.Office size={20} className="text-slate-400 group-hover:text-primary" />
                         {t("admin.dashboard.reviewStores")}
                      </span>
                      <Icons.ArrowRight size={18} className="text-slate-300 group-hover:text-primary group-hover:translate-x-1 transition-all" />
                   </Link>
-                  <Link href="/admin/settings" className="w-full py-5 px-6 bg-slate-50 hover:bg-primary/5 hover:scale-[1.02] active:scale-[0.98] text-slate-700 hover:text-primary font-black rounded-2xl flex items-center justify-between transition-all group border border-transparent hover:border-primary/20">
+                  <Link href="/admin/settings" className="w-full py-5 px-6 bg-slate-50 hover:bg-primary/5 hover:scale-[1.02] active:scale-[0.98] text-slate-700 hover:text-primary font-black rounded-xl flex items-center justify-between transition-all group border border-transparent hover:border-primary/20">
                      <span className="flex items-center gap-4">
                         <Icons.Settings size={20} className="text-slate-400 group-hover:text-primary" />
                         {t("admin.dashboard.maintenance")}

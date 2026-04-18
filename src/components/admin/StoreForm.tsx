@@ -10,7 +10,7 @@ import { useToast } from "@/components/providers/ToastProvider";
 
 const MapPicker = dynamic(() => import("@/components/ui/MapPicker"), { 
   ssr: false,
-  loading: () => <div className="h-[400px] w-full bg-slate-100 animate-pulse rounded-2xl flex items-center justify-center font-bold text-slate-400">Initializing Map Picker...</div>
+  loading: () => <div className="h-[400px] w-full bg-slate-100 animate-pulse rounded-xl flex items-center justify-center font-bold text-slate-400">Initializing Map Picker...</div>
 });
 
 interface StoreFormProps {
@@ -173,9 +173,9 @@ export default function StoreForm({ initialData, isEdit }: StoreFormProps) {
   return (
     <form onSubmit={handleSave} className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
       {initialData?.status === 'pending' && (
-        <div className="bg-primary/5 border-2 border-primary/20 rounded-2xl p-6 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xl shadow-primary/5">
+        <div className="bg-primary/5 border-2 border-primary/20 rounded-xl p-6 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xl shadow-primary/5">
            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-primary rounded-2xl flex items-center justify-center text-slate-900 animate-pulse">
+              <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center text-slate-900 animate-pulse">
                  <Icons.Shield size={24} />
               </div>
               <div>
@@ -188,7 +188,7 @@ export default function StoreForm({ initialData, isEdit }: StoreFormProps) {
                 type="button"
                 onClick={handleApprove}
                 disabled={isSaving}
-                className="flex-1 sm:flex-none px-8 py-4 bg-slate-900 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-slate-800 transition-all shadow-lg"
+                className="flex-1 sm:flex-none px-8 py-4 bg-slate-900 text-white rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-slate-800 transition-all shadow-lg"
               >
                 {isSaving ? t('common.processing') : t('admin.stores.form.verifyBtn')}
               </button>
@@ -215,7 +215,7 @@ export default function StoreForm({ initialData, isEdit }: StoreFormProps) {
                       value={formData.name}
                       onChange={e => setFormData({...formData, name: e.target.value})}
                       placeholder="e.g. Rubjob Sukhumvit Primary"
-                      className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-5 py-4 text-sm font-bold focus:outline-none focus:border-primary/50 transition-all shadow-inner shadow-slate-200/20"
+                      className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-5 py-4 text-sm font-bold focus:outline-none focus:border-primary/50 transition-all shadow-inner shadow-slate-200/20"
                     />
                  </div>
                  <div>
@@ -226,11 +226,11 @@ export default function StoreForm({ initialData, isEdit }: StoreFormProps) {
                       onChange={(lat, lng) => setFormData({...formData, lat: lat.toFixed(6), lng: lng.toFixed(6)})}
                     />
                     <div className="grid grid-cols-2 gap-4 mt-4">
-                       <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100 flex items-center justify-between">
+                       <div className="p-4 bg-slate-50 rounded-xl border border-slate-100 flex items-center justify-between">
                           <span className="text-[10px] font-black text-slate-400 uppercase">Latitude</span>
                           <span className="text-sm font-mono font-black text-slate-700">{formData.lat}</span>
                        </div>
-                       <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100 flex items-center justify-between">
+                       <div className="p-4 bg-slate-50 rounded-xl border border-slate-100 flex items-center justify-between">
                           <span className="text-[10px] font-black text-slate-400 uppercase">Longitude</span>
                           <span className="text-sm font-mono font-black text-slate-700">{formData.lng}</span>
                        </div>
@@ -244,7 +244,7 @@ export default function StoreForm({ initialData, isEdit }: StoreFormProps) {
                       value={formData.address}
                       onChange={e => setFormData({...formData, address: e.target.value})}
                       placeholder="Street number, building name, floor, district..."
-                      className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-5 py-4 text-sm font-bold focus:outline-none focus:border-primary/50 transition-all"
+                      className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-5 py-4 text-sm font-bold focus:outline-none focus:border-primary/50 transition-all"
                     />
                  </div>
                  <div>
@@ -254,7 +254,7 @@ export default function StoreForm({ initialData, isEdit }: StoreFormProps) {
                       value={formData.phone}
                       onChange={e => setFormData({...formData, phone: e.target.value})}
                       placeholder="e.g. 081-234-5678"
-                      className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-5 py-4 text-sm font-bold focus:outline-none focus:border-primary/50 transition-all"
+                      className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-5 py-4 text-sm font-bold focus:outline-none focus:border-primary/50 transition-all"
                     />
                  </div>
               </div>
@@ -272,7 +272,7 @@ export default function StoreForm({ initialData, isEdit }: StoreFormProps) {
                   {['business_license', 'owner_id', 'storefront'].map(docType => {
                      const doc = formData.documents.find((d: any) => d.type === docType) || { status: 'none', url: '', notes: '' };
                      return (
-                        <div key={docType} className="p-6 rounded-2xl border-2 border-slate-50 bg-slate-50/20 space-y-4">
+                        <div key={docType} className="p-6 rounded-xl border-2 border-slate-50 bg-slate-50/20 space-y-4">
                            <div className="flex items-center justify-between">
                               <span className="text-sm font-black text-slate-900 uppercase tracking-tight">{docType.replace('_', ' ').toUpperCase()}</span>
                               <select 
@@ -292,7 +292,7 @@ export default function StoreForm({ initialData, isEdit }: StoreFormProps) {
                            </div>
                            
                            {doc.url && (
-                             <div className="aspect-[16/7] rounded-2xl overflow-hidden border-2 border-slate-100">
+                             <div className="aspect-[16/7] rounded-xl overflow-hidden border-2 border-slate-100">
                                 <img src={doc.id ? `/api/admin/documents/${doc.id}` : doc.url} alt={docType} className="w-full h-full object-cover" />
                              </div>
                            )}
@@ -304,7 +304,7 @@ export default function StoreForm({ initialData, isEdit }: StoreFormProps) {
                                 value={doc.notes}
                                 onChange={e => handleDocChange(docType, 'notes', e.target.value)}
                                 placeholder="Audit findings..."
-                                className="w-full bg-white border border-slate-200 rounded-2xl px-4 py-3 text-xs font-bold focus:outline-none focus:border-indigo-400 transition-all"
+                                className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-xs font-bold focus:outline-none focus:border-indigo-400 transition-all"
                               />
                            </div>
                         </div>
@@ -321,7 +321,7 @@ export default function StoreForm({ initialData, isEdit }: StoreFormProps) {
                  <h2 className="text-xl font-black text-slate-900 uppercase tracking-tight">{t('admin.stores.form.servicesPricing')}</h2>
               </div>
               
-              <div className="overflow-hidden border border-slate-100 rounded-2xl">
+              <div className="overflow-hidden border border-slate-100 rounded-xl">
                  <table className="w-full text-left">
                     <thead className="bg-slate-50 border-b border-slate-100">
                        <tr>
@@ -411,7 +411,7 @@ export default function StoreForm({ initialData, isEdit }: StoreFormProps) {
                             type="number"
                             value={formData.baseDeliveryFee}
                             onChange={e => setFormData({...formData, baseDeliveryFee: e.target.value})}
-                            className="w-full bg-white/10 border-2 border-white/10 rounded-2xl px-10 py-4 text-sm font-bold focus:outline-none focus:border-white/30 transition-all"
+                            className="w-full bg-white/10 border-2 border-white/10 rounded-xl px-10 py-4 text-sm font-bold focus:outline-none focus:border-white/30 transition-all"
                           />
                        </div>
                     </div>
@@ -423,7 +423,7 @@ export default function StoreForm({ initialData, isEdit }: StoreFormProps) {
                             type="number"
                             value={formData.extraFeePerKm}
                             onChange={e => setFormData({...formData, extraFeePerKm: e.target.value})}
-                            className="w-full bg-white/10 border-2 border-white/10 rounded-2xl px-10 py-4 text-sm font-bold focus:outline-none focus:border-white/30 transition-all"
+                            className="w-full bg-white/10 border-2 border-white/10 rounded-xl px-10 py-4 text-sm font-bold focus:outline-none focus:border-white/30 transition-all"
                           />
                        </div>
                     </div>
@@ -445,7 +445,7 @@ export default function StoreForm({ initialData, isEdit }: StoreFormProps) {
                     <select 
                       value={formData.bankName}
                       onChange={e => setFormData({...formData, bankName: e.target.value})}
-                      className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-5 py-3.5 text-sm font-bold focus:outline-none focus:border-primary/50 transition-all font-mono"
+                      className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-5 py-3.5 text-sm font-bold focus:outline-none focus:border-primary/50 transition-all font-mono"
                     >
                        <option value="">Select Bank / PromptPay</option>
                        <option value="PromptPay">PromptPay (Mobile/ID)</option>
@@ -463,7 +463,7 @@ export default function StoreForm({ initialData, isEdit }: StoreFormProps) {
                       value={formData.accountNumber}
                       onChange={e => setFormData({...formData, accountNumber: e.target.value})}
                       placeholder="000-0-00000-0"
-                      className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-5 py-3.5 text-sm font-bold focus:outline-none focus:border-primary/50 transition-all font-mono"
+                      className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-5 py-3.5 text-sm font-bold focus:outline-none focus:border-primary/50 transition-all font-mono"
                     />
                  </div>
                  <div>
@@ -472,7 +472,7 @@ export default function StoreForm({ initialData, isEdit }: StoreFormProps) {
                       value={formData.accountName}
                       onChange={e => setFormData({...formData, accountName: e.target.value})}
                       placeholder="As shown in bank book"
-                      className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-5 py-3.5 text-sm font-bold focus:outline-none focus:border-primary/50 transition-all font-mono"
+                      className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-5 py-3.5 text-sm font-bold focus:outline-none focus:border-primary/50 transition-all font-mono"
                     />
                  </div>
               </div>
@@ -495,7 +495,7 @@ export default function StoreForm({ initialData, isEdit }: StoreFormProps) {
                        value={formData.email}
                        onChange={e => setFormData({...formData, email: e.target.value})}
                        placeholder="branch-email@rubjob.com"
-                       className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-5 py-4 text-sm font-bold focus:outline-none focus:border-primary/50 transition-all"
+                       className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-5 py-4 text-sm font-bold focus:outline-none focus:border-primary/50 transition-all"
                      />
                   </div>
                   <div>
@@ -508,7 +508,7 @@ export default function StoreForm({ initialData, isEdit }: StoreFormProps) {
                        value={formData.password}
                        onChange={e => setFormData({...formData, password: e.target.value})}
                        placeholder="••••••••"
-                       className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-5 py-4 text-sm font-bold focus:outline-none focus:border-primary/50 transition-all font-mono"
+                       className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-5 py-4 text-sm font-bold focus:outline-none focus:border-primary/50 transition-all font-mono"
                      />
                   </div>
                </div>
@@ -521,14 +521,14 @@ export default function StoreForm({ initialData, isEdit }: StoreFormProps) {
               <button 
                 type="submit"
                 disabled={isSaving}
-                className="w-full bg-slate-900 text-white py-6 rounded-2xl font-black text-xs uppercase tracking-[0.3em] shadow-2xl shadow-slate-300 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50"
+                className="w-full bg-slate-900 text-white py-6 rounded-xl font-black text-xs uppercase tracking-[0.3em] shadow-2xl shadow-slate-300 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50"
               >
                 {isSaving ? t('admin.stores.form.syncing') : isEdit ? t('admin.stores.form.updateBtn') : t('admin.stores.form.establishBtn')}
               </button>
               <button 
                 type="button"
                 onClick={() => router.back()}
-                className="w-full mt-4 bg-white border border-slate-200 text-slate-400 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:text-slate-900 transition-all"
+                className="w-full mt-4 bg-white border border-slate-200 text-slate-400 py-4 rounded-xl font-black text-[10px] uppercase tracking-widest hover:text-slate-900 transition-all"
               >
                 {t('admin.stores.form.discard')}
               </button>

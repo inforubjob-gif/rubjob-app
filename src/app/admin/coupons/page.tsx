@@ -156,7 +156,7 @@ export default function CouponsAdminPage() {
             <div className="w-8 h-8 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
           </div>
         ) : coupons.length === 0 ? (
-          <div className="text-center py-20 bg-white rounded-2xl border border-slate-100 italic text-slate-400">
+          <div className="text-center py-20 bg-white rounded-xl border border-slate-100 italic text-slate-400">
              {t('admin.coupons.empty')}
           </div>
         ) : (
@@ -256,7 +256,7 @@ export default function CouponsAdminPage() {
       {/* New Coupon Modal */}
       <Modal isOpen={isModalOpen} onClose={() => { setIsModalOpen(false); setEditingId(null); }} title={editingId ? t('admin.coupons.modal.titleEdit') || "Edit Coupon" : t('admin.coupons.modal.title')}>
          <form onSubmit={handleSubmit} className="space-y-6 pt-2 h-[80vh] overflow-y-auto px-1 custom-scrollbar">
-            <div className="p-4 bg-indigo-50 rounded-2xl border border-indigo-100">
+            <div className="p-4 bg-indigo-50 rounded-xl border border-indigo-100">
                <label className="flex items-center gap-3 cursor-pointer">
                   <div className={`w-12 h-6 rounded-full transition-colors relative ${formData.isVisible ? 'bg-indigo-500' : 'bg-slate-300'}`}>
                      <input 
@@ -282,7 +282,7 @@ export default function CouponsAdminPage() {
                     value={formData.code}
                     onChange={e => setFormData({...formData, code: e.target.value.toUpperCase()})}
                     placeholder="e.g. RUBJOB2026"
-                    className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-4 py-3 text-sm font-bold focus:outline-none focus:border-primary/50"
+                    className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-4 py-3 text-sm font-bold focus:outline-none focus:border-primary/50"
                   />
                </div>
                <div className="grid grid-cols-2 gap-4">
@@ -291,7 +291,7 @@ export default function CouponsAdminPage() {
                      <select 
                        value={formData.type}
                        onChange={e => setFormData({...formData, type: e.target.value})}
-                       className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-3 py-3 text-sm font-bold focus:outline-none focus:border-primary/50"
+                       className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-3 py-3 text-sm font-bold focus:outline-none focus:border-primary/50"
                      >
                         <option value="percentage">{t('admin.coupons.modal.typePercent')}</option>
                         <option value="fixed">{t('admin.coupons.modal.typeFixed')}</option>
@@ -304,7 +304,7 @@ export default function CouponsAdminPage() {
                        value={formData.value}
                        onChange={e => setFormData({...formData, value: e.target.value})}
                        placeholder={formData.type === 'percentage' ? "10" : "150"}
-                       className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-4 py-3 text-sm font-bold focus:outline-none focus:border-primary/50"
+                       className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-4 py-3 text-sm font-bold focus:outline-none focus:border-primary/50"
                      />
                   </div>
                </div>
@@ -316,7 +316,7 @@ export default function CouponsAdminPage() {
                        type="number"
                        value={formData.minOrder}
                        onChange={e => setFormData({...formData, minOrder: e.target.value})}
-                       className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-4 py-3 text-sm font-bold focus:outline-none focus:border-primary/50"
+                       className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-4 py-3 text-sm font-bold focus:outline-none focus:border-primary/50"
                      />
                   </div>
                   <div>
@@ -326,7 +326,7 @@ export default function CouponsAdminPage() {
                        value={formData.usageLimit}
                        onChange={e => setFormData({...formData, usageLimit: e.target.value})}
                        placeholder="Unlimited"
-                       className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-4 py-3 text-sm font-bold focus:outline-none focus:border-primary/50"
+                       className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-4 py-3 text-sm font-bold focus:outline-none focus:border-primary/50"
                      />
                   </div>
                </div>
@@ -337,14 +337,14 @@ export default function CouponsAdminPage() {
                     type="date"
                     value={formData.expiryDate}
                     onChange={e => setFormData({...formData, expiryDate: e.target.value})}
-                    className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-4 py-3 text-sm font-bold focus:outline-none focus:border-primary/50"
+                    className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-4 py-3 text-sm font-bold focus:outline-none focus:border-primary/50"
                   />
                </div>
             </div>
 
             <button 
               disabled={isSaving}
-              className="w-full bg-slate-900 text-white py-5 rounded-2xl font-black text-xs uppercase tracking-[0.2em] shadow-xl shadow-slate-200 hover:scale-[1.01] active:scale-[0.98] transition-all disabled:opacity-50"
+              className="w-full bg-slate-900 text-white py-5 rounded-xl font-black text-xs uppercase tracking-[0.2em] shadow-xl shadow-slate-200 hover:scale-[1.01] active:scale-[0.98] transition-all disabled:opacity-50"
             >
               {isSaving ? t('admin.coupons.modal.syncing') : (editingId ? t('admin.coupons.modal.update') : t('admin.coupons.modal.deploy'))}
             </button>

@@ -66,7 +66,7 @@ export default function PayoutMethodPage() {
         <div className="flex gap-3">
           <button
             onClick={() => setMethod("bank")}
-            className={`flex-1 p-4 rounded-2xl border-2 transition-all flex flex-col items-center gap-2 ${
+            className={`flex-1 p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-2 ${
               method === "bank" ? "border-primary bg-primary/5" : "border-slate-100 bg-white opacity-60"
             }`}
           >
@@ -77,7 +77,7 @@ export default function PayoutMethodPage() {
           </button>
           <button
             onClick={() => setMethod("promptpay")}
-            className={`flex-1 p-4 rounded-2xl border-2 transition-all flex flex-col items-center gap-2 ${
+            className={`flex-1 p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-2 ${
               method === "promptpay" ? "border-primary bg-primary/5" : "border-slate-100 bg-white opacity-60"
             }`}
           >
@@ -133,7 +133,7 @@ export default function PayoutMethodPage() {
           <Button 
             onClick={handleSave}
             disabled={!accountNumber || !accountHolder || (method === "bank" && !bankName) || isSaving}
-            className="w-full py-5 bg-primary text-white rounded-2xl font-black uppercase tracking-widest shadow-2xl shadow-primary/30"
+            className="w-full py-5 bg-primary text-white rounded-xl font-black uppercase tracking-widest shadow-2xl shadow-primary/30"
           >
             {isSaving ? t("store.payoutMethodPage.saving") : t("store.payoutMethodPage.saveMethod")}
           </Button>

@@ -89,7 +89,7 @@ export default function SupportCenterPage() {
           <p className="text-xs text-slate-500 font-bold uppercase tracking-wider mt-1">{t('admin.support.subtitle')}</p>
         </header>
 
-        <Card className="flex-1 overflow-hidden flex flex-col bg-white border border-slate-200/60 shadow-sm rounded-2xl">
+        <Card className="flex-1 overflow-hidden flex flex-col bg-white border border-slate-200/60 shadow-sm rounded-xl">
           <div className="p-5 border-b border-slate-50 bg-slate-50/30 flex items-center justify-between">
             <span className="text-xs font-black text-slate-400 uppercase tracking-widest">{t('admin.support.activeChats')}</span>
             <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
@@ -107,7 +107,7 @@ export default function SupportCenterPage() {
                   className={`w-full p-5 text-left transition-all hover:bg-slate-50 flex gap-4 items-start ${selectedTicketId === tk.id ? 'bg-primary/5 border-l-4 border-l-primary' : ''}`}
                 >
                   <div className="relative">
-                    <div className="w-12 h-12 rounded-2xl bg-slate-100 flex items-center justify-center overflow-hidden border border-slate-200 shadow-sm">
+                    <div className="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center overflow-hidden border border-slate-200 shadow-sm">
                       {tk.userPicture ? (
                         <img src={tk.userPicture} alt="" className="w-full h-full object-cover" />
                       ) : (
@@ -148,7 +148,7 @@ export default function SupportCenterPage() {
       {/* ─── Main: Chat Conversation ─── */}
       <div className="flex-1 h-full">
         {selectedTicketId ? (
-          <Card className="h-full flex flex-col bg-white border border-slate-200/60 shadow-xl rounded-2xl overflow-hidden">
+          <Card className="h-full flex flex-col bg-white border border-slate-200/60 shadow-xl rounded-xl overflow-hidden">
             {/* Header */}
             <header className="px-8 py-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/20">
               <div className="flex items-center gap-4">
@@ -166,7 +166,7 @@ export default function SupportCenterPage() {
                  </div>
               </div>
               <div className="flex items-center gap-2">
-                <button className="p-3 text-slate-400 hover:bg-slate-50 rounded-2xl transition-all"><Icons.FileText size={20} /></button>
+                <button className="p-3 text-slate-400 hover:bg-slate-50 rounded-xl transition-all"><Icons.FileText size={20} /></button>
                 <button className="bg-emerald-50 text-emerald-600 px-5 py-2.5 rounded-xl font-bold text-xs hover:bg-emerald-100 transition-all">{t('admin.support.resolveBtn')}</button>
               </div>
             </header>
@@ -194,7 +194,7 @@ export default function SupportCenterPage() {
 
             {/* Input Area */}
             <div className="p-6 border-t border-slate-100 bg-white">
-               <div className="bg-slate-50 rounded-2xl p-2 pl-6 flex items-center gap-3 border border-slate-100 ring-4 ring-slate-50/50">
+               <div className="bg-slate-50 rounded-xl p-2 pl-6 flex items-center gap-3 border border-slate-100 ring-4 ring-slate-50/50">
                   <input 
                     type="text"
                     value={replyText}
@@ -214,7 +214,7 @@ export default function SupportCenterPage() {
             </div>
           </Card>
         ) : (
-          <div className="h-full flex flex-col items-center justify-center text-center p-10 bg-white/50 border-2 border-dashed border-slate-200 rounded-2xl">
+          <div className="h-full flex flex-col items-center justify-center text-center p-10 bg-white/50 border-2 border-dashed border-slate-200 rounded-xl">
             <div className="w-24 h-24 bg-slate-100 rounded-full flex items-center justify-center mb-6 text-slate-300">
                <Icons.Chat size={48} />
             </div>

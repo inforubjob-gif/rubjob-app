@@ -66,13 +66,13 @@ export default function RiderLoginPage() {
               className="h-20 w-auto object-contain drop-shadow-md"
             />
           </div>
-          <h2 className="text-30 font-black text-slate-900 tracking-tight leading-none underline decoration-primary decoration-4 underline-offset-8">เข้าสู่ระบบไรเดอร์</h2>
+          <h2 className="text-3xl font-black text-slate-900 tracking-tight leading-none underline decoration-primary decoration-4 underline-offset-8">เข้าสู่ระบบไรเดอร์</h2>
           <p className="text-[10px] text-slate-400 font-black uppercase tracking-[0.2em] mt-6 bg-white/80 backdrop-blur-sm py-1 px-4 rounded-full inline-block border border-slate-100 italic">
             RUBJOB DELIVERY SERVICE
           </p>
         </div>
 
-        <form onSubmit={handleLogin} className="space-y-5 bg-white/40 backdrop-blur-md p-2 rounded-2xl border border-white/20 shadow-xl shadow-slate-200/40">
+        <form onSubmit={handleLogin} className="space-y-5 bg-white/40 backdrop-blur-md p-2 rounded-xl border border-white/20 shadow-xl shadow-slate-200/40">
           <div className="bg-white rounded-[1.75rem] p-6 space-y-5 shadow-sm border border-slate-50">
             <div className="space-y-2">
               <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">อีเมลผู้ใช้งาน</label>
@@ -83,7 +83,7 @@ export default function RiderLoginPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="rider@rubjob.com"
-                  className="w-full bg-slate-50 border-none rounded-2xl pl-12 pr-4 py-4 text-sm font-bold placeholder:text-slate-300 focus:ring-2 focus:ring-primary/20 transition-all"
+                  className="w-full bg-slate-50 border-none rounded-xl pl-12 pr-4 py-4 text-sm font-bold placeholder:text-slate-300 focus:ring-2 focus:ring-primary/20 transition-all"
                 />
               </div>
             </div>
@@ -97,13 +97,13 @@ export default function RiderLoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full bg-slate-50 border-none rounded-2xl pl-12 pr-4 py-4 text-sm font-bold placeholder:text-slate-300 focus:ring-2 focus:ring-primary/20 transition-all"
+                  className="w-full bg-slate-50 border-none rounded-xl pl-12 pr-4 py-4 text-sm font-bold placeholder:text-slate-300 focus:ring-2 focus:ring-primary/20 transition-all"
                 />
               </div>
             </div>
 
             {error && (
-              <div className="bg-rose-50 text-rose-500 text-[11px] font-bold p-4 rounded-2xl text-center border border-rose-100 animate-shake shadow-inner">
+              <div className="bg-rose-50 text-rose-500 text-[11px] font-bold p-4 rounded-xl text-center border border-rose-100 animate-shake shadow-inner">
                 {error}
               </div>
             )}
@@ -111,7 +111,7 @@ export default function RiderLoginPage() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-slate-900 text-white rounded-2xl py-5 text-sm font-black uppercase tracking-widest shadow-xl shadow-slate-900/20 transition-all active:scale-95 disabled:opacity-50 mt-2 flex items-center justify-center gap-3 group"
+              className="w-full bg-slate-900 text-white rounded-xl py-5 text-sm font-black uppercase tracking-widest shadow-xl shadow-slate-900/20 transition-all active:scale-95 disabled:opacity-50 mt-2 flex items-center justify-center gap-3 group"
             >
               {isLoading ? (
                 <Icons.Refresh size={20} className="animate-spin" />

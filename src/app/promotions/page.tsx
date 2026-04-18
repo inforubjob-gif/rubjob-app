@@ -119,7 +119,7 @@ export default function PromotionsPage() {
 
       <header className="relative z-10 px-6 pt-12 pb-8">
         <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center text-white border border-white/20">
+            <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center text-white border border-white/20">
                 <Icons.Percent size={20} />
             </div>
             <h1 className="text-3xl font-black text-white tracking-tight drop-shadow-sm">{t("promotions.title")}</h1>
@@ -130,8 +130,8 @@ export default function PromotionsPage() {
       <div className="relative z-10 px-5 space-y-7 pt-2 pb-24 animate-fade-in stagger">
         {/* Membership Card (High Contrast Premium) */}
         <div className="relative group animate-slide-up -mt-2">
-          <div className="absolute -inset-1 bg-gradient-to-r from-primary to-primary-dark rounded-2xl blur opacity-20 group-hover:opacity-40 transition duration-1000"></div>
-          <div className="p-6 relative overflow-hidden shadow-2xl rounded-2xl border border-white/20 bg-gradient-to-br from-[#ae8b5b] to-[#806642] backdrop-blur-xl">
+          <div className="absolute -inset-1 bg-gradient-to-r from-primary to-primary-dark rounded-xl blur opacity-20 group-hover:opacity-40 transition duration-1000"></div>
+          <div className="p-6 relative overflow-hidden shadow-2xl rounded-xl border border-white/20 bg-gradient-to-br from-[#ae8b5b] to-[#806642] backdrop-blur-xl">
             <div className="absolute top-[-20%] right-[-10%] w-48 h-48 bg-primary/20 rounded-full blur-3xl pointer-events-none" />
             
             <div className="relative z-10">
@@ -170,7 +170,7 @@ export default function PromotionsPage() {
 
               <button 
                 onClick={handleInviteFriend}
-                className="w-full mt-8 py-4 bg-[#ff9f1c] text-black rounded-2xl text-[14px] font-black tracking-wide shadow-2xl shadow-[#ff9f1c]/30 active:scale-95 transition-all outline-none"
+                className="w-full mt-8 py-4 bg-[#ff9f1c] text-white rounded-xl text-[14px] font-black tracking-wide shadow-2xl shadow-[#ff9f1c]/30 active:scale-95 transition-all outline-none"
               >
                 {t("promotions.inviteBtn")}
               </button>

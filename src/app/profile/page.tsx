@@ -239,7 +239,7 @@ export default function ProfilePage() {
       {showLanguageModal && (
         <div className="fixed inset-0 z-[110] flex items-end sm:items-center justify-center animate-fade-in">
           <div className="absolute inset-0 bg-slate-950/60 backdrop-blur-sm" onClick={() => setShowLanguageModal(false)} />
-          <div className="bg-white w-full max-w-lg rounded-t-[2.5rem] sm:rounded-2xl p-8 pb-12 relative z-10 animate-slide-up shadow-2xl">
+          <div className="bg-white w-full max-w-lg rounded-t-[2.5rem] sm:rounded-xl p-8 pb-12 relative z-10 animate-slide-up shadow-2xl">
             <div className="w-12 h-1.5 bg-slate-100 rounded-full mx-auto mb-8 sm:hidden" />
             <h3 className="text-xl font-black text-slate-900 mb-6 text-center">{t("profile.selectLanguage")}</h3>
             <div className="space-y-3">
@@ -250,7 +250,7 @@ export default function ProfilePage() {
                     setLanguage(lang.key as any);
                     setShowLanguageModal(false);
                   }}
-                  className={`w-full p-5 rounded-2xl flex items-center justify-between transition-all ${
+                  className={`w-full p-5 rounded-xl flex items-center justify-between transition-all ${
                     language === lang.key 
                       ? "bg-primary/5 border-2 border-primary" 
                       : "bg-slate-50 border-2 border-transparent"
@@ -270,7 +270,7 @@ export default function ProfilePage() {
             </div>
             <button 
               onClick={() => setShowLanguageModal(false)}
-              className="w-full mt-8 py-4 bg-slate-100 text-slate-500 rounded-2xl text-[12px] font-black uppercase tracking-widest"
+              className="w-full mt-8 py-4 bg-slate-100 text-slate-500 rounded-xl text-[12px] font-black uppercase tracking-widest"
             >
               {t("common.cancel")}
             </button>

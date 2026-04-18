@@ -95,9 +95,9 @@ export default function ServiceAreaPage() {
 
         {/* Address card at bottom */}
         <div className="absolute bottom-10 left-5 right-5 z-20">
-           <Card className="p-6 shadow-[0_20px_50px_rgba(0,0,0,0.15)] border-none bg-white/95 backdrop-blur-xl rounded-2xl">
+           <Card className="p-6 shadow-[0_20px_50px_rgba(0,0,0,0.15)] border-none bg-white/95 backdrop-blur-xl rounded-xl">
               <div className="flex gap-4 mb-6">
-                 <div className="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center text-3xl shadow-inner">📍</div>
+                 <div className="w-14 h-14 bg-primary/10 rounded-xl flex items-center justify-center text-3xl shadow-inner">📍</div>
                  <div className="flex-1">
                     <p className="text-sm font-black text-slate-900 uppercase tracking-tight mb-1">{location ? t("store.profile.pinned") : t("store.profile.pinLocation")}</p>
                     <p className="text-xs text-slate-500 font-medium">

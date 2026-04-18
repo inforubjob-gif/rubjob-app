@@ -12,7 +12,7 @@ import dynamic from "next/dynamic";
 
 const MapPicker = dynamic(() => import("@/components/ui/MapPicker"), {
   ssr: false,
-  loading: () => <div className="h-full w-full bg-slate-100 animate-pulse rounded-2xl flex items-center justify-center font-bold text-slate-400">Loading Map...</div>,
+  loading: () => <div className="h-full w-full bg-slate-100 animate-pulse rounded-xl flex items-center justify-center font-bold text-slate-400">Loading Map...</div>,
 });
 
 export default function ManageAddressesPage() {
@@ -176,7 +176,7 @@ export default function ManageAddressesPage() {
                     value={newLabel}
                     onChange={(e) => setNewLabel(e.target.value)}
                     placeholder={t("profile.labelHome")}
-                    className="w-full bg-slate-100 border-none rounded-2xl px-4 py-3.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 transition-all font-medium"
+                    className="w-full bg-slate-100 border-none rounded-xl px-4 py-3.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 transition-all font-medium"
                   />
                 </div>
                 <div>
@@ -187,7 +187,7 @@ export default function ManageAddressesPage() {
                       onChange={(e) => setNewAddress(e.target.value)}
                       placeholder={t("profile.addressPlaceholder")}
                       rows={3}
-                      className="w-full bg-slate-100 border-none rounded-2xl px-4 py-3.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 transition-all resize-none font-medium"
+                      className="w-full bg-slate-100 border-none rounded-xl px-4 py-3.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 transition-all resize-none font-medium"
                     />
                     <button 
                       onClick={() => setIsSelectingLocation(true)}
@@ -212,7 +212,7 @@ export default function ManageAddressesPage() {
                     value={newNote}
                     onChange={(e) => setNewNote(e.target.value)}
                     placeholder={t("profile.notePlaceholder")}
-                    className="w-full bg-slate-100 border-none rounded-2xl px-4 py-3.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 transition-all font-medium"
+                    className="w-full bg-slate-100 border-none rounded-xl px-4 py-3.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 transition-all font-medium"
                   />
                 </div>
                 
@@ -282,7 +282,7 @@ export default function ManageAddressesPage() {
           <div className="pt-6 pb-2">
             <button 
               onClick={() => setIsAdding(true)}
-              className="w-full py-4 bg-primary text-black rounded-2xl text-[14px] font-black tracking-wide shadow-2xl shadow-primary/30 active:scale-95 transition-all outline-none"
+              className="w-full py-4 bg-primary text-black rounded-xl text-[14px] font-black tracking-wide shadow-2xl shadow-primary/30 active:scale-95 transition-all outline-none"
             >
               {t("profile.addNewAddress")}
             </button>
