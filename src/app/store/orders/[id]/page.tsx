@@ -27,7 +27,7 @@ export default function StoreOrderDetailPage() {
     if (!id) return;
     async function fetchOrder() {
       try {
-        const res = await fetch(`/api/store/orders/${id}`);
+        const res = await fetch(`/api/orders/${id}`);
         const data = await res.json();
         setOrder(data.order);
       } catch (err) {
@@ -42,10 +42,10 @@ export default function StoreOrderDetailPage() {
   const handleUpdateStatus = async (nextStatus: string) => {
     setIsUpdating(true);
     try {
-      await fetch(`/api/store/orders/${id}/status`, {
-        method: "POST",
+      await fetch(`/api/store/orders`, {
+        method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status: nextStatus }),
+        body: JSON.stringify({ orderId: id, status: nextStatus }),
       });
       setOrder({ ...order, status: nextStatus });
     } catch (err) {
