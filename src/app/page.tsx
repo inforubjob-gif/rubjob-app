@@ -63,7 +63,7 @@ export default function HomePage() {
       <div className="absolute top-0 left-0 right-0 h-[250px] bg-gradient-to-b from-primary via-primary/90 to-slate-50 z-0" />
 
       {/* ─── Header ─── */}
-      <header className="relative z-10 px-5 pt-12 pb-6">
+      <header className="relative z-10 px-5 pt-6 pb-6">
         <div className="flex items-center justify-between mb-4">
           <img
             src="/images/rubjob-complete_Text-white.png"

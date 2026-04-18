@@ -104,7 +104,7 @@ export default function StoreDashboard() {
       <div className="absolute top-0 left-0 right-0 h-[480px] bg-gradient-to-b from-primary via-primary-dark to-slate-50 z-0" />
       
       {/* Store Header */}
-      <header className="relative z-10 px-5 pt-12 pb-6">
+      <header className="relative z-10 px-5 pt-6 pb-6">
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-4">
             <div className="w-14 h-14 rounded-xl bg-white shadow-2xl flex items-center justify-center text-primary border-4 border-white/50">
