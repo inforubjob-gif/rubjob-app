@@ -53,6 +53,7 @@ function BookingFlow() {
   const [deliveryDate, setDeliveryDate] = useState("");
   const [deliverySlot, setDeliverySlot] = useState("");
   const [selectedPayment, setSelectedPayment] = useState("promptpay");
+  const [tempPhone, setTempPhone] = useState("");
   
   // Weight & Size based selection instead of per-piece items
   const [bagSize, setBagSize] = useState<"9kg" | "14kg" | "18kg" | "28kg">("9kg");
@@ -891,20 +892,17 @@ function BookingFlow() {
                   type="tel" 
                   placeholder="081-234-5678" 
                   className="w-full bg-white border border-amber-200 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 font-bold"
-                  onChange={(e) => {
-                    // Update locally for now, sync on confirm if needed or just use for order
-                    (window as any).rubjob_temp_phone = e.target.value;
-                  }}
+                  value={tempPhone}
+                  onChange={(e) => setTempPhone(e.target.value)}
                 />
               </div>
             )}
             <Button
               fullWidth
               size="lg"
-              disabled={!selectedAddress || !pickupDate || !pickupSlot || (!profile?.phone && !(window as any).rubjob_temp_phone)}
+              disabled={!selectedAddress || !pickupDate || !pickupSlot || (!profile?.phone && !tempPhone)}
               onClick={async () => {
                 // If phone was provided in the temp input, sync it to user profile
-                const tempPhone = (window as any).rubjob_temp_phone;
                 if (tempPhone && !profile?.phone) {
                   try {
                     await fetch("/api/user/sync", {
