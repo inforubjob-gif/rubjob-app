@@ -50,7 +50,7 @@ export default function OrdersPage() {
       <div className="absolute top-0 left-0 right-0 h-[300px] bg-gradient-to-b from-primary via-primary to-slate-50 z-0" />
 
       {/* Header */}
-      <header className="relative z-30 px-5 pt-6 pb-4 transition-all">
+      <header className="relative z-30 px-5 pt-3 pb-4 transition-all">
         <div className="flex items-center gap-3 mb-5">
           <button
             onClick={() => router.back()}
@@ -58,7 +58,7 @@ export default function OrdersPage() {
           >
             <Icons.Back size={20} />
           </button>
-          <h1 className="text-xl font-black text-white tracking-tight">{t("orders.myOrders")}</h1>
+          <h1 className="text-xl font-black text-white">{t("orders.myOrders")}</h1>
         </div>
 
         {/* Tabs */}
@@ -68,7 +68,7 @@ export default function OrdersPage() {
               key={f}
               onClick={() => setTab(f)}
               className={`
-                flex-1 py-2.5 text-xs font-bold uppercase tracking-wider rounded-xl transition-all duration-200
+                flex-1 py-2.5 text-xs font-bold uppercase rounded-xl transition-all duration-200
                 ${tab === f ? "bg-white text-slate-900 shadow-lg" : "text-white/60"}
               `}
             >
@@ -82,7 +82,7 @@ export default function OrdersPage() {
         {isLoading ? (
           <div className="flex flex-col items-center justify-center py-20">
             <div className="w-10 h-10 border-4 border-white/20 border-t-white rounded-full animate-spin" />
-            <p className="text-white/60 text-xs mt-4 font-bold tracking-widest uppercase">
+            <p className="text-white/60 text-xs mt-4 font-bold uppercase">
               {t("common.loading") || "Loading Orders..."}
             </p>
           </div>

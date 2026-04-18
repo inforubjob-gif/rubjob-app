@@ -27,10 +27,10 @@ export default function NotFound() {
         </div>
 
         <div className="space-y-2 mb-10">
-          <h1 className="text-4xl font-black text-slate-900 tracking-tight leading-tight">
-            Oops! <span className="text-primary tracking-tighter">404</span>
+          <h1 className="text-4xl font-black text-slate-900 leading-tight">
+            Oops! <span className="text-primaryer">404</span>
           </h1>
-          <p className="text-sm font-bold text-slate-400 uppercase tracking-[0.2em] bg-white py-1 px-4 rounded-full inline-block border border-slate-100 italic shadow-sm">
+          <p className="text-sm font-bold text-slate-400 uppercase bg-white py-1 px-4 rounded-full inline-block border border-slate-100 shadow-sm">
             {t("common.notFoundTitle")}
           </p>
           <p className="text-sm text-slate-500 font-bold max-w-[280px] leading-relaxed mx-auto pt-4">
@@ -42,7 +42,7 @@ export default function NotFound() {
 
         <Link href="/">
           <Button 
-            className="px-12 bg-slate-900 hover:bg-black text-white py-5 rounded-2xl font-black uppercase tracking-widest shadow-2xl shadow-slate-900/20 transition-all active:scale-95 flex items-center gap-3 mx-auto"
+            className="px-12 bg-slate-900 hover:bg-black text-white py-5 rounded-2xl font-black uppercase shadow-2xl shadow-slate-900/20 transition-all active:scale-95 flex items-center gap-3 mx-auto"
           >
             <span>{t("common.goHome")}</span>
             <Icons.ArrowRight size={20} />

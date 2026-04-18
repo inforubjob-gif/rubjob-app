@@ -27,7 +27,7 @@ export default function PhotoUpload({ onPhotoCapture, label, required }: PhotoUp
   return (
     <div className="space-y-3">
       {label && (
-        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block px-1">
+        <label className="text-[10px] font-black text-slate-400 uppercase block px-1">
           {label} {required && <span className="text-red-500">*</span>}
         </label>
       )}
@@ -55,7 +55,7 @@ export default function PhotoUpload({ onPhotoCapture, label, required }: PhotoUp
             <div className="w-16 h-16 bg-white rounded-full shadow-xl shadow-slate-200/50 flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
                <Icons.Camera size={32} />
             </div>
-            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t("rider.takePhoto")}</p>
+            <p className="text-[10px] font-black text-slate-400 uppercase">{t("rider.takePhoto")}</p>
           </>
         )}
         <input 

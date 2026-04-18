@@ -74,15 +74,15 @@ export default function RiderSetupPage() {
       <div className="absolute top-0 left-0 right-0 h-[320px] bg-gradient-to-b from-primary to-transparent z-0" />
       
       <header className="relative z-10 px-5 pt-12 pb-6 text-white">
-        <h1 className="text-3xl font-black tracking-tight uppercase">{t("rider.setup.title")}</h1>
-        <p className="text-xs font-bold uppercase tracking-widest mt-1 opacity-80">{t("rider.setup.sub")}</p>
+        <h1 className="text-3xl font-black uppercase">{t("rider.setup.title")}</h1>
+        <p className="text-xs font-bold uppercase mt-1 opacity-80">{t("rider.setup.sub")}</p>
       </header>
 
       <div className="relative z-10 px-5 flex-1 max-w-lg mx-auto w-full">
         <Card className="p-6 space-y-6 shadow-2xl shadow-primary-dark/10 border border-white rounded-xl bg-white">
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
-              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t("rider.setup.fullName")}</label>
+              <label className="text-[10px] font-black text-slate-400 uppercase ml-1">{t("rider.setup.fullName")}</label>
               <div className="relative">
                 <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
                   <Icons.User size={18} />
@@ -99,7 +99,7 @@ export default function RiderSetupPage() {
             </div>
 
             <div className="space-y-2">
-              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t("rider.setup.phone")}</label>
+              <label className="text-[10px] font-black text-slate-400 uppercase ml-1">{t("rider.setup.phone")}</label>
               <div className="relative">
                 <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
                   <Icons.Phone size={18} />
@@ -116,7 +116,7 @@ export default function RiderSetupPage() {
             </div>
 
             <div className="space-y-2">
-              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t("rider.setup.vehicleType")}</label>
+              <label className="text-[10px] font-black text-slate-400 uppercase ml-1">{t("rider.setup.vehicleType")}</label>
               <div className="grid grid-cols-3 gap-3">
                 {["bike", "car", "truck"].map((type) => (
                   <button
@@ -130,14 +130,14 @@ export default function RiderSetupPage() {
                     }`}
                   >
                     {type === "bike" ? <Icons.Bike size={24} /> : type === "car" ? <Icons.Truck size={24} /> : <Icons.Package size={24} />}
-                    <span className="text-[9px] font-black uppercase tracking-widest">{t(`rider.setup.vehicles.${type}`)}</span>
+                    <span className="text-[9px] font-black uppercase">{t(`rider.setup.vehicles.${type}`)}</span>
                   </button>
                 ))}
               </div>
             </div>
 
             <div className="space-y-2">
-              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t("rider.setup.licensePlate")}</label>
+              <label className="text-[10px] font-black text-slate-400 uppercase ml-1">{t("rider.setup.licensePlate")}</label>
               <input 
                 type="text" 
                 required
@@ -154,7 +154,7 @@ export default function RiderSetupPage() {
                 fullWidth 
                 size="lg" 
                 isLoading={isSubmitting}
-                className="bg-primary text-white py-5 rounded-xl font-black uppercase tracking-[0.2em] shadow-xl shadow-primary/20 active:scale-95 transition-all"
+                className="bg-primary text-white py-5 rounded-xl font-black uppercase shadow-xl shadow-primary/20 active:scale-95 transition-all"
               >
                 {t("rider.setup.submit")}
               </Button>

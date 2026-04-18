@@ -185,7 +185,7 @@ export default function PinLock({ type, userId, onVerified, children }: PinLockP
           {isProcessing && (
             <div className="absolute inset-0 z-20 bg-slate-50/40 backdrop-blur-[2px] flex flex-col items-center justify-center rounded-3xl animate-in fade-in duration-300">
               <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mb-4" />
-              <p className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">{t("common.processing")}</p>
+              <p className="text-[10px] font-black text-primary uppercase">{t("common.processing")}</p>
             </div>
           )}
           
@@ -219,7 +219,7 @@ export default function PinLock({ type, userId, onVerified, children }: PinLockP
         {step === "confirm" && (
            <button 
              onClick={() => { setStep("setup"); setPin(""); setConfirmPin(""); }}
-             className="mt-8 text-xs font-black text-primary uppercase tracking-widest cursor-pointer"
+             className="mt-8 text-xs font-black text-primary uppercase cursor-pointer"
            >
              {t("common.back")}
            </button>

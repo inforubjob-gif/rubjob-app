@@ -25,7 +25,7 @@ export default function Loading() {
           <div className="space-y-3">
              <div className="flex items-center justify-center gap-2">
                 <Icons.Refresh size={16} className="text-primary animate-spin" />
-                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 italic">
+                <span className="text-[10px] font-black uppercase text-slate-400">
                   Processing Laundry...
                 </span>
              </div>
@@ -39,7 +39,7 @@ export default function Loading() {
       </div>
 
       <div className="absolute bottom-10 left-0 right-0 flex flex-col items-center gap-2 opacity-30">
-        <p className="text-[8px] font-black uppercase tracking-[0.4em] text-slate-300">Rubjob Logistics Engine</p>
+        <p className="text-[8px] font-black uppercase text-slate-300">Rubjob Logistics Engine</p>
       </div>
 
       <style jsx global>{`

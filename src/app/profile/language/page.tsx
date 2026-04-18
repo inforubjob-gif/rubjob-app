@@ -23,7 +23,7 @@ export default function LanguagePage() {
       </header>
 
       <main className="p-5 space-y-4">
-        <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">
+        <p className="text-xs font-bold text-slate-400 uppercase mb-3">
           {t("profile.selectLanguage")}
         </p>
         <Card className="divide-y divide-slate-100 overflow-hidden">
@@ -42,7 +42,7 @@ export default function LanguagePage() {
         </Card>
 
         <section className="pt-4 text-center">
-            <p className="text-xs text-slate-400 italic">
+            <p className="text-xs text-slate-400">
                {t("common.comingSoon")}
             </p>
         </section>

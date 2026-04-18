@@ -50,7 +50,7 @@ export default function RiderMap({ storeLat, storeLng, userLat, userLng }: Rider
   if (!isMounted) return (
     <div className="h-full w-full bg-slate-100 animate-pulse flex flex-col items-center justify-center gap-3">
         <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin" />
-        <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest">Waking Up Maps...</p>
+        <p className="text-[10px] font-black text-slate-300 uppercase">Waking Up Maps...</p>
     </div>
   );
 

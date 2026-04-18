@@ -33,19 +33,19 @@ export default function StoreOrdersPage() {
             >
                 <Icons.Search size={20} className="rotate-180" />
             </button>
-            <h1 className="text-xl font-black text-white tracking-tight drop-shadow-sm">{t("store.myOrders")}</h1>
+            <h1 className="text-xl font-black text-white drop-shadow-sm">{t("store.myOrders")}</h1>
         </div>
         
         <div className="flex bg-white/20 p-1.5 rounded-xl backdrop-blur-xl border border-white/20 shadow-lg shadow-primary-dark/10">
            <button 
                 onClick={() => setFilter("active")}
-                className={`flex-1 py-3.5 text-[11px] font-black uppercase tracking-widest rounded-[1.4rem] transition-all duration-500 ${filter === "active" ? "bg-white text-primary shadow-lg shadow-primary/20 scale-[1.02]" : "text-white/70"}`}
+                className={`flex-1 py-3.5 text-[11px] font-black uppercase rounded-[1.4rem] transition-all duration-500 ${filter === "active" ? "bg-white text-primary shadow-lg shadow-primary/20 scale-[1.02]" : "text-white/70"}`}
            >
                  {t("store.inProgressTab")}
            </button>
            <button 
                 onClick={() => setFilter("completed")}
-                className={`flex-1 py-3.5 text-[11px] font-black uppercase tracking-widest rounded-[1.4rem] transition-all duration-500 ${filter === "completed" ? "bg-white text-primary shadow-lg shadow-primary/20 scale-[1.02]" : "text-white/70"}`}
+                className={`flex-1 py-3.5 text-[11px] font-black uppercase rounded-[1.4rem] transition-all duration-500 ${filter === "completed" ? "bg-white text-primary shadow-lg shadow-primary/20 scale-[1.02]" : "text-white/70"}`}
            >
                  {t("store.completedTab")}
            </button>
@@ -65,13 +65,13 @@ export default function StoreOrdersPage() {
               </div>
               <div className="flex-1">
                 <div className="flex items-center justify-between mb-0.5">
-                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{order.id}</span>
+                  <span className="text-[10px] font-black text-slate-400 uppercase">{order.id}</span>
                   <span className="text-xs font-black text-slate-900">฿{order.price}</span>
                 </div>
                 <h3 className="text-sm font-bold text-slate-800 leading-tight">
                     {t(`orders.services.${order.svc}`) || (order.svc === "home_cleaning" ? t("orders.services.home_cleaning") : t("store.laundryService"))}
                 </h3>
-                <p className="text-[10px] text-slate-400 font-medium mt-1 uppercase tracking-tighter">{order.date}</p>
+                <p className="text-[10px] text-slate-400 font-medium mt-1 uppercaseer">{order.date}</p>
               </div>
               <div className="text-right">
                 <Badge variant={statusToBadgeVariant(order.status as any)}>

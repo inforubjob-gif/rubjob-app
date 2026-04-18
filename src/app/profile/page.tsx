@@ -84,11 +84,11 @@ export default function ProfilePage() {
       <div className="absolute top-0 left-0 right-0 h-[350px] bg-gradient-to-b from-primary via-primary to-slate-50 z-0" />
 
       {/* Profile Header */}
-      <header className="relative z-10 px-5 pt-6 pb-12">
+      <header className="relative z-10 px-5 pt-3 pb-12">
         {/* Back button */}
         <button
           onClick={() => router.back()}
-          className="absolute left-5 top-6 w-9 h-9 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center text-white active:scale-95 transition-transform z-10"
+          className="absolute left-5 top-3 w-9 h-9 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center text-white active:scale-95 transition-transform z-10"
         >
           <Icons.Back size={20} />
         </button>
@@ -108,22 +108,22 @@ export default function ProfilePage() {
           </div>
           <div className="text-white flex-1 min-w-0">
             <div className="flex items-center gap-2 group cursor-pointer" onClick={() => router.push("/profile/edit")}>
-              <h1 className="text-3xl font-extrabold tracking-tight truncate">
+              <h1 className="text-3xl font-extrabold truncate">
                 {isReady ? profile?.displayName ?? "Guest" : t("common.loading")}
               </h1>
               <Icons.Edit size={14} className="text-white/50 group-hover:text-white transition-colors" />
             </div>
             {phone ? (
-              <p className="text-sm text-white/90 font-bold tracking-wide mt-0.5 flex items-center gap-1.5">
+              <p className="text-sm text-white/90 font-bold mt-0.5 flex items-center gap-1.5">
                 <Icons.Phone size={10} strokeWidth={3} /> {phone}
               </p>
             ) : (
-              <button onClick={() => router.push("/profile/edit")} className="text-xs text-white/70 font-bold uppercase tracking-wider mt-1 border border-white/30 px-2.5 py-1 rounded-md hover:bg-white/10 transition-colors">
+              <button onClick={() => router.push("/profile/edit")} className="text-xs text-white/70 font-bold uppercase mt-1 border border-white/30 px-2.5 py-1 rounded-md hover:bg-white/10 transition-colors">
                 {t("profile.addPhone")}
               </button>
             )}
             <div className="flex items-center gap-2 mt-1">
-              <span className="px-2.5 py-1 bg-white/20 backdrop-blur-md rounded-full text-xs font-bold uppercase tracking-wider">
+              <span className="px-2.5 py-1 bg-white/20 backdrop-blur-md rounded-full text-xs font-bold uppercase">
                 {tier} {t("tiers.member")}
               </span>
               <button className="w-6 h-6 bg-white/20 rounded-lg flex items-center justify-center text-white/70">
@@ -138,7 +138,7 @@ export default function ProfilePage() {
         {/* Saved Addresses */}
         <section>
           <div className="flex items-center justify-between mb-3 px-1">
-            <h2 className="text-base font-black text-slate-900 uppercase tracking-widest">{t("profile.myAddress")}</h2>
+            <h2 className="text-base font-black text-slate-900 uppercase">{t("profile.myAddress")}</h2>
             <Link 
               href="/profile/addresses" 
               className="text-xs font-bold text-primary bg-white px-3 py-1.5 rounded-full shadow-sm active:scale-95 transition-transform"
@@ -148,7 +148,7 @@ export default function ProfilePage() {
           </div>
           <div className="space-y-2">
             {addresses.length === 0 && !isDataLoading && (
-              <p className="text-center py-4 text-xs text-muted italic">
+              <p className="text-center py-4 text-xs text-muted">
                 {t("profile.noAddress") || "No saved addresses yet."}
               </p>
             )}
@@ -171,7 +171,7 @@ export default function ProfilePage() {
 
         {/* Settings Menu */}
         <section>
-          <h2 className="text-sm font-black text-slate-900 uppercase tracking-widest mb-3 px-1">{t("profile.accountSettings")}</h2>
+          <h2 className="text-sm font-black text-slate-900 uppercase mb-3 px-1">{t("profile.accountSettings")}</h2>
           <Card className="divide-y divide-slate-50 overflow-hidden shadow-xl">
             {MENU_ITEMS.map((item) => {
               const content = (
@@ -228,7 +228,7 @@ export default function ProfilePage() {
 
         {/* App Info */}
         <div className="text-center pb-8 pt-4">
-          <p className="text-[10px] font-bold text-slate-300 uppercase tracking-widest">RUBJOB {t("common.version")} 1.0.0</p>
+          <p className="text-[10px] font-bold text-slate-300 uppercase">RUBJOB {t("common.version")} 1.0.0</p>
           <p className="text-[10px] text-slate-300 mt-2 flex items-center justify-center gap-1.5">
             {t("common.madeInBangkok")} <Icons.Guarantee size={12} className="text-primary-dark" /> Bangkok
           </p>
@@ -258,7 +258,7 @@ export default function ProfilePage() {
                 >
                   <div className="text-left">
                     <p className={`text-sm font-black ${language === lang.key ? "text-primary-dark" : "text-slate-800"}`}>{lang.label}</p>
-                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{lang.sub}</p>
+                    <p className="text-[10px] text-slate-400 font-bold uppercase">{lang.sub}</p>
                   </div>
                   {language === lang.key && (
                     <div className="w-6 h-6 bg-primary rounded-full flex items-center justify-center text-white shadow-lg">
@@ -270,7 +270,7 @@ export default function ProfilePage() {
             </div>
             <button 
               onClick={() => setShowLanguageModal(false)}
-              className="w-full mt-8 py-4 bg-slate-100 text-slate-500 rounded-xl text-[12px] font-black uppercase tracking-widest"
+              className="w-full mt-8 py-4 bg-slate-100 text-slate-500 rounded-xl text-[12px] font-black uppercase"
             >
               {t("common.cancel")}
             </button>

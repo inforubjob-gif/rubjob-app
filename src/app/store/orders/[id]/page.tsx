@@ -69,7 +69,7 @@ export default function StoreOrderDetailPage() {
         <button onClick={() => router.back()} className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400 active:scale-90 transition-all">
           <Icons.Back size={20} />
         </button>
-        <h1 className="text-sm font-black text-slate-900 uppercase tracking-widest">{t("store.manageTask")}</h1>
+        <h1 className="text-sm font-black text-slate-900 uppercase">{t("store.manageTask")}</h1>
         <button
           onClick={() => setIsIssueModalOpen(true)}
           className="w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center text-red-500 active:scale-90 transition-all border border-red-100"
@@ -89,13 +89,13 @@ export default function StoreOrderDetailPage() {
         <Card className="p-6 mb-6 border-none shadow-sm bg-white overflow-hidden relative rounded-xl">
           <div className="flex justify-between items-start mb-6">
             <div>
-              <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest leading-none mb-1.5">{t("orders.tracking")} #{id.slice(-6)}</p>
-              <Badge variant={statusToBadgeVariant(status)} className="font-black italic text-[10px] uppercase tracking-tighter">
+              <p className="text-[10px] font-black text-slate-300 uppercase leading-none mb-1.5">{t("orders.tracking")} #{id.slice(-6)}</p>
+              <Badge variant={statusToBadgeVariant(status)} className="font-black text-[10px] uppercaseer">
                 {t(`orders.status.${status}`)}
               </Badge>
             </div>
             <div className="text-right">
-              <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest leading-none mb-1.5">{t("common.store")}</p>
+              <p className="text-[10px] font-black text-slate-300 uppercase leading-none mb-1.5">{t("common.store")}</p>
               <p className="text-xs font-black text-slate-900">{t("store.unitNo")} #A12</p>
             </div>
           </div>
@@ -106,14 +106,14 @@ export default function StoreOrderDetailPage() {
                 <Icons.User size={22} />
              </div>
              <div className="flex-1 min-w-0">
-                <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest">{t("store.customer")}</p>
+                <p className="text-[10px] font-black text-slate-300 uppercase">{t("store.customer")}</p>
                 <p className="text-sm font-black text-slate-900 truncate">Customer #TR-88</p>
              </div>
           </div>
         </Card>
 
         <div className="space-y-6">
-            <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">{t("store.workflowTitle")}</h3>
+            <h3 className="text-[10px] font-black text-slate-400 uppercase px-1">{t("store.workflowTitle")}</h3>
             
             <div className="space-y-4">
               <Card className={`p-5 transition-all outline-dashed outline-2 ${status === 'delivering_to_store' ? 'outline-primary bg-primary/5 shadow-xl shadow-primary/10' : 'bg-white outline-slate-100'}`}>
@@ -123,7 +123,7 @@ export default function StoreOrderDetailPage() {
                            <Icons.Truck size={22} />
                        </div>
                        <div>
-                          <h4 className={`text-sm font-black uppercase tracking-tight ${status === 'delivering_to_store' ? 'text-primary-dark' : 'text-slate-400'}`}>{t("store.incomingFromRider")}</h4>
+                          <h4 className={`text-sm font-black uppercase ${status === 'delivering_to_store' ? 'text-primary-dark' : 'text-slate-400'}`}>{t("store.incomingFromRider")}</h4>
                           <p className="text-[10px] font-bold text-slate-400 uppercase">{t("store.arriving")} • {t("store.riderNo")} #RD-99</p>
                        </div>
                    </div>
@@ -135,8 +135,8 @@ export default function StoreOrderDetailPage() {
                     <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 blur-2xl" />
                     <div className="relative z-10 flex items-center justify-between">
                         <div>
-                            <p className="text-[11px] font-black text-white/80 uppercase tracking-[0.25em] mb-1.5 leading-none">{t("store.processing")}</p>
-                            <h3 className="text-2xl font-black italic uppercase tracking-tight drop-shadow-sm">
+                            <p className="text-[11px] font-black text-white/80 uppercase mb-1.5 leading-none">{t("store.processing")}</p>
+                            <h3 className="text-2xl font-black uppercase drop-shadow-sm">
                                {isExpress ? t("store.flashExpress") : t("store.standardWash")}
                             </h3>
                         </div>
@@ -149,7 +149,7 @@ export default function StoreOrderDetailPage() {
 
               <div className="grid grid-cols-2 gap-4">
                   <Card className="p-4 bg-white border border-slate-100">
-                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">{t("profile.service")}</p>
+                      <p className="text-[10px] font-black text-slate-400 uppercase mb-3">{t("profile.service")}</p>
                       <div className="flex items-center gap-2">
                           <div className="w-8 h-8 rounded-lg bg-orange-50 text-orange-500 flex items-center justify-center shadow-sm">
                               {getServiceIcon(order?.serviceId as any, { size: 18 })}
@@ -158,7 +158,7 @@ export default function StoreOrderDetailPage() {
                       </div>
                   </Card>
                   <Card className={`p-4 ${isExpress ? 'bg-red-50 text-red-600 border border-red-100' : 'bg-slate-50 text-slate-900 border border-slate-100'}`}>
-                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">Service Level</p>
+                      <p className="text-[10px] font-black text-slate-400 uppercase mb-3">Service Level</p>
                       <div className="flex items-center gap-2">
                           <div className={`w-8 h-8 rounded-lg ${isExpress ? 'bg-red-600 text-white' : 'bg-primary text-white'} flex items-center justify-center shadow-sm`}>
                               <Icons.Clock size={18} />
@@ -169,19 +169,19 @@ export default function StoreOrderDetailPage() {
               </div>
 
               <Card className="p-5 space-y-4 border border-slate-100">
-                  <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t("store.requirementsTitle")}</h3>
+                  <h3 className="text-[10px] font-black text-slate-400 uppercase">{t("store.requirementsTitle")}</h3>
                   <div className="space-y-3">
                       <div className="flex items-center justify-between py-2 border-b border-slate-50">
                           <span className="text-xs font-bold text-slate-500">{t("store.pickupWeight")}</span>
-                          <span className="text-xs font-black text-slate-900 tracking-tight">{weight} kg</span>
+                          <span className="text-xs font-black text-slate-900">{weight} kg</span>
                       </div>
                       <div className="flex items-center justify-between py-2 border-b border-slate-50">
                           <span className="text-xs font-bold text-slate-500">{t("store.pickupItems")}</span>
-                          <span className="text-xs font-black text-slate-900 tracking-tight">{actualItems} pcs</span>
+                          <span className="text-xs font-black text-slate-900">{actualItems} pcs</span>
                       </div>
                       {order?.staffNote && (
                         <div className="bg-amber-50 p-3 rounded-xl border border-amber-100 shadow-inner">
-                            <p className="text-[10px] font-black text-amber-600 uppercase tracking-widest mb-1 leading-none italic">{t("store.clientPrefs")}</p>
+                            <p className="text-[10px] font-black text-amber-600 uppercase mb-1 leading-none">{t("store.clientPrefs")}</p>
                             <p className="text-xs text-amber-800 leading-relaxed font-bold">{order.staffNote}</p>
                         </div>
                       )}
@@ -190,17 +190,17 @@ export default function StoreOrderDetailPage() {
 
               <div className="space-y-3">
                 {status === "delivering_to_store" && (
-                  <Button fullWidth onClick={() => handleUpdateStatus("washing")} isLoading={isUpdating} className="bg-primary text-white hover:bg-primary-dark shadow-xl shadow-primary/20 py-5 text-sm font-black italic rounded-xl uppercase tracking-widest">
+                  <Button fullWidth onClick={() => handleUpdateStatus("washing")} isLoading={isUpdating} className="bg-primary text-white hover:bg-primary-dark shadow-xl shadow-primary/20 py-5 text-sm font-black rounded-xl uppercase">
                     <Icons.Package size={20} className="mr-2" /> {t("staff.receiveFromDriver")}
                   </Button>
                 )}
                 {status === "washing" && (
-                  <Button fullWidth onClick={() => handleUpdateStatus("ready_for_pickup")} isLoading={isUpdating} className="bg-primary text-white hover:bg-primary-dark shadow-xl shadow-primary/20 py-5 text-sm font-black italic rounded-xl uppercase tracking-widest">
+                  <Button fullWidth onClick={() => handleUpdateStatus("ready_for_pickup")} isLoading={isUpdating} className="bg-primary text-white hover:bg-primary-dark shadow-xl shadow-primary/20 py-5 text-sm font-black rounded-xl uppercase">
                     <Icons.Phone size={20} className="mr-2" /> {t("staff.callRider")}
                   </Button>
                 )}
                 {status === "ready_for_pickup" && (
-                  <Button fullWidth onClick={() => handleUpdateStatus("completed")} isLoading={isUpdating} className="bg-primary text-white hover:bg-primary-dark shadow-xl py-5 text-sm font-black italic rounded-xl uppercase tracking-widest">
+                  <Button fullWidth onClick={() => handleUpdateStatus("completed")} isLoading={isUpdating} className="bg-primary text-white hover:bg-primary-dark shadow-xl py-5 text-sm font-black rounded-xl uppercase">
                     <Icons.Check size={20} className="mr-2" strokeWidth={4} /> {t("store.handoverToDriver")}
                   </Button>
                 )}
@@ -211,7 +211,7 @@ export default function StoreOrderDetailPage() {
                       </div>
                       <div>
                          <h4 className="text-lg font-black text-primary leading-none">{t("store.handoffSuccess")}</h4>
-                         <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-2 px-6 italic">{t("store.handoffDesc")}</p>
+                         <p className="text-[10px] font-bold text-slate-400 uppercase mt-2 px-6">{t("store.handoffDesc")}</p>
                       </div>
                   </div>
                 )}

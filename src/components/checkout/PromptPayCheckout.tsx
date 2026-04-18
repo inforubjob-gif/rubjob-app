@@ -59,7 +59,7 @@ export default function PromptPayCheckout({ clientSecret }: PromptPayCheckoutPro
            <Icons.Camera size={24} strokeWidth={2.5} />
         </div>
         <div className="space-y-1">
-          <p className="text-blue-900 font-black text-sm uppercase tracking-tight">{t("orders.payment.promptPaySteps")}</p>
+          <p className="text-blue-900 font-black text-sm uppercase">{t("orders.payment.promptPaySteps")}</p>
           <p className="text-blue-700 text-xs font-bold leading-relaxed">
             {t("orders.payment.promptPayDesc").split("QR Code").map((part, i, arr) => (
               <React.Fragment key={i}>
@@ -92,7 +92,7 @@ export default function PromptPayCheckout({ clientSecret }: PromptPayCheckoutPro
           disabled={isLoading || !stripe || !elements}
           id="submit"
           fullWidth
-          className="bg-primary text-white py-5 rounded-xl font-black uppercase tracking-[0.1em] shadow-2xl shadow-primary/30 active:scale-95 transition-all text-sm"
+          className="bg-primary text-white py-5 rounded-xl font-black uppercase shadow-2xl shadow-primary/30 active:scale-95 transition-all text-sm"
           isLoading={isLoading}
         >
           {isLoading ? t("orders.payment.processing") : t("orders.payment.confirmPayment")}
@@ -107,7 +107,7 @@ export default function PromptPayCheckout({ clientSecret }: PromptPayCheckoutPro
       </form>
 
       <div className="text-center">
-        <div className="inline-flex items-center gap-2 px-4 py-2 bg-slate-100 rounded-full text-[10px] font-black text-slate-400 uppercase tracking-widest">
+        <div className="inline-flex items-center gap-2 px-4 py-2 bg-slate-100 rounded-full text-[10px] font-black text-slate-400 uppercase">
            <Icons.Shield size={12} />
            100% Secure Payment by Stripe
         </div>

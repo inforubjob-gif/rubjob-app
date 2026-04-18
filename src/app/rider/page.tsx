@@ -145,16 +145,16 @@ export default function RiderDashboard() {
       </div>
 
       {/* Rider Header */}
-      <header className="relative z-10 px-5 pt-6 pb-6">
+      <header className="relative z-10 px-5 pt-3 pb-6">
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-4">
             <Icons.Logo variant="icon-white" size={56} />
             <div className="min-w-0">
-              <p className="text-xs text-white font-black uppercase tracking-[0.25em] leading-tight mb-2 flex items-center gap-2">
+              <p className="text-xs text-white font-black uppercase leading-tight mb-2 flex items-center gap-2">
                 <span className="w-1.5 h-1.5 rounded-full bg-white/50 animate-pulse" />
                 {t("rider.hero")}
               </p>
-              <h1 className="text-3xl font-black text-white tracking-tight truncate drop-shadow-md leading-none">{rider?.name || t("common.guest")}</h1>
+              <h1 className="text-3xl font-black text-white truncate drop-shadow-md leading-none">{rider?.name || t("common.guest")}</h1>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -172,8 +172,8 @@ export default function RiderDashboard() {
                       <Icons.Shield size={20} />
                   </div>
                   <div>
-                      <p className="text-xs font-black text-white/50 uppercase tracking-widest leading-none mb-1">{t("rider.profile.workStatus")}</p>
-                      <p className="text-sm font-black uppercase tracking-tight">
+                      <p className="text-xs font-black text-white/50 uppercase leading-none mb-1">{t("rider.profile.workStatus")}</p>
+                      <p className="text-sm font-black uppercase">
                         {workStatus ? t("rider.profile.receivingJobs") : t("rider.profile.notReceiving")}
                       </p>
                   </div>
@@ -189,11 +189,11 @@ export default function RiderDashboard() {
 
         <div className="grid grid-cols-2 gap-4 text-center">
           <div className="bg-white/10 backdrop-blur-md p-4 rounded-xl border border-white/10">
-            <p className="text-xs font-black text-white/50 uppercase tracking-widest">{t("rider.tasksToday")}</p>
+            <p className="text-xs font-black text-white/50 uppercase">{t("rider.tasksToday")}</p>
             <p className="text-2xl font-black mt-1 text-white">{activeJobs.length}</p>
           </div>
           <div className="bg-white/10 backdrop-blur-md p-4 rounded-xl border border-white/10">
-            <p className="text-xs font-black text-white/50 uppercase tracking-widest">{t("rider.earnings")}</p>
+            <p className="text-xs font-black text-white/50 uppercase">{t("rider.earnings")}</p>
             <p className="text-3xl font-black mt-1 text-white">
               ฿{balance.toLocaleString()}
             </p>
@@ -206,7 +206,7 @@ export default function RiderDashboard() {
         <div className="bg-slate-100 p-1.5 rounded-xl flex shadow-inner border border-slate-200/50">
           <button
             onClick={() => setActiveTab("available")}
-            className={`flex-1 py-3 text-xs font-black uppercase tracking-widest rounded-xl transition-all ${
+            className={`flex-1 py-3 text-xs font-black uppercase rounded-xl transition-all ${
               activeTab === "available" ? "bg-white text-primary shadow-lg scale-[1.02]" : "text-slate-400 hover:text-slate-600"
             }`}
           >
@@ -214,7 +214,7 @@ export default function RiderDashboard() {
           </button>
           <button
             onClick={() => setActiveTab("active")}
-            className={`flex-1 py-3 text-xs font-black uppercase tracking-widest rounded-xl transition-all ${
+            className={`flex-1 py-3 text-xs font-black uppercase rounded-xl transition-all ${
               activeTab === "active" ? "bg-white text-primary shadow-lg scale-[1.02]" : "text-slate-400 hover:text-slate-600"
             }`}
           >
@@ -243,7 +243,7 @@ export default function RiderDashboard() {
                  <div className="w-24 h-24 bg-white/20 backdrop-blur-xl rounded-xl flex items-center justify-center text-white border border-white/30 shadow-2xl mb-8 relative">
                     <Icons.Logo variant="icon" size={48} />
                  </div>
-                 <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight">{t("rider.intro.heroTitle")}</h2>
+                 <h2 className="text-2xl font-black text-slate-900 uppercase">{t("rider.intro.heroTitle")}</h2>
                  <p className="text-sm text-slate-500 font-bold mt-3 leading-relaxed max-w-[280px]">
                    {t("rider.intro.heroDesc").split("\n").map((line, i) => (
                      <span key={i}>{line}{i === 0 && <br/>}</span>
@@ -251,7 +251,7 @@ export default function RiderDashboard() {
                  </p>
                  <Button 
                    onClick={() => router.push("/rider/setup")}
-                   className="mt-8 bg-slate-900 text-white px-8 py-5 rounded-xl font-black uppercase tracking-widest shadow-xl active:scale-95 transition-all"
+                   className="mt-8 bg-slate-900 text-white px-8 py-5 rounded-xl font-black uppercase shadow-xl active:scale-95 transition-all"
                  >
                    {t("rider.intro.applyBtn")}
                  </Button>
@@ -264,7 +264,7 @@ export default function RiderDashboard() {
                        <Icons.Clock size={18} strokeWidth={4} />
                     </div>
                  </div>
-                 <h2 className="text-xl font-black text-slate-900 uppercase tracking-tight">
+                 <h2 className="text-xl font-black text-slate-900 uppercase">
                    {verificationStatus === "pending" ? t("rider.status.pending") : t("rider.status.rejected")}
                  </h2>
                  <p className="text-sm text-slate-500 font-bold mt-3 leading-relaxed max-w-[280px]">
@@ -276,14 +276,14 @@ export default function RiderDashboard() {
                    {verificationStatus === "rejected" && (
                      <Button 
                        onClick={() => router.push("/rider/documents")}
-                       className="w-full bg-primary text-white py-4 rounded-xl font-black uppercase tracking-widest shadow-xl"
+                       className="w-full bg-primary text-white py-4 rounded-xl font-black uppercase shadow-xl"
                      >
                        {t("rider.status.editDocs")}
                      </Button>
                    )}
                    <Button 
                      variant="secondary"
-                     className="w-full bg-white border border-slate-200 text-slate-900 py-4 rounded-xl font-black text-[10px] uppercase tracking-widest"
+                     className="w-full bg-white border border-slate-200 text-slate-900 py-4 rounded-xl font-black text-[10px] uppercase"
                      onClick={() => window.location.reload()}
                    >
                      {t("common.refresh")}
@@ -329,7 +329,7 @@ export default function RiderDashboard() {
                    <div className="w-10 h-10 bg-black rounded-xl border-4 border-white shadow-xl flex items-center justify-center text-white">
                       <Icons.Logo size={20} variant="icon" />
                    </div>
-                   <p className="text-xs font-black mt-2 uppercase tracking-tighter opacity-50">{t("common.store")}</p>
+                   <p className="text-xs font-black mt-2 uppercaseer opacity-50">{t("common.store")}</p>
                 </div>
 
                 <div className="flex-1 px-4 relative">
@@ -345,7 +345,7 @@ export default function RiderDashboard() {
                    <div className="w-10 h-10 bg-primary rounded-xl border-4 border-white shadow-xl flex items-center justify-center text-white">
                       <Icons.MapPin size={20} strokeWidth={3} />
                    </div>
-                   <p className="text-xs font-black mt-2 uppercase tracking-tighter opacity-50">{t("common.user")}</p>
+                   <p className="text-xs font-black mt-2 uppercaseer opacity-50">{t("common.user")}</p>
                 </div>
              </div>
 
@@ -357,12 +357,12 @@ export default function RiderDashboard() {
                      </div>
                      <div>
                         <p className="text-sm font-black text-slate-900 uppercase">{selectedJob.userName || selectedJob.customer || t("common.guest")}</p>
-                        <p className="text-xs text-slate-400 font-bold uppercase tracking-widest">{selectedJob.id}</p>
+                        <p className="text-xs text-slate-400 font-bold uppercase">{selectedJob.id}</p>
                      </div>
                   </div>
                   <div className="text-right">
                      <p className="text-xl font-black text-slate-900 leading-none">฿{selectedJob.riderEarn || selectedJob.deliveryFee}</p>
-                     <p className="text-xs text-slate-400 font-bold uppercase tracking-widest mt-1">{t("rider.earnAmountLabel")}</p>
+                     <p className="text-xs text-slate-400 font-bold uppercase mt-1">{t("rider.earnAmountLabel")}</p>
                   </div>
                </div>
 
@@ -370,14 +370,14 @@ export default function RiderDashboard() {
                   <div className="flex gap-4">
                     <Icons.Navigation size={18} className="text-primary shrink-0 mt-0.5" />
                     <div className="flex-1">
-                       <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest mb-1">{t("rider.pickup")}</p>
+                       <p className="text-[10px] font-black text-slate-300 uppercase mb-1">{t("rider.pickup")}</p>
                        <p className="text-xs font-bold text-slate-700 leading-relaxed">{selectedJob.storeName || selectedJob.store || t("rider.unknownStore")}</p>
                     </div>
                   </div>
                  <div className="flex gap-4">
                     <Icons.MapPin size={18} className="text-primary shrink-0 mt-0.5" />
                     <div className="flex-1">
-                       <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest mb-1">{t("rider.delivery")}</p>
+                       <p className="text-[10px] font-black text-slate-300 uppercase mb-1">{t("rider.delivery")}</p>
                        <p className="text-xs font-black text-slate-900 leading-relaxed">{selectedJob.customerName || selectedJob.customer || t("rider.unknownCustomer")}</p>
                        <p className="text-xs text-slate-400 font-bold mt-1">{selectedJob.address || t("rider.orderDetail.noAddress")}</p>
                     </div>
@@ -389,14 +389,14 @@ export default function RiderDashboard() {
                 <Button 
                    variant="secondary" 
                    fullWidth 
-                   className="rounded-xl py-5 font-black uppercase text-xs tracking-[0.2em]" 
+                   className="rounded-xl py-5 font-black uppercase text-xs" 
                    onClick={() => setSelectedJob(null)}
                 >
                    {t("common.close")}
                 </Button>
                 <Button 
                    fullWidth 
-                   className="bg-primary hover:bg-primary-dark text-white shadow-xl shadow-primary/20 rounded-xl py-5 font-black uppercase text-xs tracking-[0.2em] active:scale-95 transition-all"
+                   className="bg-primary hover:bg-primary-dark text-white shadow-xl shadow-primary/20 rounded-xl py-5 font-black uppercase text-xs active:scale-95 transition-all"
                    onClick={() => handleAcceptJob(selectedJob.id)}
                 >
                    {t("rider.acceptJob")}
@@ -413,7 +413,7 @@ function AvailableDeliveries({ t, router, jobs, onAccept, onViewDetails }: { t: 
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between px-1">
-        <h2 className="text-base font-black text-slate-400 uppercase tracking-widest">{t("rider.newRequests")}</h2>
+        <h2 className="text-base font-black text-slate-400 uppercase">{t("rider.newRequests")}</h2>
         <span className="text-xs font-bold bg-green-100 text-green-700 px-2 py-0.5 rounded-full">{jobs.length} {t("rider.nearby")}</span>
       </div>
 
@@ -422,7 +422,7 @@ function AvailableDeliveries({ t, router, jobs, onAccept, onViewDetails }: { t: 
            <div className="w-20 h-20 bg-slate-50 rounded-xl flex items-center justify-center mb-4 transition-all hover:scale-105 border border-slate-100 grayscale opacity-40">
               <Icons.Logo variant="icon" size={40} />
            </div>
-           <p className="text-xs font-black text-slate-300 uppercase tracking-[0.2em]">{t("rider.noJobsNearby")}</p>
+           <p className="text-xs font-black text-slate-300 uppercase">{t("rider.noJobsNearby")}</p>
         </div>
       ) : (
         jobs.map((job) => (
@@ -433,10 +433,10 @@ function AvailableDeliveries({ t, router, jobs, onAccept, onViewDetails }: { t: 
               </div>
               <div className="flex-1">
                 <div className="flex items-center gap-1.5 mb-1">
-                  <span className={`text-[11px] font-black px-1.5 py-0.5 rounded-lg uppercase tracking-tighter ${job.status === 'pending' ? 'bg-blue-100 text-blue-700' : 'bg-orange-100 text-orange-700'}`}>
+                  <span className={`text-[11px] font-black px-1.5 py-0.5 rounded-lg uppercase ${job.status === 'pending' ? 'bg-blue-100 text-blue-700' : 'bg-orange-100 text-orange-700'}`}>
                     {job.status === 'pending' ? t("rider.flow.pickupLeg") : t("rider.flow.deliveryLeg")}
                   </span>
-                  <span className="text-xs font-black text-slate-400 uppercase tracking-widest">{job.id}</span>
+                  <span className="text-xs font-black text-slate-400 uppercase">{job.id}</span>
                 </div>
                 <h3 className="font-bold text-slate-900 mb-1 leading-tight">
                   {job.status === 'pending' ? t("rider.flow.customerToStore") : t("rider.flow.storeToCustomer")}
@@ -470,7 +470,7 @@ function ActiveDeliveries({ t, router, activeJobs }: { t: any, router: any, acti
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between px-1">
-        <h2 className="text-sm font-black text-slate-400 uppercase tracking-widest">{t("rider.activeJobs")}</h2>
+        <h2 className="text-sm font-black text-slate-400 uppercase">{t("rider.activeJobs")}</h2>
       </div>
 
       {activeJobs.length === 0 ? (
@@ -478,7 +478,7 @@ function ActiveDeliveries({ t, router, activeJobs }: { t: any, router: any, acti
            <div className="w-20 h-20 bg-slate-50 rounded-xl flex items-center justify-center mb-4 transition-all hover:scale-105 border border-slate-100 grayscale opacity-40">
               <Icons.Logo variant="icon" size={40} />
            </div>
-           <p className="text-[10px] font-black text-slate-300 uppercase tracking-[0.2em]">{t("rider.noActiveJobs")}</p>
+           <p className="text-[10px] font-black text-slate-300 uppercase">{t("rider.noActiveJobs")}</p>
         </div>
       ) : (
         activeJobs.map((job) => (
@@ -488,14 +488,14 @@ function ActiveDeliveries({ t, router, activeJobs }: { t: any, router: any, acti
                 {getServiceIcon(job.serviceId as any, { size: 24 })}
               </div>
               <div className="flex-1 border-r border-slate-100 mr-2 pr-2">
-                <p className="text-xs font-black text-slate-400 uppercase tracking-tighter">{job.id}</p>
+                <p className="text-xs font-black text-slate-400 uppercaseer">{job.id}</p>
                 <h3 className="text-sm font-bold text-slate-900 leading-tight truncate">{job.storeName}</h3>
               </div>
               <div className="text-right min-w-[80px]">
                 <Badge variant={statusToBadgeVariant(job.status as any)}>
                   {t(`orders.status.${job.status}`)}
                 </Badge>
-                <p className="text-[10px] font-bold text-slate-400 mt-1 uppercase tracking-tighter">
+                <p className="text-[10px] font-bold text-slate-400 mt-1 uppercaseer">
                   {new Date(job.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                 </p>
               </div>

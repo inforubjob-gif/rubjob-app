@@ -223,15 +223,15 @@ export default function StoreSupportPage() {
             <Icons.Back size={18} className="text-white" />
           </button>
           <div>
-            <h1 className="text-xl font-black tracking-tight">{t("support.title") || "ติดต่อแอดมิน"}</h1>
-            <p className="text-[10px] text-white/60 font-bold uppercase tracking-widest">{t("support.subtitle") || "ระบบแจ้งเรื่อง / สอบถาม"}</p>
+            <h1 className="text-xl font-black">{t("support.title") || "ติดต่อแอดมิน"}</h1>
+            <p className="text-[10px] text-white/60 font-bold uppercase">{t("support.subtitle") || "ระบบแจ้งเรื่อง / สอบถาม"}</p>
           </div>
         </div>
       </header>
 
       <div className="flex-1 px-5 pt-6 pb-24 space-y-4">
         <section className="space-y-2">
-          <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.25em] pl-1">เทมเพลตยอดนิยมสำหรับร้านค้า</p>
+          <p className="text-[10px] font-black text-slate-500 uppercase pl-1">เทมเพลตยอดนิยมสำหรับร้านค้า</p>
           <div className="flex gap-2 overflow-x-auto pb-1">
             {templateOptions.map((tpl) => (
               <button
@@ -263,7 +263,7 @@ export default function StoreSupportPage() {
         </button>
 
         <section className="space-y-2 mt-2">
-          <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.25em] pl-1">Q&A พื้นฐาน</p>
+          <p className="text-[10px] font-black text-slate-500 uppercase pl-1">Q&A พื้นฐาน</p>
           {faqItems.map((faq) => (
             <div key={faq.q} className="bg-white rounded-xl border border-slate-100 p-3">
               <p className="text-xs font-black text-slate-800">{faq.q}</p>
@@ -287,7 +287,7 @@ export default function StoreSupportPage() {
           </div>
         ) : (
           <div className="space-y-3">
-            <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.25em] pl-1">{t("support.myTickets") || "รายการของฉัน"}</p>
+            <p className="text-[10px] font-black text-slate-500 uppercase pl-1">{t("support.myTickets") || "รายการของฉัน"}</p>
             {tickets.map((ticket) => (
               <button
                 key={ticket.id}
@@ -334,7 +334,7 @@ export default function StoreSupportPage() {
 
             <div className="space-y-4">
               <div>
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block">เลือกเทมเพลต</label>
+                <label className="text-[10px] font-black text-slate-400 uppercase mb-2 block">เลือกเทมเพลต</label>
                 <div className="flex gap-2 overflow-x-auto pb-1">
                   {templateOptions.map((tpl) => (
                     <button
@@ -352,7 +352,7 @@ export default function StoreSupportPage() {
                 </div>
               </div>
               <div>
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block">{t("support.subjectLabel") || "หัวข้อ"}</label>
+                <label className="text-[10px] font-black text-slate-400 uppercase mb-2 block">{t("support.subjectLabel") || "หัวข้อ"}</label>
                 <input
                   type="text"
                   value={newSubject}
@@ -362,7 +362,7 @@ export default function StoreSupportPage() {
                 />
               </div>
               <div>
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block">{t("support.messageLabel") || "ข้อความ"}</label>
+                <label className="text-[10px] font-black text-slate-400 uppercase mb-2 block">{t("support.messageLabel") || "ข้อความ"}</label>
                 <textarea
                   value={newMessage}
                   onChange={e => setNewMessage(e.target.value)}
@@ -376,14 +376,14 @@ export default function StoreSupportPage() {
             <div className="flex gap-3 mt-6">
               <button
                 onClick={() => setShowNewTicket(false)}
-                className="flex-1 py-3.5 bg-slate-100 text-slate-500 rounded-xl text-xs font-black uppercase tracking-widest"
+                className="flex-1 py-3.5 bg-slate-100 text-slate-500 rounded-xl text-xs font-black uppercase"
               >
                 {t("common.cancel") || "ยกเลิก"}
               </button>
               <button
                 onClick={() => handleSendMessage()}
                 disabled={isSending || !newMessage.trim()}
-                className="flex-1 py-3.5 bg-primary text-white rounded-xl text-xs font-black uppercase tracking-widest shadow-lg shadow-primary/20 disabled:opacity-50 active:scale-95 transition-all"
+                className="flex-1 py-3.5 bg-primary text-white rounded-xl text-xs font-black uppercase shadow-lg shadow-primary/20 disabled:opacity-50 active:scale-95 transition-all"
               >
                 {isSending ? (t("common.loading") || "กำลังส่ง...") : (t("support.sendTicket") || "ส่งเรื่อง")}
               </button>

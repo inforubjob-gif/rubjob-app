@@ -156,7 +156,7 @@ export default function BottomNav() {
               }`}>
                 {tab.icon(isActive)}
               </div>
-              <span className={`text-[10px] font-black uppercase tracking-wider leading-tight ${isActive ? "opacity-100" : "opacity-60"}`}>
+              <span className={`text-[10px] font-black uppercase leading-tight ${isActive ? "opacity-100" : "opacity-60"}`}>
                 {tab.label}
               </span>
             </Link>

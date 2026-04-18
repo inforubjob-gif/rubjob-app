@@ -120,7 +120,7 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
           <div className="w-20 h-20 bg-white/20 backdrop-blur-md rounded-xl flex items-center justify-center mx-auto mb-4 shadow-xl shadow-amber-500/20 ring-4 ring-white/30 overflow-hidden">
             <Icons.Logo size={80} variant="icon" />
           </div>
-          <h1 className="text-xl font-black text-white tracking-tight">
+          <h1 className="text-xl font-black text-white">
             {step === 1 ? "ยินดีต้อนรับ! 🎉" : "เพิ่มที่อยู่ของคุณ"}
           </h1>
           <p className="text-sm text-white/80 mt-1 font-medium">
@@ -163,7 +163,7 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
                     setPhoneError("");
                   }}
                   placeholder="08X-XXX-XXXX"
-                  className={`w-full bg-slate-50 border-2 rounded-xl px-5 py-4 text-lg font-bold text-center tracking-widest focus:outline-none focus:ring-4 transition-all duration-300 ${
+                  className={`w-full bg-slate-50 border-2 rounded-xl px-5 py-4 text-lg font-bold text-center focus:outline-none focus:ring-4 transition-all duration-300 ${
                     phoneError
                       ? "border-red-300 focus:ring-red-100 focus:border-red-400"
                       : "border-slate-100 focus:ring-primary/20 focus:border-primary"

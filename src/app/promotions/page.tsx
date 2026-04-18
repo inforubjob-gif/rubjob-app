@@ -126,7 +126,7 @@ export default function PromotionsPage() {
             <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center text-white border border-white/20">
                 <Icons.Percent size={20} />
             </div>
-            <h1 className="text-3xl font-black text-white tracking-tight drop-shadow-sm">{t("promotions.title")}</h1>
+            <h1 className="text-3xl font-black text-white drop-shadow-sm">{t("promotions.title")}</h1>
         </div>
         <p className="text-white/70 text-sm font-medium">{t("promotions.subtitle")}</p>
       </header>
@@ -142,11 +142,11 @@ export default function PromotionsPage() {
               <div className="flex justify-between items-start mb-6">
                 <div>
                   <div className="flex items-center gap-1.5 mb-1">
-                    <span className="text-xs font-black text-primary uppercase tracking-[0.1em]">RUBJOB</span>
+                    <span className="text-xs font-black text-primary uppercase">RUBJOB</span>
                     <span className="text-xs font-bold text-primary/80">{t("promotions.memberLabel")}</span>
                   </div>
                   <div className="flex items-baseline gap-2">
-                    <span className="text-[56px] leading-none font-black text-white tracking-tighter drop-shadow-md">{totalPoints}</span>
+                    <span className="text-[56px] leading-none font-black text-whiteer drop-shadow-md">{totalPoints}</span>
                     <span className="text-[11px] font-bold text-slate-300">{t("promotions.pointsLabel")}</span>
                   </div>
                 </div>
@@ -191,7 +191,7 @@ export default function PromotionsPage() {
             )}
             {!isLoadingCoupons && deals.length === 0 && (
               <Card className="p-10 text-center bg-white/10 backdrop-blur-md border border-white/20">
-                <p className="text-white/60 font-bold italic">{t("booking.noCoupons")}</p>
+                <p className="text-white/60 font-bold">{t("booking.noCoupons")}</p>
               </Card>
             )}
             {deals.map((deal, i) => (
@@ -205,7 +205,7 @@ export default function PromotionsPage() {
                             
                             <div className="flex items-start justify-between mb-2">
                                 <h3 className="font-black text-slate-800 text-base">{deal.title}</h3>
-                                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{deal.expires}</span>
+                                <span className="text-[10px] font-black text-slate-400 uppercase">{deal.expires}</span>
                             </div>
                             <p className="text-xs text-slate-500 leading-relaxed mb-6">{deal.desc}</p>
                             
@@ -214,7 +214,7 @@ export default function PromotionsPage() {
                                     onClick={() => handleCopy(deal.code)}
                                     className="bg-slate-50 border-2 border-dashed border-slate-200 rounded-xl px-4 py-2 flex-1 flex items-center justify-between active:scale-[0.98] transition-all group"
                                 >
-                                    <span className="font-black text-sm tracking-widest text-slate-700">{deal.code}</span>
+                                    <span className="font-black text-sm text-slate-700">{deal.code}</span>
                                     <span className="text-[10px] font-black text-primary-dark uppercase">
                                         {copiedCode === deal.code ? t("common.copied") : t("common.copy")}
                                     </span>
@@ -222,7 +222,7 @@ export default function PromotionsPage() {
                                 <Button 
                                     size="sm" 
                                     onClick={handleUseNow}
-                                    className="px-6 bg-primary text-white border-none font-black text-[10px] uppercase tracking-widest"
+                                    className="px-6 bg-primary text-white border-none font-black text-[10px] uppercase"
                                 >
                                     {t("common.useNow")}
                                 </Button>

@@ -78,7 +78,7 @@ export default function EditProfilePage() {
         >
           <Icons.Back size={20} />
         </button>
-        <h1 className="text-lg font-black text-white tracking-tight">{t("profile.editTitle")}</h1>
+        <h1 className="text-lg font-black text-white">{t("profile.editTitle")}</h1>
       </header>
 
       <main className="relative z-10 p-5 space-y-8 animate-fade-in">
@@ -109,12 +109,12 @@ export default function EditProfilePage() {
               onChange={handleFileChange}
             />
           </div>
-          <p className="text-[11px] font-[900] text-slate-500 uppercase tracking-[0.15em] opacity-60">{t("profile.tapToChangePhoto")}</p>
+          <p className="text-[11px] font-[900] text-slate-500 uppercase opacity-60">{t("profile.tapToChangePhoto")}</p>
         </div>
 
         <section className="space-y-6">
           <div className="space-y-2">
-            <label className="text-[11px] font-black text-slate-500 uppercase tracking-[0.2em] ml-2 block">{t("profile.fullName")}</label>
+            <label className="text-[11px] font-black text-slate-500 uppercase ml-2 block">{t("profile.fullName")}</label>
             <div className="relative">
               <input
                 type="text"
@@ -130,7 +130,7 @@ export default function EditProfilePage() {
           </div>
 
           <div className="space-y-2">
-            <label className="text-[11px] font-black text-slate-500 uppercase tracking-[0.2em] ml-2 block">{t("profile.email")}</label>
+            <label className="text-[11px] font-black text-slate-500 uppercase ml-2 block">{t("profile.email")}</label>
             <div className="relative">
               <input
                 type="email"
@@ -146,7 +146,7 @@ export default function EditProfilePage() {
           </div>
 
           <div className="space-y-2">
-            <label className="text-[11px] font-black text-slate-500 uppercase tracking-[0.2em] ml-2 block">{t("profile.phoneNumber")}</label>
+            <label className="text-[11px] font-black text-slate-500 uppercase ml-2 block">{t("profile.phoneNumber")}</label>
             <div className="flex gap-3">
               <div className="relative flex-1">
                 <input
@@ -174,14 +174,14 @@ export default function EditProfilePage() {
                 <button
                   onClick={handleVerify}
                   disabled={phone.length < 9}
-                  className="px-6 bg-slate-900 text-white rounded-xl font-black text-xs uppercase tracking-widest disabled:opacity-20 disabled:grayscale transition-all shadow-xl active:scale-95"
+                  className="px-6 bg-slate-900 text-white rounded-xl font-black text-xs uppercase disabled:opacity-20 disabled:grayscale transition-all shadow-xl active:scale-95"
                 >
                   {t("profile.verify")}
                 </button>
               )}
             </div>
             {isVerified && (
-              <p className="text-[10px] font-black text-emerald-600 uppercase tracking-widest ml-4 mt-3 flex items-center gap-1.5 bg-emerald-50 w-fit px-3 py-1 rounded-full border border-emerald-100">
+              <p className="text-[10px] font-black text-emerald-600 uppercase ml-4 mt-3 flex items-center gap-1.5 bg-emerald-50 w-fit px-3 py-1 rounded-full border border-emerald-100">
                  <span className="w-1 h-1 bg-emerald-500 rounded-full" /> {t("profile.verified")}
               </p>
             )}
@@ -192,7 +192,7 @@ export default function EditProfilePage() {
           <button
             onClick={handleSave}
             disabled={!isVerified || isLoading}
-            className="w-full py-5 bg-primary text-white rounded-xl font-[1000] uppercase tracking-[0.25em] shadow-2xl shadow-primary/30 disabled:bg-slate-200 disabled:text-slate-400 disabled:shadow-none active:scale-[0.98] transition-all flex items-center justify-center gap-3"
+            className="w-full py-5 bg-primary text-white rounded-xl font-[1000] uppercase transition-all flex items-center justify-center gap-3"
           >
             {isLoading ? (
               <div className="w-6 h-6 border-4 border-slate-950/20 border-t-slate-950 rounded-full animate-spin" />
@@ -224,7 +224,7 @@ export default function EditProfilePage() {
                 maxLength={4}
                 value={otp}
                 onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))}
-                className="w-full bg-slate-100 rounded-xl px-4 py-5 text-3xl font-black text-center tracking-[0.5em] text-slate-900 outline-none focus:ring-4 focus:ring-primary/20 transition-all"
+                className="w-full bg-slate-100 rounded-xl px-4 py-5 text-3xl font-black text-center text-slate-900 outline-none focus:ring-4 focus:ring-primary/20 transition-all"
                 placeholder="0000"
               />
             </div>
@@ -232,19 +232,19 @@ export default function EditProfilePage() {
             <div className="flex flex-col w-full gap-3">
               <button 
                 onClick={confirmOtp}
-                className="w-full py-4 bg-slate-900 text-white rounded-xl font-black uppercase tracking-widest active:scale-95 transition-all shadow-xl"
+                className="w-full py-4 bg-slate-900 text-white rounded-xl font-black uppercase active:scale-95 transition-all shadow-xl"
               >
                 {t("common.confirm")}
               </button>
               <button 
                 onClick={() => setIsVerifying(false)}
-                className="w-full py-4 text-slate-400 text-xs font-bold uppercase tracking-widest hover:text-slate-600 transition-colors"
+                className="w-full py-4 text-slate-400 text-xs font-bold uppercase hover:text-slate-600 transition-colors"
               >
                 {t("common.cancel")}
               </button>
             </div>
             
-            <p className="mt-8 text-[10px] text-slate-300 font-bold uppercase tracking-widest italic">
+            <p className="mt-8 text-[10px] text-slate-300 font-bold uppercase">
               Debug Note: Use code "1234"
             </p>
           </Card>

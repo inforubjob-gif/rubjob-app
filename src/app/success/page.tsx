@@ -15,7 +15,7 @@ export default function SuccessPage() {
       </div>
       
       <div className="space-y-3 mb-12">
-        <h1 className="text-3xl font-black text-slate-900 uppercase tracking-tight">
+        <h1 className="text-3xl font-black text-slate-900 uppercase">
           {t("success.title")}
         </h1>
         <p className="text-slate-500 font-bold text-lg">
@@ -30,7 +30,7 @@ export default function SuccessPage() {
         <Link href="/">
           <Button 
             fullWidth 
-            className="bg-primary text-white py-4 rounded-xl font-black uppercase tracking-widest shadow-2xl shadow-primary/30"
+            className="bg-primary text-white py-4 rounded-xl font-black uppercase shadow-2xl shadow-primary/30"
           >
             {t("common.goHome")}
           </Button>

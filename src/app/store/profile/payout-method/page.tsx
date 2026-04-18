@@ -61,7 +61,7 @@ export default function PayoutMethodPage() {
           >
             <Icons.Back size={20} />
           </button>
-          <h1 className="text-lg font-black text-slate-900 tracking-tight">{t("store.payoutMethodPage.title")}</h1>
+          <h1 className="text-lg font-black text-slate-900">{t("store.payoutMethodPage.title")}</h1>
         </header>
 
         <main className="p-5 space-y-6 animate-fade-in">
@@ -75,7 +75,7 @@ export default function PayoutMethodPage() {
               <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${method === "bank" ? "bg-primary text-white" : "bg-slate-100 text-slate-400"}`}>
                 <Icons.Payment size={24} />
               </div>
-              <span className="text-xs font-black uppercase tracking-widest">{t("store.payoutMethodPage.bankAccount")}</span>
+              <span className="text-xs font-black uppercase">{t("store.payoutMethodPage.bankAccount")}</span>
             </button>
             <button
               onClick={() => setMethod("promptpay")}
@@ -86,13 +86,13 @@ export default function PayoutMethodPage() {
               <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${method === "promptpay" ? "bg-primary text-white" : "bg-slate-100 text-slate-400"}`}>
                 <Icons.Phone size={24} />
               </div>
-              <span className="text-xs font-black uppercase tracking-widest">{t("store.payoutMethodPage.promptPay")}</span>
+              <span className="text-xs font-black uppercase">{t("store.payoutMethodPage.promptPay")}</span>
             </button>
           </div>
 
           <Card className="p-6 space-y-5 shadow-xl shadow-slate-200/50">
             <div className="space-y-2">
-              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t("store.payoutMethodPage.accountNumber")}</label>
+              <label className="text-[10px] font-black text-slate-400 uppercase ml-1">{t("store.payoutMethodPage.accountNumber")}</label>
               <input
                 type="text"
                 value={accountNumber}
@@ -104,7 +104,7 @@ export default function PayoutMethodPage() {
 
             {method === "bank" && (
               <div className="space-y-2">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t("store.payoutMethodPage.bankName")}</label>
+                <label className="text-[10px] font-black text-slate-400 uppercase ml-1">{t("store.payoutMethodPage.bankName")}</label>
                 <select
                   value={bankName}
                   onChange={(e) => setBankName(e.target.value)}
@@ -120,7 +120,7 @@ export default function PayoutMethodPage() {
             )}
 
             <div className="space-y-2">
-              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t("store.payoutMethodPage.accountHolder")}</label>
+              <label className="text-[10px] font-black text-slate-400 uppercase ml-1">{t("store.payoutMethodPage.accountHolder")}</label>
               <input
                 type="text"
                 value={accountHolder}
@@ -135,7 +135,7 @@ export default function PayoutMethodPage() {
             <Button 
               onClick={handleSave}
               disabled={!accountNumber || !accountHolder || (method === "bank" && !bankName) || isSaving}
-              className="w-full py-5 bg-primary text-white rounded-xl font-black uppercase tracking-widest shadow-2xl shadow-primary/30"
+              className="w-full py-5 bg-primary text-white rounded-xl font-black uppercase shadow-2xl shadow-primary/30"
             >
               {isSaving ? t("store.payoutMethodPage.saving") : t("store.payoutMethodPage.saveMethod")}
             </Button>

@@ -63,7 +63,7 @@ export default function HomePage() {
       <div className="absolute top-0 left-0 right-0 h-[250px] bg-gradient-to-b from-primary via-primary/90 to-slate-50 z-0" />
 
       {/* ─── Header ─── */}
-      <header className="relative z-10 px-5 pt-6 pb-6">
+      <header className="relative z-10 px-5 pt-3 pb-6">
         <div className="flex items-center justify-between mb-4">
           <img
             src="/images/rubjob-complete_Text-white.png"
@@ -107,8 +107,8 @@ export default function HomePage() {
         {activeOrders.length > 0 && (
           <section>
             <div className="flex items-center justify-between mb-5">
-              <h2 className="text-base font-bold text-foreground tracking-tight">{t("home.activeOrders")}</h2>
-              <Link href="/orders" className="text-xs font-black text-primary-dark uppercase tracking-widest">
+              <h2 className="text-base font-bold text-foreground">{t("home.activeOrders")}</h2>
+              <Link href="/orders" className="text-xs font-black text-primary-dark uppercase">
                 {t("common.seeAll")} →
               </Link>
             </div>
@@ -141,7 +141,7 @@ export default function HomePage() {
         {/* ─── Laundry Services ─── */}
         <section>
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-base font-bold text-foreground tracking-tight">{t("home.ourServices")}</h2>
+            <h2 className="text-base font-bold text-foreground">{t("home.ourServices")}</h2>
           </div>
           <div className="grid grid-cols-2 gap-4 stagger">
             {laundryServices.map((svc) => (
@@ -154,7 +154,7 @@ export default function HomePage() {
         {otherServices.length > 0 && (
           <section>
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-base font-bold text-foreground tracking-tight">{t("home.otherServices")}</h2>
+              <h2 className="text-base font-bold text-foreground">{t("home.otherServices")}</h2>
             </div>
             <div className="flex overflow-x-auto gap-4 -mx-5 px-5 pb-2 hide-scrollbar stagger snap-x snap-mandatory">
               {otherServices.map((svc) => (
@@ -198,7 +198,7 @@ export default function HomePage() {
                 className="w-full h-full object-contain animate-bounce-slow" 
               />
             </div>
-            <h3 className="text-xl font-black text-slate-800 mb-2 tracking-tight">{t("common.comingSoon")}</h3>
+            <h3 className="text-xl font-black text-slate-800 mb-2">{t("common.comingSoon")}</h3>
             <p className="text-sm text-slate-500 font-medium mb-8 leading-relaxed">
               {t("common.comingSoonDesc").replace("{service}", comingSoonModal!)}
             </p>

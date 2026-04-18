@@ -116,7 +116,7 @@ export default function RiderActiveHoursPage() {
           <Button 
             size="sm" 
             variant="primary" 
-            className="rounded-xl px-4 font-black italic shadow-lg shadow-primary/20"
+            className="rounded-xl px-4 font-black shadow-lg shadow-primary/20"
             onClick={handleSave}
             disabled={isSaving}
           >
@@ -128,7 +128,7 @@ export default function RiderActiveHoursPage() {
       <div className="p-5 space-y-6 animate-fade-in">
         {/* Day Selector Tabs */}
         <section>
-          <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest pl-1 mb-4">{t("rider.activeHoursPage.selectDay")}</p>
+          <p className="text-[10px] font-black text-slate-300 uppercase pl-1 mb-4">{t("rider.activeHoursPage.selectDay")}</p>
           <div className="flex overflow-x-auto gap-2 pb-2 no-scrollbar">
              {DAYS.map(day => (
                  <button
@@ -155,8 +155,8 @@ export default function RiderActiveHoursPage() {
            
            <div className="flex items-center justify-between mb-8 relative z-10">
               <div>
-                 <h3 className="text-2xl font-black text-slate-900 uppercase tracking-tight">{t(`rider.activeHoursPage.days.${selectedDay}`)}</h3>
-                 <p className="text-xs text-slate-400 font-bold uppercase tracking-widest mt-1">{t("rider.activeHoursPage.configureAvailability")}</p>
+                 <h3 className="text-2xl font-black text-slate-900 uppercase">{t(`rider.activeHoursPage.days.${selectedDay}`)}</h3>
+                 <p className="text-xs text-slate-400 font-bold uppercase mt-1">{t("rider.activeHoursPage.configureAvailability")}</p>
               </div>
               <button 
                 onClick={() => toggleDay(selectedDay)}
@@ -170,7 +170,7 @@ export default function RiderActiveHoursPage() {
              <div className="space-y-6 relative z-10">
                  <div className="grid grid-cols-2 gap-4">
                    <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 flex flex-col items-center">
-                      <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">{t("rider.activeHoursPage.startTime")}</span>
+                      <span className="text-[10px] font-black text-slate-400 uppercase mb-2">{t("rider.activeHoursPage.startTime")}</span>
                       <input 
                          type="time" 
                          value={workingHours[selectedDay].start}
@@ -179,7 +179,7 @@ export default function RiderActiveHoursPage() {
                       />
                    </div>
                    <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 flex flex-col items-center">
-                      <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">{t("rider.activeHoursPage.endTime")}</span>
+                      <span className="text-[10px] font-black text-slate-400 uppercase mb-2">{t("rider.activeHoursPage.endTime")}</span>
                       <input 
                          type="time" 
                          value={workingHours[selectedDay].end}
@@ -194,7 +194,7 @@ export default function RiderActiveHoursPage() {
                      variant="outline" 
                      fullWidth 
                      size="sm" 
-                     className="rounded-xl py-4 border-2 font-black text-[10px] uppercase tracking-widest flex items-center justify-center gap-2"
+                     className="rounded-xl py-4 border-2 font-black text-[10px] uppercase flex items-center justify-center gap-2"
                      onClick={applyToAll}
                    >
                       <Icons.Clock size={16} /> {t("rider.activeHoursPage.applyToAll")}
@@ -203,7 +203,7 @@ export default function RiderActiveHoursPage() {
              </div>
            ) : (
              <div className="py-8 text-center bg-slate-50 rounded-xl border-2 border-dashed border-slate-200">
-                <p className="text-sm font-black text-slate-400 uppercase tracking-widest">{t("rider.activeHoursPage.offDuty").replace("{day}", t(`rider.activeHoursPage.days.${selectedDay}`))}</p>
+                <p className="text-sm font-black text-slate-400 uppercase">{t("rider.activeHoursPage.offDuty").replace("{day}", t(`rider.activeHoursPage.days.${selectedDay}`))}</p>
              </div>
            )}
         </Card>

@@ -156,12 +156,12 @@ export default function ManageAddressesPage() {
         >
           <Icons.Back size={20} />
         </button>
-        <h1 className="text-lg font-black text-white tracking-tight">{t("profile.myAddress")}</h1>
+        <h1 className="text-lg font-black text-white">{t("profile.myAddress")}</h1>
       </header>
 
       <main className="relative z-10 p-5 space-y-4 animate-fade-in">
         <div className="flex items-center justify-between">
-          <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">{t("profile.title")}</p>
+          <p className="text-xs font-bold text-slate-400 uppercase">{t("profile.title")}</p>
         </div>
 
         {/* Add Address Form */}

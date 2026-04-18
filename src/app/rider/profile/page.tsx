@@ -19,8 +19,8 @@ function SettingItem({ icon, label, value, onClick }: { icon: React.ReactNode, l
               {icon}
           </div>
           <div className="text-left">
-              <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest leading-none mb-1">{label}</p>
-              <p className="text-sm font-bold text-slate-800 tracking-tight">{value}</p>
+              <p className="text-[10px] font-black text-slate-300 uppercase leading-none mb-1">{label}</p>
+              <p className="text-sm font-bold text-slate-800">{value}</p>
           </div>
       </div>
       <Icons.ChevronRight size={16} className="text-slate-200 group-hover:text-primary transition-colors" />
@@ -99,10 +99,10 @@ export default function RiderProfilePage() {
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-1.5 opacity-80">
                  <Icons.Logo variant="icon" size={16} className="grayscale brightness-[100] invert" />
-                 <p className="text-[10px] font-black uppercase tracking-[0.2em]">{t("rider.hero")}</p>
+                 <p className="text-[10px] font-black uppercase">{t("rider.hero")}</p>
               </div>
-              <h1 className="text-2xl font-black text-white tracking-tight truncate drop-shadow-lg">{riderSession?.name || t("common.guest")}</h1>
-              <p className="text-[10px] text-white/60 font-bold uppercase tracking-[0.1em] mt-1">{t("rider.profile.verifiedHero")} #{riderSession?.id?.slice(-4)}</p>
+              <h1 className="text-2xl font-black text-white truncate drop-shadow-lg">{riderSession?.name || t("common.guest")}</h1>
+              <p className="text-[10px] text-white/60 font-bold uppercase mt-1">{t("rider.profile.verifiedHero")} #{riderSession?.id?.slice(-4)}</p>
             </div>
         </div>
       </header>
@@ -116,7 +116,7 @@ export default function RiderProfilePage() {
                     <Icons.Shield size={22} />
                 </div>
                 <div>
-                    <h3 className="text-sm font-black text-slate-900 uppercase tracking-tight">{t("rider.profile.workStatus")}</h3>
+                    <h3 className="text-sm font-black text-slate-900 uppercase">{t("rider.profile.workStatus")}</h3>
                     <p className="text-[10px] text-emerald-500 font-bold uppercase">{workStatus ? t("rider.profile.receivingJobs") : t("rider.profile.notReceiving")}</p>
                 </div>
              </div>
@@ -131,7 +131,7 @@ export default function RiderProfilePage() {
 
         {/* Rider Settings */}
         <section>
-          <p className="text-[10px] font-black text-slate-300 uppercase tracking-[0.25em] mb-4 pl-1">{t("rider.profile.settings")}</p>
+          <p className="text-[10px] font-black text-slate-300 uppercase mb-4 pl-1">{t("rider.profile.settings")}</p>
           <div className="space-y-3">
              <SettingItem 
                 icon={<Icons.Globe size={20} />} 
@@ -162,7 +162,7 @@ export default function RiderProfilePage() {
 
          {/* Support */}
          <section>
-           <p className="text-[10px] font-black text-slate-300 uppercase tracking-[0.25em] mb-4 pl-1">{t("support.sectionTitle") || "ช่วยเหลือ"}</p>
+           <p className="text-[10px] font-black text-slate-300 uppercase mb-4 pl-1">{t("support.sectionTitle") || "ช่วยเหลือ"}</p>
            <div className="space-y-3">
               <SettingItem 
                  icon={<Icons.Chat size={20} />} 
@@ -174,7 +174,7 @@ export default function RiderProfilePage() {
          </section>
 
         <section>
-          <p className="text-[10px] font-black text-slate-300 uppercase tracking-[0.25em] mb-4 pl-1">{t("rider.profile.account")}</p>
+          <p className="text-[10px] font-black text-slate-300 uppercase mb-4 pl-1">{t("rider.profile.account")}</p>
           <button 
             onClick={async () => {
               try {
@@ -188,7 +188,7 @@ export default function RiderProfilePage() {
              <div className="w-10 h-10 rounded-xl bg-red-50 text-red-500 flex items-center justify-center">
                 <Icons.LogOut size={20} />
              </div>
-             <span className="text-sm font-black text-red-500 uppercase tracking-tight">{t("rider.profile.logout")}</span>
+             <span className="text-sm font-black text-red-500 uppercase">{t("rider.profile.logout")}</span>
           </button>
         </section>
        </div>
@@ -219,7 +219,7 @@ export default function RiderProfilePage() {
                   >
                     <div className="text-left">
                       <p className={`text-sm font-black ${language === lang.key ? "text-primary-dark" : "text-slate-800"}`}>{lang.label}</p>
-                      <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{lang.sub}</p>
+                      <p className="text-[10px] text-slate-400 font-bold uppercase">{lang.sub}</p>
                     </div>
                     {language === lang.key && (
                     <div className="w-6 h-6 bg-primary rounded-full flex items-center justify-center text-white shadow-lg">
@@ -231,7 +231,7 @@ export default function RiderProfilePage() {
               </div>
               <button 
                 onClick={() => setShowLanguageModal(false)}
-                className="w-full mt-8 py-4 bg-slate-100 text-slate-500 rounded-xl text-[12px] font-black uppercase tracking-widest"
+                className="w-full mt-8 py-4 bg-slate-100 text-slate-500 rounded-xl text-[12px] font-black uppercase"
               >
                 {t("common.cancel")}
               </button>

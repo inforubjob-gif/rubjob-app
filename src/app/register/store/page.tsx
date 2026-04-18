@@ -74,11 +74,11 @@ export default function StoreRegisterPage() {
         <div className="w-24 h-24 bg-primary rounded-xl flex items-center justify-center text-white mb-8 shadow-2xl shadow-primary/20 animate-in zoom-in duration-500">
           <Icons.Store size={48} strokeWidth={2.5} />
         </div>
-        <h1 className="text-3xl font-black text-slate-900 mb-3 uppercase tracking-tighter">Welcome to the Network</h1>
+        <h1 className="text-3xl font-black text-slate-900 mb-3 uppercaseer">Welcome to the Network</h1>
         <p className="text-slate-500 font-bold mb-8 max-w-xs leading-relaxed">
           Your store application is under executive review. We will contact you at <span className="text-primary">{formData.phone}</span> shortly.
         </p>
-        <Button onClick={() => router.push("/")} className="bg-slate-900 text-white rounded-xl px-12 py-5 font-black uppercase tracking-widest text-[10px] shadow-2xl shadow-slate-300 transform transition-transform hover:scale-105 active:scale-95">
+        <Button onClick={() => router.push("/")} className="bg-slate-900 text-white rounded-xl px-12 py-5 font-black uppercase text-[10px] shadow-2xl shadow-slate-300 transform transition-transform hover:scale-105 active:scale-95">
           Exit to Main Site
         </Button>
       </div>
@@ -90,7 +90,7 @@ export default function StoreRegisterPage() {
       <nav className="relative z-10 p-6 flex items-center justify-between border-b border-slate-100 mb-8">
          <div className="flex items-center gap-2" onClick={() => router.push("/")}>
             <Icons.Logo size={32} />
-            <span className="font-black text-xl italic tracking-tighter uppercase">Rubjob <span className="text-primary italic-none">Partners</span></span>
+            <span className="font-black text-xler uppercase">Rubjob <span className="text-primary-none">Partners</span></span>
          </div>
          <div className="flex items-center gap-1.5">
             {[1, 2, 3].map(s => (
@@ -101,16 +101,16 @@ export default function StoreRegisterPage() {
 
       <main className="relative z-10 px-6 max-w-xl mx-auto">
         <header className="mb-10 text-center">
-           <h1 className="text-4xl font-black uppercase tracking-tighter mb-2 italic">
+           <h1 className="text-4xl font-black uppercaseer mb-2">
               Scale Your <span className="text-primary">Business</span>
            </h1>
-           <p className="text-slate-400 text-[10px] font-black uppercase tracking-[0.3em]">Phase {step}: {step === 1 ? 'Logistics & Identity' : step === 2 ? 'Treasury & Payout' : 'Verification'}</p>
+           <p className="text-slate-400 text-[10px] font-black uppercase">Phase {step}: {step === 1 ? 'Logistics & Identity' : step === 2 ? 'Treasury & Payout' : 'Verification'}</p>
         </header>
 
         {step === 1 && (
           <div className="space-y-6 animate-in slide-in-from-right-4 duration-500">
              <div className="space-y-2">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Store / Branch Name</label>
+                <label className="text-[10px] font-black text-slate-400 uppercase ml-1">Store / Branch Name</label>
                 <input 
                   required
                   value={formData.name}
@@ -120,7 +120,7 @@ export default function StoreRegisterPage() {
                 />
              </div>
              <div className="space-y-2">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Contact Phone</label>
+                <label className="text-[10px] font-black text-slate-400 uppercase ml-1">Contact Phone</label>
                 <input 
                   required
                   type="tel"
@@ -132,7 +132,7 @@ export default function StoreRegisterPage() {
              </div>
              
              <div className="space-y-2">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Interactive Map Pin</label>
+                <label className="text-[10px] font-black text-slate-400 uppercase ml-1">Interactive Map Pin</label>
                 <div className="rounded-xl overflow-hidden border-2 border-slate-100 shadow-inner">
                    <MapPicker 
                      lat={formData.lat} 
@@ -143,7 +143,7 @@ export default function StoreRegisterPage() {
              </div>
 
              <div className="space-y-2">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Physical Address</label>
+                <label className="text-[10px] font-black text-slate-400 uppercase ml-1">Physical Address</label>
                 <textarea 
                   required
                   rows={3}
@@ -155,7 +155,7 @@ export default function StoreRegisterPage() {
              </div>
 
              <div className="pt-4">
-               <Button onClick={() => setStep(2)} disabled={!formData.name || !formData.phone || !formData.address} className="w-full bg-slate-900 text-white py-6 rounded-full font-black text-xs uppercase tracking-[0.3em] shadow-2xl shadow-slate-300 hover:scale-[1.02] active:scale-[0.98] transition-all">
+               <Button onClick={() => setStep(2)} disabled={!formData.name || !formData.phone || !formData.address} className="w-full bg-slate-900 text-white py-6 rounded-full font-black text-xs uppercase transition-all">
                   Next Protocol
                </Button>
              </div>
@@ -169,14 +169,14 @@ export default function StoreRegisterPage() {
                    <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center text-white">
                       <Icons.Wallet size={24} />
                    </div>
-                   <h3 className="font-black text-xl uppercase tracking-tighter">Treasury Setup</h3>
+                   <h3 className="font-black text-xl uppercaseer">Treasury Setup</h3>
                 </div>
                 <p className="text-xs font-bold text-slate-600 leading-relaxed uppercase">Provide your bank details to receive automated weekly payouts.</p>
              </div>
 
              <div className="space-y-6">
                 <div className="space-y-2">
-                   <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Bank Institution</label>
+                   <label className="text-[10px] font-black text-slate-400 uppercase ml-1">Bank Institution</label>
                    <select 
                       value={formData.bankName}
                       onChange={e => setFormData({...formData, bankName: e.target.value})}
@@ -193,7 +193,7 @@ export default function StoreRegisterPage() {
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                    <div className="space-y-2">
-                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Account Number</label>
+                      <label className="text-[10px] font-black text-slate-400 uppercase ml-1">Account Number</label>
                       <input 
                         required
                         value={formData.accountNumber}
@@ -203,7 +203,7 @@ export default function StoreRegisterPage() {
                       />
                    </div>
                    <div className="space-y-2">
-                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Account Name</label>
+                      <label className="text-[10px] font-black text-slate-400 uppercase ml-1">Account Name</label>
                       <input 
                         required
                         value={formData.accountName}
@@ -216,10 +216,10 @@ export default function StoreRegisterPage() {
              </div>
 
              <div className="pt-8 grid grid-cols-2 gap-4">
-               <Button onClick={() => setStep(1)} className="w-full bg-slate-100 text-slate-400 py-6 rounded-full font-black text-xs uppercase tracking-widest">
+               <Button onClick={() => setStep(1)} className="w-full bg-slate-100 text-slate-400 py-6 rounded-full font-black text-xs uppercase">
                   Back
                </Button>
-               <Button onClick={() => setStep(3)} disabled={!formData.bankName || !formData.accountNumber} className="w-full bg-slate-900 text-white py-6 rounded-full font-black text-xs uppercase tracking-widest shadow-2xl shadow-slate-300">
+               <Button onClick={() => setStep(3)} disabled={!formData.bankName || !formData.accountNumber} className="w-full bg-slate-900 text-white py-6 rounded-full font-black text-xs uppercase shadow-2xl shadow-slate-300">
                   Final Step
                </Button>
              </div>
@@ -235,7 +235,7 @@ export default function StoreRegisterPage() {
                   { id: 'storefront', label: '3. Storefront Main Photo' }
                 ].map(doc => (
                   <div key={doc.id} className="space-y-3">
-                     <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{doc.label}</label>
+                     <label className="text-[10px] font-black text-slate-400 uppercase ml-1">{doc.label}</label>
                      <div 
                        onClick={() => document.getElementById(`file-${doc.id}`)?.click()}
                        className={`relative aspect-[16/5] rounded-xl border-2 border-dashed transition-all cursor-pointer overflow-hidden flex flex-col items-center justify-center ${getDocPreview(doc.id) ? 'border-primary bg-primary/5' : 'border-slate-100 bg-slate-50'}`}
@@ -262,11 +262,11 @@ export default function StoreRegisterPage() {
                  onClick={handleSubmit} 
                  isLoading={isSubmitting}
                  disabled={formData.documents.length < 3}
-                 className="w-full bg-primary text-white py-7 rounded-full font-black text-sm uppercase tracking-[0.4em] shadow-2xl shadow-primary/30 transform transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-50"
+                 className="w-full bg-primary text-white py-7 rounded-full font-black text-sm uppercase active:scale-95 disabled:opacity-50"
                >
                   Authorize Partnership
                </Button>
-               <button onClick={() => setStep(2)} className="text-[10px] font-black text-slate-400 uppercase tracking-widest text-center mt-2">
+               <button onClick={() => setStep(2)} className="text-[10px] font-black text-slate-400 uppercase text-center mt-2">
                   Edit financial details
                </button>
              </div>

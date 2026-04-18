@@ -62,7 +62,7 @@ export default function StaffVehicleTypePage() {
           <Button 
             size="sm" 
             variant="primary" 
-            className="rounded-xl px-4 font-black italic shadow-lg shadow-primary/20"
+            className="rounded-xl px-4 font-black shadow-lg shadow-primary/20"
             onClick={handleSave}
             disabled={isSaving}
           >
@@ -72,7 +72,7 @@ export default function StaffVehicleTypePage() {
       </header>
 
       <div className="p-5 space-y-6 animate-fade-in">
-        <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest pl-1">{t("store.vehicleTypePage.selectPrimaryStoreVehicle")}</p>
+        <p className="text-[10px] font-black text-slate-300 uppercase pl-1">{t("store.vehicleTypePage.selectPrimaryStoreVehicle")}</p>
         
         <div className="space-y-4">
            {VEHICLES.map(v => (
@@ -90,7 +90,7 @@ export default function StaffVehicleTypePage() {
                         {v.icon}
                     </div>
                     <div>
-                        <h3 className="font-black text-slate-900 uppercase tracking-tight">{v.name}</h3>
+                        <h3 className="font-black text-slate-900 uppercase">{v.name}</h3>
                         <p className="text-[10px] text-slate-400 font-bold uppercase">{v.desc}</p>
                     </div>
                 </div>
@@ -107,7 +107,7 @@ export default function StaffVehicleTypePage() {
             <div className="flex items-start gap-3">
                 <Icons.Truck size={20} className="text-primary mt-1" />
                 <div className="flex-1">
-                    <p className="text-[10px] text-orange-900 font-black uppercase tracking-widest mb-1">{t("store.vehicleTypePage.storeLogistics")}</p>
+                    <p className="text-[10px] text-orange-900 font-black uppercase mb-1">{t("store.vehicleTypePage.storeLogistics")}</p>
                     <p className="text-[10px] text-orange-700 font-bold leading-relaxed">
                         {t("store.vehicleTypePage.storeLogisticsDesc")}
                     </p>

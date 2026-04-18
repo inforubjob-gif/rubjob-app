@@ -35,7 +35,7 @@ export default function Toast({ message, type, isVisible, onClose }: ToastProps)
   return (
     <div className={`fixed bottom-24 left-1/2 -translate-x-1/2 z-[9999] animate-slide-up flex items-center gap-3 px-6 py-4 rounded-xl shadow-2xl ${config.bg} ${config.text}`}>
       <div className="shrink-0">{config.icon}</div>
-      <p className="text-xs font-black uppercase tracking-widest whitespace-nowrap">{message}</p>
+      <p className="text-xs font-black uppercase whitespace-nowrap">{message}</p>
     </div>
   );
 }

@@ -20,8 +20,8 @@ function SettingItem({ icon, label, value, onClick }: { icon: React.ReactNode, l
               {icon}
           </div>
           <div className="text-left">
-              <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest leading-none mb-1">{label}</p>
-              <p className="text-sm font-bold text-slate-800 tracking-tight">{value}</p>
+              <p className="text-[10px] font-black text-slate-300 uppercase leading-none mb-1">{label}</p>
+              <p className="text-sm font-bold text-slate-800">{value}</p>
           </div>
       </div>
       <Icons.ChevronRight size={16} className="text-slate-200 group-hover:text-primary transition-colors" />
@@ -88,10 +88,10 @@ export default function StoreProfilePage() {
               <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-emerald-500 border-4 border-primary rounded-full shadow-sm" />
             </div>
             <div className="flex-1">
-              <h1 className="text-xl font-extrabold tracking-tight truncate">
+              <h1 className="text-xl font-extrabold truncate">
                 {store?.name || t("common.guest")}
               </h1>
-              <p className="text-[10px] text-white/80 font-black uppercase tracking-[0.2em]">{t("store.profile.verifiedHero")} {store?.id}</p>
+              <p className="text-[10px] text-white/80 font-black uppercase">{t("store.profile.verifiedHero")} {store?.id}</p>
             </div>
         </div>
       </header>
@@ -105,7 +105,7 @@ export default function StoreProfilePage() {
                     <Icons.Shield size={22} />
                 </div>
           <div>
-            <h3 className="text-sm font-black text-slate-900 uppercase tracking-tight">{t("store.profile.workStatus")}</h3>
+            <h3 className="text-sm font-black text-slate-900 uppercase">{t("store.profile.workStatus")}</h3>
             <p className="text-[10px] text-emerald-500 font-bold uppercase">{workStatus ? t("store.profile.receivingJobs") : t("store.profile.notReceiving")}</p>
           </div>
         </div>
@@ -119,7 +119,7 @@ export default function StoreProfilePage() {
     </Card>
 
         <section>
-          <p className="text-[10px] font-black text-slate-300 uppercase tracking-[0.25em] mb-4 pl-1">{t("store.profile.settings")}</p>
+          <p className="text-[10px] font-black text-slate-300 uppercase mb-4 pl-1">{t("store.profile.settings")}</p>
           <div className="space-y-3">
              <SettingItem 
                 icon={<Icons.Globe size={20} />} 
@@ -150,7 +150,7 @@ export default function StoreProfilePage() {
 
          {/* Support */}
          <section>
-           <p className="text-[10px] font-black text-slate-300 uppercase tracking-[0.25em] mb-4 pl-1">{t("support.sectionTitle") || "ช่วยเหลือ"}</p>
+           <p className="text-[10px] font-black text-slate-300 uppercase mb-4 pl-1">{t("support.sectionTitle") || "ช่วยเหลือ"}</p>
            <div className="space-y-3">
               <SettingItem 
                  icon={<Icons.Chat size={20} />} 
@@ -162,7 +162,7 @@ export default function StoreProfilePage() {
          </section>
 
         <section>
-          <p className="text-[10px] font-black text-slate-300 uppercase tracking-[0.25em] mb-4 pl-1">{t("store.profile.account")}</p>
+          <p className="text-[10px] font-black text-slate-300 uppercase mb-4 pl-1">{t("store.profile.account")}</p>
           <button 
             onClick={() => logout("/store")}
             className="w-full p-5 bg-white rounded-xl border border-slate-100 flex items-center gap-4 active:scale-95 transition-all shadow-sm"
@@ -170,7 +170,7 @@ export default function StoreProfilePage() {
              <div className="w-10 h-10 rounded-xl bg-red-50 text-red-500 flex items-center justify-center">
                 <Icons.LogOut size={20} />
              </div>
-             <span className="text-sm font-black text-red-500 uppercase tracking-tight">{t("store.profile.logout")}</span>
+             <span className="text-sm font-black text-red-500 uppercase">{t("store.profile.logout")}</span>
           </button>
         </section>
        </div>
@@ -201,7 +201,7 @@ export default function StoreProfilePage() {
                  >
                    <div className="text-left">
                      <p className={`text-sm font-black ${language === lang.key ? "text-primary-dark" : "text-slate-800"}`}>{lang.label}</p>
-                     <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{lang.sub}</p>
+                     <p className="text-[10px] text-slate-400 font-bold uppercase">{lang.sub}</p>
                    </div>
                    {language === lang.key && (
                      <div className="w-6 h-6 bg-primary rounded-full flex items-center justify-center text-white shadow-lg">
@@ -213,7 +213,7 @@ export default function StoreProfilePage() {
              </div>
              <button 
                onClick={() => setShowLanguageModal(false)}
-               className="w-full mt-8 py-4 bg-slate-100 text-slate-500 rounded-xl text-[12px] font-black uppercase tracking-widest"
+               className="w-full mt-8 py-4 bg-slate-100 text-slate-500 rounded-xl text-[12px] font-black uppercase"
              >
                {t("common.cancel")}
              </button>
@@ -232,7 +232,7 @@ function SettingsLink({ icon, label, value }: { icon: React.ReactNode; label: st
                     {icon}
                 </div>
                 <div className="text-left">
-                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">{label}</p>
+                    <p className="text-[10px] font-bold text-slate-400 uppercaseer">{label}</p>
                     <p className="text-sm font-bold text-slate-900">{value}</p>
                 </div>
             </div>

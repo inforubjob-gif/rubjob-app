@@ -109,13 +109,13 @@ export default function StoreDashboard() {
       </div>
 
       {/* Store Header */}
-      <header className="relative z-10 px-5 pt-6 pb-6">
+      <header className="relative z-10 px-5 pt-3 pb-6">
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-4">
             <Icons.Logo variant="icon-white" size={56} />
             <div className="min-w-0">
-               <p className="text-xs text-white/70 font-black uppercase tracking-[0.2em] leading-none mb-1 shadow-sm">{t("store.unitNo")} {store?.id?.split('-')[1] || '001'}</p>
-               <h1 className="text-3xl font-black text-white tracking-tight truncate drop-shadow-md">{store?.name || t("common.guest")}</h1>
+               <p className="text-xs text-white/70 font-black uppercase leading-none mb-1 shadow-sm">{t("store.unitNo")} {store?.id?.split('-')[1] || '001'}</p>
+               <h1 className="text-3xl font-black text-white truncate drop-shadow-md">{store?.name || t("common.guest")}</h1>
             </div>
           </div>
           <button 
@@ -128,14 +128,14 @@ export default function StoreDashboard() {
 
         <div className="grid grid-cols-2 gap-4 text-center">
           <div className="bg-white/10 backdrop-blur-lg p-5 rounded-xl border border-white/20 shadow-lg shadow-primary-dark/20 text-white">
-            <p className="text-[10px] font-black text-white/50 uppercase tracking-[0.15em]">{t("store.navOrders")}</p>
-              <p className="text-4xl font-black mt-1 tracking-tighter">
+            <p className="text-xs font-black text-white/50 uppercase">{t("store.navOrders")}</p>
+              <p className="text-4xl font-black mt-1er">
               {incomingOrders.length + washingOrders.length + readyOrders.length}
             </p>
           </div>
           <div className="bg-white/10 backdrop-blur-lg p-5 rounded-xl border border-white/20 shadow-lg shadow-primary-dark/20 text-white">
-            <p className="text-[10px] font-black text-white/50 uppercase tracking-[0.15em]">{t("store.wallet.availableBalance")}</p>
-            <p className="text-4xl font-black mt-1 tracking-tighter flex items-center justify-center gap-1">
+            <p className="text-xs font-black text-white/50 uppercase">{t("store.wallet.availableBalance")}</p>
+            <p className="text-4xl font-black mt-1er flex items-center justify-center gap-1">
               <span className="text-sm">฿</span>{Math.floor(balance).toLocaleString()}
             </p>
           </div>
@@ -151,7 +151,7 @@ export default function StoreDashboard() {
                     <Icons.Shield size={22} />
                 </div>
           <div>
-            <h3 className="text-sm font-black text-slate-900 uppercase tracking-tight">{t("store.profile.workStatus")}</h3>
+            <h3 className="text-sm font-black text-slate-900 uppercase">{t("store.profile.workStatus")}</h3>
             <p className="text-xs text-emerald-500 font-bold uppercase">{workStatus ? t("store.profile.receivingJobs") : t("store.profile.notReceiving")}</p>
           </div>
         </div>
@@ -169,7 +169,7 @@ export default function StoreDashboard() {
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={`flex-1 flex items-center justify-center gap-1 py-3.5 text-xs leading-tight font-black uppercase tracking-[0.1em] rounded-[1.2rem] transition-all duration-500 ${
+                className={`flex-1 flex items-center justify-center gap-1 py-3.5 text-xs leading-tight font-black uppercase rounded-[1.2rem] transition-all duration-500 ${
                   activeTab === tab ? "bg-white text-primary shadow-xl shadow-primary/20 scale-[1.05]" : "text-primary-dark/40"
                 }`}
               >
@@ -199,7 +199,7 @@ export default function StoreDashboard() {
                  <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center text-slate-200">
                     <Icons.FileText size={32} />
                  </div>
-                 <p className="text-xs font-black text-slate-400 uppercase tracking-widest leading-tight">
+                 <p className="text-xs font-black text-slate-400 uppercase leading-tight">
                     {t("store.noJobs")}
                  </p>
               </div>
@@ -212,7 +212,7 @@ export default function StoreDashboard() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between mb-1">
-                        <span className="text-xs font-black text-slate-400 uppercase tracking-widest">{order.id}</span>
+                        <span className="text-xs font-black text-slate-400 uppercase">{order.id}</span>
                         <Badge variant={statusToBadgeVariant(order.status)} className="scale-[0.8] origin-right">
                           {t(`orders.status.${order.status}`)}
                         </Badge>
@@ -230,14 +230,14 @@ export default function StoreDashboard() {
                   <div className="flex gap-2 mt-4 pt-4 border-t border-slate-50">
                     <Button 
                       variant="outline" 
-                      className="flex-1 rounded-xl text-xs font-black uppercase tracking-widest py-3 border-2"
+                      className="flex-1 rounded-xl text-xs font-black uppercase py-3 border-2"
                       onClick={() => router.push(`/store/orders/${order.id}`)}
                     >
                       {t("common.details")}
                     </Button>
                     {activeTab === "incoming" && (
                       <Button 
-                        className="flex-[2] bg-blue-600 text-white rounded-xl text-xs font-black uppercase tracking-widest py-3"
+                        className="flex-[2] bg-blue-600 text-white rounded-xl text-xs font-black uppercase py-3"
                         isLoading={isSubmitting}
                         onClick={() => handleUpdateStatus(order.id, "washing")}
                       >
@@ -246,7 +246,7 @@ export default function StoreDashboard() {
                     )}
                     {activeTab === "washing" && (
                       <Button 
-                        className="flex-[2] bg-primary text-white rounded-xl text-xs font-black uppercase tracking-widest py-3"
+                        className="flex-[2] bg-primary text-white rounded-xl text-xs font-black uppercase py-3"
                         isLoading={isSubmitting}
                         onClick={() => handleUpdateStatus(order.id, "ready_for_pickup")}
                       >
@@ -255,7 +255,7 @@ export default function StoreDashboard() {
                     )}
                     {activeTab === "ready" && (
                       <Button 
-                        className="flex-[2] bg-emerald-600 text-white rounded-xl text-xs font-black uppercase tracking-widest py-3"
+                        className="flex-[2] bg-emerald-600 text-white rounded-xl text-xs font-black uppercase py-3"
                         isLoading={isSubmitting}
                         onClick={() => handleUpdateStatus(order.id, "completed")}
                       >

@@ -20,10 +20,10 @@ export default function LoginView() {
 
         <div className="w-full space-y-8 text-center">
           <div className="space-y-4">
-            <h2 className="text-5xl font-black text-white tracking-tight leading-none drop-shadow-lg">
+            <h2 className="text-5xl font-black text-white leading-none drop-shadow-lg">
               rubjob
             </h2>
-            <p className="text-xs text-white/70 font-black uppercase tracking-[0.25em] bg-white/10 backdrop-blur-sm py-1.5 px-6 rounded-full inline-block border border-white/10 italic">
+            <p className="text-xs text-white/70 font-black uppercase bg-white/10 backdrop-blur-sm py-1.5 px-6 rounded-full inline-block border border-white/10">
               กรุณาเข้าสู่ระบบ
             </p>
           </div>
@@ -36,7 +36,7 @@ export default function LoginView() {
                 disabled={!isReady}
                 className="w-full bg-[#70CC6C] hover:bg-[#60B85C] text-white py-5 px-6 rounded-xl transition-all duration-200 shadow-xl shadow-green-100 active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-3 group"
               >
-                <span className="font-extrabold text-xl uppercase tracking-wider">Login With LINE</span>
+                <span className="font-extrabold text-xl uppercase">Login With LINE</span>
               </button>
             </div>
           </div>
@@ -45,7 +45,7 @@ export default function LoginView() {
 
       {/* Footer to match Rider look */}
       <div className="absolute bottom-8 left-0 right-0 text-center px-6">
-        <p className="text-xs text-slate-400 font-bold uppercase tracking-[0.2em] leading-relaxed drop-shadow-sm">
+        <p className="text-xs text-slate-400 font-bold uppercase leading-relaxed drop-shadow-sm">
           RUBJOB — LAUNDRY & LIFE SERVICE
         </p>
       </div>

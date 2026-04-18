@@ -61,7 +61,7 @@ export default function OrderIssueModal({ isOpen, onClose, orderId, onSuccess }:
     <Modal isOpen={isOpen} onClose={onClose} title={t("orders.issueModalTitle")}>
       <div className="w-full space-y-6">
         <div>
-          <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">
+          <label className="block text-[10px] font-black text-slate-400 uppercase mb-3">
             {t("orders.issueType")}
           </label>
           <div className="grid grid-cols-2 gap-2">
@@ -83,7 +83,7 @@ export default function OrderIssueModal({ isOpen, onClose, orderId, onSuccess }:
         </div>
 
         <div>
-          <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">
+          <label className="block text-[10px] font-black text-slate-400 uppercase mb-3">
             {t("orders.issueDetail")}
           </label>
           <textarea
@@ -99,7 +99,7 @@ export default function OrderIssueModal({ isOpen, onClose, orderId, onSuccess }:
           <Button
             variant="outline"
             onClick={onClose}
-            className="flex-1 rounded-xl py-4 font-black uppercase text-xs tracking-widest"
+            className="flex-1 rounded-xl py-4 font-black uppercase text-xs"
           >
             {t("common.cancel")}
           </Button>
@@ -107,7 +107,7 @@ export default function OrderIssueModal({ isOpen, onClose, orderId, onSuccess }:
             onClick={handleSubmit}
             isLoading={isSubmitting}
             disabled={!type}
-            className="flex-1 bg-primary text-white rounded-xl py-4 font-black uppercase text-xs tracking-widest shadow-xl shadow-primary/20"
+            className="flex-1 bg-primary text-white rounded-xl py-4 font-black uppercase text-xs shadow-xl shadow-primary/20"
           >
             {t("orders.submitIssue")}
           </Button>

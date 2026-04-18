@@ -42,7 +42,7 @@ export default function PaymentMethodsPage() {
 
         <main className="p-5 space-y-6">
           <section>
-            <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">{t("profile.paymentsPage.savedCards")}</p>
+            <p className="text-xs font-bold text-slate-400 uppercase mb-3">{t("profile.paymentsPage.savedCards")}</p>
             {isLoading ? (
                <div className="p-5 flex justify-center text-slate-300">...</div>
             ) : prefs?.savedCards?.length > 0 ? (
@@ -50,10 +50,10 @@ export default function PaymentMethodsPage() {
                 <Card key={idx} className="p-5 bg-gradient-to-br from-indigo-500 via-primary to-orange-400 text-white relative overflow-hidden shadow-2xl shadow-primary/20 mb-4">
                    <div className="relative z-10">
                      <div className="flex justify-between items-start mb-8">
-                       <span className="text-lg font-bold italic tracking-wider">{card.brand || "CARD"}</span>
+                       <span className="text-lg font-bold">{card.brand || "CARD"}</span>
                        <span className="text-xs opacity-60">{t("profile.paymentsPage.creditCard")}</span>
                      </div>
-                     <p className="text-lg font-mono tracking-[0.2em] mb-4">•••• •••• •••• {card.last4 || "0000"}</p>
+                     <p className="text-lg font-mono mb-4">•••• •••• •••• {card.last4 || "0000"}</p>
                      <div className="flex justify-between items-end">
                        <span className="text-[10px] uppercase opacity-60">{t("profile.paymentsPage.cardHolder")}</span>
                        <span className="text-sm font-bold">{profile?.displayName || t("common.guest")}</span>
@@ -70,7 +70,7 @@ export default function PaymentMethodsPage() {
           </section>
 
           <section className="space-y-3">
-            <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">{t("profile.paymentsPage.otherOptions")}</p>
+            <p className="text-xs font-bold text-slate-400 uppercase">{t("profile.paymentsPage.otherOptions")}</p>
             <Card className="p-4 flex items-center justify-between" hoverable>
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center text-xl">🏦</div>

@@ -74,7 +74,7 @@ export default function HelpPage() {
            <div className="w-16 h-16 bg-white/20 backdrop-blur-md rounded-xl flex items-center justify-center mx-auto mb-4 border border-white/30">
              <Icons.Chat size={32} className="text-white" />
            </div>
-           <h1 className="text-2xl font-black text-white tracking-tight">ศูนย์ช่วยเหลือ</h1>
+           <h1 className="text-2xl font-black text-white">ศูนย์ช่วยเหลือ</h1>
            <p className="text-white/80 text-sm font-medium mt-1">แจ้งปัญหาหรือสอบถามข้อมูลกับ RUBJOB</p>
         </div>
       </div>
@@ -84,7 +84,7 @@ export default function HelpPage() {
           <Card className="p-6 border-slate-100 shadow-xl shadow-slate-200/50 rounded-xl">
             <div className="space-y-5">
               <div className="space-y-1.5">
-                <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">หัวข้อที่ต้องการแจ้ง</label>
+                <label className="text-[11px] font-black text-slate-400 uppercase ml-1">หัวข้อที่ต้องการแจ้ง</label>
                 <div className="grid grid-cols-2 gap-2">
                   {["แจ้งปัญหา", "สอบถาม", "การเงิน", "อื่นๆ"].map(opt => (
                     <button
@@ -100,7 +100,7 @@ export default function HelpPage() {
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">รายละเอียด</label>
+                <label className="text-[11px] font-black text-slate-400 uppercase ml-1">รายละเอียด</label>
                 <textarea 
                   required
                   value={content}

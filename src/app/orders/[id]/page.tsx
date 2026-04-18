@@ -76,7 +76,7 @@ export default function OrderDetailPage() {
     return (
       <div className="flex flex-col items-center justify-center min-h-dvh">
         <div className="w-10 h-10 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
-        <p className="text-muted text-xs mt-4 font-bold tracking-widest uppercase">
+        <p className="text-muted text-xs mt-4 font-bold uppercase">
           {t("common.loading") || "Fetching Order Detail..."}
         </p>
       </div>

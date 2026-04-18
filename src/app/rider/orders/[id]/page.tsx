@@ -116,7 +116,7 @@ export default function RiderOrderDetailPage() {
     return (
       <div className="flex flex-col items-center justify-center min-h-dvh bg-slate-50 gap-4">
         <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin" />
-        <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest">{t("common.loading")}</p>
+        <p className="text-[10px] font-black text-slate-300 uppercase">{t("common.loading")}</p>
       </div>
     );
   }
@@ -168,7 +168,7 @@ export default function RiderOrderDetailPage() {
            <div className="absolute bottom-4 right-4 z-20 flex gap-2">
               <button 
                 onClick={() => window.open(`https://www.google.com/maps/dir/?api=1&destination=${activeDest.pos.lat},${activeDest.pos.lng}`, "_blank")}
-                className="bg-white/90 backdrop-blur-md px-4 py-2 rounded-xl border border-slate-200 shadow-xl text-primary font-black text-[10px] uppercase tracking-widest flex items-center gap-2 active:scale-95 transition-all"
+                className="bg-white/90 backdrop-blur-md px-4 py-2 rounded-xl border border-slate-200 shadow-xl text-primary font-black text-[10px] uppercase flex items-center gap-2 active:scale-95 transition-all"
               >
                  <Icons.MapPin size={14} strokeWidth={3} /> {t("rider.navigate")} {activeDest.label}
               </button>
@@ -183,10 +183,10 @@ export default function RiderOrderDetailPage() {
                     <Icons.User size={30} />
                 </div>
                 <div className="flex-1">
-                    <h3 className="text-base font-black text-slate-900 uppercase tracking-tight">{order?.userName || t("common.guest")}</h3>
+                    <h3 className="text-base font-black text-slate-900 uppercase">{order?.userName || t("common.guest")}</h3>
                     <div className="flex items-center gap-1.5 mt-1">
                        <span className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_5px_rgba(16,185,129,0.5)]" />
-                       <p className="text-xs text-slate-500 font-bold uppercase tracking-wider">{t("rider.profile.verifiedHero")}</p>
+                       <p className="text-xs text-slate-500 font-bold uppercase">{t("rider.profile.verifiedHero")}</p>
                     </div>
                 </div>
                 <div className="flex gap-2">
@@ -214,14 +214,14 @@ export default function RiderOrderDetailPage() {
                       <div className="w-0.5 h-10 bg-gradient-to-b from-slate-200 to-transparent rounded-full" />
                    </div>
                    <div className="flex-1">
-                      <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest mb-1">{t("rider.orderDetail.pickupFrom")}</p>
+                      <p className="text-[10px] font-black text-slate-300 uppercase mb-1">{t("rider.orderDetail.pickupFrom")}</p>
                       <p className="text-xs font-bold text-slate-700">{order?.storeName || t("rider.orderDetail.assignedStore")}</p>
                    </div>
                 </div>
                 <div className="flex items-start gap-4">
                    <div className="w-2.5 h-2.5 rounded-full bg-primary border-2 border-white mt-1 shadow-[0_0_5px_rgba(255,159,28,0.5)]" />
                    <div className="flex-1">
-                      <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest mb-1">{t("rider.orderDetail.deliverTo")}</p>
+                      <p className="text-[10px] font-black text-slate-300 uppercase mb-1">{t("rider.orderDetail.deliverTo")}</p>
                       <p className="text-xs font-black text-slate-900 leading-relaxed">
                         {typeof order?.address === 'string' ? order.address : (order?.address?.details || t("rider.orderDetail.noAddress"))}
                       </p>
@@ -246,11 +246,11 @@ export default function RiderOrderDetailPage() {
         <div className="fixed bottom-0 left-0 right-0 p-5 bg-white/80 backdrop-blur-2xl border-t border-slate-100/50 z-40">
            {status === "washing" ? (
              <div className="text-center p-4 bg-slate-50 rounded-xl border-2 border-dashed border-slate-200">
-                <p className="text-xs font-black text-slate-400 uppercase tracking-widest">{t("store.processing")}</p>
-                <p className="text-[10px] text-slate-400 mt-1 uppercase font-bold italic">{t("rider.orderDetail.waitingStore")}</p>
+                <p className="text-xs font-black text-slate-400 uppercase">{t("store.processing")}</p>
+                <p className="text-[10px] text-slate-400 mt-1 uppercase font-bold">{t("rider.orderDetail.waitingStore")}</p>
              </div>
            ) : status === "completed" ? (
-             <div className="p-4 bg-green-50 rounded-xl border-2 border-green-200 flex items-center justify-center gap-2 text-green-600 font-black italic">
+             <div className="p-4 bg-green-50 rounded-xl border-2 border-green-200 flex items-center justify-center gap-2 text-green-600 font-black">
                 <Icons.Check size={20} /> {t("rider.orderDetail.workCompleted")}
              </div>
            ) : (
@@ -258,7 +258,7 @@ export default function RiderOrderDetailPage() {
                 fullWidth 
                 onClick={() => handleUpdateStatus(getNextStatus(status))}
                 isLoading={isUpdating}
-                className="bg-primary text-white hover:bg-primary-dark shadow-2xl shadow-primary/30 py-6 text-base font-black italic rounded-xl uppercase tracking-widest"
+                className="bg-primary text-white hover:bg-primary-dark shadow-2xl shadow-primary/30 py-6 text-base font-black rounded-xl uppercase"
              >
                 {status === "picking_up" ? t("rider.orderDetail.btnPickup") : 
                  status === "delivering_to_store" ? t("rider.orderDetail.btnHandover") : 

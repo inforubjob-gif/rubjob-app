@@ -67,8 +67,8 @@ export default function StoreServicesPage() {
             <Icons.Back size={18} />
           </button>
           <div>
-            <h1 className="text-xl font-black text-slate-900 uppercase tracking-tight">Services & Pricing</h1>
-            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Configure your store offerings</p>
+            <h1 className="text-xl font-black text-slate-900 uppercase">Services & Pricing</h1>
+            <p className="text-[10px] text-slate-400 font-bold uppercase">Configure your store offerings</p>
           </div>
         </div>
       </header>
@@ -77,7 +77,7 @@ export default function StoreServicesPage() {
         {isLoading ? (
           <div className="flex flex-col items-center justify-center py-20 gap-4">
             <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin" />
-            <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest">Loading Services...</p>
+            <p className="text-[10px] font-black text-slate-300 uppercase">Loading Services...</p>
           </div>
         ) : (
           services.map((svc) => (
@@ -90,7 +90,7 @@ export default function StoreServicesPage() {
                   <h3 className="font-black text-slate-900 text-base leading-tight">
                     {t(`orders.services.${svc.id}`) || svc.name}
                   </h3>
-                  <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">
+                  <p className="text-[10px] text-slate-400 font-bold uppercase mt-1">
                     {svc.category} • Base: ฿{svc.basePrice}/{svc.unit}
                   </p>
                 </div>
@@ -106,8 +106,8 @@ export default function StoreServicesPage() {
               {svc.isEnabled && (
                 <div className="space-y-4 animate-slide-up">
                   <div className="flex items-center justify-between px-1">
-                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Your Price (฿)</span>
-                    <span className="text-[10px] font-black text-primary uppercase tracking-widest">Profit: +฿{svc.price - svc.basePrice}</span>
+                    <span className="text-[10px] font-black text-slate-400 uppercase">Your Price (฿)</span>
+                    <span className="text-[10px] font-black text-primary uppercase">Profit: +฿{svc.price - svc.basePrice}</span>
                   </div>
                   <div className="relative">
                     <input 
@@ -133,7 +133,7 @@ export default function StoreServicesPage() {
       </div>
 
       <footer className="fixed bottom-0 left-0 right-0 p-5 bg-white/80 backdrop-blur-md border-t border-border z-40 sm:hidden">
-         <p className="text-[9px] text-center text-slate-400 font-bold uppercase tracking-widest leading-relaxed">
+         <p className="text-[9px] text-center text-slate-400 font-bold uppercase leading-relaxed">
             Prices defined here will be applied to client bookings instantly. Ensure your rates are competitive.
          </p>
       </footer>

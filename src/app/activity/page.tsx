@@ -32,7 +32,7 @@ export default function ActivityPage() {
 
   return (
     <div className="flex flex-col min-h-dvh">
-      <header className="bg-white px-5 pt-6 pb-4 border-b border-border sticky top-0 z-30">
+      <header className="bg-white px-5 pt-3 pb-4 border-b border-border sticky top-0 z-30">
         <h1 className="text-2xl font-black text-foreground">{t("home.navOrders")}</h1>
         <p className="text-sm text-muted mt-0.5">{t("orders.noOrdersSub").replace("{tab}", "")}</p>
       </header>
@@ -45,14 +45,14 @@ export default function ActivityPage() {
               <div className="flex items-center justify-between gap-4">
                 <div className="flex-1 space-y-1.5 min-w-0">
                   <div className="flex items-center gap-2">
-                    <p className="text-sm font-black text-slate-800 uppercase tracking-tight truncate">
+                    <p className="text-sm font-black text-slate-800 uppercase truncate">
                       Order {order.id}
                     </p>
                     <Badge variant={statusToBadgeVariant(order.status)} className="scale-[0.8] origin-left">
                       {t(`orders.status.${order.status}`)}
                     </Badge>
                   </div>
-                  <p className="text-xs text-slate-400 font-bold uppercase tracking-widest leading-none">
+                  <p className="text-xs text-slate-400 font-bold uppercase leading-none">
                     {time.toLocaleDateString("th-TH", {
                       month: "short",
                       day: "numeric",

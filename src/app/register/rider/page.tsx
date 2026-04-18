@@ -65,11 +65,11 @@ export default function RiderRegisterPage() {
         <div className="w-24 h-24 bg-emerald-500 rounded-full flex items-center justify-center text-white mb-6 shadow-2xl shadow-emerald-500/20 animate-bounce">
           <Icons.Check size={48} strokeWidth={3} />
         </div>
-        <h1 className="text-3xl font-black text-white mb-4 uppercase tracking-tighter">Application Sent!</h1>
+        <h1 className="text-3xl font-black text-white mb-4 uppercaseer">Application Sent!</h1>
         <p className="text-slate-400 font-bold mb-8 max-w-xs">
           Your application is being reviewed. We will contact you at <span className="text-primary">{formData.phone}</span> within 24 hours.
         </p>
-        <Button onClick={() => router.push("/")} className="bg-white text-slate-900 rounded-full px-12 py-4 font-black uppercase tracking-widest text-xs">
+        <Button onClick={() => router.push("/")} className="bg-white text-slate-900 rounded-full px-12 py-4 font-black uppercase text-xs">
           Return Home
         </Button>
       </div>
@@ -85,7 +85,7 @@ export default function RiderRegisterPage() {
       <nav className="relative z-10 p-6 flex items-center justify-between">
          <div className="flex items-center gap-2" onClick={() => router.push("/")}>
             <Icons.Logo size={32} />
-            <span className="font-black text-xl italic tracking-tighter uppercase">Rubjob <span className="text-primary italic-none">Riders</span></span>
+            <span className="font-black text-xler uppercase">Rubjob <span className="text-primary-none">Riders</span></span>
          </div>
          <div className="flex items-center gap-4">
             <div className={`w-2 h-2 rounded-full ${step >= 1 ? 'bg-primary shadow-[0_0_10px_rgba(255,191,0,0.5)]' : 'bg-slate-800'}`} />
@@ -96,17 +96,17 @@ export default function RiderRegisterPage() {
 
       <main className="relative z-10 px-6 pt-8 max-w-lg mx-auto">
         <header className="mb-10">
-           <h1 className="text-4xl font-black uppercase tracking-tighter mb-2 italic">
+           <h1 className="text-4xl font-black uppercaseer mb-2">
               Join the <br/>
               <span className="text-primary">Elite Fleet</span>
            </h1>
-           <p className="text-slate-500 text-xs font-bold uppercase tracking-[0.2em]">Step {step} of 3: {step === 1 ? 'Personal Bio' : step === 2 ? 'Vehicle Details' : 'Verification'}</p>
+           <p className="text-slate-500 text-xs font-bold uppercase">Step {step} of 3: {step === 1 ? 'Personal Bio' : step === 2 ? 'Vehicle Details' : 'Verification'}</p>
         </header>
 
         {step === 1 && (
           <div className="space-y-6 animate-in slide-in-from-right-4 duration-500">
              <div className="space-y-2">
-                <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Full Name</label>
+                <label className="text-[10px] font-black text-slate-500 uppercase ml-1">Full Name</label>
                 <input 
                   required
                   value={formData.name}
@@ -116,7 +116,7 @@ export default function RiderRegisterPage() {
                 />
              </div>
              <div className="space-y-2">
-                <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Phone Number</label>
+                <label className="text-[10px] font-black text-slate-500 uppercase ml-1">Phone Number</label>
                 <input 
                   required
                   type="tel"
@@ -127,7 +127,7 @@ export default function RiderRegisterPage() {
                 />
              </div>
              <div className="space-y-2">
-                <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Email (Optional)</label>
+                <label className="text-[10px] font-black text-slate-500 uppercase ml-1">Email (Optional)</label>
                 <input 
                   type="email"
                   value={formData.email}
@@ -137,7 +137,7 @@ export default function RiderRegisterPage() {
                 />
              </div>
              <div className="pt-4">
-               <Button onClick={() => setStep(2)} disabled={!formData.name || !formData.phone} className="w-full bg-primary text-white py-6 rounded-xl font-black text-xs uppercase tracking-[0.3em] shadow-2xl shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all">
+               <Button onClick={() => setStep(2)} disabled={!formData.name || !formData.phone} className="w-full bg-primary text-white py-6 rounded-xl font-black text-xs uppercase transition-all">
                   Next Step
                </Button>
              </div>
@@ -147,7 +147,7 @@ export default function RiderRegisterPage() {
         {step === 2 && (
           <div className="space-y-6 animate-in slide-in-from-right-4 duration-500">
              <div className="space-y-2">
-                <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Vehicle Type</label>
+                <label className="text-[10px] font-black text-slate-500 uppercase ml-1">Vehicle Type</label>
                 <div className="grid grid-cols-3 gap-4">
                    {['bike', 'car', 'truck'].map(type => (
                       <div 
@@ -158,13 +158,13 @@ export default function RiderRegisterPage() {
                          {type === 'bike' && <Icons.Bike size={24} />}
                          {type === 'car' && <Icons.Truck size={24} />}
                          {type === 'truck' && <Icons.Package size={24} />}
-                         <span className="text-[9px] font-black uppercase tracking-widest">{type}</span>
+                         <span className="text-[9px] font-black uppercase">{type}</span>
                       </div>
                    ))}
                 </div>
              </div>
              <div className="space-y-2">
-                <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">License Plate</label>
+                <label className="text-[10px] font-black text-slate-500 uppercase ml-1">License Plate</label>
                 <input 
                   required
                   value={formData.licensePlate}
@@ -174,7 +174,7 @@ export default function RiderRegisterPage() {
                 />
              </div>
              <div className="space-y-2">
-                <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">ID Card Number</label>
+                <label className="text-[10px] font-black text-slate-500 uppercase ml-1">ID Card Number</label>
                 <input 
                   required
                   value={formData.idNumber}
@@ -184,10 +184,10 @@ export default function RiderRegisterPage() {
                 />
              </div>
              <div className="pt-4 grid grid-cols-2 gap-4">
-               <Button onClick={() => setStep(1)} className="w-full bg-slate-900 text-slate-400 py-6 rounded-xl font-black text-xs uppercase tracking-widest">
+               <Button onClick={() => setStep(1)} className="w-full bg-slate-900 text-slate-400 py-6 rounded-xl font-black text-xs uppercase">
                   Back
                </Button>
-               <Button onClick={() => setStep(3)} disabled={!formData.licensePlate || !formData.idNumber} className="w-full bg-primary text-white py-6 rounded-xl font-black text-xs uppercase tracking-widest shadow-2xl shadow-primary/20">
+               <Button onClick={() => setStep(3)} disabled={!formData.licensePlate || !formData.idNumber} className="w-full bg-primary text-white py-6 rounded-xl font-black text-xs uppercase shadow-2xl shadow-primary/20">
                   Almost Done
                </Button>
              </div>
@@ -207,7 +207,7 @@ export default function RiderRegisterPage() {
                   { id: 'profile_photo', label: '3. Profile Photo' }
                 ].map(doc => (
                   <div key={doc.id} className="space-y-3">
-                     <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">{doc.label}</label>
+                     <label className="text-[10px] font-black text-slate-500 uppercase ml-1">{doc.label}</label>
                      <div 
                        onClick={() => document.getElementById(`file-${doc.id}`)?.click()}
                        className={`relative aspect-[16/6] rounded-xl border-2 border-dashed transition-all cursor-pointer overflow-hidden flex flex-col items-center justify-center ${getDocPreview(doc.id) ? 'border-primary bg-primary/5' : 'border-slate-800 bg-slate-900/50'}`}
@@ -225,7 +225,7 @@ export default function RiderRegisterPage() {
                           onChange={e => e.target.files?.[0] && handleFileChange(doc.id, e.target.files[0])}
                         />
                         <div className="absolute inset-0 flex items-center justify-center">
-                           <span className="text-[8px] font-black uppercase tracking-widest text-slate-400">{getDocPreview(doc.id) ? 'Change Photo' : 'Upload File'}</span>
+                           <span className="text-[8px] font-black uppercase text-slate-400">{getDocPreview(doc.id) ? 'Change Photo' : 'Upload File'}</span>
                         </div>
                      </div>
                   </div>
@@ -237,11 +237,11 @@ export default function RiderRegisterPage() {
                  onClick={handleSubmit} 
                  isLoading={isSubmitting}
                  disabled={formData.documents.length < 3}
-                 className="w-full bg-primary text-white py-7 rounded-full font-black text-sm uppercase tracking-[0.4em] shadow-2xl shadow-primary/30 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50"
+                 className="w-full bg-primary text-white py-7 rounded-full font-black text-sm uppercase transition-all disabled:opacity-50"
                >
                   Submit Application
                </Button>
-               <button onClick={() => setStep(2)} className="text-[10px] font-black text-slate-500 uppercase tracking-widest">
+               <button onClick={() => setStep(2)} className="text-[10px] font-black text-slate-500 uppercase">
                   Back to edit details
                </button>
              </div>

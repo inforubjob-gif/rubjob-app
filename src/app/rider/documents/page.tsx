@@ -67,7 +67,7 @@ export default function RiderDocumentsPage() {
         <div className="w-24 h-24 bg-emerald-50 text-emerald-500 rounded-xl flex items-center justify-center mb-8 shadow-xl shadow-emerald-500/10 scale-110">
           <Icons.Shield size={48} strokeWidth={2.5} />
         </div>
-        <h1 className="text-2xl font-black text-slate-900 mb-2 uppercase tracking-tight">{t("rider.verification.submittedTitle")}</h1>
+        <h1 className="text-2xl font-black text-slate-900 mb-2 uppercase">{t("rider.verification.submittedTitle")}</h1>
         <p className="text-sm text-slate-500 font-bold max-w-[280px] leading-relaxed">
           {t("rider.verification.submittedDesc")}
         </p>
@@ -83,8 +83,8 @@ export default function RiderDocumentsPage() {
             <Icons.Back size={18} />
           </button>
           <div>
-            <h1 className="text-xl font-black text-slate-900 uppercase tracking-tight">{t("rider.verification.title")}</h1>
-            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{t("rider.verification.sub")}</p>
+            <h1 className="text-xl font-black text-slate-900 uppercase">{t("rider.verification.title")}</h1>
+            <p className="text-[10px] text-slate-400 font-bold uppercase">{t("rider.verification.sub")}</p>
           </div>
         </div>
       </header>
@@ -115,11 +115,11 @@ export default function RiderDocumentsPage() {
             isLoading={isSubmitting}
             disabled={!idCard || !license || !vehicle}
             onClick={handleSubmit}
-            className="bg-primary text-white py-5 rounded-xl font-black uppercase tracking-[0.2em] shadow-xl shadow-primary/20 active:scale-95 transition-all disabled:opacity-50"
+            className="bg-primary text-white py-5 rounded-xl font-black uppercase shadow-xl shadow-primary/20 active:scale-95 transition-all disabled:opacity-50"
           >
             {t("rider.verification.submit")}
           </Button>
-          <p className="text-[9px] text-center text-slate-400 font-bold mt-4 uppercase tracking-widest px-4">
+          <p className="text-[9px] text-center text-slate-400 font-bold mt-4 uppercase px-4">
             {t("rider.verification.agreeTerms")}
           </p>
         </div>

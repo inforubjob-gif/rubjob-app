@@ -360,7 +360,7 @@ function BookingFlow() {
         <div className="w-24 h-24 bg-white rounded-xl shadow-xl flex items-center justify-center mb-8 border border-slate-100">
            <Icons.Settings size={48} className="text-slate-300 animate-spin-slow" />
         </div>
-        <h2 className="text-2xl font-black text-slate-900 tracking-tight">{t("booking.errors.systemClosedTitle")}</h2>
+        <h2 className="text-2xl font-black text-slate-900">{t("booking.errors.systemClosedTitle")}</h2>
         <p className="text-slate-500 mt-3 font-medium leading-relaxed">
           {t("booking.errors.systemClosedDesc").split("\n").map((line, i) => (
             <span key={i}>{line}{i === 0 && <br/>}</span>
@@ -380,7 +380,7 @@ function BookingFlow() {
   return (
     <div className="flex flex-col min-h-dvh">
       {/* Header */}
-      <header className="bg-white px-5 pt-6 pb-4 border-b border-border sticky top-0 z-30">
+      <header className="bg-white px-5 pt-3 pb-4 border-b border-border sticky top-0 z-30">
         <div className="flex items-center gap-3">
           <button
             onClick={() => {
@@ -473,7 +473,7 @@ function BookingFlow() {
               </div>
               <div className="space-y-2">
                 {dbAddresses.length === 0 && (
-                  <p className="text-center py-4 text-xs text-muted italic">{t("booking.noAddress")}</p>
+                  <p className="text-center py-4 text-xs text-muted">{t("booking.noAddress")}</p>
                 )}
                 {dbAddresses.map((addr) => (
                   <Card
@@ -650,7 +650,7 @@ function BookingFlow() {
                       <Icons.Ticket size={20} />
                     </div>
                     <div className="text-left">
-                      <p className="text-[13px] font-black text-primary-dark uppercase tracking-tight leading-none">{t("booking.selectCoupon")}</p>
+                      <p className="text-[13px] font-black text-primary-dark uppercase leading-none">{t("booking.selectCoupon")}</p>
                       <p className="text-[10px] text-primary/60 font-bold mt-1 uppercase leading-none">{t("booking.promoLabel")}</p>
                     </div>
                   </div>
@@ -745,7 +745,7 @@ function BookingFlow() {
                       )}
                     </div>
                     <div className="flex items-center justify-between mt-3 pt-2 border-t border-slate-100 pl-5 text-[11px]">
-                      <span className="text-xs text-slate-400 font-bold uppercase tracking-wider">{t("booking.summary.subtotalLaundry")}</span>
+                      <span className="text-xs text-slate-400 font-bold uppercase">{t("booking.summary.subtotalLaundry")}</span>
                       <span className="font-black text-slate-700">฿{laundryFee}</span>
                     </div>
                   </div>
@@ -787,11 +787,11 @@ function BookingFlow() {
                 <div className="flex items-end justify-between border-t border-slate-200 pt-4 bg-slate-50/50 -mx-5 -mb-5 px-5 pb-5 rounded-b-2xl">
                   <div>
                     <span className="block text-sm font-black text-foreground">{t("booking.summary.total")}</span>
-                    <span className="block text-[10px] text-muted font-bold tracking-tight mt-0.5">{t("booking.summary.taxIncluded")}</span>
+                    <span className="block text-[10px] text-muted font-bold mt-0.5">{t("booking.summary.taxIncluded")}</span>
                   </div>
                   <div className="flex flex-col items-end">
                     {(couponDiscount > 0 || pointsDiscount > 0) && <span className="text-[11px] text-slate-400 line-through font-bold">฿{subTotal}</span>}
-                    <span className="text-3xl font-black text-primary-dark leading-none tracking-tighter">฿{totalPrice}</span>
+                    <span className="text-3xl font-black text-primary-dark leading-noneer">฿{totalPrice}</span>
                   </div>
                 </div>
               </Card>
@@ -852,7 +852,7 @@ function BookingFlow() {
                   <div className="w-7 h-7 bg-white rounded-lg flex items-center justify-center">
                     <span className="text-[11px] font-black text-[#1a3d6d]">PP</span>
                   </div>
-                  <span className="text-base font-black text-white tracking-tight">PromptPay</span>
+                  <span className="text-base font-black text-white">PromptPay</span>
                 </div>
                 
                 <div className="bg-white p-4 rounded-xl shadow-inner border border-slate-100 relative overflow-hidden">
@@ -875,7 +875,7 @@ function BookingFlow() {
                     <span className="text-sm font-bold text-muted">{t("booking.amountDue")}</span>
                     <span className="text-2xl font-black text-foreground">฿{totalPrice}.00</span>
                   </div>
-                  <p className="text-xs text-primary-dark font-bold mt-1 uppercase tracking-wider">
+                  <p className="text-xs text-primary-dark font-bold mt-1 uppercase">
                     {paymentQR ? t("booking.paymentDoneNote") : t("booking.instantConfirmation")}
                   </p>
                 </div>
@@ -884,7 +884,7 @@ function BookingFlow() {
 
             <div className="flex items-center justify-center gap-2 py-2 opacity-50 mt-4">
               <Icons.Shield size={14} className="text-green-600" />
-              <span className="text-xs font-bold uppercase tracking-widest text-foreground">{t("orders.payment.secure")}</span>
+              <span className="text-xs font-bold uppercase text-foreground">{t("orders.payment.secure")}</span>
             </div>
           </div>
         )}
@@ -899,7 +899,7 @@ function BookingFlow() {
             <div className="w-8 h-8 bg-rose-100 text-rose-600 rounded-full flex items-center justify-center shrink-0">
                <Icons.Info size={16} />
             </div>
-            <p className="text-xs font-black text-rose-600 uppercase tracking-tight">
+            <p className="text-xs font-black text-rose-600 uppercase">
               {t("booking.errors.minOrderRemaining")
                 .replace("{amount}", minOrderAmount.toString())
                 .replace("{needed}", (minOrderAmount - totalPrice).toString())}
@@ -983,7 +983,7 @@ function BookingFlow() {
             {isLoadingCoupons && (
                <div className="flex flex-col items-center justify-center py-20 gap-3">
                   <div className="w-10 h-10 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
-                  <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">{t("common.loading")}</p>
+                  <p className="text-xs font-bold text-slate-400 uppercase">{t("common.loading")}</p>
                </div>
             )}
             {!isLoadingCoupons && availableCoupons.length === 0 && (
@@ -1048,11 +1048,11 @@ function BookingFlow() {
 
                       <div className="flex items-center justify-between mt-3">
                         <div className="flex flex-col">
-                          <span className="text-[9px] font-black text-slate-400 uppercase tracking-tighter leading-none">{t("booking.minSpend")}</span>
+                          <span className="text-[11px] font-black text-slate-400 uppercase leading-none">{t("booking.minSpend")}</span>
                           <span className="text-[11px] font-black text-slate-600">฿{cpn.minOrder || 0}</span>
                         </div>
                         <div className="flex flex-col items-end">
-                          <span className="text-[9px] font-black text-slate-400 uppercase tracking-tighter leading-none">{t("booking.expires")}</span>
+                          <span className="text-[11px] font-black text-slate-400 uppercase leading-none">{t("booking.expires")}</span>
                           <span className="text-[10px] font-bold text-amber-600">
                             {cpn.expiryDate ? new Date(cpn.expiryDate).toLocaleDateString("th-TH", { day: 'numeric', month: 'short', year: '2-digit' }) : "∞"}
                           </span>

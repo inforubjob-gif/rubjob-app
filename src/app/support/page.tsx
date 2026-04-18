@@ -17,7 +17,7 @@ export default function SupportPage() {
       <div className="absolute top-0 left-0 right-0 h-[400px] bg-gradient-to-b from-primary via-primary to-slate-50 z-0" />
 
       <header className="relative z-10 px-5 pt-12 pb-8">
-        <h1 className="text-3xl font-black text-white tracking-tight mb-2 drop-shadow-sm">{t("support.title")}</h1>
+        <h1 className="text-3xl font-black text-white mb-2 drop-shadow-sm">{t("support.title")}</h1>
         <p className="text-white/90 text-sm font-semibold">{t("support.subtitle")}</p>
         
         {/* Search Bar */}
@@ -99,7 +99,7 @@ export default function SupportPage() {
                 <div className="absolute top-0 right-0 w-32 h-32 bg-primary/20 rounded-full -mr-16 -mt-16 blur-3xl group-hover:bg-primary/30 transition-colors" />
                 <h3 className="text-lg font-black mb-3 relative z-10">Report a Problem</h3>
                 <p className="text-xs text-slate-200 leading-relaxed mb-6 relative z-10">Having issues with your order or the app? Let us know and we&apos;ll fix it immediately.</p>
-                <Button fullWidth className="bg-primary text-white border-none font-black text-xs uppercase tracking-widest relative z-10">
+                <Button fullWidth className="bg-primary text-white border-none font-black text-xs uppercase relative z-10">
                     Open Support Ticket
                 </Button>
             </Card>

@@ -59,14 +59,14 @@ export default function StatusTimeline({ currentStatus }: StatusTimelineProps) {
             {/* Left: Text Info */}
             <div className="flex-1 space-y-1">
               <div className="flex items-center gap-2">
-                <h4 className={`text-sm font-black uppercase tracking-tight ${isCurrent ? "text-primary-dark" : "text-slate-700"}`}>
+                <h4 className={`text-sm font-black uppercase ${isCurrent ? "text-primary-dark" : "text-slate-700"}`}>
                   {t(`orders.status.${step.key}`)}
                 </h4>
                 {isCurrent && (
                   <span className="flex h-2 w-2 rounded-full bg-primary animate-ping" />
                 )}
               </div>
-              <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest leading-none">
+              <p className="text-[10px] text-slate-400 font-bold uppercase leading-none">
                 {isDone ? t("common.done") : isCurrent ? t("common.processing") : t("common.pending")}
               </p>
             </div>

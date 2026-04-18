@@ -80,7 +80,7 @@ export default function NotificationsPage() {
 
       <main className="p-5 space-y-6">
         <section className="space-y-3">
-          <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">{t("profile.notificationsPage.orderUpdates")}</p>
+          <p className="text-xs font-bold text-slate-400 uppercase">{t("profile.notificationsPage.orderUpdates")}</p>
           <Card className="divide-y divide-slate-100">
             <NotificationToggle 
               label={t("profile.notificationsPage.orderStatus")} 
@@ -98,7 +98,7 @@ export default function NotificationsPage() {
         </section>
 
         <section className="space-y-3">
-          <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">{t("profile.notificationsPage.marketing")}</p>
+          <p className="text-xs font-bold text-slate-400 uppercase">{t("profile.notificationsPage.marketing")}</p>
           <Card className="divide-y divide-slate-100">
             <NotificationToggle 
               label={t("profile.notificationsPage.promotions")} 
