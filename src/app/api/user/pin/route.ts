@@ -38,9 +38,10 @@ export async function GET(req: Request) {
         const store = await db.prepare("SELECT ownerId FROM stores WHERE id = ?").bind(storeId).first() as any;
         userId = store?.ownerId || null;
       }
+    if (!userId) {
+      console.warn(`[PIN] Unauthorized access attempt for type: ${type}`);
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-
-    if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const user = await db.prepare("SELECT walletPin FROM users WHERE id = ?").bind(userId).first() as any;
     
@@ -78,12 +79,16 @@ export async function POST(req: Request) {
       }
     }
 
-    if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!userId) {
+      console.warn(`[PIN] Unauthorized POST attempt for action: ${action}, type: ${type}`);
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
 
     if (action === "setup") {
       if (!pin || pin.length !== 6) return NextResponse.json({ error: "Invalid PIN format" }, { status: 400 });
       const hashedPin = await hashPin(pin);
       await db.prepare("UPDATE users SET walletPin = ? WHERE id = ?").bind(hashedPin, userId).run();
+      console.log(`[PIN] Successfully setup PIN for user: ${userId}`);
       return NextResponse.json({ success: true });
     } 
     

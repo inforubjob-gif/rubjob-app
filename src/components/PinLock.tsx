@@ -19,6 +19,7 @@ export default function PinLock({ type, onVerified, children }: PinLockProps) {
   const [confirmPin, setConfirmPin] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(true);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   useEffect(() => {
     checkPinStatus();
@@ -42,6 +43,7 @@ export default function PinLock({ type, onVerified, children }: PinLockProps) {
   };
 
   const handleNumberClick = (num: number) => {
+    if (isProcessing) return;
     setError("");
     if (step === "confirm") {
       if (confirmPin.length < 6) setConfirmPin(prev => prev + num.toString());
@@ -51,6 +53,7 @@ export default function PinLock({ type, onVerified, children }: PinLockProps) {
   };
 
   const handleDelete = () => {
+    if (isProcessing) return;
     if (step === "confirm") {
       setConfirmPin(prev => prev.slice(0, -1));
     } else {
@@ -65,7 +68,7 @@ export default function PinLock({ type, onVerified, children }: PinLockProps) {
       setStep("confirm");
     } else if (step === "confirm" && confirmPin.length === 6) {
       if (pin === confirmPin) {
-        setupPin();
+        if (!isProcessing) setupPin();
       } else {
         setError(t(`${type}.wallet.pin.mismatch`));
         setConfirmPin("");
@@ -74,7 +77,8 @@ export default function PinLock({ type, onVerified, children }: PinLockProps) {
   }, [pin, confirmPin]);
 
   const verifyPin = async () => {
-    setIsLoading(true);
+    if (isProcessing) return;
+    setIsProcessing(true);
     try {
       const res = await fetch("/api/user/pin", {
         method: "POST",
@@ -86,18 +90,21 @@ export default function PinLock({ type, onVerified, children }: PinLockProps) {
         setIsLocked(false);
         onVerified();
       } else {
-        setError(t(`${type}.wallet.pin.error`));
+        setError(data.error || t(`${type}.wallet.pin.error`));
         setPin("");
       }
     } catch (err) {
       console.error(err);
+      setError(t("common.error"));
     } finally {
-      setIsLoading(false);
+      setIsProcessing(false);
     }
   };
 
   const setupPin = async () => {
-    setIsLoading(true);
+    if (isProcessing) return;
+    setIsProcessing(true);
+    setError("");
     try {
       const res = await fetch("/api/user/pin", {
         method: "POST",
@@ -106,14 +113,20 @@ export default function PinLock({ type, onVerified, children }: PinLockProps) {
       });
       const data = await res.json();
       if (data.success) {
-        // We can use a custom toast here if available, but alert is fine for now as per plan
         setIsLocked(false);
         onVerified();
+      } else {
+        setError(data.error || t("common.error"));
+        // Reset confirmation if failure
+        setStep("setup");
+        setPin("");
+        setConfirmPin("");
       }
     } catch (err) {
       console.error(err);
+      setError(t("common.error"));
     } finally {
-      setIsLoading(false);
+      setIsProcessing(false);
     }
   };
 
@@ -160,13 +173,21 @@ export default function PinLock({ type, onVerified, children }: PinLockProps) {
         </div>
 
         {error && (
-          <p className="text-xs font-bold text-rose-500 mb-8 animate-shake">
+          <p className="text-[11px] font-black text-rose-500 mb-8 animate-shake bg-rose-50 px-4 py-2 rounded-full border border-rose-100">
             {error}
           </p>
         )}
 
-        {/* Keypad */}
-        <div className="grid grid-cols-3 gap-4 w-full px-4">
+        {/* Keypad with Loading Overlay */}
+        <div className="relative w-full px-4">
+          {isProcessing && (
+            <div className="absolute inset-0 z-20 bg-slate-50/40 backdrop-blur-[2px] flex flex-col items-center justify-center rounded-3xl animate-in fade-in duration-300">
+              <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mb-4" />
+              <p className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">{t("common.processing")}</p>
+            </div>
+          )}
+          
+          <div className="grid grid-cols-3 gap-4 w-full">
           {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
             <button
               key={num}
@@ -185,11 +206,13 @@ export default function PinLock({ type, onVerified, children }: PinLockProps) {
           </button>
           <button
             onClick={handleDelete}
-            className="aspect-square rounded-2xl text-slate-400 active:text-rose-500 active:scale-95 transition-all flex items-center justify-center cursor-pointer"
+            className="aspect-square rounded-2xl text-slate-400 active:text-rose-500 active:scale-95 transition-all flex items-center justify-center cursor-pointer disabled:opacity-30"
+            disabled={isProcessing}
           >
             <Icons.Close size={28} />
           </button>
         </div>
+      </div>
         
         {step === "confirm" && (
            <button 
