@@ -87,16 +87,14 @@ export default function RiderProfilePage() {
         <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-32 -mt-32 blur-3xl" />
         <div className="flex items-center gap-5">
             <div className="relative">
-              <div className="w-20 h-20 rounded-xl bg-white flex items-center justify-center p-1.5 shadow-2xl border-4 border-white/20 ring-8 ring-primary/5">
-                <div className="w-full h-full rounded-xl bg-orange-50 flex items-center justify-center overflow-hidden border border-orange-100">
-                    <img 
-                      src={!riderSession?.pictureUrl ? "https://api.dicebear.com/7.x/avataaars/svg?seed=Rubjob" : (riderSession.pictureUrl.startsWith('data:') || riderSession.pictureUrl.startsWith('http')) ? riderSession.pictureUrl : `/api/admin/documents/${riderSession.pictureUrl}`} 
-                      alt="Avatar" 
-                      className="w-full h-full object-cover" 
-                    />
-                </div>
+              <div className="w-20 h-20 rounded-xl flex items-center justify-center shadow-2xl border-2 border-white/20 ring-4 ring-primary/10 overflow-hidden bg-orange-50">
+                <img 
+                  src={!riderSession?.pictureUrl ? "https://api.dicebear.com/7.x/avataaars/svg?seed=Rubjob" : (riderSession.pictureUrl.startsWith('data:') || riderSession.pictureUrl.startsWith('http')) ? riderSession.pictureUrl : `/api/admin/documents/${riderSession.pictureUrl}`} 
+                  alt="Avatar" 
+                  className="w-full h-full object-cover" 
+                />
               </div>
-              <div className="absolute -bottom-1 -right-1 w-7 h-7 bg-emerald-500 border-4 border-primary rounded-full shadow-lg" />
+              <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-emerald-500 border-2 border-primary rounded-full shadow-lg" />
             </div>
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-1.5 opacity-80">
