@@ -68,7 +68,7 @@ export default function HomePage() {
           <img
             src="/images/rubjob-complete_Text-white.png"
             alt="RUBJOB"
-            className="h-10 w-auto object-contain"
+            className="h-14 w-auto object-contain"
           />
           
           <Link href="/profile" className="relative group">
