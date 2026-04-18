@@ -57,7 +57,7 @@ export default function StoreProfilePage() {
       }
     }
     fetchPrefs();
-  }, [profile?.userId]);
+  }, [store?.id]);
 
   const handleToggleWorkStatus = async () => {
     const nextStatus = !workStatus;
