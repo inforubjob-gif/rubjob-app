@@ -44,6 +44,12 @@ export default function StoreDashboard() {
         const walRes = await fetch(`/api/store/wallet?storeId=${storeId}`);
         const walData = await walRes.json();
         if (walData.balance !== undefined) setBalance(walData.balance);
+
+        const prefRes = await fetch(`/api/store/preferences?storeId=${storeId}`);
+        const prefData = await prefRes.json() as any;
+        if (prefData.preferences?.workStatus !== undefined) {
+          setWorkStatus(prefData.preferences.workStatus);
+        }
       }
     } catch (err) {
       console.error("Failed to fetch store dashboard data:", err);
@@ -74,6 +80,21 @@ export default function StoreDashboard() {
       console.error("Update status failed:", err);
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleToggleWorkStatus = async () => {
+    const nextStatus = !workStatus;
+    setWorkStatus(nextStatus);
+    if (!store?.id) return;
+    try {
+      await fetch("/api/store/preferences", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ storeId: store.id, workStatus: nextStatus })
+      });
+    } catch (err) {
+      console.error("Failed to update work status", err);
     }
   };
 
@@ -119,6 +140,27 @@ export default function StoreDashboard() {
       </header>
 
       <div className="relative z-10 px-5 space-y-7 pt-2 animate-fade-in">
+        {/* Toggle Status */}
+        <Card className="p-5 border-none shadow-sm shadow-primary/5 rounded-2xl bg-white border border-primary/10">
+           <div className="flex items-center justify-between">
+             <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-500 flex items-center justify-center border border-emerald-100 shadow-sm shadow-emerald-500/10">
+                    <Icons.Shield size={22} />
+                </div>
+          <div>
+            <h3 className="text-sm font-black text-slate-900 uppercase tracking-tight">{t("store.profile.workStatus")}</h3>
+            <p className="text-[10px] text-emerald-500 font-bold uppercase">{workStatus ? t("store.profile.receivingJobs") : t("store.profile.notReceiving")}</p>
+          </div>
+        </div>
+        <button 
+          onClick={handleToggleWorkStatus}
+          className={`w-14 h-8 rounded-full p-1 transition-all duration-300 ${workStatus ? 'bg-primary shadow-lg shadow-primary/30' : 'bg-slate-200'}`}
+        >
+          <div className={`w-6 h-6 rounded-full bg-white shadow-md transition-all duration-300 ${workStatus ? 'transform translate-x-6' : ''}`} />
+        </button>
+      </div>
+    </Card>
+
         <div className="bg-white/40 backdrop-blur-xl p-1.5 rounded-2xl flex shadow-lg shadow-primary-dark/10 border border-white/40">
           {(["incoming", "washing", "ready"] as const).map((tab) => (
             <button
