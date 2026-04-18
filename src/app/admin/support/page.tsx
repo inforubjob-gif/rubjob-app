@@ -100,35 +100,42 @@ export default function SupportCenterPage() {
             ) : tickets.length === 0 ? (
               <div className="p-10 text-center text-slate-400 font-medium text-xs">{t('admin.support.empty')}</div>
             ) : (
-              tickets.map((t) => (
+              tickets.map((tk) => (
                 <button
-                  key={t.id}
-                  onClick={() => setSelectedTicketId(t.id)}
-                  className={`w-full p-5 text-left transition-all hover:bg-slate-50 flex gap-4 items-start ${selectedTicketId === t.id ? 'bg-primary/5 border-l-4 border-l-primary' : ''}`}
+                  key={tk.id}
+                  onClick={() => setSelectedTicketId(tk.id)}
+                  className={`w-full p-5 text-left transition-all hover:bg-slate-50 flex gap-4 items-start ${selectedTicketId === tk.id ? 'bg-primary/5 border-l-4 border-l-primary' : ''}`}
                 >
                   <div className="relative">
                     <div className="w-12 h-12 rounded-2xl bg-slate-100 flex items-center justify-center overflow-hidden border border-slate-200 shadow-sm">
-                      {t.userPicture ? (
-                        <img src={t.userPicture} alt="" className="w-full h-full object-cover" />
+                      {tk.userPicture ? (
+                        <img src={tk.userPicture} alt="" className="w-full h-full object-cover" />
                       ) : (
                         <Icons.User size={20} className="text-slate-400" />
                       )}
                     </div>
                     {/* Channel Indicator Overlay */}
                     <div className={`absolute -bottom-1 -right-1 w-6 h-6 rounded-lg flex items-center justify-center text-[10px] shadow-md border-2 border-white 
-                      ${t.channel.includes('help') ? 'bg-rose-500 text-white' : t.channel.includes('regular') ? 'bg-emerald-500 text-white' : 'bg-indigo-500 text-white'}`}>
-                      {t.channel.includes('line') ? 'L' : 'A'}
+                      ${tk.userType === 'rider' ? 'bg-blue-500 text-white' : tk.userType === 'store' ? 'bg-purple-500 text-white' : tk.channel?.includes('help') ? 'bg-rose-500 text-white' : tk.channel?.includes('regular') ? 'bg-emerald-500 text-white' : 'bg-indigo-500 text-white'}`}>
+                      {tk.userType === 'rider' ? 'R' : tk.userType === 'store' ? 'S' : tk.channel?.includes('line') ? 'L' : 'C'}
                     </div>
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex justify-between items-start mb-0.5">
-                      <p className="font-black text-slate-900 truncate text-sm">{t.userName || t('admin.common.customer')}</p>
+                      <div className="flex items-center gap-2 min-w-0">
+                        <p className="font-black text-slate-900 truncate text-sm">{tk.userName || t('admin.common.customer')}</p>
+                        {tk.userType && tk.userType !== 'customer' && (
+                          <span className={`text-[8px] font-black uppercase px-1.5 py-0.5 rounded-md shrink-0 ${tk.userType === 'rider' ? 'bg-blue-50 text-blue-600' : 'bg-purple-50 text-purple-600'}`}>
+                            {tk.userType === 'rider' ? t('admin.common.rider') : t('admin.common.store')}
+                          </span>
+                        )}
+                      </div>
                       <span className="text-[9px] font-bold text-slate-400 whitespace-nowrap">
-                        {t.lastMessageAt ? new Date(t.lastMessageAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
+                        {tk.lastMessageAt ? new Date(tk.lastMessageAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
                       </span>
                     </div>
                     <p className="text-xs text-slate-500 truncate leading-relaxed">
-                      {t.lastMessage || t('admin.support.openingTicket')}
+                      {tk.subject ? `[${tk.subject}] ` : ''}{tk.lastMessage || t('admin.support.openingTicket')}
                     </p>
                   </div>
                 </button>

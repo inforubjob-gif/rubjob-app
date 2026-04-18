@@ -31,33 +31,30 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Ticket not found" }, { status: 404 });
     }
 
-    // 2. Fetch Token from Database
-    const channelKeyToken = `line_token_${ticket.channel.replace('_line', '')}`;
-    const result = await db.prepare(`SELECT value FROM system_settings WHERE key = ?`).bind(channelKeyToken).first() as { value: string };
-    const channelToken = result?.value;
-
-    if (!channelToken) {
-      return NextResponse.json({ error: "LINE Token not found in settings" }, { status: 500 });
-    }
-
-    // 3. Send Push Message to LINE if it's a LINE channel
+    // 2. Send Push Message to LINE if it's a LINE channel (skip for in_app)
     if (ticket.channel.includes('line')) {
-      const lineRes = await fetch("https://api.line.me/v2/bot/message/push", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${channelToken}`,
-        },
-        body: JSON.stringify({
-          to: ticket.userId,
-          messages: [{ type: "text", text: text }],
-        }),
-      });
+      const channelKeyToken = `line_token_${ticket.channel.replace('_line', '')}`;
+      const result = await db.prepare(`SELECT value FROM system_settings WHERE key = ?`).bind(channelKeyToken).first() as { value: string };
+      const channelToken = result?.value;
 
-      if (!lineRes.ok) {
-        const err = await lineRes.text();
-        console.error("LINE Push Error:", err);
-        return NextResponse.json({ error: "Failed to send message to LINE", details: err }, { status: 502 });
+      if (channelToken) {
+        const lineRes = await fetch("https://api.line.me/v2/bot/message/push", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${channelToken}`,
+          },
+          body: JSON.stringify({
+            to: ticket.userId,
+            messages: [{ type: "text", text: text }],
+          }),
+        });
+
+        if (!lineRes.ok) {
+          const err = await lineRes.text();
+          console.error("LINE Push Error:", err);
+          // Don't fail — still save message to DB
+        }
       }
     }
 

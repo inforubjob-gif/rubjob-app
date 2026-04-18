@@ -17,6 +17,9 @@ export async function GET(req: Request) {
     const db = getRequestContext().env.DB;
     if (!db) return NextResponse.json({ error: "D1 not found" }, { status: 500 });
 
+    // Self-healing: ensure userType column exists
+    try { await db.prepare("ALTER TABLE support_tickets ADD COLUMN userType TEXT DEFAULT 'customer'").run(); } catch (e) {}
+
     if (id) {
       // Fetch messages for a specific ticket
       const { results } = await db.prepare(`
@@ -33,14 +36,25 @@ export async function GET(req: Request) {
         t.*, 
         u.displayName as userName, 
         u.pictureUrl as userPicture,
+        r.name as riderName,
+        s.name as storeName,
         (SELECT content FROM support_messages WHERE ticketId = t.id ORDER BY createdAt DESC LIMIT 1) as lastMessage,
         (SELECT createdAt FROM support_messages WHERE ticketId = t.id ORDER BY createdAt DESC LIMIT 1) as lastMessageAt
       FROM support_tickets t
-      LEFT JOIN users u ON t.userId = u.id
+      LEFT JOIN users u ON t.userId = u.id AND (t.userType = 'customer' OR t.userType IS NULL)
+      LEFT JOIN rider_users r ON t.userId = r.id AND t.userType = 'rider'
+      LEFT JOIN stores s ON t.userId = s.id AND t.userType = 'store'
       ORDER BY lastMessageAt DESC NULLS LAST, t.updatedAt DESC
     `).all();
 
-    return NextResponse.json({ tickets: results });
+    // Normalize names
+    const normalizedTickets = results.map((t: any) => ({
+      ...t,
+      userName: t.userName || t.riderName || t.storeName || "Unknown",
+      userPicture: t.userPicture || null,
+    }));
+
+    return NextResponse.json({ tickets: normalizedTickets });
   } catch (error: any) {
     console.error("Admin tickets fetch error:", error);
     return NextResponse.json({ error: error.message }, { status: 500 });

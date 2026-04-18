@@ -164,6 +164,19 @@ export default function RiderProfilePage() {
           </div>
         </section>
 
+         {/* Support */}
+         <section>
+           <p className="text-[10px] font-black text-slate-300 uppercase tracking-[0.25em] mb-4 pl-1">{t("support.sectionTitle") || "ช่วยเหลือ"}</p>
+           <div className="space-y-3">
+              <SettingItem 
+                 icon={<Icons.Chat size={20} />} 
+                 label={t("support.contactAdmin") || "ติดต่อแอดมิน"} 
+                 value={t("support.contactAdminDesc") || "แจ้งปัญหา / สอบถาม"}
+                 onClick={() => router.push("/rider/support")}
+              />
+           </div>
+         </section>
+
         <section>
           <p className="text-[10px] font-black text-slate-300 uppercase tracking-[0.25em] mb-4 pl-1">{t("rider.profile.account")}</p>
           <button 
