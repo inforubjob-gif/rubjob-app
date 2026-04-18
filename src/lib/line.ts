@@ -260,10 +260,22 @@ export const washingOrderFlex = (orderId: string) =>
   orderStatusUpdateFlex(orderId, "กำลังซักรีด...", `ออเดอร์ของคุณเข้าสู่กระบวนการซักรีดแล้วครับ`, "#6366f1");
 
 /**
+ * Flex Message for Rider heading to Store
+ */
+export const deliveringToStoreFlex = (orderId: string) => 
+  orderStatusUpdateFlex(orderId, "กำลังนำส่งร้านซัก", `ไรเดอร์ได้รับผ้าของคุณแล้ว และกำลังเดินทางไปที่ร้านซักให้คุณครับ`, "#3b82f6");
+
+/**
  * Flex Message for Ready for Delivery
  */
 export const readyForDeliveryFlex = (orderId: string) => 
-  orderStatusUpdateFlex(orderId, "ซักเสร็จแล้ว!", `ผ้าซักเสร็จเรียบร้อยแล้ว กำลังรอ Rider จัดส่งให้คุณครับ`, "#f59e0b");
+  orderStatusUpdateFlex(orderId, "ผ้าซักเสร็จแล้ว! ✨", `ออเดอร์ของคุณซักเสร็จเรียบร้อยแล้ว กำลังรอไรเดอร์มารับเพื่อนำไปส่งคืนให้คุณครับ`, "#f59e0b");
+
+/**
+ * Flex Message for Rider heading to Customer
+ */
+export const deliveringToCustomerFlex = (orderId: string) => 
+  orderStatusUpdateFlex(orderId, "กำลังนำผ้าไปส่งคืน", `ไรเดอร์ได้รับผ้าสะอาดของคุณแล้ว และกำลังเดินทางไปส่งคืนให้คุณที่บ้านครับ`, "#10b981");
 
 /**
  * Flex Message for Completed

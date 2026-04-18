@@ -53,11 +53,17 @@ export async function transitionOrderStatus(
           flexMessage = riderAcceptedFlex(orderId, options.riderName);
         }
         break;
+      case "delivering_to_store":
+        flexMessage = deliveringToStoreFlex(orderId);
+        break;
       case "washing":
         flexMessage = washingOrderFlex(orderId);
         break;
-      case "ready_for_delivery":
+      case "ready_for_pickup":
         flexMessage = readyForDeliveryFlex(orderId);
+        break;
+      case "delivering_to_customer":
+        flexMessage = deliveringToCustomerFlex(orderId);
         break;
       case "completed":
         flexMessage = orderCompletedFlex(orderId);
