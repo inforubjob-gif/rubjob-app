@@ -34,6 +34,23 @@ export default function RiderOrderDetailPage() {
   const [photo, setPhoto] = useState<string | null>(null);
   const [isUpdating, setIsUpdating] = useState(false);
   const [isIssueModalOpen, setIsIssueModalOpen] = useState(false);
+  const [riderCoords, setRiderCoords] = useState<{lat: number, lng: number} | null>(null);
+
+  useEffect(() => {
+    if (typeof window !== "undefined" && navigator.geolocation) {
+      const watchId = navigator.geolocation.watchPosition(
+        (pos) => {
+          setRiderCoords({
+            lat: pos.coords.latitude,
+            lng: pos.coords.longitude
+          });
+        },
+        (err) => console.error("Rider GPS Error:", err),
+        { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
+      );
+      return () => navigator.geolocation.clearWatch(watchId);
+    }
+  }, []);
 
   useEffect(() => {
     if (!id) return;
@@ -176,6 +193,10 @@ export default function RiderOrderDetailPage() {
              storeLng={storePos.lng}
              userLat={userPos.lat}
              userLng={userPos.lng}
+             riderLat={riderCoords?.lat}
+             riderLng={riderCoords?.lng}
+             activeDestLat={activeDest.pos.lat}
+             activeDestLng={activeDest.pos.lng}
            />
            
            <div className="absolute bottom-4 right-4 z-20 flex flex-col items-end gap-2">
