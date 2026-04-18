@@ -911,8 +911,13 @@ function BookingFlow() {
           <Button
             fullWidth
             size="lg"
-            disabled={!selectedService}
-            onClick={() => setStep("details")}
+            onClick={() => {
+              if (!selectedService) {
+                showToast(t("booking.selectServiceStore"), "error");
+                return;
+              }
+              setStep("details");
+            }}
           >
             {t("common.confirm")}
           </Button>
@@ -934,8 +939,21 @@ function BookingFlow() {
             <Button
               fullWidth
               size="lg"
-              disabled={!selectedAddress || !pickupDate || !pickupSlot || (!profile?.phone && !tempPhone)}
               onClick={async () => {
+                // Validation checks
+                if (!selectedAddress) {
+                  showToast(t("booking.errors.noAddress"), "error");
+                  return;
+                }
+                if (!pickupDate || !pickupSlot) {
+                  showToast(t("booking.errors.noDateTime"), "error");
+                  return;
+                }
+                if (!profile?.phone && !tempPhone) {
+                  showToast(t("booking.errors.noPhone"), "error");
+                  return;
+                }
+
                 // If phone was provided in the temp input, sync it to user profile
                 if (tempPhone && !profile?.phone) {
                   try {
@@ -949,7 +967,6 @@ function BookingFlow() {
                         phone: tempPhone
                       })
                     });
-                    // Note: LiffProvider might not refresh immediately, but we have it in D1 now
                     profile!.phone = tempPhone; 
                   } catch (e) {
                     console.error("Phone sync failed", e);
@@ -967,8 +984,17 @@ function BookingFlow() {
             fullWidth
             size="lg"
             isLoading={isSubmitting}
-            disabled={!selectedPayment || isBelowMinOrder}
-            onClick={handleConfirm}
+            onClick={() => {
+              if (isBelowMinOrder) {
+                showToast(t("booking.errors.minOrder").replace("{amount}", minOrderAmount.toString()), "error");
+                return;
+              }
+              if (!selectedPayment) {
+                showToast(t("booking.selectPaymentDesc"), "error");
+                return;
+              }
+              handleConfirm();
+            }}
             className={isBelowMinOrder ? "bg-slate-300 text-slate-500 shadow-none border-transparent" : ""}
           >
             {isSubmitting ? t("common.loading") : isBelowMinOrder ? t("booking.errors.cannotPlaceOrder").replace("{amount}", minOrderAmount.toString()) : 
