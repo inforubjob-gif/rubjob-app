@@ -107,9 +107,7 @@ export default function StoreDashboard() {
       <header className="relative z-10 px-5 pt-6 pb-6">
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-xl bg-white shadow-2xl flex items-center justify-center text-primary border-4 border-white/50">
-              <Icons.Logo size={36} variant="icon" />
-            </div>
+            <Icons.Logo variant="icon-white" size={56} />
             <div className="min-w-0">
                <p className="text-[10px] text-white/70 font-black uppercase tracking-[0.2em] leading-none mb-1 shadow-sm">{t("store.unitNo")} {store?.id?.split('-')[1] || '001'}</p>
                <h1 className="text-2xl font-black text-white tracking-tight truncate drop-shadow-md">{store?.name || t("common.guest")}</h1>

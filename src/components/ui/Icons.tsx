@@ -14,13 +14,15 @@ export const Icons = {
   }: { 
     size?: number; 
     className?: string; 
-    variant?: "horizontal" | "icon" | "white" | "color" 
+    variant?: "horizontal" | "icon" | "white" | "color" | "icon-white" 
   }) => {
     const src = variant === "icon" 
       ? "/images/rubjob-complete_logo-color.png" 
       : variant === "white" 
         ? "/images/rubjob-complete_Text-white.png"
-        : "/images/rubjob-complete_Text-color.png";
+        : variant === "icon-white"
+          ? "/images/rubjob-complete_logo-white.png"
+          : "/images/rubjob-complete_Text-color.png";
         
     return (
       <div className={`flex items-center ${className}`}>

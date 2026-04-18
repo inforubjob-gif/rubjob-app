@@ -143,9 +143,7 @@ export default function RiderDashboard() {
       <header className="relative z-10 px-5 pt-6 pb-6">
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-xl bg-white flex items-center justify-center p-2.5 shadow-xl shadow-primary-dark/20 border-2 border-white/50 ring-4 ring-primary/10">
-              <Icons.Logo variant="icon" size={36} />
-            </div>
+            <Icons.Logo variant="icon-white" size={56} />
             <div className="min-w-0">
               <p className="text-[10px] text-white font-black uppercase tracking-[0.25em] leading-tight mb-2 flex items-center gap-2">
                 <span className="w-1.5 h-1.5 rounded-full bg-white/50 animate-pulse" />
