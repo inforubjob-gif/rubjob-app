@@ -5,17 +5,13 @@ import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import { Icons } from "@/components/ui/Icons";
 import { useTranslation } from "@/components/providers/LanguageProvider";
+import { SUPPORT_FAQS, SUPPORT_TEMPLATES } from "@/lib/support-content";
 
 export default function SupportPage() {
   const router = useRouter();
   const { t } = useTranslation();
-
-  const faqs = [
-    { q: "How do I book a service?", a: "Go to the home page and click the '+' button in the center of the bottom navigation." },
-    { q: "What are your service areas?", a: "We currently serve most areas in Bangkok. You can check specific availability during booking." },
-    { q: "How do I pay for my order?", a: "Payment can be made via PromptPay or Credit/Debit card through the LINE Mini App." },
-    { q: "Is there a guarantee for lost items?", a: "Yes, we provide item-level insurance for all orders. Check our terms for details." },
-  ];
+  const faqs = SUPPORT_FAQS.customer;
+  const templates = SUPPORT_TEMPLATES.customer;
 
   return (
     <div className="flex flex-col min-h-dvh bg-slate-50 relative overflow-hidden">
@@ -54,6 +50,31 @@ export default function SupportPage() {
                 <h3 className="text-sm font-bold">Call Support</h3>
                 <p className="text-[10px] text-slate-400 font-black uppercase">24/7 Available</p>
             </Card>
+        </section>
+
+        {/* FAQs */}
+        <section>
+          <div className="flex items-center justify-between mb-5">
+            <h2 className="text-base font-bold text-foreground">Templates</h2>
+          </div>
+          <div className="space-y-3">
+            {templates.map((tpl) => (
+              <Card key={tpl.id} className="p-4">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <h3 className="text-sm font-black text-slate-900">{tpl.title}</h3>
+                    <p className="text-xs text-slate-500 mt-1">{tpl.subject}</p>
+                  </div>
+                  <button
+                    onClick={() => navigator.clipboard.writeText(`Subject: ${tpl.subject}\n\n${tpl.message}`)}
+                    className="text-[10px] font-black px-2.5 py-1.5 rounded-lg bg-slate-100 text-slate-500"
+                  >
+                    {t("common.copy")}
+                  </button>
+                </div>
+              </Card>
+            ))}
+          </div>
         </section>
 
         {/* FAQs */}

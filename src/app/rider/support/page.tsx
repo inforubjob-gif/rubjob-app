@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Icons } from "@/components/ui/Icons";
 import { useTranslation } from "@/components/providers/LanguageProvider";
+import { SUPPORT_FAQS, SUPPORT_TEMPLATES } from "@/lib/support-content";
 
 export default function RiderSupportPage() {
   const router = useRouter();
@@ -16,8 +17,11 @@ export default function RiderSupportPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSending, setIsSending] = useState(false);
   const [showNewTicket, setShowNewTicket] = useState(false);
+  const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
   const [riderSession, setRiderSession] = useState<any>(null);
+  const templateOptions = SUPPORT_TEMPLATES.rider;
+  const faqItems = SUPPORT_FAQS.rider;
 
   useEffect(() => {
     const localSession = localStorage.getItem("rubjob_rider_session");
@@ -98,6 +102,14 @@ export default function RiderSupportPage() {
     } finally {
       setIsSending(false);
     }
+  };
+
+  const applyTemplate = (templateId: string) => {
+    const tpl = templateOptions.find((item) => item.id === templateId);
+    if (!tpl) return;
+    setSelectedTemplateId(templateId);
+    setNewSubject(tpl.subject);
+    setNewMessage(tpl.message);
   };
 
   const getStatusColor = (status: string) => {
@@ -226,6 +238,24 @@ export default function RiderSupportPage() {
       </header>
 
       <div className="flex-1 px-5 pt-6 pb-24 space-y-4">
+        <section className="space-y-2">
+          <p className="text-[10px] font-black text-slate-300 uppercase tracking-[0.25em] pl-1">เทมเพลตยอดนิยมสำหรับไรเดอร์</p>
+          <div className="flex gap-2 overflow-x-auto pb-1">
+            {templateOptions.map((tpl) => (
+              <button
+                key={tpl.id}
+                onClick={() => {
+                  setShowNewTicket(true);
+                  applyTemplate(tpl.id);
+                }}
+                className="shrink-0 px-3 py-2 rounded-xl bg-white border border-slate-100 text-xs font-bold text-slate-700 active:scale-95 transition-all"
+              >
+                {tpl.title}
+              </button>
+            ))}
+          </div>
+        </section>
+
         {/* New Ticket Button */}
         <button
           onClick={() => setShowNewTicket(true)}
@@ -239,6 +269,16 @@ export default function RiderSupportPage() {
             <p className="text-[10px] text-slate-400 font-bold">{t("support.newTicketDesc") || "สร้างรายการสอบถามหรือแจ้งปัญหา"}</p>
           </div>
         </button>
+
+        <section className="space-y-2 mt-2">
+          <p className="text-[10px] font-black text-slate-300 uppercase tracking-[0.25em] pl-1">Q&A พื้นฐาน</p>
+          {faqItems.map((faq) => (
+            <div key={faq.q} className="bg-white rounded-xl border border-slate-100 p-3">
+              <p className="text-xs font-black text-slate-800">{faq.q}</p>
+              <p className="text-xs text-slate-500 mt-1">{faq.a}</p>
+            </div>
+          ))}
+        </section>
 
         {/* Ticket List */}
         {isLoading ? (
@@ -301,6 +341,24 @@ export default function RiderSupportPage() {
             <p className="text-xs text-slate-400 font-bold mb-5">{t("support.newTicketModalDesc") || "กรอกหัวข้อและรายละเอียดที่ต้องการแจ้ง"}</p>
 
             <div className="space-y-4">
+              <div>
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block">เลือกเทมเพลต</label>
+                <div className="flex gap-2 overflow-x-auto pb-1">
+                  {templateOptions.map((tpl) => (
+                    <button
+                      key={tpl.id}
+                      onClick={() => applyTemplate(tpl.id)}
+                      className={`shrink-0 px-3 py-2 rounded-xl border text-xs font-bold transition-all ${
+                        selectedTemplateId === tpl.id
+                          ? "bg-primary/10 border-primary/30 text-primary"
+                          : "bg-slate-50 border-slate-100 text-slate-600"
+                      }`}
+                    >
+                      {tpl.title}
+                    </button>
+                  ))}
+                </div>
+              </div>
               <div>
                 <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block">{t("support.subjectLabel") || "หัวข้อ"}</label>
                 <input
