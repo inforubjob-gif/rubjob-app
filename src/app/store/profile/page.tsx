@@ -127,12 +127,6 @@ export default function StoreProfilePage() {
                 value={language === "th" ? "ไทย (TH)" : language === "en" ? "English (EN)" : "Chinese (ZH)"}
                 onClick={() => setShowLanguageModal(true)}
              />
-             <SettingItem 
-                icon={<Icons.MapPin size={20} />} 
-                label={t("store.profile.serviceArea")} 
-                value={prefs?.serviceArea || t("common.notSet")} 
-                onClick={() => router.push("/store/profile/service-area")}
-             />
               <SettingItem 
                  icon={<Icons.Clipboard size={20} />} 
                  label={t("store.laundryService")} 
@@ -145,12 +139,6 @@ export default function StoreProfilePage() {
                  value={prefs?.activeHours || t("common.notSet")} 
                  onClick={() => router.push("/store/profile/active-hours")}
               />
-             <SettingItem 
-                icon={<Icons.Truck size={20} />} 
-                label={t("store.profile.vehicleType")} 
-                value={prefs?.vehicleType || t("common.notSet")} 
-                onClick={() => router.push("/store/profile/vehicle-type")}
-             />
              <SettingItem 
                 icon={<Icons.Payment size={20} />} 
                 label={t("store.profile.payoutMethod")} 
