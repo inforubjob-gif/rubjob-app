@@ -97,7 +97,7 @@ export default function HomePage() {
         {/* ─── Hero Ads ─── */}
         <section className="relative w-full rounded-xl overflow-hidden shadow-2xl shadow-primary/20 group active:scale-[0.98] transition-all duration-500 bg-white border-4 border-white/50">
           <img 
-            src="/images/ads/Cover-app.png" 
+            src="/images/ads/rubjobfull.png" 
             alt="Rubjob Promotion"
             className="w-full h-auto block"
           />
