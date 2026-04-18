@@ -55,7 +55,7 @@ export default function StoreLoginPage() {
       <div className="relative z-10 w-full max-w-sm mx-auto space-y-10">
         <div className="text-center px-4">
           <div className="mb-10 flex justify-center">
-            <Icons.Logo variant="white" size={42} className="drop-shadow-2xl" />
+            <Icons.Logo variant="white" size={140} className="drop-shadow-2xl" />
           </div>
         </div>
           <p className="text-xs text-white/70 font-black uppercase mt-6 bg-white/10 backdrop-blur-sm py-1.5 px-6 rounded-full inline-block border border-white/10">

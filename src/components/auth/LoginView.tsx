@@ -15,7 +15,7 @@ export default function LoginView() {
       <main className="relative z-10 w-full max-w-sm mx-auto flex flex-col items-center">
         {/* Simple Logo (Standardized with other portals) */}
         <div className="mb-14 flex justify-center">
-          <Icons.Logo size={42} variant="white" className="drop-shadow-2xl" />
+          <Icons.Logo size={140} variant="white" className="drop-shadow-2xl" />
         </div>
 
         <div className="w-full space-y-8 text-center">
