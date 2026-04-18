@@ -124,8 +124,8 @@ CREATE TABLE IF NOT EXISTS orders (
   FOREIGN KEY (userId) REFERENCES users(id),
   FOREIGN KEY (storeId) REFERENCES stores(id),
   FOREIGN KEY (serviceId) REFERENCES services(id),
-  FOREIGN KEY (pickupDriverId) REFERENCES users(id),
-  FOREIGN KEY (deliveryDriverId) REFERENCES users(id)
+  FOREIGN KEY (pickupDriverId) REFERENCES rider_users(id),
+  FOREIGN KEY (deliveryDriverId) REFERENCES rider_users(id)
 );
 
 -- Addresses Table

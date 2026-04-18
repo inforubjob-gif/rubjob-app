@@ -118,8 +118,17 @@ export async function PUT(req: Request) {
 
     // Use transitionOrderStatus to handle update and notification
     // Fetch rider name first from rider_users
-    const rider = await db.prepare("SELECT name as displayName FROM rider_users WHERE id = ?").bind(riderId).first() as any;
+    const rider = await db.prepare("SELECT * FROM rider_users WHERE id = ?").bind(riderId).first() as any;
     
+    // Shadow User Sync: Ensure rider exists in 'users' table to satisfy Foreign Key constraint in 'orders'
+    // Since 'orders' table has FOREIGN KEY (pickupDriverId) REFERENCES users(id)
+    if (rider) {
+      await db.prepare(`
+        INSERT OR IGNORE INTO users (id, displayName, phone, role)
+        VALUES (?, ?, ?, 'driver')
+      `).bind(rider.id, rider.name, rider.phone).run();
+    }
+
     // Attempt assignment first to ensure idempotency/concurrency safety
     const assignmentResult = await db.prepare(`
       UPDATE orders 
