@@ -77,6 +77,8 @@ export async function POST(req: Request) {
         const store = await db.prepare("SELECT ownerId FROM stores WHERE id = ?").bind(storeId).first() as any;
         userId = store?.ownerId || null;
       }
+    } else if (type === "customer") {
+      userId = (await req.clone().json() as any).userId;
     }
 
     if (!userId) {

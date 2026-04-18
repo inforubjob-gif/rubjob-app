@@ -133,6 +133,18 @@ export const th = {
       myQRCode: "เชิญเพื่อนเพื่อเก็บคะแนน",
       helpSupport: "ช่วยเหลือและสนับสนุน",
       myAddress: "ที่อยู่ของฉัน",
+      wallet: {
+        pin: {
+          title: "รหัสความปลอดภัย",
+          setupTitle: "ตั้งรหัส PIN ความปลอดภัย",
+          enterTitle: "กรุณาใส่รหัส PIN เพื่อเข้าถึงข้อมูล",
+          error: "รหัส PIN ไม่ถูกต้อง กรุณาลองอีกครั้ง",
+          setupSuccess: "ตั้งค่ารหัส PIN สำเร็จ",
+          confirmPin: "ยืนยันรหัส PIN อีกครั้ง",
+          mismatch: "รหัส PIN ไม่ตรงกัน",
+          instruction: "รหัส 6 หลักสำหรับความปลอดภัยส่วนตัว",
+        }
+      },
       privacyPolicy: "นโยบายความเป็นส่วนตัว",
       logout: "ออกจากระบบ",
       noAddress: "ยังไม่มีที่อยู่ที่บันทึกไว้",

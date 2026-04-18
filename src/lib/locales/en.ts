@@ -62,6 +62,18 @@ export const en = {
   },
   profile: {
     title: "Profile",
+    wallet: {
+      pin: {
+        title: "Security PIN",
+        setupTitle: "Set Your Security PIN",
+        enterTitle: "Enter PIN to Access Info",
+        error: "Incorrect PIN. Please try again.",
+        setupSuccess: "PIN Setup Successful",
+        confirmPin: "Confirm Your PIN",
+        mismatch: "PINs do not match",
+        instruction: "6-digit code for your personal security",
+      }
+    },
     editTitle: "Edit Profile",
     fullName: "Full Name",
     email: "Email",

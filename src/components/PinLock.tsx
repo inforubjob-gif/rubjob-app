@@ -5,12 +5,13 @@ import { Icons } from "@/components/ui/Icons";
 import { useTranslation } from "@/components/providers/LanguageProvider";
 
 interface PinLockProps {
-  type: "rider" | "store";
+  type: "rider" | "store" | "customer";
+  userId?: string;
   onVerified: () => void;
   children: React.ReactNode;
 }
 
-export default function PinLock({ type, onVerified, children }: PinLockProps) {
+export default function PinLock({ type, userId, onVerified, children }: PinLockProps) {
   const { t } = useTranslation();
   const [isLocked, setIsLocked] = useState(true);
   const [hasPin, setHasPin] = useState<boolean | null>(null);
@@ -27,7 +28,8 @@ export default function PinLock({ type, onVerified, children }: PinLockProps) {
 
   const checkPinStatus = async () => {
     try {
-      const res = await fetch(`/api/user/pin?type=${type}`);
+      const url = `/api/user/pin?type=${type}${userId ? `&userId=${userId}` : ""}`;
+      const res = await fetch(url);
       const data = await res.json();
       setHasPin(data.hasPin);
       if (!data.hasPin) {
@@ -83,7 +85,7 @@ export default function PinLock({ type, onVerified, children }: PinLockProps) {
       const res = await fetch("/api/user/pin", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "verify", pin, type })
+        body: JSON.stringify({ action: "verify", pin, type, userId })
       });
       const data = await res.json();
       if (data.success) {
@@ -109,7 +111,7 @@ export default function PinLock({ type, onVerified, children }: PinLockProps) {
       const res = await fetch("/api/user/pin", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "setup", pin, type })
+        body: JSON.stringify({ action: "setup", pin, type, userId })
       });
       const data = await res.json();
       if (data.success) {
