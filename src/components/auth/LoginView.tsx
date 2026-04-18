@@ -2,9 +2,11 @@
 
 import { useLiff } from "@/components/providers/LiffProvider";
 import { Icons } from "@/components/ui/Icons";
+import { useTranslation } from "@/components/providers/LanguageProvider";
 
 export default function LoginView() {
   const { login, isReady } = useLiff();
+  const { t } = useTranslation();
 
   return (
     <div className="min-h-[100dvh] bg-gradient-to-b from-primary via-primary to-slate-50 flex flex-col items-center justify-center px-6 py-12 transition-all duration-700 relative overflow-hidden font-sans">

@@ -47,7 +47,7 @@ export default function StoreLoginPage() {
   };
 
   return (
-    <div className="flex flex-col min-h-dvh bg-gradient-to-b from-primary via-primary to-slate-50 relative overflow-hidden p-6 justify-center">
+    <div className="flex flex-col min-h-dvh bg-gradient-to-b from-primary via-primary to-slate-50 relative overflow-hidden p-6 justify-center items-center">
       {/* Decorative Background */}
       <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-[100px] -mr-48 -mt-48" />
       <div className="absolute bottom-0 left-0 w-96 h-96 bg-black/5 rounded-full blur-[100px] -ml-48 -mb-48" />
@@ -122,7 +122,7 @@ export default function StoreLoginPage() {
         <div className="flex flex-col items-center gap-6 mt-4 animate-in fade-in slide-in-from-bottom-4 duration-1000">
           <button 
             onClick={() => alert(t("common.forgotPasswordMessage"))}
-            className="text-white/60 hover:text-white text-xs font-black uppercase transition-colors tracking-widest border-b border-white/20 pb-0.5"
+            className="text-white hover:text-white font-black uppercase transition-colors tracking-widest border-b border-white/40 pb-0.5 text-xs shadow-sm"
           >
             {t("common.forgotPassword")}
           </button>
