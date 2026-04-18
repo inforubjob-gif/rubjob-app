@@ -166,12 +166,12 @@ export default function StoreDashboard() {
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`flex-1 py-3.5 text-[10px] font-black uppercase tracking-[0.1em] rounded-[1.4rem] transition-all duration-500 ${
+              className={`flex-1 flex items-center justify-center gap-1 py-3.5 text-[11px] leading-tight font-black uppercase tracking-[0.1em] rounded-[1.4rem] transition-all duration-500 ${
                 activeTab === tab ? "bg-white text-primary shadow-lg shadow-primary/20 scale-[1.02]" : "text-white/70"
               }`}
             >
-              {tab === "incoming" ? t("store.incomingFromRider") : tab === "washing" ? t("store.processing") : t("store.readyForRider")}
-              {tab === "incoming" && incomingOrders.length > 0 && <span className="ml-1 opacity-50">({incomingOrders.length})</span>}
+              <span>{tab === "incoming" ? t("store.incomingFromRider") : tab === "washing" ? t("store.processing") : t("store.readyForRider")}</span>
+              {tab === "incoming" && incomingOrders.length > 0 && <span className="opacity-50">({incomingOrders.length})</span>}
             </button>
           ))}
         </div>
