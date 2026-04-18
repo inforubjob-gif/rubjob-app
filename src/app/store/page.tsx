@@ -178,8 +178,8 @@ export default function StoreDashboard() {
             </button>
           ))}
         </div>
-      </div>
 
+        {/* Orders Listing */}
         {isLoading ? (
           <div className="space-y-4 px-5">
              {[1, 2, 3].map((i) => (
