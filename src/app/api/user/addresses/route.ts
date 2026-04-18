@@ -68,7 +68,20 @@ export async function POST(req: Request) {
       )
     `).run();
 
-    // 2. If isDefault is true, unset other defaults first
+    // 2. Migration Guard: Add missing columns if they don't exist (Self-healing for existing tables)
+    try {
+      await db.prepare(`ALTER TABLE addresses ADD COLUMN note TEXT`).run();
+    } catch (e) { /* Column might already exist */ }
+    
+    try {
+      await db.prepare(`ALTER TABLE addresses ADD COLUMN lat REAL`).run();
+    } catch (e) { /* Column might already exist */ }
+    
+    try {
+      await db.prepare(`ALTER TABLE addresses ADD COLUMN lng REAL`).run();
+    } catch (e) { /* Column might already exist */ }
+
+    // 3. If isDefault is true, unset other defaults first
     if (isDefault) {
       await db.prepare(`UPDATE addresses SET isDefault = 0 WHERE userId = ?`).bind(userId).run();
     }
