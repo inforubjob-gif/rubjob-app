@@ -40,13 +40,19 @@ export default function RiderOrderDetailPage() {
     async function fetchOrder() {
       try {
         const res = await fetch(`/api/orders/${id}`);
+        if (!res.ok) {
+          throw new Error(`Error: ${res.status}`);
+        }
         const data = await res.json() as any;
         if (data.order) {
           setOrder(data.order);
           setStatus(data.order.status);
+        } else {
+          setOrder(null);
         }
       } catch (err) {
         console.error("Failed to fetch order detail:", err);
+        setOrder(null);
       } finally {
         setIsLoading(false);
       }

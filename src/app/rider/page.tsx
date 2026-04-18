@@ -114,8 +114,8 @@ export default function RiderDashboard() {
       const data = await res.json();
       if (res.ok && data.success) {
         setSelectedJob(null);
-        // Clean refresh to sync all stats
-        window.location.reload();
+        // Navigate to the job details page for next steps
+        router.push(`/rider/orders/${jobId}`);
       } else {
         alert(data.error || t("rider.acceptJobError"));
       }

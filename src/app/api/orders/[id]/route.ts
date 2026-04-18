@@ -23,32 +23,46 @@ export async function GET(
              s.name as serviceName, s.icon as serviceIcon, s.estimatedDays,
              u_customer.displayName as userName,
              st.name as storeName, st.lat as storeLat, st.lng as storeLng,
-             u_pickup.displayName as pickupDriverName,
-             u_delivery.displayName as deliveryDriverName
+             COALESCE(r_pickup.name, u_pickup.displayName) as pickupDriverName,
+             COALESCE(r_delivery.name, u_delivery.displayName) as deliveryDriverName
       FROM orders o
       JOIN services s ON o.serviceId = s.id
       JOIN users u_customer ON o.userId = u_customer.id
       JOIN stores st ON o.storeId = st.id
       LEFT JOIN users u_pickup ON o.pickupDriverId = u_pickup.id
+      LEFT JOIN rider_users r_pickup ON o.pickupDriverId = r_pickup.id
       LEFT JOIN users u_delivery ON o.deliveryDriverId = u_delivery.id
+      LEFT JOIN rider_users r_delivery ON o.deliveryDriverId = r_delivery.id
       WHERE o.id = ?
-    `).bind(id).first();
-
+    `).bind(id).first() as any;
+ 
     if (!order) {
       return NextResponse.json({ error: "Order not found" }, { status: 404 });
     }
-
-    // Parse JSON fields if they are strings
-    if (typeof order.items === "string") {
-      order.items = JSON.parse(order.items);
-    }
-    if (typeof order.address === "string") {
-      order.address = JSON.parse(order.address);
-    }
-    if (typeof order.paymentInfo === "string") {
-      order.paymentInfo = JSON.parse(order.paymentInfo);
-    }
-
+ 
+    // Parse JSON fields defensively
+    try {
+      if (typeof order.items === "string" && order.items.trim()) {
+        order.items = JSON.parse(order.items);
+      } else if (!order.items) {
+        order.items = [];
+      }
+    } catch (e) { order.items = []; }
+ 
+    try {
+      if (typeof order.address === "string" && order.address.trim()) {
+        order.address = JSON.parse(order.address);
+      } else if (typeof order.address !== "object") {
+        order.address = { label: "N/A" };
+      }
+    } catch (e) { order.address = { label: "N/A" }; }
+ 
+    try {
+      if (typeof order.paymentInfo === "string" && order.paymentInfo.trim()) {
+        order.paymentInfo = JSON.parse(order.paymentInfo);
+      }
+    } catch (e) { /* leave as is */ }
+ 
     return NextResponse.json({ order });
   } catch (error: any) {
     console.error("Fetch order detail error:", error);
