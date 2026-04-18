@@ -46,9 +46,11 @@ export async function GET(req: Request) {
     const gpRiderPercent = parseFloat(settings.gp_rider_percent || "10");
     const riderBasePayout = parseFloat(settings.rider_base_payout || "0");
 
-    const calculateRiderEarn = (deliveryFee: number) => {
+    const calculateRiderEarn = (deliveryFee: number, status: string) => {
       const commission = (deliveryFee * gpRiderPercent) / 100;
-      return (deliveryFee - commission) + riderBasePayout;
+      const totalEarn = (deliveryFee - commission) + riderBasePayout;
+      // Split 50/50 between legs.
+      return totalEarn * 0.5;
     };
 
     // 0. Fetch Rider Profile status and pictureUrl
@@ -56,8 +58,6 @@ export async function GET(req: Request) {
     const verificationStatus = riderProfile?.status || "unregistered";
 
     // 1. Available Jobs: 
-    // - Pending pickup from user (status = 'pending')
-    // - Ready for delivery from store (status = 'ready_for_pickup')
     const availableJobs = await db.prepare(`
       SELECT o.*, s.name as serviceName, st.name as storeName, st.address as storeAddress, st.lat as storeLat, st.lng as storeLng
       FROM orders o
@@ -82,13 +82,13 @@ export async function GET(req: Request) {
       pictureUrl: riderProfile?.pictureUrl,
       available: availableJobs.results.map((r: any) => ({
         ...r,
-        riderEarn: calculateRiderEarn(r.deliveryFee || 0),
+        riderEarn: calculateRiderEarn(r.deliveryFee || 0, r.status),
         address: JSON.parse(r.address || "{}"),
         items: JSON.parse(r.items || "[]")
       })),
       active: activeJobs.results.map((r: any) => ({
         ...r,
-        riderEarn: calculateRiderEarn(r.deliveryFee || 0),
+        riderEarn: calculateRiderEarn(r.deliveryFee || 0, r.status),
         address: JSON.parse(r.address || "{}"),
         items: JSON.parse(r.items || "[]")
       }))
@@ -101,7 +101,7 @@ export async function GET(req: Request) {
 
 /**
  * PUT /api/rider/orders
- * Rider accepts a job
+ * Rider accepts a job (Pickup or Delivery leg)
  */
 export async function PUT(req: Request) {
   const session = await getRiderSession();
@@ -116,12 +116,12 @@ export async function PUT(req: Request) {
     const db = getRequestContext().env.DB;
     if (!db) return NextResponse.json({ error: "D1 not found" }, { status: 500 });
 
-    // Use transitionOrderStatus to handle update and notification
-    // Fetch rider name first from rider_users
+    const order = await db.prepare("SELECT status, pickupDriverId, deliveryDriverId FROM orders WHERE id = ?").bind(orderId).first() as any;
+    if (!order) return NextResponse.json({ error: "Order not found" }, { status: 404 });
+
     const rider = await db.prepare("SELECT * FROM rider_users WHERE id = ?").bind(riderId).first() as any;
     
-    // Shadow User Sync: Ensure rider exists in 'users' table to satisfy Foreign Key constraint in 'orders'
-    // Since 'orders' table has FOREIGN KEY (pickupDriverId) REFERENCES users(id)
+    // Shadow User Sync for FK
     if (rider) {
       await db.prepare(`
         INSERT OR IGNORE INTO users (id, displayName, phone, role)
@@ -129,26 +129,37 @@ export async function PUT(req: Request) {
       `).bind(rider.id, rider.name, rider.phone).run();
     }
 
-    // Attempt assignment first to ensure idempotency/concurrency safety
-    const assignmentResult = await db.prepare(`
-      UPDATE orders 
-      SET pickupDriverId = ?
-      WHERE id = ? AND status = 'pending' AND pickupDriverId IS NULL
-    `).bind(riderId, orderId).run();
+    let assignmentResult;
+    let nextStatus: any = null;
+
+    if (order.status === 'pending' && !order.pickupDriverId) {
+      // Leg 1: Pickup
+      assignmentResult = await db.prepare(`
+        UPDATE orders SET pickupDriverId = ? WHERE id = ? AND status = 'pending' AND pickupDriverId IS NULL
+      `).bind(riderId, orderId).run();
+      nextStatus = "picking_up";
+    } else if (order.status === 'ready_for_pickup' && !order.deliveryDriverId) {
+      // Leg 2: Delivery
+      assignmentResult = await db.prepare(`
+        UPDATE orders SET deliveryDriverId = ? WHERE id = ? AND status = 'ready_for_pickup' AND deliveryDriverId IS NULL
+      `).bind(riderId, orderId).run();
+      nextStatus = "delivering_to_customer";
+    } else {
+      return NextResponse.json({ success: false, error: "งานนี้ไม่พร้อมให้รับหรือถูกรับไปแล้ว" }, { status: 409 });
+    }
 
     if (assignmentResult.meta.changes > 0) {
-      // If assignment succeeded, perform status transition and notification
       const transition = await transitionOrderStatus(
         db, 
         orderId, 
-        "picking_up", 
+        nextStatus, 
         getRequestContext().env,
-        { riderName: rider?.displayName || "Rider" }
+        { riderName: rider?.name || "Rider" }
       );
       
       return NextResponse.json({ success: true, message: "Job accepted successfully" });
     } else {
-      return NextResponse.json({ success: false, error: "งานนี้อาจถูกรับไปแล้วหรือสถานะเปลี่ยนไปแล้ว" }, { status: 409 });
+      return NextResponse.json({ success: false, error: "งานนี้ถูกรับไปแล้ว" }, { status: 409 });
     }
   } catch (error: any) {
     console.error("Accept job error:", error);

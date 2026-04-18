@@ -32,31 +32,45 @@ export async function GET(req: Request) {
     const gpRiderPercent = parseFloat(settings.gp_rider_percent || "10");
     const riderBasePayout = parseFloat(settings.rider_base_payout || "0");
 
-    // 2. Calculate Earnings (completed orders where user is pickup or delivery driver)
+    // 2. Calculate Earnings (completed orders or orders that reached the handover point)
     const ordersRes = await db.prepare(`
       SELECT id, deliveryFee, createdAt, status,
-             CASE WHEN pickupDriverId = ? THEN 1 ELSE 0 END as isPickup,
-             CASE WHEN deliveryDriverId = ? THEN 1 ELSE 0 END as isDelivery
+             pickupDriverId, deliveryDriverId
       FROM orders 
-      WHERE (pickupDriverId = ? OR deliveryDriverId = ?) AND status = 'completed'
-    `).bind(riderId, riderId, riderId, riderId).all();
+      WHERE (pickupDriverId = ? OR deliveryDriverId = ?)
+    `).bind(riderId, riderId).all();
 
     let totalEarnings = 0;
-    const history = (ordersRes.results as any[]).map(o => {
-      // If a rider did BOTH legs, they earn twice? 
-      // Current design: deliveryFee is per order. 
-      // For simplicity: If they did at least one leg, they get the portion.
-      // Better: In real app, we might split fee. 
-      // Logic: riderEarn = (deliveryFee * (1 - GP%)) + base
-      const earnings = (o.deliveryFee * (100 - gpRiderPercent) / 100) + riderBasePayout;
-      totalEarnings += earnings;
-      return {
-        id: o.id,
-        type: "Delivery Earnings",
-        amount: earnings,
-        date: o.createdAt,
-        status: "Success"
-      };
+    const history: any[] = [];
+
+    (ordersRes.results as any[]).forEach(o => {
+      const totalOrderEarn = (o.deliveryFee * (100 - gpRiderPercent) / 100) + riderBasePayout;
+      const legEarn = totalOrderEarn * 0.5;
+
+      // Leg 1: Pickup (Earned if status reached 'washing' or later)
+      const pickupCompletedStatuses = ['washing', 'ready_for_pickup', 'delivering_to_customer', 'completed'];
+      if (o.pickupDriverId === riderId && pickupCompletedStatuses.includes(o.status)) {
+        totalEarnings += legEarn;
+        history.push({
+          id: `${o.id}-P`,
+          type: "Pickup Earnings",
+          amount: legEarn,
+          date: o.createdAt,
+          status: "Success"
+        });
+      }
+
+      // Leg 2: Delivery (Earned only if status is 'completed')
+      if (o.deliveryDriverId === riderId && o.status === 'completed') {
+        totalEarnings += legEarn;
+        history.push({
+          id: `${o.id}-D`,
+          type: "Delivery Earnings",
+          amount: legEarn,
+          date: o.createdAt,
+          status: "Success"
+        });
+      }
     });
 
     // 3. Calculate Withdrawals

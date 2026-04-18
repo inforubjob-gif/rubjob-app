@@ -78,8 +78,11 @@ export async function GET(
     const riderBasePayout = parseFloat(settings.rider_base_payout || "0");
 
     const deliveryFee = order.deliveryFee || 0;
-    const commission = (deliveryFee * gpRiderPercent) / 100;
-    order.riderEarn = (deliveryFee - commission) + riderBasePayout;
+    const totalRiderPayout = (deliveryFee * (100 - gpRiderPercent) / 100) + riderBasePayout;
+    
+    order.riderEarn = totalRiderPayout; // Legacy field for backwards compatibility
+    order.riderPickupEarn = totalRiderPayout * 0.5;
+    order.riderDeliveryEarn = totalRiderPayout * 0.5;
 
     return NextResponse.json({ order });
   } catch (error: any) {
