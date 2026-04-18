@@ -150,12 +150,6 @@ export default function RiderProfilePage() {
                 onClick={() => router.push("/rider/profile/vehicle-type")}
              />
              <SettingItem 
-                icon={<Icons.Clock size={20} />} 
-                label={t("rider.profile.activeHours")} 
-                value={prefs?.activeHours || t("common.notSet")} 
-                onClick={() => router.push("/rider/profile/active-hours")}
-             />
-             <SettingItem 
                 icon={<Icons.Payment size={20} />} 
                 label={t("rider.profile.payoutMethod")} 
                 value={prefs?.payoutMethod ? `${prefs.payoutMethod.bank ? prefs.payoutMethod.bank.toUpperCase() : 'Account'} ***${prefs.payoutMethod.account?.slice(-4) || ''}` : t("common.notSet")} 
