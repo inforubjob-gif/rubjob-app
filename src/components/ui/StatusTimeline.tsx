@@ -11,17 +11,18 @@ interface Step {
 }
 
 const STEPS: Step[] = [
-  { key: "picking_up", image: "/images/icon/icon-ไรเดอร์กำลังเข้ารับผ้า.png" },
-  { key: "delivering_to_store", image: "/images/icon/icon-ไรเดอร์กำลังนำผ้าส่งร้าน.png" },
-  { key: "washing", image: "/images/icon/icon-กำลังซัก.png" },
-  { key: "delivering_to_customer", image: "/images/icon/icon-ไรเดอร์กำลังนำผ้าส่งคืน.png" },
-  { key: "completed", image: "/images/icon/เสร็จสิ้น.png" },
+  { key: "picking_up", icon: Icons.Package },
+  { key: "delivering_to_store", icon: Icons.Store },
+  { key: "washing", icon: Icons.WashFold },
+  { key: "delivering_to_customer", icon: Icons.Bike },
+  { key: "completed", icon: Icons.CheckCircle },
 ];
 
 const statusOrder: OrderStatus[] = [
   "picking_up",
   "delivering_to_store",
   "washing",
+  "ready_for_pickup",
   "delivering_to_customer",
   "completed",
 ];
