@@ -15,14 +15,14 @@ export default function StoreAuthGate({ children }: { children: React.ReactNode 
     }
   }, [store, isLoading, pathname, router]);
 
-  if (isLoading) {
+  if (isLoading || (!store && pathname !== "/store/login")) {
     return (
-      <div className="flex h-screen w-full items-center justify-center bg-slate-50">
+      <div className="flex h-screen w-full items-center justify-center bg-slate-50 relative z-[999]">
         <div className="w-12 h-12 border-4 border-primary-light border-t-primary rounded-full animate-spin"></div>
       </div>
     );
   }
 
-  // If on login page, or authenticated, show children
+  // If on login page, or authenticated === true, show children
   return <>{children}</>;
 }

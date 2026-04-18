@@ -30,15 +30,15 @@ export default function RiderAuthGate({ children }: { children: React.ReactNode 
     checkAuth();
   }, [pathname, router]);
 
-  // Prevent flicker on protected pages
-  if (isAuthenticated === null && pathname !== "/rider/login") {
+  // Prevent flicker on protected pages, or while waiting to redirect
+  if ((isAuthenticated === null || isAuthenticated === false) && pathname !== "/rider/login") {
     return (
-      <div className="flex h-screen w-full items-center justify-center bg-slate-50">
+      <div className="flex h-screen w-full items-center justify-center bg-slate-50 relative z-[999]">
         <div className="w-10 h-10 border-4 border-primary/20 border-t-primary rounded-full animate-spin"></div>
       </div>
     );
   }
 
-  // If on login page, or authenticated, show children
+  // If on login page, or authenticated === true, show children
   return <>{children}</>;
 }
