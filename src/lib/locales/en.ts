@@ -370,6 +370,21 @@ export const en = {
       processing: "Processing...",
       confirmPayment: "Confirm Payment",
     },
+    reportIssue: "Report Issue",
+    issueModalTitle: "Report Order Issue",
+    issueType: "Issue Type",
+    issueDetail: "Detailed Description",
+    issueDetailPlaceholder: "Describe the obstacle or issue in detail...",
+    submitIssue: "Submit Report",
+    issueSuccess: "Report sent. Admin will contact you via ticket history soon.",
+    issueTypes: {
+      accident: "Accident",
+      vehicle_broken: "Vehicle Breakdown",
+      customer_not_reachable: "Customer Unreachable",
+      store_closed: "Store Closed/Unreachable",
+      weather: "Bad Weather",
+      other: "Other Issues",
+    }
   },
   tiers: {
     bronze: "Bronze",

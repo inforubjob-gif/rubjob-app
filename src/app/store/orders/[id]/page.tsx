@@ -10,6 +10,7 @@ import Button from "@/components/ui/Button";
 import { Icons, getServiceIcon } from "@/components/ui/Icons";
 import { useTranslation } from "@/components/providers/LanguageProvider";
 import CountdownTimer from "@/components/ui/CountdownTimer";
+import OrderIssueModal from "@/components/orders/OrderIssueModal";
 
 export default function StoreOrderDetailPage() {
   const params = useParams<{ id: string }>();
@@ -20,6 +21,7 @@ export default function StoreOrderDetailPage() {
   const [order, setOrder] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isUpdating, setIsUpdating] = useState(false);
+  const [isIssueModalOpen, setIsIssueModalOpen] = useState(false);
 
   useEffect(() => {
     if (!id) return;
@@ -68,8 +70,20 @@ export default function StoreOrderDetailPage() {
           <Icons.Back size={20} />
         </button>
         <h1 className="text-sm font-black text-slate-900 uppercase tracking-widest">{t("store.manageTask")}</h1>
-        <div className="w-10" />
+        <button
+          onClick={() => setIsIssueModalOpen(true)}
+          className="w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center text-red-500 active:scale-90 transition-all border border-red-100"
+          title={t("orders.reportIssue")}
+        >
+          <Icons.Alert size={20} />
+        </button>
       </header>
+      
+      <OrderIssueModal 
+        isOpen={isIssueModalOpen} 
+        onClose={() => setIsIssueModalOpen(false)} 
+        orderId={id as string} 
+      />
 
       <div className="flex-1 px-5 py-6">
         <Card className="p-6 mb-6 border-none shadow-sm bg-white overflow-hidden relative rounded-xl">

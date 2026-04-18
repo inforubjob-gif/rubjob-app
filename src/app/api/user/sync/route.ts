@@ -52,9 +52,15 @@ export async function POST(req: Request) {
       )
     `).run();
 
-    // Migrations: Add walletPin column if missing
     try {
       await db.prepare(`ALTER TABLE users ADD COLUMN walletPin TEXT`).run();
+    } catch (e) {
+      // Column might already exist
+    }
+
+    // Migrations: Add orderId to support_tickets
+    try {
+      await db.prepare(`ALTER TABLE support_tickets ADD COLUMN orderId TEXT`).run();
     } catch (e) {
       // Column might already exist
     }

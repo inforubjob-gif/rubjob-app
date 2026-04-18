@@ -11,6 +11,7 @@ import { Icons } from "@/components/ui/Icons";
 import { useTranslation } from "@/components/providers/LanguageProvider";
 import PhotoUpload from "@/components/ui/PhotoUpload";
 import dynamic from "next/dynamic";
+import OrderIssueModal from "@/components/orders/OrderIssueModal";
 
 const RiderMap = dynamic(() => import("@/components/rider/RiderMap"), { 
   ssr: false,
@@ -32,6 +33,7 @@ export default function RiderOrderDetailPage() {
   const [status, setStatus] = useState("picking_up");
   const [photo, setPhoto] = useState<string | null>(null);
   const [isUpdating, setIsUpdating] = useState(false);
+  const [isIssueModalOpen, setIsIssueModalOpen] = useState(false);
 
   useEffect(() => {
     if (!id) return;
@@ -134,11 +136,22 @@ export default function RiderOrderDetailPage() {
             <h1 className="text-lg font-bold text-slate-900">{t("rider.manageTask")}</h1>
             <p className="text-xs text-slate-400">{t("orders.orderNo")} #{id}</p>
           </div>
-          <Badge variant={statusToBadgeVariant(status as any)}>
-            {t(`orders.status.${status}`)}
           </Badge>
+          <button
+            onClick={() => setIsIssueModalOpen(true)}
+            className="w-9 h-9 rounded-xl bg-red-50 flex items-center justify-center text-red-500 active:scale-95 transition-transform border border-red-100"
+            title={t("orders.reportIssue")}
+          >
+            <Icons.Alert size={18} />
+          </button>
         </div>
       </header>
+
+      <OrderIssueModal 
+        isOpen={isIssueModalOpen} 
+        onClose={() => setIsIssueModalOpen(false)} 
+        orderId={id as string} 
+      />
 
       <div className="flex-1 space-y-6 animate-fade-in relative">
         {/* Functional Map Section */}

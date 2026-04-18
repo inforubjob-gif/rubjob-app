@@ -426,6 +426,21 @@ export const th = {
         promptPayDesc: "แคปเจอร์หน้าจอที่มี QR Code เพื่อนำไปสแกนจ่ายในแอปธนาคารของคุณ",
         processing: "กำลังประมวลผล...",
         confirmPayment: "ยืนยันการชำระเงิน",
+      },
+      reportIssue: "แจ้งเหตุขัดข้อง",
+      issueModalTitle: "แจ้งเหตุขัดข้องของออเดอร์",
+      issueType: "ประเภทปัญหา",
+      issueDetail: "รายละเอียดเพิ่มเติม",
+      issueDetailPlaceholder: "อธิบายภาษาไทยถึงอุปสรรคหรือเหตุขัดข้องที่เกิดขึ้น...",
+      submitIssue: "ส่งรายงานแอดมิน",
+      issueSuccess: "ส่งเรื่องเรียบร้อย แอดมินจะติดต่อกลับผ่านแชทประวัติโดยเร็วที่สุด",
+      issueTypes: {
+        accident: "เกิดอุบัติเหตุ",
+        vehicle_broken: "ยานพาหนะขัดข้อง",
+        customer_not_reachable: "ติดต่อลูกค้าไม่ได้",
+        store_closed: "ร้านค้าปิด/ไม่มีคนรับ",
+        weather: "สภาพอากาศไม่เอื้ออำนวย",
+        other: "ปัญหาอื่นๆ",
       }
     },
     tiers: {
