@@ -300,12 +300,16 @@ export default function RiderOrderDetailPage() {
                 <span className="text-[10px] font-black bg-slate-100 text-slate-500 px-2 py-0.5 rounded-lg uppercase">{order?.items?.length || 0} {t("orders.itemCount")}</span>
              </div>
              <div className="space-y-3">
-                {order?.items?.map((item: any, i: number) => (
-                  <div key={i} className="flex items-center justify-between text-xs font-bold">
-                    <span className="text-slate-400">{item.name} × {item.quantity}</span>
-                    <span className="text-slate-900 italic">฿{item.pricePerUnit * item.quantity}</span>
-                  </div>
-                ))}
+                {order?.items?.map((item: any, i: number) => {
+                  const qty = parseFloat(item.quantity) || 1;
+                  const price = parseFloat(item.pricePerUnit) || 0;
+                  return (
+                    <div key={i} className="flex items-center justify-between text-xs font-bold">
+                      <span className="text-slate-400">{item.name} × {item.quantity}</span>
+                      <span className="text-slate-900 italic">฿{price * qty}</span>
+                    </div>
+                  );
+                })}
                 <div className="pt-3 mt-3 border-t border-dashed border-slate-100 flex items-center justify-between">
                    <span className="text-xs font-black text-slate-900 uppercase">{t("orders.total")}</span>
                    <span className="text-lg font-black text-primary italic">฿{order?.totalPrice}</span>
@@ -345,7 +349,7 @@ export default function RiderOrderDetailPage() {
              >
                 {status === "picking_up" ? t("rider.orderDetail.btnPickup") : 
                  status === "delivering_to_store" ? t("rider.orderDetail.btnHandover") : 
-                 status === "ready_for_pickup" ? t("rider.orderDetail.btnPickupStore") : 
+                 status === "ready_for_pickup" ? t("staff.receiveFromDriver") : 
                  status === "delivering_to_customer" ? t("rider.orderDetail.btnFinish") : t("rider.orderDetail.btnUpdateTask")}
              </Button>
            )}

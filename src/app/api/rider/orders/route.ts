@@ -143,7 +143,8 @@ export async function PUT(req: Request) {
       assignmentResult = await db.prepare(`
         UPDATE orders SET deliveryDriverId = ? WHERE id = ? AND status = 'ready_for_pickup' AND deliveryDriverId IS NULL
       `).bind(riderId, orderId).run();
-      nextStatus = "delivering_to_customer";
+      // Keep status as ready_for_pickup so they are directed to the store first
+      nextStatus = "ready_for_pickup";
     } else {
       return NextResponse.json({ success: false, error: "งานนี้ไม่พร้อมให้รับหรือถูกรับไปแล้ว" }, { status: 409 });
     }
