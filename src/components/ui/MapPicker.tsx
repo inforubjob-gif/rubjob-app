@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import L from "leaflet";
 import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
@@ -45,17 +45,35 @@ function MapUpdater({ lat, lng }: { lat: number, lng: number }) {
 
 export default function MapPicker({ lat, lng, onChange }: MapPickerProps) {
   const [isMounted, setIsMounted] = useState(false);
+  const hasAutoLocated = useRef(false);
 
   useEffect(() => {
     setIsMounted(true);
   }, []);
 
-  if (!isMounted) return <div className="h-[300px] w-full bg-slate-100 animate-pulse rounded-2xl flex items-center justify-center font-bold text-slate-400">Loading Map...</div>;
+  useEffect(() => {
+    if (!isMounted || hasAutoLocated.current) return;
+    if (lat !== 0 && lng !== 0) return;
+    if (typeof navigator === "undefined" || !navigator.geolocation) return;
+
+    hasAutoLocated.current = true;
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        onChange(position.coords.latitude, position.coords.longitude);
+      },
+      () => {
+        // Keep Bangkok as fallback if location permission denied.
+      },
+      { enableHighAccuracy: true, timeout: 8000, maximumAge: 60000 }
+    );
+  }, [isMounted, lat, lng, onChange]);
+
+  if (!isMounted) return <div className="h-full w-full bg-slate-100 animate-pulse rounded-2xl flex items-center justify-center font-bold text-slate-400">Loading Map...</div>;
 
   const center: [number, number] = lat !== 0 && lng !== 0 ? [lat, lng] : [13.7563, 100.5018]; // Default to Bangkok
 
   return (
-    <div className="h-[300px] w-full rounded-2xl overflow-hidden border-2 border-slate-100 z-0">
+    <div className="h-full w-full rounded-2xl overflow-hidden border-2 border-slate-100 z-0">
       <MapContainer center={center} zoom={13} style={{ height: "100%", width: "100%" }}>
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'

@@ -76,7 +76,7 @@ export default function PayoutMethodPage() {
         >
           <Icons.Back size={20} />
         </button>
-        <h1 className="text-lg font-black text-slate-900 tracking-tight">{t("staff.profile.payoutMethodPage.title")}</h1>
+        <h1 className="text-lg font-black text-slate-900 tracking-tight">{t("rider.payoutMethodPage.title")}</h1>
       </header>
 
       <main className="p-5 space-y-6 animate-fade-in">
@@ -90,7 +90,7 @@ export default function PayoutMethodPage() {
             <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${method === "bank" ? "bg-primary text-white" : "bg-slate-100 text-slate-400"}`}>
               <Icons.Payment size={24} />
             </div>
-            <span className="text-xs font-black uppercase tracking-widest">{t("staff.profile.payoutMethodPage.bankAccount")}</span>
+            <span className="text-xs font-black uppercase tracking-widest">{t("rider.payoutMethodPage.bankAccount")}</span>
           </button>
           <button
             onClick={() => setMethod("promptpay")}
@@ -101,13 +101,13 @@ export default function PayoutMethodPage() {
             <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${method === "promptpay" ? "bg-primary text-white" : "bg-slate-100 text-slate-400"}`}>
               <Icons.Phone size={24} />
             </div>
-            <span className="text-xs font-black uppercase tracking-widest">{t("staff.profile.payoutMethodPage.promptPay")}</span>
+            <span className="text-xs font-black uppercase tracking-widest">{t("rider.payoutMethodPage.promptPay")}</span>
           </button>
         </div>
 
         <Card className="p-6 space-y-5 shadow-xl shadow-slate-200/50">
           <div className="space-y-2">
-            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t("staff.profile.payoutMethodPage.accountNumber")}</label>
+            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t("rider.payoutMethodPage.accountNumber")}</label>
             <input
               type="text"
               value={accountNumber}
@@ -119,13 +119,13 @@ export default function PayoutMethodPage() {
 
           {method === "bank" && (
             <div className="space-y-2">
-              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t("staff.profile.payoutMethodPage.bankName")}</label>
+              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t("rider.payoutMethodPage.bankName")}</label>
               <select
                 value={bankName}
                 onChange={(e) => setBankName(e.target.value)}
                 className="w-full bg-slate-50 rounded-xl px-4 py-4 font-bold text-slate-900 outline-none focus:ring-2 focus:ring-primary/20 transition-all border border-slate-100 appearance-none"
               >
-                <option value="">Select Bank</option>
+                <option value="">{t("rider.payoutMethodPage.selectBank")}</option>
                 <option value="kbank">Kasikorn Bank (K-Bank)</option>
                 <option value="scb">Siam Commercial Bank (SCB)</option>
                 <option value="bbl">Bangkok Bank (BBL)</option>
@@ -135,13 +135,13 @@ export default function PayoutMethodPage() {
           )}
 
           <div className="space-y-2">
-            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t("staff.profile.payoutMethodPage.accountHolder")}</label>
+            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t("rider.payoutMethodPage.accountHolder")}</label>
             <input
               type="text"
               value={accountHolder}
               onChange={(e) => setAccountHolder(e.target.value)}
               className="w-full bg-slate-50 rounded-xl px-4 py-4 font-bold text-slate-900 outline-none focus:ring-2 focus:ring-primary/20 transition-all border border-slate-100"
-              placeholder="Full Name"
+              placeholder={t("rider.payoutMethodPage.fullNamePlaceholder")}
             />
           </div>
         </Card>
@@ -152,7 +152,7 @@ export default function PayoutMethodPage() {
             disabled={!accountNumber || !accountHolder || (method === "bank" && !bankName) || isSaving}
             className="w-full py-5 bg-primary text-white rounded-2xl font-black uppercase tracking-widest shadow-2xl shadow-primary/30"
           >
-            {isSaving ? "Saving..." : t("staff.profile.payoutMethodPage.saveMethod")}
+            {isSaving ? t("rider.payoutMethodPage.saving") : t("rider.payoutMethodPage.saveMethod")}
           </Button>
         </div>
       </main>

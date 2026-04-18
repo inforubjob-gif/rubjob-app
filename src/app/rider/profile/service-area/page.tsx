@@ -118,7 +118,7 @@ export default function RiderServiceAreaPage() {
            <div className="bg-white/90 backdrop-blur-md px-4 py-2 rounded-full shadow-xl border border-white/50 flex items-center gap-2">
               <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
               <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">
-                {hasPinned ? "Position Pinned" : "Tap Map to Pin Location"}
+                {hasPinned ? t("rider.serviceAreaPage.positionPinned") : t("rider.serviceAreaPage.tapMapToPinLocation")}
               </p>
            </div>
         </div>
@@ -130,7 +130,7 @@ export default function RiderServiceAreaPage() {
                  <div className="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center text-3xl shadow-inner shrink-0">📍</div>
                  <div className="flex-1 overflow-hidden">
                     <p className="text-sm font-black text-slate-900 uppercase tracking-tight mb-1">
-                      {hasPinned ? "Pinned Location" : "Select Your Area"}
+                      {hasPinned ? t("rider.serviceAreaPage.pinnedLocation") : t("rider.serviceAreaPage.selectYourArea")}
                     </p>
                     <p className="text-[10px] text-slate-400 font-mono font-bold truncate">
                       LAT: {location.lat.toFixed(6)} <br/>
@@ -144,7 +144,7 @@ export default function RiderServiceAreaPage() {
                 disabled={!hasPinned || isSaving}
                 className="w-full mt-6 py-5 bg-primary text-white rounded-xl text-sm font-black uppercase tracking-[0.2em] shadow-xl shadow-primary/30 active:scale-[0.98] transition-all disabled:opacity-50"
               >
-                 {isSaving ? "Saving..." : "Confirm Support Area"}
+                 {isSaving ? t("rider.payoutMethodPage.saving") : t("rider.serviceAreaPage.confirmSupportArea")}
               </button>
            </Card>
         </div>

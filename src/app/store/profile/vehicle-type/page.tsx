@@ -56,8 +56,8 @@ export default function StaffVehicleTypePage() {
             <Icons.Back size={18} />
           </button>
           <div className="flex-1">
-            <h1 className="text-lg font-bold text-slate-900">{t("staff.profile.vehicleType")}</h1>
-            <p className="text-xs text-slate-400">Manage store delivery vehicles</p>
+            <h1 className="text-lg font-bold text-slate-900">{t("store.profile.vehicleType")}</h1>
+            <p className="text-xs text-slate-400">{t("store.vehicleTypePage.manageStoreDeliveryVehicles")}</p>
           </div>
           <Button 
             size="sm" 
@@ -72,7 +72,7 @@ export default function StaffVehicleTypePage() {
       </header>
 
       <div className="p-5 space-y-6 animate-fade-in">
-        <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest pl-1">Select primary store vehicle</p>
+        <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest pl-1">{t("store.vehicleTypePage.selectPrimaryStoreVehicle")}</p>
         
         <div className="space-y-4">
            {VEHICLES.map(v => (
@@ -107,9 +107,9 @@ export default function StaffVehicleTypePage() {
             <div className="flex items-start gap-3">
                 <Icons.Truck size={20} className="text-primary mt-1" />
                 <div className="flex-1">
-                    <p className="text-[10px] text-orange-900 font-black uppercase tracking-widest mb-1">Store Logistics</p>
+                    <p className="text-[10px] text-orange-900 font-black uppercase tracking-widest mb-1">{t("store.vehicleTypePage.storeLogistics")}</p>
                     <p className="text-[10px] text-orange-700 font-bold leading-relaxed">
-                        This vehicle will be used for store-managed pickups and deliveries. Ensure all permit documents are up to date.
+                        {t("store.vehicleTypePage.storeLogisticsDesc")}
                     </p>
                 </div>
             </div>

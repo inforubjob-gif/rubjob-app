@@ -124,7 +124,7 @@ export default function StoreProfilePage() {
              <SettingItem 
                 icon={<Icons.Globe size={20} />} 
                 label={t("store.profile.language")} 
-                value={language === "th" ? "ไทย (TH)" : language === "en" ? "English (EN)" : "Chinese (ZH)"}
+                value={language === "th" ? "ไทย (TH)" : "English (EN)"}
                 onClick={() => setShowLanguageModal(true)}
              />
               <SettingItem 

@@ -8,6 +8,12 @@ import type { Address } from "@/types";
 import { useTranslation } from "@/components/providers/LanguageProvider";
 import { Icons } from "@/components/ui/Icons";
 import { useLiff } from "@/components/providers/LiffProvider";
+import dynamic from "next/dynamic";
+
+const MapPicker = dynamic(() => import("@/components/ui/MapPicker"), {
+  ssr: false,
+  loading: () => <div className="h-full w-full bg-slate-100 animate-pulse rounded-2xl flex items-center justify-center font-bold text-slate-400">Loading Map...</div>,
+});
 
 export default function ManageAddressesPage() {
   const router = useRouter();
@@ -93,8 +99,7 @@ export default function ManageAddressesPage() {
   };
 
   const confirmLocation = () => {
-    // Simulated coordinate selection
-    setLocation({ lat: 13.7563, lng: 100.5018 });
+    if (!location) return;
     setIsSelectingLocation(false);
   };
 
@@ -105,21 +110,13 @@ export default function ManageAddressesPage() {
             <h1 className="text-lg font-bold">{t("profile.setCoordinates")}</h1>
             <button onClick={() => setIsSelectingLocation(false)} className="text-sm font-medium text-slate-400">{t("common.cancel")}</button>
          </header>
-         <div className="flex-1 relative bg-slate-100 overflow-hidden flex items-center justify-center">
-            {/* Simulated Map Background */}
-            <div className="absolute inset-0 bg-[#f8f9fa] flex items-center justify-center">
-              <div className="text-center p-8">
-                 <div className="text-6xl mb-4">🗺️</div>
-                 <p className="text-slate-400 text-sm">แผนที่จำลองการปักหมุด</p>
-              </div>
-            </div>
-            
-            {/* Pin Center */}
-            <div className="relative z-10 -translate-y-5">
-               <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center shadow-lg ring-4 ring-white text-white">
-                  <Icons.MapPin size={24} strokeWidth={3} />
-               </div>
-               <div className="w-2 h-2 bg-primary rounded-full mx-auto mt-1 animate-ping" />
+         <div className="flex-1 relative bg-slate-100 overflow-hidden">
+            <div className="absolute inset-0 z-0">
+              <MapPicker
+                lat={location?.lat || 0}
+                lng={location?.lng || 0}
+                onChange={(lat, lng) => setLocation({ lat, lng })}
+              />
             </div>
 
             {/* Address Overlay */}
@@ -134,7 +131,8 @@ export default function ManageAddressesPage() {
                   </div>
                   <button 
                     onClick={confirmLocation}
-                    className="w-full py-3.5 bg-slate-900 text-white rounded-xl text-sm font-bold shadow-lg active:scale-95 transition-transform"
+                    disabled={!location}
+                    className="w-full py-3.5 bg-slate-900 text-white rounded-xl text-sm font-bold shadow-lg active:scale-95 transition-transform disabled:opacity-50"
                   >
                     {t("profile.confirmLocation")}
                   </button>
@@ -254,7 +252,7 @@ export default function ManageAddressesPage() {
                          <Icons.MapPin size={10} strokeWidth={4} /> {t("profile.pinned")}
                        </span>
                   </div>
-                  <p className="text-xs text-slate-500 mt-1 line-clamp-2">{addr.fullAddress}</p>
+                  <p className="text-xs text-slate-500 mt-1 line-clamp-2">{addr.details}</p>
                   {addr.note && (
                     <div className="flex items-center gap-1 mt-1 text-primary-dark opacity-80">
                       <Icons.FileText size={10} strokeWidth={3} />

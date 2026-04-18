@@ -40,6 +40,9 @@ export default function ActiveHoursPage() {
   }, [store?.id]);
 
   const handleSave = async () => {
+    if (!store?.id) return;
+    setIsSaving(true);
+    const mon = workingHours.Mon;
     const activeHoursStr = mon.isOpen ? `${mon.start} - ${mon.end}` : "Varies";
 
     await fetch("/api/store/preferences", {
@@ -90,8 +93,8 @@ export default function ActiveHoursPage() {
             <Icons.Back size={18} />
           </button>
           <div className="flex-1">
-            <h1 className="text-lg font-bold text-slate-900">{t("staff.profile.activeHours")}</h1>
-            <p className="text-xs text-slate-400">Set hours for each day</p>
+            <h1 className="text-lg font-bold text-slate-900">{t("store.profile.activeHours")}</h1>
+            <p className="text-xs text-slate-400">{t("store.activeHoursPage.setHoursEachDay")}</p>
           </div>
           <Button 
             size="sm" 
@@ -108,7 +111,7 @@ export default function ActiveHoursPage() {
       <div className="p-5 space-y-6 animate-fade-in">
         {/* Day Selector Tabs */}
         <section>
-          <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest pl-1 mb-4">Select Day to Configure</p>
+          <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest pl-1 mb-4">{t("store.activeHoursPage.selectDayToConfigure")}</p>
           <div className="flex overflow-x-auto gap-2 pb-2 no-scrollbar">
              {DAYS.map(day => (
                  <button
@@ -136,7 +139,7 @@ export default function ActiveHoursPage() {
            <div className="flex items-center justify-between mb-8 relative z-10">
               <div>
                  <h3 className="text-2xl font-black text-slate-900 uppercase tracking-tight">{selectedDay}</h3>
-                 <p className="text-xs text-slate-400 font-bold uppercase tracking-widest mt-1">Configure Business Hours</p>
+                 <p className="text-xs text-slate-400 font-bold uppercase tracking-widest mt-1">{t("store.activeHoursPage.configureBusinessHours")}</p>
               </div>
               <button 
                 onClick={() => toggleDay(selectedDay)}
@@ -150,7 +153,7 @@ export default function ActiveHoursPage() {
              <div className="space-y-6 relative z-10">
                 <div className="grid grid-cols-2 gap-4">
                    <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100 flex flex-col items-center">
-                      <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Open</span>
+                      <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">{t("store.activeHoursPage.open")}</span>
                       <input 
                          type="time" 
                          value={workingHours[selectedDay].start}
@@ -159,7 +162,7 @@ export default function ActiveHoursPage() {
                       />
                    </div>
                    <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100 flex flex-col items-center">
-                      <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Close</span>
+                      <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">{t("store.activeHoursPage.close")}</span>
                       <input 
                          type="time" 
                          value={workingHours[selectedDay].end}
@@ -177,13 +180,15 @@ export default function ActiveHoursPage() {
                      className="rounded-2xl py-4 border-2 font-black text-[10px] uppercase tracking-widest flex items-center justify-center gap-2"
                      onClick={applyToAll}
                    >
-                      <Icons.WashFold size={16} /> Apply to all days
+                      <Icons.WashFold size={16} /> {t("store.activeHoursPage.applyToAllDays")}
                    </Button>
                 </div>
              </div>
            ) : (
              <div className="py-8 text-center bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200">
-                <p className="text-sm font-black text-slate-400 uppercase tracking-widest">Store Closed on {selectedDay}</p>
+                <p className="text-sm font-black text-slate-400 uppercase tracking-widest">
+                  {t("store.activeHoursPage.storeClosedOn").replace("{day}", selectedDay)}
+                </p>
              </div>
            )}
         </Card>
@@ -193,7 +198,7 @@ export default function ActiveHoursPage() {
             <div className="flex items-start gap-3">
                 <Icons.Info size={16} className="text-primary mt-0.5" />
                 <p className="text-[10px] text-orange-700 font-bold leading-relaxed uppercase">
-                    Orders requested outside these hours will be automatically placed into your queue for the next day.
+                    {t("store.activeHoursPage.outsideHoursNotice")}
                 </p>
             </div>
         </div>

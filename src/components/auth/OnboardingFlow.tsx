@@ -1,10 +1,16 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState } from "react";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import { Icons } from "@/components/ui/Icons";
 import { useLiff } from "@/components/providers/LiffProvider";
+import dynamic from "next/dynamic";
+
+const MapPicker = dynamic(() => import("@/components/ui/MapPicker"), {
+  ssr: false,
+  loading: () => <div className="h-full w-full bg-slate-100 animate-pulse rounded-2xl flex items-center justify-center text-slate-400 text-sm font-bold">Loading Map...</div>,
+});
 
 interface OnboardingFlowProps {
   onComplete: () => void;
@@ -68,12 +74,9 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
     }
   }
 
-  function handlePinLocation() {
-    // Simulate getting user location
-    const baseLat = 13.7563 + (Math.random() - 0.5) * 0.02;
-    const baseLng = 100.5018 + (Math.random() - 0.5) * 0.02;
-    setPinLat(parseFloat(baseLat.toFixed(6)));
-    setPinLng(parseFloat(baseLng.toFixed(6)));
+  function handlePinLocation(lat: number, lng: number) {
+    setPinLat(parseFloat(lat.toFixed(6)));
+    setPinLng(parseFloat(lng.toFixed(6)));
     setPinSet(true);
   }
 
@@ -259,22 +262,20 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
                   />
                 </div>
 
-                {/* Pin location */}
-                <button
-                  onClick={handlePinLocation}
-                  className={`w-full flex items-center justify-center gap-2.5 py-3.5 rounded-xl border-2 transition-all duration-300 ${
-                    pinSet
-                      ? "border-emerald-300 bg-emerald-50 text-emerald-700"
-                      : "border-dashed border-slate-200 bg-slate-50 text-slate-500 hover:bg-primary/5 hover:border-primary/30 hover:text-primary-dark"
-                  }`}
-                >
-                  <Icons.MapPin size={18} />
-                  <span className="text-sm font-bold">
-                    {pinSet
-                      ? `📍 ปักหมุดแล้ว (${pinLat}, ${pinLng})`
-                      : "📍 ปักหมุดตำแหน่ง"}
-                  </span>
-                </button>
+                {/* Pin location with real map */}
+                <div className="space-y-2">
+                  <label className="text-xs font-bold text-slate-500 mb-1.5 block">ปักหมุดตำแหน่ง</label>
+                  <div className="h-52 w-full rounded-xl overflow-hidden border-2 border-slate-100">
+                    <MapPicker
+                      lat={pinLat || 0}
+                      lng={pinLng || 0}
+                      onChange={handlePinLocation}
+                    />
+                  </div>
+                  <p className={`text-xs font-bold ${pinSet ? "text-emerald-600" : "text-slate-400"}`}>
+                    {pinSet ? `📍 ปักหมุดแล้ว (${pinLat}, ${pinLng})` : "แตะแผนที่เพื่อปักหมุดตำแหน่ง"}
+                  </p>
+                </div>
               </div>
             </Card>
 
