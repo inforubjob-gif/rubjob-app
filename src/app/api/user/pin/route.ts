@@ -38,6 +38,7 @@ export async function GET(req: Request) {
         const store = await db.prepare("SELECT ownerId FROM stores WHERE id = ?").bind(storeId).first() as any;
         userId = store?.ownerId || null;
       }
+    }
     if (!userId) {
       console.warn(`[PIN] Unauthorized access attempt for type: ${type}`);
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
