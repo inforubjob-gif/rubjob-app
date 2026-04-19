@@ -315,5 +315,6 @@ export default function StoreDashboard() {
           </div>
         )}
       </div>
-    );
+    </div>
+  );
 }

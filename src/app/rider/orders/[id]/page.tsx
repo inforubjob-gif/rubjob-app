@@ -220,7 +220,9 @@ export default function RiderOrderDetailPage() {
              <div className="relative z-10 flex items-center justify-between">
                 <div>
                    <p className="text-[10px] font-black text-white/60 uppercase tracking-widest mb-1">{t("rider.earnAmountLabel")}</p>
-                   <h2 className="text-4xl font-black italic">฿{order?.riderEarn?.toFixed(0)}</h2>
+                   <h2 className="text-4xl font-black italic">
+                     ฿{(['picking_up', 'delivering_to_store'].includes(status) ? order?.riderPickupEarn : order?.riderDeliveryEarn || order?.riderEarn * 0.5)?.toFixed(0)}
+                   </h2>
                 </div>
                 <div className="w-14 h-14 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center border border-white/30">
                    <Icons.Logo variant="icon-white" size={32} />

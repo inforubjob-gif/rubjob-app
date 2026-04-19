@@ -99,6 +99,7 @@ export default function OrderDetailPage() {
   const serviceId = order.serviceId || order.service;
   const items = Array.isArray(order.items) ? order.items : [];
   const address = typeof order.address === "object" ? order.address : { label: "N/A" };
+  const isDeliveryPhase = ['ready_for_pickup', 'delivering_to_customer', 'completed'].includes(order.status);
 
   return (
     <div className="flex flex-col min-h-dvh">
@@ -164,16 +165,16 @@ export default function OrderDetailPage() {
             </h3>
             <div className="flex items-center gap-3">
               <div className="w-11 h-11 rounded-full bg-primary-light flex items-center justify-center text-lg font-bold text-primary-dark">
-                {(order.status === 'delivering_to_customer' ? order.deliveryDriverName : order.pickupDriverName || "D")?.[0]}
+                {(isDeliveryPhase ? order.deliveryDriverName : order.pickupDriverName || "D")?.[0]}
               </div>
               <div className="flex-1">
                 <p className="text-sm font-semibold text-foreground">
-                  {order.status === 'delivering_to_customer' ? order.deliveryDriverName : order.pickupDriverName || "Driver Partner"}
+                  {isDeliveryPhase ? order.deliveryDriverName : order.pickupDriverName || "Driver Partner"}
                 </p>
-                <p className="text-xs text-muted">Rider ID: {(order.status === 'delivering_to_customer' ? order.deliveryDriverId : order.pickupDriverId)?.slice(-6).toUpperCase()}</p>
+                <p className="text-xs text-muted">Rider ID: {(isDeliveryPhase ? order.deliveryDriverId : order.pickupDriverId)?.slice(-6).toUpperCase()}</p>
               </div>
               <a
-                href={`tel:${order.riderPhone || '0810000000'}`}
+                href={`tel:${isDeliveryPhase ? order.deliveryDriverPhone : order.pickupDriverPhone}`}
                 className="w-10 h-10 rounded-xl bg-success/10 flex items-center justify-center"
               >
                 <Icons.Phone size={20} className="text-success" />
