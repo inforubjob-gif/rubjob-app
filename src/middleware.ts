@@ -24,7 +24,8 @@ const ROOT_DOMAINS = [
   "rubjob-all.com",
   "rubjob.com",
   "rubjob-app.pages.dev",
-  "lvh.me", // Local development (resolves to 127.0.0.1)
+  "lvh.me", // Local development with subdomains
+  "localhost", // Local development root
 ];
 
 /**

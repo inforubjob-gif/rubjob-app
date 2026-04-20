@@ -21,7 +21,18 @@ export default function BottomNav() {
   const isStoreContext = pathname.startsWith("/store") || hostname.startsWith("store.");
   const isRiderContext = pathname.startsWith("/rider") || hostname.startsWith("rider.");
   const isAdminContext = pathname.startsWith("/admin") || hostname.startsWith("admin.");
-  const isLandingContext = pathname.startsWith("/landing");
+  
+  const isLandingContext = pathname.startsWith("/landing") || (
+    !hostname.startsWith("app.") &&
+    !hostname.startsWith("admin.") &&
+    !hostname.startsWith("rider.") &&
+    !hostname.startsWith("store.") &&
+    (hostname.includes("rubjob-all.com") ||
+     hostname.includes("rubjob.com") ||
+     hostname === "localhost" ||
+     hostname === "lvh.me") &&
+    pathname === "/"
+  );
 
   // Hide on Admin portal and landing page
   if (isAdminContext || isLandingContext) return null;
