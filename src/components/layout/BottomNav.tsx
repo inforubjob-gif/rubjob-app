@@ -15,13 +15,16 @@ interface Tab {
 export default function BottomNav() {
   const pathname = usePathname();
   const { t } = useTranslation();
-  
-  const isStoreContext = pathname.startsWith("/store");
-  const isRiderContext = pathname.startsWith("/rider");
-  const isAdminContext = pathname.startsWith("/admin");
 
-  // Hide on Admin portal always
-  if (isAdminContext) return null;
+  // Detect context from both hostname subdomain and pathname
+  const hostname = typeof window !== "undefined" ? window.location.hostname : "";
+  const isStoreContext = pathname.startsWith("/store") || hostname.startsWith("store.");
+  const isRiderContext = pathname.startsWith("/rider") || hostname.startsWith("rider.");
+  const isAdminContext = pathname.startsWith("/admin") || hostname.startsWith("admin.");
+  const isLandingContext = pathname.startsWith("/landing");
+
+  // Hide on Admin portal and landing page
+  if (isAdminContext || isLandingContext) return null;
 
   // Hide on Authentication screens
   if (pathname === "/store/login" || pathname === "/rider/login" || pathname.startsWith("/admin/login")) {

@@ -17,16 +17,25 @@ export default function AppWrapper({ children }: { children: React.ReactNode }) 
     window.location.pathname.startsWith("/store") ||
     window.location.hostname.startsWith("admin.") ||
     window.location.hostname.startsWith("rider.") ||
-    window.location.hostname.startsWith("store.") ||
-    // Support lvh.me for local development
-    window.location.hostname.includes("admin.lvh.me") ||
-    window.location.hostname.includes("rider.lvh.me") ||
-    window.location.hostname.includes("store.lvh.me")
+    window.location.hostname.startsWith("store.")
+  );
+
+  // Landing page should bypass LIFF/onboarding entirely
+  const isLanding = typeof window !== "undefined" && (
+    window.location.pathname.startsWith("/landing") ||
+    // Root domain with no subdomain (middleware rewrites to /landing)
+    (!window.location.hostname.startsWith("app.") &&
+     !window.location.hostname.startsWith("admin.") &&
+     !window.location.hostname.startsWith("rider.") &&
+     !window.location.hostname.startsWith("store.") &&
+     (window.location.hostname.includes("rubjob-all.com") ||
+      window.location.hostname.includes("rubjob.com")) &&
+     window.location.pathname === "/")
   );
 
   // Check if user has completed onboarding (has phone + at least 1 address)
   useEffect(() => {
-    if (!isReady || !isLoggedIn || !profile?.userId || isBackoffice) {
+    if (!isReady || !isLoggedIn || !profile?.userId || isBackoffice || isLanding) {
       setNeedsOnboarding(null);
       return;
     }
@@ -62,7 +71,7 @@ export default function AppWrapper({ children }: { children: React.ReactNode }) 
     }
 
     checkOnboarding();
-  }, [isReady, isLoggedIn, profile?.userId, isBackoffice]);
+  }, [isReady, isLoggedIn, profile?.userId, isBackoffice, isLanding]);
 
   const isApi = typeof window !== "undefined" && window.location.pathname.startsWith("/api/");
 
@@ -76,7 +85,7 @@ export default function AppWrapper({ children }: { children: React.ReactNode }) 
   }
 
   // API routes should never be wrapped or redirected to login view
-  if (isApi) {
+  if (isApi || isLanding) {
     return <>{children}</>;
   }
 
