@@ -257,13 +257,10 @@ export default function LandingPage() {
                 เริ่มใช้งานทันที
                 <span className="group-hover:translate-x-1 transition-transform">→</span>
               </a>
-              <a
-                href="#line-app"
-                className="group px-8 py-4 w-full sm:w-auto bg-white border border-slate-200 hover:border-[#00B900] text-slate-700 font-bold text-base rounded-2xl shadow-sm hover:shadow-md transition-all hover:-translate-y-1 active:translate-y-0 flex items-center justify-center gap-2"
-              >
-                <img src="/images/มาสคอต-รอ.png" className="w-5 h-5 object-contain" />
-                ดูฟีเจอร์เพิ่มเติม
-              </a>
+              <a href="#how-it-works" className="px-6 py-4 bg-white text-slate-800 font-bold rounded-xl md:rounded-2xl shadow-sm border border-slate-100 hover:border-primary hover:text-primary transition-all duration-300 flex items-center justify-center gap-2 group">
+                  <img src="/images/mascot-peek.png" alt="" className="w-5 h-5 object-contain group-hover:-translate-y-1 transition-transform" />
+                  ดูฟีเจอร์เพิ่มเติม
+                </a>
             </div>
           </div>
 
@@ -273,9 +270,9 @@ export default function LandingPage() {
              {/* Mascot Floating Image */}
              <div className="relative w-full max-w-[400px] h-full animate-float z-20 flex items-center justify-center">
                <img 
-                 src="/images/มาสคอต-รอ.png" 
+                 src="/images/mascot-ready.png" 
                  alt="Rubjob Mascot Ready" 
-                 className="w-full h-auto max-h-full object-contain drop-shadow-2xl"
+                 className="w-full h-auto object-contain filter drop-shadow-2xl"
                />
              </div>
 
@@ -295,7 +292,7 @@ export default function LandingPage() {
            <div className="w-full lg:w-1/3 flex justify-center lg:justify-start">
              <div className="relative w-[350px] animate-float-delayed">
                <img 
-                 src="/images/มาสคอต-เคาะห้อง.png" 
+                 src="/images/mascot-knock.png" 
                  alt="Rubjob Mascot Door to Door" 
                  className="w-full h-auto object-contain drop-shadow-2xl"
                />
@@ -336,7 +333,7 @@ export default function LandingPage() {
 
            {/* Standing Mascot 9 */}
            <div className="hidden lg:block absolute bottom-10 right-[5%] w-40 animate-float-delayed z-20">
-             <img src="/images/9.png" alt="Mascot Setup" className="w-full h-auto drop-shadow-xl" />
+             <img src="/images/mascot-peek.png" alt="Mascot Setup" className="w-full h-auto drop-shadow-xl" />
            </div>
 
         </div>
@@ -356,7 +353,7 @@ export default function LandingPage() {
             {/* Mascot Decorating Features */}
             <div className="hidden lg:block relative w-[250px] animate-float right-0 bottom-0 z-20">
               <img 
-                 src="/images/มาสคอต-ตากผ้า.png" 
+                 src="/images/mascot-hanging.png" 
                  alt="Rubjob Mascot Hanging Clothes" 
                  className="w-full h-auto object-contain drop-shadow-xl"
                />
@@ -512,8 +509,8 @@ export default function LandingPage() {
         <div className="absolute right-0 top-0 w-[40vw] h-[40vw] bg-[#00B900]/10 rounded-bl-full -z-10" />
 
         {/* Mascot 13 (Peeking) reused here playfully */}
-        <div className="absolute left-[-20px] top-[10%] w-32 transform rotate-12 z-20 hidden md:block">
-           <img src="/images/13.png" alt="Mascot Peeking" className="w-full h-auto drop-shadow-lg" />
+        <div className="absolute top-1/2 -left-12 transform -translate-y-1/2 w-48 opacity-20 pointer-events-none hidden lg:block">
+           <img src="/images/mascot-wink.png" alt="Mascot Deco" className="w-full h-auto" />
         </div>
         
         <div className="max-w-7xl mx-auto px-6 md:px-12 relative z-30">
@@ -594,7 +591,7 @@ export default function LandingPage() {
         
         {/* Chilling Mascot 10 */}
         <div className="absolute -top-[70px] left-1/2 transform -translate-x-1/2 sm:translate-x-0 sm:right-[15%] sm:left-auto w-28 animate-float z-20">
-           <img src="/images/10.png" alt="Mascot Resting" className="w-full h-auto drop-shadow-lg" />
+           <img src="/images/mascot-chill.png" alt="Mascot Resting" className="w-full h-auto drop-shadow-lg" />
         </div>
 
         <div className="max-w-7xl mx-auto px-6 md:px-12 flex flex-col items-center text-center relative z-30">
