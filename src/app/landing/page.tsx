@@ -190,7 +190,7 @@ export default function LandingPage() {
             <img 
               src="/images/rubjob-complete_Text-color.png" 
               alt="RUBJOB" 
-              className="h-8 w-auto object-contain" 
+              className="h-16 md:h-[80px] w-auto object-contain scale-110 md:scale-[1.2] origin-left" 
             />
           </div>
           
@@ -600,7 +600,7 @@ export default function LandingPage() {
           <img 
             src="/images/rubjob-complete_Text-color.png" 
             alt="RUBJOB" 
-            className="h-9 w-auto object-contain mb-3" 
+            className="h-20 md:h-[100px] w-auto object-contain mb-4 transform scale-125" 
           />
           <p className="text-slate-500 max-w-sm mx-auto text-sm mb-6">
             ผู้จัดการชีวิต (Life Operator) 👋🏼
