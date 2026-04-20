@@ -186,10 +186,12 @@ export default function LandingPage() {
       {/* ─── Navigation ─── */}
       <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? 'bg-white/80 backdrop-blur-xl shadow-sm py-4' : 'bg-transparent py-6'}`}>
         <div className="max-w-7xl mx-auto px-6 md:px-12 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <span className="font-black text-2xl tracking-tighter text-slate-900">
-              RUB<span className="text-primary">JOB</span>
-            </span>
+          <div className="flex items-center">
+            <img 
+              src="/images/rubjob-complete_Text-color.png" 
+              alt="RUBJOB" 
+              className="h-8 w-auto object-contain" 
+            />
           </div>
           
           <div className="hidden md:flex items-center gap-8 text-sm font-bold text-slate-600">
@@ -595,9 +597,11 @@ export default function LandingPage() {
         </div>
 
         <div className="max-w-7xl mx-auto px-6 md:px-12 flex flex-col items-center text-center relative z-30">
-          <h2 className="text-2xl font-black tracking-tighter text-slate-900 mb-1">
-            RUB<span className="text-primary">JOB</span>
-          </h2>
+          <img 
+            src="/images/rubjob-complete_Text-color.png" 
+            alt="RUBJOB" 
+            className="h-9 w-auto object-contain mb-3" 
+          />
           <p className="text-slate-500 max-w-sm mx-auto text-sm mb-6">
             ผู้จัดการชีวิต (Life Operator) 👋🏼
           </p>
