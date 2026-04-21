@@ -1,4 +1,6 @@
+@import url('https://cdn.jsdelivr.net/gh/lazywasabi/thai-web-fonts@7/fonts/LINESeedSansTH/LINESeedSansTH.css');
 @import "tailwindcss";
+
 
 /* ─── RUBJOB Brand Tokens ─── */
 @theme inline {
