@@ -130,13 +130,19 @@ export default function middleware(req: NextRequest) {
       return NextResponse.redirect(url);
     }
 
+    let response;
     // Rewrite: prepend portal prefix if not already present
     if (targetPrefix && !pathname.startsWith(targetPrefix)) {
       url.pathname = `${targetPrefix}${pathname}`;
-      return NextResponse.rewrite(url);
+      response = NextResponse.rewrite(url);
+    } else {
+      response = NextResponse.next();
     }
 
-    return NextResponse.next();
+    // Prevent indexing of portal subdomains by search engines and AI bots
+    response.headers.set("X-Robots-Tag", "noindex, nofollow");
+
+    return response;
   }
 
   // ─── Unknown subdomain — redirect to root domain ───

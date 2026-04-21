@@ -20,9 +20,12 @@ export default function AppWrapper({ children }: { children: React.ReactNode }) 
     window.location.hostname.startsWith("store.")
   );
 
-  // Landing page should bypass LIFF/onboarding entirely
+  // Landing and legal pages should bypass LIFF/onboarding entirely
   const isLanding = typeof window !== "undefined" && (
     window.location.pathname.startsWith("/landing") ||
+    window.location.pathname.startsWith("/privacy") ||
+    window.location.pathname.startsWith("/terms") ||
+    window.location.pathname.startsWith("/contact") ||
     // Root domain with no subdomain (middleware rewrites to /landing)
     (!window.location.hostname.startsWith("app.") &&
      !window.location.hostname.startsWith("admin.") &&

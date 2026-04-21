@@ -21,16 +21,6 @@ export const metadata: Metadata = {
     icon: "/images/rubjob-complete_logo-color.png",
     apple: "/images/rubjob-complete_logo-color.png",
   },
-  robots: {
-    index: false,
-    follow: false,
-    nocache: true,
-    googleBot: {
-      index: false,
-      follow: false,
-      noimageindex: true,
-    },
-  },
 };
 
 export const viewport: Viewport = {

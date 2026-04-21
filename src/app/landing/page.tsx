@@ -200,12 +200,7 @@ export default function LandingPage() {
             <a href="#line-app" className="hover:text-primary transition-colors">Line App</a>
           </div>
 
-          <a
-            href={mounted ? getPortalUrl("app") : "#"}
-            className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-primary to-orange-500 hover:from-primary-dark hover:to-orange-600 text-white font-bold text-sm rounded-full transition-all hover:scale-105 active:scale-95 shadow-lg shadow-primary/30"
-          >
-            เข้าใช้งานแอป <span className="text-lg leading-none hidden sm:inline">→</span>
-          </a>
+          {/* App link removed as per request to decouple website from app */}
         </div>
       </nav>
 
@@ -252,16 +247,9 @@ export default function LandingPage() {
                 mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
               }`}
             >
-              <a
-                href={mounted ? getPortalUrl("app") : "#"}
-                className="group px-8 py-4 w-full sm:w-auto bg-slate-900 hover:bg-slate-800 text-white font-black text-base rounded-2xl shadow-xl hover:shadow-2xl transition-all hover:-translate-y-1 active:translate-y-0 flex items-center justify-center gap-3"
-              >
-                เริ่มใช้งานทันที
-                <span className="group-hover:translate-x-1 transition-transform">→</span>
-              </a>
-              <a href="#how-it-works" className="px-6 py-4 bg-white text-slate-800 font-bold rounded-xl md:rounded-2xl shadow-sm border border-slate-100 hover:border-primary hover:text-primary transition-all duration-300 flex items-center justify-center gap-2 group">
+              <a href="#how-it-works" className="px-10 py-4 bg-slate-900 hover:bg-slate-800 text-white font-black text-base rounded-2xl shadow-xl hover:shadow-2xl transition-all hover:-translate-y-1 active:translate-y-0 flex items-center justify-center gap-3 group">
                   <img src="/images/mascot-peek.png" alt="" className="w-5 h-5 object-contain group-hover:-translate-y-1 transition-transform" />
-                  ดูฟีเจอร์เพิ่มเติม
+                  ดูฟีเจอร์การใช้งาน
                 </a>
             </div>
           </div>
@@ -511,8 +499,8 @@ export default function LandingPage() {
         <div className="absolute right-0 top-0 w-[40vw] h-[40vw] bg-[#00B900]/10 rounded-bl-full -z-10" />
 
         {/* Mascot 13 (Peeking) reused here playfully */}
-        <div className="absolute top-1/2 -left-12 transform -translate-y-1/2 w-48 opacity-20 pointer-events-none hidden lg:block">
-           <img src="/images/mascot-wink.png" alt="Mascot Deco" className="w-full h-auto" />
+        <div className="absolute top-1/2 -left-12 transform -translate-y-1/2 w-48 opacity-100 pointer-events-none hidden lg:block z-10">
+           <img src="/images/mascot-wink.png" alt="Mascot Deco" className="w-full h-auto drop-shadow-xl" />
         </div>
         
         <div className="max-w-7xl mx-auto px-6 md:px-12 relative z-30">
@@ -530,20 +518,14 @@ export default function LandingPage() {
                 <span className="text-primary font-bold">รับจบทุกเรื่องแทนคุณของจริง! 👌🏻</span>
               </p>
               
-              <a
-                href={mounted ? getPortalUrl("app") : "#"}
-                className="inline-flex items-center gap-3 px-8 py-4 bg-[#00B900] hover:bg-[#009b00] text-white font-black text-lg rounded-2xl shadow-xl shadow-[#00B900]/30 transition-all hover:scale-105 active:scale-95"
-              >
-                เพิ่มเพื่อนใน LINE เลย
-                <span className="bg-white/20 px-2 py-1 rounded-md text-sm">@rubjob</span>
-              </a>
+              {/* App link removed per request */}
             </div>
 
             {/* Mascot Showcase Right */}
             <div className="flex-1 relative w-full max-w-sm mx-auto flex items-center justify-center py-10">
-               {/* Confident Mascot 11 */}
+               {/* Confident Mascot */}
                <div className="relative w-48 lg:w-64 animate-float z-20">
-                  <img src="/images/11.png" alt="Mascot Confident" className="w-full h-auto drop-shadow-2xl" />
+                  <img src="/images/mascot-jump.png" alt="Mascot Confident" className="w-full h-auto drop-shadow-2xl" />
                </div>
                {/* Floating elements behind */}
                <div className="absolute top-[20%] right-0 bg-white p-4 rounded-xl shadow-xl border border-slate-100 transform rotate-6 animate-float-delayed z-30">
@@ -609,9 +591,9 @@ export default function LandingPage() {
           <div className="w-full border-t border-slate-100 pt-6 flex flex-col md:flex-row items-center justify-between gap-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">
             <span>© 2026 RUBJOB. All rights reserved.</span>
             <div className="flex items-center gap-4 sm:gap-6">
-              <a href="#" className="hover:text-primary transition-colors">Privacy Policy</a>
-              <a href="#" className="hover:text-primary transition-colors">Terms of Service</a>
-              <a href="#" className="hover:text-primary transition-colors">Contact Support</a>
+              <a href="/privacy" className="hover:text-primary transition-colors">Privacy Policy</a>
+              <a href="/terms" className="hover:text-primary transition-colors">Terms of Service</a>
+              <a href="/contact" className="hover:text-primary transition-colors">Contact Support</a>
             </div>
           </div>
         </div>
