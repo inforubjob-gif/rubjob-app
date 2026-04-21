@@ -9,7 +9,8 @@ export default async function robots(): Promise<MetadataRoute.Robots> {
     host.startsWith("app.") ||
     host.startsWith("store.") ||
     host.startsWith("admin.") ||
-    host.startsWith("rider.");
+    host.startsWith("rider.") ||
+    host.startsWith("provider.");
 
   if (isPortal) {
     return {

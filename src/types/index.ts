@@ -7,7 +7,7 @@ export interface User {
   email?: string;
   statusMessage?: string;
   phone?: string;
-  role?: "user" | "store_admin" | "system_admin" | "driver";
+  role?: "user" | "store_admin" | "system_admin" | "driver" | "specialist";
   assignedStoreId?: string;
 }
 
@@ -25,6 +25,11 @@ export interface Store {
   createdAt: string;
 }
 
+// ─── Order Types ───
+
+/** Determines the fulfillment flow: logistics (rider+store) vs direct_service (provider only) */
+export type OrderType = "logistics" | "direct_service";
+
 export type OrderStatus =
   | "pending"
   | "picking_up"
@@ -33,12 +38,17 @@ export type OrderStatus =
   | "ready_for_pickup"
   | "delivering_to_customer"
   | "completed"
-  | "cancelled";
+  | "cancelled"
+  // Direct-service specific statuses
+  | "accepted"
+  | "in_progress";
 
 export interface Order {
   id: string;
   userId: string;
-  storeId: string;
+  orderType: OrderType;
+  storeId?: string;
+  providerId?: string;
   service: ServiceType;
   status: OrderStatus;
   items: OrderItem[];
@@ -48,6 +58,7 @@ export interface Order {
   deliveryDate?: string;
   laundryFee: number;
   deliveryFee: number;
+  serviceFee?: number;
   distanceKm?: number;
   totalPrice: number;
   pickupDriverId?: string;
@@ -64,7 +75,10 @@ export interface OrderItem {
 
 export type ServiceType = 
   | "wash_fold" | "dry_clean" | "iron_only" | "wash_iron" 
-  | "home_cleaning" | "aircon_service" | "personal_assistant" | "companionship";
+  | "home_cleaning" | "aircon_service" | "personal_assistant" | "companionship"
+  | "gecko_catcher" | "fortune_telling" | "life_management" | "companion_friend";
+
+export type ServiceCategory = "laundry" | "cleaning" | "maintenance" | "personal" | "friend" | "specialist";
 
 export interface Service {
   id: string;
@@ -93,4 +107,24 @@ export interface TimeSlot {
   label: string;
   startTime: string;
   endTime: string;
+}
+
+// ─── Provider / Specialist Types ───
+
+export interface ProviderUser {
+  id: string;
+  email: string;
+  name: string;
+  phone: string;
+  pictureUrl?: string;
+  lineUserId?: string;
+  /** Skills this provider offers (e.g. ["gecko_catcher", "companion_friend"]) */
+  skills: string[];
+  /** Provider sets their own pricing per skill */
+  pricing: Record<string, number>;
+  /** Unit per skill (hour, session, etc.) */
+  pricingUnit: Record<string, string>;
+  bio?: string;
+  status: "pending" | "active" | "suspended" | "rejected";
+  createdAt: string;
 }

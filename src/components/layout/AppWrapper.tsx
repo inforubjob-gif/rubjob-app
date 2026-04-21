@@ -15,9 +15,11 @@ export default function AppWrapper({ children }: { children: React.ReactNode }) 
     window.location.pathname.startsWith("/admin") || 
     window.location.pathname.startsWith("/rider") || 
     window.location.pathname.startsWith("/store") ||
+    window.location.pathname.startsWith("/provider") ||
     window.location.hostname.startsWith("admin.") ||
     window.location.hostname.startsWith("rider.") ||
-    window.location.hostname.startsWith("store.")
+    window.location.hostname.startsWith("store.") ||
+    window.location.hostname.startsWith("provider.")
   );
 
   // Landing and legal pages should bypass LIFF/onboarding entirely

@@ -36,11 +36,12 @@ const SUBDOMAIN_MAP: Record<string, string> = {
   admin: "/admin",
   rider: "/rider",
   store: "/store",
+  provider: "/provider",
   app: "",   // User app — root-level pages, no prefix needed
 };
 
 /** Portal path prefixes that should be isolated per-subdomain */
-const PORTAL_PREFIXES = ["/admin", "/rider", "/store", "/landing"];
+const PORTAL_PREFIXES = ["/admin", "/rider", "/store", "/provider", "/landing"];
 
 /**
  * Extract subdomain from hostname against known root domains.

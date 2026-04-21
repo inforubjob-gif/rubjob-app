@@ -75,6 +75,53 @@ export const SERVICES: Service[] = [
   },
 ];
 
+// ─── Direct Service Categories (Provider/Specialist — NOT shown in main app) ───
+export const DIRECT_SERVICES: Service[] = [
+  {
+    id: "gecko_catcher",
+    name: "Gecko Catcher",
+    category: "specialist",
+    description: "Professional gecko & pest removal from your home",
+    basePrice: 300,
+    unit: "session",
+    icon: "gecko_catcher",
+    estimatedDays: 0,
+  },
+  {
+    id: "fortune_telling",
+    name: "Fortune Telling",
+    category: "specialist",
+    description: "Horoscope reading, tarot, and life guidance sessions",
+    basePrice: 500,
+    unit: "session",
+    icon: "fortune_telling",
+    estimatedDays: 0,
+  },
+  {
+    id: "life_management",
+    name: "Life Management",
+    category: "specialist",
+    description: "Errands, scheduling, admin tasks — your personal organizer",
+    basePrice: 400,
+    unit: "hour",
+    icon: "life_management",
+    estimatedDays: 0,
+  },
+  {
+    id: "companion_friend",
+    name: "Companion Friend",
+    category: "specialist",
+    description: "A friendly companion for lonely times, meals, or outings",
+    basePrice: 250,
+    unit: "hour",
+    icon: "companion_friend",
+    estimatedDays: 0,
+  },
+];
+
+/** All available skill IDs for Provider registration */
+export const PROVIDER_SKILL_OPTIONS = DIRECT_SERVICES.map(s => ({ id: s.id, name: s.name, icon: s.icon, unit: s.unit, suggestedPrice: s.basePrice }));
+
 // ─── Standard Time Slots (7:00–17:00) ───
 export const TIME_SLOTS: TimeSlot[] = [
   { id: "early_morning", label: "เช้าตรู่", startTime: "07:00", endTime: "09:00" },
