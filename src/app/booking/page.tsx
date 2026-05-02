@@ -560,10 +560,9 @@ function BookingFlow() {
                     <button
                       key={slot.id}
                       onClick={() => setPickupSlot(slot.id)}
-                      className={`py-2 px-2 rounded-xl text-center transition-all duration-300 ${pickupSlot === slot.id ? "bg-primary text-white shadow-md shadow-primary/20 scale-[1.02]" : "bg-white text-foreground hover:bg-slate-100 border border-border"}`}
+                      className={`py-3 px-2 rounded-xl text-center transition-all duration-300 ${pickupSlot === slot.id ? "bg-primary text-white shadow-md shadow-primary/20 scale-[1.02]" : "bg-white text-foreground hover:bg-slate-100 border border-border"}`}
                     >
-                      <p className="text-xs font-semibold">{t(`timeSlots.${slot.id}`) || slot.label}</p>
-                      <p className="text-[10px] opacity-80">{slot.startTime}–{slot.endTime}</p>
+                      <p className="text-xs font-bold">{t(`timeSlots.${slot.id}`) || slot.label}</p>
                     </button>
                   ))}
                 </div>

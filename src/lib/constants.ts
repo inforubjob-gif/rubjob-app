@@ -122,11 +122,18 @@ export const DIRECT_SERVICES: Service[] = [
 /** All available skill IDs for Provider registration */
 export const PROVIDER_SKILL_OPTIONS = DIRECT_SERVICES.map(s => ({ id: s.id, name: s.name, icon: s.icon, unit: s.unit, suggestedPrice: s.basePrice }));
 
-// ─── Standard Time Slots (7:00–17:00) ───
+// ─── Standard Time Slots (08:00–20:00) ───
 export const TIME_SLOTS: TimeSlot[] = [
-  { id: "early_morning", label: "เช้าตรู่", startTime: "07:00", endTime: "09:00" },
-  { id: "morning",       label: "เช้า",     startTime: "09:00", endTime: "11:00" },
-  { id: "midday",        label: "สาย",      startTime: "11:00", endTime: "13:00" },
-  { id: "afternoon",     label: "บ่าย",     startTime: "13:00", endTime: "15:00" },
-  { id: "late_afternoon", label: "บ่ายแก่", startTime: "15:00", endTime: "17:00" },
+  { id: "h08_09", label: "08:00 - 09:00", startTime: "08:00", endTime: "09:00" },
+  { id: "h09_10", label: "09:00 - 10:00", startTime: "09:00", endTime: "10:00" },
+  { id: "h10_11", label: "10:00 - 11:00", startTime: "10:00", endTime: "11:00" },
+  { id: "h11_12", label: "11:00 - 12:00", startTime: "11:00", endTime: "12:00" },
+  { id: "h12_13", label: "12:00 - 13:00", startTime: "12:00", endTime: "13:00" },
+  { id: "h13_14", label: "13:00 - 14:00", startTime: "13:00", endTime: "14:00" },
+  { id: "h14_15", label: "14:00 - 15:00", startTime: "14:00", endTime: "15:00" },
+  { id: "h15_16", label: "15:00 - 16:00", startTime: "15:00", endTime: "16:00" },
+  { id: "h16_17", label: "16:00 - 17:00", startTime: "16:00", endTime: "17:00" },
+  { id: "h17_18", label: "17:00 - 18:00", startTime: "17:00", endTime: "18:00" },
+  { id: "h18_19", label: "18:00 - 19:00", startTime: "18:00", endTime: "19:00" },
+  { id: "h19_20", label: "19:00 - 20:00", startTime: "19:00", endTime: "20:00" },
 ];
