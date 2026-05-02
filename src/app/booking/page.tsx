@@ -253,18 +253,12 @@ function BookingFlow() {
   // Pricing Logic (2026 Strategy)
   let pricing: any = { customerTotal: 0, breakdown: { laundry: 0, delivery: 0, addons: 0 } };
   
-  try {
-    if (distanceKm <= 10) {
-      pricing = calculateOrderPrice({
-        weightKg: parseInt(bagSize),
-        distanceKm: distanceKm,
-        isExpress: deliverySpeed === "express",
-        needsDetergent: needsDetergent
-      });
-    }
-  } catch (err) {
-    console.error("Pricing error:", err);
-  }
+    pricing = calculateOrderPrice({
+      weightKg: parseInt(bagSize),
+      distanceKm: distanceKm,
+      isExpress: deliverySpeed === "express",
+      needsDetergent: needsDetergent
+    });
 
   const laundryFee = pricing.breakdown.laundry;
   const deliveryFee = pricing.breakdown.delivery;
@@ -837,14 +831,23 @@ function BookingFlow() {
                 </div>
                 
                 {/* Total */}
-                <div className="flex items-end justify-between border-t border-slate-200 pt-4 bg-slate-50/50 -mx-5 -mb-5 px-5 pb-5 rounded-b-2xl">
-                  <div>
-                    <span className="block text-sm font-black text-foreground">{t("booking.summary.total")}</span>
-                    <span className="block text-[10px] text-muted font-bold mt-0.5">{t("booking.summary.taxIncluded")}</span>
-                  </div>
-                  <div className="flex flex-col items-end">
-                    {(couponDiscount > 0 || pointsDiscount > 0) && <span className="text-[11px] text-slate-400 line-through font-bold">฿{subTotal}</span>}
-                    <span className="text-3xl font-black text-primary-dark leading-none">฿{totalPrice}</span>
+                <div className="flex flex-col border-t border-slate-200 pt-4 bg-slate-50/50 -mx-5 -mb-5 px-5 pb-5 rounded-b-2xl">
+                  {isTooFar && (
+                    <div className="bg-red-50 text-red-600 text-[11px] font-bold p-2 rounded-lg mb-3 flex items-center gap-2 border border-red-100">
+                      <Icons.AlertCircle size={14} />
+                      {t("booking.errors.tooFar") || "ขออภัย ระยะทางไกลเกิน 10 กม. ไม่สามารถให้บริการได้"}
+                    </div>
+                  )}
+                  
+                  <div className="flex items-end justify-between">
+                    <div>
+                      <span className="block text-sm font-black text-foreground">{t("booking.summary.total")}</span>
+                      <span className="block text-[10px] text-muted font-bold mt-0.5">{t("booking.summary.taxIncluded")}</span>
+                    </div>
+                    <div className="flex flex-col items-end">
+                      {(couponDiscount > 0 || pointsDiscount > 0) && <span className="text-[11px] text-slate-400 line-through font-bold">฿{subTotal}</span>}
+                      <span className={`text-3xl font-black leading-none ${isTooFar ? "text-slate-400" : "text-primary-dark"}`}>฿{totalPrice}</span>
+                    </div>
                   </div>
                 </div>
               </Card>
