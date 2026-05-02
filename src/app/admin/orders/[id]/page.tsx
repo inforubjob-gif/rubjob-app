@@ -91,17 +91,22 @@ export default function AdminOrderDetailPage() {
 
            {/* Order Items */}
            <Card className="p-8">
-              <h2 className="text-sm font-black text-slate-900 uppercase tracking-widest mb-6">รายการสั่งซื้อ</h2>
+              <h2 className="text-sm font-black text-slate-900 uppercase tracking-widest mb-6">รายละเอียดค่าบริการ</h2>
               <div className="space-y-4">
-                 {/* Logic to map items would go here */}
                  <div className="flex justify-between text-sm font-bold border-b border-slate-50 pb-4">
-                    <span className="text-slate-500">Service Fee</span>
+                    <span className="text-slate-500">ค่าซัก + อบผ้า ({order.weight_kg || 9} kg)</span>
                     <span className="text-slate-900">฿{order.laundryFee}</span>
                  </div>
                  <div className="flex justify-between text-sm font-bold border-b border-slate-50 pb-4">
-                    <span className="text-slate-500">Delivery Fee</span>
+                    <span className="text-slate-500">ค่าขนส่ง (ระยะทาง {order.distanceKm?.toFixed(1)} km)</span>
                     <span className="text-slate-900">฿{order.deliveryFee}</span>
                  </div>
+                 {order.addonsTotal > 0 && (
+                   <div className="flex justify-between text-sm font-bold border-b border-slate-50 pb-4">
+                      <span className="text-slate-500">ค่าบริการเสริม (Add-ons)</span>
+                      <span className="text-primary-dark">+฿{order.addonsTotal}</span>
+                   </div>
+                 )}
                  {order.cancellationFee > 0 && (
                    <div className="flex justify-between text-sm font-bold text-rose-500 border-b border-rose-50 pb-4">
                       <span>Cancellation Fee</span>
@@ -109,7 +114,7 @@ export default function AdminOrderDetailPage() {
                    </div>
                  )}
                  <div className="flex justify-between text-xl font-black pt-4">
-                    <span className="text-slate-900 uppercase">Total</span>
+                    <span className="text-slate-900 uppercase">ยอดรวมสุทธิ</span>
                     <span className="text-primary-dark">฿{order.totalPrice}</span>
                  </div>
               </div>

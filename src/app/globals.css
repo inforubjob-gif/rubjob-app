@@ -4,10 +4,17 @@
 
 /* ─── RUBJOB Brand Tokens ─── */
 @theme inline {
-  /* Primary Gold / Orange */
-  --color-primary: #ff9f1c;
-  --color-primary-dark: #e68a19;
-  --color-primary-light: #fff4e5;
+  /* RubJob Brand Palette */
+  --color-rubjob-passion: #FF9F1C;
+  --color-rubjob-light: #FFBC1C;
+  --color-rubjob-heavy: #FF771C;
+  --color-rubjob-dark: #131313;
+  --color-rubjob-white: #FFFFFF;
+
+  /* Legacy / Primary mapping */
+  --color-primary: var(--color-rubjob-passion);
+  --color-primary-dark: var(--color-rubjob-heavy);
+  --color-primary-light: #FFF4E5;
 
   /* Neutrals */
   --color-surface: #FFFFFF;

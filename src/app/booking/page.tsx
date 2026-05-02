@@ -9,6 +9,7 @@ import type { ServiceType, Address, Store } from "@/types";
 
 import { Icons, getServiceIcon } from "@/components/ui/Icons";
 import Modal from "@/components/ui/Modal";
+import { calculateOrderPrice } from "@/utils/pricing";
 
 function getDistanceKm(lat1: number, lon1: number, lat2: number, lon2: number) {
   const R = 6371; 
@@ -67,6 +68,7 @@ function BookingFlow() {
   // Weight & Size based selection instead of per-piece items
   const [bagSize, setBagSize] = useState<"9kg" | "14kg" | "18kg" | "28kg">("9kg");
   const [withFolding, setWithFolding] = useState<boolean>(true);
+  const [needsDetergent, setNeedsDetergent] = useState<boolean>(false);
 
   // Pickup: always scheduled (no more instant option)
   const [pickupDate, setPickupDate] = useState("");
@@ -246,37 +248,19 @@ function BookingFlow() {
     ? getDistanceKm(selectedAddress.lat, selectedAddress.lng, selectedStore.lat, selectedStore.lng)
     : 5.1; 
     
-  // Pricing Logic
-  const baseDeliveryFee = deliverySpeed === "express" ? 59 : 39;
-  
-  // Dynamic radius from settings
-  const radiusLimit = Number(systemSettings.radius_km) || 5;
-  const radiusExtended = radiusLimit * 2; // e.g. 10 if radius is 5
+  // Pricing Logic (2026 Strategy)
+  const pricing = calculateOrderPrice({
+    weightKg: parseInt(bagSize),
+    distanceKm: distanceKm,
+    isExpress: deliverySpeed === "express",
+    needsDetergent: needsDetergent
+  });
 
-  let distanceExtra = 0;
-  if (distanceKm > radiusExtended) {
-    distanceExtra = (radiusExtended - radiusLimit) * 8 + Math.ceil(distanceKm - radiusExtended) * 20;
-  } else if (distanceKm > radiusLimit) {
-    distanceExtra = Math.ceil(distanceKm - radiusLimit) * 8;
-  }
-  const deliveryFee = selectedAddress && selectedStore ? baseDeliveryFee + distanceExtra : 0;
+  const laundryFee = pricing.breakdown.laundry;
+  const deliveryFee = pricing.breakdown.delivery;
+  const addonsTotal = pricing.breakdown.addons;
 
-  const bagSizeExtra = bagSize === "28kg" ? 20 : 0;
-  
-  let foldingFee = 0;
-  if (withFolding) {
-    if (bagSize === "9kg" || bagSize === "14kg") foldingFee = 20;
-    else if (bagSize === "18kg") foldingFee = 25;
-    else if (bagSize === "28kg") foldingFee = 35;
-  }
-
-  const laundryFee = pkgDataRaw
-    ? Number(pkgDataRaw.price)
-    : service?.category === "laundry" 
-      ? (service?.basePrice || 0) + bagSizeExtra + foldingFee
-      : (service?.basePrice || 0);
-
-  const subTotal = laundryFee + deliveryFee;
+  const subTotal = pricing.customerTotal;
   const totalDiscount = couponDiscount + pointsDiscount;
   const totalPrice = Math.max(subTotal - totalDiscount, 0);
 
@@ -616,7 +600,7 @@ function BookingFlow() {
                   {t("booking.foldingServiceTitle")}
                 </h3>
                 
-                <Card className="overflow-hidden mb-2">
+                <Card className="overflow-hidden mb-5">
                   <label className="flex items-center justify-between p-4 cursor-pointer hover:bg-slate-50 transition-colors border-b border-border" onClick={() => setWithFolding(false)}>
                     <div className="flex flex-col">
                       <span className="text-sm font-bold text-foreground">{t("booking.options.noFolding")}</span>
@@ -634,6 +618,22 @@ function BookingFlow() {
                     </div>
                     <div className={`w-5 h-5 rounded-full flex items-center justify-center transition-colors ${withFolding ? "bg-primary text-white shadow-md shadow-primary/30" : "border-2 border-slate-200"}`}>
                       {withFolding && <span className="text-xs font-bold leading-none flex items-center justify-center pt-0.5">✓</span>}
+                    </div>
+                  </label>
+                </Card>
+
+                <h3 className="text-sm font-bold text-foreground mb-2 flex items-center gap-2">
+                  <Icons.Shield size={18} className="text-primary" /> 
+                  น้ำยาซักผ้า / ปรับผ้านุ่ม
+                </h3>
+                <Card className="p-4 mb-4">
+                  <label className="flex items-center justify-between cursor-pointer" onClick={() => setNeedsDetergent(!needsDetergent)}>
+                    <div className="flex flex-col">
+                      <span className="text-sm font-bold text-foreground">รับน้ำยาของร้าน</span>
+                      <span className="text-xs text-primary-dark font-medium">+฿20 (เกรดพรีเมียม)</span>
+                    </div>
+                    <div className={`w-[42px] h-[24px] rounded-full p-[2px] transition-colors duration-300 flex items-center ${needsDetergent ? "bg-primary" : "bg-slate-200"}`}>
+                      <div className={`w-5 h-5 rounded-full bg-white transition-transform duration-300 shadow-sm ${needsDetergent ? "translate-x-[18px]" : "translate-x-0"}`} />
                     </div>
                   </label>
                 </Card>
@@ -740,33 +740,29 @@ function BookingFlow() {
               <Card className="p-5">
                 <div className="space-y-4 mb-4 text-xs font-medium text-slate-600">
                   
-                  {/* Shop Section */}
+                  {/* Service Section */}
                   <div>
                     <div className="flex items-center gap-1.5 mb-2 text-primary-dark font-bold">
-                      <span className="text-sm leading-none pt-0.5">🏪</span>
-                      <span>{t("booking.summary.storeSection")}{selectedStore ? ` (${selectedStore.name})` : ""}</span>
+                      <span className="text-sm leading-none pt-0.5">🧺</span>
+                      <span>{t("booking.summary.package")} {bagSize}</span>
                     </div>
                     <div className="space-y-2 pl-5">
                       <div className="flex items-center justify-between">
-                        <span>{t("booking.summary.package")} {pkgDataRaw ? `${service?.name} (${pkgDataRaw.name})` : (t(`orders.services.${service?.id}`) || service?.name || '')}</span>
-                        <span className="font-bold text-slate-800">฿{pkgDataRaw ? pkgDataRaw.price : (service?.basePrice || 0)}</span>
+                        <span>{t("booking.summary.package")} {bagSize}</span>
+                        <span className="font-bold text-slate-800">฿{laundryFee}</span>
                       </div>
-                      {service?.category === "laundry" && bagSizeExtra > 0 && (
-                        <div className="flex items-center justify-between">
-                          <span>{t("booking.summary.extraBag")} ({bagSize})</span>
-                          <span className="font-bold text-slate-800">+฿{bagSizeExtra}</span>
+                      {deliverySpeed === "express" && (
+                        <div className="flex items-center justify-between text-primary-dark">
+                          <span>ค่าบริการด่วนพิเศษ (Express)</span>
+                          <span className="font-bold">+฿20</span>
                         </div>
                       )}
-                      {service?.category === "laundry" && foldingFee > 0 && (
-                        <div className="flex items-center justify-between">
-                          <span>{t("booking.foldingServiceTitle")}</span>
-                          <span className="font-bold text-slate-800">+฿{foldingFee}</span>
+                      {needsDetergent && (
+                        <div className="flex items-center justify-between text-primary-dark">
+                          <span>ค่าน้ำยาซักผ้า/ปรับผ้านุ่ม</span>
+                          <span className="font-bold">+฿20</span>
                         </div>
                       )}
-                    </div>
-                    <div className="flex items-center justify-between mt-3 pt-2 border-t border-slate-100 pl-5 text-[11px]">
-                      <span className="text-xs text-slate-400 font-bold uppercase">{t("booking.summary.subtotalLaundry")}</span>
-                      <span className="font-black text-slate-700">฿{laundryFee}</span>
                     </div>
                   </div>
 
@@ -778,8 +774,8 @@ function BookingFlow() {
                     </div>
                     <div className="space-y-2 pl-5">
                       <div className="flex items-center justify-between">
-                        <span>{t("booking.summary.deliveryFee")} ({deliverySpeed === "express" ? t("booking.speed.expressShort") : t("booking.speed.standardShort")})</span>
-                        <span className="font-bold text-slate-800">+฿{deliveryFee}</span>
+                        <span>{t("booking.summary.deliveryFee")}</span>
+                        <span className="font-bold text-slate-800">฿{deliveryFee}</span>
                       </div>
                     </div>
                   </div>
