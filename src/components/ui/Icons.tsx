@@ -95,6 +95,7 @@ export const Icons = {
   Package: (props: IconProps) => <MaterialIcon name="inventory_2" {...props} />,
   LogOut: (props: IconProps) => <MaterialIcon name="logout" {...props} />,
   Bike: (props: IconProps) => <MaterialIcon name="pedal_bike" {...props} />,
+  Star: (props: IconProps) => <MaterialIcon name="star" {...props} />,
   Stars: (props: IconProps) => <MaterialIcon name="grade" {...props} />,
   Globe: (props: IconProps) => <MaterialIcon name="public" {...props} />,
   FileText: (props: IconProps) => <MaterialIcon name="description" {...props} />,
