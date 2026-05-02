@@ -612,9 +612,15 @@ function BookingFlow() {
                 
                 <div className="grid grid-cols-2 gap-2 mb-4">
                   {(["9kg", "14kg", "18kg", "28kg"] as const).map((size) => (
-                    <label key={size} className={`flex flex-col items-center justify-center p-3 rounded-xl border-2 cursor-pointer transition-all ${bagSize === size ? "border-primary bg-primary/5 shadow-sm" : "border-slate-100 bg-white hover:bg-slate-50"}`} onClick={() => setBagSize(size)}>
-                      <span className="text-sm font-bold text-foreground">{size}</span>
-                      {size === "28kg" && <span className="text-[10px] text-muted">+฿20</span>}
+                    <label key={size} className={`flex flex-col items-center justify-center p-3.5 rounded-xl border-2 cursor-pointer transition-all ${bagSize === size ? "border-primary bg-primary/5 shadow-md shadow-primary/10" : "border-slate-100 bg-white hover:bg-slate-50"}`} onClick={() => setBagSize(size)}>
+                      <span className="text-sm font-black text-foreground">{size}</span>
+                      <span className="text-[10px] text-muted font-bold">
+                        {size === "9kg" ? "~25-30 ชิ้น" : 
+                         size === "14kg" ? "~40-50 ชิ้น" : 
+                         size === "18kg" ? "~60-70 ชิ้น" : 
+                         "~80-100 ชิ้น"}
+                      </span>
+                      {size === "28kg" && <span className="text-[10px] text-primary-dark font-black mt-1">+฿20</span>}
                     </label>
                   ))}
                 </div>
