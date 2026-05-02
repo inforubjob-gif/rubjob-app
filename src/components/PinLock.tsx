@@ -180,40 +180,31 @@ export default function PinLock({ type, userId, onVerified, children }: PinLockP
           </p>
         )}
 
-        {/* Keypad with Loading Overlay */}
-        <div className="relative w-full px-4">
-          {isProcessing && (
-            <div className="absolute inset-0 z-20 bg-slate-50/40 backdrop-blur-[2px] flex flex-col items-center justify-center rounded-3xl animate-in fade-in duration-300">
-              <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mb-4" />
-              <p className="text-[10px] font-black text-primary uppercase">{t("common.processing")}</p>
-            </div>
-          )}
-          
-          <div className="grid grid-cols-3 gap-4 w-full">
-          {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
-            <button
-              key={num}
-              onClick={() => handleNumberClick(num)}
-              className="aspect-square rounded-2xl bg-white text-2xl font-black text-slate-700 shadow-sm border border-slate-100 active:bg-slate-50 active:scale-95 transition-all flex items-center justify-center cursor-pointer"
-            >
-              {num}
-            </button>
-          ))}
-          <div />
-          <button
-            onClick={() => handleNumberClick(0)}
-            className="aspect-square rounded-2xl bg-white text-2xl font-black text-slate-700 shadow-sm border border-slate-100 active:bg-slate-50 active:scale-95 transition-all flex items-center justify-center cursor-pointer"
-          >
-            0
-          </button>
-          <button
-            onClick={handleDelete}
-            className="aspect-square rounded-2xl text-slate-400 active:text-rose-500 active:scale-95 transition-all flex items-center justify-center cursor-pointer disabled:opacity-30"
-            disabled={isProcessing}
-          >
-            <Icons.Close size={28} />
-          </button>
-        </div>
+        {/* Hidden Input to trigger native keyboard */}
+        <input
+          type="tel"
+          inputMode="numeric"
+          pattern="[0-9]*"
+          maxLength={6}
+          value={step === "confirm" ? confirmPin : pin}
+          onChange={(e) => {
+            const val = e.target.value.replace(/\D/g, "").slice(0, 6);
+            if (step === "confirm") {
+              setConfirmPin(val);
+            } else {
+              setPin(val);
+            }
+          }}
+          autoFocus
+          className="absolute opacity-0 pointer-events-none"
+          id="pin-input"
+        />
+
+        {/* Clickable area to focus hidden input */}
+        <div 
+          onClick={() => document.getElementById("pin-input")?.focus()}
+          className="w-full h-20 cursor-pointer" 
+        />
       </div>
         
         {step === "confirm" && (
