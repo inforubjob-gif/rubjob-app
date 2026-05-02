@@ -54,6 +54,24 @@ export default function HomePage() {
     fetchOrders();
   }, [profile?.userId]);
 
+  // 3. Fetch Primary Address
+  const [primaryAddress, setPrimaryAddress] = useState<any>(null);
+  useEffect(() => {
+    if (!profile?.userId) return;
+    async function fetchAddress() {
+      try {
+        const res = await fetch(`/api/user/addresses?userId=${profile?.userId}`);
+        const data = await res.json() as any;
+        if (data.addresses && data.addresses.length > 0) {
+          setPrimaryAddress(data.addresses[0]);
+        }
+      } catch (err) {
+        console.error("Failed to fetch address:", err);
+      }
+    }
+    fetchAddress();
+  }, [profile?.userId]);
+
   const laundryServices = services.filter(s => s.category === "laundry");
   const otherServices = services.filter(s => s.category !== "laundry");
   const activeOrders = orders.filter((o) => o.status !== "completed" && o.status !== "cancelled");
@@ -64,15 +82,30 @@ export default function HomePage() {
       <div className="absolute top-0 left-0 right-0 h-[250px] bg-gradient-to-b from-primary via-primary/90 to-slate-50 z-0" />
 
       {/* ─── Header ─── */}
-      <header className="relative z-10 px-5 pt-3 pb-6">
-        <div className="flex items-center justify-between mb-4">
-          <img
-            src="/images/rubjob-complete_Vertical-text-white.png"
-            alt="RUBJOB"
-            className="h-20 w-auto object-contain"
-          />
+      <header className="relative z-10 px-5 pt-10 pb-6">
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3 flex-1 min-w-0">
+            <Link href="/" className="shrink-0">
+               <img
+                 src="/images/rubjob-complete_logo-white.png"
+                 alt="RUBJOB"
+                 className="h-10 w-auto object-contain"
+               />
+            </Link>
+            
+            <Link href="/profile/addresses" className="flex-1 bg-white/20 backdrop-blur-md rounded-full px-4 py-2 flex items-center gap-2 border border-white/10 active:scale-95 transition-all truncate">
+               <Icons.MapPin size={16} className="text-white shrink-0" />
+               <div className="flex flex-col min-w-0">
+                  <span className="text-[10px] font-black text-white/60 uppercase leading-none mb-0.5">{t("profile.myAddress")}</span>
+                  <span className="text-xs font-bold text-white truncate">
+                    {primaryAddress ? primaryAddress.label : t("profile.addNewAddress")}
+                  </span>
+               </div>
+               <Icons.Back size={10} className="text-white/50 rotate-[-90deg] ml-auto shrink-0" />
+            </Link>
+          </div>
           
-          <Link href="/profile" className="relative group">
+          <Link href="/profile" className="relative group shrink-0">
             <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-white text-lg font-bold overflow-hidden ring-4 ring-white/30 shadow-xl group-active:scale-90 transition-all">
               {profile?.pictureUrl ? (
                 <img
@@ -86,8 +119,6 @@ export default function HomePage() {
             </div>
           </Link>
         </div>
-
-
       </header>
 
       <div className="relative z-10 px-5 space-y-7 pt-2 pb-24 animate-fade-in">
