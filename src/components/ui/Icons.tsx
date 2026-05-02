@@ -161,13 +161,14 @@ export function IconCircle({
   className = "" 
 }: { 
   children: React.ReactNode; 
-  variant?: "orange" | "yellow" | "white" | "black" | "slate" | "ghost"; 
+  variant?: "orange" | "yellow" | "green" | "white" | "black" | "slate" | "ghost"; 
   size?: "sm" | "md" | "lg" | "xl";
   className?: string;
 }) {
   const variants = {
     orange: "bg-[#FF9F1C] text-white shadow-[#FF9F1C]/20",
     yellow: "bg-[#ffce00] text-slate-900 shadow-[#ffce00]/20",
+    green:  "bg-[#10B981] text-white shadow-[#10B981]/20",
     white:  "bg-white text-slate-900 border border-slate-100 shadow-slate-200/50",
     black:  "bg-[#1a1a1a] text-white shadow-black/20",
     slate:  "bg-slate-100 text-slate-500",

@@ -22,6 +22,7 @@ export default function RiderDashboard() {
   const [workStatus, setWorkStatus] = useState(true);
   const [selectedJob, setSelectedJob] = useState<any | null>(null);
   const [rider, setRider] = useState<any>(null);
+  const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
 
   // Lifted state
   const [availableJobs, setAvailableJobs] = useState<any[]>([]);
@@ -88,6 +89,7 @@ export default function RiderDashboard() {
   }
 
   const handleToggleWorkStatus = async () => {
+    setIsStatusModalOpen(false);
     const nextStatus = !workStatus;
     setWorkStatus(nextStatus);
     if (!rider?.id) return;
@@ -208,7 +210,7 @@ export default function RiderDashboard() {
         <Card className="mb-6 bg-white/10 backdrop-blur-xl border border-white/20 shadow-xl shadow-primary-dark/20 rounded-xl p-4 text-white">
            <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                  <IconCircle variant={workStatus ? "black" : "slate"} size="md">
+                  <IconCircle variant={workStatus ? "green" : "slate"} size="md">
                       <Icons.Shield size={24} />
                   </IconCircle>
                   <div>
@@ -219,7 +221,7 @@ export default function RiderDashboard() {
                   </div>
               </div>
               <button 
-                onClick={handleToggleWorkStatus}
+                onClick={() => setIsStatusModalOpen(true)}
                 className={`w-14 h-8 rounded-full p-1 transition-all duration-300 ${workStatus ? 'bg-white shadow-lg shadow-white/20' : 'bg-white/20'}`}
               >
                 <div className={`w-6 h-6 rounded-full shadow-md transition-all duration-300 ${workStatus ? 'bg-primary transform translate-x-6' : 'bg-white'}`} />
@@ -493,6 +495,39 @@ export default function RiderDashboard() {
              </div>
           </div>
         )}
+      </Modal>
+
+      {/* Status Confirmation Modal */}
+      <Modal 
+        isOpen={isStatusModalOpen} 
+        onClose={() => setIsStatusModalOpen(false)}
+        title={workStatus ? t("rider.profile.stopWorkTitle") || "หยุดรับงานชั่วคราว?" : t("rider.profile.startWorkTitle") || "เริ่มรับงาน?"}
+      >
+        <div className="flex flex-col items-center text-center p-2">
+          <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mb-6 ${workStatus ? 'bg-rose-50 text-rose-500' : 'bg-emerald-50 text-emerald-500'}`}>
+             <Icons.Shield size={32} />
+          </div>
+          <h3 className="text-lg font-black text-slate-900 mb-2 uppercase">
+            {workStatus ? t("rider.profile.stopWorkConfirm") || "ต้องการหยุดรับงานใช่หรือไม่?" : t("rider.profile.startWorkConfirm") || "พร้อมเริ่มรับงานแล้วใช่หรือไม่?"}
+          </h3>
+          <p className="text-xs font-bold text-slate-400 mb-8 max-w-[240px]">
+            {workStatus 
+              ? t("rider.profile.stopWorkDesc") || "เมื่อหยุดรับงาน คุณจะไม่เห็นงานใหม่ในพื้นที่จนกว่าจะเปิดสถานะอีกครั้ง" 
+              : t("rider.profile.startWorkDesc") || "เมื่อเริ่มรับงาน คุณจะได้รับการแจ้งเตือนงานใหม่ในพื้นที่ทันที"}
+          </p>
+          <div className="grid grid-cols-2 gap-4 w-full">
+            <Button variant="secondary" fullWidth onClick={() => setIsStatusModalOpen(false)}>
+              {t("common.cancel")}
+            </Button>
+            <Button 
+              fullWidth 
+              className={workStatus ? "bg-rose-500 hover:bg-rose-600 text-white shadow-rose-100" : "bg-emerald-500 hover:bg-emerald-600 text-white shadow-emerald-100"}
+              onClick={handleToggleWorkStatus}
+            >
+              {t("common.confirm")}
+            </Button>
+          </div>
+        </div>
       </Modal>
     </div>
   );
