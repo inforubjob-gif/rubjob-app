@@ -29,6 +29,30 @@ export default function OrderDetailPage() {
   const { t } = useTranslation();
   const [order, setOrder] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [rating, setRating] = useState(0);
+  const [reviewText, setReviewText] = useState("");
+  const [isSubmittingReview, setIsSubmittingReview] = useState(false);
+
+  const handleSubmitReview = async () => {
+    if (rating === 0) return;
+    setIsSubmittingReview(true);
+    try {
+      const res = await fetch(`/api/orders/${id}/review`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ rating, reviewText }),
+      });
+      if (res.ok) {
+        alert("ขอบคุณสำหรับรีวิวครับ!");
+        // Update local state to hide review box
+        setOrder({ ...order, rating, reviewText });
+      }
+    } catch (err) {
+      console.error("Failed to submit review:", err);
+    } finally {
+      setIsSubmittingReview(false);
+    }
+  };
 
   useEffect(() => {
     async function fetchOrder() {
@@ -154,6 +178,50 @@ export default function OrderDetailPage() {
               <Icons.MapPin size={18} className="text-primary" /> {t("orders.tracking")}
             </h3>
             <StatusTimeline currentStatus={order.status} orderType={order.orderType} />
+          </Card>
+        )}
+
+        {/* Review Section (New) */}
+        {order.status === "completed" && !order.rating && (
+          <Card className="p-6 bg-gradient-to-br from-white to-primary/5 border-primary/20 shadow-xl shadow-primary/5">
+             <div className="flex flex-col items-center text-center">
+                <div className="w-16 h-16 bg-primary-light rounded-2xl flex items-center justify-center text-3xl mb-4 animate-bounce-slow">
+                   ⭐️
+                </div>
+                <h3 className="text-lg font-black text-foreground mb-1">{t("orders.review.title") || "ให้คะแนนบริการนี้"}</h3>
+                <p className="text-xs text-muted mb-6">{t("orders.review.subtitle") || "ความเห็นของคุณช่วยพัฒนาการบริการให้ดียิ่งขึ้น"}</p>
+                
+                <div className="flex gap-3 mb-8">
+                   {[1, 2, 3, 4, 5].map((star) => (
+                      <button 
+                        key={star}
+                        onClick={() => setRating(star)}
+                        className={`text-3xl transition-all duration-300 transform ${rating >= star ? "scale-125 grayscale-0" : "grayscale opacity-30 hover:opacity-50 hover:scale-110"}`}
+                      >
+                         ⭐
+                      </button>
+                   ))}
+                </div>
+
+                {rating > 0 && (
+                  <div className="w-full space-y-4 animate-fade-in">
+                     <textarea 
+                        className="w-full bg-white border border-slate-200 rounded-2xl p-4 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all placeholder:text-slate-300 font-medium"
+                        placeholder={t("orders.review.placeholder") || "เล่าประสบการณ์การใช้งานที่นี่..."}
+                        rows={3}
+                        value={reviewText}
+                        onChange={(e) => setReviewText(e.target.value)}
+                     />
+                     <Button 
+                        onClick={handleSubmitReview}
+                        disabled={isSubmittingReview}
+                        className="w-full bg-primary hover:bg-primary-dark text-white font-black py-4 rounded-xl shadow-lg shadow-primary/20 active:scale-95 transition-all uppercase tracking-widest"
+                     >
+                        {isSubmittingReview ? t("common.sending") : t("orders.review.submit") || "ส่งรีวิวเลย"}
+                     </Button>
+                  </div>
+                )}
+             </div>
           </Card>
         )}
 

@@ -30,6 +30,8 @@ CREATE TABLE IF NOT EXISTS Orders (
     weight_kg REAL NOT NULL,
     distance_km REAL NOT NULL,
     total_price REAL NOT NULL,
+    rating INTEGER CHECK (rating BETWEEN 1 AND 5),
+    review_text TEXT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (customer_id) REFERENCES Users(id),
     FOREIGN KEY (rubber_id) REFERENCES Users(id),
