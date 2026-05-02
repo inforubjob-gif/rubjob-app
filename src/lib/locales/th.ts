@@ -560,6 +560,17 @@ export const th = {
         withdrawSuccessDesc: "ยอดเงินจะถูกโอนเข้าบัญชีของคุณภายใน 24 ชม.",
         alertBankInfo: "กรุณากรอกข้อมูลธนาคารให้ครบถ้วน",
         withdrawError: "ถอนเงินไม่สำเร็จ",
+        types: {
+          "Pickup Earnings": "รายได้จากการรับผ้า",
+          "Delivery Earnings": "รายได้จากการส่งผ้า",
+          "Withdrawal": "ถอนเงิน",
+        },
+        statuses: {
+          "Success": "สำเร็จ",
+          "Success ": "สำเร็จ",
+          "pending": "รอดำเนินการ",
+          "rejected": "ปฏิเสธ",
+        },
         pin: {
           title: "รหัสความปลอดภัย",
           setupTitle: "ตั้งรหัส PIN กระเป๋าเงินของคุณ",
