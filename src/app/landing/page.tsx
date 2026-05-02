@@ -190,9 +190,9 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-6 md:px-12 flex items-center justify-between">
           <div className="flex items-center">
             <img 
-              src="/images/rubjob-complete_Text-color.png" 
+              src="/images/rubjob-complete_Vertical-text-color.png" 
               alt="RUBJOB" 
-              className="h-16 md:h-[80px] w-auto object-contain scale-110 md:scale-[1.2] origin-left" 
+              className="h-20 md:h-[100px] w-auto object-contain scale-110 md:scale-[1.3] origin-left" 
             />
           </div>
           
@@ -689,9 +689,9 @@ export default function LandingPage() {
 
         <div className="max-w-7xl mx-auto px-6 md:px-12 flex flex-col items-center text-center relative z-30">
           <img 
-            src="/images/rubjob-complete_Text-color.png" 
+            src="/images/rubjob-complete_Vertical-text-color.png" 
             alt="RUBJOB" 
-            className="h-20 md:h-[100px] w-auto object-contain mb-4 transform scale-125" 
+            className="h-24 md:h-[120px] w-auto object-contain mb-4 transform scale-125" 
           />
           <p className="text-slate-500 max-w-sm mx-auto text-sm mb-6">
             ผู้จัดการชีวิต (Life Operator) 👋🏼

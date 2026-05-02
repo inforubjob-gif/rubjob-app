@@ -67,9 +67,9 @@ export default function HomePage() {
       <header className="relative z-10 px-5 pt-3 pb-6">
         <div className="flex items-center justify-between mb-4">
           <img
-            src="/images/rubjob-complete_Text-white.png"
+            src="/images/rubjob-complete_Vertical-text-white.png"
             alt="RUBJOB"
-            className="h-14 w-auto object-contain"
+            className="h-20 w-auto object-contain"
           />
           
           <Link href="/profile" className="relative group">

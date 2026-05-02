@@ -53,12 +53,16 @@ export default function StoreLoginPage() {
       <div className="absolute bottom-0 left-0 w-96 h-96 bg-black/5 rounded-full blur-[100px] -ml-48 -mb-48" />
 
       <div className="relative z-10 w-full max-w-sm mx-auto space-y-10">
-        <div className="text-center px-4">
+        <div className="text-center px-4 animate-float">
           <div className="mb-10 flex justify-center">
-            <Icons.Logo variant="white" size={140} className="drop-shadow-2xl" />
+             <img 
+               src="/images/rubjob-complete_Vertical-text-white.png" 
+               alt="RUBJOB" 
+               className="h-28 w-auto object-contain drop-shadow-2xl" 
+             />
           </div>
           <p className="text-xl text-white font-black uppercase mt-6 bg-white/10 backdrop-blur-sm py-3 px-10 rounded-full inline-block border border-white/20">
-            {t("store.loginPage.portal")}
+             ระบบจัดการร้านพาร์ทเนอร์
           </p>
         </div>
 
@@ -140,8 +144,8 @@ export default function StoreLoginPage() {
         </div>
         
         <div className="text-center pb-8 sticky bottom-0">
-          <p className="text-xs text-slate-400 font-bold uppercase leading-relaxed drop-shadow-sm">
-            {t("store.loginPage.authorizedOnly")}
+          <p className="text-[10px] text-slate-400 font-bold uppercase tracking-[0.15em] drop-shadow-sm">
+             RUBJOB - ผู้จัดการชีวิต LIFE OPERATOR
           </p>
         </div>
       </div>
