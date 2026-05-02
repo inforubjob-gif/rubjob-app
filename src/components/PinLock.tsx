@@ -205,8 +205,7 @@ export default function PinLock({ type, userId, onVerified, children }: PinLockP
           onClick={() => document.getElementById("pin-input")?.focus()}
           className="w-full h-20 cursor-pointer" 
         />
-      </div>
-        
+
         {step === "confirm" && (
            <button 
              onClick={() => { setStep("setup"); setPin(""); setConfirmPin(""); }}
