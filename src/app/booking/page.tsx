@@ -253,12 +253,16 @@ function BookingFlow() {
   // Pricing Logic (2026 Strategy)
   let pricing: any = { customerTotal: 0, breakdown: { laundry: 0, delivery: 0, addons: 0 } };
   
+  try {
     pricing = calculateOrderPrice({
-      weightKg: parseInt(bagSize),
-      distanceKm: distanceKm,
+      weightKg: parseInt(bagSize) || 9,
+      distanceKm: distanceKm || 0,
       isExpress: deliverySpeed === "express",
       needsDetergent: needsDetergent
     });
+  } catch (err) {
+    console.error("Pricing error:", err);
+  }
 
   const laundryFee = pricing.breakdown.laundry;
   const deliveryFee = pricing.breakdown.delivery;
