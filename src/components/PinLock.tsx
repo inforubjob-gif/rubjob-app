@@ -193,7 +193,7 @@ export default function PinLock({ type, userId, onVerified, children }: PinLockP
           </p>
         )}
 
-        {/* Hidden Input to trigger native keyboard */}
+        {/* Hidden Input to trigger native keyboard - covering whole screen for better auto-focus */}
         <input
           ref={pinInputRef}
           type="tel"
@@ -209,7 +209,8 @@ export default function PinLock({ type, userId, onVerified, children }: PinLockP
               setPin(val);
             }
           }}
-          className="fixed top-0 left-0 w-0 h-0 opacity-0"
+          autoFocus
+          className="fixed inset-0 w-full h-full opacity-0 z-[100] cursor-pointer"
           id="pin-input"
         />
 
