@@ -240,52 +240,7 @@ export default function RiderDashboard() {
           </div>
         </div>
 
-        {/* PWA & LINE Connectivity Alert */}
-        <div className="mt-8 space-y-4">
-          {!rider?.lineUserId && (
-            <Card className="bg-gradient-to-r from-green-600 to-emerald-500 border-none text-white p-5 shadow-xl shadow-green-900/20">
-              <div className="flex items-start gap-4">
-                <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center shrink-0">
-                  <Icons.Bell className="text-white" size={24} />
-                </div>
-                <div className="flex-1">
-                  <h3 className="font-black text-base uppercase leading-tight">เชื่อมต่อ LINE รับงาน</h3>
-                  <p className="text-xs text-white/80 font-bold mt-1 leading-relaxed">รับแจ้งเตือนทันทีที่มีงานเข้า ไม่ต้องเปิดหน้าจอค้างไว้ครับ</p>
-                  <Button 
-                    variant="secondary" 
-                    size="sm" 
-                    className="mt-4 bg-white text-emerald-600 font-black uppercase text-[10px] py-2 px-6 rounded-lg"
-                    onClick={async () => {
-                      try {
-                        const res = await fetch(`/api/auth/link-line?accountId=${rider.id}`);
-                        const data = await res.json() as any;
-                        const token = data.token;
-                        const liffId = process.env.NEXT_PUBLIC_LIFF_ID;
-                        window.location.href = `https://liff.line.me/${liffId}/auth/link-line?type=rider&id=${rider.id}&token=${token}`;
-                      } catch (e) {
-                        alert("เกิดข้อผิดพลาดในการสร้างลิงก์เชื่อมต่อ");
-                      }
-                    }}
-                  >
-                    เชื่อมต่อตอนนี้
-                  </Button>
-                </div>
-              </div>
-            </Card>
-          )}
-
-          <Card className="bg-slate-900/50 backdrop-blur-xl border border-white/5 text-white p-5">
-            <div className="flex items-start gap-4">
-              <div className="w-12 h-12 bg-primary/20 rounded-2xl flex items-center justify-center shrink-0">
-                <Icons.Logo variant="icon" size={24} />
-              </div>
-              <div className="flex-1">
-                <h3 className="font-black text-sm uppercase leading-tight">ติดตั้งแอปบนหน้าจอ</h3>
-                <p className="text-[10px] text-white/60 font-bold mt-1 leading-relaxed">กดที่ปุ่ม 'แชร์' ด้านล่าง แล้วเลือก 'เพิ่มลงในหน้าจอโฮม' เพื่อการใช้งานที่สะดวกเหมือนแอปจริงครับ</p>
-              </div>
-            </div>
-          </Card>
-        </div>
+        {/* Dashboard Mascot Accent moved here or handled via background */}
       </header>
 
       <div className="relative z-10 px-5 space-y-7 pt-2 animate-fade-in">
@@ -398,6 +353,53 @@ export default function RiderDashboard() {
             )}
           </>
         )}
+
+        {/* PWA & LINE Connectivity Alert (Moved to Bottom) */}
+        <div className="mt-4 space-y-4">
+          {!rider?.lineUserId && (
+            <Card className="bg-gradient-to-r from-green-600 to-emerald-500 border-none text-white p-5 shadow-xl shadow-green-900/20">
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center shrink-0">
+                  <Icons.Bell className="text-white" size={24} />
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-black text-base uppercase leading-tight">เชื่อมต่อ LINE รับงาน</h3>
+                  <p className="text-xs text-white/80 font-bold mt-1 leading-relaxed">รับแจ้งเตือนทันทีที่มีงานเข้า ไม่ต้องเปิดหน้าจอค้างไว้ครับ</p>
+                  <Button 
+                    variant="secondary" 
+                    size="sm" 
+                    className="mt-4 bg-white text-emerald-600 font-black uppercase text-[10px] py-2 px-6 rounded-lg"
+                    onClick={async () => {
+                      try {
+                        const res = await fetch(`/api/auth/link-line?accountId=${rider.id}`);
+                        const data = await res.json() as any;
+                        const token = data.token;
+                        const liffId = process.env.NEXT_PUBLIC_LIFF_ID;
+                        window.location.href = `https://liff.line.me/${liffId}/auth/link-line?type=rider&id=${rider.id}&token=${token}`;
+                      } catch (e) {
+                        alert("เกิดข้อผิดพลาดในการสร้างลิงก์เชื่อมต่อ");
+                      }
+                    }}
+                  >
+                    เชื่อมต่อตอนนี้
+                  </Button>
+                </div>
+              </div>
+            </Card>
+          )}
+
+          <Card className="bg-slate-900/50 backdrop-blur-xl border border-white/5 text-white p-5">
+            <div className="flex items-start gap-4">
+              <div className="w-12 h-12 bg-primary/20 rounded-2xl flex items-center justify-center shrink-0">
+                <Icons.Logo variant="icon" size={24} />
+              </div>
+              <div className="flex-1">
+                <h3 className="font-black text-sm uppercase leading-tight">ติดตั้งแอปบนหน้าจอ</h3>
+                <p className="text-[10px] text-white/60 font-bold mt-1 leading-relaxed">กดที่ปุ่ม 'แชร์' ด้านล่าง แล้วเลือก 'เพิ่มลงในหน้าจอโฮม' เพื่อการใช้งานที่สะดวกเหมือนแอปจริงครับ</p>
+              </div>
+            </div>
+          </Card>
+        </div>
       </div>
 
       {/* Modern Job Detail Modal */}
