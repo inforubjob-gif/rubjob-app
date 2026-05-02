@@ -154,22 +154,34 @@ export default function PinLock({ type, userId, onVerified, children }: PinLockP
     return <>{children}</>;
   }
 
+  useEffect(() => {
+    // Force focus on mount to trigger keyboard
+    const timer = setTimeout(() => {
+      pinInputRef.current?.focus();
+    }, 300);
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <div 
       className="fixed inset-0 bg-slate-50 z-[10000] flex flex-col overflow-hidden touch-none"
       onClick={() => pinInputRef.current?.focus()}
     >
-      {/* Top Header with Back Button */}
-      <header className="px-5 pt-12 pb-4 flex items-center">
+      {/* Top Header with Back Button - High Z-index to be clickable */}
+      <header className="px-5 pt-12 pb-4 flex items-center relative z-[1000]">
         <button
-          onClick={() => router.back()}
+          onClick={(e) => {
+            e.stopPropagation();
+            router.back();
+          }}
           className="w-10 h-10 rounded-xl bg-white shadow-sm border border-slate-100 flex items-center justify-center text-slate-900 active:scale-95 transition-transform"
         >
           <Icons.Back size={18} />
         </button>
       </header>
 
-      <div className="flex-1 flex flex-col items-center justify-center max-w-sm mx-auto w-full pb-20">
+      {/* Moved items up with pt-4 and justify-start to avoid keyboard overlap */}
+      <div className="flex-1 flex flex-col items-center justify-start max-w-sm mx-auto w-full pt-4 pb-20 relative z-10">
         <div className="w-20 h-20 bg-primary/10 text-primary rounded-3xl flex items-center justify-center mb-8 shadow-xl shadow-primary/5">
           <Icons.Lock size={40} />
         </div>
@@ -203,7 +215,7 @@ export default function PinLock({ type, userId, onVerified, children }: PinLockP
           </p>
         )}
 
-        {/* Hidden Input - covering whole screen */}
+        {/* Hidden Input - covering area but below header */}
         <input
           ref={pinInputRef}
           type="tel"
@@ -220,7 +232,7 @@ export default function PinLock({ type, userId, onVerified, children }: PinLockP
             }
           }}
           autoFocus
-          className="fixed inset-0 w-full h-full opacity-0 z-[100] cursor-pointer"
+          className="absolute inset-0 w-full h-full opacity-0 z-[100] cursor-default"
           id="pin-input"
         />
 
