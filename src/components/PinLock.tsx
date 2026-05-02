@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Icons } from "@/components/ui/Icons";
 import { useTranslation } from "@/components/providers/LanguageProvider";
 
@@ -132,6 +132,16 @@ export default function PinLock({ type, userId, onVerified, children }: PinLockP
     }
   };
 
+  const pinInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    // Try to focus on mount, but mobile browsers often block this
+    const timer = setTimeout(() => {
+      pinInputRef.current?.focus();
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [step]);
+
   if (isLoading && !pin && !confirmPin) {
     return (
       <div className="flex-1 flex items-center justify-center bg-slate-50 min-h-[400px]">
@@ -145,7 +155,10 @@ export default function PinLock({ type, userId, onVerified, children }: PinLockP
   }
 
   return (
-    <div className="flex-1 flex flex-col bg-slate-50 min-h-dvh animate-fade-in p-6 z-[9999]">
+    <div 
+      className="flex-1 flex flex-col bg-slate-50 min-h-dvh animate-fade-in p-6 z-[9999] cursor-pointer"
+      onClick={() => pinInputRef.current?.focus()}
+    >
       <div className="flex-1 flex flex-col items-center justify-center max-w-sm mx-auto w-full pt-10">
         <div className="w-20 h-20 bg-primary/10 text-primary rounded-3xl flex items-center justify-center mb-8 shadow-xl shadow-primary/5">
           <Icons.Lock size={40} />
@@ -182,6 +195,7 @@ export default function PinLock({ type, userId, onVerified, children }: PinLockP
 
         {/* Hidden Input to trigger native keyboard */}
         <input
+          ref={pinInputRef}
           type="tel"
           inputMode="numeric"
           pattern="[0-9]*"
@@ -195,15 +209,8 @@ export default function PinLock({ type, userId, onVerified, children }: PinLockP
               setPin(val);
             }
           }}
-          autoFocus
-          className="absolute opacity-0 pointer-events-none"
+          className="fixed top-0 left-0 w-0 h-0 opacity-0"
           id="pin-input"
-        />
-
-        {/* Clickable area to focus hidden input */}
-        <div 
-          onClick={() => document.getElementById("pin-input")?.focus()}
-          className="w-full h-20 cursor-pointer" 
         />
 
         {step === "confirm" && (
