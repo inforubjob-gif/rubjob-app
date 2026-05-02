@@ -28,6 +28,10 @@ export function calculateOrderPrice(details: {
 }): PricingResult {
   const { weightKg, distanceKm, isExpress, needsDetergent } = details;
 
+  if (distanceKm > 10) {
+    throw new Error("Service unavailable: Distance exceeds 10km limit");
+  }
+
   // 1. Laundry Cost Calculation
   let laundryCost = 0;
   if (weightKg <= 9) laundryCost = 120;

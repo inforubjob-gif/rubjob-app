@@ -251,12 +251,20 @@ function BookingFlow() {
   const distanceExtra = distanceKm >= 3 ? (distanceKm * 10) : 0;
     
   // Pricing Logic (2026 Strategy)
-  const pricing = calculateOrderPrice({
-    weightKg: parseInt(bagSize),
-    distanceKm: distanceKm,
-    isExpress: deliverySpeed === "express",
-    needsDetergent: needsDetergent
-  });
+  let pricing: any = { customerTotal: 0, breakdown: { laundry: 0, delivery: 0, addons: 0 } };
+  
+  try {
+    if (distanceKm <= 10) {
+      pricing = calculateOrderPrice({
+        weightKg: parseInt(bagSize),
+        distanceKm: distanceKm,
+        isExpress: deliverySpeed === "express",
+        needsDetergent: needsDetergent
+      });
+    }
+  } catch (err) {
+    console.error("Pricing error:", err);
+  }
 
   const laundryFee = pricing.breakdown.laundry;
   const deliveryFee = pricing.breakdown.delivery;
@@ -275,7 +283,13 @@ function BookingFlow() {
 
   const unitLabel = service?.unit === "hour" ? t("booking.hours") : service?.unit === "session" ? t("home.perSession") : t("home.perPiece");
 
+  const isTooFar = distanceKm > 10;
+
   async function handleConfirm() {
+    if (isTooFar) {
+      showToast(t("booking.errors.tooFar") || "ขออภัย ระยะทางไกลเกิน 10 กม. ไม่สามารถให้บริการได้", "error");
+      return;
+    }
     if (isBelowMinOrder) {
       showToast(t("booking.errors.minOrder").replace("{amount}", minOrderAmount.toString()), "error");
       return;
