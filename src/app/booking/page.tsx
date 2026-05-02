@@ -886,7 +886,7 @@ function BookingFlow() {
                     <Row icon={<Icons.Home size={12} />} label={t("common.store")} value={`${selectedStore.name} (${distanceKm.toFixed(1)} ${t("booking.km")})`} />
                   )}
                   <Row icon={<Icons.FileText size={11} />} label={t("booking.confirm.bagSize")} value={`${bagSize} ${bagSizeExtra > 0 ? `(+฿${bagSizeExtra})` : ""}`} />
-                  <Row icon={<Icons.Tasks size={11} />} label={t("booking.confirm.extraService")} value={withFolding ? `${t("booking.options.withFoldingShort")} (+฿${foldingFee})` : t("booking.options.noFoldingShort")} />
+                  <Row icon={<Icons.Tasks size={11} />} label={t("booking.confirm.extraService")} value={withFolding ? t("booking.options.withFoldingShort") : t("booking.options.noFoldingShort")} />
                 </div>
               </Card>
             </section>
