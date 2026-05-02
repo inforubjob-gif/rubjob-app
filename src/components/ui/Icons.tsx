@@ -165,7 +165,7 @@ export function IconCircle({
   className?: string;
 }) {
   const variants = {
-    orange: "bg-[#ff8a00] text-white shadow-[#ff8a00]/20",
+    orange: "bg-[#FF9F1C] text-white shadow-[#FF9F1C]/20",
     yellow: "bg-[#ffce00] text-slate-900 shadow-[#ffce00]/20",
     white:  "bg-white text-slate-900 border border-slate-100 shadow-slate-200/50",
     black:  "bg-[#1a1a1a] text-white shadow-black/20",

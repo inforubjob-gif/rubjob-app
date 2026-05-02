@@ -178,7 +178,7 @@ export default function ProfilePage() {
             {MENU_ITEMS.map((item) => {
               const content = (
                 <>
-                  <IconCircle variant={item.label === t("profile.language") ? "yellow" : "black"} size="md">
+                  <IconCircle variant="black" size="md">
                     {item.icon}
                   </IconCircle>
                   <div className="flex-1 min-w-0">
