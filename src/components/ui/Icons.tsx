@@ -161,7 +161,7 @@ export function IconCircle({
   className = "" 
 }: { 
   children: React.ReactNode; 
-  variant?: "orange" | "yellow" | "white" | "black" | "slate"; 
+  variant?: "orange" | "yellow" | "white" | "black" | "slate" | "ghost"; 
   size?: "sm" | "md" | "lg" | "xl";
   className?: string;
 }) {
