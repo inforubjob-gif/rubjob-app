@@ -243,10 +243,12 @@ function BookingFlow() {
     }
   }, [dates, pickupDate, pickupSlot]);
 
-  // Calculate distance based on actual coordinates or fallback
   const distanceKm = selectedStore && selectedAddress?.lat && selectedAddress?.lng 
     ? getDistanceKm(selectedAddress.lat, selectedAddress.lng, selectedStore.lat, selectedStore.lng)
     : 5.1; 
+  
+  // Extra distance fee calculation for display (Matches pricing.ts logic)
+  const distanceExtra = distanceKm >= 3 ? (distanceKm * 10) : 0;
     
   // Pricing Logic (2026 Strategy)
   const pricing = calculateOrderPrice({
@@ -260,7 +262,11 @@ function BookingFlow() {
   const deliveryFee = pricing.breakdown.delivery;
   const addonsTotal = pricing.breakdown.addons;
 
-  const subTotal = pricing.customerTotal;
+  // Add-on components for display
+  const bagSizeExtra = 0; // Legacy, now integrated into laundryFee
+  const foldingFee = withFolding ? (bagSize === "28kg" ? 35 : bagSize === "18kg" ? 25 : 20) : 0;
+
+  const subTotal = pricing.customerTotal + foldingFee;
   const totalDiscount = couponDiscount + pointsDiscount;
   const totalPrice = Math.max(subTotal - totalDiscount, 0);
 
@@ -558,7 +564,7 @@ function BookingFlow() {
                 <label className={`flex items-center justify-between p-3.5 rounded-xl border-2 cursor-pointer transition-all ${deliverySpeed === "standard" ? "border-primary bg-primary/5 shadow-md shadow-primary/5" : "border-slate-100 bg-white hover:bg-slate-50"}`} onClick={() => setDeliverySpeed("standard")}>
                   <div className="flex flex-col">
                     <span className="text-sm font-bold text-foreground">{t("booking.speed.standardTitle")}</span>
-                    <span className="text-xs text-muted block mt-0.5">{t("booking.speed.standardDesc").replace("{fee}", (39 + distanceExtra).toString())}</span>
+                    <span className="text-xs text-muted block mt-0.5">{t("booking.speed.standardDesc").replace("{fee}", (50 + distanceExtra).toString())}</span>
                   </div>
                   <div className={`w-5 h-5 rounded-full flex items-center justify-center transition-colors ${deliverySpeed === "standard" ? "bg-primary text-white" : "border-2 border-slate-200"}`}>
                     {deliverySpeed === "standard" && <span className="text-xs font-bold leading-none flex items-center justify-center pt-0.5">✓</span>}
@@ -568,7 +574,7 @@ function BookingFlow() {
                 <label className={`flex items-center justify-between p-3.5 rounded-xl border-2 cursor-pointer transition-all ${deliverySpeed === "express" ? "border-[ff9f1c] bg-[#fff8e1] shadow-md shadow-[ff9f1c]/10" : "border-slate-100 bg-white hover:bg-slate-50"}`} onClick={() => setDeliverySpeed("express")}>
                   <div className="flex flex-col">
                     <span className="text-sm font-bold text-[ff9f1c]">{t("booking.speed.expressTitle")}</span>
-                    <span className="text-xs text-[ff9f1c]/80 block mt-0.5">{t("booking.speed.expressDesc").replace("{fee}", (59 + distanceExtra).toString())}</span>
+                    <span className="text-xs text-[ff9f1c]/80 block mt-0.5">{t("booking.speed.expressDesc").replace("{fee}", (50 + distanceExtra + 20).toString())}</span>
                   </div>
                   <div className={`w-5 h-5 rounded-full flex items-center justify-center transition-colors ${deliverySpeed === "express" ? "bg-[ff9f1c] text-white" : "border-2 border-slate-200"}`}>
                     {deliverySpeed === "express" && <span className="text-xs font-bold leading-none flex items-center justify-center pt-0.5">✓</span>}
@@ -807,7 +813,7 @@ function BookingFlow() {
                   </div>
                   <div className="flex flex-col items-end">
                     {(couponDiscount > 0 || pointsDiscount > 0) && <span className="text-[11px] text-slate-400 line-through font-bold">฿{subTotal}</span>}
-                    <span className="text-3xl font-black text-primary-dark leading-noneer">฿{totalPrice}</span>
+                    <span className="text-3xl font-black text-primary-dark leading-none">฿{totalPrice}</span>
                   </div>
                 </div>
               </Card>
