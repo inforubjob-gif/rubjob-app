@@ -21,6 +21,7 @@ export default function StoreDashboard() {
   const [isLoading, setIsLoading] = useState(true);
   const [workStatus, setWorkStatus] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
 
   // Lifted state
   const [incomingOrders, setIncomingOrders] = useState<any[]>([]);
@@ -84,6 +85,7 @@ export default function StoreDashboard() {
   };
 
   const handleToggleWorkStatus = async () => {
+    setIsStatusModalOpen(false);
     const nextStatus = !workStatus;
     setWorkStatus(nextStatus);
     if (!store?.id) return;
@@ -104,7 +106,7 @@ export default function StoreDashboard() {
       <div className="absolute top-0 left-0 right-0 h-[480px] bg-gradient-to-b from-primary via-primary-dark to-slate-50 z-0" />
       
       {/* Dashboard Mascot Accent */}
-      <div className="fixed -bottom-10 -right-10 w-64 opacity-[0.04] pointer-events-none select-none z-0 rotate-6 hidden sm:block">
+      <div className="fixed -bottom-20 -right-20 w-80 opacity-[0.04] pointer-events-none select-none z-0 rotate-12 group hover:opacity-[0.08] transition-opacity">
         <img src="/images/มาสคอต-ตากผ้า.png" alt="" />
       </div>
 
@@ -114,104 +116,63 @@ export default function StoreDashboard() {
           <div className="flex items-center gap-4">
             <Icons.Logo variant="icon-white" size={56} />
             <div className="min-w-0">
-               <p className="text-xs text-white/70 font-black uppercase leading-none mb-1 shadow-sm">{t("store.unitNo")} {store?.id?.split('-')[1] || '001'}</p>
-               <h1 className="text-3xl font-black text-white truncate drop-shadow-md">{store?.name || t("common.guest")}</h1>
+              <p className="text-xs text-white font-black uppercase leading-tight mb-2 flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-white/50 animate-pulse" />
+                {t("store.unitNo")} {store?.id?.split('-')[1] || '001'}
+              </p>
+              <h1 className="text-3xl font-black text-white truncate drop-shadow-md leading-none">{store?.name || t("common.guest")}</h1>
             </div>
           </div>
           <button 
             onClick={logout}
-            className="w-11 h-11 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/30 shadow-lg shadow-white/5 active:scale-90 transition-transform text-white"
+            className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/20 shadow-md shadow-primary-dark/10 active:scale-90 transition-transform text-white"
           >
-            <Icons.Lock size={22} />
+            <Icons.LogOut size={20} />
           </button>
         </div>
 
+        {/* Work Status Toggle (Dashboard Version) */}
+        <Card className="mb-6 bg-white/10 backdrop-blur-xl border border-white/20 shadow-xl shadow-primary-dark/20 rounded-xl p-4 text-white">
+           <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                  <IconCircle variant={workStatus ? "green" : "slate"} size="md">
+                      <Icons.Shield size={24} />
+                  </IconCircle>
+                  <div>
+                      <p className="text-xs font-black text-white/50 uppercase leading-none mb-1">{t("store.profile.workStatus")}</p>
+                      <p className="text-sm font-black uppercase">
+                        {workStatus ? t("store.profile.receivingJobs") : t("store.profile.notReceiving")}
+                      </p>
+                  </div>
+              </div>
+              <button 
+                onClick={() => setIsStatusModalOpen(true)}
+                className={`w-14 h-8 rounded-full p-1 transition-all duration-300 ${workStatus ? 'bg-white shadow-lg shadow-white/20' : 'bg-white/20'}`}
+              >
+                <div className={`w-6 h-6 rounded-full shadow-md transition-all duration-300 ${workStatus ? 'bg-primary transform translate-x-6' : 'bg-white'}`} />
+              </button>
+           </div>
+        </Card>
+        
         <div className="grid grid-cols-2 gap-4 text-center">
-          <div className="bg-white/10 backdrop-blur-lg p-5 rounded-xl border border-white/20 shadow-lg shadow-primary-dark/20 text-white">
+          <div className="bg-white/10 backdrop-blur-md p-4 rounded-xl border border-white/10">
             <p className="text-xs font-black text-white/50 uppercase">{t("store.navOrders")}</p>
-              <p className="text-4xl font-black mt-1er">
+              <p className="text-2xl font-black mt-1 text-white">
               {incomingOrders.length + washingOrders.length + readyOrders.length}
             </p>
           </div>
-          <div className="bg-white/10 backdrop-blur-lg p-5 rounded-xl border border-white/20 shadow-lg shadow-primary-dark/20 text-white">
+          <div className="bg-white/10 backdrop-blur-md p-4 rounded-xl border border-white/10">
             <p className="text-xs font-black text-white/50 uppercase">{t("store.wallet.availableBalance")}</p>
-            <p className="text-4xl font-black mt-1er flex items-center justify-center gap-1">
-              <span className="text-sm">฿</span>{Math.floor(balance).toLocaleString()}
+            <p className="text-3xl font-black mt-1 text-white">
+               ฿{Math.floor(balance).toLocaleString()}
             </p>
           </div>
         </div>
 
-        {/* PWA & LINE Connectivity Alert */}
-        <div className="mt-8 space-y-4">
-          {!store?.lineUserId && (
-            <Card className="bg-gradient-to-r from-green-600 to-emerald-500 border-none text-white p-5 shadow-xl shadow-green-900/20">
-              <div className="flex items-start gap-4">
-                <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center shrink-0">
-                  <Icons.Bell className="text-white" size={24} />
-                </div>
-                <div className="flex-1">
-                  <h3 className="font-black text-base uppercase leading-tight">รับแจ้งออเดอร์ทาง LINE</h3>
-                  <p className="text-xs text-white/80 font-bold mt-1 leading-relaxed">รับแจ้งเตือนทันทีที่มีลูกค้าสั่งของ หรือไรเดอร์กำลังเอาผ้ามาส่งครับ</p>
-                  <Button 
-                    variant="secondary" 
-                    size="sm" 
-                    className="mt-4 bg-white text-emerald-600 font-black uppercase text-[10px] py-2 px-6 rounded-lg shadow-lg active:scale-95 transition-all"
-                    onClick={async () => {
-                      try {
-                        const res = await fetch(`/api/auth/link-line?accountId=${store.id}`);
-                        const data = await res.json() as any;
-                        const token = data.token;
-                        const liffId = process.env.NEXT_PUBLIC_LIFF_ID;
-                        window.location.href = `https://liff.line.me/${liffId}/auth/link-line?type=store&id=${store.id}&token=${token}`;
-                      } catch (e) {
-                        alert("เกิดข้อผิดพลาดในการสร้างลิงก์เชื่อมต่อ");
-                      }
-                    }}
-                  >
-                    เชื่อมต่อตอนนี้
-                  </Button>
-                </div>
-              </div>
-            </Card>
-          )}
-
-          <Card className="bg-slate-900/40 backdrop-blur-xl border border-white/10 text-white p-5">
-            <div className="flex items-start gap-4">
-              <div className="w-10 h-10 bg-primary/20 rounded-xl flex items-center justify-center shrink-0">
-                <Icons.Logo variant="icon" size={20} />
-              </div>
-              <div className="flex-1 min-w-0">
-                <h3 className="font-black text-sm uppercase leading-tight">เพิ่มแอปตัวจัดการร้านค้าลงหน้าจอ</h3>
-                <p className="text-[10px] text-white/50 font-bold mt-1 leading-relaxed">กดที่ปุ่ม 'แชร์' บนเบราว์เซอร์ แล้วเลือก 'เพิ่มลงในหน้าจอโฮม' เพื่อการใช้งานที่รวดเร็วครับ</p>
-              </div>
-            </div>
-          </Card>
-        </div>
       </header>
 
       <div className="relative z-10 px-5 space-y-7 pt-2 animate-fade-in">
-        {/* Toggle Status */}
-        <Card className="p-5 border-none shadow-sm shadow-primary/5 rounded-xl bg-white border border-primary/10">
-           <div className="flex items-center justify-between">
-             <div className="flex items-center gap-4">
-                <IconCircle variant="black" size="md">
-                    <Icons.Shield size={22} />
-                </IconCircle>
-          <div>
-            <h3 className="text-sm font-black text-slate-900 uppercase">{t("store.profile.workStatus")}</h3>
-            <p className="text-xs text-emerald-500 font-bold uppercase">{workStatus ? t("store.profile.receivingJobs") : t("store.profile.notReceiving")}</p>
-          </div>
-        </div>
-        <button 
-          onClick={handleToggleWorkStatus}
-          className={`w-14 h-8 rounded-full p-1 transition-all duration-300 ${workStatus ? 'bg-primary shadow-lg shadow-primary/30' : 'bg-slate-200'}`}
-        >
-          <div className={`w-6 h-6 rounded-full bg-white shadow-md transition-all duration-300 ${workStatus ? 'transform translate-x-6' : ''}`} />
-        </button>
-      </div>
-    </Card>
-
-        <div className="bg-white/60 backdrop-blur-xl p-1.5 rounded-2xl flex shadow-xl shadow-primary-dark/5 border border-white/60">
+        <div className="bg-slate-100 p-1.5 rounded-xl flex shadow-inner border border-slate-200/50">
           {(["incoming", "washing", "ready"] as const).map((tab) => (
               <button
                 key={tab}
@@ -315,7 +276,89 @@ export default function StoreDashboard() {
             )}
           </div>
         )}
+
+        {/* PWA & LINE Connectivity Alert (Moved to Bottom) */}
+        <div className="mt-8 space-y-4">
+          {!store?.lineUserId && (
+            <Card className="bg-gradient-to-r from-green-600 to-emerald-500 border-none text-white p-5 shadow-xl shadow-green-900/20">
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center shrink-0">
+                  <Icons.Bell className="text-white" size={24} />
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-black text-base uppercase leading-tight">รับแจ้งออเดอร์ทาง LINE</h3>
+                  <p className="text-xs text-white/80 font-bold mt-1 leading-relaxed">รับแจ้งเตือนทันทีที่มีลูกค้าสั่งของ หรือไรเดอร์กำลังเอาผ้ามาส่งครับ</p>
+                  <Button 
+                    variant="secondary" 
+                    size="sm" 
+                    className="mt-4 bg-white text-emerald-600 font-black uppercase text-[10px] py-2 px-6 rounded-lg shadow-lg active:scale-95 transition-all"
+                    onClick={async () => {
+                      try {
+                        const res = await fetch(`/api/auth/link-line?accountId=${store.id}`);
+                        const data = await res.json() as any;
+                        const token = data.token;
+                        const liffId = process.env.NEXT_PUBLIC_LIFF_ID;
+                        window.location.href = `https://liff.line.me/${liffId}/auth/link-line?type=store&id=${store.id}&token=${token}`;
+                      } catch (e) {
+                        alert("เกิดข้อผิดพลาดในการสร้างลิงก์เชื่อมต่อ");
+                      }
+                    }}
+                  >
+                    เชื่อมต่อตอนนี้
+                  </Button>
+                </div>
+              </div>
+            </Card>
+          )}
+
+          <Card className="bg-slate-900/50 backdrop-blur-xl border border-white/5 text-white p-5">
+            <div className="flex items-start gap-4">
+              <div className="w-12 h-12 bg-primary/20 rounded-2xl flex items-center justify-center shrink-0">
+                <Icons.Logo variant="icon" size={24} />
+              </div>
+              <div className="flex-1">
+                <h3 className="font-black text-sm uppercase leading-tight">ติดตั้งแอปตัวจัดการร้านค้า</h3>
+                <p className="text-[10px] text-white/60 font-bold mt-1 leading-relaxed">กดที่ปุ่ม 'แชร์' บนเบราว์เซอร์ แล้วเลือก 'เพิ่มลงในหน้าจอโฮม' เพื่อการใช้งานที่รวดเร็วครับ</p>
+              </div>
+            </div>
+          </Card>
+        </div>
       </div>
+
+      {/* Status Confirmation Modal */}
+      {store && (
+        <Modal 
+          isOpen={isStatusModalOpen} 
+          onClose={() => setIsStatusModalOpen(false)}
+          title={workStatus ? t("store.profile.stopWorkTitle") || "หยุดรับงานชั่วคราว?" : t("store.profile.startWorkTitle") || "เริ่มรับงาน?"}
+        >
+          <div className="flex flex-col items-center text-center p-2">
+            <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mb-6 ${workStatus ? 'bg-rose-50 text-rose-500' : 'bg-emerald-50 text-emerald-500'}`}>
+               <Icons.Shield size={32} />
+            </div>
+            <h3 className="text-lg font-black text-slate-900 mb-2 uppercase">
+              {workStatus ? t("store.profile.stopWorkConfirm") || "ต้องการหยุดรับงานใช่หรือไม่?" : t("store.profile.startWorkConfirm") || "พร้อมเริ่มรับงานแล้วใช่หรือไม่?"}
+            </h3>
+            <p className="text-xs font-bold text-slate-400 mb-8 max-w-[240px]">
+              {workStatus 
+                ? t("store.profile.stopWorkDesc") || "เมื่อหยุดรับงาน ร้านค้าของคุณจะไม่ปรากฏในการค้นหาจนกว่าจะเปิดสถานะอีกครั้ง" 
+                : t("store.profile.startWorkDesc") || "เมื่อเริ่มรับงาน ลูกค้าจะสามารถเห็นและสั่งบริการจากร้านของคุณได้ทันที"}
+            </p>
+            <div className="grid grid-cols-2 gap-4 w-full">
+              <Button variant="secondary" fullWidth onClick={() => setIsStatusModalOpen(false)}>
+                {t("common.cancel")}
+              </Button>
+              <Button 
+                fullWidth 
+                className={workStatus ? "bg-rose-500 hover:bg-rose-600 text-white shadow-rose-100" : "bg-emerald-500 hover:bg-emerald-600 text-white shadow-emerald-100"}
+                onClick={handleToggleWorkStatus}
+              >
+                {t("common.confirm")}
+              </Button>
+            </div>
+          </div>
+        </Modal>
+      )}
     </div>
   );
 }
