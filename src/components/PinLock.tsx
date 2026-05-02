@@ -156,10 +156,20 @@ export default function PinLock({ type, userId, onVerified, children }: PinLockP
 
   return (
     <div 
-      className="flex-1 flex flex-col bg-slate-50 min-h-dvh animate-fade-in p-6 z-[9999] cursor-pointer"
+      className="fixed inset-0 bg-slate-50 z-[10000] flex flex-col overflow-hidden touch-none"
       onClick={() => pinInputRef.current?.focus()}
     >
-      <div className="flex-1 flex flex-col items-center justify-center max-w-sm mx-auto w-full pt-10">
+      {/* Top Header with Back Button */}
+      <header className="px-5 pt-12 pb-4 flex items-center">
+        <button
+          onClick={() => router.back()}
+          className="w-10 h-10 rounded-xl bg-white shadow-sm border border-slate-100 flex items-center justify-center text-slate-900 active:scale-95 transition-transform"
+        >
+          <Icons.Back size={18} />
+        </button>
+      </header>
+
+      <div className="flex-1 flex flex-col items-center justify-center max-w-sm mx-auto w-full pb-20">
         <div className="w-20 h-20 bg-primary/10 text-primary rounded-3xl flex items-center justify-center mb-8 shadow-xl shadow-primary/5">
           <Icons.Lock size={40} />
         </div>
@@ -193,7 +203,7 @@ export default function PinLock({ type, userId, onVerified, children }: PinLockP
           </p>
         )}
 
-        {/* Hidden Input to trigger native keyboard - covering whole screen for better auto-focus */}
+        {/* Hidden Input - covering whole screen */}
         <input
           ref={pinInputRef}
           type="tel"
@@ -216,8 +226,13 @@ export default function PinLock({ type, userId, onVerified, children }: PinLockP
 
         {step === "confirm" && (
            <button 
-             onClick={() => { setStep("setup"); setPin(""); setConfirmPin(""); }}
-             className="mt-8 text-xs font-black text-primary uppercase cursor-pointer"
+             onClick={(e) => { 
+               e.stopPropagation();
+               setStep("setup"); 
+               setPin(""); 
+               setConfirmPin(""); 
+             }}
+             className="mt-8 text-xs font-black text-primary uppercase cursor-pointer relative z-[200]"
            >
              {t("common.back")}
            </button>
