@@ -117,12 +117,12 @@ export default function HomePage() {
               {activeOrders.map((order) => {
                 const serviceId = order.serviceId || order.service;
                 return (
-                  <Link key={order.id} href={`/orders/${order.id}`}>
-                    <Card className="p-4 flex items-center gap-3" hoverable>
-                      <div className="w-11 h-11 bg-primary-light rounded-xl flex items-center justify-center text-primary-dark shrink-0">
-                        {getServiceIcon(serviceId, { size: 22 })}
-                      </div>
-                      <div className="flex-1 min-w-0">
+                    <Link key={order.id} href={`/orders/${order.id}`}>
+                      <Card className="p-4 flex items-center gap-4" hoverable>
+                        <IconCircle variant={i % 2 === 0 ? "orange" : "black"} size="md">
+                          {getServiceIcon(serviceId, { size: 24 })}
+                        </IconCircle>
+                        <div className="flex-1 min-w-0">
                         <p className="text-sm font-semibold text-foreground truncate">
                           {t(`orders.services.${serviceId}`)}
                         </p>
@@ -249,10 +249,10 @@ function ServiceCard({ svc, t, onComingSoon, className }: { svc: any, t: any, on
   if (onComingSoon) {
     return (
       <button onClick={() => onComingSoon(t(`orders.services.${svc.id}`) || svc.name)} className={className || "min-w-[145px] flex-shrink-0 snap-center"}>
-        <Card className="p-5 h-full flex flex-col items-center justify-center text-center" hoverable>
-          <div className="w-12 h-12 bg-primary-light rounded-xl flex items-center justify-center text-primary-dark mb-4 group-hover:scale-110 transition-transform">
-            {getServiceIcon(svc.id, { size: 24 })}
-          </div>
+        <Card className="p-6 h-full flex flex-col items-center justify-center text-center" hoverable>
+          <IconCircle variant="slate" size="lg" className="mb-4 group-hover:scale-110 transition-transform">
+            {getServiceIcon(svc.id, { size: 28 })}
+          </IconCircle>
           <h3 className="text-[13px] font-black text-foreground leading-tight line-clamp-2 w-full">
             {t(`orders.services.${svc.id}`) || svc.name}
           </h3>
@@ -263,16 +263,16 @@ function ServiceCard({ svc, t, onComingSoon, className }: { svc: any, t: any, on
 
   return (
     <Link href={svc.isDynamicGig ? `/service/${svc.id}` : `/booking?service=${svc.id}`} className={className || "min-w-[145px] flex-shrink-0 snap-center"}>
-      <Card className="p-5 h-full flex flex-col items-center justify-center text-center group border-2 border-transparent hover:border-primary/20 transition-all" hoverable>
+      <Card className="p-6 h-full flex flex-col items-center justify-center text-center group border-2 border-transparent hover:border-primary/20 transition-all" hoverable>
         {svc.isDynamicGig && (
           <span className="absolute top-2 right-2 flex h-2 w-2">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
             <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
           </span>
         )}
-        <div className="w-12 h-12 bg-primary-light rounded-xl flex items-center justify-center text-primary-dark mb-4 group-hover:scale-110 transition-transform">
-          {getServiceIcon(svc.icon || svc.id, { size: 24 })}
-        </div>
+        <IconCircle variant={svc.category === 'laundry' ? 'orange' : 'yellow'} size="lg" className="mb-4 group-hover:scale-110 transition-transform">
+          {getServiceIcon(svc.icon || svc.id, { size: 28 })}
+        </IconCircle>
         <h3 className="text-[13px] font-black text-foreground leading-tight line-clamp-2 w-full">
           {svc.isDynamicGig ? svc.name : (t(`orders.services.${svc.id}`) || svc.name)}
         </h3>

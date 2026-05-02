@@ -65,7 +65,7 @@ export default function AdminOrdersPage() {
                       <Badge variant={statusToBadgeVariant(order.status)}>{t(`orders.status.${order.status}`)}</Badge>
                     </td>
                     <td className="px-6 py-4 text-slate-700 font-bold">{order.userDisplayName || order.userId.slice(0, 10)}</td>
-                    <td className="px-6 py-4 text-right font-black">฿{order.totalPrice}</td>
+                    <td className="px-6 py-4 text-right font-black">฿{Math.ceil(order.totalPrice)}</td>
                     <td className="px-6 py-4 text-center">
                        <button className="text-primary font-bold text-xs hover:underline">{t('admin.orders.viewJson')}</button>
                     </td>

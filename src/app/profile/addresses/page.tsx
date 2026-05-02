@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Card from "@/components/ui/Card";
 import type { Address } from "@/types";
 import { useTranslation } from "@/components/providers/LanguageProvider";
-import { Icons } from "@/components/ui/Icons";
+import { Icons, IconCircle } from "@/components/ui/Icons";
 import { useLiff } from "@/components/providers/LiffProvider";
 import dynamic from "next/dynamic";
  
@@ -124,9 +124,11 @@ export default function ManageAddressesPage() {
          <header className="bg-white px-5 pt-12 pb-4 border-b border-slate-200 flex items-center justify-between sticky top-0 z-40">
             <button
               onClick={() => setIsSelectingLocation(false)}
-              className="w-9 h-9 rounded-xl bg-slate-100 flex items-center justify-center text-slate-600 active:scale-95 transition-transform"
+              className="active:scale-95 transition-transform"
             >
-              <Icons.Back size={20} />
+              <IconCircle variant="white" size="sm">
+                <Icons.Back size={16} />
+              </IconCircle>
             </button>
             <h1 className="text-lg font-bold text-slate-900 absolute left-1/2 -translate-x-1/2 whitespace-nowrap">
               {t("profile.setCoordinates")}
@@ -178,9 +180,11 @@ export default function ManageAddressesPage() {
       <header className="bg-white px-5 pt-12 pb-4 border-b border-slate-200 flex items-center justify-between sticky top-0 z-40">
         <button
           onClick={() => router.back()}
-          className="w-9 h-9 rounded-xl bg-slate-100 flex items-center justify-center text-slate-600 active:scale-95 transition-transform"
+          className="active:scale-95 transition-transform"
         >
-          <Icons.Back size={20} />
+          <IconCircle variant="white" size="sm">
+            <Icons.Back size={16} />
+          </IconCircle>
         </button>
         <h1 className="text-lg font-bold text-slate-900 absolute left-1/2 -translate-x-1/2">
           {t("profile.myAddress")}
@@ -263,9 +267,9 @@ export default function ManageAddressesPage() {
             <Card key={addr.id} onClick={() => handleEditClick(addr)} className="p-0 overflow-hidden border-slate-100 shadow-xl shadow-slate-200/40 rounded-[1.75rem] active:scale-[0.99] transition-transform cursor-pointer">
               <div className="p-5 flex items-start gap-4">
                 {/* Icon Container */}
-                <div className="w-14 h-14 bg-slate-50 rounded-[1.25rem] flex items-center justify-center text-slate-400 shrink-0 border border-slate-100">
-                  {addr.label.toLowerCase().includes("home") || addr.label.includes("บ้าน") ? <Icons.Home size={26} /> : <Icons.Office size={26} />}
-                </div>
+                <IconCircle variant="orange" size="md">
+                  {addr.label.toLowerCase().includes("home") || addr.label.includes("บ้าน") ? <Icons.Home size={22} /> : <Icons.Office size={22} />}
+                </IconCircle>
  
                 {/* Details */}
                 <div className="flex-1 min-w-0">
@@ -300,9 +304,9 @@ export default function ManageAddressesPage() {
         {/* Placeholder if empty */}
         {addresses.length === 0 && !isAdding && (
           <div className="py-12 flex flex-col items-center">
-             <div className="w-20 h-20 bg-white rounded-[2rem] shadow-xl shadow-slate-200/50 flex items-center justify-center mb-6 text-slate-200 border border-slate-50">
-               <Icons.MapPin size={40} strokeWidth={1.5} />
-             </div>
+             <IconCircle variant="slate" size="lg" className="mb-6 opacity-40">
+               <Icons.MapPin size={32} strokeWidth={1.5} />
+             </IconCircle>
              <p className="text-xs font-black text-slate-300 uppercase tracking-widest">{t("profile.noAddress")}</p>
           </div>
         )}

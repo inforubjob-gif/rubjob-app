@@ -47,26 +47,12 @@ export default function BottomNav() {
     {
       href: "/",
       label: t("home.navHome") || "Home",
-      icon: (active) => (
-        <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={3} viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-          <path strokeLinecap="round" strokeLinejoin="round" d="M9 22V12h6v10" />
-        </svg>
-      ),
+      icon: (active) => <Icons.Home size={24} strokeWidth={active ? 3 : 2.5} />,
     },
     {
       href: "/orders",
       label: t("home.navOrders") || "Orders",
-      icon: (active) => (
-        <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={3} viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
-          <path strokeLinecap="round" strokeLinejoin="round" d="M15 2H9a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1z" />
-          <path strokeLinecap="round" strokeLinejoin="round" d="M12 11h4" />
-          <path strokeLinecap="round" strokeLinejoin="round" d="M12 16h4" />
-          <path strokeLinecap="round" strokeLinejoin="round" d="M8 11h.01" />
-          <path strokeLinecap="round" strokeLinejoin="round" d="M8 16h.01" />
-        </svg>
-      ),
+      icon: (active) => <Icons.Tasks size={24} strokeWidth={active ? 3 : 2.5} />,
     },
     {
       href: "/booking",
@@ -89,12 +75,7 @@ export default function BottomNav() {
     {
       href: "/profile",
       label: t("home.navProfile") || "Profile",
-      icon: (active) => (
-        <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={3} viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
-          <circle cx="12" cy="7" r="4" />
-        </svg>
-      ),
+      icon: (active) => <Icons.User size={24} strokeWidth={active ? 3 : 2.5} />,
     },
   ];
 

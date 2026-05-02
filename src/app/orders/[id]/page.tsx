@@ -132,11 +132,11 @@ export default function OrderDetailPage() {
         <div className="flex items-center gap-3">
           <button
             onClick={() => router.back()}
-            className="w-9 h-9 rounded-xl bg-surface-alt flex items-center justify-center"
+            className="active:scale-95 transition-transform"
           >
-            <svg className="w-5 h-5 text-foreground" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
-            </svg>
+            <IconCircle variant="white" size="sm">
+              <Icons.Back size={18} />
+            </IconCircle>
           </button>
           <div className="flex-1">
             <h1 className="text-lg font-bold text-foreground">{t("orders.detailsTitle")}</h1>
@@ -151,10 +151,10 @@ export default function OrderDetailPage() {
       <div className="flex-1 px-5 py-5 space-y-5 animate-fade-in">
         {/* Service Info */}
         <Card className="p-4">
-          <div className="flex items-center gap-3 mb-3">
-            <div className="w-12 h-12 bg-primary-light rounded-xl flex items-center justify-center text-primary-dark shrink-0">
+          <div className="flex items-center gap-4 mb-3">
+            <IconCircle variant="orange" size="md">
               {getServiceIcon(serviceId, { size: 24 })}
-            </div>
+            </IconCircle>
             <div>
               <h2 className="text-base font-bold text-foreground">{t(`orders.services.${serviceId}`) || order.serviceName}</h2>
               <p className="text-xs text-muted">~{order.estimatedDays || 2} {t("booking.dayTurnaround")}</p>
@@ -283,7 +283,7 @@ export default function OrderDetailPage() {
             </div>
             <div className="border-t border-border pt-2 flex items-center justify-between">
               <span className="text-sm font-bold text-foreground">{t("orders.total")}</span>
-              <span className="text-lg font-bold text-primary-dark">฿{order.totalPrice}</span>
+              <span className="text-lg font-bold text-primary-dark">฿{Math.ceil(order.totalPrice)}</span>
             </div>
           </div>
         </Card>

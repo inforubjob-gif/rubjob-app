@@ -193,9 +193,9 @@ export default function StoreDashboard() {
         <Card className="p-5 border-none shadow-sm shadow-primary/5 rounded-xl bg-white border border-primary/10">
            <div className="flex items-center justify-between">
              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-500 flex items-center justify-center border border-emerald-100 shadow-sm shadow-emerald-500/10">
+                <IconCircle variant="black" size="md">
                     <Icons.Shield size={22} />
-                </div>
+                </IconCircle>
           <div>
             <h3 className="text-sm font-black text-slate-900 uppercase">{t("store.profile.workStatus")}</h3>
             <p className="text-xs text-emerald-500 font-bold uppercase">{workStatus ? t("store.profile.receivingJobs") : t("store.profile.notReceiving")}</p>
@@ -253,9 +253,9 @@ export default function StoreDashboard() {
               (activeTab === "incoming" ? incomingOrders : activeTab === "washing" ? washingOrders : readyOrders).map((order) => (
                 <Card key={order.id} className="p-4 border border-slate-100 shadow-sm hover:shadow-xl transition-all duration-300 group rounded-xl">
                   <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 bg-slate-50 border border-slate-100 rounded-xl flex items-center justify-center text-slate-400 shrink-0 group-hover:bg-primary/5 transition-colors">
+                    <IconCircle variant="orange" size="md">
                       {getServiceIcon(order.serviceId as any, { size: 24, className: "group-hover:text-primary transition-colors" })}
-                    </div>
+                    </IconCircle>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between mb-1">
                         <span className="text-xs font-black text-slate-400 uppercase">{order.id}</span>

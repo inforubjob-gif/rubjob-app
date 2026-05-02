@@ -2,7 +2,7 @@
 
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
-import { Icons } from "@/components/ui/Icons";
+import { Icons, IconCircle } from "@/components/ui/Icons";
 import { useTranslation } from "@/components/providers/LanguageProvider";
 import { SUPPORT_FAQS, SUPPORT_TEMPLATES } from "@/lib/support-content";
 
@@ -35,16 +35,16 @@ export default function SupportPage() {
         {/* Quick Contact */}
         <section className="grid grid-cols-2 gap-4">
             <Card className="p-5 flex flex-col items-center text-center gap-3" hoverable>
-                <div className="w-12 h-12 rounded-xl bg-green-50 text-green-600 flex items-center justify-center">
-                    <Icons.Line size={24} />
-                </div>
+                <IconCircle variant="white" size="md">
+                    <Icons.Line size={24} className="text-green-600" />
+                </IconCircle>
                 <h3 className="text-sm font-bold text-slate-900">{t("support.contactAdmin")}</h3>
                 <p className="text-[10px] text-slate-500 font-black uppercase">LINE Official</p>
             </Card>
             <Card className="p-5 flex flex-col items-center text-center gap-3" hoverable>
-                <div className="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
-                    <Icons.Phone size={24} />
-                </div>
+                <IconCircle variant="white" size="md">
+                    <Icons.Phone size={24} className="text-blue-600" />
+                </IconCircle>
                 <h3 className="text-sm font-bold text-slate-900">Call Support</h3>
                 <p className="text-[10px] text-slate-500 font-black uppercase">24/7 Available</p>
             </Card>
@@ -84,7 +84,9 @@ export default function SupportPage() {
             {faqs.map((faq, i) => (
               <Card key={i} className="p-5">
                 <h3 className="text-sm font-black text-slate-800 mb-2 flex items-start gap-2">
-                    <Icons.HelpCircle size={18} className="text-primary mt-0.5 shrink-0" />
+                    <IconCircle variant="orange" size="sm" className="mt-0.5 shrink-0">
+                        <Icons.HelpCircle size={16} />
+                    </IconCircle>
                     {faq.q}
                 </h3>
                 <p className="text-xs text-slate-500 leading-relaxed pl-7">{faq.a}</p>

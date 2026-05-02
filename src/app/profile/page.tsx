@@ -5,7 +5,7 @@ import { useLiff } from "@/components/providers/LiffProvider";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Card from "@/components/ui/Card";
-import { Icons } from "@/components/ui/Icons";
+import { Icons, IconCircle } from "@/components/ui/Icons";
 import { useTranslation } from "@/components/providers/LanguageProvider";
 import type { Language } from "@/lib/i18n";
 
@@ -88,9 +88,11 @@ export default function ProfilePage() {
         {/* Back button */}
         <button
           onClick={() => router.back()}
-          className="absolute left-5 top-3 w-9 h-9 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center text-white active:scale-95 transition-transform z-10"
+          className="absolute left-5 top-4 active:scale-95 transition-transform z-10"
         >
-          <Icons.Back size={20} />
+          <IconCircle variant="white" size="sm">
+            <Icons.Back size={16} />
+          </IconCircle>
         </button>
 
         <div className="flex items-center gap-4 mt-10">
@@ -154,10 +156,10 @@ export default function ProfilePage() {
             )}
             {addresses.map((addr) => (
               <Card key={addr.id} className="p-4" hoverable>
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-slate-100 rounded-xl flex items-center justify-center text-slate-400 shrink-0">
-                    {addr.label.toLowerCase().includes("home") || addr.label.toLowerCase().includes("บ้าน") ? <Icons.Home size={20} strokeWidth={3} /> : <Icons.Office size={20} strokeWidth={3} />}
-                  </div>
+                <div className="flex items-center gap-4">
+                  <IconCircle variant="orange" size="md">
+                    {addr.label.toLowerCase().includes("home") || addr.label.toLowerCase().includes("บ้าน") ? <Icons.Home size={22} strokeWidth={2.5} /> : <Icons.Office size={22} strokeWidth={2.5} />}
+                  </IconCircle>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-bold text-slate-900">{addr.label}</p>
                     <p className="text-[11px] text-slate-400 truncate">{addr.details}</p>
@@ -176,9 +178,9 @@ export default function ProfilePage() {
             {MENU_ITEMS.map((item) => {
               const content = (
                 <>
-                  <div className="w-10 h-10 bg-slate-50 group-hover:bg-primary-light rounded-xl flex items-center justify-center text-slate-400 group-hover:text-primary-dark shrink-0 transition-colors">
+                  <IconCircle variant={item.label === t("profile.language") ? "yellow" : "black"} size="md">
                     {item.icon}
-                  </div>
+                  </IconCircle>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-bold text-slate-800">{item.label}</p>
                     <p className="text-[11px] text-slate-400">{item.description}</p>
@@ -213,11 +215,11 @@ export default function ProfilePage() {
             {/* Logout Button */}
             <button
               onClick={logout}
-              className="w-full flex items-center gap-4 px-4 py-4 hover:bg-rose-50 transition-colors text-left group border-t border-slate-50"
+              className="w-full flex items-center gap-4 px-4 py-5 hover:bg-rose-50 transition-colors text-left group border-t border-slate-50"
             >
-              <div className="w-10 h-10 bg-rose-50 rounded-xl flex items-center justify-center text-rose-400 group-hover:text-rose-600 shrink-0 transition-colors">
-                <Icons.Lock size={20} />
-              </div>
+              <IconCircle variant="black" size="md" className="group-hover:bg-rose-600 transition-colors">
+                <Icons.Lock size={20} className="text-white" />
+              </IconCircle>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-bold text-rose-600">{t("profile.logout")}</p>
                 <p className="text-[11px] text-rose-300">{t("profile.signOutDesc")}</p>

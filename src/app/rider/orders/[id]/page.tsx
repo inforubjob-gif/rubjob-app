@@ -7,7 +7,7 @@ import { useParams, useRouter } from "next/navigation";
 import Card from "@/components/ui/Card";
 import Badge, { statusToBadgeVariant } from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
-import { Icons } from "@/components/ui/Icons";
+import { Icons, IconCircle } from "@/components/ui/Icons";
 import { useTranslation } from "@/components/providers/LanguageProvider";
 import PhotoUpload from "@/components/ui/PhotoUpload";
 import dynamic from "next/dynamic";
@@ -158,9 +158,11 @@ export default function RiderOrderDetailPage() {
         <div className="flex items-center gap-3">
           <button
             onClick={() => router.back()}
-            className="w-9 h-9 rounded-xl bg-orange-50 flex items-center justify-center text-primary active:scale-95 transition-transform border border-orange-100"
+            className="active:scale-95 transition-transform"
           >
-            <Icons.Back size={18} />
+            <IconCircle variant="white" size="sm">
+              <Icons.Back size={16} />
+            </IconCircle>
           </button>
           <div className="flex-1">
             <h1 className="text-lg font-bold text-slate-900">{t("rider.manageTask")}</h1>
@@ -171,10 +173,12 @@ export default function RiderOrderDetailPage() {
           </Badge>
           <button
             onClick={() => setIsIssueModalOpen(true)}
-            className="w-9 h-9 rounded-xl bg-red-50 flex items-center justify-center text-red-500 active:scale-95 transition-transform border border-red-100"
+            className="active:scale-95 transition-transform"
             title={t("orders.reportIssue")}
           >
-            <Icons.Alert size={18} />
+            <IconCircle variant="slate" size="sm">
+              <Icons.Alert size={16} className="text-red-500" />
+            </IconCircle>
           </button>
         </div>
       </header>
@@ -237,9 +241,9 @@ export default function RiderOrderDetailPage() {
           <Card className="p-6 border-none shadow-xl shadow-primary/5 rounded-[2rem] bg-white relative overflow-hidden">
              <div className="absolute top-0 right-0 w-32 h-32 bg-orange-50 rounded-full -mr-16 -mt-16 blur-3xl opacity-50" />
              <div className="flex items-center gap-4 mb-6 relative z-10">
-                <div className="w-14 h-14 rounded-2xl bg-slate-50 flex items-center justify-center text-slate-600 border border-slate-100 shadow-inner">
-                    <Icons.User size={30} />
-                </div>
+                <IconCircle variant="black" size="lg">
+                    <Icons.User size={32} />
+                </IconCircle>
                 <div className="flex-1">
                     <h3 className="text-base font-black text-slate-900 uppercase">{order?.userName || t("common.guest")}</h3>
                     <div className="flex items-center gap-1.5 mt-1">

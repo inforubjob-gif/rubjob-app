@@ -3,7 +3,7 @@
  */
 export function calculateFinalPrice(basePrice: number, surgeMultiplier: number = 1.0, discount: number = 0) {
   const priceAfterSurge = basePrice * surgeMultiplier;
-  return Math.max(0, priceAfterSurge - discount);
+  return Math.ceil(Math.max(0, priceAfterSurge - discount));
 }
 
 /**
@@ -15,7 +15,7 @@ export function getCancellationFee(orderStatus: string, basePrice: number) {
   
   if (activeStatuses.includes(orderStatus)) {
     // 10% of base price or minimum 20 THB
-    return Math.max(20, basePrice * 0.1);
+    return Math.ceil(Math.max(20, basePrice * 0.1));
   }
   
   return 0;

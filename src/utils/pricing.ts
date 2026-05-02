@@ -58,7 +58,11 @@ export function calculateOrderPrice(details: {
   if (needsDetergent) addonsTotal += 20;
 
   // 4. Totals
-  const customerTotal = laundryCost + deliveryFee + addonsTotal;
+  const finalLaundry = Math.ceil(laundryCost);
+  const finalDelivery = Math.ceil(deliveryFee);
+  const finalAddons = Math.ceil(addonsTotal);
+  const customerTotal = finalLaundry + finalDelivery + finalAddons;
+  
   const platformTotalRevenue = laundryPlatformGP + rubberComm + platformServiceFee;
 
   return {
@@ -66,9 +70,9 @@ export function calculateOrderPrice(details: {
     rubberNetIncome,
     platformTotalRevenue,
     breakdown: {
-      laundry: laundryCost,
-      delivery: deliveryFee,
-      addons: addonsTotal,
+      laundry: finalLaundry,
+      delivery: finalDelivery,
+      addons: finalAddons,
     },
   };
 }

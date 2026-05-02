@@ -208,9 +208,9 @@ export default function RiderDashboard() {
         <Card className="mb-6 bg-white/10 backdrop-blur-xl border border-white/20 shadow-xl shadow-primary-dark/20 rounded-xl p-4 text-white">
            <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${workStatus ? 'bg-emerald-500 text-white' : 'bg-white/20 text-white/60'}`}>
-                      <Icons.Shield size={20} />
-                  </div>
+                  <IconCircle variant={workStatus ? "black" : "slate"} size="md">
+                      <Icons.Shield size={24} />
+                  </IconCircle>
                   <div>
                       <p className="text-xs font-black text-white/50 uppercase leading-none mb-1">{t("rider.profile.workStatus")}</p>
                       <p className="text-sm font-black uppercase">
@@ -514,9 +514,9 @@ function AvailableDeliveries({ t, router, jobs, onAccept, onViewDetails }: { t: 
         jobs.map((job) => (
           <Card key={job.id} className="p-4 border-2 border-transparent hover:border-primary/20 transition-all">
             <div className="flex items-start gap-4">
-              <div className="w-14 h-14 bg-slate-100 rounded-xl flex items-center justify-center text-slate-400 shrink-0">
+              <IconCircle variant="orange" size="md">
                 {getServiceIcon(job.serviceId as any, { size: 28 })}
-              </div>
+              </IconCircle>
               <div className="flex-1">
                 <div className="flex items-center gap-1.5 mb-1">
                   <span className={`text-[11px] font-black px-1.5 py-0.5 rounded-lg uppercase ${job.status === 'pending' ? 'bg-blue-100 text-blue-700' : 'bg-orange-100 text-orange-700'}`}>
@@ -570,9 +570,9 @@ function ActiveDeliveries({ t, router, activeJobs }: { t: any, router: any, acti
         activeJobs.map((job) => (
           <Card key={job.id} className="p-4 border-l-4 border-primary shadow-sm hover:shadow-md transition-shadow">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-primary/10 text-primary-dark rounded-xl flex items-center justify-center shrink-0">
+              <IconCircle variant="black" size="md">
                 {getServiceIcon(job.serviceId as any, { size: 24 })}
-              </div>
+              </IconCircle>
               <div className="flex-1 border-r border-slate-100 mr-2 pr-2">
                 <p className="text-xs font-black text-slate-400 uppercaseer">{job.id}</p>
                 <h3 className="text-sm font-bold text-slate-900 leading-tight truncate">{job.storeName}</h3>

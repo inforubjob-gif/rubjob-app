@@ -138,7 +138,7 @@ export default function OrdersPage() {
                         
                         <div className="flex items-center gap-2 mt-2">
                            <span className="text-[10px] font-black text-primary bg-primary/10 px-2 py-0.5 rounded-md">
-                             ฿{order.totalPrice}
+                             ฿{Math.ceil(order.totalPrice)}
                            </span>
                            <span className="text-[10px] text-slate-400 font-bold">
                              {items.length} {t("orders.itemCount")} • {new Date(order.createdAt).toLocaleDateString(language === "th" ? "th" : "en", {

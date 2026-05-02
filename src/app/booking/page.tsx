@@ -7,7 +7,7 @@ import Button from "@/components/ui/Button";
 import { TIME_SLOTS } from "@/lib/constants";
 import type { ServiceType, Address, Store } from "@/types";
 
-import { Icons, getServiceIcon } from "@/components/ui/Icons";
+import { Icons, getServiceIcon, IconCircle } from "@/components/ui/Icons";
 import Modal from "@/components/ui/Modal";
 import { calculateOrderPrice } from "@/utils/pricing";
 
@@ -276,7 +276,7 @@ function BookingFlow() {
 
   const subTotal = pricing.customerTotal + foldingFee;
   const totalDiscount = couponDiscount + pointsDiscount;
-  const totalPrice = Math.max(subTotal - totalDiscount, 0);
+  const totalPrice = Math.ceil(Math.max(subTotal - totalDiscount, 0));
 
   const minOrderAmount = Number(systemSettings.min_order_amount) || 0;
   const isBelowMinOrder = totalPrice < minOrderAmount;
@@ -404,16 +404,18 @@ function BookingFlow() {
       {/* Header */}
       <header className="bg-white px-5 pt-3 pb-4 border-b border-border sticky top-0 z-30">
         <div className="flex items-center gap-3">
-          <button
-            onClick={() => {
-              if (step === "service") router.back();
-              else if (step === "details") setStep("service");
-              else if (step === "payment") setStep("details");
-            }}
-            className="w-9 h-9 rounded-xl bg-surface-alt flex items-center justify-center text-foreground active:scale-95 transition-transform"
-          >
-            <Icons.Back size={20} />
-          </button>
+            <button
+              onClick={() => {
+                if (step === "service") router.back();
+                else if (step === "details") setStep("service");
+                else if (step === "payment") setStep("details");
+              }}
+              className="active:scale-95 transition-transform"
+            >
+              <IconCircle variant="white" size="sm">
+                <Icons.Back size={18} />
+              </IconCircle>
+            </button>
           <h1 className="text-lg font-bold text-foreground">
             {step === "service" ? t("booking.serviceTitle") : 
             step === "details" ? t("booking.pickupTitle") : 
@@ -450,11 +452,9 @@ function BookingFlow() {
                     : "border-slate-100 hover:border-slate-200"
                 }`}
               >
-                <div className={`w-14 h-14 rounded-xl flex items-center justify-center shrink-0 transition-colors ${
-                  selectedService === svc.id ? "bg-primary text-white shadow-md shadow-primary/30" : "bg-primary-light text-primary-dark"
-                }`}>
+                <IconCircle variant={selectedService === svc.id ? "orange" : "white"} size="lg" className="shrink-0">
                   {getServiceIcon(svc.id, { size: 28 })}
-                </div>
+                </IconCircle>
                 <div className="flex-1 min-w-0">
                   <h3 className="text-base font-black text-foreground">{t(`orders.services.${svc.id}`) || svc.name}</h3>
                   <p className="text-xs text-muted mt-1 leading-relaxed opacity-90">{t(`serviceDesc.${svc.id}`) || svc.description}</p>
@@ -483,8 +483,10 @@ function BookingFlow() {
             {/* Address selection */}
             <section>
               <div className="flex items-center justify-between mb-2">
-                <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
-                  <Icons.MapPin size={18} className="text-primary" /> {t("booking.pickupAddress")}
+                <h3 className="text-sm font-black text-foreground flex items-center gap-2 uppercase tracking-tight">
+                  <IconCircle variant="orange" size="sm">
+                    <Icons.MapPin size={14} strokeWidth={3} />
+                  </IconCircle> {t("booking.pickupAddress")}
                 </h3>
                 <button 
                   onClick={() => router.push("/profile/addresses")}
@@ -509,11 +511,9 @@ function BookingFlow() {
                     }`}
                   >
                     <div className="flex items-start gap-2">
-                      <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 mt-0.5 transition-colors ${
-                        selectedAddress?.id === addr.id ? "bg-primary text-white" : "bg-slate-100 text-slate-400"
-                      }`}>
-                        {addr.label.toLowerCase().includes("home") || addr.label.toLowerCase().includes("บ้าน") ? <Icons.Home size={18} /> : <Icons.Office size={18} />}
-                      </div>
+                      <IconCircle variant={selectedAddress?.id === addr.id ? "orange" : "slate"} size="md">
+                        {addr.label.toLowerCase().includes("home") || addr.label.toLowerCase().includes("บ้าน") ? <Icons.Home size={20} /> : <Icons.Office size={20} />}
+                      </IconCircle>
                       <div>
                         <p className={`text-sm font-bold transition-colors ${
                           selectedAddress?.id === addr.id ? "text-primary-dark" : "text-foreground"
@@ -534,11 +534,12 @@ function BookingFlow() {
               {/* Auto-assigned store is hidden from the user per requirements */}
             </section>
 
-            {/* Pickup Info — always show date/time picker (no instant option) */}
             <section>
-              <h3 className="text-sm font-bold text-foreground mb-2 flex items-center gap-2">
-                <Icons.Bell size={18} className="text-primary" /> {t("booking.pickupSelectTime")}
-              </h3>
+                <h3 className="text-sm font-black text-foreground mb-2 flex items-center gap-2 uppercase tracking-tight">
+                  <IconCircle variant="yellow" size="sm">
+                    <Icons.Bell size={14} strokeWidth={3} />
+                  </IconCircle> {t("booking.pickupSelectTime")}
+                </h3>
               
               <div className="p-3 bg-slate-50/80 rounded-xl space-y-4 animate-fade-in border border-slate-100">
                 <div className="flex gap-2 overflow-x-auto hide-scrollbar pb-1">
@@ -571,9 +572,11 @@ function BookingFlow() {
 
             {/* Delivery Options — 2 choices: มาตรฐาน + ด่วนพิเศษ */}
             <section>
-              <h3 className="text-sm font-bold text-foreground mb-2 flex items-center gap-2">
-                <Icons.Home size={18} className="text-primary" /> {t("booking.deliveryOptions")}
-              </h3>
+                <h3 className="text-sm font-black text-foreground mb-2 flex items-center gap-2 uppercase tracking-tight">
+                  <IconCircle variant="black" size="sm">
+                    <Icons.Home size={14} strokeWidth={3} />
+                  </IconCircle> {t("booking.deliveryOptions")}
+                </h3>
               <div className="space-y-2">
                 <label className={`flex items-center justify-between p-3.5 rounded-xl border-2 cursor-pointer transition-all ${deliverySpeed === "standard" ? "border-primary bg-primary/5 shadow-md shadow-primary/5" : "border-slate-100 bg-white hover:bg-slate-50"}`} onClick={() => setDeliverySpeed("standard")}>
                   <div className="flex flex-col">
@@ -601,8 +604,10 @@ function BookingFlow() {
             {/* Luggage Size & Folding Option - Only for Laundry */}
             {service?.category === "laundry" && (
               <section>
-                <h3 className="text-sm font-bold text-foreground mb-2 flex items-center gap-2">
-                  <Icons.FileText size={18} className="text-primary" /> 
+                <h3 className="text-sm font-black text-foreground mb-2 flex items-center gap-2 uppercase tracking-tight">
+                  <IconCircle variant="orange" size="sm">
+                    <Icons.FileText size={14} strokeWidth={3} />
+                  </IconCircle>
                   {t("booking.bagSizeTitle")}
                 </h3>
                 
@@ -615,8 +620,10 @@ function BookingFlow() {
                   ))}
                 </div>
 
-                <h3 className="text-sm font-bold text-foreground mb-2 flex items-center gap-2">
-                  <Icons.Tasks size={18} className="text-primary" /> 
+                <h3 className="text-sm font-black text-foreground mb-2 flex items-center gap-2 uppercase tracking-tight">
+                  <IconCircle variant="yellow" size="sm">
+                    <Icons.Tasks size={14} strokeWidth={3} />
+                  </IconCircle>
                   {t("booking.foldingServiceTitle")}
                 </h3>
                 
@@ -642,8 +649,10 @@ function BookingFlow() {
                   </label>
                 </Card>
 
-                <h3 className="text-sm font-bold text-foreground mb-2 flex items-center gap-2">
-                  <Icons.Shield size={18} className="text-primary" /> 
+                <h3 className="text-sm font-black text-foreground mb-2 flex items-center gap-2 uppercase tracking-tight">
+                  <IconCircle variant="black" size="sm">
+                    <Icons.Shield size={14} strokeWidth={3} />
+                  </IconCircle>
                   น้ำยาซักผ้า / ปรับผ้านุ่ม
                 </h3>
                 <Card className="p-4 mb-4">
@@ -663,8 +672,10 @@ function BookingFlow() {
             {/* Discount & Points */}
             <section className="animate-fade-in">
               <div className="flex items-center justify-between mb-2 mt-6">
-                <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
-                  <Icons.Ticket size={18} className="text-primary" /> {t("booking.discountsTitle")}
+                <h3 className="text-sm font-black text-foreground flex items-center gap-2 uppercase tracking-tight">
+                  <IconCircle variant="yellow" size="sm">
+                    <Icons.Ticket size={14} strokeWidth={3} />
+                  </IconCircle> {t("booking.discountsTitle")}
                 </h3>
               </div>
               
@@ -686,9 +697,9 @@ function BookingFlow() {
                   className="w-full mb-4 bg-primary/5 hover:bg-primary/10 border-2 border-dashed border-primary/20 rounded-xl p-3 flex items-center justify-between group transition-all"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center shadow-sm text-primary group-active:scale-95 transition-transform">
+                    <IconCircle variant="orange" size="md">
                       <Icons.Ticket size={20} />
-                    </div>
+                    </IconCircle>
                     <div className="text-left">
                       <p className="text-[13px] font-black text-primary-dark uppercase leading-none">{t("booking.selectCoupon")}</p>
                       <p className="text-[10px] text-primary/60 font-bold mt-1 uppercase leading-none">{t("booking.promoLabel")}</p>
@@ -754,8 +765,10 @@ function BookingFlow() {
               </Card>
 
               {/* Billing Summary */}
-              <h3 className="text-sm font-bold text-foreground mb-2 flex items-center gap-2 mt-6">
-                <Icons.FileText size={18} className="text-primary" /> {t("booking.summaryTitle")}
+              <h3 className="text-sm font-black text-foreground mb-2 flex items-center gap-2 mt-6 uppercase tracking-tight">
+                <IconCircle variant="black" size="sm">
+                  <Icons.FileText size={14} strokeWidth={3} />
+                </IconCircle> {t("booking.summaryTitle")}
               </h3>
               <Card className="p-5">
                 <div className="space-y-4 mb-4 text-xs font-medium text-slate-600">

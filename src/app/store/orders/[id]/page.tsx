@@ -7,7 +7,7 @@ import { useParams, useRouter } from "next/navigation";
 import Card from "@/components/ui/Card";
 import Badge, { statusToBadgeVariant } from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
-import { Icons, getServiceIcon } from "@/components/ui/Icons";
+import { Icons, IconCircle, getServiceIcon } from "@/components/ui/Icons";
 import { useTranslation } from "@/components/providers/LanguageProvider";
 import CountdownTimer from "@/components/ui/CountdownTimer";
 import OrderIssueModal from "@/components/orders/OrderIssueModal";
@@ -66,16 +66,20 @@ export default function StoreOrderDetailPage() {
   return (
     <div className="flex flex-col min-h-dvh bg-slate-50">
       <header className="bg-white px-5 pt-12 pb-6 border-b border-slate-100 flex items-center justify-between sticky top-0 z-50">
-        <button onClick={() => router.back()} className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400 active:scale-90 transition-all">
-          <Icons.Back size={20} />
+        <button onClick={() => router.back()} className="active:scale-90 transition-all">
+          <IconCircle variant="white" size="sm">
+            <Icons.Back size={18} />
+          </IconCircle>
         </button>
         <h1 className="text-sm font-black text-slate-900 uppercase">{t("store.manageTask")}</h1>
         <button
           onClick={() => setIsIssueModalOpen(true)}
-          className="w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center text-red-500 active:scale-90 transition-all border border-red-100"
+          className="active:scale-90 transition-all"
           title={t("orders.reportIssue")}
         >
-          <Icons.Alert size={20} />
+          <IconCircle variant="slate" size="sm">
+            <Icons.Alert size={18} className="text-red-500" />
+          </IconCircle>
         </button>
       </header>
       
@@ -102,9 +106,9 @@ export default function StoreOrderDetailPage() {
 
           <div className="flex items-center gap-4 relative">
              <div className="absolute left-6 top-6 bottom-6 w-0.5 bg-dashed border-l-2 border-slate-100 border-dashed" />
-             <div className="relative z-10 w-12 h-12 rounded-xl bg-slate-50 text-slate-400 flex items-center justify-center shadow-inner">
-                <Icons.User size={22} />
-             </div>
+             <IconCircle variant="black" size="md" className="relative z-10">
+                <Icons.User size={24} />
+             </IconCircle>
              <div className="flex-1 min-w-0">
                 <p className="text-[10px] font-black text-slate-300 uppercase">{t("store.customer")}</p>
                 <p className="text-sm font-black text-slate-900 truncate">Customer #TR-88</p>
@@ -119,9 +123,9 @@ export default function StoreOrderDetailPage() {
               <Card className={`p-5 transition-all outline-dashed outline-2 ${status === 'delivering_to_store' ? 'outline-primary bg-primary/5 shadow-xl shadow-primary/10' : 'bg-white outline-slate-100'}`}>
                 <div className="flex items-center justify-between">
                    <div className="flex items-center gap-4">
-                       <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${status === 'delivering_to_store' ? 'bg-primary text-white shadow-lg' : 'bg-slate-50 text-slate-300'}`}>
-                           <Icons.Truck size={22} />
-                       </div>
+                       <IconCircle variant={status === 'delivering_to_store' ? 'orange' : 'slate'} size="md">
+                           <Icons.Truck size={24} />
+                       </IconCircle>
                        <div>
                           <h4 className={`text-sm font-black uppercase ${status === 'delivering_to_store' ? 'text-primary-dark' : 'text-slate-400'}`}>{t("store.incomingFromRider")}</h4>
                           <p className="text-[10px] font-bold text-slate-400 uppercase">{t("store.arriving")} • {t("store.riderNo")} #RD-99</p>
@@ -151,18 +155,18 @@ export default function StoreOrderDetailPage() {
                   <Card className="p-4 bg-white border border-slate-100">
                       <p className="text-[10px] font-black text-slate-400 uppercase mb-3">{t("profile.service")}</p>
                       <div className="flex items-center gap-2">
-                          <div className="w-8 h-8 rounded-lg bg-orange-50 text-orange-500 flex items-center justify-center shadow-sm">
+                          <IconCircle variant="orange" size="sm">
                               {getServiceIcon(order?.serviceId as any, { size: 18 })}
-                          </div>
+                          </IconCircle>
                           <span className="text-xs font-black text-slate-900">{order?.serviceName || t(`orders.services.${order?.serviceId}`)}</span>
                       </div>
                   </Card>
                   <Card className={`p-4 ${isExpress ? 'bg-red-50 text-red-600 border border-red-100' : 'bg-slate-50 text-slate-900 border border-slate-100'}`}>
                       <p className="text-[10px] font-black text-slate-400 uppercase mb-3">Service Level</p>
                       <div className="flex items-center gap-2">
-                          <div className={`w-8 h-8 rounded-lg ${isExpress ? 'bg-red-600 text-white' : 'bg-primary text-white'} flex items-center justify-center shadow-sm`}>
+                          <IconCircle variant={isExpress ? "black" : "yellow"} size="sm">
                               <Icons.Clock size={18} />
-                          </div>
+                          </IconCircle>
                           <span className="text-xs font-black">{isExpress ? "EXPRESS" : "STANDARD"}</span>
                       </div>
                   </Card>
@@ -206,9 +210,9 @@ export default function StoreOrderDetailPage() {
                 )}
                 {status === "completed" && (
                   <div className="p-10 bg-orange-50 rounded-xl border-4 border-dashed border-orange-200 flex flex-col items-center justify-center gap-4 text-center animate-bounce-slow">
-                      <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center text-white shadow-2xl shadow-orange-200">
+                      <IconCircle variant="orange" size="lg" className="shadow-2xl shadow-orange-200">
                           <Icons.Check size={32} strokeWidth={4} />
-                      </div>
+                      </IconCircle>
                       <div>
                          <h4 className="text-lg font-black text-primary leading-none">{t("store.handoffSuccess")}</h4>
                          <p className="text-[10px] font-bold text-slate-400 uppercase mt-2 px-6">{t("store.handoffDesc")}</p>

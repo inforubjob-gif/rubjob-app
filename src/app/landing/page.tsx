@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Card from "@/components/ui/Card";
-import { Icons } from "@/components/ui/Icons";
+import { Icons, IconCircle } from "@/components/ui/Icons";
 
 /** Resolve the app subdomain URL dynamically based on current hostname */
 function getPortalUrl(subdomain: string): string {
@@ -26,34 +26,40 @@ function getPortalUrl(subdomain: string): string {
 
 const FEATURES = [
   { 
-    icon: <svg className="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>, 
-    title: "Wash & Iron", 
-    desc: "การดูแลเสื้อผ้าที่ใส่ใจกว่าเดิม ด้วยระบบมาตรฐานที่เชื่อมต่อร้านซักในพื้นที่คุณ" 
+    icon: <IconCircle variant="orange" size="lg"><Icons.Relax size={32} strokeWidth={2.5} /></IconCircle>, 
+    title: "Relax & Rest", 
+    titleColor: "text-[#ff8a00]",
+    desc: "คืนเวลาพักผ่อนให้คุณจัดการทุกเรื่องผ้าให้เสร็จสรรพ ครบในที่เดียว ชีวิตง่ายขึ้นทันที" 
   },
   { 
-    icon: <svg className="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="15.5" cy="18.5" r="2.5"></circle><circle cx="5.5" cy="18.5" r="2.5"></circle><path d="M12 18H8m-2 0H3v-8h11l3-4h3l3 4v8h-2m-9 0V8"></path><line x1="1" y1="1" x2="23" y2="1" stroke="transparent"></line></svg>, 
-    title: "Fast Delivery", 
-    desc: "รับ-ส่งถึงที่ ด้วยไรเดอร์มืออาชีพ ประหยัดเวลา ไม่ต้องแบกตะกร้าซักไปเอง" 
+    icon: <IconCircle variant="yellow" size="lg"><Icons.Smile size={32} strokeWidth={2.5} /></IconCircle>, 
+    title: "Happy Status", 
+    titleColor: "text-[#ffce00]",
+    desc: "อัปเดตสถานะทุกขั้นตอน ไม่ต้องคอยตามหรือกังวลใจ ให้คุณยิ้มได้ในทุกวัน" 
   },
   { 
-    icon: <svg className="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>, 
-    title: "Live Tracking", 
-    desc: "ติดตามสถานะการซักและตำแหน่งของไรเดอร์ได้แบบเรียลไทม์ผ่านขีดสุด" 
+    icon: <IconCircle variant="white" size="lg"><Icons.Settings size={32} strokeWidth={2.5} /></IconCircle>, 
+    title: "Customizable", 
+    titleColor: "text-slate-800",
+    desc: "เลือกเวลาได้ มีด่วนพิเศษ ปรับแต่งชีวิตได้ตามต้องการ พร้อมซัพพอร์ตตลอดเวลา" 
   },
   { 
-    icon: <svg className="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>, 
-    title: "LINE Integration", 
-    desc: "ทำรายการ แชท และรับแจ้งเตือนได้ง่ายๆ ผ่าน LINE ของคุณ รวดเร็วตลอดเวลา" 
+    icon: <IconCircle variant="black" size="lg"><Icons.HeartHand size={32} strokeWidth={2.5} /></IconCircle>, 
+    title: "Trustworthy", 
+    titleColor: "text-slate-900",
+    desc: "บริการสม่ำเสมอ สร้างความไว้วางใจในระยะยาว เหมือนมีคนดูแลครอบครัวแทนคุณ" 
   },
   { 
-    icon: <svg className="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><path d="M9 12l2 2 4-4"></path></svg>, 
-    title: "Quality Insured", 
-    desc: "คุ้มครองเสื้อผ้าทุกชิ้นด้วยความรอบคอบ หมดกังวลเรื่องผ้าสูญหาย" 
+    icon: <IconCircle variant="orange" size="lg"><Icons.Lightbulb size={32} strokeWidth={2.5} /></IconCircle>, 
+    title: "Smart Delivery", 
+    titleColor: "text-[#ff8a00]",
+    desc: "แพ็กเรียบร้อย ส่งถึงมือ จบงานแบบไม่ต้องคิดต่อ ด้วยระบบจัดการที่ชาญฉลาด" 
   },
   { 
-    icon: <svg className="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>, 
-    title: "Cashless Payment", 
-    desc: "ทำธุรกรรมได้ปลอดภัย 100% เชื่อมต่อระบบชำระเงินดิจิทัลทันสมัย" 
+    icon: <IconCircle variant="yellow" size="lg"><Icons.Check size={32} strokeWidth={3} /></IconCircle>, 
+    title: "Perfect Quality", 
+    titleColor: "text-[#ffce00]",
+    desc: "มาตรฐานความสะอาดระดับมืออาชีพ ตรวจสอบทุกชิ้นก่อนส่งคืนถึงมือคุณ" 
   },
 ];
 
@@ -359,13 +365,13 @@ export default function LandingPage() {
             {FEATURES.map((f, i) => (
               <div
                 key={i}
-                className="group p-8 bg-white rounded-[32px] border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-primary/10 transition-all duration-300 hover:-translate-y-1"
+                className="group p-8 bg-white rounded-[40px] border border-slate-100 shadow-sm hover:shadow-2xl hover:shadow-primary/5 transition-all duration-500 hover:-translate-y-2 flex flex-col items-center text-center lg:items-start lg:text-left"
               >
-                <div className="w-16 h-16 rounded-2xl bg-primary/10 text-primary text-3xl flex items-center justify-center mb-6 group-hover:scale-110 group-hover:bg-primary group-hover:text-white transition-all duration-300">
+                <div className="mb-8 group-hover:scale-110 transition-transform duration-500">
                   {f.icon}
                 </div>
-                <h4 className="text-xl font-black text-slate-800 mb-3">{f.title}</h4>
-                <p className="text-slate-500 leading-relaxed text-sm">{f.desc}</p>
+                <h4 className={`text-2xl font-black mb-4 transition-colors ${f.titleColor || 'text-slate-800'}`}>{f.title}</h4>
+                <p className="text-slate-500 leading-relaxed text-sm font-medium">{f.desc}</p>
               </div>
             ))}
           </div>

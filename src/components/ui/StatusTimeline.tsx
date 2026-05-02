@@ -1,6 +1,6 @@
 "use client";
 
-import { Icons } from "./Icons";
+import { Icons, IconCircle } from "./Icons";
 import type { OrderStatus, OrderType } from "@/types";
 import { useTranslation } from "@/components/providers/LanguageProvider";
 
@@ -8,20 +8,21 @@ interface Step {
   key: OrderStatus;
   icon?: (props: any) => React.ReactNode;
   image?: string;
+  variant?: "orange" | "yellow" | "white" | "black" | "slate";
 }
 
 const LOGISTICS_STEPS: Step[] = [
-  { key: "picking_up", icon: Icons.Package },
-  { key: "delivering_to_store", icon: Icons.Store },
-  { key: "washing", icon: Icons.WashFold },
-  { key: "delivering_to_customer", icon: Icons.Bike },
-  { key: "completed", icon: Icons.CheckCircle },
+  { key: "picking_up", icon: Icons.Package, variant: "orange" },
+  { key: "delivering_to_store", icon: Icons.Store, variant: "black" },
+  { key: "washing", icon: Icons.WashFold, variant: "yellow" },
+  { key: "delivering_to_customer", icon: Icons.Bike, variant: "orange" },
+  { key: "completed", icon: Icons.CheckCircle, variant: "black" },
 ];
 
 const DIRECT_STEPS: Step[] = [
-  { key: "accepted", icon: Icons.User },
-  { key: "in_progress", icon: Icons.Truck }, // Traveling to customer
-  { key: "completed", icon: Icons.CheckCircle },
+  { key: "accepted", icon: Icons.User, variant: "orange" },
+  { key: "in_progress", icon: Icons.Truck, variant: "black" }, 
+  { key: "completed", icon: Icons.CheckCircle, variant: "black" },
 ];
 
 const LOGISTICS_ORDER: OrderStatus[] = [
@@ -56,7 +57,7 @@ export default function StatusTimeline({ currentStatus, orderType = "logistics" 
   const currentIdx = statusOrder.indexOf(currentStatus);
 
   return (
-    <div className="space-y-6 py-2 px-1">
+    <div className="space-y-8 py-4 px-1">
       {steps.map((step, index) => {
         // Map step key to index in statusOrder
         const stepIdx = statusOrder.indexOf(step.key);
@@ -67,8 +68,25 @@ export default function StatusTimeline({ currentStatus, orderType = "logistics" 
         return (
           <div 
             key={step.key} 
-            className={`flex items-center justify-between gap-4 transition-all duration-500 ${isFuture ? "opacity-30 grayscale" : "opacity-100"}`}
+            className={`flex items-center justify-between gap-6 transition-all duration-500 ${isFuture ? "opacity-30 grayscale" : "opacity-100"}`}
           >
+            {/* Right: Icon (Moved to left for better timeline flow if desired, but keeping layout) */}
+            <div className={`relative shrink-0 transition-all duration-500 ${isCurrent ? "scale-110" : "scale-100"}`}>
+               <IconCircle 
+                  variant={isCurrent ? "orange" : isDone ? "black" : "slate"} 
+                  size="lg"
+                  className={isCurrent ? "ring-4 ring-primary/20 shadow-xl shadow-primary/20" : ""}
+               >
+                 {step.icon && <step.icon size={28} strokeWidth={2.5} />}
+               </IconCircle>
+              
+              {isDone && (
+                <div className="absolute -top-1 -right-1 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center text-white border-2 border-white shadow-sm animate-fade-in z-10">
+                  <Icons.Check size={12} strokeWidth={4} />
+                </div>
+              )}
+            </div>
+
             {/* Left: Text Info */}
             <div className="flex-1 space-y-1">
               <div className="flex items-center gap-2">
@@ -83,28 +101,10 @@ export default function StatusTimeline({ currentStatus, orderType = "logistics" 
                 {isDone ? t("common.done") : isCurrent ? t("common.processing") : t("common.pending")}
               </p>
             </div>
-
-            {/* Right: Icon */}
-            <div className={`relative w-16 h-16 transition-transform duration-500 ${isCurrent ? "scale-110" : "scale-100"}`}>
-              {step.image ? (
-                <img 
-                  src={step.image} 
-                  alt={step.key} 
-                  className="w-full h-full object-contain" 
-                />
-              ) : (
-                step.icon && <step.icon size={32} className={isCurrent ? "text-primary" : "text-slate-400"} />
-              )}
-              
-              {isDone && (
-                <div className="absolute -top-1 -right-1 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center text-white border-2 border-white shadow-sm animate-fade-in">
-                  <Icons.Check size={10} strokeWidth={4} />
-                </div>
-              )}
-            </div>
           </div>
         );
       })}
     </div>
   );
 }
+

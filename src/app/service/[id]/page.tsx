@@ -4,7 +4,7 @@ export const runtime = 'edge';
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Icons, getServiceIcon } from "@/components/ui/Icons";
+import { Icons, getServiceIcon, IconCircle } from "@/components/ui/Icons";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 
@@ -76,16 +76,18 @@ export default function GigLandingPage({ params }: { params: { id: string } }) {
     <div className="flex flex-col min-h-screen bg-slate-50 pb-10">
       {/* Dynamic Header Image / Icon Cover */}
       <div className="relative h-[250px] bg-gradient-to-br from-primary via-primary-dark to-slate-900 w-full overflow-hidden flex items-center justify-center">
-        <div className="absolute top-4 left-4 z-10 w-10 h-10 bg-black/20 backdrop-blur-md rounded-full flex items-center justify-center cursor-pointer" onClick={() => router.back()}>
-          <Icons.ArrowRight size={20} className="text-white rotate-180" />
+        <div className="absolute top-4 left-4 z-10 active:scale-95 transition-transform cursor-pointer" onClick={() => router.back()}>
+          <IconCircle variant="white" size="sm">
+            <Icons.ArrowRight size={18} className="rotate-180" />
+          </IconCircle>
         </div>
         
         {/* Placeholder Cover Abstract */}
         <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/60 to-transparent" />
         
-        <div className="w-24 h-24 bg-white/10 backdrop-blur-md rounded-2xl flex items-center justify-center text-white/90 shadow-xl border border-white/20 transform rotate-3">
+        <IconCircle variant="white" size="lg" className="transform rotate-3 shadow-2xl">
           {getServiceIcon(gig.icon, { size: 48, className: "transform -rotate-3" })}
-        </div>
+        </IconCircle>
       </div>
 
       <div className="px-5 -mt-8 relative z-10">
@@ -161,11 +163,15 @@ export default function GigLandingPage({ params }: { params: { id: string } }) {
                   
                   <div className="grid grid-cols-2 gap-y-3 mb-5 border-t border-slate-100 pt-3">
                     <div className="flex items-center gap-2">
-                      <Icons.Clock size={16} className="text-slate-400" />
+                      <IconCircle variant="slate" size="sm" className="opacity-50">
+                        <Icons.Clock size={16} />
+                      </IconCircle>
                       <span className="text-[10px] font-bold text-slate-500">{pkg.deliveryDays} วันส่งมอบ</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Icons.Refresh size={16} className="text-slate-400" />
+                      <IconCircle variant="slate" size="sm" className="opacity-50">
+                        <Icons.Refresh size={16} />
+                      </IconCircle>
                       <span className="text-[10px] font-bold text-slate-500">{pkg.revisions == 99 ? 'แก้ไขไม่จำกัด' : pkg.revisions == 0 ? 'ไม่ให้แก้ไข' : `แก้ไข ${pkg.revisions} ครั้ง`}</span>
                     </div>
                   </div>
