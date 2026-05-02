@@ -75,151 +75,222 @@ export default function StoreProfilePage() {
   };
 
   return (
-    <div className="flex flex-col min-h-dvh bg-slate-50">
-      <header className="bg-primary text-white px-5 pt-12 pb-10 rounded-b-[3rem] shadow-xl relative overflow-hidden">
-        <div className="absolute top-0 left-0 w-32 h-32 bg-white/20 rounded-full -ml-16 -mt-16 blur-2xl" />
-        <div className="flex items-center gap-4">
-            <div className="relative">
-              <div className="w-16 h-16 rounded-xl bg-white shadow-xl flex items-center justify-center p-1 border-2 border-orange-100/50">
-                <div className="w-full h-full rounded-xl bg-orange-50 flex items-center justify-center text-primary overflow-hidden font-black text-xl">
-                    {store?.name?.[0] || "S"}
-                </div>
-              </div>
-              <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-emerald-500 border-4 border-primary rounded-full shadow-sm" />
+    <div className="flex flex-col min-h-dvh bg-slate-50 relative overflow-hidden">
+      {/* Background Gradient Layer */}
+      <div className="absolute top-0 left-0 right-0 h-[350px] bg-gradient-to-b from-primary via-primary to-slate-50 z-0" />
+
+      {/* Profile Header */}
+      <header className="relative z-10 px-5 pt-3 pb-12">
+        {/* Back button */}
+        <button
+          onClick={() => router.back()}
+          className="absolute left-5 top-4 active:scale-95 transition-transform z-10"
+        >
+          <IconCircle variant="white" size="sm">
+            <Icons.Back size={16} />
+          </IconCircle>
+        </button>
+
+        <div className="flex items-center gap-4 mt-10">
+          {/* Avatar */}
+          <div className="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center text-white text-2xl font-bold overflow-hidden ring-4 ring-white/30 shadow-lg">
+            <div className="w-full h-full bg-white flex items-center justify-center text-primary font-black text-2xl">
+              {store?.name?.[0] || "S"}
             </div>
-            <div className="flex-1">
-              <h1 className="text-xl font-extrabold truncate">
+          </div>
+          <div className="text-white flex-1 min-w-0">
+            <div className="flex items-center gap-2">
+              <h1 className="text-3xl font-extrabold truncate">
                 {store?.name || t("common.guest")}
               </h1>
-              <p className="text-[10px] text-white/80 font-black uppercase">{t("store.profile.verifiedHero")} {store?.id}</p>
+              {workStatus && <div className="w-2.5 h-2.5 bg-emerald-400 rounded-full animate-pulse shadow-sm shadow-emerald-400/50" />}
             </div>
+            <p className="text-[10px] text-white/70 font-black uppercase tracking-wider mt-1 flex items-center gap-1.5">
+              <Icons.Logo variant="icon" size={10} className="grayscale brightness-[100] invert" />
+              {t("store.profile.verifiedHero")} #{String(store?.id || '').slice(-4)}
+            </p>
+          </div>
         </div>
       </header>
 
-      <div className="flex-1 px-5 pt-6 space-y-7 pb-24 animate-fade-in">
-        {/* Toggle Status */}
-        <Card className="p-5 border-none shadow-sm shadow-primary/5 rounded-xl bg-white border border-primary/10">
-           <div className="flex items-center justify-between">
-             <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-500 flex items-center justify-center border border-emerald-100 shadow-sm shadow-emerald-500/10">
-                    <Icons.Shield size={22} />
-                </div>
-          <div>
-            <h3 className="text-sm font-black text-slate-900 uppercase">{t("store.profile.workStatus")}</h3>
-            <p className="text-[10px] text-emerald-500 font-bold uppercase">{workStatus ? t("store.profile.receivingJobs") : t("store.profile.notReceiving")}</p>
+      <div className="relative z-10 flex-1 px-5 -mt-4 space-y-6 pb-24 animate-fade-in">
+        {/* Status Section */}
+        <section>
+          <Card className="p-4 overflow-hidden border-none shadow-xl">
+             <div className="flex items-center justify-between">
+               <div className="flex items-center gap-4">
+                  <IconCircle variant={workStatus ? "green" : "slate"} size="md">
+                      <Icons.Shield size={22} />
+                  </IconCircle>
+                  <div>
+                      <p className="text-xs font-black text-slate-400 uppercase leading-none mb-1">{t("store.profile.workStatus")}</p>
+                      <p className={`text-sm font-black uppercase ${workStatus ? 'text-emerald-500' : 'text-slate-400'}`}>
+                        {workStatus ? t("store.profile.receivingJobs") : t("store.profile.notReceiving")}
+                      </p>
+                  </div>
+               </div>
+               <button 
+                  onClick={handleToggleWorkStatus}
+                  className={`w-14 h-8 rounded-full p-1 transition-all duration-300 ${workStatus ? 'bg-primary shadow-lg shadow-primary/20' : 'bg-slate-100'}`}
+               >
+                  <div className={`w-6 h-6 rounded-full bg-white shadow-md transition-all duration-300 ${workStatus ? 'transform translate-x-6' : ''}`} />
+               </button>
+             </div>
+          </Card>
+        </section>
+
+        {/* Store Settings Menu */}
+        <section>
+          <h2 className="text-xs font-black text-slate-900 uppercase mb-3 px-1">{t("store.profile.settings")}</h2>
+          <Card className="divide-y divide-slate-50 overflow-hidden shadow-xl">
+            <button
+              onClick={() => setShowLanguageModal(true)}
+              className="w-full flex items-center gap-4 px-4 py-4 hover:bg-slate-50 transition-colors text-left group"
+            >
+              <IconCircle variant="ghost" size="md">
+                <Icons.Globe size={20} />
+              </IconCircle>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-bold text-slate-800">{t("store.profile.language")}</p>
+                <p className="text-[11px] text-slate-400">{language === "th" ? "ไทย (TH)" : "English (EN)"}</p>
+              </div>
+              <Icons.Back size={14} className="text-slate-200 rotate-180 group-hover:text-primary transition-colors" />
+            </button>
+
+            <button
+              onClick={() => router.push("/store/services")}
+              className="w-full flex items-center gap-4 px-4 py-4 hover:bg-slate-50 transition-colors text-left group"
+            >
+              <IconCircle variant="ghost" size="md">
+                <Icons.Clipboard size={20} />
+              </IconCircle>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-bold text-slate-800">{t("store.laundryService")}</p>
+                <p className="text-[11px] text-slate-400">{t("store.manageTask")}</p>
+              </div>
+              <Icons.Back size={14} className="text-slate-200 rotate-180 group-hover:text-primary transition-colors" />
+            </button>
+
+            <button
+              onClick={() => router.push("/store/profile/active-hours")}
+              className="w-full flex items-center gap-4 px-4 py-4 hover:bg-slate-50 transition-colors text-left group"
+            >
+              <IconCircle variant="ghost" size="md">
+                <Icons.Clock size={20} />
+              </IconCircle>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-bold text-slate-800">{t("store.profile.activeHours")}</p>
+                <p className="text-[11px] text-slate-400">{prefs?.activeHours || t("common.notSet")}</p>
+              </div>
+              <Icons.Back size={14} className="text-slate-200 rotate-180 group-hover:text-primary transition-colors" />
+            </button>
+
+            <button
+              onClick={() => router.push("/store/profile/payout-method")}
+              className="w-full flex items-center gap-4 px-4 py-4 hover:bg-slate-50 transition-colors text-left group"
+            >
+              <IconCircle variant="ghost" size="md">
+                <Icons.Payment size={20} />
+              </IconCircle>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-bold text-slate-800">{t("store.profile.payoutMethod")}</p>
+                <p className="text-[11px] text-slate-400">
+                   {prefs?.payoutMethod ? `${prefs.payoutMethod.bank ? prefs.payoutMethod.bank.toUpperCase() : 'Account'} ***${String(prefs.payoutMethod.account || '').slice(-4)}` : t("common.notSet")}
+                </p>
+              </div>
+              <Icons.Back size={14} className="text-slate-200 rotate-180 group-hover:text-primary transition-colors" />
+            </button>
+          </Card>
+        </section>
+
+        {/* Support Section */}
+        <section>
+          <h2 className="text-xs font-black text-slate-900 uppercase mb-3 px-1">{t("support.sectionTitle") || "ช่วยเหลือ"}</h2>
+          <Card className="divide-y divide-slate-50 overflow-hidden shadow-xl">
+            <button
+              onClick={() => router.push("/store/support")}
+              className="w-full flex items-center gap-4 px-4 py-4 hover:bg-slate-50 transition-colors text-left group"
+            >
+              <IconCircle variant="ghost" size="md">
+                <Icons.Chat size={20} />
+              </IconCircle>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-bold text-slate-800">{t("support.contactAdmin") || "ติดต่อแอดมิน"}</p>
+                <p className="text-[11px] text-slate-400">{t("support.contactAdminDesc") || "แจ้งปัญหา / สอบถาม"}</p>
+              </div>
+              <Icons.Back size={14} className="text-slate-200 rotate-180 group-hover:text-primary transition-colors" />
+            </button>
+          </Card>
+        </section>
+
+        {/* Logout Button */}
+        <button
+          onClick={() => logout("/store")}
+          className="w-full flex items-center gap-4 px-4 py-5 bg-white rounded-2xl shadow-xl hover:bg-rose-50 transition-colors text-left group"
+        >
+          <IconCircle variant="ghost" size="md" className="group-hover:text-rose-600 transition-colors">
+            <Icons.LogOut size={20} />
+          </IconCircle>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-bold text-rose-600">{t("store.profile.logout")}</p>
+            <p className="text-[11px] text-rose-300 uppercase font-black">{t("store.profile.verifiedHero")} #{String(store?.id || '').slice(-4)}</p>
+          </div>
+        </button>
+
+        {/* App Info */}
+        <div className="text-center pb-8 pt-4">
+          <p className="text-[10px] font-bold text-slate-300 uppercase tracking-widest">RUBJOB {t("common.version")} 1.0.0</p>
+          <p className="text-[10px] text-slate-300 mt-2 flex items-center justify-center gap-1.5 font-bold">
+            {t("common.madeInBangkok")} <Icons.Guarantee size={12} className="text-primary-dark opacity-50" /> Bangkok
+          </p>
+        </div>
+      </div>
+
+      {/* Language Modal (Dropdown Style) */}
+      {showLanguageModal && (
+        <div className="fixed inset-0 z-[110] flex items-end sm:items-center justify-center animate-fade-in">
+          <div className="absolute inset-0 bg-slate-950/60 backdrop-blur-sm" onClick={() => setShowLanguageModal(false)} />
+          <div className="bg-white w-full max-w-lg rounded-t-[2.5rem] sm:rounded-xl p-8 pb-12 relative z-10 animate-slide-up shadow-2xl">
+            <div className="w-12 h-1.5 bg-slate-100 rounded-full mx-auto mb-8 sm:hidden" />
+            <h3 className="text-xl font-black text-slate-900 mb-6 text-center">{t("store.profile.selectLanguage")}</h3>
+            <div className="space-y-3">
+              {[
+                { key: "th", label: "ภาษาไทย", sub: "Thai (TH)" },
+                { key: "en", label: "English", sub: "English (EN)" },
+              ].map((lang) => (
+                <button
+                  key={lang.key}
+                  onClick={() => {
+                    setLanguage(lang.key as any);
+                    setShowLanguageModal(false);
+                  }}
+                  className={`w-full p-5 rounded-xl flex items-center justify-between transition-all ${
+                    language === lang.key 
+                      ? "bg-primary/5 border-2 border-primary" 
+                      : "bg-slate-50 border-2 border-transparent"
+                  }`}
+                >
+                  <div className="text-left">
+                    <p className={`text-sm font-black ${language === lang.key ? "text-primary-dark" : "text-slate-800"}`}>{lang.label}</p>
+                    <p className="text-[10px] text-slate-400 font-bold uppercase">{lang.sub}</p>
+                  </div>
+                  {language === lang.key && (
+                    <div className="w-6 h-6 bg-primary rounded-full flex items-center justify-center text-white shadow-lg">
+                      <Icons.Check size={14} strokeWidth={4} className="text-white" />
+                    </div>
+                  )}
+                </button>
+              ))}
+            </div>
+            <button 
+              onClick={() => setShowLanguageModal(false)}
+              className="w-full mt-8 py-4 bg-slate-100 text-slate-500 rounded-xl text-[12px] font-black uppercase"
+            >
+              {t("common.cancel")}
+            </button>
           </div>
         </div>
-        <button 
-          onClick={handleToggleWorkStatus}
-          className={`w-14 h-8 rounded-full p-1 transition-all duration-300 ${workStatus ? 'bg-primary shadow-lg shadow-primary/30' : 'bg-slate-200'}`}
-        >
-          <div className={`w-6 h-6 rounded-full bg-white shadow-md transition-all duration-300 ${workStatus ? 'transform translate-x-6' : ''}`} />
-        </button>
-      </div>
-    </Card>
-
-        <section>
-          <p className="text-[10px] font-black text-slate-300 uppercase mb-4 pl-1">{t("store.profile.settings")}</p>
-          <div className="space-y-3">
-             <SettingItem 
-                icon={<Icons.Globe size={20} />} 
-                label={t("store.profile.language")} 
-                value={language === "th" ? "ไทย (TH)" : "English (EN)"}
-                onClick={() => setShowLanguageModal(true)}
-             />
-              <SettingItem 
-                 icon={<Icons.Clipboard size={20} />} 
-                 label={t("store.laundryService")} 
-                 value={t("store.manageTask")} 
-                 onClick={() => router.push("/store/services")}
-              />
-              <SettingItem 
-                 icon={<Icons.Clock size={20} />} 
-                 label={t("store.profile.activeHours")} 
-                 value={prefs?.activeHours || t("common.notSet")} 
-                 onClick={() => router.push("/store/profile/active-hours")}
-              />
-             <SettingItem 
-                icon={<Icons.Payment size={20} />} 
-                label={t("store.profile.payoutMethod")} 
-                value={prefs?.payoutMethod ? `${prefs.payoutMethod.bank ? prefs.payoutMethod.bank.toUpperCase() : 'Account'} ***${String(prefs.payoutMethod.account || '').slice(-4)}` : t("common.notSet")} 
-                onClick={() => router.push("/store/profile/payout-method")}
-             />
-          </div>
-        </section>
-
-         {/* Support */}
-         <section>
-           <p className="text-[10px] font-black text-slate-300 uppercase mb-4 pl-1">{t("support.sectionTitle") || "ช่วยเหลือ"}</p>
-           <div className="space-y-3">
-              <SettingItem 
-                 icon={<Icons.Chat size={20} />} 
-                 label={t("support.contactAdmin") || "ติดต่อแอดมิน"} 
-                 value={t("support.contactAdminDesc") || "แจ้งปัญหา / สอบถาม"}
-                 onClick={() => router.push("/store/support")}
-              />
-           </div>
-         </section>
-
-        <section>
-          <p className="text-[10px] font-black text-slate-300 uppercase mb-4 pl-1">{t("store.profile.account")}</p>
-          <button 
-            onClick={() => logout("/store")}
-            className="w-full p-5 bg-white rounded-xl border border-slate-100 flex items-center gap-4 active:scale-95 transition-all shadow-sm"
-          >
-             <div className="w-10 h-10 rounded-xl bg-red-50 text-red-500 flex items-center justify-center">
-                <Icons.LogOut size={20} />
-             </div>
-             <span className="text-sm font-black text-red-500 uppercase">{t("store.profile.logout")}</span>
-          </button>
-        </section>
-       </div>
-
-        {/* Language Modal (Dropdown Style) */}
-        {showLanguageModal && (
-          <div className="fixed inset-0 z-[110] flex items-end sm:items-center justify-center animate-fade-in">
-            <div className="absolute inset-0 bg-primary-dark/40 backdrop-blur-md" onClick={() => setShowLanguageModal(false)} />
-            <div className="bg-white w-full max-w-lg rounded-t-[3rem] sm:rounded-xl p-8 pb-12 relative z-10 animate-slide-up shadow-2xl">
-              <div className="w-12 h-1.5 bg-orange-100 rounded-full mx-auto mb-8 sm:hidden" />
-             <h3 className="text-xl font-black text-slate-900 mb-6 text-center">{t("store.profile.selectLanguage")}</h3>
-             <div className="space-y-3">
-               {[
-                 { key: "th", label: "ภาษาไทย", sub: "Thai (TH)" },
-                 { key: "en", label: "English", sub: "English (EN)" },
-               ].map((lang) => (
-                 <button
-                   key={lang.key}
-                   onClick={() => {
-                     setLanguage(lang.key as any);
-                     setShowLanguageModal(false);
-                   }}
-                   className={`w-full p-5 rounded-xl flex items-center justify-between transition-all ${
-                     language === lang.key 
-                       ? "bg-primary/5 border-2 border-primary" 
-                       : "bg-slate-50 border-2 border-transparent"
-                   }`}
-                 >
-                   <div className="text-left">
-                     <p className={`text-sm font-black ${language === lang.key ? "text-primary-dark" : "text-slate-800"}`}>{lang.label}</p>
-                     <p className="text-[10px] text-slate-400 font-bold uppercase">{lang.sub}</p>
-                   </div>
-                   {language === lang.key && (
-                     <div className="w-6 h-6 bg-primary rounded-full flex items-center justify-center text-white shadow-lg">
-                       <Icons.Check size={14} strokeWidth={4} className="text-white" />
-                     </div>
-                   )}
-                 </button>
-               ))}
-             </div>
-             <button 
-               onClick={() => setShowLanguageModal(false)}
-               className="w-full mt-8 py-4 bg-slate-100 text-slate-500 rounded-xl text-[12px] font-black uppercase"
-             >
-               {t("common.cancel")}
-             </button>
-           </div>
-         </div>
-       )}
+      )}
     </div>
   );
 }
