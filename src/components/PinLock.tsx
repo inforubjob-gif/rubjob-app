@@ -166,24 +166,27 @@ export default function PinLock({ type, userId, onVerified, children }: PinLockP
 
   return (
     <div 
-      className="fixed inset-0 bg-slate-50 z-[10000] flex flex-col overflow-hidden touch-none"
-      onClick={() => pinInputRef.current?.focus()}
+      className="fixed inset-0 bg-slate-50 z-[10000] flex flex-col touch-none"
     >
       {/* Top Header with Back Button - High Z-index to be clickable */}
-      <header className="px-5 pt-12 pb-4 flex items-center relative z-[1000]">
+      <header className="px-5 pt-12 pb-4 flex items-center relative z-[10001]">
         <button
           onClick={(e) => {
+            e.preventDefault();
             e.stopPropagation();
             router.back();
           }}
-          className="w-10 h-10 rounded-xl bg-white shadow-sm border border-slate-100 flex items-center justify-center text-slate-900 active:scale-95 transition-transform"
+          className="w-10 h-10 rounded-xl bg-white shadow-md border border-slate-100 flex items-center justify-center text-slate-900 active:scale-95 transition-transform"
         >
           <Icons.Back size={18} />
         </button>
       </header>
 
-      {/* Moved items up with pt-4 and justify-start to avoid keyboard overlap */}
-      <div className="flex-1 flex flex-col items-center justify-start max-w-sm mx-auto w-full pt-4 pb-20 relative z-10">
+      {/* Moved items up with pt-8 and justify-start to avoid keyboard overlap */}
+      <div 
+        className="flex-1 flex flex-col items-center justify-start max-w-sm mx-auto w-full pt-8 pb-20 relative z-10"
+        onClick={() => pinInputRef.current?.focus()}
+      >
         <div className="w-20 h-20 bg-primary/10 text-primary rounded-3xl flex items-center justify-center mb-8 shadow-xl shadow-primary/5">
           <Icons.Lock size={40} />
         </div>
@@ -198,7 +201,7 @@ export default function PinLock({ type, userId, onVerified, children }: PinLockP
         </p>
 
         {/* PIN Dots */}
-        <div className="flex gap-4 mb-12">
+        <div className="flex gap-4 mb-12 relative z-20">
           {[...Array(6)].map((_, i) => (
             <div 
               key={i} 
@@ -212,12 +215,12 @@ export default function PinLock({ type, userId, onVerified, children }: PinLockP
         </div>
 
         {error && (
-          <p className="text-[11px] font-black text-rose-500 mb-8 animate-shake bg-rose-50 px-4 py-2 rounded-full border border-rose-100">
+          <p className="text-[11px] font-black text-rose-500 mb-8 animate-shake bg-rose-50 px-4 py-2 rounded-full border border-rose-100 relative z-20">
             {error}
           </p>
         )}
 
-        {/* Hidden Input - covering area but below header */}
+        {/* Hidden Input - covering area but below header and dots for z-order */}
         <input
           ref={pinInputRef}
           type="tel"
@@ -234,23 +237,32 @@ export default function PinLock({ type, userId, onVerified, children }: PinLockP
             }
           }}
           autoFocus
-          className="absolute inset-0 w-full h-full opacity-0 z-[100] cursor-default"
-          id="pin-input"
+          className="absolute inset-0 w-full h-full opacity-0 z-[50] cursor-default"
         />
 
-        {step === "confirm" && (
-           <button 
-             onClick={(e) => { 
-               e.stopPropagation();
-               setStep("setup"); 
-               setPin(""); 
-               setConfirmPin(""); 
-             }}
-             className="mt-8 text-xs font-black text-primary uppercase cursor-pointer relative z-[200]"
-           >
-             {t("common.back")}
-           </button>
-        )}
+        {/* Manual Focus Trigger for Mobile */}
+        <div className="relative z-[60] flex flex-col items-center gap-6">
+          <button 
+            onClick={() => pinInputRef.current?.focus()}
+            className="text-[10px] font-black text-slate-300 uppercase tracking-widest animate-pulse px-6 py-2"
+          >
+            {t("common.tapToEnterPin") || "แตะเพื่อใส่รหัส"}
+          </button>
+
+          {step === "confirm" && (
+             <button 
+               onClick={(e) => { 
+                 e.stopPropagation();
+                 setStep("setup"); 
+                 setPin(""); 
+                 setConfirmPin(""); 
+               }}
+               className="text-xs font-black text-primary uppercase cursor-pointer"
+             >
+               {t("common.back")}
+             </button>
+          )}
+        </div>
       </div>
     </div>
   );
