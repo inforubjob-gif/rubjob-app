@@ -146,7 +146,7 @@ export default function PromotionsPage() {
                     <span className="text-xs font-bold text-primary/80">{t("promotions.memberLabel")}</span>
                   </div>
                   <div className="flex items-baseline gap-2">
-                    <span className="text-[56px] leading-none font-black text-whiteer drop-shadow-md">{totalPoints}</span>
+                    <span className="text-[56px] leading-none font-black text-white drop-shadow-lg">{totalPoints}</span>
                     <span className="text-[11px] font-bold text-slate-300">{t("promotions.pointsLabel")}</span>
                   </div>
                 </div>
