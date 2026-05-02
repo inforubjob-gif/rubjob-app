@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
+import { useRouter } from "next/navigation";
 import { Icons } from "@/components/ui/Icons";
 import { useTranslation } from "@/components/providers/LanguageProvider";
 
@@ -12,6 +13,7 @@ interface PinLockProps {
 }
 
 export default function PinLock({ type, userId, onVerified, children }: PinLockProps) {
+  const router = useRouter();
   const { t } = useTranslation();
   const [isLocked, setIsLocked] = useState(true);
   const [hasPin, setHasPin] = useState<boolean | null>(null);
