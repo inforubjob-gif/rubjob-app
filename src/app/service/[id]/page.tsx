@@ -1,5 +1,7 @@
 "use client";
 
+export const runtime = 'edge';
+
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Icons, getServiceIcon } from "@/components/ui/Icons";
