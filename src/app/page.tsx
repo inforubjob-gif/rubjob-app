@@ -87,11 +87,7 @@ export default function HomePage() {
           </Link>
         </div>
 
-        {/* Search-like bar */}
-        <div className="bg-white/20 backdrop-blur-md rounded-xl px-4 py-3.5 flex items-center gap-2 text-white/80 shadow-inner border border-white/10 mt-6">
-          <Icons.Search size={18} />
-          <span className="text-sm font-medium">{t("common.searchHint")}</span>
-        </div>
+
       </header>
 
       <div className="relative z-10 px-5 space-y-7 pt-2 pb-24 animate-fade-in">
