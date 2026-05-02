@@ -46,6 +46,34 @@ export default function ManageAddressesPage() {
   const [newNote, setNewNote] = useState("");
   const [location, setLocation] = useState<{lat: number, lng: number} | null>(null);
   
+  const handleSelectAddress = async (addr: Address) => {
+    if (!profile?.userId || isSaving) return;
+    
+    setIsSaving(true);
+    try {
+      const res = await fetch("/api/user/addresses", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: addr.id,
+          userId: profile.userId,
+          isDefault: true
+        }),
+      });
+
+      const data = await res.json() as any;
+      if (data.success) {
+        router.back();
+      } else {
+        alert(data.error || "Failed to select address");
+      }
+    } catch (err) {
+      console.error("Select address error:", err);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   const handleEditClick = (addr: Address) => {
     setEditingAddressId(addr.id || null);
     setNewLabel(addr.label);
@@ -264,10 +292,10 @@ export default function ManageAddressesPage() {
  
         <div className="space-y-4">
           {addresses.map((addr) => (
-            <Card key={addr.id} onClick={() => handleEditClick(addr)} className="p-0 overflow-hidden border-slate-100 shadow-xl shadow-slate-200/40 rounded-[1.75rem] active:scale-[0.99] transition-transform cursor-pointer">
+            <Card key={addr.id} onClick={() => handleSelectAddress(addr)} className={`p-0 overflow-hidden border-slate-100 shadow-xl shadow-slate-200/40 rounded-[1.75rem] active:scale-[0.99] transition-transform cursor-pointer ${addr.isDefault ? 'border-primary ring-2 ring-primary/10' : ''}`}>
               <div className="p-5 flex items-start gap-4">
                 {/* Icon Container */}
-                <IconCircle variant="orange" size="md">
+                <IconCircle variant={addr.isDefault ? "orange" : "ghost"} size="md">
                   {addr.label.toLowerCase().includes("home") || addr.label.includes("บ้าน") ? <Icons.Home size={22} /> : <Icons.Office size={22} />}
                 </IconCircle>
  
@@ -276,7 +304,7 @@ export default function ManageAddressesPage() {
                   <div className="flex items-center gap-2 mb-1">
                     <p className="text-sm font-black text-slate-900 uppercase truncate">{addr.label}</p>
                     {addr.isDefault && (
-                       <span className="text-[9px] bg-primary/10 text-primary-dark px-2 py-0.5 rounded-md font-black uppercase">{t("common.confirm")}</span>
+                       <span className="text-[9px] bg-primary text-white px-2 py-0.5 rounded-md font-black uppercase">{t("common.confirm")}</span>
                     )}
                   </div>
                   <p className="text-[11px] text-slate-500 font-medium leading-relaxed line-clamp-2">{addr.details}</p>
@@ -293,8 +321,14 @@ export default function ManageAddressesPage() {
                   </div>
                 </div>
  
-                <button className="text-slate-300 p-1 self-center hover:text-primary transition-colors">
-                  <Icons.ChevronRight size={18} />
+                <button 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleEditClick(addr);
+                  }}
+                  className="text-slate-300 p-3 self-center hover:text-primary transition-colors active:scale-90"
+                >
+                  <Icons.Edit size={20} />
                 </button>
               </div>
             </Card>
