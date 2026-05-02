@@ -91,11 +91,13 @@ export default function RiderOrderDetailPage() {
     "delivering_to_customer": "deliveryUser",
   };
 
+  const photoUploadRef = useRef<any>(null);
   const currentPhotoStep = photoSteps[status];
 
   const handleUpdateStatus = async (nextStatus: string) => {
     if (currentPhotoStep && !photo) {
-      alert(t("rider.photoStepDesc"));
+      // Automatically trigger camera if photo is missing
+      photoUploadRef.current?.triggerCapture();
       return;
     }
 
@@ -327,6 +329,7 @@ export default function RiderOrderDetailPage() {
              <Card className="p-6 border-none shadow-xl shadow-primary/5 rounded-[2rem] bg-white border border-primary/10 relative overflow-hidden group">
                 <div className="absolute -top-10 -right-10 w-32 h-32 bg-primary/5 rounded-full blur-2xl transition-all group-hover:bg-primary/10" />
                 <PhotoUpload 
+                  ref={photoUploadRef}
                   onPhotoCapture={(url) => setPhoto(url)} 
                   label={t(`rider.photoStep.${currentPhotoStep}`)}
                   required

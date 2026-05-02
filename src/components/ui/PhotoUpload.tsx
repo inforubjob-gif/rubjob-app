@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, forwardRef, useImperativeHandle } from "react";
 import { Icons } from "./Icons";
 import { useTranslation } from "@/components/providers/LanguageProvider";
 
@@ -10,17 +10,53 @@ interface PhotoUploadProps {
   required?: boolean;
 }
 
-export default function PhotoUpload({ onPhotoCapture, label, required }: PhotoUploadProps) {
+export interface PhotoUploadHandle {
+  triggerCapture: () => void;
+}
+
+const PhotoUpload = forwardRef<PhotoUploadHandle, PhotoUploadProps>(({ onPhotoCapture, label, required }, ref) => {
   const [preview, setPreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { t } = useTranslation();
 
+  useImperativeHandle(ref, () => ({
+    triggerCapture: () => {
+      fileInputRef.current?.click();
+    }
+  }));
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const url = URL.createObjectURL(file);
-      setPreview(url);
-      onPhotoCapture(url);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const img = new Image();
+        img.onload = () => {
+          // Compress image using canvas
+          const canvas = document.createElement("canvas");
+          let width = img.width;
+          let height = img.height;
+          
+          // Resize if too large
+          const MAX_WIDTH = 1000;
+          if (width > MAX_WIDTH) {
+            height *= MAX_WIDTH / width;
+            width = MAX_WIDTH;
+          }
+          
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext("2d");
+          ctx?.drawImage(img, 0, 0, width, height);
+          
+          // Output as compressed base64
+          const compressedBase64 = canvas.toDataURL("image/jpeg", 0.7);
+          setPreview(compressedBase64);
+          onPhotoCapture(compressedBase64);
+        };
+        img.src = reader.result as string;
+      };
+      reader.readAsDataURL(file);
     }
   };
 
@@ -69,4 +105,8 @@ export default function PhotoUpload({ onPhotoCapture, label, required }: PhotoUp
       </div>
     </div>
   );
-}
+});
+
+PhotoUpload.displayName = "PhotoUpload";
+
+export default PhotoUpload;
