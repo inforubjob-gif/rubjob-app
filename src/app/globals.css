@@ -38,6 +38,12 @@
   --shadow-nav: 0 -4px 16px rgba(0,0,0,0.04);
 }
 
+/* ─── Global Font Weight Reduction ─── */
+.font-black { font-weight: 700 !important; }    /* black -> bold (700) */
+.font-bold { font-weight: 500 !important; }     /* bold -> medium (500) */
+.font-semibold { font-weight: 400 !important; } /* semibold -> regular (400) */
+.font-medium { font-weight: 400 !important; }   /* medium -> regular (400) */
+
 /* ─── Base ─── */
 html {
   -webkit-tap-highlight-color: transparent;
