@@ -170,6 +170,7 @@ export function IconCircle({
     white:  "bg-white text-slate-900 border border-slate-100 shadow-slate-200/50",
     black:  "bg-[#1a1a1a] text-white shadow-black/20",
     slate:  "bg-slate-100 text-slate-500",
+    ghost:  "bg-transparent text-slate-900 shadow-none",
   };
 
   const sizes = {

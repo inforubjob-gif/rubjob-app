@@ -178,7 +178,7 @@ export default function ProfilePage() {
             {MENU_ITEMS.map((item) => {
               const content = (
                 <>
-                  <IconCircle variant="black" size="md">
+                  <IconCircle variant="ghost" size="md">
                     {item.icon}
                   </IconCircle>
                   <div className="flex-1 min-w-0">
@@ -217,8 +217,8 @@ export default function ProfilePage() {
               onClick={logout}
               className="w-full flex items-center gap-4 px-4 py-5 hover:bg-rose-50 transition-colors text-left group border-t border-slate-50"
             >
-              <IconCircle variant="black" size="md" className="group-hover:bg-rose-600 transition-colors">
-                <Icons.Lock size={20} className="text-white" />
+              <IconCircle variant="ghost" size="md" className="group-hover:text-rose-600 transition-colors">
+                <Icons.Lock size={20} />
               </IconCircle>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-bold text-rose-600">{t("profile.logout")}</p>
