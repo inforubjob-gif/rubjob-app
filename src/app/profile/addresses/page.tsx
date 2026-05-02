@@ -40,10 +40,20 @@ export default function ManageAddressesPage() {
   const [isSelectingLocation, setIsSelectingLocation] = useState(false);
   
   // Form State
+  const [editingAddressId, setEditingAddressId] = useState<string | null>(null);
   const [newLabel, setNewLabel] = useState("");
   const [newAddress, setNewAddress] = useState("");
   const [newNote, setNewNote] = useState("");
   const [location, setLocation] = useState<{lat: number, lng: number} | null>(null);
+  
+  const handleEditClick = (addr: Address) => {
+    setEditingAddressId(addr.id || null);
+    setNewLabel(addr.label);
+    setNewAddress(addr.details);
+    setNewNote(addr.note || "");
+    setLocation({ lat: addr.lat || 13.7563, lng: addr.lng || 100.5018 });
+    setIsAdding(true);
+  };
  
   const handleAddAddress = async () => {
     if (!profile?.userId) return;
@@ -54,33 +64,40 @@ export default function ManageAddressesPage() {
  
     setIsSaving(true);
     try {
+      const isEditing = !!editingAddressId;
       const res = await fetch("/api/user/addresses", {
-        method: "POST",
+        method: isEditing ? "PUT" : "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          id: editingAddressId,
           userId: profile.userId,
           label: newLabel,
           details: newAddress,
           note: newNote,
           lat: location?.lat || 13.7563,
           lng: location?.lng || 100.5018,
-          isDefault: addresses.length === 0,
+          isDefault: !isEditing && addresses.length === 0,
         }),
       });
  
       const data = await res.json() as any;
       if (data.success) {
-        const newAddr: Address = {
-          id: data.id,
-          label: newLabel,
-          details: newAddress,
-          note: newNote,
-          lat: location?.lat || 13.7563,
-          lng: location?.lng || 100.5018,
-        };
- 
-        setAddresses([newAddr, ...addresses]);
+        if (isEditing) {
+          setAddresses(addresses.map(a => a.id === editingAddressId ? { ...a, label: newLabel, details: newAddress, note: newNote, lat: location?.lat || 0, lng: location?.lng || 0 } : a));
+        } else {
+          const newAddr: Address = {
+            id: data.id,
+            label: newLabel,
+            details: newAddress,
+            note: newNote,
+            lat: location?.lat || 13.7563,
+            lng: location?.lng || 100.5018,
+          };
+          setAddresses([newAddr, ...addresses]);
+        }
+  
         setIsAdding(false);
+        setEditingAddressId(null);
         setNewLabel("");
         setNewAddress("");
         setNewNote("");
@@ -177,10 +194,10 @@ export default function ManageAddressesPage() {
           <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t("profile.title")}</p>
         </div>
  
-        {/* Add Address Form (Premium Card) */}
+        {/* Add/Edit Address Form (Premium Card) */}
         {isAdding && (
           <Card className="p-6 bg-white shadow-xl shadow-primary/5 animate-in slide-in-from-top-4 duration-300 rounded-[2rem] border-slate-100">
-             <h2 className="text-sm font-black text-slate-900 uppercase tracking-tight mb-5">{t("profile.addNewAddress")}</h2>
+             <h2 className="text-sm font-black text-slate-900 uppercase tracking-tight mb-5">{editingAddressId ? t("profile.editAddress") || "แก้ไขที่อยู่" : t("profile.addNewAddress")}</h2>
              <div className="space-y-5">
                 <div>
                   <label className="text-[10px] font-black text-slate-400 uppercase mb-1.5 ml-1 block">{t("profile.addressLabel")}</label>
@@ -224,7 +241,7 @@ export default function ManageAddressesPage() {
                 
                 <div className="flex gap-3 pt-2">
                    <button 
-                     onClick={() => setIsAdding(false)}
+                     onClick={() => { setIsAdding(false); setEditingAddressId(null); setNewLabel(""); setNewAddress(""); setNewNote(""); setLocation(null); }}
                      className="flex-1 py-4 bg-slate-100 text-slate-500 rounded-[1.25rem] text-xs font-black uppercase active:scale-95 transition-transform"
                    >
                      {t("common.cancel")}
@@ -243,7 +260,7 @@ export default function ManageAddressesPage() {
  
         <div className="space-y-4">
           {addresses.map((addr) => (
-            <Card key={addr.id} className="p-0 overflow-hidden border-slate-100 shadow-xl shadow-slate-200/40 rounded-[1.75rem] active:scale-[0.99] transition-transform">
+            <Card key={addr.id} onClick={() => handleEditClick(addr)} className="p-0 overflow-hidden border-slate-100 shadow-xl shadow-slate-200/40 rounded-[1.75rem] active:scale-[0.99] transition-transform cursor-pointer">
               <div className="p-5 flex items-start gap-4">
                 {/* Icon Container */}
                 <div className="w-14 h-14 bg-slate-50 rounded-[1.25rem] flex items-center justify-center text-slate-400 shrink-0 border border-slate-100">

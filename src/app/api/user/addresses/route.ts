@@ -97,3 +97,34 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
+
+/**
+ * PUT /api/user/addresses
+ * Updates an existing address
+ */
+export async function PUT(req: Request) {
+  try {
+    const body = (await req.json()) as any;
+    const { id, label, details, note, lat, lng } = body;
+    
+    if (!id || !label || !details) {
+      return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+    }
+
+    const db = getRequestContext().env.DB;
+    if (!db) {
+      return NextResponse.json({ error: "D1 Database binding 'DB' not found" }, { status: 500 });
+    }
+
+    await db.prepare(`
+      UPDATE addresses 
+      SET label = ?, details = ?, note = ?, lat = ?, lng = ?
+      WHERE id = ?
+    `).bind(label, details, note, lat, lng, id).run();
+
+    return NextResponse.json({ success: true });
+  } catch (error: any) {
+    console.error("Update address error:", error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+}
