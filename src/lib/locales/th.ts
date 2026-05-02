@@ -314,8 +314,8 @@ export const th = {
       viewMyOrders: "ดูประวัติการสั่งซื้อ",
       speed: {
         standardTitle: "มาตรฐาน (บริการรอบมาตรฐาน)",
-        standardDesc: "รับผ้าภายใน 24 ชม. (ค่าส่ง ฿{fee})",
-        standardShort: "มาตรฐาน (24 ชม.)",
+        standardDesc: "รับผ้าภายใน 6-12 ชม. (ค่าส่ง ฿{fee})",
+        standardShort: "มาตรฐาน (6-12 ชม.)",
         expressTitle: "ด่วนพิเศษ (บริการด่วนภายในวัน) ⚡",
         expressDesc: "รับผ้าภายใน 6 ชม. (ค่าส่ง ฿{fee})",
         expressShort: "ด่วนพิเศษ (6 ชม.)",
