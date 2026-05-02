@@ -112,26 +112,36 @@ function BookingFlow() {
     return bestStore;
   }
 
+  const [isDataLoading, setIsDataLoading] = useState(true);
+  const [dataError, setDataError] = useState<string | null>(null);
+
   // Fetch real data from APIs
   useEffect(() => {
-    if (!profile?.userId) return;
+    // If profile is still loading from useLiff, wait
+    // If profile is null after loading, it means user is a guest or not logged in yet
+    if (!profile?.userId) {
+      // We still want to load services and stores even for guests to see the UI
+      // but addresses will be empty.
+    }
 
     async function fetchData() {
+      setIsDataLoading(true);
+      setDataError(null);
       try {
-        const [sRes, stRes, adRes, setRes] = await Promise.all([
-          fetch("/api/services"),
-          fetch("/api/stores"),
-          fetch(`/api/user/addresses?userId=${profile?.userId}`),
-          fetch("/api/admin/settings") // Fetch system settings
-        ]);
+        const fetchAddresses = profile?.userId 
+          ? fetch(`/api/user/addresses?userId=${profile?.userId}`).then(r => r.json())
+          : Promise.resolve({ addresses: [] });
 
-        const sData = (await sRes.json()) as any;
-        const stData = (await stRes.json()) as any;
-        const adData = (await adRes.json()) as any;
-        const setData = (await setRes.json()) as any;
+        const [sData, stData, adData, setData] = await Promise.all([
+          fetch("/api/services").then(r => r.json()),
+          fetch("/api/stores").then(r => r.json()),
+          fetchAddresses,
+          fetch("/api/admin/settings").then(r => r.json()).catch(() => ({ settings: [] }))
+        ]);
 
         if (sData?.services) setDbServices(sData.services);
         if (stData?.stores) setDbStores(stData.stores);
+        
         if (setData?.settings && Array.isArray(setData.settings)) {
           const settingsMap: Record<string, any> = {};
           setData.settings.forEach((s: any) => {
@@ -145,15 +155,17 @@ function BookingFlow() {
           if (adData.addresses.length > 0 && !selectedAddress) {
             const firstAddr = adData.addresses[0];
             setSelectedAddress(firstAddr);
-            // Auto-assign store for default address
             if (stData?.stores) {
               const store = autoAssignStore(firstAddr, stData.stores);
               if (store) setSelectedStore(store);
             }
           }
         }
-      } catch (err) {
+      } catch (err: any) {
         console.error("Failed to fetch booking data:", err);
+        setDataError(err.message || "Failed to load booking data");
+      } finally {
+        setIsDataLoading(false);
       }
     }
     fetchData();
@@ -373,7 +385,66 @@ function BookingFlow() {
     }
   }
 
-  // Handle platform closed state
+  // 1. Loading State
+  if (isDataLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-dvh bg-slate-50 gap-4">
+        <div className="w-12 h-12 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
+        <p className="text-sm font-black text-slate-400 uppercase tracking-widest">{t("common.loading")}</p>
+      </div>
+    );
+  }
+
+  // 2. Error State
+  if (dataError) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-dvh px-10 text-center bg-slate-50">
+        <IconCircle variant="orange" size="lg" className="mb-6">
+          <Icons.AlertCircle size={32} />
+        </IconCircle>
+        <h2 className="text-xl font-black text-slate-900">{t("common.error")}</h2>
+        <p className="text-slate-500 mt-2 text-sm font-bold">{dataError}</p>
+        <Button 
+          className="mt-8 rounded-xl font-black px-10 shadow-lg shadow-primary/20"
+          onClick={() => window.location.reload()}
+        >
+          {t("common.retry")}
+        </Button>
+      </div>
+    );
+  }
+
+  // 3. Login Required
+  if (!profile?.userId) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-dvh px-10 text-center bg-slate-50">
+        <div className="w-24 h-24 bg-white rounded-3xl shadow-xl flex items-center justify-center mb-8 border border-slate-100 rotate-3">
+           <Icons.Logo variant="icon" size={48} className="text-primary" />
+        </div>
+        <h2 className="text-2xl font-black text-slate-900">{t("booking.loginRequiredTitle") || "เข้าสู่ระบบเพื่อจองงาน"}</h2>
+        <p className="text-slate-500 mt-3 font-bold text-sm leading-relaxed">
+          {t("booking.loginRequiredDesc") || "กรุณาเข้าสู่ระบบผ่าน LINE เพื่อเริ่มขั้นตอนการสั่งบริการซักอบรีด"}
+        </p>
+        <Button 
+          className="mt-10 w-full rounded-2xl font-black py-4 shadow-xl shadow-primary/20"
+          onClick={() => {
+            // Trigger LIFF login or redirect to login page if available
+            window.location.href = "/";
+          }}
+        >
+          {t("common.login")}
+        </Button>
+        <button 
+          onClick={() => router.push("/")}
+          className="mt-6 text-xs font-black text-slate-400 uppercase tracking-widest"
+        >
+          {t("common.goHome")}
+        </button>
+      </div>
+    );
+  }
+
+  // 4. Handle platform closed state
   if (isLoaded && systemSettings.is_open === "false") {
     return (
       <div className="flex flex-col items-center justify-center min-h-dvh px-10 text-center animate-fade-in bg-slate-50">
@@ -382,7 +453,7 @@ function BookingFlow() {
         </div>
         <h2 className="text-2xl font-black text-slate-900">{t("booking.errors.systemClosedTitle")}</h2>
         <p className="text-slate-500 mt-3 font-medium leading-relaxed">
-          {t("booking.errors.systemClosedDesc").split("\n").map((line, i) => (
+          {t("booking.errors.systemClosedDesc")?.split("\n").map((line: string, i: number) => (
             <span key={i}>{line}{i === 0 && <br/>}</span>
           ))}
         </p>
