@@ -130,23 +130,23 @@ function BookingFlow() {
         const adData = (await adRes.json()) as any;
         const setData = (await setRes.json()) as any;
 
-        if (sData.services) setDbServices(sData.services);
-        if (stData.stores) setDbStores(stData.stores);
-        if (setData.settings) {
+        if (sData?.services) setDbServices(sData.services);
+        if (stData?.stores) setDbStores(stData.stores);
+        if (setData?.settings && Array.isArray(setData.settings)) {
           const settingsMap: Record<string, any> = {};
           setData.settings.forEach((s: any) => {
-            settingsMap[s.key] = s.value;
+            if (s.key) settingsMap[s.key] = s.value;
           });
           setSystemSettings(settingsMap);
         }
         
-        if (adData.addresses) {
+        if (adData?.addresses && Array.isArray(adData.addresses)) {
           setDbAddresses(adData.addresses);
           if (adData.addresses.length > 0 && !selectedAddress) {
             const firstAddr = adData.addresses[0];
             setSelectedAddress(firstAddr);
             // Auto-assign store for default address
-            if (stData.stores) {
+            if (stData?.stores) {
               const store = autoAssignStore(firstAddr, stData.stores);
               if (store) setSelectedStore(store);
             }
