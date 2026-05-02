@@ -122,23 +122,32 @@ export default function AppWrapper({ children }: { children: React.ReactNode }) 
   }
 
   if (!isLoggedIn) {
-    if (isBackoffice) {
+    if (isBackoffice || isLanding || isApi) {
       return <>{children}</>;
     }
     return <LoginView />;
   }
 
-  // If on backoffice, don't check onboarding at all
+  // If on backoffice, don't check onboarding at all - return early before the loading state
   if (isBackoffice) {
     return <>{children}</>;
   }
 
-  // Still checking onboarding status
-  if (needsOnboarding === null || checkingOnboarding) {
+  // Still checking onboarding status for customers
+  if ((needsOnboarding === null || checkingOnboarding) && !isBackoffice && !isLanding && !isApi) {
+    // Add a safety timeout: If still loading after 4 seconds, just show children
     return (
       <div className="flex flex-col items-center justify-center min-h-dvh bg-slate-50">
         <div className="w-12 h-12 border-4 border-primary/20 border-t-primary rounded-full animate-spin mb-4" />
         <p className="text-[10px] font-black text-slate-400 uppercase animate-pulse">Loading your profile...</p>
+        
+        {/* Fail-safe button if stuck */}
+        <button 
+          onClick={() => setNeedsOnboarding(false)}
+          className="mt-12 text-[10px] font-black text-slate-300 uppercase underline underline-offset-4"
+        >
+          Skip Loading
+        </button>
       </div>
     );
   }

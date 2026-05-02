@@ -117,43 +117,47 @@ export default function LiffProvider({ children }: { children: ReactNode }) {
           statusMessage: liffProfile.statusMessage,
         };
 
-        // Sync with Cloudflare D1
-        let mergedProfile = { ...profile };
-        try {
-          await fetch("/api/user/sync", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              id: profile.userId,
-              displayName: profile.displayName,
-              pictureUrl: profile.pictureUrl
-            }),
-          });
-
-          // Fetch extra DB fields (role, assignedStoreId)
-          const dbRes = await fetch(`/api/user/${profile.userId}`);
-          const dbData = await dbRes.json() as any;
-          if (dbData.user) {
-            mergedProfile = {
-              ...profile,
-              role: dbData.user.role,
-              assignedStoreId: dbData.user.assignedStoreId,
-              phone: dbData.user.phone
-            };
-          }
-        } catch (err) {
-          console.error("Failed to sync/fetch user with D1:", err);
-        }
-
-        setCtx({
+        // Set initial profile immediately so UI can unblock
+        setCtx(prev => ({
+          ...prev,
           isReady: true,
           isLoggedIn: true,
           isInClient,
-          profile: mergedProfile,
-          error: null,
+          profile,
           login: handleLogin,
           logout: handleLogout,
-        });
+        }));
+
+        // Background Sync with Cloudflare D1
+        (async () => {
+          try {
+            await fetch("/api/user/sync", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                id: profile.userId,
+                displayName: profile.displayName,
+                pictureUrl: profile.pictureUrl
+              }),
+            });
+
+            const dbRes = await fetch(`/api/user/${profile.userId}`);
+            if (dbRes.ok) {
+              const dbData = await dbRes.json() as any;
+              if (dbData.user) {
+                const mergedProfile = {
+                  ...profile,
+                  role: dbData.user.role,
+                  assignedStoreId: dbData.user.assignedStoreId,
+                  phone: dbData.user.phone
+                };
+                setCtx(prev => ({ ...prev, profile: mergedProfile }));
+              }
+            }
+          } catch (err) {
+            console.error("Background sync failed:", err);
+          }
+        })();
       } catch (err) {
         console.error("[RUBJOB] LIFF init failed:", err);
         setCtx(prev => ({

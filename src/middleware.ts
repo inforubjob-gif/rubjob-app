@@ -52,6 +52,7 @@ function extractSubdomain(hostname: string): string | null {
   // Strip port (e.g. "admin.lvh.me:3000" → "admin.lvh.me")
   const host = hostname.split(":")[0];
 
+  // 1. Try exact match against root domains
   for (const root of ROOT_DOMAINS) {
     if (host === root) {
       return ""; // Bare domain, no subdomain
@@ -65,7 +66,28 @@ function extractSubdomain(hostname: string): string | null {
     }
   }
 
-  return null; // Unknown domain (e.g. localhost during dev)
+  // 2. Fallback for Cloudflare Pages preview URLs (*.pages.dev)
+  if (host.endsWith(".pages.dev")) {
+    const parts = host.split(".");
+    // If it's like admin.project.pages.dev (length 4)
+    if (parts.length >= 4) {
+      return parts[0];
+    }
+    // If it's like project.pages.dev (length 3)
+    return "";
+  }
+
+  // 3. Fallback for development (localhost, lvh.me with subdomains)
+  const parts = host.split(".");
+  if (parts.length > 1) {
+     const sub = parts[0];
+     // Recognize common subdomains even if the root isn't explicitly listed
+     if (["admin", "rider", "store", "provider", "app"].includes(sub)) {
+        return sub;
+     }
+  }
+
+  return null; // Unknown domain
 }
 
 export default function middleware(req: NextRequest) {
@@ -146,8 +168,7 @@ export default function middleware(req: NextRequest) {
     return response;
   }
 
-  // ─── Unknown subdomain — redirect to root domain ───
-  const rootDomain = ROOT_DOMAINS.find((d) => hostname.includes(d)) || ROOT_DOMAINS[0];
-  const port = hostname.includes(":") ? `:${hostname.split(":")[1]}` : "";
-  return NextResponse.redirect(new URL(`${url.protocol}//${rootDomain}${port}/`));
+  // 4. Default fallback: serve the main app for unrecognized domains
+  // Instead of redirecting to the root domain, we just let it serve the root files.
+  return NextResponse.next();
 }

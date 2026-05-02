@@ -128,16 +128,18 @@ function BookingFlow() {
       setIsDataLoading(true);
       setDataError(null);
       try {
-        const fetchAddresses = profile?.userId 
-          ? fetch(`/api/user/addresses?userId=${profile?.userId}`).then(r => r.json())
-          : Promise.resolve({ addresses: [] });
-
-        const [sData, stData, adData, setData] = await Promise.all([
-          fetch("/api/services").then(r => r.json()),
-          fetch("/api/stores").then(r => r.json()),
-          fetchAddresses,
-          fetch("/api/admin/settings").then(r => r.json()).catch(() => ({ settings: [] }))
+        // Individual fetching with safe fallbacks
+        const [sRes, stRes, adRes, setRes] = await Promise.all([
+          fetch("/api/services").catch(() => null),
+          fetch("/api/stores").catch(() => null),
+          profile?.userId ? fetch(`/api/user/addresses?userId=${profile.userId}`).catch(() => null) : Promise.resolve(null),
+          fetch("/api/admin/settings").catch(() => null)
         ]);
+
+        const sData = sRes?.ok ? await sRes.json() : { services: [] };
+        const stData = stRes?.ok ? await stRes.json() : { stores: [] };
+        const adData = adRes?.ok ? await adRes.json() : { addresses: [] };
+        const setData = setRes?.ok ? await setRes.json() : { settings: [] };
 
         if (sData?.services) setDbServices(sData.services);
         if (stData?.stores) setDbStores(stData.stores);

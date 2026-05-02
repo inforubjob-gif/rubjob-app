@@ -100,7 +100,7 @@ export default function StoreOrderDetailPage() {
             </div>
             <div className="text-right">
               <p className="text-[10px] font-black text-slate-300 uppercase leading-none mb-1.5">{t("common.store")}</p>
-              <p className="text-xs font-black text-slate-900">{t("store.unitNo")} #A12</p>
+              <p className="text-xs font-black text-slate-900">{t("store.unitNo")} #{order?.storeId?.split('-')[1] || '001'}</p>
             </div>
           </div>
 
@@ -111,7 +111,7 @@ export default function StoreOrderDetailPage() {
              </IconCircle>
              <div className="flex-1 min-w-0">
                 <p className="text-[10px] font-black text-slate-300 uppercase">{t("store.customer")}</p>
-                <p className="text-sm font-black text-slate-900 truncate">Customer #TR-88</p>
+                <p className="text-sm font-black text-slate-900 truncate">{order?.userName || t("common.guest")}</p>
              </div>
           </div>
         </Card>
@@ -128,7 +128,7 @@ export default function StoreOrderDetailPage() {
                        </IconCircle>
                        <div>
                           <h4 className={`text-sm font-black uppercase ${status === 'delivering_to_store' ? 'text-primary-dark' : 'text-slate-400'}`}>{t("store.incomingFromRider")}</h4>
-                          <p className="text-[10px] font-bold text-slate-400 uppercase">{t("store.arriving")} • {t("store.riderNo")} #RD-99</p>
+                          <p className="text-[10px] font-bold text-slate-400 uppercase">{t("store.arriving")} • {t("store.riderNo")} #{order?.riderId?.split('-')[1] || 'RD-01'}</p>
                        </div>
                    </div>
                 </div>

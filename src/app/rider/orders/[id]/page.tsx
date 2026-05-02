@@ -92,11 +92,22 @@ export default function RiderOrderDetailPage() {
   };
 
   const photoUploadRef = useRef<any>(null);
+  const [autoSubmitAfterPhoto, setAutoSubmitAfterPhoto] = useState(false);
   const currentPhotoStep = photoSteps[status];
 
-  const handleUpdateStatus = async (nextStatus: string) => {
-    if (currentPhotoStep && !photo) {
+  // Auto-submit effect when photo is captured
+  useEffect(() => {
+    if (autoSubmitAfterPhoto && photo) {
+      setAutoSubmitAfterPhoto(false);
+      handleUpdateStatus(getNextStatus(status), photo);
+    }
+  }, [photo, autoSubmitAfterPhoto, status]);
+
+  const handleUpdateStatus = async (nextStatus: string, photoOverride?: string) => {
+    const activePhoto = photoOverride || photo;
+    if (currentPhotoStep && !activePhoto) {
       // Automatically trigger camera if photo is missing
+      setAutoSubmitAfterPhoto(true);
       photoUploadRef.current?.triggerCapture();
       return;
     }
@@ -106,10 +117,11 @@ export default function RiderOrderDetailPage() {
       await fetch(`/api/rider/orders/${id}/status`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status: nextStatus, photo }),
+        body: JSON.stringify({ status: nextStatus, photo: activePhoto }),
       });
       setStatus(nextStatus);
       setPhoto(null);
+      setAutoSubmitAfterPhoto(false);
       
       // Auto-redirection for states that end the current rider leg
       if (nextStatus === "washing" || nextStatus === "completed") {
@@ -250,7 +262,7 @@ export default function RiderOrderDetailPage() {
                     <h3 className="text-base font-black text-slate-900 uppercase">{order?.userName || t("common.guest")}</h3>
                     <div className="flex items-center gap-1.5 mt-1">
                        <span className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_5px_rgba(16,185,129,0.5)]" />
-                       <p className="text-xs text-slate-500 font-bold uppercase">{t("rider.profile.verifiedHero")} — {t("tiers.silver")}</p>
+                       <p className="text-xs text-slate-500 font-bold uppercase">{t("rider.profile.verifiedHero")} — {order?.isExpress ? t("tiers.platinum") : t("tiers.silver")}</p>
                     </div>
                 </div>
                 <div className="flex gap-2">

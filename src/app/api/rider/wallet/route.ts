@@ -127,7 +127,7 @@ export async function POST(req: Request) {
 
     await db.prepare(`
       INSERT INTO payout_requests (id, requesterId, requesterType, amount, bankName, accountNumber, accountName, status)
-      VALUES (?, ?, 'driver', ?, ?, ?, ?, 'pending')
+      VALUES (?, ?, 'rider', ?, ?, ?, ?, 'pending')
     `).bind(id, riderId, amount, bankName || "N/A", accountNumber || "N/A", accountName || "N/A").run();
 
     return NextResponse.json({ success: true, payoutId: id });

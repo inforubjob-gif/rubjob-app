@@ -33,13 +33,20 @@ export default function RiderDashboard() {
 
   useEffect(() => {
     // Check Local Session (Unified identity for riders)
-    const localSession = localStorage.getItem("rubjob_rider_session");
-    if (localSession) {
-      const parsed = JSON.parse(localSession);
-      setRider(parsed);
-      fetchRiderData(parsed.id);
-    } else {
-      setIsLoading(false); 
+    try {
+      const localSession = localStorage.getItem("rubjob_rider_session");
+      if (localSession) {
+        const parsed = JSON.parse(localSession);
+        setRider(parsed);
+        fetchRiderData(parsed.id);
+      } else {
+        setIsLoading(false); 
+        router.push("/rider/login");
+      }
+    } catch (err) {
+      console.error("Session parse error:", err);
+      localStorage.removeItem("rubjob_rider_session");
+      setIsLoading(false);
       router.push("/rider/login");
     }
   }, [router]);

@@ -24,11 +24,16 @@ export default function RiderWalletPage() {
   const [riderSession, setRiderSession] = useState<any>(null);
 
   useEffect(() => {
-    const localSession = localStorage.getItem("rubjob_rider_session");
-    if (localSession) {
-      const parsed = JSON.parse(localSession);
-      setRiderSession(parsed);
-    } else {
+    try {
+      const localSession = localStorage.getItem("rubjob_rider_session");
+      if (localSession) {
+        const parsed = JSON.parse(localSession);
+        setRiderSession(parsed);
+      } else {
+        window.location.href = "/rider/login";
+      }
+    } catch (err) {
+      console.error("Session parse error:", err);
       window.location.href = "/rider/login";
     }
   }, []);
@@ -96,7 +101,7 @@ export default function RiderWalletPage() {
           <div className="relative z-10">
             <p className="text-[10px] font-black text-white/50 uppercase mb-2">{t("rider.wallet.balance")}</p>
             <div className="flex items-baseline justify-center gap-2 mb-8 text-white">
-              <span className="text-5xl font-black drop-shadow-md">฿{Math.ceil(balance).toLocaleString()}</span>
+              <span className="text-5xl font-black drop-shadow-md">฿{(Number(balance) || 0).toLocaleString()}</span>
             </div>
             <div className="flex gap-3 max-w-xs mx-auto">
                <Button 
@@ -123,11 +128,18 @@ export default function RiderWalletPage() {
                   </div>
                   <div className="flex-1">
                     <p className="text-sm font-bold text-slate-900">{t(`rider.wallet.types.${trx.type}`) || trx.type}</p>
-                    <p className="text-[10px] text-slate-400 font-medium uppercase">{trx.date}</p>
+                    <p className="text-[10px] text-slate-400 font-medium uppercase">
+                      {new Date(trx.date).toLocaleDateString('th-TH', { 
+                        day: 'numeric', 
+                        month: 'short', 
+                        hour: '2-digit', 
+                        minute: '2-digit' 
+                      })}
+                    </p>
                   </div>
                   <div className="text-right">
                     <p className={`text-sm font-black ${trx.amount > 0 ? 'text-green-600' : 'text-slate-900'}`}>
-                      {trx.amount > 0 ? `+฿${Math.ceil(trx.amount)}` : `-฿${Math.ceil(Math.abs(trx.amount))}`}
+                      {trx.amount > 0 ? `+฿${(Number(trx.amount) || 0).toLocaleString()}` : `-฿${(Math.abs(Number(trx.amount) || 0)).toLocaleString()}`}
                     </p>
                     <p className="text-[9px] font-bold text-slate-400 uppercase">{t(`rider.wallet.statuses.${trx.status}`) || trx.status}</p>
                   </div>

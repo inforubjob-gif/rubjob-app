@@ -32,6 +32,15 @@ export default function PinLock({ type, userId, onVerified, children }: PinLockP
     try {
       const url = `/api/user/pin?type=${type}${userId ? `&userId=${userId}` : ""}`;
       const res = await fetch(url);
+      
+      if (res.status === 401) {
+        // Not logged in, redirect to respective portal login
+        if (type === "rider") router.replace("/rider/login");
+        else if (type === "store") router.replace("/store/login");
+        else if (type === "customer") router.replace("/");
+        return;
+      }
+
       const data = await res.json() as any;
       setHasPin(data.hasPin);
       if (!data.hasPin) {
@@ -160,23 +169,23 @@ export default function PinLock({ type, userId, onVerified, children }: PinLockP
     // Force focus on mount to trigger keyboard
     const timer = setTimeout(() => {
       pinInputRef.current?.focus();
-    }, 300);
+    }, 500);
     return () => clearTimeout(timer);
-  }, []);
+  }, [isLocked, step]);
 
   return (
     <div 
       className="fixed inset-0 bg-slate-50 z-[10000] flex flex-col touch-none"
     >
       {/* Top Header with Back Button - High Z-index to be clickable */}
-      <header className="px-5 pt-12 pb-4 flex items-center relative z-[10001]">
+      <header className="px-5 pt-12 pb-4 flex items-center relative z-[10002]">
         <button
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
             router.back();
           }}
-          className="w-10 h-10 rounded-xl bg-white shadow-md border border-slate-100 flex items-center justify-center text-slate-900 active:scale-95 transition-transform"
+          className="w-10 h-10 rounded-xl bg-white shadow-md border border-slate-100 flex items-center justify-center text-slate-900 active:scale-95 transition-transform pointer-events-auto"
         >
           <Icons.Back size={18} />
         </button>
@@ -200,8 +209,8 @@ export default function PinLock({ type, userId, onVerified, children }: PinLockP
           {t(`${type}.wallet.pin.instruction`)}
         </p>
 
-        {/* PIN Dots */}
-        <div className="flex gap-4 mb-12 relative z-20">
+        {/* PIN Dots - Moved higher to avoid keyboard */}
+        <div className="flex gap-4 mb-8 relative z-20">
           {[...Array(6)].map((_, i) => (
             <div 
               key={i} 
@@ -215,12 +224,36 @@ export default function PinLock({ type, userId, onVerified, children }: PinLockP
         </div>
 
         {error && (
-          <p className="text-[11px] font-black text-rose-500 mb-8 animate-shake bg-rose-50 px-4 py-2 rounded-full border border-rose-100 relative z-20">
+          <p className="text-[11px] font-black text-rose-500 mb-6 animate-shake bg-rose-50 px-4 py-2 rounded-full border border-rose-100 relative z-20">
             {error}
           </p>
         )}
 
-        {/* Hidden Input - covering area but below header and dots for z-order */}
+        {/* Manual Focus Trigger for Mobile */}
+        <div className="relative z-[60] flex flex-col items-center gap-4">
+          <button 
+            onClick={() => pinInputRef.current?.focus()}
+            className="text-[10px] font-black text-slate-300 uppercase tracking-widest animate-pulse px-6 py-2"
+          >
+            {t("common.tapToEnterPin") || "แตะเพื่อใส่รหัส"}
+          </button>
+
+          {step === "confirm" && (
+             <button 
+               onClick={(e) => { 
+                 e.stopPropagation();
+                 setStep("setup"); 
+                 setPin(""); 
+                 setConfirmPin(""); 
+               }}
+               className="text-xs font-black text-primary uppercase cursor-pointer py-2"
+             >
+               {t("common.back")}
+             </button>
+          )}
+        </div>
+
+        {/* Hidden Input - covering only the bottom area to avoid blocking back button */}
         <input
           ref={pinInputRef}
           type="tel"
@@ -237,32 +270,8 @@ export default function PinLock({ type, userId, onVerified, children }: PinLockP
             }
           }}
           autoFocus
-          className="absolute inset-0 w-full h-full opacity-0 z-[50] cursor-default"
+          className="absolute bottom-0 left-0 right-0 h-2/3 opacity-0 z-[50] cursor-default"
         />
-
-        {/* Manual Focus Trigger for Mobile */}
-        <div className="relative z-[60] flex flex-col items-center gap-6">
-          <button 
-            onClick={() => pinInputRef.current?.focus()}
-            className="text-[10px] font-black text-slate-300 uppercase tracking-widest animate-pulse px-6 py-2"
-          >
-            {t("common.tapToEnterPin") || "แตะเพื่อใส่รหัส"}
-          </button>
-
-          {step === "confirm" && (
-             <button 
-               onClick={(e) => { 
-                 e.stopPropagation();
-                 setStep("setup"); 
-                 setPin(""); 
-                 setConfirmPin(""); 
-               }}
-               className="text-xs font-black text-primary uppercase cursor-pointer"
-             >
-               {t("common.back")}
-             </button>
-          )}
-        </div>
       </div>
     </div>
   );

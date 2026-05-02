@@ -85,16 +85,16 @@ export default function StoreWalletPage() {
         <header className="bg-primary text-white px-5 pt-12 pb-10 rounded-b-2xl shadow-xl relative overflow-hidden text-center">
           <div className="absolute top-0 right-0 w-40 h-40 bg-white/20 rounded-full -mr-20 -mt-20 blur-3xl" />
           <div className="relative z-10">
-            <p className="text-[10px] font-black text-white/50 uppercase mb-2">{t("staff.wallet.availableBalance")}</p>
+            <p className="text-[10px] font-black text-white/50 uppercase mb-2">{t("store.wallet.availableBalance")}</p>
             <div className="flex items-baseline justify-center gap-2 mb-8 text-white">
-              <span className="text-5xl font-black drop-shadow-md">฿{Math.ceil(balance).toLocaleString()}</span>
+              <span className="text-5xl font-black drop-shadow-md">฿{(Number(balance) || 0).toLocaleString()}</span>
             </div>
             <div className="flex gap-3 max-w-xs mx-auto">
                <Button 
                  onClick={() => setIsModalOpen(true)}
                  className="flex-1 bg-white/20 backdrop-blur-lg text-white border border-white/40 shadow-xl py-4 font-black text-sm uppercase active:scale-95 transition-all"
                >
-                  <Icons.Payment size={18} className="mr-2" /> {t("staff.wallet.withdraw")}
+                  <Icons.Payment size={18} className="mr-2" /> {t("store.wallet.withdraw")}
                </Button>
                <button className="w-14 h-14 rounded-xl bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/20 active:scale-95 transition-transform shadow-lg">
                   <Icons.Clock size={20} className="text-white" />
@@ -105,7 +105,7 @@ export default function StoreWalletPage() {
 
         <div className="flex-1 px-5 py-8 space-y-6 pb-24 animate-fade-in">
           <section>
-            <h2 className="text-xs font-black text-slate-400 uppercase mb-4 px-1">{t("staff.wallet.history")}</h2>
+            <h2 className="text-xs font-black text-slate-400 uppercase mb-4 px-1">{t("store.wallet.history")}</h2>
             <div className="space-y-3">
               {transactions.map((trx) => (
                 <div key={trx.id} className="bg-white p-4 rounded-xl border border-slate-100 shadow-sm flex items-center gap-4">
@@ -114,13 +114,20 @@ export default function StoreWalletPage() {
                   </div>
                   <div className="flex-1">
                     <p className="text-sm font-bold text-slate-900">{trx.type}</p>
-                    <p className="text-[10px] text-slate-400 font-medium uppercase">{trx.date}</p>
+                    <p className="text-[10px] text-slate-400 font-medium uppercase">
+                      {new Date(trx.date).toLocaleDateString('th-TH', { 
+                        day: 'numeric', 
+                        month: 'short', 
+                        hour: '2-digit', 
+                        minute: '2-digit' 
+                      })}
+                    </p>
                   </div>
                   <div className="text-right">
                     <p className={`text-sm font-black ${trx.amount > 0 ? 'text-green-600' : 'text-slate-900'}`}>
-                      {trx.amount > 0 ? `+฿${Math.ceil(trx.amount)}` : `-฿${Math.ceil(Math.abs(trx.amount))}`}
+                      {trx.amount > 0 ? `+฿${(Number(trx.amount) || 0).toLocaleString()}` : `-฿${(Math.abs(Number(trx.amount) || 0)).toLocaleString()}`}
                     </p>
-                    <p className="text-[9px] font-bold text-slate-400 uppercase">{trx.status}</p>
+                    <p className="text-[9px] font-bold text-slate-400 uppercase">{t(`store.wallet.statuses.${trx.status}`) || trx.status}</p>
                   </div>
                 </div>
               ))}
@@ -189,10 +196,10 @@ export default function StoreWalletPage() {
                   
                   <Button 
                      onClick={handleWithdraw}
-                     disabled={!amount || parseInt(amount) < 100 || parseInt(amount) > balance || isProcessing}
+                     disabled={!amount || parseInt(amount) < 100 || (Number(amount) > balance) || isProcessing}
                      className="w-full py-5 bg-primary text-white rounded-xl font-black uppercase shadow-2xl shadow-primary/30"
                   >
-                     {isProcessing ? t("rider.wallet.processing") : t("staff.wallet.confirmWithdraw")}
+                     {isProcessing ? t("rider.wallet.processing") : t("store.wallet.confirmWithdraw")}
                   </Button>
                   <button 
                     onClick={closeModal}
@@ -208,7 +215,7 @@ export default function StoreWalletPage() {
                   <Icons.CheckCircle size={40} />
                </div>
                <p className="text-sm text-slate-500 font-bold leading-relaxed mb-10 max-w-[240px]">
-                  {t("staff.wallet.withdrawSuccessDesc")}
+                  {t("store.wallet.withdrawSuccessDesc")}
                </p>
                <Button 
                  onClick={closeModal}
