@@ -182,23 +182,27 @@ export default function OrderDetailPage() {
         )}
 
         {/* Review Section (New) */}
-        {order.status === "completed" && !order.rating && (
-          <Card className="p-6 bg-gradient-to-br from-white to-primary/5 border-primary/20 shadow-xl shadow-primary/5">
+         {order.status === "completed" && !order.rating && (
+          <Card className="p-8 border border-slate-100 bg-white">
              <div className="flex flex-col items-center text-center">
-                <div className="w-16 h-16 bg-primary-light rounded-2xl flex items-center justify-center text-3xl mb-4 animate-bounce-slow">
-                   ⭐️
+                <div className="w-14 h-14 bg-primary/10 rounded-full flex items-center justify-center text-primary mb-4">
+                   <Icons.Star size={28} fill="currentColor" />
                 </div>
-                <h3 className="text-lg font-black text-foreground mb-1">{t("orders.review.title") || "ให้คะแนนบริการนี้"}</h3>
-                <p className="text-xs text-muted mb-6">{t("orders.review.subtitle") || "ความเห็นของคุณช่วยพัฒนาการบริการให้ดียิ่งขึ้น"}</p>
+                <h3 className="text-lg font-black text-foreground mb-1">{t("orders.review.title")}</h3>
+                <p className="text-xs text-muted mb-8">{t("orders.review.subtitle")}</p>
                 
-                <div className="flex gap-3 mb-8">
+                <div className="flex gap-2 mb-8">
                    {[1, 2, 3, 4, 5].map((star) => (
                       <button 
                         key={star}
                         onClick={() => setRating(star)}
-                        className={`text-3xl transition-all duration-300 transform ${rating >= star ? "scale-125 grayscale-0" : "grayscale opacity-30 hover:opacity-50 hover:scale-110"}`}
+                        className={`transition-all duration-200 ${rating >= star ? "text-primary scale-110" : "text-slate-200 hover:text-slate-300"}`}
                       >
-                         ⭐
+                         <Icons.Star 
+                           size={36} 
+                           fill={rating >= star ? "currentColor" : "none"} 
+                           strokeWidth={rating >= star ? 0 : 2}
+                         />
                       </button>
                    ))}
                 </div>
