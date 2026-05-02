@@ -40,7 +40,7 @@ export default function RiderActiveHoursPage() {
   async function fetchPrefs(id: string) {
     try {
       const res = await fetch(`/api/users/preferences?userId=${id}`);
-      const data = await res.json();
+      const data = await res.json() as any;
       if (data.preferences?.activeHoursObj) {
         setWorkingHours(data.preferences.activeHoursObj);
       }

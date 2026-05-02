@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Card from "@/components/ui/Card";
 import Badge, { statusToBadgeVariant } from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
-import { Icons, getServiceIcon } from "@/components/ui/Icons";
+import { Icons, getServiceIcon, IconCircle } from "@/components/ui/Icons";
 import { useTranslation } from "@/components/providers/LanguageProvider";
 import { useStoreAuth } from "@/components/providers/StoreProvider";
 import CountdownTimer from "@/components/ui/CountdownTimer";
@@ -42,7 +42,7 @@ export default function StoreDashboard() {
 
         // Also fetch balance
         const walRes = await fetch(`/api/store/wallet?storeId=${storeId}`);
-        const walData = await walRes.json();
+        const walData = await walRes.json() as any;
         if (walData.balance !== undefined) setBalance(walData.balance);
 
         const prefRes = await fetch(`/api/store/preferences?storeId=${storeId}`);
@@ -159,7 +159,8 @@ export default function StoreDashboard() {
                     onClick={async () => {
                       try {
                         const res = await fetch(`/api/auth/link-line?accountId=${store.id}`);
-                        const { token } = await res.json();
+                        const data = await res.json() as any;
+                        const token = data.token;
                         const liffId = process.env.NEXT_PUBLIC_LIFF_ID;
                         window.location.href = `https://liff.line.me/${liffId}/auth/link-line?type=store&id=${store.id}&token=${token}`;
                       } catch (e) {

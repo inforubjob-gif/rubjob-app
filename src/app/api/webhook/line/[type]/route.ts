@@ -14,12 +14,12 @@ export const runtime = "edge";
  *   3. users.id → Customer (LINE Login users)
  *   4. None → Unknown / Guest
  */
-export async function POST(req: Request, { params }: { params: { type: string } }) {
+export async function POST(req: Request, { params }: { params: Promise<{ type: string }> }) {
   try {
     const db = getRequestContext().env.DB as any;
     if (!db) return NextResponse.json({ error: "D1 not found" }, { status: 500 });
     
-    const channelType = params.type; // 'regular' or 'help'
+    const channelType = (await params).type; // 'regular' or 'help'
     const bodyText = await req.text();
     let body: any = {};
     try { body = JSON.parse(bodyText); } catch(e) {}

@@ -274,11 +274,11 @@ export default function OrderDetailPage() {
             <div className="border-t border-dashed border-border pt-2 space-y-2">
               <div className="flex items-center justify-between text-sm">
                 <span className="text-muted">{t("booking.laundryFee") || "Laundry Fee"}</span>
-                <span className="font-semibold text-foreground">฿{order.laundryFee}</span>
+                <span className="font-semibold text-foreground">฿{Math.ceil(order.laundryFee)}</span>
               </div>
               <div className="flex items-center justify-between text-sm">
                 <span className="text-muted">{t("booking.deliveryFee") || "Delivery Fee"}</span>
-                <span className="font-semibold text-foreground">฿{order.deliveryFee}</span>
+                <span className="font-semibold text-foreground">฿{Math.ceil(order.deliveryFee)}</span>
               </div>
             </div>
             <div className="border-t border-border pt-2 flex items-center justify-between">

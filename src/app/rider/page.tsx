@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Card from "@/components/ui/Card";
 import Badge, { statusToBadgeVariant, statusLabel } from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
-import { Icons, getServiceIcon } from "@/components/ui/Icons";
+import { Icons, getServiceIcon, IconCircle } from "@/components/ui/Icons";
 import { useTranslation } from "@/components/providers/LanguageProvider";
 
 import Modal from "@/components/ui/Modal";
@@ -49,7 +49,7 @@ export default function RiderDashboard() {
     try {
       // Fetch Preferences (includes Work Status)
       const prefRes = await fetch(`/api/users/preferences?userId=${riderId}`);
-      const prefData = await prefRes.json();
+      const prefData = await prefRes.json() as any;
       if (prefData.preferences?.workStatus !== undefined) {
         setWorkStatus(prefData.preferences.workStatus);
       }
@@ -78,7 +78,7 @@ export default function RiderDashboard() {
 
       // Fetch Balance
       const walRes = await fetch(`/api/rider/wallet?riderId=${riderId}`);
-      const walData = await walRes.json();
+      const walData = await walRes.json() as any;
       if (walData.balance !== undefined) setBalance(walData.balance);
     } catch (err) {
       console.error("Failed to fetch rider dashboard data:", err);
@@ -111,7 +111,7 @@ export default function RiderDashboard() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ orderId: jobId, riderId: rider.id }),
       });
-      const data = await res.json();
+      const data = await res.json() as any;
       if (res.ok && data.success) {
         setSelectedJob(null);
         // Navigate to the job details page for next steps
@@ -141,7 +141,7 @@ export default function RiderDashboard() {
     const interval = setInterval(async () => {
       try {
         const res = await fetch(`/api/rider/orders?riderId=${rider.id}`);
-        const data = await res.json();
+        const data = await res.json() as any;
         
         if (data.available && data.available.length > availableJobs.length) {
           // New Job Found!
@@ -235,7 +235,7 @@ export default function RiderDashboard() {
           <div className="bg-white/10 backdrop-blur-md p-4 rounded-xl border border-white/10">
             <p className="text-xs font-black text-white/50 uppercase">{t("rider.earnings")}</p>
             <p className="text-3xl font-black mt-1 text-white">
-              ฿{balance.toLocaleString()}
+              ฿{Math.ceil(balance).toLocaleString()}
             </p>
           </div>
         </div>
@@ -258,7 +258,8 @@ export default function RiderDashboard() {
                     onClick={async () => {
                       try {
                         const res = await fetch(`/api/auth/link-line?accountId=${rider.id}`);
-                        const { token } = await res.json();
+                        const data = await res.json() as any;
+                        const token = data.token;
                         const liffId = process.env.NEXT_PUBLIC_LIFF_ID;
                         window.location.href = `https://liff.line.me/${liffId}/auth/link-line?type=rider&id=${rider.id}&token=${token}`;
                       } catch (e) {

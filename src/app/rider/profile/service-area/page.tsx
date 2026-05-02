@@ -39,7 +39,7 @@ export default function RiderServiceAreaPage() {
   async function fetchPrefs(id: string) {
     try {
       const res = await fetch(`/api/users/preferences?userId=${id}`);
-      const data = await res.json();
+      const data = await res.json() as any;
       if (data.preferences?.serviceAreaCoords) {
         const coords = typeof data.preferences.serviceAreaCoords === 'string' 
           ? JSON.parse(data.preferences.serviceAreaCoords) 

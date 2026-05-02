@@ -43,7 +43,7 @@ export default function RiderWalletPage() {
     if (!riderSession?.id) return;
     try {
       const res = await fetch(`/api/rider/wallet?riderId=${riderSession.id}`);
-      const data = await res.json();
+      const data = await res.json() as any;
       if (data.balance !== undefined) setBalance(data.balance);
       if (data.transactions) setTransactions(data.transactions);
     } catch (err) {
@@ -96,8 +96,7 @@ export default function RiderWalletPage() {
           <div className="relative z-10">
             <p className="text-[10px] font-black text-white/50 uppercase mb-2">{t("rider.wallet.balance")}</p>
             <div className="flex items-baseline justify-center gap-2 mb-8 text-white">
-              <span className="text-5xl font-black drop-shadow-md">฿{Math.floor(balance).toLocaleString()}</span>
-              <span className="text-lg font-bold opacity-50">.{(balance % 1).toFixed(2).split('.')[1]}</span>
+              <span className="text-5xl font-black drop-shadow-md">฿{Math.ceil(balance).toLocaleString()}</span>
             </div>
             <div className="flex gap-3 max-w-xs mx-auto">
                <Button 
@@ -128,7 +127,7 @@ export default function RiderWalletPage() {
                   </div>
                   <div className="text-right">
                     <p className={`text-sm font-black ${trx.amount > 0 ? 'text-green-600' : 'text-slate-900'}`}>
-                      {trx.amount > 0 ? `+฿${trx.amount}` : `-฿${Math.abs(trx.amount)}`}
+                      {trx.amount > 0 ? `+฿${Math.ceil(trx.amount)}` : `-฿${Math.ceil(Math.abs(trx.amount))}`}
                     </p>
                     <p className="text-[9px] font-bold text-slate-400 uppercase">{t(`rider.wallet.statuses.${trx.status}`) || trx.status}</p>
                   </div>

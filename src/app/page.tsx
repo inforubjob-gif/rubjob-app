@@ -5,7 +5,7 @@ import { useLiff } from "@/components/providers/LiffProvider";
 import Card from "@/components/ui/Card";
 import Badge, { statusToBadgeVariant, statusLabel } from "@/components/ui/Badge";
 // Removed mock import
-import { Icons, getServiceIcon } from "@/components/ui/Icons";
+import { Icons, getServiceIcon, IconCircle } from "@/components/ui/Icons";
 import { useTranslation } from "@/components/providers/LanguageProvider";
 
 import { useEffect, useState } from "react";
@@ -114,7 +114,7 @@ export default function HomePage() {
               </Link>
             </div>
             <div className="flex flex-col gap-5 stagger">
-              {activeOrders.map((order) => {
+              {activeOrders.map((order, i) => {
                 const serviceId = order.serviceId || order.service;
                 return (
                     <Link key={order.id} href={`/orders/${order.id}`}>

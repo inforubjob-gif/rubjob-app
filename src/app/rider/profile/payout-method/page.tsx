@@ -35,7 +35,7 @@ export default function PayoutMethodPage() {
   async function fetchPrefs(id: string) {
     try {
       const res = await fetch(`/api/users/preferences?userId=${id}`);
-      const data = await res.json();
+      const data = await res.json() as any;
       const p = data.preferences?.payoutMethod;
       if (p) {
         setMethod(p.type || "bank");

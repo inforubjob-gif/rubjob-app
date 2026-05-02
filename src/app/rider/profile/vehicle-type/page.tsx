@@ -31,7 +31,7 @@ export default function VehicleTypePage() {
   async function fetchPrefs(id: string) {
     try {
       const res = await fetch(`/api/users/preferences?userId=${id}`);
-      const data = await res.json();
+      const data = await res.json() as any;
       if (data.preferences?.vehicleType) {
         setSelectedVehicle(data.preferences.vehicleType);
       }

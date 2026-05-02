@@ -30,7 +30,7 @@ export default function PinLock({ type, userId, onVerified, children }: PinLockP
     try {
       const url = `/api/user/pin?type=${type}${userId ? `&userId=${userId}` : ""}`;
       const res = await fetch(url);
-      const data = await res.json();
+      const data = await res.json() as any;
       setHasPin(data.hasPin);
       if (!data.hasPin) {
         setStep("setup");
@@ -87,7 +87,7 @@ export default function PinLock({ type, userId, onVerified, children }: PinLockP
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action: "verify", pin, type, userId })
       });
-      const data = await res.json();
+      const data = await res.json() as any;
       if (data.success) {
         setIsLocked(false);
         onVerified();
@@ -113,7 +113,7 @@ export default function PinLock({ type, userId, onVerified, children }: PinLockP
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action: "setup", pin, type, userId })
       });
-      const data = await res.json();
+      const data = await res.json() as any;
       if (data.success) {
         setIsLocked(false);
         onVerified();

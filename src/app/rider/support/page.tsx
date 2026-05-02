@@ -41,7 +41,7 @@ export default function RiderSupportPage() {
   const fetchTickets = async () => {
     try {
       const res = await fetch("/api/support/tickets");
-      const data = await res.json();
+      const data = await res.json() as any;
       if (data.tickets) setTickets(data.tickets);
     } catch (err) {
       console.error("Failed to fetch tickets:", err);
@@ -53,7 +53,7 @@ export default function RiderSupportPage() {
   const fetchMessages = async (id: string) => {
     try {
       const res = await fetch(`/api/support/tickets?id=${id}`);
-      const data = await res.json();
+      const data = await res.json() as any;
       if (data.messages) setMessages(data.messages);
     } catch (err) {
       console.error("Failed to load messages:", err);
@@ -76,7 +76,7 @@ export default function RiderSupportPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
       });
-      const data = await res.json();
+      const data = await res.json() as any;
       if (data.success) {
         setNewMessage("");
         setNewSubject("");
