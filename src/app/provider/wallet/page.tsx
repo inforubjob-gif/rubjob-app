@@ -22,7 +22,7 @@ export default function ProviderWalletPage() {
     setIsLoading(true);
     try {
       const res = await fetch("/api/provider/wallet");
-      const data = await res.json();
+      const data = await res.json() as any;
       setBalance(data.balance || 0);
       setTransactions(data.transactions || []);
     } catch (err) {
@@ -44,7 +44,7 @@ export default function ProviderWalletPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ amount: amt }),
       });
-      const data = await res.json();
+      const data = await res.json() as any;
       if (res.ok && data.success) {
         alert("ส่งคำขอถอนเงินแล้ว จะโอนภายใน 24 ชม.");
         setShowWithdraw(false);

@@ -28,8 +28,8 @@ export default function StoreOrderDetailPage() {
     async function fetchOrder() {
       try {
         const res = await fetch(`/api/orders/${id}`);
-        const data = await res.json();
-        setOrder(data.order);
+        const data = await res.json() as any;
+        if (data.order) setOrder(data.order);
       } catch (err) {
         console.error("Fetch order detail failed:", err);
       } finally {

@@ -71,7 +71,7 @@ function SettingsContent() {
     setIsLoading(true);
     try {
       const res = await fetch("/api/admin/admins");
-      const data = await res.json();
+      const data = await res.json() as any;
       if (data.admins) setAdmins(data.admins);
     } catch (err) {
       setError(t("common.error"));
@@ -101,7 +101,7 @@ function SettingsContent() {
         fetchAdmins();
         setTimeout(() => setSuccess(""), 3000);
       } else {
-        const data = await res.json();
+        const data = await res.json() as any;
         setError(data.error || t("common.error"));
       }
     } catch (err) {
@@ -130,7 +130,7 @@ function SettingsContent() {
         await refreshAdmin();
         setTimeout(() => setSuccess(""), 3000);
       } else {
-        const data = await res.json();
+        const data = await res.json() as any;
         setError(data.error || t("common.error"));
       }
     } catch (err) {
@@ -154,7 +154,7 @@ function SettingsContent() {
         method: "POST",
         body: formData
       });
-      const data = await res.json();
+      const data = await res.json() as any;
       if (res.ok && data.url) {
         setProfileForm(prev => ({ ...prev, avatarUrl: data.url }));
         setSuccess(t("common.success"));
@@ -204,7 +204,7 @@ function SettingsContent() {
   async function fetchSettings() {
     try {
       const res = await fetch("/api/admin/settings");
-      const data = await res.json();
+      const data = await res.json() as any;
       if (data.settings) {
         setSystemSettings(data.settings);
         const settingsMap: Record<string, any> = {};

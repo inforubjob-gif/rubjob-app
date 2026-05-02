@@ -62,7 +62,7 @@ export default function GigBuilderPage() {
   async function fetchGigData(providerId: string, gigId: string) {
     try {
       const res = await fetch(`/api/provider/services?providerId=${providerId}`);
-      const data = await res.json();
+      const data = await res.json() as any;
       if (data.services) {
         const gig = data.services.find((s: any) => s.id === gigId);
         if (gig) {
@@ -124,7 +124,7 @@ export default function GigBuilderPage() {
         }),
       });
 
-      const data = await res.json();
+      const data = await res.json() as any;
       if (res.ok && data.success) {
         alert("บันทึกบริการสำเร็จ!");
         router.push("/provider/services");

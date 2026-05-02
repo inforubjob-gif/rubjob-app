@@ -9,7 +9,7 @@ import Badge, { statusToBadgeVariant, statusLabel } from "@/components/ui/Badge"
 import StatusTimeline from "@/components/ui/StatusTimeline";
 import Button from "@/components/ui/Button";
 // Removed mock import
-import { Icons, getServiceIcon } from "@/components/ui/Icons";
+import { Icons, getServiceIcon, IconCircle } from "@/components/ui/Icons";
 import { useTranslation } from "@/components/providers/LanguageProvider";
 import { useLiff } from "@/components/providers/LiffProvider";
 

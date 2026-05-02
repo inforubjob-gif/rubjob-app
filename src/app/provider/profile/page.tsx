@@ -33,7 +33,7 @@ export default function ProviderProfilePage() {
   async function fetchGigs(providerId: string) {
     try {
       const res = await fetch(`/api/provider/services?providerId=${providerId}`);
-      const data = await res.json();
+      const data = await res.json() as any;
       if (data.services) setGigs(data.services);
     } catch (e) {
       console.error(e);

@@ -22,7 +22,7 @@ export default function ProvidersAdminPage() {
     setIsLoading(true);
     try {
       const res = await fetch("/api/admin/providers");
-      const data = await res.json();
+      const data = await res.json() as any;
       if (data.providers) setProviders(data.providers);
     } catch (err) {
       console.error(err);

@@ -28,7 +28,7 @@ export default function ProviderServicesDashboard() {
     setIsLoading(true);
     try {
       const res = await fetch(`/api/provider/services?providerId=${providerId}`);
-      const data = await res.json();
+      const data = await res.json() as any;
       if (data.services) {
         setServices(data.services);
       }

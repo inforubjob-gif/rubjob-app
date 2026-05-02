@@ -25,7 +25,7 @@ export default function StoreServicesPage() {
   const fetchServices = async () => {
     try {
       const res = await fetch(`/api/store/services?storeId=${store?.id}`);
-      const data = await res.json();
+      const data = await res.json() as any;
       if (data.services) setServices(data.services);
     } catch (err) {
       console.error(err);

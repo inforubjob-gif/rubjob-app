@@ -6,7 +6,7 @@ import { RUBJOB_I18N, Language } from "@/lib/i18n";
 interface LanguageContextType {
   language: Language;
   setLanguage: (lang: Language) => void;
-  t: (path: string) => string;
+  t: (path: string, options?: any) => string;
 }
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
@@ -27,7 +27,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     localStorage.setItem("rubjob_lang", lang);
   };
 
-  const t = (path: string): string => {
+  const t = (path: string, options?: any): string => {
     try {
       const keys = path.split(".");
       const currentLang = language || "th";

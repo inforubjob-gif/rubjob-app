@@ -55,7 +55,7 @@ export default function ProviderDashboard() {
     try {
       // Fetch preferences (work status)
       const prefRes = await fetch(`/api/users/preferences?userId=${providerId}`);
-      const prefData = await prefRes.json();
+      const prefData = await prefRes.json() as any;
       if (prefData.preferences?.workStatus !== undefined) {
         setWorkStatus(prefData.preferences.workStatus);
       }
@@ -75,7 +75,7 @@ export default function ProviderDashboard() {
 
       // Fetch wallet balance
       const walRes = await fetch(`/api/provider/wallet?providerId=${providerId}`);
-      const walData = await walRes.json();
+      const walData = await walRes.json() as any;
       if (walData.balance !== undefined) setBalance(walData.balance);
     } catch (err) {
       console.error("Failed to fetch provider data:", err);
@@ -108,7 +108,7 @@ export default function ProviderDashboard() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ orderId: jobId, action: "accept" }),
       });
-      const data = await res.json();
+      const data = await res.json() as any;
       if (res.ok && data.success) {
         setSelectedJob(null);
         // Refresh
@@ -132,7 +132,7 @@ export default function ProviderDashboard() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ orderId: jobId, action }),
       });
-      const data = await res.json();
+      const data = await res.json() as any;
       if (res.ok && data.success) {
         fetchProviderData(provider.id);
       } else {

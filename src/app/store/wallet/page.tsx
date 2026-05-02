@@ -31,7 +31,7 @@ export default function StoreWalletPage() {
   const fetchWalletData = async () => {
     try {
       const res = await fetch(`/api/store/wallet?storeId=${store?.id}`);
-      const data = await res.json();
+      const data = await res.json() as any;
       if (data.balance !== undefined) setBalance(data.balance);
       if (data.transactions) setTransactions(data.transactions);
     } catch (err) {
@@ -63,7 +63,7 @@ export default function StoreWalletPage() {
         setIsSuccess(true);
         fetchWalletData();
       } else {
-        const data = await res.json();
+        const data = await res.json() as any;
         alert(data.error || t("store.wallet.withdrawError"));
       }
     } catch (err) {

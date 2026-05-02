@@ -92,7 +92,7 @@ export default function ProviderSetupPage() {
         }),
       });
 
-      const data = await res.json();
+      const data = await res.json() as any;
       if (res.ok && data.success) {
         // Update local session
         const newSession = {

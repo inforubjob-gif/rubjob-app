@@ -42,7 +42,7 @@ function LinkLineContent() {
           body: JSON.stringify({ type, accountId, lineUserId, token }),
         });
 
-        const data = await res.json();
+        const data = await res.json() as any;
 
         if (res.ok && data.success) {
           setStatus("success");

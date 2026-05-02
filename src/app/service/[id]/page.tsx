@@ -18,7 +18,7 @@ export default function GigLandingPage({ params }: { params: { id: string } }) {
     async function fetchGig() {
       try {
         const res = await fetch("/api/services");
-        const data = await res.json();
+        const data = await res.json() as any;
         if (data.services) {
           const found = data.services.find((s: any) => s.id === params.id);
           if (found) {
