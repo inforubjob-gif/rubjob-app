@@ -940,6 +940,7 @@ export const th = {
         users: "ผู้ใช้งานและบทบาท",
         stores: "จัดการร้านค้า",
         riders: "จัดการไรเดอร์",
+        providers: "ผู้ให้บริการ (Gigs)",
         coupons: "คูปองส่วนลด",
         finance: "การเงินและยอดโอน",
         support: "ศูนย์ช่วยเหลือ",

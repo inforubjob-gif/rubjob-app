@@ -134,6 +134,46 @@ export default function RiderDashboard() {
     router.push("/rider/login");
   };
 
+  // 🔔 In-App Notification Polling (Free & Fast)
+  useEffect(() => {
+    if (!rider?.id || !workStatus) return;
+
+    const interval = setInterval(async () => {
+      try {
+        const res = await fetch(`/api/rider/orders?riderId=${rider.id}`);
+        const data = await res.json();
+        
+        if (data.available && data.available.length > availableJobs.length) {
+          // New Job Found!
+          setAvailableJobs(data.available);
+          
+          // Play Notification Sound
+          const audio = new Audio("https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3");
+          audio.play().catch(() => console.log("Sound blocked by browser"));
+          
+          // Show browser notification if permitted
+          if (Notification.permission === "granted") {
+            new Notification("💸 มีงานใหม่เข้า!", {
+              body: `มีงานใหม่รอคุณอยู่ รายได้ดี กดรับงานด่วน!`,
+              icon: "/images/rubjob-logo.png"
+            });
+          }
+        } else if (data.available) {
+          setAvailableJobs(data.available);
+        }
+      } catch (e) {}
+    }, 15000); // Check every 15 seconds
+
+    return () => clearInterval(interval);
+  }, [rider?.id, workStatus, availableJobs.length]);
+
+  // Request notification permission
+  useEffect(() => {
+    if (typeof window !== "undefined" && "Notification" in window) {
+      Notification.requestPermission();
+    }
+  }, []);
+
   return (
     <div className="flex flex-col min-h-screen bg-slate-50 relative overflow-hidden">
       {/* Background Gradient Layer */}

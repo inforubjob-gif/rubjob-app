@@ -230,6 +230,25 @@ export default function RiderSupportPage() {
       </header>
 
       <div className="flex-1 px-5 pt-6 pb-24 space-y-4">
+        {/* ── LINE OA Direct Contact ── */}
+        <a
+          href="https://line.me/R/ti/p/@rubjob"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="block bg-gradient-to-r from-green-600 to-emerald-500 p-5 rounded-xl shadow-xl shadow-green-900/20 text-white active:scale-[0.98] transition-all"
+        >
+          <div className="flex items-center gap-4">
+            <div className="w-14 h-14 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center shrink-0">
+              <Icons.Line size={28} className="text-white" />
+            </div>
+            <div className="flex-1">
+              <h3 className="font-black text-base leading-tight">💬 ทักทาง LINE OA ได้เลย!</h3>
+              <p className="text-xs text-white/80 font-bold mt-1 leading-relaxed">ส่งข้อความถึงแอดมินผ่าน LINE ได้ทันที ระบบจะรู้อัตโนมัติว่าคุณเป็นไรเดอร์ครับ</p>
+            </div>
+            <Icons.ChevronRight size={20} className="text-white/60 shrink-0" />
+          </div>
+        </a>
+
         <section className="space-y-2">
           <p className="text-[10px] font-black text-slate-500 uppercase pl-1">เทมเพลตยอดนิยมสำหรับไรเดอร์</p>
           <div className="flex gap-2 overflow-x-auto pb-1">

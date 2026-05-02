@@ -15,6 +15,7 @@ export default function HomePage() {
   const { profile, isReady } = useLiff();
   const { t } = useTranslation();
   const [comingSoonModal, setComingSoonModal] = useState<string | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState("All");
 
   // State for live data
   const [services, setServices] = useState<any[]>([]);
@@ -154,12 +155,40 @@ export default function HomePage() {
         {otherServices.length > 0 && (
           <section>
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-base font-bold text-foreground">{t("home.otherServices")}</h2>
+              <h2 className="text-base font-bold text-foreground font-black lowercase tracking-tight">{t("home.otherServices")}</h2>
             </div>
-            <div className="flex overflow-x-auto gap-4 -mx-5 px-5 pb-2 hide-scrollbar stagger snap-x snap-mandatory">
-              {otherServices.map((svc) => (
-                <ServiceCard key={svc.id} svc={svc} t={t} onComingSoon={setComingSoonModal} />
+            
+            {/* Category Chips */}
+            <div className="flex gap-2 mb-6 overflow-x-auto -mx-5 px-5 pb-2 hide-scrollbar">
+               {['All', 'Cleaning', 'Personal Assistant', 'Help'].map((cat) => (
+                 <button 
+                  key={cat}
+                  onClick={() => setSelectedCategory(cat)}
+                  className={`px-5 py-2.5 rounded-xl text-[10px] font-black uppercase whitespace-nowrap transition-all border-2 ${
+                    selectedCategory === cat 
+                    ? 'bg-primary border-primary text-white shadow-lg shadow-primary/30' 
+                    : 'bg-white border-slate-100 text-slate-400 hover:border-primary/20'
+                  }`}
+                 >
+                   {cat === 'All' ? 'ทั้งหมด' : 
+                    cat === 'Cleaning' ? 'ทำความสะอาด 🧹' : 
+                    cat === 'Personal Assistant' ? 'ผู้ช่วยส่วนตัว 🤝' : 'ช่วยเหลือ 🔧'}
+                 </button>
+               ))}
+            </div>
+
+            <div className="flex overflow-x-auto gap-4 -mx-5 px-5 pb-4 hide-scrollbar snap-x snap-mandatory min-h-[160px]">
+              {otherServices
+                .filter(svc => selectedCategory === 'All' || svc.category === selectedCategory)
+                .map((svc) => (
+                  <ServiceCard key={svc.id} svc={svc} t={t} />
               ))}
+              {otherServices.filter(svc => selectedCategory === 'All' || svc.category === selectedCategory).length === 0 && (
+                <div className="w-full flex flex-col items-center justify-center py-10 bg-slate-100/50 rounded-2xl border-2 border-dashed border-slate-200">
+                  <Icons.Search size={24} className="text-slate-300 mb-2" />
+                  <p className="text-[10px] font-black text-slate-400 uppercase">ไม่พบบริการในหมวดนี้</p>
+                </div>
+              )}
             </div>
           </section>
         )}
@@ -233,14 +262,25 @@ function ServiceCard({ svc, t, onComingSoon, className }: { svc: any, t: any, on
   }
 
   return (
-    <Link href={`/booking?service=${svc.id}`} className={className || "min-w-[145px] flex-shrink-0 snap-center"}>
-      <Card className="p-5 h-full flex flex-col items-center justify-center text-center" hoverable>
+    <Link href={svc.isDynamicGig ? `/service/${svc.id}` : `/booking?service=${svc.id}`} className={className || "min-w-[145px] flex-shrink-0 snap-center"}>
+      <Card className="p-5 h-full flex flex-col items-center justify-center text-center group border-2 border-transparent hover:border-primary/20 transition-all" hoverable>
+        {svc.isDynamicGig && (
+          <span className="absolute top-2 right-2 flex h-2 w-2">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+          </span>
+        )}
         <div className="w-12 h-12 bg-primary-light rounded-xl flex items-center justify-center text-primary-dark mb-4 group-hover:scale-110 transition-transform">
-          {getServiceIcon(svc.id, { size: 24 })}
+          {getServiceIcon(svc.icon || svc.id, { size: 24 })}
         </div>
         <h3 className="text-[13px] font-black text-foreground leading-tight line-clamp-2 w-full">
-          {t(`orders.services.${svc.id}`) || svc.name}
+          {svc.isDynamicGig ? svc.name : (t(`orders.services.${svc.id}`) || svc.name)}
         </h3>
+        {svc.isDynamicGig && (
+          <p className="text-[10px] font-bold text-primary-dark mt-2 bg-primary/10 px-2 py-0.5 rounded-md w-max mx-auto truncate max-w-full">
+            เริ่มต้น ฿{svc.basePrice || 0}
+          </p>
+        )}
       </Card>
     </Link>
   );

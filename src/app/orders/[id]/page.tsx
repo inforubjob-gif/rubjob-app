@@ -153,7 +153,7 @@ export default function OrderDetailPage() {
             <h3 className="text-sm font-bold text-foreground mb-4 flex items-center gap-2">
               <Icons.MapPin size={18} className="text-primary" /> {t("orders.tracking")}
             </h3>
-            <StatusTimeline currentStatus={order.status} />
+            <StatusTimeline currentStatus={order.status} orderType={order.orderType} />
           </Card>
         )}
 

@@ -21,6 +21,7 @@ export default function BottomNav() {
   const isStoreContext = pathname.startsWith("/store") || hostname.startsWith("store.");
   const isRiderContext = pathname.startsWith("/rider") || hostname.startsWith("rider.");
   const isAdminContext = pathname.startsWith("/admin") || hostname.startsWith("admin.");
+  const isProviderContext = pathname.startsWith("/provider") || hostname.startsWith("provider.");
   
   const isLandingContext = pathname.startsWith("/landing") || (
     !hostname.startsWith("app.") &&
@@ -38,7 +39,7 @@ export default function BottomNav() {
   if (isAdminContext || isLandingContext) return null;
 
   // Hide on Authentication screens
-  if (pathname === "/store/login" || pathname === "/rider/login" || pathname.startsWith("/admin/login")) {
+  if (pathname === "/store/login" || pathname === "/rider/login" || pathname === "/provider/login" || pathname.startsWith("/admin/login")) {
     return null;
   }
 
@@ -143,13 +144,31 @@ export default function BottomNav() {
     },
   ];
 
-  const tabs = isRiderContext ? RIDER_TABS : (isStoreContext ? STORE_TABS : USER_TABS);
+  const PROVIDER_TABS: Tab[] = [
+    {
+      href: "/provider",
+      label: "งาน",
+      icon: (active) => <Icons.Tasks size={24} strokeWidth={active ? 3 : 2} />,
+    },
+    {
+      href: "/provider/wallet",
+      label: "รายได้",
+      icon: (active) => <Icons.Wallet size={24} strokeWidth={active ? 3 : 2} />,
+    },
+    {
+      href: "/provider/profile",
+      label: "โปรไฟล์",
+      icon: (active) => <Icons.UserCog size={24} strokeWidth={active ? 3 : 2} />,
+    },
+  ];
+
+  const tabs = isProviderContext ? PROVIDER_TABS : isRiderContext ? RIDER_TABS : (isStoreContext ? STORE_TABS : USER_TABS);
 
   return (
     <nav className={`fixed bottom-0 left-0 right-0 z-50 bg-primary border-primary-dark/20 border-t shadow-[0_-8px_30px_rgba(255,159,28,0.25)] pb-[env(safe-area-inset-bottom,0px)]`}>
       <div className={`flex items-center justify-around h-16 max-w-lg mx-auto px-2 text-white/70`}>
         {tabs.map((tab) => {
-          const isActive = (tab.href === "/" || tab.href === "/store" || tab.href === "/rider") 
+          const isActive = (tab.href === "/" || tab.href === "/store" || tab.href === "/rider" || tab.href === "/provider") 
             ? pathname === tab.href 
             : pathname.startsWith(tab.href);
           

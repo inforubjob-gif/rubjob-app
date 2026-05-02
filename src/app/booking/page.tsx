@@ -42,6 +42,14 @@ function BookingFlow() {
   const initServiceRaw = searchParams.get("service") as ServiceType | null;
   const validInitService = initServiceRaw;
 
+  const pkgDataParam = searchParams.get("pkgData");
+  const pkgDataRaw = useMemo(() => {
+    if (!pkgDataParam) return null;
+    try {
+      return JSON.parse(decodeURIComponent(atob(pkgDataParam)));
+    } catch(e) { return null; }
+  }, [pkgDataParam]);
+
   const { profile } = useLiff();
   const { t, language } = useTranslation();
   const { showToast } = useToast();
@@ -262,7 +270,12 @@ function BookingFlow() {
     else if (bagSize === "28kg") foldingFee = 35;
   }
 
-  const laundryFee = (service?.basePrice || 0) + bagSizeExtra + foldingFee;
+  const laundryFee = pkgDataRaw
+    ? Number(pkgDataRaw.price)
+    : service?.category === "laundry" 
+      ? (service?.basePrice || 0) + bagSizeExtra + foldingFee
+      : (service?.basePrice || 0);
+
   const subTotal = laundryFee + deliveryFee;
   const totalDiscount = couponDiscount + pointsDiscount;
   const totalPrice = Math.max(subTotal - totalDiscount, 0);
@@ -291,7 +304,7 @@ function BookingFlow() {
         setIsSubmitting(false);
         return;
       }
-      if (!selectedStore?.id || !selectedService) {
+      if ((!selectedStore?.id && !service?.isDynamicGig) || !selectedService) {
         showToast(t("booking.selectServiceStore"), "error");
         setIsSubmitting(false);
         return;
@@ -300,9 +313,14 @@ function BookingFlow() {
       const userId = profile.userId;
       const payload = {
         userId,
-        storeId: selectedStore.id,
+        storeId: service?.isDynamicGig ? undefined : selectedStore?.id,
+        providerId: service?.isDynamicGig ? service.providerId : undefined,
         serviceId: selectedService,
-        items: [{ name: `${t("booking.bag")} ${bagSize}`, qty: 1 }],
+        items: pkgDataRaw 
+          ? [{ name: `${service?.name || selectedService} - ${pkgDataRaw.name}`, qty: 1 }] 
+          : service?.category === "laundry" 
+            ? [{ name: `${t("booking.bag")} ${bagSize}`, qty: 1 }] 
+            : [{ name: service?.name || selectedService, qty: 1 }],
         address: selectedAddress,
         paymentMethod: selectedPayment,
         laundryFee,
@@ -417,7 +435,7 @@ function BookingFlow() {
         {/* ─── Step: Service ─── */}
         {step === "service" && (
           <div className="space-y-4 stagger">
-            {dbServices.filter(s => s.category === "laundry").map((svc) => (
+            {dbServices.map((svc) => (
               <Card
                 key={svc.id}
                 hoverable
@@ -438,7 +456,7 @@ function BookingFlow() {
                   <p className="text-xs text-muted mt-1 leading-relaxed opacity-90">{t(`serviceDesc.${svc.id}`) || svc.description}</p>
                   <div className="flex items-center gap-2 mt-2">
                     <span className="text-xs font-black text-primary-dark bg-primary/10 px-2 py-0.5 rounded-md">
-                      {t("booking.fromPrice")} ฿{svc.basePrice}/{unitLabel}
+                      {t("booking.fromPrice")} ฿{svc.basePrice}/{svc.unit === "hour" ? t("booking.hours") : svc.unit === "session" ? t("home.perSession") : t("home.perPiece")}
                     </span>
                     <span className="text-xs font-bold text-slate-400">
                       ~{svc.estimatedDays} {t("booking.dayTurnaround")}
@@ -576,49 +594,51 @@ function BookingFlow() {
               {distanceExtra > 0 && <span className="text-[10px] text-muted block mt-2 ml-1">{t("booking.distanceNote").replace("{distance}", distanceKm.toFixed(1))}</span>}
             </section>
 
-            {/* Luggage Size & Folding Option */}
-            <section>
-              <h3 className="text-sm font-bold text-foreground mb-2 flex items-center gap-2">
-                <Icons.FileText size={18} className="text-primary" /> 
-                {t("booking.bagSizeTitle")}
-              </h3>
-              
-              <div className="grid grid-cols-2 gap-2 mb-4">
-                {(["9kg", "14kg", "18kg", "28kg"] as const).map((size) => (
-                  <label key={size} className={`flex flex-col items-center justify-center p-3 rounded-xl border-2 cursor-pointer transition-all ${bagSize === size ? "border-primary bg-primary/5 shadow-sm" : "border-slate-100 bg-white hover:bg-slate-50"}`} onClick={() => setBagSize(size)}>
-                    <span className="text-sm font-bold text-foreground">{size}</span>
-                    {size === "28kg" && <span className="text-[10px] text-muted">+฿20</span>}
+            {/* Luggage Size & Folding Option - Only for Laundry */}
+            {service?.category === "laundry" && (
+              <section>
+                <h3 className="text-sm font-bold text-foreground mb-2 flex items-center gap-2">
+                  <Icons.FileText size={18} className="text-primary" /> 
+                  {t("booking.bagSizeTitle")}
+                </h3>
+                
+                <div className="grid grid-cols-2 gap-2 mb-4">
+                  {(["9kg", "14kg", "18kg", "28kg"] as const).map((size) => (
+                    <label key={size} className={`flex flex-col items-center justify-center p-3 rounded-xl border-2 cursor-pointer transition-all ${bagSize === size ? "border-primary bg-primary/5 shadow-sm" : "border-slate-100 bg-white hover:bg-slate-50"}`} onClick={() => setBagSize(size)}>
+                      <span className="text-sm font-bold text-foreground">{size}</span>
+                      {size === "28kg" && <span className="text-[10px] text-muted">+฿20</span>}
+                    </label>
+                  ))}
+                </div>
+
+                <h3 className="text-sm font-bold text-foreground mb-2 flex items-center gap-2">
+                  <Icons.Tasks size={18} className="text-primary" /> 
+                  {t("booking.foldingServiceTitle")}
+                </h3>
+                
+                <Card className="overflow-hidden mb-2">
+                  <label className="flex items-center justify-between p-4 cursor-pointer hover:bg-slate-50 transition-colors border-b border-border" onClick={() => setWithFolding(false)}>
+                    <div className="flex flex-col">
+                      <span className="text-sm font-bold text-foreground">{t("booking.options.noFolding")}</span>
+                      <span className="text-xs text-muted">{t("booking.options.noFoldingDesc")}</span>
+                    </div>
+                    <div className={`w-5 h-5 rounded-full flex items-center justify-center transition-colors ${!withFolding ? "bg-primary text-white shadow-md shadow-primary/30" : "border-2 border-slate-200"}`}>
+                      {!withFolding && <span className="text-xs font-bold leading-none flex items-center justify-center pt-0.5">✓</span>}
+                    </div>
                   </label>
-                ))}
-              </div>
 
-              <h3 className="text-sm font-bold text-foreground mb-2 flex items-center gap-2">
-                <Icons.Tasks size={18} className="text-primary" /> 
-                {t("booking.foldingServiceTitle")}
-              </h3>
-              
-              <Card className="overflow-hidden mb-2">
-                <label className="flex items-center justify-between p-4 cursor-pointer hover:bg-slate-50 transition-colors border-b border-border" onClick={() => setWithFolding(false)}>
-                  <div className="flex flex-col">
-                    <span className="text-sm font-bold text-foreground">{t("booking.options.noFolding")}</span>
-                    <span className="text-xs text-muted">{t("booking.options.noFoldingDesc")}</span>
-                  </div>
-                  <div className={`w-5 h-5 rounded-full flex items-center justify-center transition-colors ${!withFolding ? "bg-primary text-white shadow-md shadow-primary/30" : "border-2 border-slate-200"}`}>
-                    {!withFolding && <span className="text-xs font-bold leading-none flex items-center justify-center pt-0.5">✓</span>}
-                  </div>
-                </label>
-
-                <label className="flex items-center justify-between p-4 cursor-pointer hover:bg-slate-50 transition-colors" onClick={() => setWithFolding(true)}>
-                  <div className="flex flex-col">
-                    <span className="text-sm font-bold text-foreground">{t("booking.options.withFolding")}</span>
-                    <span className="text-xs text-primary-dark font-medium">+฿{bagSize === "28kg" ? 35 : bagSize === "18kg" ? 25 : 20}</span>
-                  </div>
-                  <div className={`w-5 h-5 rounded-full flex items-center justify-center transition-colors ${withFolding ? "bg-primary text-white shadow-md shadow-primary/30" : "border-2 border-slate-200"}`}>
-                    {withFolding && <span className="text-xs font-bold leading-none flex items-center justify-center pt-0.5">✓</span>}
-                  </div>
-                </label>
-              </Card>
-            </section>
+                  <label className="flex items-center justify-between p-4 cursor-pointer hover:bg-slate-50 transition-colors" onClick={() => setWithFolding(true)}>
+                    <div className="flex flex-col">
+                      <span className="text-sm font-bold text-foreground">{t("booking.options.withFolding")}</span>
+                      <span className="text-xs text-primary-dark font-medium">+฿{bagSize === "28kg" ? 35 : bagSize === "18kg" ? 25 : 20}</span>
+                    </div>
+                    <div className={`w-5 h-5 rounded-full flex items-center justify-center transition-colors ${withFolding ? "bg-primary text-white shadow-md shadow-primary/30" : "border-2 border-slate-200"}`}>
+                      {withFolding && <span className="text-xs font-bold leading-none flex items-center justify-center pt-0.5">✓</span>}
+                    </div>
+                  </label>
+                </Card>
+              </section>
+            )}
 
             {/* Discount & Points */}
             <section className="animate-fade-in">
@@ -671,7 +691,7 @@ function BookingFlow() {
                         const res = await fetch("/api/coupons/validate", {
                           method: "POST",
                           headers: { "Content-Type": "application/json" },
-                          body: JSON.stringify({ code: couponCode, subtotal: laundryFee + deliveryFee })
+                          body: JSON.stringify({ code: couponCode, subtotal: laundryFee + deliveryFee, userRole: 'customer' })
                         });
                         const data = await res.json();
                         if (res.ok && data.success) {
@@ -728,16 +748,16 @@ function BookingFlow() {
                     </div>
                     <div className="space-y-2 pl-5">
                       <div className="flex items-center justify-between">
-                        <span>{t("booking.summary.package")} {t(`orders.services.${service?.id}`) || service?.name}</span>
-                        <span className="font-bold text-slate-800">฿{service?.basePrice || 0}</span>
+                        <span>{t("booking.summary.package")} {pkgDataRaw ? `${service?.name} (${pkgDataRaw.name})` : (t(`orders.services.${service?.id}`) || service?.name || '')}</span>
+                        <span className="font-bold text-slate-800">฿{pkgDataRaw ? pkgDataRaw.price : (service?.basePrice || 0)}</span>
                       </div>
-                      {bagSizeExtra > 0 && (
+                      {service?.category === "laundry" && bagSizeExtra > 0 && (
                         <div className="flex items-center justify-between">
                           <span>{t("booking.summary.extraBag")} ({bagSize})</span>
                           <span className="font-bold text-slate-800">+฿{bagSizeExtra}</span>
                         </div>
                       )}
-                      {foldingFee > 0 && (
+                      {service?.category === "laundry" && foldingFee > 0 && (
                         <div className="flex items-center justify-between">
                           <span>{t("booking.foldingServiceTitle")}</span>
                           <span className="font-bold text-slate-800">+฿{foldingFee}</span>
@@ -1033,7 +1053,7 @@ function BookingFlow() {
                         const res = await fetch("/api/coupons/validate", {
                            method: "POST",
                            headers: { "Content-Type": "application/json" },
-                           body: JSON.stringify({ code: cpn.code, subtotal: laundryFee + deliveryFee })
+                           body: JSON.stringify({ code: cpn.code, subtotal: laundryFee + deliveryFee, userRole: 'customer' })
                         });
                         const data = await res.json();
                         if (res.ok && data.success) {

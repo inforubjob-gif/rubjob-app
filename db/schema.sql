@@ -86,6 +86,19 @@ CREATE TABLE IF NOT EXISTS store_documents (
   FOREIGN KEY (storeId) REFERENCES stores(id) ON DELETE CASCADE
 );
 
+-- Specialists/Providers Table
+CREATE TABLE IF NOT EXISTS specialist_profiles (
+  id TEXT PRIMARY KEY, -- Linked to users.id
+  bio TEXT,
+  skills TEXT, -- JSON array of skill IDs
+  status TEXT DEFAULT 'pending', -- pending, active, suspended
+  bankName TEXT,
+  accountNumber TEXT,
+  accountName TEXT,
+  createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (id) REFERENCES users(id) ON DELETE CASCADE
+);
+
 -- Services Table (Master Data)
 CREATE TABLE IF NOT EXISTS services (
   id TEXT PRIMARY KEY,
@@ -96,6 +109,7 @@ CREATE TABLE IF NOT EXISTS services (
   unit TEXT NOT NULL, -- piece, hour, session
   icon TEXT,
   estimatedDays INTEGER,
+  gpPercent REAL DEFAULT 15, -- Category/Service specific GP
   isActive INTEGER DEFAULT 1
 );
 
@@ -103,9 +117,11 @@ CREATE TABLE IF NOT EXISTS services (
 CREATE TABLE IF NOT EXISTS orders (
   id TEXT PRIMARY KEY,
   userId TEXT NOT NULL,
-  storeId TEXT NOT NULL,
+  orderType TEXT DEFAULT 'logistics', -- logistics, direct_service
+  storeId TEXT, -- Nullable for direct_service
+  providerId TEXT, -- ID from specialist_profiles, Nullable for logistics
   serviceId TEXT NOT NULL,
-  status TEXT NOT NULL, -- pending, picking_up, delivering_to_store, washing, delivering_to_customer, completed, cancelled
+  status TEXT NOT NULL, -- pending, picking_up, delivering_to_store, washing, delivering_to_customer, completed, cancelled, accepted, in_progress
   laundryFee REAL NOT NULL,
   deliveryFee REAL NOT NULL,
   distanceKm REAL,
@@ -117,12 +133,17 @@ CREATE TABLE IF NOT EXISTS orders (
   scheduledDate TEXT,
   pickupDriverId TEXT, -- ID of the driver picking up
   deliveryDriverId TEXT, -- ID of the driver delivering
+  evidenceBeforeUrl TEXT, -- Photo evidence before service
+  evidenceAfterUrl TEXT, -- Photo evidence after service
+  cancellationFee REAL DEFAULT 0,
+  surgeMultiplier REAL DEFAULT 1.0,
   staffNote TEXT, -- Private note from staff
   serviceDetails TEXT, -- JSON for actual weights/durations after pickup
   createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
   updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (userId) REFERENCES users(id),
   FOREIGN KEY (storeId) REFERENCES stores(id),
+  FOREIGN KEY (providerId) REFERENCES specialist_profiles(id),
   FOREIGN KEY (serviceId) REFERENCES services(id),
   FOREIGN KEY (pickupDriverId) REFERENCES rider_users(id),
   FOREIGN KEY (deliveryDriverId) REFERENCES rider_users(id)

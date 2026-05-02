@@ -40,6 +40,15 @@ export default function AppWrapper({ children }: { children: React.ReactNode }) 
      window.location.pathname === "/")
   );
 
+  // Service Worker Registration & Web Push
+  useEffect(() => {
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js')
+        .then(reg => console.log('SW Registered:', reg.scope))
+        .catch(err => console.error('SW Registration failed:', err));
+    }
+  }, []);
+
   // Check if user has completed onboarding (has phone + at least 1 address)
   useEffect(() => {
     if (!isReady || !isLoggedIn || !profile?.userId || isBackoffice || isLanding) {
@@ -68,6 +77,22 @@ export default function AppWrapper({ children }: { children: React.ReactNode }) 
         const hasAddress = (addrData.addresses?.length || 0) > 0;
 
         setNeedsOnboarding(!hasPhone || !hasAddress);
+        
+        // Automation: Subscribe to Push notifications if not already done
+        if (hasPhone) {
+          const { subscribeToPush } = await import("@/lib/notifications");
+          const vapidKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
+          if (vapidKey) {
+            const sub = await subscribeToPush(vapidKey);
+            if (sub) {
+              await fetch("/api/user/push-subscription", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ userId: profile.userId, subscription: sub })
+              });
+            }
+          }
+        }
       } catch (err) {
         console.error("Failed to check onboarding status:", err);
         // On error, let user through (don't block)

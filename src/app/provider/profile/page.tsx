@@ -18,13 +18,29 @@ const SKILL_LABELS: Record<string, string> = {
 export default function ProviderProfilePage() {
   const router = useRouter();
   const [provider, setProvider] = useState<any>(null);
+  const [gigs, setGigs] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const session = localStorage.getItem("rubjob_provider_session");
     if (session) {
-      setProvider(JSON.parse(session));
+      const p = JSON.parse(session);
+      setProvider(p);
+      fetchGigs(p.id);
     }
   }, []);
+
+  async function fetchGigs(providerId: string) {
+    try {
+      const res = await fetch(`/api/provider/services?providerId=${providerId}`);
+      const data = await res.json();
+      if (data.services) setGigs(data.services);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsLoading(false);
+    }
+  }
 
   const handleLogout = async () => {
     try { await fetch("/api/provider/logout", { method: "POST" }); } catch (e) {}
@@ -37,18 +53,18 @@ export default function ProviderProfilePage() {
   return (
     <div className="flex flex-col min-h-screen bg-slate-50">
       {/* Header */}
-      <div className="bg-gradient-to-b from-violet-600 to-violet-500 px-5 pt-4 pb-14 relative">
+      <div className="bg-gradient-to-b from-primary to-primary-dark px-5 pt-4 pb-14 relative">
         <div className="flex items-center gap-3 mb-6">
           <button onClick={() => router.push("/provider")} className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
             <Icons.ArrowRight size={18} className="text-white rotate-180" />
           </button>
-          <h1 className="text-xl font-black text-white uppercase">โปรไฟล์</h1>
+          <h1 className="text-xl font-black text-white uppercase">โปรไฟล์พาร์ทเนอร์</h1>
         </div>
 
         <div className="flex items-center gap-5">
-          <div className="w-20 h-20 rounded-2xl bg-white/20 flex items-center justify-center text-4xl border-2 border-white/30 shadow-xl">
+          <div className="w-20 h-20 rounded-2xl bg-white/20 flex items-center justify-center text-4xl border-2 border-white/30 shadow-xl overflow-hidden">
             {provider.pictureUrl ? (
-              <img src={provider.pictureUrl} alt="" className="w-full h-full rounded-2xl object-cover" />
+              <img src={provider.pictureUrl} alt="" className="w-full h-full object-cover" />
             ) : (
               "🧑‍💼"
             )}
@@ -56,42 +72,68 @@ export default function ProviderProfilePage() {
           <div>
             <h2 className="text-2xl font-black text-white leading-tight">{provider.name}</h2>
             <p className="text-xs text-white/60 font-bold uppercase mt-1">{provider.email}</p>
-            <span className={`inline-block mt-2 text-[10px] font-black uppercase px-3 py-1 rounded-full ${
-              provider.status === "active" ? "bg-emerald-500 text-white" : "bg-amber-500 text-white"
-            }`}>
-              {provider.status === "active" ? "ยืนยันแล้ว" : provider.status}
-            </span>
+            <div className="flex items-center gap-2 mt-2">
+              <span className={`text-[10px] font-black uppercase px-2 py-0.5 rounded-md ${
+                provider.status === "active" ? "bg-emerald-500 text-white" : "bg-amber-500 text-white"
+              }`}>
+                {provider.status === "active" ? "Verified" : provider.status}
+              </span>
+              <span className="bg-white/20 text-white text-[10px] font-black px-2 py-0.5 rounded-md">
+                {gigs.length} GIGS
+              </span>
+            </div>
           </div>
         </div>
       </div>
 
       {/* Content */}
       <div className="px-5 -mt-6 space-y-4 pb-24 relative z-10">
-        {/* Skills Card */}
+        {/* Marketplace Gigs Card */}
         <Card className="p-6">
-          <h3 className="text-xs font-black text-slate-400 uppercase mb-4">ทักษะและบริการของฉัน</h3>
-          {provider.skills && provider.skills.length > 0 ? (
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-xs font-black text-slate-400 uppercase tracking-wider">บริการที่ฉันเปิดรับงาน</h3>
+            <span className="text-[10px] font-bold text-primary-dark bg-primary/10 px-2 py-0.5 rounded-full uppercase">Dynamic Marketplace</span>
+          </div>
+
+          {isLoading ? (
+            <div className="flex justify-center py-8 text-primary animate-spin"><Icons.Loading size={24} /></div>
+          ) : gigs.length > 0 ? (
             <div className="space-y-3">
-              {provider.skills.map((skill: string) => (
-                <div key={skill} className="flex items-center justify-between bg-violet-50 rounded-xl p-4 border border-violet-100">
-                  <div className="flex items-center gap-3">
-                    <span className="text-xl">{SKILL_LABELS[skill]?.slice(-2) || "🔧"}</span>
-                    <span className="text-sm font-black text-slate-800">{SKILL_LABELS[skill]?.slice(0, -3) || skill}</span>
+              {gigs.map((gig: any) => {
+                const pkgs = JSON.parse(gig.packages || "[]");
+                const basePrice = pkgs.find((p: any) => p.type === 'basic')?.price || 0;
+                return (
+                  <div key={gig.id} onClick={() => router.push("/provider/services")} className="flex items-center gap-4 bg-white rounded-xl p-3 border border-slate-100 shadow-sm active:scale-95 transition-all cursor-pointer">
+                    <div className="w-12 h-12 bg-primary-light rounded-xl flex items-center justify-center text-primary-dark shrink-0">
+                      <Icons.Stars size={20} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h4 className="text-sm font-black text-slate-800 truncate">{gig.title}</h4>
+                      <p className="text-[10px] font-bold text-slate-400 line-clamp-1">{gig.description || "—"}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-xs font-black text-primary-dark">฿{basePrice}</p>
+                      <p className="text-[9px] text-slate-400 font-bold uppercase">Starting</p>
+                    </div>
                   </div>
-                  <div className="text-right">
-                    <p className="text-sm font-black text-violet-600">
-                      ฿{provider.pricing?.[skill]?.toLocaleString() || "—"}
-                    </p>
-                    <p className="text-[10px] text-slate-400 font-bold">
-                      /{provider.pricingUnit?.[skill] || "ครั้ง"}
-                    </p>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           ) : (
-            <p className="text-xs text-slate-400 font-bold">ยังไม่มีทักษะที่ลงทะเบียน</p>
+            <div className="py-8 text-center bg-slate-50 rounded-xl border border-dashed border-slate-200">
+               <Icons.Search size={24} className="mx-auto text-slate-300 mb-2" />
+               <p className="text-[10px] text-slate-400 font-bold uppercase">ยังไม่ได้สร้างบริการแบบ Gig</p>
+            </div>
           )}
+
+          <Button 
+            variant="primary" 
+            fullWidth 
+            className="mt-4 rounded-xl font-black text-xs uppercase py-3.5 shadow-lg shadow-primary/20"
+            onClick={() => router.push("/provider/services")}
+          >
+            ไปหน้าจัดการบริการ (Manage Gigs)
+          </Button>
         </Card>
 
         {/* Bio */}
@@ -102,13 +144,56 @@ export default function ProviderProfilePage() {
           </Card>
         )}
 
+        {/* LINE ID Setting */}
+        <Card className="p-6">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center text-emerald-600">
+               <Icons.Line size={18} />
+            </div>
+            <h3 className="text-xs font-black text-slate-400 uppercase tracking-wider">LINE Contact ID</h3>
+          </div>
+          
+          <div className="flex gap-2">
+            <input 
+              type="text" 
+              placeholder="e.g. rubjob_official"
+              value={provider.lineId || ""} 
+              onChange={(e) => setProvider({...provider, lineId: e.target.value})}
+              className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold outline-none focus:ring-4 focus:ring-primary/10 transition-all"
+            />
+            <Button 
+              onClick={async () => {
+                try {
+                   const res = await fetch("/api/provider/profile", {
+                     method: "PUT",
+                     headers: { "Content-Type": "application/json" },
+                     body: JSON.stringify({ lineId: provider.lineId })
+                   });
+                   if (res.ok) {
+                     localStorage.setItem("rubjob_provider_session", JSON.stringify(provider));
+                     alert("บันทึก LINE ID สำเร็จ!");
+                   }
+                } catch (e) {
+                   console.error(e);
+                }
+              }}
+              className="rounded-xl px-6"
+            >
+              บันทึก
+            </Button>
+          </div>
+          <p className="text-[10px] text-slate-400 font-bold mt-2 leading-relaxed">
+            * ใส่ไอดีไลน์เพื่อให้ลูกค้ากดปุ่ม "ติดต่อ" เพื่อแชทกับคุณได้โดยตรง
+          </p>
+        </Card>
+
         {/* Settings */}
         <Card className="p-2 divide-y divide-slate-50">
           <button 
             onClick={() => router.push("/provider/wallet")}
             className="w-full flex items-center gap-4 p-4 hover:bg-slate-50 rounded-xl transition-colors"
           >
-            <div className="w-10 h-10 rounded-xl bg-violet-100 flex items-center justify-center text-violet-600">
+            <div className="w-10 h-10 rounded-xl bg-orange-100 flex items-center justify-center text-primary-dark">
               <Icons.CreditCard size={20} />
             </div>
             <div className="flex-1 text-left">
@@ -117,22 +202,6 @@ export default function ProviderProfilePage() {
             </div>
             <Icons.ArrowRight size={16} className="text-slate-300" />
           </button>
-
-          <a 
-            href="https://line.me/R/ti/p/@rubjob" 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className="w-full flex items-center gap-4 p-4 hover:bg-slate-50 rounded-xl transition-colors"
-          >
-            <div className="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center text-emerald-600">
-              <Icons.Line size={20} />
-            </div>
-            <div className="flex-1 text-left">
-              <p className="text-sm font-black text-slate-900">ติดต่อแอดมิน</p>
-              <p className="text-[10px] text-slate-400 font-bold">แชทผ่าน LINE Official</p>
-            </div>
-            <Icons.ExternalLink size={16} className="text-slate-300" />
-          </a>
         </Card>
 
         {/* Logout */}
@@ -146,23 +215,7 @@ export default function ProviderProfilePage() {
         </Button>
       </div>
 
-      {/* Bottom Nav */}
-      <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-slate-100 shadow-lg">
-        <div className="flex items-center justify-around py-3 max-w-md mx-auto">
-          <button onClick={() => router.push("/provider")} className="flex flex-col items-center gap-1 text-slate-400 hover:text-violet-600 transition-colors">
-            <Icons.Home size={20} />
-            <span className="text-[10px] font-black uppercase">งาน</span>
-          </button>
-          <button onClick={() => router.push("/provider/wallet")} className="flex flex-col items-center gap-1 text-slate-400 hover:text-violet-600 transition-colors">
-            <Icons.CreditCard size={20} />
-            <span className="text-[10px] font-black uppercase">รายได้</span>
-          </button>
-          <button onClick={() => router.push("/provider/profile")} className="flex flex-col items-center gap-1 text-violet-600">
-            <Icons.User size={20} />
-            <span className="text-[10px] font-black uppercase">โปรไฟล์</span>
-          </button>
-        </div>
-      </nav>
+      {/* Bottom Nav handled by global AppWrapper */}
     </div>
   );
 }

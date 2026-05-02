@@ -630,6 +630,34 @@ function SettingsContent() {
                        </div>
                     </div>
                   </div>
+
+                  <div className="space-y-4 pt-4 border-t border-slate-50">
+                    <div className="flex items-center justify-between">
+                       <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">โหมดตัวคูณราคา (Surge Pricing)</label>
+                       <div 
+                         onClick={() => updateLocalSetting("surge_enabled", getSetting("surge_enabled") === "true" ? "false" : "true")}
+                         className={`w-12 h-6 rounded-full transition-all cursor-pointer relative ${getSetting("surge_enabled") === "true" ? "bg-amber-400" : "bg-slate-200"}`}
+                       >
+                          <div className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-all ${getSetting("surge_enabled") === "true" ? "left-7" : "left-1"}`} />
+                       </div>
+                    </div>
+                    {getSetting("surge_enabled") === "true" && (
+                       <div className="flex items-center gap-4 animate-in slide-in-from-top-2 duration-300">
+                          <div className="flex-1 relative">
+                             <input 
+                               type="number" 
+                               step="0.1"
+                               className="w-full bg-amber-50 border-2 border-amber-100 rounded-xl pl-6 pr-12 py-3 text-lg text-amber-900 font-black focus:border-amber-400 outline-none transition-all"
+                               placeholder="1.2"
+                               value={getSetting("surge_multiplier")}
+                               onChange={(e) => updateLocalSetting("surge_multiplier", e.target.value)}
+                             />
+                             <div className="absolute right-4 top-1/2 -translate-y-1/2 text-amber-400 font-black text-sm">×</div>
+                          </div>
+                          <div className="text-[10px] font-bold text-slate-400 leading-tight">เพิ่มราคาอัตโนมัติ<br/>กระตุ้นพาร์ทเนอร์</div>
+                       </div>
+                    )}
+                  </div>
                </div>
             </Card>
 

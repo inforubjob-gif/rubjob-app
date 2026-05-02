@@ -17,7 +17,9 @@ export async function POST(req: Request) {
     
     // 1. Validate Inputs
     validateRequired(body.userId, "userId");
-    validateRequired(body.storeId, "storeId");
+    if (!body.storeId && !body.providerId) {
+      return NextResponse.json({ error: "Either storeId or providerId is required" }, { status: 400 });
+    }
     validateRequired(body.serviceId, "serviceId");
     validateRequired(body.items, "items");
     validateRequired(body.address, "address");
@@ -31,7 +33,7 @@ export async function POST(req: Request) {
     const address = tryParseJSON(body.address, "address");
     
     const { 
-      userId, storeId, serviceId, paymentMethod, scheduledDate 
+      userId, storeId, providerId, serviceId, paymentMethod, scheduledDate 
     } = body;
 
     // Access D1 from Cloudflare context
@@ -43,18 +45,24 @@ export async function POST(req: Request) {
 
     const orderId = `RJ-${nanoid(8).toUpperCase()}`;
 
+    // Self-healing: ensure providerId column exists
+    try {
+      await db.prepare("ALTER TABLE orders ADD COLUMN providerId TEXT").run();
+    } catch(e) {}
+
     // Insert Order
     await db.prepare(`
       INSERT INTO orders (
-        id, userId, storeId, serviceId, status, 
+        id, userId, storeId, providerId, serviceId, status, 
         laundryFee, deliveryFee, distanceKm, totalPrice, 
         paymentMethod, items, address, scheduledDate
       )
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `).bind(
       orderId,
       userId,
-      storeId,
+      storeId || null,
+      providerId || null,
       serviceId,
       "pending",
       laundryFee,
@@ -67,37 +75,29 @@ export async function POST(req: Request) {
       scheduledDate
     ).run();
 
-    // Fetch service info for notification
-    const service = await db.prepare("SELECT name FROM services WHERE id = ?").bind(serviceId).first();
+    // Fetch service info for notification (check both standard services and gigs)
+    let serviceName = "Gig Service";
+    if (providerId) {
+      const gig = await db.prepare("SELECT title as name FROM provider_services WHERE id = ?").bind(serviceId).first();
+      if (gig) serviceName = gig.name as string;
+    } else {
+      const svc = await db.prepare("SELECT name FROM services WHERE id = ?").bind(serviceId).first();
+      if (svc) serviceName = svc.name as string;
+    }
 
     // Send LINE Notification (Async, don't block response)
     if (env.LINE_CHANNEL_ACCESS_TOKEN) {
-      // 1. Notify Customer
+      // 1. Notify Customer (Messaging API - Professional Flex Message)
+      const { bookingConfirmationFlex } = await import("@/lib/line");
       sendLinePush(
         userId, 
-        [bookingConfirmationFlex(orderId, service?.name || "Service", totalPrice)],
+        [bookingConfirmationFlex(orderId, serviceName, totalPrice)],
         env.LINE_CHANNEL_ACCESS_TOKEN
       ).catch(err => console.error("LINE push error (customer):", err));
 
-      // 2. Broadcast to eligible Riders
-      // Fetch riders assigned to this store or area
-      const riders = await db.prepare(`
-        SELECT id FROM users 
-        WHERE role = 'driver' AND (assignedStoreId = ? OR assignedStoreId IS NULL)
-      `).bind(storeId).all();
-
-      if (riders.results && riders.results.length > 0) {
-        const riderNotifyMsg = {
-          type: "text",
-          text: `🚨 มีออเดอร์ใหม่เข้า! [${orderId}]\nบริการ: ${service?.name}\nร้าน: ${storeId}\nกดดูงานได้ที่หน้า Rider App ครับ`
-        };
-
-        // Send to each rider (Cloudflare Workers fetch limit might apply if too many, but for now it's okay for few riders)
-        riders.results.forEach((rider: any) => {
-          sendLinePush(rider.id, [riderNotifyMsg], env.LINE_CHANNEL_ACCESS_TOKEN)
-            .catch(err => console.error(`LINE push error (rider ${rider.id}):`, err));
-        });
-      }
+      // 2. Broadcast to Riders Group (Now using In-App Polling & Web Push - 100% Free)
+      // Since LINE Notify is discontinued, we rely on our built-in real-time update system
+      // Riders who are "Online" will get a Sound Alert and In-App notification within 15s.
     }
 
     return NextResponse.json({ 

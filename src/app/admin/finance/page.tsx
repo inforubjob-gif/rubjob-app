@@ -65,8 +65,11 @@ export default function FinanceAdminPage() {
   }
 
   const totalGross = transactions.reduce((acc, t) => acc + (t.totalPrice || 0), 0);
-  const totalPartnerCut = transactions.reduce((acc, t) => acc + ((t.totalPrice || 0) * 0.7), 0);
-  const totalPlatformComission = totalGross - totalPartnerCut;
+  const totalPlatformComission = transactions.reduce((acc, t) => {
+    const gp = t.gpPercent ? t.gpPercent / 100 : 0.3;
+    return acc + (t.totalPrice * gp);
+  }, 0);
+  const totalPartnerCut = totalGross - totalPlatformComission;
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto pb-20">
@@ -162,7 +165,9 @@ export default function FinanceAdminPage() {
                           <p className="text-xs font-bold text-slate-500">{new Date(tx.createdAt).toLocaleDateString()}</p>
                        </td>
                        <td className="px-8 py-5 text-right font-black text-slate-900">฿{tx.totalPrice.toLocaleString()}</td>
-                       <td className="px-8 py-5 text-right font-black text-emerald-600">฿{(tx.totalPrice * 0.3).toFixed(2)}</td>
+                       <td className="px-8 py-5 text-right font-black text-emerald-600">
+                          ฿{(tx.totalPrice * (tx.gpPercent ? tx.gpPercent / 100 : 0.3)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                       </td>
                        <td className="px-8 py-5 text-right">
                           <button className="text-[9px] font-black uppercase tracking-widest text-primary hover:underline">{t('admin.finance.action.verify')}</button>
                        </td>

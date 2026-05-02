@@ -4,8 +4,15 @@ import { NextResponse } from "next/server";
 export const runtime = "edge";
 
 /**
- * Unified LINE Webhook for Regular and Help channels
+ * Unified LINE Webhook for all channels
  * Endpoint: /api/webhook/line/[type]
+ * 
+ * Auto-detects whether the sender is a Rider, Store, or Customer
+ * by cross-referencing LINE userId against:
+ *   1. rider_users.lineUserId → Rider
+ *   2. stores.lineUserId → Store
+ *   3. users.id → Customer (LINE Login users)
+ *   4. None → Unknown / Guest
  */
 export async function POST(req: Request, { params }: { params: { type: string } }) {
   try {
@@ -26,7 +33,6 @@ export async function POST(req: Request, { params }: { params: { type: string } 
     
     if (!channelSecret) {
       console.error(`Missing LINE Secret in DB for channel: ${channelType}`);
-      // If not in DB, fallback to ENV for migration period if needed, or just error
       return NextResponse.json({ error: "LINE configuration missing in settings" }, { status: 500 });
     }
 
@@ -54,6 +60,10 @@ export async function POST(req: Request, { params }: { params: { type: string } 
       }
     }
 
+    // Self-healing: ensure columns exist
+    try { await db.prepare("ALTER TABLE support_tickets ADD COLUMN userType TEXT DEFAULT 'customer'").run(); } catch (e) {}
+    try { await db.prepare("ALTER TABLE support_tickets ADD COLUMN senderName TEXT").run(); } catch (e) {}
+
     const events = body.events || [];
 
     for (const event of events) {
@@ -62,8 +72,47 @@ export async function POST(req: Request, { params }: { params: { type: string } 
         const text = isManual ? body.message : event.message.text;
         const channelKey = isManual ? "in_app" : `${channelType}_line`;
 
+        // ── Auto-detect User Type ──
+        // Cross-reference LINE userId against rider, store, and customer tables
+        let userType = 'customer';
+        let senderName = '';
+
+        if (!isManual) {
+          // Check rider_users first
+          const rider = await db.prepare(
+            `SELECT id, name FROM rider_users WHERE lineUserId = ?`
+          ).bind(userId).first() as any;
+
+          if (rider) {
+            userType = 'rider';
+            senderName = rider.name || '';
+          } else {
+            // Check stores
+            const store = await db.prepare(
+              `SELECT id, name FROM stores WHERE lineUserId = ?`
+            ).bind(userId).first() as any;
+
+            if (store) {
+              userType = 'store';
+              senderName = store.name || '';
+            } else {
+              // Check regular users (LINE Login)
+              const user = await db.prepare(
+                `SELECT id, displayName FROM users WHERE id = ?`
+              ).bind(userId).first() as any;
+
+              if (user) {
+                userType = 'customer';
+                senderName = user.displayName || '';
+              } else {
+                userType = 'unknown';
+                senderName = '';
+              }
+            }
+          }
+        }
+
         // 3. Find or Create Active Ticket
-        // We look for 'open' or 'pending' tickets for this user on this channel
         let ticket = await db.prepare(`
           SELECT id FROM support_tickets 
           WHERE userId = ? AND channel = ? AND status IN ('open', 'pending')
@@ -74,23 +123,28 @@ export async function POST(req: Request, { params }: { params: { type: string } 
 
         if (!ticketId) {
           ticketId = `TKT-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+          const subjectPrefix = userType === 'rider' ? '🏍️ Rider' : userType === 'store' ? '🏪 Store' : '👤 Customer';
           await db.prepare(`
-            INSERT INTO support_tickets (id, userId, channel, subject, status)
-            VALUES (?, ?, ?, ?, 'open')
-          `).bind(ticketId, userId, channelKey, `Chat from ${channelType} LINE`).run();
+            INSERT INTO support_tickets (id, userId, channel, subject, status, userType, senderName)
+            VALUES (?, ?, ?, ?, 'open', ?, ?)
+          `).bind(
+            ticketId, userId, channelKey, 
+            `${subjectPrefix} — Chat from LINE`,
+            userType, senderName
+          ).run();
         }
 
         // 4. Save Message
         const messageId = `MSG-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
         await db.prepare(`
           INSERT INTO support_messages (id, ticketId, senderType, senderId, content)
-          VALUES (?, ?, 'user', ?, ?)
-        `).bind(messageId, ticketId, userId, text).run();
+          VALUES (?, ?, ?, ?, ?)
+        `).bind(messageId, ticketId, userType === 'unknown' ? 'user' : userType, userId, text).run();
 
-        // 5. Update Ticket's updatedAt
+        // 5. Update Ticket's updatedAt and senderName (in case it changed)
         await db.prepare(`
-          UPDATE support_tickets SET updatedAt = CURRENT_TIMESTAMP WHERE id = ?
-        `).bind(ticketId).run();
+          UPDATE support_tickets SET updatedAt = CURRENT_TIMESTAMP, senderName = COALESCE(?, senderName) WHERE id = ?
+        `).bind(senderName || null, ticketId).run();
       }
     }
 

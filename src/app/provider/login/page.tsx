@@ -52,7 +52,7 @@ export default function ProviderLoginPage() {
   };
 
   return (
-    <div className="flex flex-col min-h-dvh bg-gradient-to-b from-violet-600 via-violet-500 to-slate-50 relative overflow-hidden p-6 justify-center items-center">
+    <div className="flex flex-col min-h-dvh bg-gradient-to-b from-primary-dark via-primary to-slate-50 relative overflow-hidden p-6 justify-center items-center">
       {/* Decorative Background */}
       <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-[100px] -mr-48 -mt-48" />
       <div className="absolute bottom-0 left-0 w-96 h-96 bg-black/5 rounded-full blur-[100px] -ml-48 -mb-48" />
@@ -67,7 +67,7 @@ export default function ProviderLoginPage() {
           </p>
         </div>
 
-        <form onSubmit={handleLogin} className="space-y-5 bg-white/10 backdrop-blur-md p-2 rounded-2xl border border-white/20 shadow-2xl shadow-violet-900/20">
+        <form onSubmit={handleLogin} className="space-y-5 bg-white/10 backdrop-blur-md p-2 rounded-2xl border border-white/20 shadow-2xl shadow-primary-dark/20">
           <div className="bg-white rounded-[1.75rem] p-8 space-y-6 shadow-sm">
             <div className="space-y-2">
               <label className="text-xs font-black text-slate-400 uppercase ml-1">
@@ -80,7 +80,7 @@ export default function ProviderLoginPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="provider@rubjob.com"
-                  className="w-full bg-slate-50 border-none rounded-xl pl-12 pr-4 py-4 text-base font-bold placeholder:text-slate-300 focus:ring-2 focus:ring-violet-500/20 transition-all"
+                  className="w-full bg-slate-50 border-none rounded-xl pl-12 pr-4 py-4 text-base font-bold placeholder:text-slate-300 focus:ring-2 focus:ring-primary/20 transition-all"
                 />
               </div>
             </div>
@@ -96,7 +96,7 @@ export default function ProviderLoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full bg-slate-50 border-none rounded-xl pl-12 pr-4 py-4 text-base font-bold placeholder:text-slate-300 focus:ring-2 focus:ring-violet-500/20 transition-all"
+                  className="w-full bg-slate-50 border-none rounded-xl pl-12 pr-4 py-4 text-base font-bold placeholder:text-slate-300 focus:ring-2 focus:ring-primary/20 transition-all"
                 />
               </div>
             </div>

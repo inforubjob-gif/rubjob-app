@@ -11,6 +11,9 @@ export async function GET(req: Request) {
     const db = getRequestContext().env.DB;
     if (!db) return NextResponse.json({ error: "D1 not found" }, { status: 500 });
 
+    // Self-healing: ensure eligibleRoles column exists
+    try { await db.prepare("ALTER TABLE coupons ADD COLUMN eligibleRoles TEXT DEFAULT 'all'").run(); } catch (e) {}
+
     const { results } = await db.prepare(`
       SELECT * FROM coupons
       ORDER BY createdAt DESC
@@ -26,19 +29,22 @@ export async function POST(req: Request) {
   const session = await getAdminSession();
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   try {
-    const { code, type, value, minOrder, maxDiscount, expiryDate, usageLimit, isVisible, title, description } = await req.json() as any;
+    const { code, type, value, minOrder, maxDiscount, expiryDate, usageLimit, isVisible, title, description, eligibleRoles } = await req.json() as any;
     const db = getRequestContext().env.DB;
     if (!db) return NextResponse.json({ error: "D1 not found" }, { status: 500 });
+
+    // Self-healing
+    try { await db.prepare("ALTER TABLE coupons ADD COLUMN eligibleRoles TEXT DEFAULT 'all'").run(); } catch (e) {}
 
     if (!code || !type || !value) return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
 
     const id = `CPN-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
 
     await db.prepare(`
-      INSERT INTO coupons (id, code, type, value, minOrder, maxDiscount, expiryDate, usageLimit, isVisible, title, description)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO coupons (id, code, type, value, minOrder, maxDiscount, expiryDate, usageLimit, isVisible, title, description, eligibleRoles)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `).bind(
-      id, code.toUpperCase(), type, value, minOrder || 0, maxDiscount || null, expiryDate || null, usageLimit || null, isVisible ? 1 : 0, title || null, description || null
+      id, code.toUpperCase(), type, value, minOrder || 0, maxDiscount || null, expiryDate || null, usageLimit || null, isVisible ? 1 : 0, title || null, description || null, eligibleRoles || 'all'
     ).run();
 
     return NextResponse.json({ success: true, id });
@@ -54,9 +60,12 @@ export async function PUT(req: Request) {
   const session = await getAdminSession();
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   try {
-    const { id, code, type, value, minOrder, maxDiscount, expiryDate, usageLimit, isActive, isVisible, title, description } = await req.json() as any;
+    const { id, code, type, value, minOrder, maxDiscount, expiryDate, usageLimit, isActive, isVisible, title, description, eligibleRoles } = await req.json() as any;
     const db = getRequestContext().env.DB;
     if (!db) return NextResponse.json({ error: "D1 not found" }, { status: 500 });
+
+    // Self-healing
+    try { await db.prepare("ALTER TABLE coupons ADD COLUMN eligibleRoles TEXT DEFAULT 'all'").run(); } catch (e) {}
 
     if (!id) return NextResponse.json({ error: "Missing ID" }, { status: 400 });
 
@@ -74,7 +83,8 @@ export async function PUT(req: Request) {
             isActive = COALESCE(?, isActive),
             isVisible = COALESCE(?, isVisible),
             title = ?,
-            description = ?
+            description = ?,
+            eligibleRoles = COALESCE(?, eligibleRoles)
         WHERE id = ?
       `).bind(
         code?.toUpperCase(),
@@ -88,6 +98,7 @@ export async function PUT(req: Request) {
         isVisible !== undefined ? (isVisible ? 1 : 0) : null,
         title || null,
         description || null,
+        eligibleRoles || null,
         id
       ).run();
     } else {

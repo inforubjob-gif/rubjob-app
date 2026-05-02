@@ -60,14 +60,14 @@ export async function GET(req: Request) {
       available = availRes.results || [];
     }
 
-    // Fetch active orders assigned to this provider
+    // Fetch active/pending orders assigned to this provider (Direct Gig Bookings)
     const activeRes = await db.prepare(`
       SELECT o.id, o.serviceId, o.totalPrice, o.status, o.createdAt,
              u.displayName as customerName
       FROM orders o
       JOIN users u ON o.userId = u.id
       WHERE o.providerId = ?
-        AND o.status IN ('accepted', 'in_progress')
+        AND o.status IN ('pending', 'accepted', 'in_progress')
       ORDER BY o.createdAt DESC
     `).bind(token).all();
 
@@ -109,9 +109,9 @@ export async function PUT(req: Request) {
     }
 
     if (action === "accept") {
-      // Accept a pending direct-service order
+      // Accept a pending direct-service or directly-assigned gig order
       const order = await db.prepare(
-        "SELECT id, status, providerId FROM orders WHERE id = ? AND orderType = 'direct_service'"
+        "SELECT id, status, providerId FROM orders WHERE id = ?"
       ).bind(orderId).first() as any;
 
       if (!order) return NextResponse.json({ error: "Order not found" }, { status: 404 });

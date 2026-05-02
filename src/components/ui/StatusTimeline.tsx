@@ -1,7 +1,7 @@
 "use client";
 
 import { Icons } from "./Icons";
-import type { OrderStatus } from "@/types";
+import type { OrderStatus, OrderType } from "@/types";
 import { useTranslation } from "@/components/providers/LanguageProvider";
 
 interface Step {
@@ -10,7 +10,7 @@ interface Step {
   image?: string;
 }
 
-const STEPS: Step[] = [
+const LOGISTICS_STEPS: Step[] = [
   { key: "picking_up", icon: Icons.Package },
   { key: "delivering_to_store", icon: Icons.Store },
   { key: "washing", icon: Icons.WashFold },
@@ -18,7 +18,14 @@ const STEPS: Step[] = [
   { key: "completed", icon: Icons.CheckCircle },
 ];
 
-const statusOrder: OrderStatus[] = [
+const DIRECT_STEPS: Step[] = [
+  { key: "accepted", icon: Icons.User },
+  { key: "in_progress", icon: Icons.Truck }, // Traveling to customer
+  { key: "completed", icon: Icons.CheckCircle },
+];
+
+const LOGISTICS_ORDER: OrderStatus[] = [
+  "pending",
   "picking_up",
   "delivering_to_store",
   "washing",
@@ -27,30 +34,35 @@ const statusOrder: OrderStatus[] = [
   "completed",
 ];
 
+const DIRECT_ORDER: OrderStatus[] = [
+  "pending",
+  "accepted",
+  "in_progress",
+  "completed",
+];
+
 interface StatusTimelineProps {
   currentStatus: OrderStatus;
+  orderType?: OrderType;
 }
 
-export default function StatusTimeline({ currentStatus }: StatusTimelineProps) {
+export default function StatusTimeline({ currentStatus, orderType = "logistics" }: StatusTimelineProps) {
   const { t } = useTranslation();
+  
+  const isDirect = orderType === "direct_service";
+  const steps = isDirect ? DIRECT_STEPS : LOGISTICS_STEPS;
+  const statusOrder = isDirect ? DIRECT_ORDER : LOGISTICS_ORDER;
+  
   const currentIdx = statusOrder.indexOf(currentStatus);
-  
-  let startIdx = currentIdx - 1;
-  if (startIdx < 0) startIdx = 0;
-  if (startIdx > STEPS.length - 3) startIdx = STEPS.length - 3;
-  
-  const visibleSteps = STEPS.slice(startIdx, startIdx + 3);
-  const firstVisibleGlobalIdx = STEPS.findIndex(s => s.key === visibleSteps[0].key);
-
-  // How many segments (out of 2) are filled
-  const filledSegments = Math.max(0, Math.min(2, currentIdx - firstVisibleGlobalIdx));
 
   return (
     <div className="space-y-6 py-2 px-1">
-      {STEPS.map((step, index) => {
-        const isDone = index < currentIdx;
-        const isCurrent = index === currentIdx;
-        const isFuture = index > currentIdx;
+      {steps.map((step, index) => {
+        // Map step key to index in statusOrder
+        const stepIdx = statusOrder.indexOf(step.key);
+        const isDone = stepIdx < currentIdx;
+        const isCurrent = step.key === currentStatus || (step.key === "completed" && currentStatus === "completed");
+        const isFuture = stepIdx > currentIdx && !isCurrent;
         
         return (
           <div 
@@ -72,7 +84,7 @@ export default function StatusTimeline({ currentStatus }: StatusTimelineProps) {
               </p>
             </div>
 
-            {/* Right: Large Icon (No Border) */}
+            {/* Right: Icon */}
             <div className={`relative w-16 h-16 transition-transform duration-500 ${isCurrent ? "scale-110" : "scale-100"}`}>
               {step.image ? (
                 <img 

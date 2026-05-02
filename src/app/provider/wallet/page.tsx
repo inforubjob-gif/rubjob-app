@@ -61,7 +61,7 @@ export default function ProviderWalletPage() {
   return (
     <div className="flex flex-col min-h-screen bg-slate-50">
       {/* Header */}
-      <div className="bg-gradient-to-b from-violet-600 to-violet-500 px-5 pt-4 pb-10 relative">
+      <div className="bg-gradient-to-b from-primary to-primary-dark px-5 pt-4 pb-10 relative">
         <div className="flex items-center gap-3 mb-8">
           <button onClick={() => router.push("/provider")} className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
             <Icons.ArrowRight size={18} className="text-white rotate-180" />
@@ -74,7 +74,7 @@ export default function ProviderWalletPage() {
           <p className="text-4xl font-black text-white mb-4">฿{balance.toLocaleString()}</p>
           <Button
             onClick={() => setShowWithdraw(!showWithdraw)}
-            className="bg-white text-violet-600 font-black uppercase text-xs py-3 px-6 rounded-xl shadow-lg active:scale-95 transition-all"
+            className="bg-white text-primary font-black uppercase text-xs py-3 px-6 rounded-xl shadow-lg active:scale-95 transition-all"
           >
             แจ้งถอนเงิน
           </Button>
@@ -84,20 +84,20 @@ export default function ProviderWalletPage() {
       {/* Withdraw Form */}
       {showWithdraw && (
         <div className="px-5 -mt-4 mb-4 animate-in fade-in slide-in-from-top-4">
-          <Card className="p-6 border-2 border-violet-200">
+          <Card className="p-6 border-2 border-orange-200">
             <p className="text-xs font-black text-slate-400 uppercase mb-3">จำนวนเงินที่ต้องการถอน</p>
             <input
               type="number"
               value={withdrawAmount}
               onChange={(e) => setWithdrawAmount(e.target.value)}
               placeholder="0"
-              className="w-full bg-slate-50 rounded-xl px-4 py-4 text-2xl font-black text-center border-none focus:ring-2 focus:ring-violet-500/20 mb-4"
+              className="w-full bg-slate-50 rounded-xl px-4 py-4 text-2xl font-black text-center border-none focus:ring-2 focus:ring-primary/20 mb-4"
             />
             <p className="text-[10px] text-slate-400 font-bold text-center mb-4">ถอนขั้นต่ำ 100 บาท</p>
             <Button
               fullWidth
               onClick={handleWithdraw}
-              className="bg-violet-600 text-white py-4 rounded-xl font-black uppercase shadow-xl active:scale-95 transition-all"
+              className="bg-primary hover:bg-primary-dark text-white py-4 rounded-xl font-black uppercase shadow-xl active:scale-95 transition-all"
             >
               ยืนยันการถอนเงิน
             </Button>
@@ -107,8 +107,8 @@ export default function ProviderWalletPage() {
 
       {/* Commission Info */}
       <div className="px-5 mb-6">
-        <Card className="bg-violet-50 border border-violet-100 p-4">
-          <p className="text-xs font-bold text-violet-700">
+        <Card className="bg-orange-50 border border-orange-100 p-4">
+          <p className="text-xs font-bold text-primary-dark">
             💡 อัตราค่าธรรมเนียมแพลตฟอร์ม 15% — คุณได้รับ 85% ของแต่ละงาน
           </p>
         </Card>
@@ -156,23 +156,7 @@ export default function ProviderWalletPage() {
         )}
       </div>
 
-      {/* Bottom Nav */}
-      <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-slate-100 shadow-lg">
-        <div className="flex items-center justify-around py-3 max-w-md mx-auto">
-          <button onClick={() => router.push("/provider")} className="flex flex-col items-center gap-1 text-slate-400 hover:text-violet-600 transition-colors">
-            <Icons.Home size={20} />
-            <span className="text-[10px] font-black uppercase">งาน</span>
-          </button>
-          <button onClick={() => router.push("/provider/wallet")} className="flex flex-col items-center gap-1 text-violet-600">
-            <Icons.CreditCard size={20} />
-            <span className="text-[10px] font-black uppercase">รายได้</span>
-          </button>
-          <button onClick={() => router.push("/provider/profile")} className="flex flex-col items-center gap-1 text-slate-400 hover:text-violet-600 transition-colors">
-            <Icons.User size={20} />
-            <span className="text-[10px] font-black uppercase">โปรไฟล์</span>
-          </button>
-        </div>
-      </nav>
+      {/* Bottom Nav removed, handled by AppWrapper */}
     </div>
   );
 }

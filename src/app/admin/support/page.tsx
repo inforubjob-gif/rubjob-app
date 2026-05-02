@@ -5,21 +5,52 @@ import Card from "@/components/ui/Card";
 import { Icons } from "@/components/ui/Icons";
 import { useTranslation } from "@/components/providers/LanguageProvider";
 
+type FilterType = "all" | "customer" | "rider" | "store";
+
+const FILTER_CONFIG: Record<FilterType, { label: string; icon: string; color: string; bg: string }> = {
+  all:      { label: "ทั้งหมด",  icon: "💬", color: "text-slate-700", bg: "bg-slate-100" },
+  customer: { label: "ลูกค้า",   icon: "👤", color: "text-emerald-700", bg: "bg-emerald-50" },
+  rider:    { label: "ไรเดอร์",  icon: "🏍️", color: "text-blue-700", bg: "bg-blue-50" },
+  store:    { label: "ร้านค้า",  icon: "🏪", color: "text-purple-700", bg: "bg-purple-50" },
+};
+
+function getUserTypeBadge(userType: string) {
+  switch (userType) {
+    case 'rider':
+      return { label: 'RIDER', icon: '🏍️', badgeClass: 'bg-blue-50 text-blue-600 ring-blue-200', dotClass: 'bg-blue-500' };
+    case 'store':
+      return { label: 'STORE', icon: '🏪', badgeClass: 'bg-purple-50 text-purple-600 ring-purple-200', dotClass: 'bg-purple-500' };
+    case 'unknown':
+      return { label: 'UNKNOWN', icon: '❓', badgeClass: 'bg-slate-50 text-slate-500 ring-slate-200', dotClass: 'bg-slate-400' };
+    default:
+      return { label: 'CUSTOMER', icon: '👤', badgeClass: 'bg-emerald-50 text-emerald-600 ring-emerald-200', dotClass: 'bg-emerald-500' };
+  }
+}
+
+function getChannelBadge(channel: string) {
+  if (channel?.includes('line')) {
+    return { label: 'LINE', color: 'bg-green-50 text-green-600', icon: '💬' };
+  }
+  return { label: 'In-App', color: 'bg-indigo-50 text-indigo-600', icon: '📱' };
+}
+
 export default function SupportCenterPage() {
   const { t } = useTranslation();
   const [tickets, setTickets] = useState<any[]>([]);
+  const [counts, setCounts] = useState<Record<string, number>>({ total: 0, customer: 0, rider: 0, store: 0, unknown: 0 });
   const [selectedTicketId, setSelectedTicketId] = useState<string | null>(null);
   const [messages, setMessages] = useState<any[]>([]);
   const [replyText, setReplyText] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [isSending, setIsSending] = useState(false);
+  const [activeFilter, setActiveFilter] = useState<FilterType>("all");
   const chatEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     fetchTickets();
     const interval = setInterval(fetchTickets, 10000); // Polling every 10s
     return () => clearInterval(interval);
-  }, []);
+  }, [activeFilter]);
 
   useEffect(() => {
     if (selectedTicketId) {
@@ -33,9 +64,11 @@ export default function SupportCenterPage() {
 
   const fetchTickets = async () => {
     try {
-      const res = await fetch("/api/admin/support/tickets");
+      const filterParam = activeFilter !== "all" ? `&filter=${activeFilter}` : "";
+      const res = await fetch(`/api/admin/support/tickets?_=${Date.now()}${filterParam}`);
       const data = await res.json();
       if (data.tickets) setTickets(data.tickets);
+      if (data.counts) setCounts(data.counts);
     } catch (err) {
       console.error("Failed to fetch tickets:", err);
     } finally {
@@ -79,6 +112,8 @@ export default function SupportCenterPage() {
   };
 
   const selectedTicket = tickets.find(t => t.id === selectedTicketId);
+  const typeBadge = selectedTicket ? getUserTypeBadge(selectedTicket.userType) : null;
+  const channelBadge = selectedTicket ? getChannelBadge(selectedTicket.channel) : null;
 
   return (
     <div className="h-[calc(100vh-120px)] flex gap-6 overflow-hidden">
@@ -88,6 +123,32 @@ export default function SupportCenterPage() {
           <h1 className="text-2xl font-black text-slate-900 tracking-tight">{t('admin.support.title')}</h1>
           <p className="text-xs text-slate-500 font-bold uppercase tracking-wider mt-1">{t('admin.support.subtitle')}</p>
         </header>
+
+        {/* ─── Filter Tabs ─── */}
+        <div className="flex gap-1.5 bg-slate-100 p-1.5 rounded-xl">
+          {(Object.keys(FILTER_CONFIG) as FilterType[]).map((key) => {
+            const cfg = FILTER_CONFIG[key];
+            const count = key === 'all' ? counts.total : (counts[key] || 0);
+            return (
+              <button
+                key={key}
+                onClick={() => { setActiveFilter(key); setIsLoading(true); }}
+                className={`flex-1 py-2 px-1 rounded-lg text-[10px] font-black uppercase transition-all flex items-center justify-center gap-1
+                  ${activeFilter === key 
+                    ? 'bg-white shadow-md text-slate-900 scale-[1.02]' 
+                    : 'text-slate-400 hover:text-slate-600'
+                  }`}
+              >
+                <span>{cfg.icon}</span>
+                {count > 0 && (
+                  <span className={`text-[8px] px-1.5 py-0.5 rounded-full font-black ${activeFilter === key ? cfg.bg + ' ' + cfg.color : 'bg-slate-200 text-slate-500'}`}>
+                    {count}
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </div>
 
         <Card className="flex-1 overflow-hidden flex flex-col bg-white border border-slate-200/60 shadow-sm rounded-xl">
           <div className="p-5 border-b border-slate-50 bg-slate-50/30 flex items-center justify-between">
@@ -100,46 +161,55 @@ export default function SupportCenterPage() {
             ) : tickets.length === 0 ? (
               <div className="p-10 text-center text-slate-400 font-medium text-xs">{t('admin.support.empty')}</div>
             ) : (
-              tickets.map((tk) => (
-                <button
-                  key={tk.id}
-                  onClick={() => setSelectedTicketId(tk.id)}
-                  className={`w-full p-5 text-left transition-all hover:bg-slate-50 flex gap-4 items-start ${selectedTicketId === tk.id ? 'bg-primary/5 border-l-4 border-l-primary' : ''}`}
-                >
-                  <div className="relative">
-                    <div className="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center overflow-hidden border border-slate-200 shadow-sm">
-                      {tk.userPicture ? (
-                        <img src={tk.userPicture} alt="" className="w-full h-full object-cover" />
-                      ) : (
-                        <Icons.User size={20} className="text-slate-400" />
-                      )}
-                    </div>
-                    {/* Channel Indicator Overlay */}
-                    <div className={`absolute -bottom-1 -right-1 w-6 h-6 rounded-lg flex items-center justify-center text-[10px] shadow-md border-2 border-white 
-                      ${tk.userType === 'rider' ? 'bg-blue-500 text-white' : tk.userType === 'store' ? 'bg-purple-500 text-white' : tk.channel?.includes('help') ? 'bg-rose-500 text-white' : tk.channel?.includes('regular') ? 'bg-emerald-500 text-white' : 'bg-indigo-500 text-white'}`}>
-                      {tk.userType === 'rider' ? 'R' : tk.userType === 'store' ? 'S' : tk.channel?.includes('line') ? 'L' : 'C'}
-                    </div>
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex justify-between items-start mb-0.5">
-                      <div className="flex items-center gap-2 min-w-0">
-                        <p className="font-black text-slate-900 truncate text-sm">{tk.userName || t('admin.common.customer')}</p>
-                        {tk.userType && tk.userType !== 'customer' && (
-                          <span className={`text-[8px] font-black uppercase px-1.5 py-0.5 rounded-md shrink-0 ${tk.userType === 'rider' ? 'bg-blue-50 text-blue-600' : 'bg-purple-50 text-purple-600'}`}>
-                            {tk.userType === 'rider' ? t('admin.common.rider') : t('admin.common.store')}
-                          </span>
+              tickets.map((tk) => {
+                const badge = getUserTypeBadge(tk.userType);
+                const chBadge = getChannelBadge(tk.channel);
+                return (
+                  <button
+                    key={tk.id}
+                    onClick={() => setSelectedTicketId(tk.id)}
+                    className={`w-full p-5 text-left transition-all hover:bg-slate-50 flex gap-4 items-start ${selectedTicketId === tk.id ? 'bg-primary/5 border-l-4 border-l-primary' : ''}`}
+                  >
+                    <div className="relative">
+                      <div className="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center overflow-hidden border border-slate-200 shadow-sm">
+                        {tk.userPicture ? (
+                          <img src={tk.userPicture} alt="" className="w-full h-full object-cover" />
+                        ) : (
+                          <span className="text-xl">{badge.icon}</span>
                         )}
                       </div>
-                      <span className="text-[9px] font-bold text-slate-400 whitespace-nowrap">
-                        {tk.lastMessageAt ? new Date(tk.lastMessageAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
-                      </span>
+                      {/* User Type Dot Overlay */}
+                      <div className={`absolute -bottom-1 -right-1 w-5 h-5 rounded-lg flex items-center justify-center shadow-md border-2 border-white ${badge.dotClass}`}>
+                        <span className="text-[8px] text-white font-black">
+                          {tk.userType === 'rider' ? 'R' : tk.userType === 'store' ? 'S' : 'C'}
+                        </span>
+                      </div>
                     </div>
-                    <p className="text-xs text-slate-500 truncate leading-relaxed">
-                      {tk.subject ? `[${tk.subject}] ` : ''}{tk.lastMessage || t('admin.support.openingTicket')}
-                    </p>
-                  </div>
-                </button>
-              ))
+                    <div className="flex-1 min-w-0">
+                      <div className="flex justify-between items-start mb-0.5">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <p className="font-black text-slate-900 truncate text-sm">{tk.userName || t('admin.common.customer')}</p>
+                          <span className={`text-[8px] font-black uppercase px-1.5 py-0.5 rounded-md shrink-0 ring-1 ${badge.badgeClass}`}>
+                            {badge.label}
+                          </span>
+                        </div>
+                        <span className="text-[9px] font-bold text-slate-400 whitespace-nowrap">
+                          {tk.lastMessageAt ? new Date(tk.lastMessageAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
+                        </span>
+                      </div>
+                      <p className="text-xs text-slate-500 truncate leading-relaxed">
+                        {tk.lastMessage || t('admin.support.openingTicket')}
+                      </p>
+                      {/* Channel Source */}
+                      <div className="flex items-center gap-2 mt-1.5">
+                        <span className={`text-[8px] font-black uppercase px-1.5 py-0.5 rounded-md ${chBadge.color}`}>
+                          {chBadge.icon} {chBadge.label}
+                        </span>
+                      </div>
+                    </div>
+                  </button>
+                );
+              })
             )}
           </div>
         </Card>
@@ -152,16 +222,32 @@ export default function SupportCenterPage() {
             {/* Header */}
             <header className="px-8 py-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/20">
               <div className="flex items-center gap-4">
-                 <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary-dark font-black">
-                   {selectedTicket?.userName?.[0]?.toUpperCase() || 'C'}
+                 <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-xl font-black ${typeBadge ? typeBadge.badgeClass : 'bg-primary/10'}`}>
+                   {typeBadge?.icon || selectedTicket?.userName?.[0]?.toUpperCase() || 'C'}
                  </div>
                  <div>
-                   <h2 className="font-black text-slate-900 tracking-tight">{t('admin.support.chatWith').replace('{name}', selectedTicket?.userName || t('admin.common.customer'))}</h2>
-                   <div className="flex items-center gap-2 mt-0.5">
-                      <span className={`w-1.5 h-1.5 rounded-full ${selectedTicket?.status === 'open' ? 'bg-emerald-500' : 'bg-amber-500'}`} />
-                      <span className="text-[10px] font-black uppercase tracking-[0.15em] text-slate-400">
-                        {selectedTicket?.status === 'open' ? t('common.pending') : t('common.done')} • {selectedTicket?.channel.replace('_', ' ')}
-                      </span>
+                   <div className="flex items-center gap-2">
+                     <h2 className="font-black text-slate-900 tracking-tight">
+                       {selectedTicket?.userName || t('admin.common.customer')}
+                     </h2>
+                     {typeBadge && (
+                       <span className={`text-[9px] font-black uppercase px-2 py-1 rounded-lg ring-1 ${typeBadge.badgeClass}`}>
+                         {typeBadge.label}
+                       </span>
+                     )}
+                   </div>
+                   <div className="flex items-center gap-3 mt-1">
+                     <div className="flex items-center gap-1.5">
+                       <span className={`w-1.5 h-1.5 rounded-full ${selectedTicket?.status === 'open' ? 'bg-emerald-500' : 'bg-amber-500'}`} />
+                       <span className="text-[10px] font-black uppercase tracking-[0.15em] text-slate-400">
+                         {selectedTicket?.status === 'open' ? t('common.pending') : t('common.done')}
+                       </span>
+                     </div>
+                     {channelBadge && (
+                       <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-md ${channelBadge.color}`}>
+                         {channelBadge.icon} {channelBadge.label}
+                       </span>
+                     )}
                    </div>
                  </div>
               </div>
@@ -184,7 +270,10 @@ export default function SupportCenterPage() {
                       {m.content}
                     </div>
                     <p className={`text-[10px] font-bold text-slate-400 mt-1.5 px-2 ${m.senderType === 'admin' ? 'text-right' : 'text-left'}`}>
-                      {m.senderType === 'admin' ? t('admin.support.you') : (selectedTicket?.userName || t('admin.common.customer'))} • {new Date(m.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      {m.senderType === 'admin' 
+                        ? t('admin.support.you') 
+                        : `${typeBadge?.icon || '👤'} ${selectedTicket?.userName || t('admin.common.customer')}`
+                      } • {new Date(m.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </p>
                   </div>
                 </div>
@@ -220,6 +309,19 @@ export default function SupportCenterPage() {
             </div>
             <h3 className="text-xl font-black text-slate-900">{t('admin.support.noSelect')}</h3>
             <p className="text-sm text-slate-500 max-w-xs mx-auto mt-2 font-medium">{t('admin.support.selectSub')}</p>
+            
+            {/* Quick Legend */}
+            <div className="mt-8 flex flex-wrap justify-center gap-3">
+              {(['customer', 'rider', 'store'] as const).map(type => {
+                const badge = getUserTypeBadge(type);
+                return (
+                  <div key={type} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold ${badge.badgeClass} ring-1`}>
+                    <span>{badge.icon}</span>
+                    <span>{badge.label}</span>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         )}
       </div>

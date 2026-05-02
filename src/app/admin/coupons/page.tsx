@@ -8,6 +8,28 @@ import Modal from "@/components/ui/Modal";
 import { useTranslation } from "@/components/providers/LanguageProvider";
 import { useToast } from "@/components/providers/ToastProvider";
 
+const ROLE_OPTIONS = [
+  { key: "all", label: "🌟 ทุกคน", color: "bg-amber-50 text-amber-600 ring-amber-200" },
+  { key: "customer", label: "👤 ลูกค้า", color: "bg-emerald-50 text-emerald-600 ring-emerald-200" },
+  { key: "rider", label: "🏍️ ไรเดอร์", color: "bg-blue-50 text-blue-600 ring-blue-200" },
+  { key: "store", label: "🏪 ร้านค้า", color: "bg-purple-50 text-purple-600 ring-purple-200" },
+];
+
+function getEligibleRoleBadges(eligibleRoles: string) {
+  if (!eligibleRoles || eligibleRoles === 'all') {
+    return [{ label: '🌟 ALL', class: 'bg-amber-50 text-amber-600' }];
+  }
+  const roles = eligibleRoles.split(',').map(r => r.trim());
+  return roles.map(role => {
+    switch (role) {
+      case 'rider': return { label: '🏍️ RIDER', class: 'bg-blue-50 text-blue-600' };
+      case 'store': return { label: '🏪 STORE', class: 'bg-purple-50 text-purple-600' };
+      case 'customer': return { label: '👤 CUSTOMER', class: 'bg-emerald-50 text-emerald-600' };
+      default: return { label: role.toUpperCase(), class: 'bg-slate-50 text-slate-500' };
+    }
+  });
+}
+
 export default function CouponsAdminPage() {
   const { t } = useTranslation();
   const { showToast } = useToast();
@@ -28,12 +50,26 @@ export default function CouponsAdminPage() {
     usageLimit: "",
     isVisible: false,
     title: "",
-    description: ""
+    description: "",
+    eligibleRoles: "all" as string, // 'all' | 'customer' | 'rider' | 'store' | 'rider,store' etc.
   });
+
+  // Selected roles for the checkbox UI
+  const [selectedRoles, setSelectedRoles] = useState<Set<string>>(new Set(["all"]));
 
   useEffect(() => {
     fetchCoupons();
   }, []);
+
+  // Sync selectedRoles to formData.eligibleRoles
+  useEffect(() => {
+    if (selectedRoles.has("all")) {
+      setFormData(prev => ({ ...prev, eligibleRoles: "all" }));
+    } else {
+      const roles = Array.from(selectedRoles).filter(r => r !== "all").join(",");
+      setFormData(prev => ({ ...prev, eligibleRoles: roles || "all" }));
+    }
+  }, [selectedRoles]);
 
   async function fetchCoupons() {
     setIsLoading(true);
@@ -65,7 +101,7 @@ export default function CouponsAdminPage() {
       if (res.ok) {
         setIsModalOpen(false);
         setEditingId(null);
-        setFormData({ code: "", type: "percentage", value: "", minOrder: "0", maxDiscount: "", expiryDate: "", usageLimit: "", isVisible: false, title: "", description: "" });
+        resetForm();
         fetchCoupons();
       } else {
         const err = await res.json();
@@ -78,8 +114,14 @@ export default function CouponsAdminPage() {
     }
   };
 
+  function resetForm() {
+    setFormData({ code: "", type: "percentage", value: "", minOrder: "0", maxDiscount: "", expiryDate: "", usageLimit: "", isVisible: false, title: "", description: "", eligibleRoles: "all" });
+    setSelectedRoles(new Set(["all"]));
+  }
+
   const handleEdit = (coupon: any) => {
     setEditingId(coupon.id);
+    const roles = coupon.eligibleRoles || "all";
     setFormData({
       code: coupon.code,
       type: coupon.type,
@@ -90,10 +132,49 @@ export default function CouponsAdminPage() {
       usageLimit: (coupon.usageLimit || "").toString(),
       isVisible: coupon.isVisible === 1,
       title: coupon.title || "",
-      description: coupon.description || ""
+      description: coupon.description || "",
+      eligibleRoles: roles,
     });
+    // Parse roles into set
+    if (roles === "all") {
+      setSelectedRoles(new Set(["all"]));
+    } else {
+      setSelectedRoles(new Set(roles.split(",").map((r: string) => r.trim())));
+    }
     setIsModalOpen(true);
   };
+
+  function handleRoleToggle(roleKey: string) {
+    setSelectedRoles(prev => {
+      const next = new Set(prev);
+      if (roleKey === "all") {
+        // Toggle all — if already all, deselect and default to customer
+        if (next.has("all")) {
+          next.clear();
+          next.add("customer");
+        } else {
+          next.clear();
+          next.add("all");
+        }
+      } else {
+        // Remove "all" if selecting individual
+        next.delete("all");
+        if (next.has(roleKey)) {
+          next.delete(roleKey);
+          // If nothing selected, default to all
+          if (next.size === 0) next.add("all");
+        } else {
+          next.add(roleKey);
+        }
+        // If all 3 individual roles are selected, switch to "all"
+        if (next.has("customer") && next.has("rider") && next.has("store")) {
+          next.clear();
+          next.add("all");
+        }
+      }
+      return next;
+    });
+  }
 
   async function toggleStatus(id: string, currentStatus: number) {
     try {
@@ -145,7 +226,7 @@ export default function CouponsAdminPage() {
         <button 
           onClick={() => {
             setEditingId(null);
-            setFormData({ code: "", type: "percentage", value: "", minOrder: "0", maxDiscount: "", expiryDate: "", usageLimit: "", isVisible: false, title: "", description: "" });
+            resetForm();
             setIsModalOpen(true);
           }}
           className="px-5 py-3 bg-slate-900 text-white rounded-xl text-sm font-bold shadow-lg flex items-center justify-center gap-2 hover:bg-slate-800 transition-all active:scale-95 w-full sm:w-auto"
@@ -170,6 +251,7 @@ export default function CouponsAdminPage() {
                 <tr>
                   <th className="px-6 py-4">{t('admin.coupons.table.promoCode')}</th>
                   <th className="px-6 py-4">{t('admin.coupons.table.discount')}</th>
+                  <th className="px-6 py-4">สิทธิ์</th>
                   <th className="px-6 py-4">{t('admin.coupons.table.usage')}</th>
                   <th className="px-6 py-4">{t('admin.coupons.table.expiry')}</th>
                   <th className="px-6 py-4">{t('admin.coupons.table.status')}</th>
@@ -177,80 +259,92 @@ export default function CouponsAdminPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
-                {coupons.map(coupon => (
-                  <tr key={coupon.id} className="hover:bg-slate-50/50 transition-colors group">
-                    <td className="px-6 py-4">
-                      <div className="flex flex-col gap-1">
-                         <div className="flex items-center gap-2">
-                            <span className="text-sm font-black text-slate-900 tracking-tight">{coupon.code}</span>
-                            {coupon.isVisible === 1 && (
-                               <span className="text-[8px] font-black text-indigo-500 uppercase bg-indigo-50 px-1 py-0.5 rounded-lg leading-none">{t('admin.coupons.status.wallet')}</span>
-                            )}
-                         </div>
-                         <p className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">
-                            {coupon.isVisible === 1 ? t('admin.coupons.status.public') : t('admin.coupons.status.exclusive')}
+                {coupons.map(coupon => {
+                  const roleBadges = getEligibleRoleBadges(coupon.eligibleRoles);
+                  return (
+                    <tr key={coupon.id} className="hover:bg-slate-50/50 transition-colors group">
+                      <td className="px-6 py-4">
+                        <div className="flex flex-col gap-1">
+                           <div className="flex items-center gap-2">
+                              <span className="text-sm font-black text-slate-900 tracking-tight">{coupon.code}</span>
+                              {coupon.isVisible === 1 && (
+                                 <span className="text-[8px] font-black text-indigo-500 uppercase bg-indigo-50 px-1 py-0.5 rounded-lg leading-none">{t('admin.coupons.status.wallet')}</span>
+                              )}
+                           </div>
+                           {coupon.title && (
+                             <p className="text-[9px] font-bold text-slate-400 truncate max-w-[140px]">{coupon.title}</p>
+                           )}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                         <span className="font-black text-indigo-600">
+                            {coupon.type === 'percentage' ? `${coupon.value}%` : `฿${coupon.value}`}
+                         </span>
+                         <p className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter mt-0.5">
+                            Min ฿{coupon.minOrder || 0}
                          </p>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                       <span className="font-black text-indigo-600">
-                          {coupon.type === 'percentage' ? `${coupon.value}%` : `฿${coupon.value}`}
-                       </span>
-                       <p className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter mt-0.5">
-                          Min ฿{coupon.minOrder || 0}
-                       </p>
-                    </td>
-                    <td className="px-6 py-4">
-                       <div className="flex flex-col gap-1">
-                          <span className="font-bold text-slate-900 text-xs">{coupon.usedCount || 0} / {coupon.usageLimit || "∞"}</span>
-                          <div className="w-20 h-1 bg-slate-100 rounded-full overflow-hidden">
-                             <div 
-                                className="h-full bg-primary" 
-                                style={{ width: coupon.usageLimit ? `${Math.min(100, (coupon.usedCount / coupon.usageLimit) * 100)}%` : '0%' }}
-                             />
-                          </div>
-                       </div>
-                    </td>
-                    <td className="px-6 py-4 font-medium text-xs text-slate-500">
-                       {coupon.expiryDate ? new Date(coupon.expiryDate).toLocaleDateString() : t('admin.coupons.noExpiry')}
-                    </td>
-                    <td className="px-6 py-4">
-                       <Badge variant={coupon.isActive === 1 ? "success" : "danger"}>
-                          {coupon.isActive === 1 ? t('admin.coupons.status.active') : t('admin.coupons.status.disabled')}
-                       </Badge>
-                    </td>
-                    <td className="px-6 py-4 text-right">
-                       <div className="flex justify-end items-center gap-2 opacity-100 transition-opacity">
-                          <button 
-                            onClick={() => handleEdit(coupon)}
-                            className="p-1.5 text-indigo-500 hover:bg-indigo-50 border border-transparent hover:border-indigo-100 rounded-lg transition-all"
-                            title="Edit Coupon"
-                          >
-                            <Icons.Settings size={16} />
-                          </button>
-                          <button 
-                            onClick={() => toggleVisibility(coupon.id, coupon.isVisible)}
-                            title={coupon.isVisible === 1 ? "Hide from customer wallet" : "Show in customer wallet"}
-                            className={`p-1.5 rounded-lg transition-colors border ${coupon.isVisible === 1 ? 'text-emerald-500 border-emerald-100 bg-emerald-50' : 'text-slate-400 border-slate-100 hover:bg-slate-50'}`}
-                          >
-                            <Icons.Check size={16} />
-                          </button>
-                          <button 
-                            onClick={() => toggleStatus(coupon.id, coupon.isActive)}
-                            className={`px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-tight transition-all active:scale-95 ${coupon.isActive === 1 ? 'bg-rose-50 text-rose-600 hover:bg-rose-100' : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100'}`}
-                          >
-                            {coupon.isActive === 1 ? t('admin.coupons.lock') : t('admin.coupons.unlock')}
-                          </button>
-                          <button 
-                            onClick={() => handleDelete(coupon.id, coupon.code)}
-                            className="p-1.5 text-slate-300 hover:text-rose-500 transition-colors"
-                          >
-                             <Icons.Trash size={16} />
-                          </button>
-                       </div>
-                    </td>
-                  </tr>
-                ))}
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex flex-wrap gap-1">
+                          {roleBadges.map((badge, i) => (
+                            <span key={i} className={`text-[8px] font-black uppercase px-1.5 py-0.5 rounded-md leading-none ${badge.class}`}>
+                              {badge.label}
+                            </span>
+                          ))}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                         <div className="flex flex-col gap-1">
+                            <span className="font-bold text-slate-900 text-xs">{coupon.usedCount || 0} / {coupon.usageLimit || "∞"}</span>
+                            <div className="w-20 h-1 bg-slate-100 rounded-full overflow-hidden">
+                               <div 
+                                  className="h-full bg-primary" 
+                                  style={{ width: coupon.usageLimit ? `${Math.min(100, (coupon.usedCount / coupon.usageLimit) * 100)}%` : '0%' }}
+                               />
+                            </div>
+                         </div>
+                      </td>
+                      <td className="px-6 py-4 font-medium text-xs text-slate-500">
+                         {coupon.expiryDate ? new Date(coupon.expiryDate).toLocaleDateString() : t('admin.coupons.noExpiry')}
+                      </td>
+                      <td className="px-6 py-4">
+                         <Badge variant={coupon.isActive === 1 ? "success" : "danger"}>
+                            {coupon.isActive === 1 ? t('admin.coupons.status.active') : t('admin.coupons.status.disabled')}
+                         </Badge>
+                      </td>
+                      <td className="px-6 py-4 text-right">
+                         <div className="flex justify-end items-center gap-2 opacity-100 transition-opacity">
+                            <button 
+                              onClick={() => handleEdit(coupon)}
+                              className="p-1.5 text-indigo-500 hover:bg-indigo-50 border border-transparent hover:border-indigo-100 rounded-lg transition-all"
+                              title="Edit Coupon"
+                            >
+                              <Icons.Settings size={16} />
+                            </button>
+                            <button 
+                              onClick={() => toggleVisibility(coupon.id, coupon.isVisible)}
+                              title={coupon.isVisible === 1 ? "Hide from customer wallet" : "Show in customer wallet"}
+                              className={`p-1.5 rounded-lg transition-colors border ${coupon.isVisible === 1 ? 'text-emerald-500 border-emerald-100 bg-emerald-50' : 'text-slate-400 border-slate-100 hover:bg-slate-50'}`}
+                            >
+                              <Icons.Check size={16} />
+                            </button>
+                            <button 
+                              onClick={() => toggleStatus(coupon.id, coupon.isActive)}
+                              className={`px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-tight transition-all active:scale-95 ${coupon.isActive === 1 ? 'bg-rose-50 text-rose-600 hover:bg-rose-100' : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100'}`}
+                            >
+                              {coupon.isActive === 1 ? t('admin.coupons.lock') : t('admin.coupons.unlock')}
+                            </button>
+                            <button 
+                              onClick={() => handleDelete(coupon.id, coupon.code)}
+                              className="p-1.5 text-slate-300 hover:text-rose-500 transition-colors"
+                            >
+                               <Icons.Trash size={16} />
+                            </button>
+                         </div>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
@@ -276,6 +370,38 @@ export default function CouponsAdminPage() {
                      <span className="text-[10px] text-slate-500 font-medium">{t('admin.coupons.modal.visibilitySub')}</span>
                   </div>
                </label>
+            </div>
+
+            {/* ─── Eligible Roles Selector ─── */}
+            <div className="p-4 bg-gradient-to-r from-amber-50 to-orange-50 rounded-xl border border-amber-100">
+               <p className="text-[10px] uppercase font-black text-amber-700 tracking-widest mb-3 flex items-center gap-1.5">
+                 <span>🎯</span> สิทธิ์การใช้งานคูปอง
+               </p>
+               <div className="grid grid-cols-2 gap-2">
+                 {ROLE_OPTIONS.map(role => {
+                   const isActive = selectedRoles.has(role.key);
+                   return (
+                     <button
+                       key={role.key}
+                       type="button"
+                       onClick={() => handleRoleToggle(role.key)}
+                       className={`py-2.5 px-3 rounded-xl text-xs font-black transition-all border-2 active:scale-95 ${
+                         isActive
+                           ? `${role.color} ring-1 border-current shadow-sm scale-[1.02]`
+                           : 'bg-white border-slate-100 text-slate-400 hover:border-slate-200'
+                       }`}
+                     >
+                       {role.label}
+                     </button>
+                   );
+                 })}
+               </div>
+               <p className="text-[9px] text-amber-600/70 font-bold mt-2.5 leading-relaxed">
+                 {selectedRoles.has("all") 
+                   ? "✨ ผู้ใช้ทุกกลุ่มสามารถใช้คูปองนี้ได้"
+                   : `🔒 ใช้ได้เฉพาะ: ${Array.from(selectedRoles).map(r => ROLE_OPTIONS.find(o => o.key === r)?.label || r).join(", ")}`
+                 }
+               </p>
             </div>
 
             <div className="space-y-4">

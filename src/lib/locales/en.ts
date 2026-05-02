@@ -835,6 +835,7 @@ export const en = {
       users: "Users & Roles",
       stores: "Stores",
       riders: "Riders",
+      providers: "Freelancers (Gigs)",
       coupons: "Coupons",
       finance: "Finance",
       support: "Support",

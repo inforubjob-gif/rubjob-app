@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Card from "@/components/ui/Card";
+import { Icons } from "@/components/ui/Icons";
 
 /** Resolve the app subdomain URL dynamically based on current hostname */
 function getPortalUrl(subdomain: string): string {
@@ -540,32 +542,139 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ─── Contact Channels ─── */}
-      <section className="relative z-10 py-24 bg-[#fafbfd] overflow-hidden">
-        <div className="max-w-7xl mx-auto px-6 md:px-12 text-center">
-          <div className="inline-block px-4 py-1.5 bg-primary/10 text-primary-dark font-black text-xs uppercase tracking-widest rounded-full mb-6">
-            RUBJOB Channels
+      {/* ─── Premium Partnership Section 🚀 ─── */}
+      <section id="partnership" className="relative z-10 py-32 md:py-48 overflow-hidden bg-white">
+        {/* Abstract Background Shapes */}
+        <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-primary/5 rounded-full blur-[120px] -mr-96 -mt-96" />
+        <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-blue-500/5 rounded-full blur-[100px] -ml-48 -mb-48" />
+
+        <div className="max-w-7xl mx-auto px-6 md:px-12 relative z-10">
+          <div className="text-center max-w-3xl mx-auto mb-20 md:mb-28">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-slate-900 text-white rounded-full text-[10px] font-black uppercase tracking-[0.2em] mb-6 shadow-xl shadow-slate-900/20">
+              <span className="w-1.5 h-1.5 bg-primary rounded-full animate-pulse" />
+              Empowering Partners
+            </div>
+            <h3 className="text-5xl md:text-7xl font-black text-slate-900 leading-[1.1] tracking-tight mb-8">
+               ร่วมขับเคลื่อนอนาคต<br/>
+               <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-orange-500 to-primary-dark">ไปกับ RUBJOB</span>
+            </h3>
+            <p className="text-xl text-slate-500 font-medium leading-relaxed">
+               เปิดโอกาสการสร้างรายได้ที่ไร้ขีดจำกัด ไม่ว่าคุณจะเป็นร้านค้ามืออาชีพ หรือไรเดอร์ที่ต้องการอิสระ เรามีระบบที่พร้อมซัพพอร์ตคุณในทุกก้าว
+            </p>
           </div>
-          <h2 className="text-4xl md:text-5xl font-black text-slate-900 mb-16 leading-tight">
-            ช่องทาง <span className="text-primary">การติดต่อ</span>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12">
+            
+            {/* For Stores & Providers Card */}
+            <div className="group relative">
+               <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-700 blur-3xl -z-10 rounded-[48px]" />
+               <Card className="h-full p-10 md:p-14 bg-white border border-slate-100 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.05)] rounded-[48px] overflow-hidden flex flex-col transition-all duration-500 group-hover:-translate-y-2 group-hover:shadow-[0_48px_80px_-16px_rgba(255,165,0,0.15)] group-hover:border-primary/20">
+                  <div className="flex items-start justify-between mb-12">
+                    <div className="w-20 h-20 rounded-[28px] bg-gradient-to-br from-primary to-orange-500 text-white flex items-center justify-center shadow-2xl shadow-primary/30 group-hover:scale-110 group-hover:rotate-3 transition-all duration-500">
+                       <Icons.Store size={40} strokeWidth={2.5} />
+                    </div>
+                    <div className="px-4 py-2 bg-primary/5 border border-primary/10 rounded-full text-[10px] font-black text-primary uppercase tracking-[0.1em] h-fit">
+                       Store & Provider
+                    </div>
+                  </div>
+                  
+                  <h4 className="text-4xl font-black text-slate-900 mb-6 group-hover:text-primary transition-colors">สำหรับร้านค้า<br/>และมืออาชีพ</h4>
+                  <p className="text-slate-500 text-lg mb-10 leading-relaxed font-medium">
+                    เปลี่ยนธุรกิจของคุณให้เป็นระบบดิจิทัล 100% เพิ่มฐานลูกค้าในพื้นที่ และจัดการทุกอย่างผ่านระบบหลังบ้านที่ทรงพลังที่สุด
+                  </p>
+                  
+                  <div className="space-y-5 mb-14 flex-1">
+                    {[
+                      { icon: <Icons.CheckCircle className="text-primary" />, text: "เพิ่มฐานลูกค้าและออเดอร์จาก LINE" },
+                      { icon: <Icons.CheckCircle className="text-primary" />, text: "ระบบจัดการรายรับและถอนเงินรายวัน" },
+                      { icon: <Icons.CheckCircle className="text-primary" />, text: "เครื่องมือวิเคราะห์ยอดขายและคูปอง" }
+                    ].map((item, i) => (
+                      <div key={i} className="flex items-center gap-4 text-slate-600 font-bold group-hover:translate-x-1 transition-transform">
+                         <div className="w-6 h-6 shrink-0">{item.icon}</div>
+                         <span className="text-sm">{item.text}</span>
+                      </div>
+                    ))}
+                  </div>
+
+                  <a 
+                    href="/landing/register/partner"
+                    className="w-full py-6 bg-slate-900 text-white font-black text-center text-lg rounded-2xl hover:bg-primary transition-all duration-300 shadow-2xl shadow-slate-900/10 active:scale-[0.98] relative overflow-hidden group/btn"
+                  >
+                    <span className="relative z-10 uppercase tracking-widest">สมัครเป็นพาร์ทเนอร์</span>
+                    <div className="absolute inset-0 bg-gradient-to-r from-primary to-orange-500 opacity-0 group-hover/btn:opacity-100 transition-opacity duration-300" />
+                  </a>
+               </Card>
+            </div>
+
+            {/* For Riders Card */}
+            <div className="group relative">
+               <div className="absolute inset-0 bg-gradient-to-br from-blue-500/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-700 blur-3xl -z-10 rounded-[48px]" />
+               <Card className="h-full p-10 md:p-14 bg-white border border-slate-100 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.05)] rounded-[48px] overflow-hidden flex flex-col transition-all duration-500 group-hover:-translate-y-2 group-hover:shadow-[0_48px_80px_-16px_rgba(59,130,246,0.15)] group-hover:border-blue-500/20">
+                  <div className="flex items-start justify-between mb-12">
+                    <div className="w-20 h-20 rounded-[28px] bg-gradient-to-br from-blue-500 to-indigo-600 text-white flex items-center justify-center shadow-2xl shadow-blue-500/30 group-hover:scale-110 group-hover:-rotate-3 transition-all duration-500">
+                       <Icons.Bike size={40} strokeWidth={2.5} />
+                    </div>
+                    <div className="px-4 py-2 bg-blue-50 border border-blue-100 rounded-full text-[10px] font-black text-blue-500 uppercase tracking-[0.1em] h-fit">
+                       Delivery Hero
+                    </div>
+                  </div>
+                  
+                  <h4 className="text-4xl font-black text-slate-900 mb-6 group-hover:text-blue-600 transition-colors">สำหรับไรเดอร์<br/>ฮีโร่รับ-ส่ง</h4>
+                  <p className="text-slate-500 text-lg mb-10 leading-relaxed font-medium">
+                    รับงานอิสระ รายได้ดี มีงานต่อเนื่องในพื้นที่ที่คุณคุ้นเคย พร้อมระบบนำทางที่แม่นยำและโบนัสพิเศษ
+                  </p>
+                  
+                  <div className="space-y-5 mb-14 flex-1">
+                    {[
+                      { icon: <Icons.CheckCircle className="text-blue-500" />, text: "ค่ารอบที่เป็นธรรมและโบนัส Surge" },
+                      { icon: <Icons.CheckCircle className="text-blue-500" />, text: "ประกันอุบัติเหตุและความคุ้มครอง" },
+                      { icon: <Icons.CheckCircle className="text-blue-500" />, text: "อิสระในการเลือกเวลาทำงานเอง" }
+                    ].map((item, i) => (
+                      <div key={i} className="flex items-center gap-4 text-slate-600 font-bold group-hover:translate-x-1 transition-transform">
+                         <div className="w-6 h-6 shrink-0">{item.icon}</div>
+                         <span className="text-sm">{item.text}</span>
+                      </div>
+                    ))}
+                  </div>
+
+                  <a 
+                    href="/landing/register/rider"
+                    className="w-full py-6 bg-slate-900 text-white font-black text-center text-lg rounded-2xl hover:bg-blue-600 transition-all duration-300 shadow-2xl shadow-slate-900/10 active:scale-[0.98] relative overflow-hidden group/btn"
+                  >
+                    <span className="relative z-10 uppercase tracking-widest">สมัครเป็นไรเดอร์</span>
+                    <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-indigo-600 opacity-0 group-hover/btn:opacity-100 transition-opacity duration-300" />
+                  </a>
+               </Card>
+            </div>
+
+          </div>
+        </div>
+
+        {/* Decorative Floating Elements */}
+        <div className="absolute top-1/2 left-0 w-24 h-24 bg-primary/20 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute top-1/3 right-0 w-32 h-32 bg-blue-500/10 rounded-full blur-3xl animate-pulse-delayed" />
+      </section>
+
+      {/* ─── Contact Channels ─── */}
+      <section className="relative z-10 py-32 bg-[#fafbfd] overflow-hidden border-t border-slate-100">
+        <div className="max-w-7xl mx-auto px-6 md:px-12 text-center">
+          <div className="inline-block px-5 py-2 bg-slate-100 text-slate-500 font-black text-[10px] uppercase tracking-[0.2em] rounded-full mb-8">
+            Connect with us
+          </div>
+          <h2 className="text-5xl md:text-6xl font-black text-slate-900 mb-20 leading-tight">
+            เราพร้อมให้ <span className="text-primary">คำปรึกษา</span>
           </h2>
 
-          <div className="bg-white rounded-[32px] md:rounded-[48px] shadow-sm border border-slate-100 p-8 md:p-12">
-            <div className="grid grid-cols-1 md:grid-cols-3 divide-y-4 md:divide-y-0 md:divide-x-4 divide-slate-50 gap-y-12">
-              
-              {CONTACTS.map((contact, i) => (
-                <div key={i} className="flex items-center justify-center gap-6 group hover:-translate-y-1 transition-transform cursor-pointer">
-                  <div className={`w-16 h-16 rounded-full flex items-center justify-center text-2xl shadow-lg shrink-0 ${contact.bgClass}`}>
-                    {contact.icon}
-                  </div>
-                  <div className="text-left">
-                    <h4 className="text-xl font-bold text-slate-900 group-hover:text-primary transition-colors">{contact.name}</h4>
-                    <p className="text-sm font-medium text-slate-500 mt-1">{contact.desc}</p>
-                  </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {CONTACTS.map((contact, i) => (
+              <div key={i} className="group bg-white p-10 rounded-[40px] shadow-sm hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border border-slate-50 flex flex-col items-center">
+                <div className={`w-20 h-20 rounded-[24px] flex items-center justify-center text-3xl shadow-xl mb-8 group-hover:scale-110 transition-transform ${contact.bgClass}`}>
+                  {contact.icon}
                 </div>
-              ))}
-              
-            </div>
+                <h4 className="text-2xl font-black text-slate-900 group-hover:text-primary transition-colors mb-2">{contact.name}</h4>
+                <p className="text-slate-400 font-bold text-sm">{contact.desc}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>

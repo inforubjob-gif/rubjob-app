@@ -32,6 +32,7 @@ export async function POST(req: Request) {
           pricing TEXT DEFAULT '{}',
           pricingUnit TEXT DEFAULT '{}',
           bio TEXT DEFAULT '',
+          lineId TEXT DEFAULT '',
           status TEXT DEFAULT 'pending',
           createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
         )
