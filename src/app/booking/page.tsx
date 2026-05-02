@@ -272,7 +272,7 @@ function BookingFlow() {
 
   // Add-on components for display
   const bagSizeExtra = 0; // Legacy, now integrated into laundryFee
-  const foldingFee = withFolding ? (bagSize === "28kg" ? 35 : bagSize === "18kg" ? 25 : 20) : 0;
+  const foldingFee = 0; // User requested no folding fee
 
   const subTotal = pricing.customerTotal + foldingFee;
   const totalDiscount = couponDiscount + pointsDiscount;
@@ -646,7 +646,6 @@ function BookingFlow() {
                   <label className="flex items-center justify-between p-4 cursor-pointer hover:bg-slate-50 transition-colors" onClick={() => setWithFolding(true)}>
                     <div className="flex flex-col">
                       <span className="text-sm font-bold text-foreground">{t("booking.options.withFolding")}</span>
-                      <span className="text-xs text-primary-dark font-medium">+฿{bagSize === "28kg" ? 35 : bagSize === "18kg" ? 25 : 20}</span>
                     </div>
                     <div className={`w-5 h-5 rounded-full flex items-center justify-center transition-colors ${withFolding ? "bg-primary text-white shadow-md shadow-primary/30" : "border-2 border-slate-200"}`}>
                       {withFolding && <span className="text-xs font-bold leading-none flex items-center justify-center pt-0.5">✓</span>}
