@@ -40,7 +40,7 @@ export async function GET(req: Request) {
  */
 export async function POST(req: Request) {
   try {
-    const body = (await req.json()) as any;
+    const body = (await req.json() as any) as any;
     const { userId, label, details, note, lat, lng, isDefault } = body;
     
     if (!userId || !label || !details) {
@@ -104,7 +104,7 @@ export async function POST(req: Request) {
  */
 export async function PUT(req: Request) {
   try {
-    const body = (await req.json()) as any;
+    const body = (await req.json() as any) as any;
     const { id, label, details, note, lat, lng } = body;
     
     if (!id || !label || !details) {

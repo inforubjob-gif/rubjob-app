@@ -9,10 +9,10 @@ export const runtime = "edge";
  */
 export async function GET(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const db = getRequestContext().env.DB;
     if (!db) {
       return NextResponse.json({ error: "D1 Database binding 'DB' not found" }, { status: 500 });

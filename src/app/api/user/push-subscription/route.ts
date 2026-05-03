@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server";
-import { getContext } from "@cloudflare/next-on-pages";
+import { getRequestContext } from "@cloudflare/next-on-pages";
 
 export const runtime = "edge";
 
 export async function POST(request: Request) {
   try {
-    const { userId, subscription } = await request.json();
-    const env = (getContext() as any).env;
+    const { userId, subscription } = await request.json() as any;
+    const env = (getRequestContext() as any).env;
     const db = env.DB;
 
     // We can store this in the 'preferences' field of the users table for now

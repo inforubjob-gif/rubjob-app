@@ -6,7 +6,7 @@ export const runtime = "edge";
 export async function PUT(req: Request) {
   try {
     const db = getRequestContext().env.DB;
-    const body = await req.json();
+    const body = await req.json() as any;
     const { providerId, lineId, name, bio } = body;
 
     // In a real app, we'd get providerId from session/cookie

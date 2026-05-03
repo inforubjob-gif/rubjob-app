@@ -72,7 +72,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
     }
 
-    const { amount } = await req.json();
+    const { amount } = await req.json() as any;
     if (!amount || amount < 100) {
       return NextResponse.json({ error: "ยอดถอนขั้นต่ำ 100 บาท" }, { status: 400 });
     }

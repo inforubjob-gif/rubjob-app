@@ -331,6 +331,7 @@ export default function StoreDashboard() {
                     className="bg-white text-emerald-600 font-black uppercase text-[10px] py-2.5 px-8 rounded-xl shadow-lg active:scale-95 transition-all"
                     onClick={async () => {
                       try {
+                        if (!store) return;
                         const res = await fetch(`/api/auth/link-line?accountId=${store.id}`);
                         const data = await res.json() as any;
                         const token = data.token;

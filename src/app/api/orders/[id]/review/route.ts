@@ -9,11 +9,11 @@ export const runtime = "edge";
  */
 export async function POST(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
-    const { rating, reviewText } = await req.json();
+    const { id } = await params;
+    const { rating, reviewText } = await req.json() as any;
 
     if (!rating || rating < 1 || rating > 5) {
       return NextResponse.json({ error: "Invalid rating" }, { status: 400 });

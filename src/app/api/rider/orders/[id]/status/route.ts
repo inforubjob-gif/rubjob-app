@@ -9,11 +9,11 @@ export const runtime = "edge";
  * POST /api/rider/orders/[id]/status
  * Update order status by rider with optional photo proof
  */
-export async function POST(req: Request, { params }: { params: { id: string } }) {
+export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const session = await getRiderSession();
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   try {
-    const id = params.id;
+    const { id } = await params;
     const { status, photo } = await req.json() as any;
     const db = getRequestContext().env.DB;
     if (!db) return NextResponse.json({ error: "D1 not found" }, { status: 500 });

@@ -23,7 +23,7 @@ export default function VerificationCenterPage() {
     setIsLoading(true);
     try {
       const res = await fetch("/api/admin/verification");
-      const data = await res.json();
+      const data = await res.json() as any;
       if (data.documents) setDocs(data.documents);
     } catch (err) {
       console.error(err);
@@ -102,8 +102,8 @@ export default function VerificationCenterPage() {
                    </div>
                 </div>
                 <div className="flex gap-2">
-                   <Button variant="success" size="sm" onClick={() => updateDocStatus(selectedDoc.id, 'verified')}>Approve</Button>
-                   <Button variant="danger" size="sm" onClick={() => updateDocStatus(selectedDoc.id, 'rejected')}>Reject</Button>
+                   <Button variant={"success" as any} size="sm" onClick={() => updateDocStatus(selectedDoc.id, 'verified')}>Approve</Button>
+                   <Button variant={"danger" as any} size="sm" onClick={() => updateDocStatus(selectedDoc.id, 'rejected')}>Reject</Button>
                 </div>
               </div>
 

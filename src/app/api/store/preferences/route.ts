@@ -27,7 +27,7 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
   try {
-    const { storeId, ...newPrefs } = await req.json();
+    const { storeId, ...newPrefs } = await req.json() as any;
 
     if (!storeId) {
       return NextResponse.json({ error: "Store ID is required" }, { status: 400 });

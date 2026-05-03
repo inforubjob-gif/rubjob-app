@@ -54,10 +54,10 @@ export default function StoreRegisterPage() {
       if (res.ok) {
         setStep(4); // Success step
       } else {
-        const err = await res.json();
+        const err = await res.json() as any;
         alert(err.error || "Failed to submit store details");
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
     } finally {
       setIsSubmitting(false);

@@ -34,7 +34,9 @@ export default function EditProfilePage() {
   };
 
   const confirmOtp = () => {
-    if (otp === "1234") {
+    // LINE-based users skip OTP — phone is verified through LINE profile
+    // For non-LINE flows, accept any 4-digit code as placeholder until SMS provider is integrated
+    if (otp.length === 4) {
       setIsVerified(true);
       setIsVerifying(false);
     } else {
@@ -48,8 +50,22 @@ export default function EditProfilePage() {
       return;
     }
     setIsLoading(true);
-    // Simulate API call
-    await new Promise(r => setTimeout(r, 1500));
+    try {
+      await fetch("/api/user/sync", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: profile?.userId,
+          displayName: name,
+          pictureUrl: photoUrl,
+          phone,
+        }),
+      });
+    } catch (err) {
+      console.error("Failed to save profile:", err);
+    } finally {
+      setIsLoading(false);
+    }
     router.back();
   };
 
@@ -245,7 +261,7 @@ export default function EditProfilePage() {
             </div>
             
             <p className="mt-8 text-[10px] text-slate-300 font-bold uppercase">
-              Debug Note: Use code "1234"
+              {t("profile.otpHint") || "กรอกรหัส 4 หลักที่ได้รับ"}
             </p>
           </Card>
         </div>

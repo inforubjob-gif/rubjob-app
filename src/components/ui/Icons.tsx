@@ -82,6 +82,7 @@ export const Icons = {
   Close: (props: IconProps) => <MaterialIcon name="close" {...props} />,
   Info: (props: IconProps) => <MaterialIcon name="info" {...props} />,
   Alert: (props: IconProps) => <MaterialIcon name="warning" {...props} />,
+  AlertCircle: (props: IconProps) => <MaterialIcon name="error_outline" {...props} />,
   Guarantee: (props: IconProps) => <MaterialIcon name="verified_user" {...props} />,
   MapPin: (props: IconProps) => <MaterialIcon name="location_on" {...props} />,
   Payment: (props: IconProps) => <MaterialIcon name="payments" {...props} />,

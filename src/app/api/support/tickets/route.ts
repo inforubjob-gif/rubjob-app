@@ -81,7 +81,7 @@ export async function POST(req: Request) {
   try { await db.prepare("ALTER TABLE support_tickets ADD COLUMN userType TEXT DEFAULT 'customer'").run(); } catch (e) {}
   try { await db.prepare("ALTER TABLE support_tickets ADD COLUMN orderId TEXT").run(); } catch (e) {}
 
-  const body = await req.json() as { subject?: string; ticketId?: string; message: string };
+  const body = await req.json() as any as { subject?: string; ticketId?: string; message: string };
   const { subject, ticketId, message } = body;
 
   if (!message?.trim()) {

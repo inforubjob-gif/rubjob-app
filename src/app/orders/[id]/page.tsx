@@ -186,7 +186,7 @@ export default function OrderDetailPage() {
           <Card className="p-8 border border-slate-100 bg-white">
              <div className="flex flex-col items-center text-center">
                 <div className="w-14 h-14 bg-primary/10 rounded-full flex items-center justify-center text-primary mb-4">
-                   <Icons.Star size={28} fill="currentColor" />
+                   <Icons.Star size={28} fill={true} />
                 </div>
                 <h3 className="text-lg font-black text-foreground mb-1">{t("orders.review.title")}</h3>
                 <p className="text-xs text-muted mb-8">{t("orders.review.subtitle")}</p>
@@ -200,7 +200,7 @@ export default function OrderDetailPage() {
                       >
                          <Icons.Star 
                            size={36} 
-                           fill={rating >= star ? "currentColor" : "none"} 
+                           fill={rating >= star} 
                            strokeWidth={rating >= star ? 0 : 2}
                          />
                       </button>

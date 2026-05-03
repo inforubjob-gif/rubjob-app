@@ -136,10 +136,10 @@ function BookingFlow() {
           fetch("/api/admin/settings").catch(() => null)
         ]);
 
-        const sData = sRes?.ok ? await sRes.json() : { services: [] };
-        const stData = stRes?.ok ? await stRes.json() : { stores: [] };
-        const adData = adRes?.ok ? await adRes.json() : { addresses: [] };
-        const setData = setRes?.ok ? await setRes.json() : { settings: [] };
+        const sData = sRes?.ok ? await sRes.json() as any : { services: [] };
+        const stData = stRes?.ok ? await stRes.json() as any : { stores: [] };
+        const adData = adRes?.ok ? await adRes.json() as any : { addresses: [] };
+        const setData = setRes?.ok ? await setRes.json() as any : { settings: [] };
 
         if (sData?.services) setDbServices(sData.services);
         if (stData?.stores) setDbStores(stData.stores);
@@ -371,7 +371,7 @@ function BookingFlow() {
         })
       });
 
-      const payData = await payRes.json() as any;
+      const payData = await payRes.json() as any as any;
       if (payRes.ok && payData.paymentData) {
         setPaymentQR(payData.paymentData);
         // Step remains 'payment' but now shows the real QR
@@ -799,7 +799,7 @@ function BookingFlow() {
                           headers: { "Content-Type": "application/json" },
                           body: JSON.stringify({ code: couponCode, subtotal: laundryFee + deliveryFee, userRole: 'customer' })
                         });
-                        const data = await res.json();
+                        const data = await res.json() as any;
                         if (res.ok && data.success) {
                           setAppliedCoupon({ code: data.coupon.code, discount: data.coupon.discount });
                           showToast(t("booking.couponSuccess").replace("{amount}", data.coupon.discount.toString()), "success");
@@ -1168,7 +1168,7 @@ function BookingFlow() {
                            headers: { "Content-Type": "application/json" },
                            body: JSON.stringify({ code: cpn.code, subtotal: laundryFee + deliveryFee, userRole: 'customer' })
                         });
-                        const data = await res.json();
+                        const data = await res.json() as any;
                         if (res.ok && data.success) {
                            setAppliedCoupon({ code: data.coupon.code, discount: data.coupon.discount });
                            showToast(t("booking.couponSuccess").replace("{amount}", data.coupon.discount.toString()), "success");

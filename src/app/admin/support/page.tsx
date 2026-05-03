@@ -66,7 +66,7 @@ export default function SupportCenterPage() {
     try {
       const filterParam = activeFilter !== "all" ? `&filter=${activeFilter}` : "";
       const res = await fetch(`/api/admin/support/tickets?_=${Date.now()}${filterParam}`);
-      const data = await res.json();
+      const data = await res.json() as any;
       if (data.tickets) setTickets(data.tickets);
       if (data.counts) setCounts(data.counts);
     } catch (err) {
@@ -79,7 +79,7 @@ export default function SupportCenterPage() {
   const fetchMessages = async (id: string) => {
     try {
       const res = await fetch(`/api/admin/support/tickets?id=${id}`);
-      const data = await res.json();
+      const data = await res.json() as any;
       if (data.messages) setMessages(data.messages);
     } catch (err) {
       console.error("Failed to fetch messages:", err);

@@ -12,7 +12,7 @@ export async function POST(req: Request) {
   const session = await getAdminSession();
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   try {
-    const { ticketId, text, adminName } = (await req.json()) as { ticketId: string; text: string; adminName: string };
+    const { ticketId, text, adminName } = (await req.json() as any) as { ticketId: string; text: string; adminName: string };
     
     if (!ticketId || !text) {
       return NextResponse.json({ error: "Ticket ID and Text required" }, { status: 400 });

@@ -20,15 +20,15 @@ async function resolveIdentity(): Promise<{ id: string; type: string } | null> {
  * POST /api/orders/[id]/report-issue
  * Create a support ticket linked to an order.
  */
-export async function POST(req: Request, { params }: { params: { id: string } }) {
-  const { id: orderId } = params;
+export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const { id: orderId } = await params;
   const identity = await resolveIdentity();
   if (!identity) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const db = getRequestContext().env.DB;
   if (!db) return NextResponse.json({ error: "DB not found" }, { status: 500 });
 
-  const body = await req.json() as { type: string; message: string };
+  const body = await req.json() as any as { type: string; message: string };
   const { type, message } = body;
 
   if (!type) return NextResponse.json({ error: "Issue type required" }, { status: 400 });

@@ -21,6 +21,8 @@ export interface Store {
   serviceRadiusKm: number;
   baseDeliveryFee: number;
   extraFeePerKm: number;
+  phone?: string;
+  lineUserId?: string;
   isActive: boolean;
   createdAt: string;
 }

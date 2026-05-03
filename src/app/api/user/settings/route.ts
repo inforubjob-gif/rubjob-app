@@ -27,7 +27,7 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    const settings = JSON.parse(user.preferences || "{}");
+    const settings = JSON.parse((user.preferences as string) || "{}");
     return NextResponse.json({ settings });
   } catch (error: any) {
     console.error("Fetch settings error:", error);
@@ -55,7 +55,7 @@ export async function POST(req: Request) {
     // Merge or overwrite preferences? For simplicity, we'll overwrite the keys provided
     // First, get existing
     const existing = await db.prepare("SELECT preferences FROM users WHERE id = ?").bind(userId).first();
-    const currentPrefs = JSON.parse(existing?.preferences || "{}");
+    const currentPrefs = JSON.parse((existing?.preferences as string) || "{}");
     
     const newPrefs = {
       ...currentPrefs,

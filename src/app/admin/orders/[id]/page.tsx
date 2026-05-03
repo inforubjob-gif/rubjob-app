@@ -25,7 +25,7 @@ export default function AdminOrderDetailPage() {
     setIsLoading(true);
     try {
       const res = await fetch(`/api/admin/orders?id=${id}`);
-      const data = await res.json();
+      const data = await res.json() as any;
       if (data.order) setOrder(data.order);
     } catch (err) {
       console.error(err);

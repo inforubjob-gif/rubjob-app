@@ -214,7 +214,7 @@ export default function ProfilePage() {
             
             {/* Logout Button */}
             <button
-              onClick={logout}
+              onClick={() => logout()}
               className="w-full flex items-center gap-4 px-4 py-5 hover:bg-rose-50 transition-colors text-left group border-t border-slate-50"
             >
               <IconCircle variant="ghost" size="md" className="group-hover:text-rose-600 transition-colors">

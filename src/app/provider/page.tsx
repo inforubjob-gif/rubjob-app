@@ -398,7 +398,7 @@ export default function ProviderDashboard() {
                             fullWidth 
                             className="bg-primary text-white hover:bg-primary-dark shadow-xl shadow-primary/20 active:scale-95 transition-all col-span-2" 
                             size="sm"
-                            onClick={() => handleAction(job.id, "accept")}
+                            onClick={() => handleAcceptJob(job.id)}
                           >
                             รับงานนี้
                           </Button>

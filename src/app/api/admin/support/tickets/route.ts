@@ -99,7 +99,7 @@ export async function GET(req: Request) {
  */
 export async function PATCH(req: Request) {
   try {
-    const { id, status } = (await req.json()) as { id: string; status: string };
+    const { id, status } = (await req.json() as any) as { id: string; status: string };
     const db = getRequestContext().env.DB;
     if (!db) return NextResponse.json({ error: "D1 not found" }, { status: 500 });
 

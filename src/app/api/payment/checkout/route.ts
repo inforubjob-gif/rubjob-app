@@ -10,7 +10,7 @@ export const runtime = "edge";
  */
 export async function POST(req: Request) {
   try {
-    const { orderId, amount } = await req.json() as { orderId: string, amount: number };
+    const { orderId, amount } = await req.json() as any as { orderId: string, amount: number };
 
     if (!orderId || !amount) {
       return NextResponse.json({ error: "Order ID and Amount required" }, { status: 400 });
@@ -27,7 +27,7 @@ export async function POST(req: Request) {
 
     // Initialize Stripe
     const stripe = new Stripe(stripeSecretKey, {
-      apiVersion: "2025-01-27.acacia", // Use latest stable version compatible with Edge
+      apiVersion: "2026-03-25.dahlia", // Use latest stable version compatible with Edge
       httpClient: Stripe.createFetchHttpClient(), // Required for Edge Runtime
     });
 

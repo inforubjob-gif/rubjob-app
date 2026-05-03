@@ -36,7 +36,7 @@ export default function RiderManagementAdminPage() {
     setIsLoading(true);
     try {
       const res = await fetch("/api/admin/riders");
-      const data = await res.json();
+      const data = await res.json() as any;
       if (data.riders) {
         setRiders(data.riders);
         setFilteredRiders(data.riders);

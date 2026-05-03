@@ -35,7 +35,7 @@ export async function PUT(req: Request) {
     const db = getRequestContext().env.DB;
     if (!db) return NextResponse.json({ error: "D1 not found" }, { status: 500 });
 
-    const { id, status } = await req.json();
+    const { id, status } = await req.json() as any;
     if (!id || !status) {
       return NextResponse.json({ error: "id and status required" }, { status: 400 });
     }

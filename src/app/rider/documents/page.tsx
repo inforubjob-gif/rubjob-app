@@ -50,7 +50,7 @@ export default function RiderDocumentsPage() {
           router.replace("/rider");
         }, 3000);
       } else {
-        const data = await res.json();
+        const data = await res.json() as any;
         showToast(data.error || t("common.error"), "error");
       }
     } catch (err) {

@@ -91,7 +91,7 @@ export async function PUT(req: Request) {
       return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
     }
 
-    const { orderId, action } = await req.json();
+    const { orderId, action } = await req.json() as any;
     if (!orderId) {
       return NextResponse.json({ error: "orderId required" }, { status: 400 });
     }

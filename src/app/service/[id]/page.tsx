@@ -8,7 +8,7 @@ import { Icons, getServiceIcon, IconCircle } from "@/components/ui/Icons";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 
-export default function GigLandingPage({ params }: { params: { id: string } }) {
+export default function GigLandingPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
   const [gig, setGig] = useState<any>(null);
   const [packages, setPackages] = useState<any[]>([]);
@@ -17,10 +17,11 @@ export default function GigLandingPage({ params }: { params: { id: string } }) {
   useEffect(() => {
     async function fetchGig() {
       try {
+        const { id } = await params;
         const res = await fetch("/api/services");
         const data = await res.json() as any;
         if (data.services) {
-          const found = data.services.find((s: any) => s.id === params.id);
+          const found = data.services.find((s: any) => s.id === id);
           if (found) {
             setGig(found);
             try {
@@ -37,7 +38,7 @@ export default function GigLandingPage({ params }: { params: { id: string } }) {
       }
     }
     fetchGig();
-  }, [params.id]);
+  }, [params]);
 
   const handleBookPackage = (pkg: any) => {
     // Route to booking page with specific gig and package instructions

@@ -1,25 +1,42 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Card from "@/components/ui/Card";
 import Badge, { statusToBadgeVariant, statusLabel } from "@/components/ui/Badge";
 import { Icons, getServiceIcon } from "@/components/ui/Icons";
 import { useTranslation } from "@/components/providers/LanguageProvider";
+import { useStoreAuth } from "@/components/providers/StoreProvider";
+import Skeleton from "@/components/ui/Skeleton";
 
 export default function StoreOrdersPage() {
   const router = useRouter();
   const { t } = useTranslation();
+  const { store } = useStoreAuth();
   const [filter, setFilter] = useState<"active" | "completed">("active");
+  const [allOrders, setAllOrders] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Mock data - in a real app these would be fetched from API
-  const orders = filter === "active" ? [
-    { id: "ORD-9905", svc: "home_cleaning", status: "picked_up", date: "Today", price: 500 },
-    { id: "ORD-9902", svc: "wash_fold", status: "washing", date: "Yesterday", price: 120 },
-  ] : [
-    { id: "ORD-9880", svc: "dry_clean", status: "completed", date: "24 Mar", price: 350 },
-    { id: "ORD-9875", svc: "wash_iron", status: "completed", date: "22 Mar", price: 180 },
-  ];
+  useEffect(() => {
+    if (!store?.id) return;
+    async function fetchOrders() {
+      try {
+        const res = await fetch(`/api/store/orders?storeId=${store?.id}`);
+        const data = await res.json() as any;
+        if (data.orders) setAllOrders(data.orders);
+      } catch (err) {
+        console.error("Failed to fetch store orders:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    fetchOrders();
+  }, [store?.id]);
+
+  const activeStatuses = ["pending", "picking_up", "picked_up", "delivering_to_store", "washing", "ready_for_pickup", "delivering_to_customer"];
+  const orders = filter === "active"
+    ? allOrders.filter(o => activeStatuses.includes(o.status))
+    : allOrders.filter(o => o.status === "completed" || o.status === "cancelled");
 
   return (
     <div className="flex flex-col min-h-dvh bg-slate-50">
@@ -59,7 +76,19 @@ export default function StoreOrdersPage() {
       </div>
 
       <main className="flex-1 p-5 space-y-6 pb-28 animate-fade-in stagger">
-        {orders.length === 0 ? (
+        {isLoading ? (
+          <div className="space-y-4">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="bg-white p-5 rounded-[1.75rem] border border-slate-100 flex items-center gap-4">
+                <Skeleton variant="circle" className="w-14 h-14" />
+                <div className="flex-1 space-y-2">
+                  <Skeleton variant="text" className="w-24 h-4" />
+                  <Skeleton variant="text" className="w-full h-3" />
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : orders.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-24 text-center">
             <div className="w-20 h-20 bg-white rounded-[2rem] shadow-xl shadow-slate-200/50 flex items-center justify-center mb-6 text-slate-200 border border-slate-50">
               <Icons.FileText size={40} strokeWidth={1.5} />
@@ -82,14 +111,14 @@ export default function StoreOrdersPage() {
                  <div className="p-5 flex items-center gap-4">
                    {/* Icon Container */}
                    <div className="w-14 h-14 bg-slate-50 rounded-[1.25rem] flex items-center justify-center text-primary-dark shrink-0 border border-slate-100">
-                     {getServiceIcon(order.svc as any, { size: 28 })}
+                     {getServiceIcon(order.serviceId as any, { size: 28 })}
                    </div>
 
                    {/* Details */}
                    <div className="flex-1 min-w-0">
                      <div className="flex items-center justify-between gap-2 mb-1">
                        <h3 className="text-sm font-black text-slate-900 truncate uppercase">
-                         {t(`orders.services.${order.svc}`) || (order.svc === "home_cleaning" ? t("orders.services.home_cleaning") : t("store.laundryService"))}
+                         {t(`orders.services.${order.serviceId}`) || order.serviceName || t("store.laundryService")}
                        </h3>
                        <Badge variant={statusToBadgeVariant(order.status as any)} className="text-[9px] font-black py-0.5 px-2">
                          {t(`orders.status.${order.status}`)}
@@ -99,10 +128,10 @@ export default function StoreOrdersPage() {
                      
                      <div className="flex items-center gap-2 mt-2">
                         <span className="text-[10px] font-black text-primary bg-primary/10 px-2 py-0.5 rounded-md">
-                          ฿{order.price}
+                          ฿{Math.ceil(order.totalPrice || 0)}
                         </span>
                         <span className="text-[10px] text-slate-400 font-bold uppercase">
-                          {order.date}
+                          {new Date(order.createdAt).toLocaleDateString('th-TH', { day: 'numeric', month: 'short' })}
                         </span>
                      </div>
                    </div>

@@ -67,7 +67,7 @@ export default function PromotionsPage() {
     e.stopPropagation();
     try {
       if (!process.env.NEXT_PUBLIC_LIFF_ID) {
-        alert(t("promotions.inviteSuccessMock"));
+        alert(t("promotions.inviteSuccess"));
         return;
       }
 

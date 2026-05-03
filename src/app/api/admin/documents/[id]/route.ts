@@ -11,14 +11,14 @@ export const runtime = "edge";
  */
 export async function GET(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const adminSession = await getAdminSession();
   const riderSession = await getRiderSession();
   if (!adminSession && !riderSession) return new Response("Unauthorized", { status: 401 });
 
   try {
-    const { id } = params;
+    const { id } = await params;
     const db = getRequestContext().env.DB;
     if (!db) return new Response("DB not found", { status: 500 });
 

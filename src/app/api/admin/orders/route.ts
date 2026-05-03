@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getContext } from "@cloudflare/next-on-pages";
+import { getRequestContext } from "@cloudflare/next-on-pages";
 
 export const runtime = "edge";
 
@@ -7,8 +7,7 @@ export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const id = searchParams.get("id");
-    const env = (getContext() as any).env;
-    const db = env.DB;
+    const db = getRequestContext().env.DB;
 
     if (id) {
       const order = await db.prepare(`

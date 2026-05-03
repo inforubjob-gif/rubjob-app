@@ -45,10 +45,10 @@ export default function RiderRegisterPage() {
       if (res.ok) {
         setStep(4); // Success step
       } else {
-        const err = await res.json();
+        const err = await res.json() as any;
         alert(err.error || "Something went wrong");
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
     } finally {
       setIsSubmitting(false);

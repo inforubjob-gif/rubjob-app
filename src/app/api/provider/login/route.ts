@@ -6,7 +6,7 @@ export const runtime = "edge";
 
 export async function POST(req: Request) {
   try {
-    const { email, password } = await req.json();
+    const { email, password } = await req.json() as any;
 
     if (!email || !password) {
       return NextResponse.json({ success: false, error: "กรุณากรอกอีเมลและรหัสผ่าน" }, { status: 400 });

@@ -76,7 +76,7 @@ export async function GET() {
  */
 export async function PATCH(req: Request) {
   try {
-    const { updates } = (await req.json()) as { updates: { key: string; value: string }[] };
+    const { updates } = (await req.json() as any) as { updates: { key: string; value: string }[] };
     if (!updates || !Array.isArray(updates)) {
       return NextResponse.json({ error: "Invalid updates format" }, { status: 400 });
     }

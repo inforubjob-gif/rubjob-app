@@ -104,7 +104,7 @@ export default function CouponsAdminPage() {
         resetForm();
         fetchCoupons();
       } else {
-        const err = await res.json();
+        const err = await res.json() as any;
         showToast(err.error || t('admin.common.toast.error'), "error");
       }
     } catch (err) {

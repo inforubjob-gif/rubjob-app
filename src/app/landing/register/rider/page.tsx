@@ -38,7 +38,7 @@ export default function RiderRegisterPage() {
         method: "POST",
         body: upData,
       });
-      const data = await res.json();
+      const data = await res.json() as any;
       if (data.url) {
         setFormData({ ...formData, [field]: data.url });
       }
@@ -64,7 +64,7 @@ export default function RiderRegisterPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
-      const data = await res.json();
+      const data = await res.json() as any;
 
       if (res.ok) {
         router.push("/rider/login?registered=true");

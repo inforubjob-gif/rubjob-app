@@ -108,7 +108,7 @@ export async function PUT(req: Request) {
   const session = await getRiderSession();
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   try {
-    const { orderId, riderId } = await req.json();
+    const { orderId, riderId } = await req.json() as any;
 
     if (!orderId || !riderId) {
       return NextResponse.json({ error: "Order ID and Rider ID required" }, { status: 400 });

@@ -2,7 +2,7 @@
 
 export const runtime = "edge";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Card from "@/components/ui/Card";
 import Badge, { statusToBadgeVariant } from "@/components/ui/Badge";
