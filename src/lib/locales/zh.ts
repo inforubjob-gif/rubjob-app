@@ -33,6 +33,7 @@ export const zh = {
     comingSoonDesc: "{service} 服务正在开发中，敬请期待！ ✨",
     gotIt: "知道了",
     remove: "移除",
+    tapToEnterPin: "点击输入密码",
   },
   home: {
     activeOrders: "当前订单",

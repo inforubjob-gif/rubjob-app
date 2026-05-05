@@ -1,5 +1,7 @@
 import { getRequestContext } from "@cloudflare/next-on-pages";
 import { NextResponse } from "next/server";
+import { getProviderSession } from "@/lib/auth-server";
+import { nanoid } from "nanoid";
 import { cookies } from "next/headers";
 
 export const runtime = "edge";
@@ -10,8 +12,7 @@ export const runtime = "edge";
  */
 export async function GET(req: Request) {
   try {
-    const cookieStore = await cookies();
-    const token = cookieStore.get("provider_token")?.value;
+    const token = await getProviderSession();
     if (!token) {
       return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
     }
@@ -34,26 +35,62 @@ export async function GET(req: Request) {
       `).run();
     } catch (e) {}
 
-    // Calculate balance
-    const balRes = await db.prepare(`
-      SELECT COALESCE(SUM(CASE 
-        WHEN type = 'job_completion' AND status = 'completed' THEN amount 
-        WHEN type = 'withdrawal' AND status = 'completed' THEN -amount 
-        ELSE 0 END), 0) as balance
-      FROM provider_wallet WHERE providerId = ?
+    // Calculate Earnings (sum of totalPrice from completed orders)
+    const earningsRes = await db.prepare(`
+      SELECT SUM(totalPrice) as totalEarnings 
+      FROM orders 
+      WHERE providerId = ? AND status = 'completed'
     `).bind(token).first() as any;
+    
+    // Applying 15% commission for now
+    const totalEarnings = (earningsRes?.totalEarnings || 0) * 0.85; 
 
-    // Transaction history
-    const histRes = await db.prepare(`
-      SELECT * FROM provider_wallet 
-      WHERE providerId = ? 
-      ORDER BY createdAt DESC 
-      LIMIT 50
+    // Calculate Withdrawals
+    const withdrawalsRes = await db.prepare(`
+      SELECT SUM(amount) as totalWithdrawn 
+      FROM payout_requests 
+      WHERE requesterId = ? AND status != 'rejected'
+    `).bind(token).first() as any;
+    
+    const totalWithdrawn = withdrawalsRes?.totalWithdrawn || 0;
+    const balance = totalEarnings - totalWithdrawn;
+
+    // Fetch Recent Transactions (Orders + Payouts)
+    const { results: orders } = await db.prepare(`
+      SELECT id, totalPrice as amount, createdAt, 'earning' as type, 'success' as status
+      FROM orders 
+      WHERE providerId = ? AND status = 'completed'
+      ORDER BY createdAt DESC LIMIT 10
     `).bind(token).all();
 
-    return NextResponse.json({
-      balance: balRes?.balance || 0,
-      transactions: histRes.results || [],
+    const { results: payouts } = await db.prepare(`
+      SELECT id, amount, createdAt, 'withdrawal' as type, status
+      FROM payout_requests 
+      WHERE requesterId = ?
+      ORDER BY createdAt DESC LIMIT 10
+    `).bind(token).all();
+
+    // Map and merge
+    const transactions = [
+      ...(orders as any[]).map(o => ({ 
+        id: o.id, 
+        type: "Service Earning", 
+        amount: o.amount * 0.85, 
+        date: o.createdAt, 
+        status: "Success" 
+      })),
+      ...(payouts as any[]).map(p => ({ 
+        id: p.id, 
+        type: "Withdrawal", 
+        amount: -p.amount, 
+        date: p.createdAt, 
+        status: p.status 
+      }))
+    ].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+    return NextResponse.json({ 
+      balance: Math.max(0, balance),
+      transactions: transactions.slice(0, 15)
     });
   } catch (err: any) {
     console.error("Provider wallet GET error:", err);
@@ -66,8 +103,7 @@ export async function GET(req: Request) {
  */
 export async function POST(req: Request) {
   try {
-    const cookieStore = await cookies();
-    const token = cookieStore.get("provider_token")?.value;
+    const token = await getProviderSession();
     if (!token) {
       return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
     }
@@ -80,23 +116,40 @@ export async function POST(req: Request) {
     const db = getRequestContext().env.DB;
     if (!db) return NextResponse.json({ error: "D1 not found" }, { status: 500 });
 
-    // Check balance
-    const balRes = await db.prepare(`
-      SELECT COALESCE(SUM(CASE 
-        WHEN type = 'job_completion' AND status = 'completed' THEN amount 
-        WHEN type = 'withdrawal' AND status = 'completed' THEN -amount 
-        ELSE 0 END), 0) as balance
-      FROM provider_wallet WHERE providerId = ?
+    // Check total earnings from orders and current balance
+    const earningsRes = await db.prepare(`
+      SELECT SUM(totalPrice) as totalEarnings 
+      FROM orders 
+      WHERE providerId = ? AND status = 'completed'
     `).bind(token).first() as any;
+    
+    // Applying 15% platform commission
+    const totalEarnings = (earningsRes?.totalEarnings || 0) * 0.85; 
 
-    if ((balRes?.balance || 0) < amount) {
+    const withdrawalsRes = await db.prepare(`
+      SELECT SUM(amount) as totalWithdrawn 
+      FROM payout_requests 
+      WHERE requesterId = ? AND status != 'rejected'
+    `).bind(token).first() as any;
+    
+    const totalWithdrawn = withdrawalsRes?.totalWithdrawn || 0;
+    const balance = totalEarnings - totalWithdrawn;
+
+    if (balance < amount) {
       return NextResponse.json({ error: "ยอดเงินไม่เพียงพอ" }, { status: 400 });
     }
 
+    const { bankName, accountNumber, accountName } = await req.json() as any || {};
+    const payoutId = `WDR-${nanoid(8).toUpperCase()}`;
+
+    // Insert into unified payout_requests
     await db.prepare(`
-      INSERT INTO provider_wallet (providerId, amount, type, status, createdAt)
-      VALUES (?, ?, 'withdrawal', 'pending', CURRENT_TIMESTAMP)
-    `).bind(token, amount).run();
+      INSERT INTO payout_requests (id, requesterId, requesterType, amount, bankName, accountNumber, accountName, status)
+      VALUES (?, ?, 'provider', ?, ?, ?, ?, 'pending')
+    `).bind(
+      payoutId, token, amount, 
+      bankName || "N/A", accountNumber || "N/A", accountName || "N/A"
+    ).run();
 
     return NextResponse.json({ success: true });
   } catch (err: any) {

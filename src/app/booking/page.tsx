@@ -371,9 +371,9 @@ function BookingFlow() {
         })
       });
 
-      const payData = await payRes.json() as any as any;
-      if (payRes.ok && payData.paymentData) {
-        setPaymentQR(payData.paymentData);
+      const payData = await payRes.json() as any;
+      if (payRes.ok && payData.clientSecret) {
+        setPaymentQR(payData.clientSecret);
         // Step remains 'payment' but now shows the real QR
       } else {
         // If payment fails to init, still have the order. Redirect to order page.

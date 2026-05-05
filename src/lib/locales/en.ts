@@ -18,7 +18,7 @@ export const en = {
     madeInBangkok: "Made with Heart",
     version: "Version",
     notFoundTitle: "Page Not Found",
-    notFoundDesc: "Sorry, we couldn't find the page you me looking for.\nHow about going back to the home page? ✨",
+    notFoundDesc: "Sorry, we couldn't find the page you're looking for.\nHow about going back to the home page? ✨",
     goHome: "Go Home",
     close: "Close",
     guest: "Guest",
@@ -39,6 +39,7 @@ export const en = {
     processing: "Washing / Processing...",
     pending: "Pending",
     remove: "Remove",
+    tapToEnterPin: "Tap to enter PIN",
   },
   home: {
     activeOrders: "Active Orders",

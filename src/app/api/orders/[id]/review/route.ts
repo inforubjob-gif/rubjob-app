@@ -21,17 +21,21 @@ export async function POST(
 
     const db = getRequestContext().env.DB;
 
+    // Self-healing: Ensure new columns exist
+    try { await db.prepare("ALTER TABLE orders ADD COLUMN rating INTEGER").run(); } catch (e) {}
+    try { await db.prepare("ALTER TABLE orders ADD COLUMN review_text TEXT").run(); } catch (e) {}
+
     // Update order with rating and review
     const result = await db
       .prepare(
-        "UPDATE Orders SET rating = ?, review_text = ? WHERE id = ? AND status = 'COMPLETED'"
+        "UPDATE orders SET rating = ?, review_text = ? WHERE id = ? AND status = 'completed'"
       )
       .bind(rating, reviewText, id)
       .run();
 
     if (result.meta.changes === 0) {
       return NextResponse.json(
-        { error: "Order not found or not in COMPLETED status" },
+        { error: "Order not found or not in completed status" },
         { status: 404 }
       )
     }
@@ -40,23 +44,23 @@ export async function POST(
     if (rating <= 3 || (reviewText && reviewText.trim().length > 0)) {
       // Get customer info
       const orderData = await db.prepare(`
-        SELECT o.customer_id, u.name as customerName 
-        FROM Orders o 
-        JOIN Users u ON o.customer_id = u.id 
+        SELECT o.userId, u.displayName as customerName 
+        FROM orders o 
+        LEFT JOIN users u ON o.userId = u.id 
         WHERE o.id = ?
       `).bind(id).first() as any;
       
-      if (orderData?.customer_id) {
+      if (orderData?.userId) {
         const ticketId = `SUP-REV-${id.slice(-6).toUpperCase()}`;
         const messageId = `MSG-${Math.random().toString(36).substring(2, 10).toUpperCase()}`;
         const content = `[Review ${rating} Stars] ${reviewText || "No comment"}`;
 
         // 1. Create or Update Support Ticket
         await db.prepare(`
-          INSERT INTO support_tickets (id, userId, userType, status, updatedAt, senderName)
-          VALUES (?, ?, 'customer', 'open', CURRENT_TIMESTAMP, ?)
+          INSERT INTO support_tickets (id, userId, userType, status, updatedAt)
+          VALUES (?, ?, 'customer', 'open', CURRENT_TIMESTAMP)
           ON CONFLICT(id) DO UPDATE SET status = 'open', updatedAt = CURRENT_TIMESTAMP
-        `).bind(ticketId, orderData.customer_id, orderData.customerName || "Customer").run();
+        `).bind(ticketId, orderData.userId).run();
 
         // 2. Insert the review as the first message
         await db.prepare(`

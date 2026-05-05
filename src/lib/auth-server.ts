@@ -17,3 +17,9 @@ export async function getRiderSession() {
   const token = cookieStore.get("rider_token")?.value;
   return token || null;
 }
+
+export async function getProviderSession() {
+  const cookieStore = await cookies();
+  const token = cookieStore.get("provider_token")?.value;
+  return token || null;
+}

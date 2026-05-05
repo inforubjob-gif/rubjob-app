@@ -44,6 +44,7 @@ export const th = {
       suspend: "ระงับการใช้งาน",
       review: "ตรวจสอบ",
       remove: "นำออก",
+      tapToEnterPin: "แตะเพื่อใส่รหัส",
     },
     home: {
       activeOrders: "ออเดอร์ปัจจุบัน",
@@ -572,7 +573,6 @@ export const th = {
         },
         statuses: {
           "Success": "สำเร็จ",
-          "Success ": "สำเร็จ",
           "pending": "รอดำเนินการ",
           "rejected": "ปฏิเสธ",
         },
@@ -816,7 +816,7 @@ export const th = {
         confirmSupportArea: "ยืนยันพื้นที่ให้บริการ",
       },
       completePickup: "ยืนยันรับผ้าเรียบร้อย",
-      completeDelivery: "ลายละเอียดส่งผ้าเรียบร้อย",
+      completeDelivery: "ยืนยันส่งผ้าเรียบร้อย",
       orderDetail: {
         pickupFrom: "รับผ้าที่",
         deliverTo: "ส่งผ้าที่",
@@ -1210,7 +1210,7 @@ export const th = {
           cloudCostPerOrder: "Estimated Cloud Cost per Order",
           perOrder: "Order",
           growthProjection: "Growth Projection",
-          projectionTitle: "จำลองสเกลธุกิจ",
+          projectionTitle: "จำลองสเกลธุรกิจ",
           projectionSub: "Rubjob ใช้สถาปัตยกรรมแบบ Edge Computing ที่ไม่ต้องปรับแต่งระบบ (Zero Configuration) แม้จะมีผู้ใช้งานเพิ่มขึ้นนับแสนราย ต้นทุนคงที่ยังคงอยู่ในระดับที่ควบคุมได้",
           orderInputLabel: "Projection: Orders per Month",
           mvpStage: "MVP Stage (1k)",
@@ -1404,7 +1404,7 @@ export const th = {
       termsDescription: "กรุณาอ่านข้อกำหนดเหล่านี้ให้ละเอียดก่อนเข้าใช้งานแพลตฟอร์ม Rubjob",
       lastUpdated: "อัปเดตล่าสุดเมื่อ: {date}",
       businessDetails: "ข้อมูลธุรกิจ",
-      address: "ที่อยู่: [BUSINESS_ADDRESS]",
+      address: "ที่อยู่: กรุงเทพมหานคร, ประเทศไทย",
       email: "อีเมล: support@rubjob.com",
     },
     landingContact: {

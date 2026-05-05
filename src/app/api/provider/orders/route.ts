@@ -1,6 +1,6 @@
 import { getRequestContext } from "@cloudflare/next-on-pages";
 import { NextResponse } from "next/server";
-import { cookies } from "next/headers";
+import { getProviderSession } from "@/lib/auth-server";
 
 export const runtime = "edge";
 
@@ -14,8 +14,7 @@ export const runtime = "edge";
 
 export async function GET(req: Request) {
   try {
-    const cookieStore = await cookies();
-    const token = cookieStore.get("provider_token")?.value;
+    const token = await getProviderSession();
     if (!token) {
       return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
     }
@@ -85,8 +84,7 @@ export async function GET(req: Request) {
 
 export async function PUT(req: Request) {
   try {
-    const cookieStore = await cookies();
-    const token = cookieStore.get("provider_token")?.value;
+    const token = await getProviderSession();
     if (!token) {
       return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
     }
@@ -132,42 +130,10 @@ export async function PUT(req: Request) {
       return NextResponse.json({ success: true, status: "in_progress" });
 
     } else if (action === "complete") {
-      // Mark order as completed + credit provider wallet
+      // Mark order as completed
       await db.prepare(`
         UPDATE orders SET status = 'completed', updatedAt = CURRENT_TIMESTAMP WHERE id = ? AND providerId = ?
       `).bind(orderId, token).run();
-
-      // Credit provider wallet
-      const order = await db.prepare("SELECT totalPrice FROM orders WHERE id = ?").bind(orderId).first() as any;
-      if (order) {
-        // Provider gets 85% (platform takes 15% GP)
-        const gpPercent = 15;
-        const providerEarnings = (order.totalPrice * (100 - gpPercent)) / 100;
-        
-        try {
-          await db.prepare(`
-            INSERT INTO provider_wallet (providerId, orderId, amount, type, status, createdAt)
-            VALUES (?, ?, ?, 'job_completion', 'completed', CURRENT_TIMESTAMP)
-          `).bind(token, orderId, providerEarnings).run();
-        } catch (e) {
-          // Table might not exist yet, create it
-          await db.prepare(`
-            CREATE TABLE IF NOT EXISTS provider_wallet (
-              id INTEGER PRIMARY KEY AUTOINCREMENT,
-              providerId TEXT NOT NULL,
-              orderId TEXT,
-              amount REAL NOT NULL DEFAULT 0,
-              type TEXT DEFAULT 'job_completion',
-              status TEXT DEFAULT 'completed',
-              createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
-            )
-          `).run();
-          await db.prepare(`
-            INSERT INTO provider_wallet (providerId, orderId, amount, type, status, createdAt)
-            VALUES (?, ?, ?, 'job_completion', 'completed', CURRENT_TIMESTAMP)
-          `).bind(token, orderId, providerEarnings).run();
-        }
-      }
 
       return NextResponse.json({ success: true, status: "completed" });
     }

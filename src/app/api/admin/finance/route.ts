@@ -13,11 +13,11 @@ export async function GET(req: Request) {
 
     const { results } = await db.prepare(`
       SELECT o.id, o.storeId, o.totalPrice, o.laundryFee, o.deliveryFee, o.status, o.createdAt,
-             u.displayName as customerName, s.name as storeName, r.displayName as riderName
+             u.displayName as customerName, s.name as storeName, r.name as riderName
       FROM orders o
       LEFT JOIN users u ON o.userId = u.id
       LEFT JOIN stores s ON o.storeId = s.id
-      LEFT JOIN users r ON o.deliveryDriverId = r.id
+      LEFT JOIN rider_users r ON o.deliveryDriverId = r.id
       WHERE o.status = 'completed'
       ORDER BY o.createdAt DESC
       LIMIT 100

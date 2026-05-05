@@ -50,6 +50,7 @@ CREATE TABLE IF NOT EXISTS users (
   assignedStoreId TEXT, -- specifically for drivers to bind them to a store area
   points INTEGER DEFAULT 0,
   preferences TEXT, -- JSON holding activeHours, serviceArea, vehicleType, payoutMethod, etc.
+  walletPin TEXT,
   createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -139,6 +140,8 @@ CREATE TABLE IF NOT EXISTS orders (
   surgeMultiplier REAL DEFAULT 1.0,
   staffNote TEXT, -- Private note from staff
   serviceDetails TEXT, -- JSON for actual weights/durations after pickup
+  rating INTEGER, -- 1-5 star rating
+  review_text TEXT, -- Customer review text
   createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
   updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (userId) REFERENCES users(id),
@@ -163,7 +166,7 @@ CREATE TABLE IF NOT EXISTS addresses (
 );
 
 -- Initial Services Data
-INSERT OR REPLACE INTO services (id, name, category, description, basePrice, unit, icon, estimatedDays) VALUES
+INSERT OR REPLACE INTO services (id, name, category, description, basePrice, unit, icon, estimatedDays, isActive) VALUES
 ('wash_fold', 'Wash & Fold', 'laundry', 'Everyday laundry, washed and neatly folded', 59, 'piece', 'wash_fold', 2, 1),
 ('dry_clean', 'Dry Clean', 'laundry', 'Premium care for delicate fabrics & suits', 129, 'piece', 'dry_clean', 3, 1),
 ('iron_only', 'Iron Only', 'laundry', 'Perfectly pressed, ready to wear', 39, 'piece', 'iron_only', 1, 1),

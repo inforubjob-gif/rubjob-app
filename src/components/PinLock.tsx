@@ -153,6 +153,15 @@ export default function PinLock({ type, userId, onVerified, children }: PinLockP
     return () => clearTimeout(timer);
   }, [step]);
 
+  useEffect(() => {
+    // Force focus on mount to trigger keyboard
+    if (!isLocked) return;
+    const timer = setTimeout(() => {
+      pinInputRef.current?.focus();
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [isLocked, step]);
+
   if (isLoading && !pin && !confirmPin) {
     return (
       <div className="flex-1 flex items-center justify-center bg-slate-50 min-h-[400px]">
@@ -164,14 +173,6 @@ export default function PinLock({ type, userId, onVerified, children }: PinLockP
   if (!isLocked) {
     return <>{children}</>;
   }
-
-  useEffect(() => {
-    // Force focus on mount to trigger keyboard
-    const timer = setTimeout(() => {
-      pinInputRef.current?.focus();
-    }, 500);
-    return () => clearTimeout(timer);
-  }, [isLocked, step]);
 
   return (
     <div 

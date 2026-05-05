@@ -1,13 +1,12 @@
 import { getRequestContext } from "@cloudflare/next-on-pages";
 import { NextResponse } from "next/server";
-import { cookies } from "next/headers";
+import { getProviderSession } from "@/lib/auth-server";
 
 export const runtime = "edge";
 
 export async function GET() {
   try {
-    const cookieStore = await cookies();
-    const token = cookieStore.get("provider_token")?.value;
+    const token = await getProviderSession();
 
     if (!token) {
       return NextResponse.json({ error: "Not authenticated" }, { status: 401 });

@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS Users (
     name TEXT NOT NULL,
     phone TEXT UNIQUE NOT NULL,
     role TEXT CHECK (role IN ('CUSTOMER', 'RUBBER', 'PARTNER')) NOT NULL,
+    walletPin TEXT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
