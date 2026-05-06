@@ -261,8 +261,11 @@ function BookingFlow() {
     ? getDistanceKm(selectedAddress.lat, selectedAddress.lng, selectedStore.lat, selectedStore.lng)
     : 5.1; 
   
-  // Extra distance fee calculation for display (Matches pricing.ts logic)
-  const distanceExtra = distanceKm >= 3 ? (distanceKm * 10) : 0;
+  // Single Trip Fare = 50 + (Distance > 3 ? (Distance - 3) * 10 : 0)
+  // Gross Rubber Fare (round trip) = Single Trip Fare * 2
+  const singleTripBase = 50;
+  const singleTripDistanceBonus = distanceKm > 3 ? (distanceKm - 3) * 10 : 0;
+  const totalDeliveryBase = (singleTripBase + singleTripDistanceBonus) * 2;
     
   // Pricing Logic (2026 Strategy)
   let pricing: any = { customerTotal: 0, breakdown: { laundry: 0, delivery: 0, addons: 0 } };
@@ -651,7 +654,7 @@ function BookingFlow() {
                 <label className={`flex items-center justify-between p-3.5 rounded-xl border-2 cursor-pointer transition-all ${deliverySpeed === "standard" ? "border-primary bg-primary/5 shadow-md shadow-primary/5" : "border-slate-100 bg-white hover:bg-slate-50"}`} onClick={() => setDeliverySpeed("standard")}>
                   <div className="flex flex-col">
                     <span className="text-sm font-bold text-foreground">{t("booking.speed.standardTitle")}</span>
-                    <span className="text-xs text-muted block mt-0.5">{t("booking.speed.standardDesc").replace("{fee}", Math.ceil(50 + distanceExtra).toString())}</span>
+                    <span className="text-xs text-muted block mt-0.5">{t("booking.speed.standardDesc").replace("{fee}", Math.ceil(totalDeliveryBase).toString())}</span>
                   </div>
                   <div className={`w-5 h-5 rounded-full flex items-center justify-center transition-colors ${deliverySpeed === "standard" ? "bg-primary text-white" : "border-2 border-slate-200"}`}>
                     {deliverySpeed === "standard" && <span className="text-xs font-bold leading-none flex items-center justify-center pt-0.5">✓</span>}
@@ -661,14 +664,14 @@ function BookingFlow() {
                 <label className={`flex items-center justify-between p-3.5 rounded-xl border-2 cursor-pointer transition-all ${deliverySpeed === "express" ? "border-[ff9f1c] bg-[#fff8e1] shadow-md shadow-[ff9f1c]/10" : "border-slate-100 bg-white hover:bg-slate-50"}`} onClick={() => setDeliverySpeed("express")}>
                   <div className="flex flex-col">
                     <span className="text-sm font-bold text-[ff9f1c]">{t("booking.speed.expressTitle")}</span>
-                    <span className="text-xs text-[ff9f1c]/80 block mt-0.5">{t("booking.speed.expressDesc").replace("{fee}", Math.ceil(50 + distanceExtra + 20).toString())}</span>
+                    <span className="text-xs text-[ff9f1c]/80 block mt-0.5">{t("booking.speed.expressDesc").replace("{fee}", Math.ceil(totalDeliveryBase + 20).toString())}</span>
                   </div>
                   <div className={`w-5 h-5 rounded-full flex items-center justify-center transition-colors ${deliverySpeed === "express" ? "bg-[ff9f1c] text-white" : "border-2 border-slate-200"}`}>
                     {deliverySpeed === "express" && <span className="text-xs font-bold leading-none flex items-center justify-center pt-0.5">✓</span>}
                   </div>
                 </label>
               </div>
-              {distanceExtra > 0 && <span className="text-[10px] text-muted block mt-2 ml-1">{t("booking.distanceNote").replace("{distance}", distanceKm.toFixed(1))}</span>}
+              {singleTripDistanceBonus > 0 && <span className="text-[10px] text-muted block mt-2 ml-1">{t("booking.distanceNote").replace("{distance}", distanceKm.toFixed(1))}</span>}
             </section>
 
             {/* Luggage Size & Folding Option - Only for Laundry */}

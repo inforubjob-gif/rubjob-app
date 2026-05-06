@@ -42,8 +42,8 @@ export async function GET(req: Request) {
       WHERE providerId = ? AND status = 'completed'
     `).bind(token).first() as any;
     
-    // Applying 15% commission for now
-    const totalEarnings = (earningsRes?.totalEarnings || 0) * 0.85; 
+    // Applying 10% platform GP per skill.md
+    const totalEarnings = (earningsRes?.totalEarnings || 0) * 0.90; 
 
     // Calculate Withdrawals
     const withdrawalsRes = await db.prepare(`
@@ -75,7 +75,7 @@ export async function GET(req: Request) {
       ...(orders as any[]).map(o => ({ 
         id: o.id, 
         type: "Service Earning", 
-        amount: o.amount * 0.85, 
+        amount: o.amount * 0.90, 
         date: o.createdAt, 
         status: "Success" 
       })),
@@ -123,8 +123,8 @@ export async function POST(req: Request) {
       WHERE providerId = ? AND status = 'completed'
     `).bind(token).first() as any;
     
-    // Applying 15% platform commission
-    const totalEarnings = (earningsRes?.totalEarnings || 0) * 0.85; 
+    // Applying 10% platform GP per skill.md
+    const totalEarnings = (earningsRes?.totalEarnings || 0) * 0.90; 
 
     const withdrawalsRes = await db.prepare(`
       SELECT SUM(amount) as totalWithdrawn 

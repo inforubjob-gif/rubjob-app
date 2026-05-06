@@ -144,7 +144,7 @@ export default function PartnerRegisterPage() {
                         <div className={`w-14 h-14 rounded-2xl flex items-center justify-center ${formData.type === t ? 'bg-primary text-white' : 'bg-slate-50'}`}>
                           {t === 'store' ? <Icons.Store size={28} /> : <Icons.User size={28} />}
                         </div>
-                        <span className="text-[10px] font-black uppercase tracking-widest">{t === 'store' ? 'ร้านค้า (Store)' : 'มืออาชีพ (Specialist)'}</span>
+                        <span className="text-[10px] font-black uppercase tracking-widest">{t === 'store' ? 'ร้านค้า / พาร์ทเนอร์' : 'มืออาชีพ / ผู้ให้บริการ'}</span>
                       </button>
                     ))}
                   </div>

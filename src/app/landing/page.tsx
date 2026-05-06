@@ -580,7 +580,7 @@ export default function LandingPage() {
                        <Icons.Store size={40} strokeWidth={2.5} />
                     </div>
                     <div className="px-4 py-2 bg-primary/5 border border-primary/10 rounded-full text-[10px] font-black text-primary uppercase tracking-[0.1em] h-fit">
-                       Store & Provider
+                       Partner (พาร์ทเนอร์)
                     </div>
                   </div>
                   

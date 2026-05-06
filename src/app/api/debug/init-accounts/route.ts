@@ -62,8 +62,8 @@ export async function GET(req: Request) {
     // 7. Seed Initial System Settings
     const settings = [
       { key: 'is_open', value: 'true' },
-      { key: 'gp_store_percent', value: '20' },
-      { key: 'gp_rubber_percent', value: '10' },
+      { key: 'gp_store_percent', value: '10' },
+      { key: 'gp_rubber_percent', value: '15' },
       { key: 'min_order_amount', value: '100' },
       { key: 'radius_km', value: '10' }
     ];

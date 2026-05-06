@@ -7,8 +7,8 @@ export const runtime = "edge";
 const DEFAULT_SETTINGS = [
   { key: "is_open", value: "true", type: "boolean", description: "Whether the platform is currently accepting new orders." },
   { key: "radius_km", value: "5", type: "number", description: "Default service radius for stores in kilometers." },
-  { key: "gp_store_percent", value: "20", type: "number", description: "GP percentage taken from Store sales (Commission)." },
-  { key: "gp_rubber_percent", value: "10", type: "number", description: "GP percentage taken from Rubber delivery fees." },
+  { key: "gp_store_percent", value: "10", type: "number", description: "GP percentage taken from Store sales (Commission)." },
+  { key: "gp_rubber_percent", value: "15", type: "number", description: "GP percentage taken from Rubber delivery fees." },
   { key: "rubber_base_payout", value: "25", type: "number", description: "Flat base amount paid to rubbers per delivery before distance bonus." },
   { key: "min_order_amount", value: "0", type: "number", description: "Minimum order value required to place a booking." },
   { key: "delivery_fee_base", value: "39", type: "number", description: "Base delivery fee charged to customers." },
