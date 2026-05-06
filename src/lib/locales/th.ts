@@ -45,6 +45,7 @@ export const th = {
       review: "ตรวจสอบ",
       remove: "นำออก",
       tapToEnterPin: "แตะเพื่อใส่รหัส",
+      lifeOperator: "RUBJOB - ผู้จัดการชีวิต LIFE OPERATOR",
     },
     home: {
       activeOrders: "ออเดอร์ปัจจุบัน",
@@ -704,6 +705,7 @@ export const th = {
       },
       login: {
         title: "พาร์ทเนอร์ (Partner)",
+        portal: "พาร์ทเนอร์ (PARTNER)",
         subtitle: "เข้าสู่ระบบเพื่อจัดการร้านค้าและบริการของคุณ",
         email: "อีเมล",
         password: "รหัสผ่าน",
@@ -785,6 +787,9 @@ export const th = {
       vehicleType: "ข้อมูลยานพาหนะ",
       takePhoto: "ถ่ายรูปเพื่อยืนยัน",
       photoRequired: "ต้องถ่ายรูปก่อนยืนยัน",
+      login: {
+        portal: "รับเบอร์ (RUBBER)",
+      },
       photoStep: {
         pickupUser: "ถ่ายรูปขณะรับผ้าจากลูกค้า",
         deliveryStore: "ถ่ายรูปขณะส่งผ้าที่ร้าน",

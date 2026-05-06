@@ -40,6 +40,7 @@ export const en = {
     pending: "Pending",
     remove: "Remove",
     tapToEnterPin: "Tap to enter PIN",
+    lifeOperator: "RUBJOB - LIFE OPERATOR",
   },
   home: {
     activeOrders: "Active Orders",
@@ -677,6 +678,9 @@ export const en = {
     vehicleType: "Vehicle Info",
     takePhoto: "Take Proof Photo",
     photoRequired: "Photo required before confirmation",
+    login: {
+      portal: "Rubber (RUBBER)",
+    },
     photoStep: {
       pickupUser: "Pickup from Customer",
       deliveryStore: "Delivery at Store",
@@ -798,6 +802,7 @@ export const en = {
         emailLabel: "Username / Email",
         passwordLabel: "Password",
         button: "Login to Start Working",
+        portal: "Rubber (RUBBER)",
         footer: "For registered rubbers only.\nContact @RUBJOB_HELP if you have issues.",
       }
     },

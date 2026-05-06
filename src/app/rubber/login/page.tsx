@@ -69,7 +69,7 @@ export default function RubberLoginPage() {
              />
           </div>
           <p className="text-xl text-white font-black uppercase mt-6 bg-white/10 backdrop-blur-sm py-3 px-10 rounded-full inline-block border border-white/20">
-             รับเบอร์ (RUBBER)
+             {t("rubber.login.portal")}
           </p>
         </div>
 
@@ -152,7 +152,7 @@ export default function RubberLoginPage() {
 
         <div className="text-center pb-8 sticky bottom-0">
           <p className="text-[10px] text-slate-400 font-bold uppercase tracking-[0.15em] drop-shadow-sm">
-             RUBJOB - ผู้จัดการชีวิต LIFE OPERATOR
+             {t("common.lifeOperator")}
           </p>
         </div>
       </div>
