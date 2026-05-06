@@ -103,9 +103,19 @@ export default function middleware(req: NextRequest) {
 
   // ─── Root domain (rubjob-all.com, no subdomain) → Landing page ───
   if (subdomain === "") {
-    // We used to redirect /admin, /rubber to subdomains here.
-    // Now we allow accessing them directly from the root domain for easier deployment.
-
+    // Block access to portal routes from the root domain
+    if (PORTAL_PREFIXES.some((p) => pathname.startsWith(p) && p !== "/landing")) {
+      // Redirect /admin, /rubber, /partner to proper subdomain
+      for (const [sub, prefix] of Object.entries(SUBDOMAIN_MAP)) {
+        if (prefix && pathname.startsWith(prefix)) {
+          const hostWithoutPort = hostname.split(":")[0];
+          const rootDomain = ROOT_DOMAINS.find((d) => hostWithoutPort.endsWith(d)) || ROOT_DOMAINS[0];
+          const targetHost = url.port ? `${sub}.${rootDomain}:${url.port}` : `${sub}.${rootDomain}`;
+          const targetPath = pathname.slice(prefix.length) || "/";
+          return NextResponse.redirect(new URL(`${url.protocol}//${targetHost}${targetPath}`));
+        }
+      }
+    }
 
     // Rewrite root "/" to "/landing"
     if (pathname === "/") {
@@ -120,8 +130,21 @@ export default function middleware(req: NextRequest) {
   const targetPrefix = SUBDOMAIN_MAP[subdomain];
 
   if (targetPrefix !== undefined) {
-    // Subdomain isolation disabled to prevent bounce issues.
-    // Allow users to access /rubber or /partner even if they are on a subdomain.
+    // Subdomain isolation: redirect cross-portal access to the correct subdomain
+    // e.g. app.rubjob.com/rubber → redirect to rubber.rubjob.com/
+    for (const [otherSub, otherPrefix] of Object.entries(SUBDOMAIN_MAP)) {
+      if (
+        otherPrefix &&
+        otherPrefix !== targetPrefix &&
+        pathname.startsWith(otherPrefix)
+      ) {
+        const hostWithoutPort = hostname.split(":")[0];
+        const rootDomain = ROOT_DOMAINS.find((d) => hostWithoutPort.endsWith(d)) || ROOT_DOMAINS[0];
+        const targetHost = url.port ? `${otherSub}.${rootDomain}:${url.port}` : `${otherSub}.${rootDomain}`;
+        const targetPath = pathname.slice(otherPrefix.length) || "/";
+        return NextResponse.redirect(new URL(`${url.protocol}//${targetHost}${targetPath}`));
+      }
+    }
 
     // Block /landing from portal subdomains
     if (pathname.startsWith("/landing")) {
