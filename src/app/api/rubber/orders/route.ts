@@ -33,23 +33,10 @@ export async function GET(req: Request) {
     try { await db.prepare("ALTER TABLE rubber_users ADD COLUMN accountName TEXT").run(); } catch(e) {}
     try { await db.prepare("ALTER TABLE rubber_users ADD COLUMN lineUserId TEXT").run(); } catch(e) {}
 
-    // Fetch Financial Settings for Calculation
-    const settingsRows = await db.prepare(`
-      SELECT key, value FROM system_settings 
-      WHERE key IN ('gp_rubber_percent', 'rubber_base_payout')
-    `).all();
-    
-    const settings: Record<string, string> = {};
-    settingsRows.results.forEach((row: any) => {
-      settings[row.key] = row.value;
-    });
-
-    const gpRubberPercent = parseFloat(settings.gp_rubber_percent || "10");
-    const rubberBasePayout = parseFloat(settings.rubber_base_payout || "0");
-
     const calculateRubberEarn = (deliveryFee: number, status: string) => {
-      const commission = (deliveryFee * gpRubberPercent) / 100;
-      const totalEarn = (deliveryFee - commission) + rubberBasePayout;
+      // 15% commission + 15 THB Platform Fee
+      const commission = deliveryFee * 0.15;
+      const totalEarn = deliveryFee - commission - 15;
       // Split 50/50 between legs.
       return totalEarn * 0.5;
     };

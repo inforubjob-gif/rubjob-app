@@ -63,22 +63,9 @@ export async function GET(
       }
     } catch (e) { /* leave as is */ }
  
-    // Fetch Financial Settings for Calculation
-    const settingsRows = await db.prepare(`
-      SELECT key, value FROM system_settings 
-      WHERE key IN ('gp_rubber_percent', 'rubber_base_payout')
-    `).all();
-    
-    const settings: Record<string, string> = {};
-    settingsRows.results.forEach((row: any) => {
-      settings[row.key] = row.value;
-    });
-
-    const gpRubberPercent = parseFloat(settings.gp_rubber_percent || "10");
-    const rubberBasePayout = parseFloat(settings.rubber_base_payout || "0");
-
     const deliveryFee = order.deliveryFee || 0;
-    const totalRubberPayout = (deliveryFee * (100 - gpRubberPercent) / 100) + rubberBasePayout;
+    // 15% commission + 15 THB Platform Fee
+    const totalRubberPayout = deliveryFee - (deliveryFee * 0.15) - 15;
     
     order.rubberEarn = totalRubberPayout; // Legacy field for backwards compatibility
     order.rubberPickupEarn = totalRubberPayout * 0.5;

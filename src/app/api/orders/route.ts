@@ -130,17 +130,9 @@ export async function POST(req: Request) {
         WHERE ru.lineUserId IS NOT NULL
       `).all();
 
-      // Fetch System Settings for Earnings Calculation
-      const settingsRows = await db.prepare(`
-        SELECT key, value FROM system_settings WHERE key IN ('gp_rubber_percent', 'rubber_base_payout')
-      `).all();
-      const settings: any = {};
-      settingsRows.results.forEach((r: any) => settings[r.key] = r.value);
-      
-      const gpRubberPercent = parseFloat(settings.gp_rubber_percent || "10");
-      const rubberBasePayout = parseFloat(settings.rubber_base_payout || "0");
-      const commission = (deliveryFee * gpRubberPercent) / 100;
-      const legEarn = ((deliveryFee - commission) + rubberBasePayout) * 0.5;
+      // 15% commission + 15 THB Platform Fee
+      const totalOrderEarn = deliveryFee - (deliveryFee * 0.15) - 15;
+      const legEarn = totalOrderEarn * 0.5;
 
       for (const r of (rubbers.results as any[])) {
         try {

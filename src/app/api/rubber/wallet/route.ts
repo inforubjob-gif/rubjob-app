@@ -20,19 +20,7 @@ export async function GET(req: Request) {
     const db = getRequestContext().env.DB;
     if (!db) return NextResponse.json({ error: "D1 not found" }, { status: 500 });
 
-    // 1. Fetch System Settings for Commissions
-    const settingsRows = await db.prepare(`
-      SELECT key, value FROM system_settings 
-      WHERE key IN ('gp_rubber_percent', 'rubber_base_payout')
-    `).all();
-    
-    const settings: Record<string, string> = {};
-    settingsRows.results.forEach((row: any) => settings[row.key] = row.value);
-
-    const gpRubberPercent = parseFloat(settings.gp_rubber_percent || "10");
-    const rubberBasePayout = parseFloat(settings.rubber_base_payout || "0");
-
-    // 2. Calculate Earnings (completed orders or orders that reached the handover point)
+    // 1. Calculate Earnings (completed orders or orders that reached the handover point)
     const ordersRes = await db.prepare(`
       SELECT id, deliveryFee, createdAt, status,
              pickupDriverId, deliveryDriverId
@@ -44,7 +32,8 @@ export async function GET(req: Request) {
     const history: any[] = [];
 
     (ordersRes.results as any[]).forEach(o => {
-      const totalOrderEarn = (o.deliveryFee * (100 - gpRubberPercent) / 100) + rubberBasePayout;
+      // 15% commission + 15 THB Platform Fee
+      const totalOrderEarn = o.deliveryFee - (o.deliveryFee * 0.15) - 15;
       const legEarn = totalOrderEarn * 0.5;
 
       // Leg 1: Pickup (Earned if status reached 'washing' or later)
