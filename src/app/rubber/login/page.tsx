@@ -69,7 +69,7 @@ export default function RubberLoginPage() {
              />
           </div>
           <p className="text-xl text-white font-black uppercase mt-6 bg-white/10 backdrop-blur-sm py-3 px-10 rounded-full inline-block border border-white/20">
-             พาร์ทเนอร์รับเบอร์
+             รับเบอร์ (RUBBER)
           </p>
         </div>
 
@@ -116,7 +116,7 @@ export default function RubberLoginPage() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-slate-900 hover:bg-black text-white rounded-xl py-5 text-base font-black uppercase shadow-xl shadow-slate-900/20 transition-all active:scale-95 disabled:opacity-50 mt-2 flex items-center justify-center gap-3 group"
+              className="w-full bg-primary hover:bg-primary-dark text-white rounded-xl py-5 text-base font-black uppercase shadow-xl shadow-primary/20 transition-all active:scale-95 disabled:opacity-50 mt-2 flex items-center justify-center gap-3 group"
             >
               {isLoading ? (
                 <Icons.Refresh size={20} className="animate-spin" />
