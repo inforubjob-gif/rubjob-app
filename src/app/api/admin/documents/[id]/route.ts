@@ -1,6 +1,6 @@
 import { getRequestContext } from "@cloudflare/next-on-pages";
 import { NextResponse } from "next/server";
-import { getAdminSession, getRiderSession } from "@/lib/auth-server";
+import { getAdminSession, getRubberSession } from "@/lib/auth-server";
 
 export const runtime = "edge";
 
@@ -14,8 +14,8 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const adminSession = await getAdminSession();
-  const riderSession = await getRiderSession();
-  if (!adminSession && !riderSession) return new Response("Unauthorized", { status: 401 });
+  const rubberSession = await getRubberSession();
+  if (!adminSession && !rubberSession) return new Response("Unauthorized", { status: 401 });
 
   try {
     const { id } = await params;
@@ -27,7 +27,7 @@ export async function GET(
     // we assume the middleware or parent route handles auth.
     
     // 2. Fetch document from DB
-    const doc = await db.prepare("SELECT url, type FROM rider_documents WHERE id = ?")
+    const doc = await db.prepare("SELECT url, type FROM rubber_documents WHERE id = ?")
       .bind(id)
       .first() as any;
 

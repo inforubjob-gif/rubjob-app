@@ -874,11 +874,11 @@ function BookingFlow() {
                     </div>
                   </div>
 
-                  {/* Rider Section */}
+                  {/* Rubber Section */}
                   <div className="pt-3 border-t border-dashed border-slate-200">
                     <div className="flex items-center gap-1.5 mb-2 text-blue-600 font-bold">
                       <span className="text-sm leading-none pt-0.5">🛵</span>
-                      <span>{t("booking.summary.riderSection")}</span>
+                      <span>{t("booking.summary.rubberSection")}</span>
                     </div>
                     <div className="space-y-2 pl-5">
                       <div className="flex items-center justify-between">

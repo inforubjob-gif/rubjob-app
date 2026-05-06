@@ -29,7 +29,7 @@ export interface Store {
 
 // ─── Order Types ───
 
-/** Determines the fulfillment flow: logistics (rider+store) vs direct_service (provider only) */
+/** Determines the fulfillment flow: logistics (rubber+store) vs direct_service (provider only) */
 export type OrderType = "logistics" | "direct_service";
 
 export type OrderStatus =

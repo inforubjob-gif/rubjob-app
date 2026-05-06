@@ -13,11 +13,11 @@ export default function AppWrapper({ children }: { children: React.ReactNode }) 
 
   const isBackoffice = typeof window !== "undefined" && (
     window.location.pathname.startsWith("/admin") || 
-    window.location.pathname.startsWith("/rider") || 
-    window.location.pathname.startsWith("/store") ||
-    window.location.pathname.startsWith("/provider") ||
+    window.location.pathname.startsWith("/rubber") || 
+    window.location.pathname.startsWith("/partner-store") ||
+    window.location.pathname.startsWith("/partner-service") ||
     window.location.hostname.startsWith("admin.") ||
-    window.location.hostname.startsWith("rider.") ||
+    window.location.hostname.startsWith("rubber.") ||
     window.location.hostname.startsWith("store.") ||
     window.location.hostname.startsWith("provider.")
   );
@@ -31,7 +31,7 @@ export default function AppWrapper({ children }: { children: React.ReactNode }) 
     // Root domain with no subdomain (middleware rewrites to /landing)
     (!window.location.hostname.startsWith("app.") &&
      !window.location.hostname.startsWith("admin.") &&
-     !window.location.hostname.startsWith("rider.") &&
+     !window.location.hostname.startsWith("rubber.") &&
      !window.location.hostname.startsWith("store.") &&
      (window.location.hostname.includes("rubjob-all.com") ||
       window.location.hostname.includes("rubjob.com") ||

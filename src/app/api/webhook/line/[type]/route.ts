@@ -7,9 +7,9 @@ export const runtime = "edge";
  * Unified LINE Webhook for all channels
  * Endpoint: /api/webhook/line/[type]
  * 
- * Auto-detects whether the sender is a Rider, Store, or Customer
+ * Auto-detects whether the sender is a Rubber, Store, or Customer
  * by cross-referencing LINE userId against:
- *   1. rider_users.lineUserId → Rider
+ *   1. rubber_users.lineUserId → Rubber
  *   2. stores.lineUserId → Store
  *   3. users.id → Customer (LINE Login users)
  *   4. None → Unknown / Guest
@@ -73,19 +73,19 @@ export async function POST(req: Request, { params }: { params: Promise<{ type: s
         const channelKey = isManual ? "in_app" : `${channelType}_line`;
 
         // ── Auto-detect User Type ──
-        // Cross-reference LINE userId against rider, store, and customer tables
+        // Cross-reference LINE userId against rubber, store, and customer tables
         let userType = 'customer';
         let senderName = '';
 
         if (!isManual) {
-          // Check rider_users first
-          const rider = await db.prepare(
-            `SELECT id, name FROM rider_users WHERE lineUserId = ?`
+          // Check rubber_users first
+          const rubber = await db.prepare(
+            `SELECT id, name FROM rubber_users WHERE lineUserId = ?`
           ).bind(userId).first() as any;
 
-          if (rider) {
-            userType = 'rider';
-            senderName = rider.name || '';
+          if (rubber) {
+            userType = 'rubber';
+            senderName = rubber.name || '';
           } else {
             // Check stores
             const store = await db.prepare(
@@ -123,7 +123,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ type: s
 
         if (!ticketId) {
           ticketId = `TKT-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
-          const subjectPrefix = userType === 'rider' ? '🏍️ Rider' : userType === 'store' ? '🏪 Store' : '👤 Customer';
+          const subjectPrefix = userType === 'rubber' ? '🏍️ Rubber' : userType === 'store' ? '🏪 Store' : '👤 Customer';
           await db.prepare(`
             INSERT INTO support_tickets (id, userId, channel, subject, status, userType, senderName)
             VALUES (?, ?, ?, ?, 'open', ?, ?)

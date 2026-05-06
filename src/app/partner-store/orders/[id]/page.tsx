@@ -1,0 +1,228 @@
+"use client";
+
+export const runtime = "edge";
+
+import { useState, useEffect } from "react";
+import { useParams, useRouter } from "next/navigation";
+import Card from "@/components/ui/Card";
+import Badge, { statusToBadgeVariant } from "@/components/ui/Badge";
+import Button from "@/components/ui/Button";
+import { Icons, IconCircle, getServiceIcon } from "@/components/ui/Icons";
+import { useTranslation } from "@/components/providers/LanguageProvider";
+import CountdownTimer from "@/components/ui/CountdownTimer";
+import OrderIssueModal from "@/components/orders/OrderIssueModal";
+
+export default function StoreOrderDetailPage() {
+  const params = useParams<{ id: string }>();
+  const id = params.id;
+  const router = useRouter();
+  const { t } = useTranslation();
+  
+  const [order, setOrder] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [isIssueModalOpen, setIsIssueModalOpen] = useState(false);
+
+  useEffect(() => {
+    if (!id) return;
+    async function fetchOrder() {
+      try {
+        const res = await fetch(`/api/orders/${id}`);
+        const data = await res.json() as any;
+        if (data.order) setOrder(data.order);
+      } catch (err) {
+        console.error("Fetch order detail failed:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    fetchOrder();
+  }, [id]);
+
+  const handleUpdateStatus = async (nextStatus: string) => {
+    setIsUpdating(true);
+    try {
+      await fetch(`/api/store/orders`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ orderId: id, status: nextStatus }),
+      });
+      setOrder({ ...order, status: nextStatus });
+    } catch (err) {
+      console.error("Update status failed:", err);
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  if (isLoading) return <div className="p-10 text-center font-bold text-slate-400 animate-pulse">{t("common.loading")}</div>;
+  if (!order) return <div className="p-10 text-center font-bold text-slate-400">{t("orders.orderNotFound")}</div>;
+
+  const status = order.status;
+  const isExpress = order.serviceLevel === "EXPRESS";
+  const weight = order.weight || 5;
+  const actualItems = order.itemCount || 10;
+
+  return (
+    <div className="flex flex-col min-h-dvh bg-slate-50">
+      <header className="bg-white px-5 pt-12 pb-6 border-b border-slate-100 flex items-center justify-between sticky top-0 z-50">
+        <button onClick={() => router.back()} className="active:scale-90 transition-all">
+          <IconCircle variant="white" size="sm">
+            <Icons.Back size={18} />
+          </IconCircle>
+        </button>
+        <h1 className="text-sm font-black text-slate-900 uppercase">{t("store.manageTask")}</h1>
+        <button
+          onClick={() => setIsIssueModalOpen(true)}
+          className="active:scale-90 transition-all"
+          title={t("orders.reportIssue")}
+        >
+          <IconCircle variant="slate" size="sm">
+            <Icons.Alert size={18} className="text-red-500" />
+          </IconCircle>
+        </button>
+      </header>
+      
+      <OrderIssueModal 
+        isOpen={isIssueModalOpen} 
+        onClose={() => setIsIssueModalOpen(false)} 
+        orderId={id as string} 
+      />
+
+      <div className="flex-1 px-5 py-6">
+        <Card className="p-6 mb-6 border-none shadow-sm bg-white overflow-hidden relative rounded-xl">
+          <div className="flex justify-between items-start mb-6">
+            <div>
+              <p className="text-[10px] font-black text-slate-300 uppercase leading-none mb-1.5">{t("orders.tracking")} #{id.slice(-6)}</p>
+              <Badge variant={statusToBadgeVariant(status)} className="font-black text-[10px] uppercaseer">
+                {t(`orders.status.${status}`)}
+              </Badge>
+            </div>
+            <div className="text-right">
+              <p className="text-[10px] font-black text-slate-300 uppercase leading-none mb-1.5">{t("common.store")}</p>
+              <p className="text-xs font-black text-slate-900">{t("store.unitNo")} #{order?.storeId?.split('-')[1] || '001'}</p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-4 relative">
+             <div className="absolute left-6 top-6 bottom-6 w-0.5 bg-dashed border-l-2 border-slate-100 border-dashed" />
+             <IconCircle variant="black" size="md" className="relative z-10">
+                <Icons.User size={24} />
+             </IconCircle>
+             <div className="flex-1 min-w-0">
+                <p className="text-[10px] font-black text-slate-300 uppercase">{t("store.customer")}</p>
+                <p className="text-sm font-black text-slate-900 truncate">{order?.userName || t("common.guest")}</p>
+             </div>
+          </div>
+        </Card>
+
+        <div className="space-y-6">
+            <h3 className="text-[10px] font-black text-slate-400 uppercase px-1">{t("store.workflowTitle")}</h3>
+            
+            <div className="space-y-4">
+              <Card className={`p-5 transition-all outline-dashed outline-2 ${status === 'delivering_to_store' ? 'outline-primary bg-primary/5 shadow-xl shadow-primary/10' : 'bg-white outline-slate-100'}`}>
+                <div className="flex items-center justify-between">
+                   <div className="flex items-center gap-4">
+                       <IconCircle variant={status === 'delivering_to_store' ? 'orange' : 'slate'} size="md">
+                           <Icons.Truck size={24} />
+                       </IconCircle>
+                       <div>
+                          <h4 className={`text-sm font-black uppercase ${status === 'delivering_to_store' ? 'text-primary-dark' : 'text-slate-400'}`}>{t("store.incomingFromRubber")}</h4>
+                          <p className="text-[10px] font-bold text-slate-400 uppercase">{t("store.arriving")} • {t("store.rubberNo")} #{order?.rubberId?.split('-')[1] || 'RD-01'}</p>
+                       </div>
+                   </div>
+                </div>
+              </Card>
+
+              {status === "washing" && (
+                 <Card className={`p-6 border-none shadow-2xl ${isExpress ? 'bg-red-600 shadow-red-200' : 'bg-primary shadow-primary/20'} text-white relative overflow-hidden rounded-xl`}>
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 blur-2xl" />
+                    <div className="relative z-10 flex items-center justify-between">
+                        <div>
+                            <p className="text-[11px] font-black text-white/80 uppercase mb-1.5 leading-none">{t("store.processing")}</p>
+                            <h3 className="text-2xl font-black uppercase drop-shadow-sm">
+                               {isExpress ? t("store.flashExpress") : t("store.standardWash")}
+                            </h3>
+                        </div>
+                        <div className="bg-white/20 p-3.5 rounded-xl backdrop-blur-md border border-white/30 shadow-inner">
+                           <CountdownTimer seconds={isExpress ? 1200 : 3600} urgentThreshold={900} />
+                        </div>
+                    </div>
+                 </Card>
+              )}
+
+              <div className="grid grid-cols-2 gap-4">
+                  <Card className="p-4 bg-white border border-slate-100">
+                      <p className="text-[10px] font-black text-slate-400 uppercase mb-3">{t("profile.service")}</p>
+                      <div className="flex items-center gap-2">
+                          <IconCircle variant="orange" size="sm">
+                              {getServiceIcon(order?.serviceId as any, { size: 18 })}
+                          </IconCircle>
+                          <span className="text-xs font-black text-slate-900">{order?.serviceName || t(`orders.services.${order?.serviceId}`)}</span>
+                      </div>
+                  </Card>
+                  <Card className={`p-4 ${isExpress ? 'bg-red-50 text-red-600 border border-red-100' : 'bg-slate-50 text-slate-900 border border-slate-100'}`}>
+                      <p className="text-[10px] font-black text-slate-400 uppercase mb-3">Service Level</p>
+                      <div className="flex items-center gap-2">
+                          <IconCircle variant={isExpress ? "black" : "yellow"} size="sm">
+                              <Icons.Clock size={18} />
+                          </IconCircle>
+                          <span className="text-xs font-black">{isExpress ? "EXPRESS" : "STANDARD"}</span>
+                      </div>
+                  </Card>
+              </div>
+
+              <Card className="p-5 space-y-4 border border-slate-100">
+                  <h3 className="text-[10px] font-black text-slate-400 uppercase">{t("store.requirementsTitle")}</h3>
+                  <div className="space-y-3">
+                      <div className="flex items-center justify-between py-2 border-b border-slate-50">
+                          <span className="text-xs font-bold text-slate-500">{t("store.pickupWeight")}</span>
+                          <span className="text-xs font-black text-slate-900">{weight} kg</span>
+                      </div>
+                      <div className="flex items-center justify-between py-2 border-b border-slate-50">
+                          <span className="text-xs font-bold text-slate-500">{t("store.pickupItems")}</span>
+                          <span className="text-xs font-black text-slate-900">{actualItems} pcs</span>
+                      </div>
+                      {order?.staffNote && (
+                        <div className="bg-amber-50 p-3 rounded-xl border border-amber-100 shadow-inner">
+                            <p className="text-[10px] font-black text-amber-600 uppercase mb-1 leading-none">{t("store.clientPrefs")}</p>
+                            <p className="text-xs text-amber-800 leading-relaxed font-bold">{order.staffNote}</p>
+                        </div>
+                      )}
+                  </div>
+              </Card>
+
+              <div className="space-y-3">
+                {status === "delivering_to_store" && (
+                  <Button fullWidth onClick={() => handleUpdateStatus("washing")} isLoading={isUpdating} className="bg-primary text-white hover:bg-primary-dark shadow-xl shadow-primary/20 py-5 text-sm font-black rounded-xl uppercase">
+                    <Icons.Package size={20} className="mr-2" /> {t("staff.receiveFromDriver")}
+                  </Button>
+                )}
+                {status === "washing" && (
+                  <Button fullWidth onClick={() => handleUpdateStatus("ready_for_pickup")} isLoading={isUpdating} className="bg-primary text-white hover:bg-primary-dark shadow-xl shadow-primary/20 py-5 text-sm font-black rounded-xl uppercase">
+                    <Icons.Phone size={20} className="mr-2" /> {t("staff.callRubber")}
+                  </Button>
+                )}
+                {status === "ready_for_pickup" && (
+                  <Button fullWidth onClick={() => handleUpdateStatus("completed")} isLoading={isUpdating} className="bg-primary text-white hover:bg-primary-dark shadow-xl py-5 text-sm font-black rounded-xl uppercase">
+                    <Icons.Check size={20} className="mr-2" strokeWidth={4} /> {t("store.handoverToDriver")}
+                  </Button>
+                )}
+                {status === "completed" && (
+                  <div className="p-10 bg-orange-50 rounded-xl border-4 border-dashed border-orange-200 flex flex-col items-center justify-center gap-4 text-center animate-bounce-slow">
+                      <IconCircle variant="orange" size="lg" className="shadow-2xl shadow-orange-200">
+                          <Icons.Check size={32} strokeWidth={4} />
+                      </IconCircle>
+                      <div>
+                         <h4 className="text-lg font-black text-primary leading-none">{t("store.handoffSuccess")}</h4>
+                         <p className="text-[10px] font-bold text-slate-400 uppercase mt-2 px-6">{t("store.handoffDesc")}</p>
+                      </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+      </div>
+    </div>
+  );
+}

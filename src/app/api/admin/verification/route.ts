@@ -7,16 +7,16 @@ export async function GET() {
   try {
     const db = getRequestContext().env.DB;
 
-    // Fetch pending documents from both rider_documents and store_documents
-    const riderDocs = await db.prepare(`
-      SELECT d.*, r.name as partnerName, r.email as partnerEmail, 'rider' as partnerType
-      FROM rider_documents d
-      JOIN rider_users r ON d.riderId = r.id
+    // Fetch pending documents from both rubber_documents and store_documents
+    const rubberDocs = await db.prepare(`
+      SELECT d.*, r.name as partnerName, r.email as partnerEmail, 'rubber' as partnerType
+      FROM rubber_documents d
+      JOIN rubber_users r ON d.rubberId = r.id
       WHERE d.status = 'pending'
       ORDER BY d.createdAt DESC
     `).all();
 
-    return NextResponse.json({ documents: riderDocs.results });
+    return NextResponse.json({ documents: rubberDocs.results });
   } catch (err) {
     console.error(err);
     return NextResponse.json({ error: "Failed to fetch" }, { status: 500 });
@@ -29,7 +29,7 @@ export async function PUT(request: Request) {
     const db = getRequestContext().env.DB;
 
     await db.prepare(`
-      UPDATE rider_documents 
+      UPDATE rubber_documents 
       SET status = ?, notes = ?, createdAt = CURRENT_TIMESTAMP 
       WHERE id = ?
     `).bind(status, notes || null, id).run();

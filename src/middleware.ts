@@ -34,14 +34,14 @@ const ROOT_DOMAINS = [
  */
 const SUBDOMAIN_MAP: Record<string, string> = {
   admin: "/admin",
-  rider: "/rider",
-  store: "/store",
-  provider: "/provider",
+  rubber: "/rubber",
+  store: "/partner-store",
+  provider: "/partner-service",
   app: "",   // User app — root-level pages, no prefix needed
 };
 
 /** Portal path prefixes that should be isolated per-subdomain */
-const PORTAL_PREFIXES = ["/admin", "/rider", "/store", "/provider", "/landing"];
+const PORTAL_PREFIXES = ["/admin", "/rubber", "/partner-store", "/partner-service", "/landing"];
 
 /**
  * Extract subdomain from hostname against known root domains.
@@ -82,7 +82,7 @@ function extractSubdomain(hostname: string): string | null {
   if (parts.length > 1) {
      const sub = parts[0];
      // Recognize common subdomains even if the root isn't explicitly listed
-     if (["admin", "rider", "store", "provider", "app"].includes(sub)) {
+     if (["admin", "rubber", "store", "provider", "app"].includes(sub)) {
         return sub;
      }
   }
@@ -106,7 +106,7 @@ export default function middleware(req: NextRequest) {
   if (subdomain === "") {
     // Block access to portal routes from the root domain
     if (PORTAL_PREFIXES.some((p) => pathname.startsWith(p) && p !== "/landing")) {
-      // Redirect /admin, /rider, /store to proper subdomain
+      // Redirect /admin, /rubber, /store to proper subdomain
       for (const [sub, prefix] of Object.entries(SUBDOMAIN_MAP)) {
         if (prefix && pathname.startsWith(prefix)) {
           const targetPath = pathname.slice(prefix.length) || "/";
@@ -130,12 +130,12 @@ export default function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
-  // ─── Known portal subdomains (admin, rider, store, app) ───
+  // ─── Known portal subdomains (admin, rubber, store, app) ───
   const targetPrefix = SUBDOMAIN_MAP[subdomain];
 
   if (targetPrefix !== undefined) {
     // Subdomain isolation: block cross-portal access
-    // e.g. rider.rubjob-all.com/admin → redirect to /
+    // e.g. rubber.rubjob-all.com/admin → redirect to /
     for (const [otherSub, otherPrefix] of Object.entries(SUBDOMAIN_MAP)) {
       if (
         otherPrefix &&

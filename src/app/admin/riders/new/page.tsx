@@ -1,19 +1,19 @@
 "use client";
 
 import { useTranslation } from "@/components/providers/LanguageProvider";
-import RiderForm from "@/components/admin/RiderForm";
+import RubberForm from "@/components/admin/RubberForm";
 
-export default function NewRiderPage() {
+export default function NewRubberPage() {
   const { t } = useTranslation();
 
   return (
     <div className="max-w-7xl mx-auto py-8">
       <header className="mb-10 px-4 md:px-0">
-        <h1 className="text-3xl font-black text-slate-900 tracking-tight uppercase">{t('admin.riders.new.title')}</h1>
-        <p className="text-slate-500 font-medium mt-2">{t('admin.riders.new.subtitle')}</p>
+        <h1 className="text-3xl font-black text-slate-900 tracking-tight uppercase">{t('admin.rubbers.new.title')}</h1>
+        <p className="text-slate-500 font-medium mt-2">{t('admin.rubbers.new.subtitle')}</p>
       </header>
       
-      <RiderForm />
+      <RubberForm />
     </div>
   );
 }

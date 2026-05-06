@@ -436,7 +436,7 @@ export default function StoreForm({ initialData, isEdit }: StoreFormProps) {
                  <div className="w-10 h-10 rounded-xl bg-primary/5 text-primary flex items-center justify-center">
                     <Icons.Wallet size={20} />
                  </div>
-                 <h2 className="text-xl font-black text-slate-900 uppercase tracking-tight">{t('admin.riders.form.payoutInfo')}</h2>
+                 <h2 className="text-xl font-black text-slate-900 uppercase tracking-tight">{t('admin.rubbers.form.payoutInfo')}</h2>
               </div>
               
               <div className="space-y-5">

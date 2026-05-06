@@ -65,7 +65,7 @@ const FEATURES = [
 
 const STEPS = [
   { number: "01", title: "กดสั่งซัก", desc: "เข้าแอปผ่านไลน์ เลือกบริการที่ต้องการได้ทันที" },
-  { number: "02", title: "ไรเดอร์ไปรับ", desc: "รอไรเดอร์มารับผ้าถึงหน้าบ้าน นำส่งไปร้านซัก" },
+  { number: "02", title: "รับเบอร์ไปรับ", desc: "รอรับเบอร์มารับผ้าถึงหน้าบ้าน นำส่งไปร้านซัก" },
   { number: "03", title: "ตรวจเช็ค & ซัก", desc: "ร้านซักมืออาชีพดำเนินงาน คุณสามารถเช็กสถานะได้เสมอ" },
   { number: "04", title: "ส่งคืนสุดประทับใจ", desc: "รับผ้าที่หอมสะอาด กลับมาถึงมือคุณอย่างสมบูรณ์แบบ" },
 ];
@@ -81,7 +81,7 @@ const TESTIMONIALS = [
   },
   {
     rating: 5,
-    quote: "ไม่ต้องโหลดแอปเพิ่มให้เปลืองเมมฯ ระบบติดตามสถานะก็เป๊ะ ไรเดอร์มารับตรงเวลามาก",
+    quote: "ไม่ต้องโหลดแอปเพิ่มให้เปลืองเมมฯ ระบบติดตามสถานะก็เป๊ะ รับเบอร์มารับตรงเวลามาก",
     author: "คุณตั้ม",
     role: "พนักงานออฟฟิศ",
     iconColor: "bg-blue-100 text-blue-500",
@@ -116,7 +116,7 @@ const FAQS = [
   },
   {
     q: "จะเปลี่ยนที่อยู่รับ-ส่งผ้าต้องทำอย่างไร?",
-    a: "คุณสามารถแก้ไขหรือเปลี่ยนที่อยู่ใหม่ผ่านหน้าจอระบบบัญชีส่วนตัวบน LINE ได้เลยในขั้นตอนก่อนที่จะกดยืนยันเรียกไรเดอร์เข้ารับผ้าครับ"
+    a: "คุณสามารถแก้ไขหรือเปลี่ยนที่อยู่ใหม่ผ่านหน้าจอระบบบัญชีส่วนตัวบน LINE ได้เลยในขั้นตอนก่อนที่จะกดยืนยันเรียกรับเบอร์เข้ารับผ้าครับ"
   },
   {
     q: "สามารถจ่ายเงินผ่านช่องทางไหนได้บ้าง?",
@@ -565,7 +565,7 @@ export default function LandingPage() {
                <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-orange-500 to-primary-dark">ไปกับ RUBJOB</span>
             </h3>
             <p className="text-xl text-slate-500 font-medium leading-relaxed">
-               เปิดโอกาสการสร้างรายได้ที่ไร้ขีดจำกัด ไม่ว่าคุณจะเป็นร้านค้ามืออาชีพ หรือไรเดอร์ที่ต้องการอิสระ เรามีระบบที่พร้อมซัพพอร์ตคุณในทุกก้าว
+               เปิดโอกาสการสร้างรายได้ที่ไร้ขีดจำกัด ไม่ว่าคุณจะเป็นร้านค้ามืออาชีพ หรือรับเบอร์ที่ต้องการอิสระ เรามีระบบที่พร้อมซัพพอร์ตคุณในทุกก้าว
             </p>
           </div>
 
@@ -612,7 +612,7 @@ export default function LandingPage() {
                </Card>
             </div>
 
-            {/* For Riders Card */}
+            {/* For Rubbers Card */}
             <div className="group relative">
                <div className="absolute inset-0 bg-gradient-to-br from-blue-500/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-700 blur-3xl -z-10 rounded-[48px]" />
                <Card className="h-full p-10 md:p-14 bg-white border border-slate-100 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.05)] rounded-[48px] overflow-hidden flex flex-col transition-all duration-500 group-hover:-translate-y-2 group-hover:shadow-[0_48px_80px_-16px_rgba(59,130,246,0.15)] group-hover:border-blue-500/20">
@@ -625,7 +625,7 @@ export default function LandingPage() {
                     </div>
                   </div>
                   
-                  <h4 className="text-4xl font-black text-slate-900 mb-6 group-hover:text-blue-600 transition-colors">สำหรับไรเดอร์<br/>ฮีโร่รับ-ส่ง</h4>
+                  <h4 className="text-4xl font-black text-slate-900 mb-6 group-hover:text-blue-600 transition-colors">สำหรับรับเบอร์<br/>ฮีโร่รับ-ส่ง</h4>
                   <p className="text-slate-500 text-lg mb-10 leading-relaxed font-medium">
                     รับงานอิสระ รายได้ดี มีงานต่อเนื่องในพื้นที่ที่คุณคุ้นเคย พร้อมระบบนำทางที่แม่นยำและโบนัสพิเศษ
                   </p>
@@ -644,10 +644,10 @@ export default function LandingPage() {
                   </div>
 
                   <a 
-                    href="/landing/register/rider"
+                    href="/landing/register/rubber"
                     className="w-full py-6 bg-slate-900 text-white font-black text-center text-lg rounded-2xl hover:bg-blue-600 transition-all duration-300 shadow-2xl shadow-slate-900/10 active:scale-[0.98] relative overflow-hidden group/btn"
                   >
-                    <span className="relative z-10 uppercase tracking-widest">สมัครเป็นไรเดอร์</span>
+                    <span className="relative z-10 uppercase tracking-widest">สมัครเป็นรับเบอร์</span>
                     <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-indigo-600 opacity-0 group-hover/btn:opacity-100 transition-opacity duration-300" />
                   </a>
                </Card>

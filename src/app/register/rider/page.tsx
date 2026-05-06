@@ -6,7 +6,7 @@ import { Icons } from "@/components/ui/Icons";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 
-export default function RiderRegisterPage() {
+export default function RubberRegisterPage() {
   const router = useRouter();
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -36,7 +36,7 @@ export default function RiderRegisterPage() {
   const handleSubmit = async () => {
     setIsSubmitting(true);
     try {
-      const res = await fetch("/api/register/rider", {
+      const res = await fetch("/api/register/rubber", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData)
@@ -85,7 +85,7 @@ export default function RiderRegisterPage() {
       <nav className="relative z-10 p-6 flex items-center justify-between">
          <div className="flex items-center gap-2" onClick={() => router.push("/")}>
             <Icons.Logo size={32} />
-            <span className="font-black text-xler uppercase">Rubjob <span className="text-primary-none">Riders</span></span>
+            <span className="font-black text-xler uppercase">Rubjob <span className="text-primary-none">Rubbers</span></span>
          </div>
          <div className="flex items-center gap-4">
             <div className={`w-2 h-2 rounded-full ${step >= 1 ? 'bg-primary shadow-[0_0_10px_rgba(255,191,0,0.5)]' : 'bg-slate-800'}`} />

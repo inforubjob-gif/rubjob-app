@@ -12,43 +12,43 @@ export async function GET(req: Request) {
     if (!db) return NextResponse.json({ error: "D1 not found" }, { status: 500 });
 
     // Self-healing: Ensure required columns and tables exist
-    try { await db.prepare("ALTER TABLE rider_users ADD COLUMN rider_number INTEGER").run(); } catch(e) {}
-    try { await db.prepare("ALTER TABLE rider_users ADD COLUMN pictureUrl TEXT").run(); } catch(e) {}
-    try { await db.prepare("ALTER TABLE rider_users ADD COLUMN bankName TEXT").run(); } catch(e) {}
-    try { await db.prepare("ALTER TABLE rider_users ADD COLUMN accountNumber TEXT").run(); } catch(e) {}
-    try { await db.prepare("ALTER TABLE rider_users ADD COLUMN accountName TEXT").run(); } catch(e) {}
+    try { await db.prepare("ALTER TABLE rubber_users ADD COLUMN rubber_number INTEGER").run(); } catch(e) {}
+    try { await db.prepare("ALTER TABLE rubber_users ADD COLUMN pictureUrl TEXT").run(); } catch(e) {}
+    try { await db.prepare("ALTER TABLE rubber_users ADD COLUMN bankName TEXT").run(); } catch(e) {}
+    try { await db.prepare("ALTER TABLE rubber_users ADD COLUMN accountNumber TEXT").run(); } catch(e) {}
+    try { await db.prepare("ALTER TABLE rubber_users ADD COLUMN accountName TEXT").run(); } catch(e) {}
     
     try {
       await db.prepare(`
-        CREATE TABLE IF NOT EXISTS rider_documents (
+        CREATE TABLE IF NOT EXISTS rubber_documents (
           id TEXT PRIMARY KEY,
-          riderId TEXT NOT NULL,
+          rubberId TEXT NOT NULL,
           type TEXT NOT NULL,
           url TEXT NOT NULL,
           status TEXT DEFAULT 'pending',
           notes TEXT,
           createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
-          FOREIGN KEY (riderId) REFERENCES rider_users(id) ON DELETE CASCADE
+          FOREIGN KEY (rubberId) REFERENCES rubber_users(id) ON DELETE CASCADE
         )
       `).run();
     } catch (e) {}
 
-    const { results: riders } = await db.prepare(`
-      SELECT * FROM rider_users ORDER BY createdAt DESC
+    const { results: rubbers } = await db.prepare(`
+      SELECT * FROM rubber_users ORDER BY createdAt DESC
     `).all();
 
-    // Fetch documents for all riders
+    // Fetch documents for all rubbers
     const { results: docs } = await db.prepare(`
-      SELECT * FROM rider_documents
+      SELECT * FROM rubber_documents
     `).all();
 
-    const ridersWithDocs = riders.map((r: any) => ({
+    const rubbersWithDocs = rubbers.map((r: any) => ({
       ...r,
-      displayId: r.rider_number ? `RD-${String(r.rider_number).padStart(4, '0')}` : r.id,
-      documents: docs.filter((d: any) => d.riderId === r.id)
+      displayId: r.rubber_number ? `RD-${String(r.rubber_number).padStart(4, '0')}` : r.id,
+      documents: docs.filter((d: any) => d.rubberId === r.id)
     }));
 
-    return NextResponse.json({ riders: ridersWithDocs });
+    return NextResponse.json({ rubbers: rubbersWithDocs });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
@@ -64,22 +64,22 @@ export async function POST(req: Request) {
     if (!db) return NextResponse.json({ error: "D1 not found" }, { status: 500 });
 
     // Self-healing: Ensure required columns exist
-    try { await db.prepare("ALTER TABLE rider_users ADD COLUMN rider_number INTEGER").run(); } catch(e) {}
-    try { await db.prepare("ALTER TABLE rider_users ADD COLUMN pictureUrl TEXT").run(); } catch(e) {}
-    try { await db.prepare("ALTER TABLE rider_users ADD COLUMN bankName TEXT").run(); } catch(e) {}
-    try { await db.prepare("ALTER TABLE rider_users ADD COLUMN accountNumber TEXT").run(); } catch(e) {}
-    try { await db.prepare("ALTER TABLE rider_users ADD COLUMN accountName TEXT").run(); } catch(e) {}
+    try { await db.prepare("ALTER TABLE rubber_users ADD COLUMN rubber_number INTEGER").run(); } catch(e) {}
+    try { await db.prepare("ALTER TABLE rubber_users ADD COLUMN pictureUrl TEXT").run(); } catch(e) {}
+    try { await db.prepare("ALTER TABLE rubber_users ADD COLUMN bankName TEXT").run(); } catch(e) {}
+    try { await db.prepare("ALTER TABLE rubber_users ADD COLUMN accountNumber TEXT").run(); } catch(e) {}
+    try { await db.prepare("ALTER TABLE rubber_users ADD COLUMN accountName TEXT").run(); } catch(e) {}
 
     if (!email || !password || !name) return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
 
-    // 1. Get next rider number
-    const lastRider = await db.prepare("SELECT rider_number FROM rider_users ORDER BY rider_number DESC LIMIT 1").first() as any;
-    const nextNumber = (lastRider?.rider_number || 0) + 1;
+    // 1. Get next rubber number
+    const lastRubber = await db.prepare("SELECT rubber_number FROM rubber_users ORDER BY rubber_number DESC LIMIT 1").first() as any;
+    const nextNumber = (lastRubber?.rubber_number || 0) + 1;
     const displayId = `RD-${String(nextNumber).padStart(4, '0')}`;
     const id = `RDR-${Math.random().toString(36).substr(2, 6).toUpperCase()}`;
 
     await db.prepare(`
-      INSERT INTO rider_users (id, email, password, name, phone, vehicleType, address, idNumber, licensePlate, emergencyContact, status, rider_number, bankName, accountNumber, accountName, pictureUrl)
+      INSERT INTO rubber_users (id, email, password, name, phone, vehicleType, address, idNumber, licensePlate, emergencyContact, status, rubber_number, bankName, accountNumber, accountName, pictureUrl)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'active', ?, ?, ?, ?, ?)
     `).bind(
       id, email, password, name, phone || "", vehicleType || "bike", address || "", idNumber || "", licensePlate || "", emergencyContact || "", nextNumber,
@@ -106,9 +106,9 @@ export async function PUT(req: Request) {
 
     if (!id) return NextResponse.json({ error: "Missing ID" }, { status: 400 });
 
-    // Update main rider info
+    // Update main rubber info
     await db.prepare(`
-      UPDATE rider_users 
+      UPDATE rubber_users 
       SET status = COALESCE(?, status),
           name = COALESCE(?, name),
           phone = COALESCE(?, phone),
@@ -132,12 +132,12 @@ export async function PUT(req: Request) {
       for (const doc of documents) {
         if (doc.id) {
             await db.prepare(`
-               UPDATE rider_documents SET status = ?, url = ?, notes = ? WHERE id = ?
+               UPDATE rubber_documents SET status = ?, url = ?, notes = ? WHERE id = ?
             `).bind(doc.status, doc.url, doc.notes, doc.id).run();
         } else {
             const docId = `DOC-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
             await db.prepare(`
-               INSERT INTO rider_documents (id, riderId, type, status, url, notes)
+               INSERT INTO rubber_documents (id, rubberId, type, status, url, notes)
                VALUES (?, ?, ?, ?, ?, ?)
             `).bind(docId, id, doc.type, doc.status || 'pending', doc.url || "", doc.notes || "").run();
         }
@@ -160,7 +160,7 @@ export async function DELETE(req: Request) {
 
     if (!id) return NextResponse.json({ error: "Missing ID" }, { status: 400 });
 
-    await db.prepare(`DELETE FROM rider_users WHERE id = ?`).bind(id).run();
+    await db.prepare(`DELETE FROM rubber_users WHERE id = ?`).bind(id).run();
 
     return NextResponse.json({ success: true });
   } catch (error: any) {

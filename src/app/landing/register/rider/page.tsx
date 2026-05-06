@@ -6,7 +6,7 @@ import { Icons } from "@/components/ui/Icons";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 
-export default function RiderRegisterPage() {
+export default function RubberRegisterPage() {
   const router = useRouter();
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
@@ -59,7 +59,7 @@ export default function RiderRegisterPage() {
     setError("");
 
     try {
-      const res = await fetch("/api/rider/register", {
+      const res = await fetch("/api/rubber/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
@@ -67,7 +67,7 @@ export default function RiderRegisterPage() {
       const data = await res.json() as any;
 
       if (res.ok) {
-        router.push("/rider/login?registered=true");
+        router.push("/rubber/login?registered=true");
       } else {
         setError(data.error || "Failed to register");
       }
@@ -101,7 +101,7 @@ export default function RiderRegisterPage() {
         {/* Header */}
         <div className="text-center mb-16">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-white border border-slate-200 rounded-full text-[10px] font-black uppercase tracking-widest text-slate-400 mb-8 shadow-sm">
-             Rider Onboarding
+             Rubber Onboarding
           </div>
           <h1 className="text-4xl md:text-6xl font-black tracking-tight leading-tight mb-4">
              ร่วมทีม <span className="text-primary">RUBJOB</span>
@@ -141,7 +141,7 @@ export default function RiderRegisterPage() {
                   </div>
                   <div className="space-y-2">
                     <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">อีเมล</label>
-                    <input type="email" required className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-6 py-4.5 text-lg font-bold focus:border-primary focus:bg-white outline-none transition-all" placeholder="rider@rubjob.com" value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} />
+                    <input type="email" required className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-6 py-4.5 text-lg font-bold focus:border-primary focus:bg-white outline-none transition-all" placeholder="rubber@rubjob.com" value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} />
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
@@ -307,7 +307,7 @@ export default function RiderRegisterPage() {
 
         <div className="text-center mt-12 space-y-4">
           <p className="text-sm font-bold text-slate-400">
-            Have an account? <a href="/rider/login" className="text-primary hover:underline font-black">Sign In</a>
+            Have an account? <a href="/rubber/login" className="text-primary hover:underline font-black">Sign In</a>
           </p>
           <div className="flex items-center justify-center gap-8 pt-8 opacity-30 grayscale">
             <Icons.Logo size={80} />

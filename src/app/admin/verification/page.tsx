@@ -71,8 +71,8 @@ export default function VerificationCenterPage() {
                 onClick={() => setSelectedDoc(doc)}
                 className={`w-full text-left p-4 rounded-xl border-2 transition-all flex items-center gap-4 ${selectedDoc?.id === doc.id ? 'bg-primary/5 border-primary shadow-lg scale-[1.02]' : 'bg-white border-slate-100 hover:border-slate-200'}`}
               >
-                <div className={`w-12 h-12 rounded-lg flex items-center justify-center text-xl ${doc.partnerType === 'rider' ? 'bg-blue-50 text-blue-500' : 'bg-violet-50 text-violet-500'}`}>
-                  {doc.partnerType === 'rider' ? <Icons.Bike size={24} /> : <Icons.User size={24} />}
+                <div className={`w-12 h-12 rounded-lg flex items-center justify-center text-xl ${doc.partnerType === 'rubber' ? 'bg-blue-50 text-blue-500' : 'bg-violet-50 text-violet-500'}`}>
+                  {doc.partnerType === 'rubber' ? <Icons.Bike size={24} /> : <Icons.User size={24} />}
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="font-black text-slate-900 truncate">{doc.partnerName}</p>

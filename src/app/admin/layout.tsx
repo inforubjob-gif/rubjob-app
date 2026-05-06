@@ -22,7 +22,7 @@ function PermissionGate({ children }: { children: React.ReactNode }) {
       "/admin/orders": "orders",
       "/admin/users": "users",
       "/admin/stores": "stores",
-      "/admin/riders": "riders",
+      "/admin/rubbers": "rubbers",
       "/admin/coupons": "coupons",
       "/admin/finance": "finance",
       "/admin/support": "support",

@@ -184,9 +184,9 @@ export const th = {
       account: "บัญชี",
       logOut: "ออกจากระบบ",
       verifiedHero: "พนักงานยืนยันแล้ว",
-      incomingFromRider: "รายการรอรับจากคนขับ",
+      incomingFromRubber: "รายการรอรับจากคนขับ",
       processing: "กำลังดำเนินการซัก/รีด",
-      readyForRider: "รอส่งคืนคนขับ",
+      readyForRubber: "รอส่งคืนคนขับ",
       urgent: "เร่งด่วน",
       timeLeft: "เวลาที่เหลือ",
       receiveFromDriver: "รับผ้าจากคนขับ",
@@ -340,7 +340,7 @@ export const th = {
       summaryTitle: "สรุปยอดชำระ",
       summary: {
         storeSection: "ส่วนของร้านซักรีด",
-        riderSection: "ส่วนของค่าจัดส่ง (ไรเดอร์)",
+        rubberSection: "ส่วนของค่าจัดส่ง (รับเบอร์)",
         package: "แพ็กเกจ",
         extraBag: "น้ำหนักกระเป๋าพิเศษ",
         subtotalLaundry: "รวมค่าซักรีด",
@@ -596,7 +596,7 @@ export const th = {
       arriving: "กำลังมาถึง",
       customer: "ลูกค้า",
       notAssigned: "ยังไม่ได้มอบหมาย",
-      riderNo: "ไรเดอร์หมายเลข",
+      rubberNo: "รับเบอร์หมายเลข",
       photoVerified: "ตรวจสอบภาพถ่ายแล้ว",
       mins: "นาที",
       serviceLevel: "ระดับบริการ",
@@ -607,18 +607,18 @@ export const th = {
       pickupItems: "จำนวนชิ้นที่รับ",
       clientPrefs: "ความต้องการพิเศษจากลูกค้า",
       workflowTitle: "ขั้นตอนหน้าที่ร้าน",
-      incomingFromRider: "งานจากไรเดอร์",
-      readyForRider: "รอไรเดอร์รับผ้า",
+      incomingFromRubber: "งานจากรับเบอร์",
+      readyForRubber: "รอรับเบอร์รับผ้า",
       flashExpress: "ซักด่วน (Flash)",
       standardWash: "ซักมาตรฐาน",
-      comingToStore: "ไรเดอร์กำลังมาที่ร้าน",
-      atStore: "ไรเดอร์ถึงร้านแล้ว",
+      comingToStore: "รับเบอร์กำลังมาที่ร้าน",
+      atStore: "รับเบอร์ถึงร้านแล้ว",
       handoffSuccess: "ส่งมอบสำเร็จ!",
       handoffDesc: "ขอบคุณที่เป็นส่วนหนึ่งในความสำเร็จของ RUBJOB งานของคุณยอดเยี่ยมมาก",
       handoverToDriver: "ส่งผ้าให้คนขับเรียบร้อย",
-      incomingFromRider: "รอรับผ้าจากคนขับ",
+      incomingFromRubber: "รอรับผ้าจากคนขับ",
       processing: "กำลังซัก/รีด",
-      readyForRider: "รอส่งคืนคนขับ",
+      readyForRubber: "รอส่งคืนคนขับ",
       urgent: "เร่งด่วน",
       timeLeft: "เวลาที่เหลือ",
       receiveFromDriver: "รับผ้าจากคนขับ",
@@ -701,10 +701,21 @@ export const th = {
       },
       orderDetail: {
         serviceLevel: "ระดับบริการ",
+      },
+      login: {
+        title: "พาร์ทเนอร์ (Partner)",
+        subtitle: "เข้าสู่ระบบเพื่อจัดการร้านค้าและบริการของคุณ",
+        email: "อีเมล",
+        password: "รหัสผ่าน",
+        submit: "เข้าสู่ระบบ",
+        emailPlaceholder: "email@example.com",
+        passwordPlaceholder: "••••••••",
+        failed: "เข้าสู่ระบบไม่สำเร็จ",
+        errorConn: "เกิดข้อผิดพลาดในการเชื่อมต่อ"
       }
     },
-    rider: {
-      hero: "ไรเดอร์",
+    rubber: {
+      hero: "รับเบอร์",
       tasksToday: "รับงานวันนี้",
       earnings: "รายได้สะสม",
       availableJobs: "งานว่างรับผ้า",
@@ -791,7 +802,7 @@ export const th = {
         payoutMethod: "ช่องทางการรับเงิน",
         account: "บัญชี",
         logout: "ออกจากระบบ",
-        verifiedHero: "ไรเดอร์ระดับ",
+        verifiedHero: "รับเบอร์ระดับ",
         selectLanguage: "เลือกภาษา",
         vehicleType: "ข้อมูลยานพาหนะ",
       },
@@ -833,7 +844,7 @@ export const th = {
       intro: {
         heroTitle: "ร่วมเป็นฮีโร่กับ RUBJOB",
         heroDesc: "ร่วมเป็นส่วนหนึ่งของทีมส่งผ้ามืออาชีพ\nหารายได้ง่ายๆ ในเวลาที่คุณเลือกเอง",
-        applyBtn: "สมัครเป็นไรเดอร์เลย",
+        applyBtn: "สมัครเป็นรับเบอร์เลย",
       },
       status: {
         pending: "อยู่ระหว่างตรวจสอบ",
@@ -843,7 +854,7 @@ export const th = {
         editDocs: "แก้ไขเอกสาร",
       },
       setup: {
-        title: "สมัครเป็นไรเดอร์",
+        title: "สมัครเป็นรับเบอร์",
         sub: "ร่วมเป็นส่วนหนึ่งของทีมส่งผ้ามืออาชีพ",
         fullName: "ชื่อ-นามสกุล",
         fullNamePlaceholder: "ชื่อผู้สมัคร",
@@ -885,7 +896,7 @@ export const th = {
         endTime: "เวลาสิ้นสุด",
         applyToAll: "ใช้กับทุกวัน",
         offDuty: "ปิดทำการวัน{day}",
-        reminder: "ระบบจะเลือกงานให้ไรเดอร์ตามเวลาทำการที่ระบุไว้ ยิ่งเปิดรับมากยิ่งเพิ่มโอกาสสร้างรายได้!",
+        reminder: "ระบบจะเลือกงานให้รับเบอร์ตามเวลาทำการที่ระบุไว้ ยิ่งเปิดรับมากยิ่งเพิ่มโอกาสสร้างรายได้!",
         days: {
           Mon: "จันทร์",
           Tue: "อังคาร",
@@ -915,11 +926,11 @@ export const th = {
         successDesc: "ทีมงานกำลังตรวจสอบเอกสารของคุณครับ...",
       },
       login: {
-        title: "เข้าสู่ระบบไรเดอร์",
+        title: "เข้าสู่ระบบรับเบอร์",
         emailLabel: "อีเมลผู้ใช้งาน",
         passwordLabel: "รหัสผ่านลับ",
         button: "เข้าสู่ระบบเพื่อเริ่มงาน",
-        footer: "ระบบไรเดอร์\nพบปัญหาติดต่อ @RUBJOB_HELP",
+        footer: "ระบบรับเบอร์\nพบปัญหาติดต่อ @RUBJOB_HELP",
       }
     },
     staff: {
@@ -934,7 +945,7 @@ export const th = {
         withdrawSuccess: "ยื่นคำขอถอนเงินสำเร็จ",
         withdrawSuccessDesc: "ทีมงานกำลังตรวจสอบคำขอของคุณ ยอดเงินจะเข้าบัญชีภายใน 24 ชั่วโมงครับ",
         receiveFromDriver: "รับผ้าจากคนขับ",
-        callRider: "เรียกคนขับ",
+        callRubber: "เรียกคนขับ",
         withdrawMin: "ยอดถอนขั้นต่ำสุด 100 บาท",
       },
     },
@@ -942,7 +953,7 @@ export const th = {
       common: {
         adminBadge: "ผู้ดูแลระบบ",
         customer: "ลูกค้า",
-        rider: "ไรเดอร์",
+        rubber: "รับเบอร์",
         store: "ร้านค้า",
         toast: {
           success: "ดำเนินการสำเร็จ",
@@ -957,7 +968,7 @@ export const th = {
         orders: "รายการออเดอร์",
         users: "ผู้ใช้งานและบทบาท",
         stores: "จัดการร้านค้า",
-        riders: "จัดการไรเดอร์",
+        rubbers: "จัดการรับเบอร์",
         providers: "ผู้ให้บริการ (Gigs)",
         coupons: "คูปองส่วนลด",
         finance: "การเงินและยอดโอน",
@@ -977,8 +988,8 @@ export const th = {
         grossRevenue: "รายได้รวม (Gross)",
         platformEarnings: "รายได้แพลตฟอร์ม",
         gpLabel: "ค่าธรรมเนียม (GP)",
-        activeRiders: "ไรเดอร์ที่พร้อมงาน",
-        totalRiders: "ไรเดอร์ทั้งหมด",
+        activeRubbers: "รับเบอร์ที่พร้อมงาน",
+        totalRubbers: "รับเบอร์ทั้งหมด",
         quickActions: "คำสั่งด่วน",
         processPayouts: "จัดการยอดโอนเงิน",
         reviewStores: "ตรวจสอบร้านค้าใหม่",
@@ -992,8 +1003,8 @@ export const th = {
         authCustomers: "ลูกค้าที่ยืนยันตัวตนแล้ว",
         processedVol: "ปริมาณออเดอร์ที่ดำเนินการ",
         overallSales: "ยอดขายรวมทั้งหมด",
-        netCommission: "ยอดกำไรสุทธิหลังหักยอดโอนไรเดอร์",
-        gpShare: "ส่วนแบ่ง GP: ร้านค้า-{store}% / ไรเดอร์-{rider}%",
+        netCommission: "ยอดกำไรสุทธิหลังหักยอดโอนรับเบอร์",
+        gpShare: "ส่วนแบ่ง GP: ร้านค้า-{store}% / รับเบอร์-{rubber}%",
       },
       users: {
         title: "จัดการผู้ใช้งาน",
@@ -1006,7 +1017,7 @@ export const th = {
         tableActions: "จัดการ",
         roleCustomer: "ลูกค้าทั่วไป",
         rolePartner: "พาร์ทเนอร์ร้านค้า",
-        roleRider: "ไรเดอร์",
+        roleRubber: "รับเบอร์",
         joinedDate: "วันที่เข้าร่วม",
         noUsers: "ไม่พบผู้ใช้งานที่ตรงตามเงื่อนไข",
         clearSearch: "ล้างการค้นหา",
@@ -1056,7 +1067,7 @@ export const th = {
         financeTitle: "กำหนดค่าการเงิน",
         financeSub: "การตั้งค่า GP และลอจิกรายได้",
         financeLabelStoreGP: "Store GP (%)",
-        financeLabelRiderGP: "Rider GP (%)",
+        financeLabelRubberGP: "Rubber GP (%)",
         financeLabelBasePayout: "ค่าเที่ยวพื้นฐาน (Base Payout)",
         stripeTitle: "การเชื่อมต่อ Stripe",
         stripeSub: "กำหนดค่าระบบชำระเงินออนไลน์",
@@ -1083,7 +1094,7 @@ export const th = {
         share: "ส่วนแบ่ง",
         fixedRate: "อัตราคงที่",
         refId: "รหัสอ้างอิง",
-        fleetId: "รหัสไรเดอร์",
+        fleetId: "รหัสรับเบอร์",
       },
       finance: {
         title: "บัญชีและการเงิน",
@@ -1306,15 +1317,15 @@ export const th = {
           initializingMap: "กำลังเตรียมระบบแผนที่...",
         }
       },
-      riders: {
+      rubbers: {
         list: {
-          title: "การบริหารจัดการไรเดอร์",
+          title: "การบริหารจัดการรับเบอร์",
           subtitle: "ตรวจสอบรายชื่อพนักงานขนส่ง สถานะการทำงาน และเอกสารยืนยันตัวตน",
-          newBtn: "เพิ่มพาร์ทเนอร์ไรเดอร์",
-          empty: "ยังไม่มีข้อมูลไรเดอร์ในระบบ",
-          emptyAction: "ลงทะเบียนไรเดอร์คนแรก →",
+          newBtn: "เพิ่มพาร์ทเนอร์รับเบอร์",
+          empty: "ยังไม่มีข้อมูลรับเบอร์ในระบบ",
+          emptyAction: "ลงทะเบียนรับเบอร์คนแรก →",
           table: {
-            rider: "ไรเดอร์",
+            rubber: "รับเบอร์",
             contact: "ข้อมูลการติดต่อ",
             vehicle: "พาหนะ",
             status: "สถานะ",
@@ -1322,11 +1333,11 @@ export const th = {
           }
         },
         new: {
-          title: "ลงทะเบียนพาร์ทเนอร์ไรเดอร์ใหม่",
+          title: "ลงทะเบียนพาร์ทเนอร์รับเบอร์ใหม่",
           subtitle: "สร้างโปรไฟล์พนักงานขนส่งและเตรียมขั้นตอนการตรวจสอบเอกสาร"
         },
         edit: {
-          title: "แก้ไขข้อมูลไรเดอร์",
+          title: "แก้ไขข้อมูลรับเบอร์",
           subtitle: "ปรับปรุงรายละเอียดบุคคล ตรวจสอบเอกสาร และสถานะบัญชี"
         },
         form: {
@@ -1356,7 +1367,7 @@ export const th = {
           accountNumber: "เลขบัญชี / รหัสพร้อมเพย์",
           accountName: "ชื่อเจ้าของบัญชี",
           emergencyContact: "ติดต่อฉุกเฉิน",
-          authorizeBtn: "อนุมัติสิทธิ์ไรเดอร์",
+          authorizeBtn: "อนุมัติสิทธิ์รับเบอร์",
           updateBtn: "อัปเดตข้อมูลบุคลากร",
           exitProfiling: "ออกจากหน้าโปรไฟล์",
           statusControl: "การควบคุมสถานะบัญชี",
@@ -1423,7 +1434,7 @@ export const th = {
         q1: "Rubjob เปิดให้บริการกี่โมง?",
         a1: "เราเปิดให้บริการรับ-ส่งผ้าตลอด 24 ชั่วโมงผ่านระบบอัตโนมัติบน LINE ครับ",
         q2: "จำกัดน้ำหนักผ้าขั้นต่ำไหม?",
-        a2: "เราไม่มีน้ำหนักขั้นต่ำ แต่จะมีค่าบริการเริ่มต้นตามระยะทางของไรเดอร์ครับ",
+        a2: "เราไม่มีน้ำหนักขั้นต่ำ แต่จะมีค่าบริการเริ่มต้นตามระยะทางของรับเบอร์ครับ",
         q3: "ถ้าผ้าเสียหายต้องทำอย่างไร?",
         a3: "สามารถติดต่อแอดมินผ่าน LINE เพื่อแจ้งเรื่องเคลมได้ทันทีตามนโยบายรับประกันครับ",
       }

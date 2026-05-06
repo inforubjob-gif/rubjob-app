@@ -11,7 +11,7 @@ import { useToast } from "@/components/providers/ToastProvider";
 const ROLE_OPTIONS = [
   { key: "all", label: "🌟 ทุกคน", color: "bg-amber-50 text-amber-600 ring-amber-200" },
   { key: "customer", label: "👤 ลูกค้า", color: "bg-emerald-50 text-emerald-600 ring-emerald-200" },
-  { key: "rider", label: "🏍️ ไรเดอร์", color: "bg-blue-50 text-blue-600 ring-blue-200" },
+  { key: "rubber", label: "🏍️ รับเบอร์", color: "bg-blue-50 text-blue-600 ring-blue-200" },
   { key: "store", label: "🏪 ร้านค้า", color: "bg-purple-50 text-purple-600 ring-purple-200" },
 ];
 
@@ -22,7 +22,7 @@ function getEligibleRoleBadges(eligibleRoles: string) {
   const roles = eligibleRoles.split(',').map(r => r.trim());
   return roles.map(role => {
     switch (role) {
-      case 'rider': return { label: '🏍️ RIDER', class: 'bg-blue-50 text-blue-600' };
+      case 'rubber': return { label: '🏍️ RUBBER', class: 'bg-blue-50 text-blue-600' };
       case 'store': return { label: '🏪 STORE', class: 'bg-purple-50 text-purple-600' };
       case 'customer': return { label: '👤 CUSTOMER', class: 'bg-emerald-50 text-emerald-600' };
       default: return { label: role.toUpperCase(), class: 'bg-slate-50 text-slate-500' };
@@ -51,7 +51,7 @@ export default function CouponsAdminPage() {
     isVisible: false,
     title: "",
     description: "",
-    eligibleRoles: "all" as string, // 'all' | 'customer' | 'rider' | 'store' | 'rider,store' etc.
+    eligibleRoles: "all" as string, // 'all' | 'customer' | 'rubber' | 'store' | 'rubber,store' etc.
   });
 
   // Selected roles for the checkbox UI
@@ -167,7 +167,7 @@ export default function CouponsAdminPage() {
           next.add(roleKey);
         }
         // If all 3 individual roles are selected, switch to "all"
-        if (next.has("customer") && next.has("rider") && next.has("store")) {
+        if (next.has("customer") && next.has("rubber") && next.has("store")) {
           next.clear();
           next.add("all");
         }

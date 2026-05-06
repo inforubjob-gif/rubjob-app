@@ -1,4 +1,4 @@
-export type SupportRole = "customer" | "store" | "rider";
+export type SupportRole = "customer" | "store" | "rubber";
 
 export interface SupportTemplate {
   id: string;
@@ -36,9 +36,9 @@ export const SUPPORT_TEMPLATES: Record<SupportRole, SupportTemplate[]> = {
   store: [
     {
       id: "pickup-issue",
-      title: "ปัญหารับผ้าจากไรเดอร์",
+      title: "ปัญหารับผ้าจากรับเบอร์",
       subject: "แจ้งปัญหาการรับ-ส่งงานหน้าร้าน",
-      message: "มีปัญหาในการรับงานจากไรเดอร์สำหรับออเดอร์ [ORDER_ID] รายละเอียด: [DETAIL] กรุณาช่วยประสานงานให้ด้วย",
+      message: "มีปัญหาในการรับงานจากรับเบอร์สำหรับออเดอร์ [ORDER_ID] รายละเอียด: [DETAIL] กรุณาช่วยประสานงานให้ด้วย",
     },
     {
       id: "payout-check",
@@ -53,7 +53,7 @@ export const SUPPORT_TEMPLATES: Record<SupportRole, SupportTemplate[]> = {
       message: "ต้องการปรับพื้นที่ให้บริการของร้านเป็น [AREA] เพื่อรองรับงานเพิ่ม กรุณาช่วยตรวจสอบเงื่อนไขและยืนยันให้ด้วย",
     },
   ],
-  rider: [
+  rubber: [
     {
       id: "job-issue",
       title: "ปัญหางานจัดส่ง",
@@ -69,8 +69,8 @@ export const SUPPORT_TEMPLATES: Record<SupportRole, SupportTemplate[]> = {
     {
       id: "account-status",
       title: "ปัญหาบัญชีคนขับ",
-      subject: "ขอความช่วยเหลือเรื่องสถานะบัญชีไรเดอร์",
-      message: "บัญชีไรเดอร์มีปัญหาเรื่อง [DETAIL] (เช่น รับงานไม่ได้/สถานะไม่อัปเดต) กรุณาช่วยตรวจสอบให้หน่อยครับ/ค่ะ",
+      subject: "ขอความช่วยเหลือเรื่องสถานะบัญชีรับเบอร์",
+      message: "บัญชีรับเบอร์มีปัญหาเรื่อง [DETAIL] (เช่น รับงานไม่ได้/สถานะไม่อัปเดต) กรุณาช่วยตรวจสอบให้หน่อยครับ/ค่ะ",
     },
   ],
 };
@@ -96,7 +96,7 @@ export const SUPPORT_FAQS: Record<SupportRole, SupportFaq[]> = {
       a: "ตรวจสอบสถานะการทำงาน, พื้นที่ให้บริการ และการตั้งค่าเวลาทำการก่อน หากยังมีปัญหาให้เปิดตั๋วได้ทันที",
     },
     {
-      q: "ไรเดอร์ยังไม่เข้ารับผ้าเกินเวลาควรทำยังไง?",
+      q: "รับเบอร์ยังไม่เข้ารับผ้าเกินเวลาควรทำยังไง?",
       a: "แจ้งเลขออเดอร์ผ่านตั๋วช่วยเหลือ ทีมแอดมินจะช่วยเร่งเคสให้",
     },
     {
@@ -104,7 +104,7 @@ export const SUPPORT_FAQS: Record<SupportRole, SupportFaq[]> = {
       a: "ส่งช่วงวันที่และเลขออเดอร์ที่เกี่ยวข้องผ่านตั๋วเพื่อให้ทีมการเงินตรวจสอบรายละเอียด",
     },
   ],
-  rider: [
+  rubber: [
     {
       q: "รับงานไม่ได้แม้เปิดสถานะแล้ว เกิดจากอะไร?",
       a: "อาจเกิดจากพื้นที่ให้บริการหรือสถานะบัญชีไม่พร้อม ตรวจสอบในหน้าโปรไฟล์ก่อน แล้วแจ้งแอดมินหากยังผิดปกติ",

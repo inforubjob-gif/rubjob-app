@@ -11,8 +11,8 @@ export default function AdminDashboard() {
   const [stats, setStats] = useState({ 
     users: 0, rawUsers: 0, stores: 0, activeStores: 0, 
     orders: 0, revenue: 0, earnings: 0, 
-    gpStore: 20, gpRider: 10,
-    totalRiders: 0, activeRiders: 0,
+    gpStore: 20, gpRubber: 10,
+    totalRubbers: 0, activeRubbers: 0,
     tables: [] as string[],
     inventory: {} as Record<string, number>,
     connection: "WAITING"
@@ -40,9 +40,9 @@ export default function AdminDashboard() {
             revenue: data.revenue || 0,
             earnings: data.earnings || 0,
             gpStore: data.gpStore || 20,
-            gpRider: data.gpRider || 10,
-            totalRiders: data.totalRiders || 0,
-            activeRiders: data.activeRiders || 0,
+            gpRubber: data.gpRubber || 10,
+            totalRubbers: data.totalRubbers || 0,
+            activeRubbers: data.activeRubbers || 0,
             tables: data.tables || [],
             inventory: data.inventory || {},
             connection: data.connection || "CONNECTED"
@@ -75,7 +75,7 @@ export default function AdminDashboard() {
           </h1>
           <div className="flex items-center gap-4">
              <div className="px-3 py-1 bg-primary/10 text-primary rounded-lg text-xs font-black uppercase tracking-wider border border-primary/20">
-               {t("admin.dashboard.gpLabel")}: {stats.gpStore}% / {stats.gpRider}%
+               {t("admin.dashboard.gpLabel")}: {stats.gpStore}% / {stats.gpRubber}%
              </div>
              <p className="text-slate-400 text-sm font-bold tracking-tight">
                {t("admin.dashboard.noc")}
@@ -143,24 +143,24 @@ export default function AdminDashboard() {
               </Card>
             </div>
 
-            {/* Riders Card */}
+            {/* Rubbers Card */}
             <Card className="p-7 bg-white border border-slate-100 shadow-card hover:shadow-card-hover hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group">
                <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-50/50 rounded-full blur-3xl -mr-12 -mt-12 group-hover:bg-emerald-100/50 transition-colors" />
                <div className="w-14 h-14 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-6 shadow-inner group-hover:scale-110 transition-transform">
                   <Icons.Car size={28} />
                </div>
                <div className="flex items-center justify-between mb-2">
-                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.15em]">{t("admin.dashboard.totalRiders")}</p>
+                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.15em]">{t("admin.dashboard.totalRubbers")}</p>
                  <div className="flex items-center gap-1.5 bg-emerald-500/10 text-emerald-600 px-2 py-0.5 rounded-full border border-emerald-500/10">
                     <div className="w-1 h-1 bg-emerald-500 rounded-full animate-pulse" />
-                    <span className="text-[9px] font-black">{Number(stats.activeRiders)} {t("admin.dashboard.liveSync").split(' ')[0]}</span>
+                    <span className="text-[9px] font-black">{Number(stats.activeRubbers)} {t("admin.dashboard.liveSync").split(' ')[0]}</span>
                  </div>
                </div>
                <h2 className="text-4xl font-black text-slate-900 leading-none tracking-tighter">
-                 {Number(stats.activeRiders)}<span className="text-slate-300 text-2xl font-bold mx-1">/</span>{Number(stats.totalRiders)}
+                 {Number(stats.activeRubbers)}<span className="text-slate-300 text-2xl font-bold mx-1">/</span>{Number(stats.totalRubbers)}
                </h2>
                <div className="mt-4 w-full h-1.5 bg-slate-50 rounded-full overflow-hidden">
-                  <div className="h-full bg-emerald-500 transition-all duration-1000 ease-out shadow-[0_0_8px_rgba(16,185,129,0.4)]" style={{ width: `${(Number(stats.activeRiders) / (Number(stats.totalRiders) || 1)) * 100}%` }} />
+                  <div className="h-full bg-emerald-500 transition-all duration-1000 ease-out shadow-[0_0_8px_rgba(16,185,129,0.4)]" style={{ width: `${(Number(stats.activeRubbers) / (Number(stats.totalRubbers) || 1)) * 100}%` }} />
                </div>
             </Card>
 
@@ -227,7 +227,7 @@ export default function AdminDashboard() {
                        <Icons.Wallet size={28} />
                     </div>
                     <div className="bg-white/20 backdrop-blur-md px-4 py-1.5 rounded-xl text-[10px] font-black tracking-widest uppercase border border-white/20 shadow-sm">
-                      {t("admin.dashboard.gpShare").replace("{store}", String(stats.gpStore)).replace("{rider}", String(stats.gpRider))}
+                      {t("admin.dashboard.gpShare").replace("{store}", String(stats.gpStore)).replace("{rubber}", String(stats.gpRubber))}
                     </div>
                   </div>
                   

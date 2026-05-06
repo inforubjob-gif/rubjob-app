@@ -69,7 +69,7 @@ export default function PrivacyPage() {
               <p className="text-slate-600 leading-relaxed">
                 {language === 'th' 
                  ? "ข้อมูลของคุณจะถูกนำไปใช้เพื่อการจัดส่งผ้าโดยคนขับ ตรวจสอบสถานะการซักอบรีดโดยร้านค้าพาร์ทเนอร์ และแจ้งเตือนสถานะต่างๆ ผ่าน LINE OA"
-                 : "Your data is used for delivery coordination by riders, laundry processing verification by partner stores, and status notifications via our LINE OA."}
+                 : "Your data is used for delivery coordination by rubbers, laundry processing verification by partner stores, and status notifications via our LINE OA."}
               </p>
             </section>
 

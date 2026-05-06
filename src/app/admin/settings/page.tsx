@@ -44,7 +44,7 @@ function SettingsContent() {
     { id: "orders", label: t("admin.nav.orders") },
     { id: "users", label: t("admin.nav.users") },
     { id: "stores", label: t("admin.nav.stores") },
-    { id: "riders", label: t("admin.nav.riders") },
+    { id: "rubbers", label: t("admin.nav.rubbers") },
     { id: "coupons", label: t("admin.nav.coupons") },
     { id: "finance", label: t("admin.nav.finance") },
     { id: "support", label: t("admin.nav.support") },
@@ -565,7 +565,7 @@ function SettingsContent() {
                             onClick={logout}
                             className="bg-rose-50 text-rose-500 px-6 py-5 rounded-xl font-black text-[10px] uppercase tracking-widest border border-rose-100 hover:bg-rose-500 hover:text-white transition-all shadow-sm"
                           >
-                             {t("rider.profile.logout")}
+                             {t("rubber.profile.logout")}
                           </button>
                        </div>
                     </form>
@@ -696,7 +696,7 @@ function SettingsContent() {
 
                     <div className="space-y-4">
                       <div className="flex items-center justify-between px-1">
-                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t("admin.settings.financeLabelRiderGP")}</label>
+                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t("admin.settings.financeLabelRubberGP")}</label>
                         <span className="text-[10px] font-black text-orange-500">{t("admin.settings.share")}</span>
                       </div>
                       <div className="relative group/input">
@@ -704,8 +704,8 @@ function SettingsContent() {
                           type="number" 
                           className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-6 py-4.5 text-2xl text-slate-900 font-black focus:border-orange-500 transition-all outline-none font-mono text-center"
                           placeholder="10"
-                          value={getSetting("gp_rider_percent")}
-                          onChange={(e) => updateLocalSetting("gp_rider_percent", e.target.value)}
+                          value={getSetting("gp_rubber_percent")}
+                          onChange={(e) => updateLocalSetting("gp_rubber_percent", e.target.value)}
                         />
                         <div className="absolute right-4 top-1/2 -translate-y-1/2 text-orange-600 font-black text-lg opacity-30">%</div>
                       </div>
@@ -720,8 +720,8 @@ function SettingsContent() {
                         type="number" 
                         className="w-full bg-emerald-50/30 border-2 border-emerald-100/50 rounded-xl pl-16 pr-6 py-6 text-3xl text-slate-900 font-black focus:border-emerald-500 transition-all outline-none font-mono"
                         placeholder="25"
-                        value={getSetting("rider_base_payout")}
-                        onChange={(e) => updateLocalSetting("rider_base_payout", e.target.value)}
+                        value={getSetting("rubber_base_payout")}
+                        onChange={(e) => updateLocalSetting("rubber_base_payout", e.target.value)}
                       />
                       <div className="absolute right-8 top-1/2 -translate-y-1/2 flex items-center gap-2">
                         <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />

@@ -248,10 +248,10 @@ export const orderStatusUpdateFlex = (orderId: string, statusText: string, descr
 });
 
 /**
- * Flex Message for Rider Accepted
+ * Flex Message for Rubber Accepted
  */
-export const riderAcceptedFlex = (orderId: string, riderName: string) => 
-  orderStatusUpdateFlex(orderId, "มี Rider รับงานแล้ว!", `คุณ ${riderName} กำลังเดินทางไปรับผ้าของคุณครับ`, "#10b981");
+export const rubberAcceptedFlex = (orderId: string, rubberName: string) => 
+  orderStatusUpdateFlex(orderId, "มี Rubber รับงานแล้ว!", `คุณ ${rubberName} กำลังเดินทางไปรับผ้าของคุณครับ`, "#10b981");
 
 /**
  * Flex Message for Washing
@@ -260,27 +260,27 @@ export const washingOrderFlex = (orderId: string) =>
   orderStatusUpdateFlex(orderId, "กำลังซักรีด...", `ออเดอร์ของคุณเข้าสู่กระบวนการซักรีดแล้วครับ`, "#6366f1");
 
 /**
- * Flex Message for Rider heading to Store
+ * Flex Message for Rubber heading to Store
  */
 export const deliveringToStoreFlex = (orderId: string) => 
-  orderStatusUpdateFlex(orderId, "กำลังนำส่งร้านซัก", `ไรเดอร์ได้รับผ้าของคุณแล้ว และกำลังเดินทางไปที่ร้านซักให้คุณครับ`, "#3b82f6");
+  orderStatusUpdateFlex(orderId, "กำลังนำส่งร้านซัก", `รับเบอร์ได้รับผ้าของคุณแล้ว และกำลังเดินทางไปที่ร้านซักให้คุณครับ`, "#3b82f6");
 
 /**
  * Flex Message for Ready for Delivery
  */
 export const readyForDeliveryFlex = (orderId: string) => 
-  orderStatusUpdateFlex(orderId, "ผ้าซักเสร็จแล้ว! ✨", `ออเดอร์ของคุณซักเสร็จเรียบร้อยแล้ว กำลังรอไรเดอร์มารับเพื่อนำไปส่งคืนให้คุณครับ`, "#f59e0b");
+  orderStatusUpdateFlex(orderId, "ผ้าซักเสร็จแล้ว! ✨", `ออเดอร์ของคุณซักเสร็จเรียบร้อยแล้ว กำลังรอรับเบอร์มารับเพื่อนำไปส่งคืนให้คุณครับ`, "#f59e0b");
 
 /**
- * Flex Message for Rider heading to Customer
+ * Flex Message for Rubber heading to Customer
  */
 export const deliveringToCustomerFlex = (orderId: string) => 
-  orderStatusUpdateFlex(orderId, "กำลังนำผ้าไปส่งคืน", `ไรเดอร์ได้รับผ้าสะอาดของคุณแล้ว และกำลังเดินทางไปส่งคืนให้คุณที่บ้านครับ`, "#10b981");
+  orderStatusUpdateFlex(orderId, "กำลังนำผ้าไปส่งคืน", `รับเบอร์ได้รับผ้าสะอาดของคุณแล้ว และกำลังเดินทางไปส่งคืนให้คุณที่บ้านครับ`, "#10b981");
 
 /**
- * Flex Message for New Job Available (For Riders)
+ * Flex Message for New Job Available (For Rubbers)
  */
-export const riderNewJobFlex = (orderId: string, type: string, earn: number) => 
+export const rubberNewJobFlex = (orderId: string, type: string, earn: number) => 
   orderStatusUpdateFlex(
     orderId, 
     "💸 มีงานใหม่เข้า!", 
@@ -295,7 +295,7 @@ export const storeOrderAlertFlex = (orderId: string) =>
   orderStatusUpdateFlex(
     orderId, 
     "🧺 ออเดอร์ใหม่เข้า!", 
-    `มีลูกค้าสั่งบริการใหม่ครับ ตรวจสอบรายละเอียดและเตรียมรับผ้าจากไรเดอร์ได้เลย`, 
+    `มีลูกค้าสั่งบริการใหม่ครับ ตรวจสอบรายละเอียดและเตรียมรับผ้าจากรับเบอร์ได้เลย`, 
     "#6366f1"
   );
 

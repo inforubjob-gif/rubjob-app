@@ -6,7 +6,7 @@ import { Icons } from "@/components/ui/Icons";
 import { useTranslation } from "@/components/providers/LanguageProvider";
 
 interface PinLockProps {
-  type: "rider" | "store" | "customer";
+  type: "rubber" | "store" | "customer";
   userId?: string;
   onVerified: () => void;
   children: React.ReactNode;
@@ -35,8 +35,8 @@ export default function PinLock({ type, userId, onVerified, children }: PinLockP
       
       if (res.status === 401) {
         // Not logged in, redirect to respective portal login
-        if (type === "rider") router.replace("/rider/login");
-        else if (type === "store") router.replace("/store/login");
+        if (type === "rubber") router.replace("/rubber/login");
+        else if (type === "store") router.replace("/partner/login");
         else if (type === "customer") router.replace("/");
         return;
       }

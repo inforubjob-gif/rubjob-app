@@ -95,9 +95,9 @@ export async function POST(req: Request) {
         env.LINE_CHANNEL_ACCESS_TOKEN
       ).catch(err => console.error("LINE push error (customer):", err));
 
-      // 2. Broadcast to Riders Group (Now using In-App Polling & Web Push - 100% Free)
+      // 2. Broadcast to Rubbers Group (Now using In-App Polling & Web Push - 100% Free)
       // Since LINE Notify is discontinued, we rely on our built-in real-time update system
-      // Riders who are "Online" will get a Sound Alert and In-App notification within 15s.
+      // Rubbers who are "Online" will get a Sound Alert and In-App notification within 15s.
     }
 
     return NextResponse.json({ 

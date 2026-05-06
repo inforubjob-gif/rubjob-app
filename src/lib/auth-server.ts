@@ -12,9 +12,9 @@ export async function getStoreSession() {
   return token || null;
 }
 
-export async function getRiderSession() {
+export async function getRubberSession() {
   const cookieStore = await cookies();
-  const token = cookieStore.get("rider_token")?.value;
+  const token = cookieStore.get("rubber_token")?.value;
   return token || null;
 }
 

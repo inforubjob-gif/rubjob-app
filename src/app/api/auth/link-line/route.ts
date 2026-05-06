@@ -5,7 +5,7 @@ export const runtime = "edge";
 
 /**
  * POST /api/auth/link-line
- * Securely links a Rider or Store account to a LINE User ID
+ * Securely links a Rubber or Store account to a LINE User ID
  */
 export async function POST(req: Request) {
   try {
@@ -35,15 +35,15 @@ export async function POST(req: Request) {
     }
 
     // 2. Perform Link & Ensure generic user entry exists for preferences
-    if (type === "rider") {
-      await db.prepare(`UPDATE rider_users SET lineUserId = ? WHERE id = ?`)
+    if (type === "rubber") {
+      await db.prepare(`UPDATE rubber_users SET lineUserId = ? WHERE id = ?`)
         .bind(lineUserId, accountId).run();
       
       // Ensure entry in 'users' table exists for preferences
       await db.prepare(`
         INSERT OR IGNORE INTO users (id, role, displayName) 
         VALUES (?, 'driver', ?)
-      `).bind(accountId, "Rider").run();
+      `).bind(accountId, "Rubber").run();
       
     } else if (type === "store") {
       await db.prepare(`UPDATE stores SET lineUserId = ? WHERE id = ?`)

@@ -30,9 +30,9 @@ export async function GET(
       JOIN users u_customer ON o.userId = u_customer.id
       JOIN stores st ON o.storeId = st.id
       LEFT JOIN users u_pickup ON o.pickupDriverId = u_pickup.id
-      LEFT JOIN rider_users r_pickup ON o.pickupDriverId = r_pickup.id
+      LEFT JOIN rubber_users r_pickup ON o.pickupDriverId = r_pickup.id
       LEFT JOIN users u_delivery ON o.deliveryDriverId = u_delivery.id
-      LEFT JOIN rider_users r_delivery ON o.deliveryDriverId = r_delivery.id
+      LEFT JOIN rubber_users r_delivery ON o.deliveryDriverId = r_delivery.id
       WHERE o.id = ?
     `).bind(id).first() as any;
  
@@ -66,7 +66,7 @@ export async function GET(
     // Fetch Financial Settings for Calculation
     const settingsRows = await db.prepare(`
       SELECT key, value FROM system_settings 
-      WHERE key IN ('gp_rider_percent', 'rider_base_payout')
+      WHERE key IN ('gp_rubber_percent', 'rubber_base_payout')
     `).all();
     
     const settings: Record<string, string> = {};
@@ -74,15 +74,15 @@ export async function GET(
       settings[row.key] = row.value;
     });
 
-    const gpRiderPercent = parseFloat(settings.gp_rider_percent || "10");
-    const riderBasePayout = parseFloat(settings.rider_base_payout || "0");
+    const gpRubberPercent = parseFloat(settings.gp_rubber_percent || "10");
+    const rubberBasePayout = parseFloat(settings.rubber_base_payout || "0");
 
     const deliveryFee = order.deliveryFee || 0;
-    const totalRiderPayout = (deliveryFee * (100 - gpRiderPercent) / 100) + riderBasePayout;
+    const totalRubberPayout = (deliveryFee * (100 - gpRubberPercent) / 100) + rubberBasePayout;
     
-    order.riderEarn = totalRiderPayout; // Legacy field for backwards compatibility
-    order.riderPickupEarn = totalRiderPayout * 0.5;
-    order.riderDeliveryEarn = totalRiderPayout * 0.5;
+    order.rubberEarn = totalRubberPayout; // Legacy field for backwards compatibility
+    order.rubberPickupEarn = totalRubberPayout * 0.5;
+    order.rubberDeliveryEarn = totalRubberPayout * 0.5;
 
     return NextResponse.json({ order });
   } catch (error: any) {

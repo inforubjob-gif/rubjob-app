@@ -91,7 +91,7 @@ const PhotoUpload = forwardRef<PhotoUploadHandle, PhotoUploadProps>(({ onPhotoCa
             <div className="w-16 h-16 bg-white rounded-full shadow-xl shadow-slate-200/50 flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
                <Icons.Camera size={32} />
             </div>
-            <p className="text-[10px] font-black text-slate-400 uppercase">{t("rider.takePhoto")}</p>
+            <p className="text-[10px] font-black text-slate-400 uppercase">{t("rubber.takePhoto")}</p>
           </>
         )}
         <input 

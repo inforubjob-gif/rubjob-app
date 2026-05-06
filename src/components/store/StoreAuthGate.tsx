@@ -10,12 +10,12 @@ export default function StoreAuthGate({ children }: { children: React.ReactNode 
   const pathname = usePathname();
 
   useEffect(() => {
-    if (!isLoading && !store && pathname !== "/store/login") {
-      router.push("/store/login");
+    if (!isLoading && !store && pathname !== "/partner/login") {
+      router.push("/partner/login");
     }
   }, [store, isLoading, pathname, router]);
 
-  if (isLoading || (!store && pathname !== "/store/login")) {
+  if (isLoading || (!store && pathname !== "/partner/login")) {
     return (
       <div className="flex h-screen w-full items-center justify-center bg-slate-50 relative z-[999]">
         <div className="w-12 h-12 border-4 border-primary-light border-t-primary rounded-full animate-spin"></div>

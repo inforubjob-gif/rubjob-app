@@ -6,7 +6,7 @@ export const runtime = "edge";
 /**
  * GET /api/coupons
  * List visible, active coupons
- * Optional: ?role=rider|store|customer to filter by eligible role
+ * Optional: ?role=rubber|store|customer to filter by eligible role
  */
 export async function GET(req: Request) {
   try {
@@ -17,7 +17,7 @@ export async function GET(req: Request) {
     try { await db.prepare("ALTER TABLE coupons ADD COLUMN eligibleRoles TEXT DEFAULT 'all'").run(); } catch (e) {}
 
     const { searchParams } = new URL(req.url);
-    const role = searchParams.get("role"); // rider | store | customer
+    const role = searchParams.get("role"); // rubber | store | customer
 
     const { results } = await db.prepare(`
       SELECT * FROM coupons 

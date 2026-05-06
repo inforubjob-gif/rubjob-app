@@ -19,15 +19,15 @@ const createCustomIcon = (color: string, iconHtml?: string) => {
 
 const storeIcon = createCustomIcon("#000000", '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>');
 const userIcon = createCustomIcon("#FF9F1C", '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>');
-const riderIcon = createCustomIcon("#3B82F6", '<div className="w-full h-full animate-pulse flex items-center justify-center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="3"></circle></svg></div>');
+const rubberIcon = createCustomIcon("#3B82F6", '<div className="w-full h-full animate-pulse flex items-center justify-center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="3"></circle></svg></div>');
 
-interface RiderMapProps {
+interface RubberMapProps {
   storeLat: number;
   storeLng: number;
   userLat: number;
   userLng: number;
-  riderLat?: number | null;
-  riderLng?: number | null;
+  rubberLat?: number | null;
+  rubberLng?: number | null;
   activeDestLat?: number;
   activeDestLng?: number;
 }
@@ -48,16 +48,16 @@ function MapBoundsSetter({ points }: { points: [number, number][] }) {
   return null;
 }
 
-export default function RiderMap({ 
+export default function RubberMap({ 
   storeLat, 
   storeLng, 
   userLat, 
   userLng,
-  riderLat,
-  riderLng,
+  rubberLat,
+  rubberLng,
   activeDestLat,
   activeDestLng
-}: RiderMapProps) {
+}: RubberMapProps) {
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
@@ -73,26 +73,26 @@ export default function RiderMap({
 
   const storePos: [number, number] = [storeLat || 13.7563, storeLng || 100.5018];
   const userPos: [number, number] = [userLat || 13.7563, userLng || 100.5018];
-  const riderPos: [number, number] | null = (riderLat && riderLng) ? [riderLat, riderLng] : null;
+  const rubberPos: [number, number] | null = (rubberLat && rubberLng) ? [rubberLat, rubberLng] : null;
   
   // Decide what route to show
   let routePoints: [number, number][] = [storePos, userPos];
   let boundsPoints: [number, number][] = [storePos, userPos];
 
-  if (riderPos) {
+  if (rubberPos) {
     const destPos: [number, number] = (activeDestLat && activeDestLng) 
       ? [activeDestLat, activeDestLng] 
       : userPos;
     
-    routePoints = [riderPos, destPos];
-    boundsPoints = [riderPos, destPos];
+    routePoints = [rubberPos, destPos];
+    boundsPoints = [rubberPos, destPos];
   }
 
   return (
     <div className="h-full w-full z-0 relative">
       <MapContainer 
-        center={riderPos || storePos} 
-        zoom={riderPos ? 16 : 13} 
+        center={rubberPos || storePos} 
+        zoom={rubberPos ? 16 : 13} 
         scrollWheelZoom={false}
         style={{ height: "100%", width: "100%" }}
         zoomControl={false}
@@ -104,14 +104,14 @@ export default function RiderMap({
         
         <Marker position={storePos} icon={storeIcon} />
         <Marker position={userPos} icon={userIcon} />
-        {riderPos && <Marker position={riderPos} icon={riderIcon} />}
+        {rubberPos && <Marker position={rubberPos} icon={rubberIcon} />}
         
         <Polyline 
           positions={routePoints} 
-          color={riderPos ? "#3B82F6" : "#FF9F1C"} 
-          weight={riderPos ? 6 : 4} 
+          color={rubberPos ? "#3B82F6" : "#FF9F1C"} 
+          weight={rubberPos ? 6 : 4} 
           opacity={0.8} 
-          dashArray={riderPos ? "" : "10, 10"}
+          dashArray={rubberPos ? "" : "10, 10"}
         />
         
         <MapBoundsSetter points={boundsPoints} />

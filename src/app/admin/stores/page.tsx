@@ -67,7 +67,7 @@ export default function StoresAdminPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id, isActive: currentStatus === 1 ? 0 : 1 })
       });
-      showToast(currentStatus === 1 ? t('admin.riders.form.suspended') : t('admin.riders.form.verified'), "success");
+      showToast(currentStatus === 1 ? t('admin.rubbers.form.suspended') : t('admin.rubbers.form.verified'), "success");
     } catch (err) {
       console.error("Failed to toggle status", err);
       showToast(t('admin.common.toast.error'), "error");
@@ -203,9 +203,9 @@ export default function StoresAdminPage() {
                          store.status === 'pending' ? "warning" : 
                          "danger"
                        }>
-                          {store.status === 'active' ? t('admin.riders.form.verified') : 
-                           store.status === 'pending' ? t('admin.riders.form.pendingReview') : 
-                           t('admin.riders.form.rejected')}
+                          {store.status === 'active' ? t('admin.rubbers.form.verified') : 
+                           store.status === 'pending' ? t('admin.rubbers.form.pendingReview') : 
+                           t('admin.rubbers.form.rejected')}
                        </Badge>
                     </td>
                     <td className="px-8 py-6 text-right">

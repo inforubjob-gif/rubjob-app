@@ -26,7 +26,7 @@ function LinkLineContent() {
         const profile = await liff.getProfile();
         const lineUserId = profile.userId;
 
-        const type = searchParams.get("type"); // rider or store
+        const type = searchParams.get("type"); // rubber or store
         const accountId = searchParams.get("id");
         const token = searchParams.get("token");
 

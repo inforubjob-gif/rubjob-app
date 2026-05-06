@@ -52,7 +52,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     } catch (e) {}
     localStorage.removeItem("rubjob_store_session");
     setStore(null);
-    router.push("/store/login");
+    router.push("/partner/login");
   };
 
   return (

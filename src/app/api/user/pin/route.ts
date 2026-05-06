@@ -1,6 +1,6 @@
 import { getRequestContext } from "@cloudflare/next-on-pages";
 import { NextResponse } from "next/server";
-import { getRiderSession, getStoreSession } from "@/lib/auth-server";
+import { getRubberSession, getStoreSession } from "@/lib/auth-server";
 
 export const runtime = "edge";
 
@@ -22,7 +22,7 @@ async function hashPin(pin: string) {
 export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
-    const type = searchParams.get("type"); // 'rider' or 'store'
+    const type = searchParams.get("type"); // 'rubber' or 'store'
     
     const context = getRequestContext();
     const db = context.env.DB;
@@ -30,8 +30,8 @@ export async function GET(req: Request) {
 
     let userId: string | null = null;
 
-    if (type === "rider") {
-      userId = await getRiderSession();
+    if (type === "rubber") {
+      userId = await getRubberSession();
     } else if (type === "store") {
       const storeId = await getStoreSession();
       if (storeId) {
@@ -70,8 +70,8 @@ export async function POST(req: Request) {
 
     let userId: string | null = null;
 
-    if (type === "rider") {
-      userId = await getRiderSession();
+    if (type === "rubber") {
+      userId = await getRubberSession();
     } else if (type === "store") {
       const storeId = await getStoreSession();
       if (storeId) {

@@ -104,14 +104,14 @@ export async function POST(req: Request) {
       scheduledDate || null
     ).run();
 
-    // 🤖 Automation: Notify Store and Available Riders via LINE
+    // 🤖 Automation: Notify Store and Available Rubbers via LINE
     const env = getRequestContext().env;
     const accessToken = env.LINE_CHANNEL_ACCESS_TOKEN;
     
     if (accessToken) {
       const { 
         sendLinePush, 
-        riderNewJobFlex, 
+        rubberNewJobFlex, 
         storeOrderAlertFlex 
       } = await import("@/lib/line");
 
@@ -121,32 +121,32 @@ export async function POST(req: Request) {
         await sendLinePush(storeData.lineUserId, [storeOrderAlertFlex(orderId)], accessToken).catch(() => {});
       }
 
-      // 2. Broadcast to Online Riders
-      // We look for riders who have linked LINE and have workStatus = true in preferences
-      const riders = await db.prepare(`
+      // 2. Broadcast to Online Rubbers
+      // We look for rubbers who have linked LINE and have workStatus = true in preferences
+      const rubbers = await db.prepare(`
         SELECT ru.lineUserId, u.preferences
-        FROM rider_users ru
+        FROM rubber_users ru
         JOIN users u ON ru.id = u.id
         WHERE ru.lineUserId IS NOT NULL
       `).all();
 
       // Fetch System Settings for Earnings Calculation
       const settingsRows = await db.prepare(`
-        SELECT key, value FROM system_settings WHERE key IN ('gp_rider_percent', 'rider_base_payout')
+        SELECT key, value FROM system_settings WHERE key IN ('gp_rubber_percent', 'rubber_base_payout')
       `).all();
       const settings: any = {};
       settingsRows.results.forEach((r: any) => settings[r.key] = r.value);
       
-      const gpRiderPercent = parseFloat(settings.gp_rider_percent || "10");
-      const riderBasePayout = parseFloat(settings.rider_base_payout || "0");
-      const commission = (deliveryFee * gpRiderPercent) / 100;
-      const legEarn = ((deliveryFee - commission) + riderBasePayout) * 0.5;
+      const gpRubberPercent = parseFloat(settings.gp_rubber_percent || "10");
+      const rubberBasePayout = parseFloat(settings.rubber_base_payout || "0");
+      const commission = (deliveryFee * gpRubberPercent) / 100;
+      const legEarn = ((deliveryFee - commission) + rubberBasePayout) * 0.5;
 
-      for (const r of (riders.results as any[])) {
+      for (const r of (rubbers.results as any[])) {
         try {
           const prefs = JSON.parse(r.preferences || "{}");
           if (prefs.workStatus === true) {
-            await sendLinePush(r.lineUserId, [riderNewJobFlex(orderId, 'pending', legEarn)], accessToken).catch(() => {});
+            await sendLinePush(r.lineUserId, [rubberNewJobFlex(orderId, 'pending', legEarn)], accessToken).catch(() => {});
           }
         } catch (e) {}
       }

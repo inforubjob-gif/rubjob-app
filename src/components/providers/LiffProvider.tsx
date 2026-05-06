@@ -227,10 +227,10 @@ export default function LiffProvider({ children }: { children: ReactNode }) {
                 Be Store Owner
               </button>
               <button 
-                onClick={() => { localStorage.setItem("rubjob_mock_user", "RIDER-001"); window.location.reload(); }}
+                onClick={() => { localStorage.setItem("rubjob_mock_user", "RUBBER-001"); window.location.reload(); }}
                 className="px-4 py-2 bg-indigo-50 text-indigo-600 rounded-xl text-[10px] font-black uppercase hover:bg-indigo-100 transition-colors"
               >
-                Be Rider
+                Be Rubber
               </button>
            </div>
            <button 

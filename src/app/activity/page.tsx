@@ -70,9 +70,9 @@ export default function ActivityPage() {
                     src={
                       order.status === "completed" ? "/images/icon/เสร็จสิ้น.png" :
                       order.status === "washing" ? "/images/icon/icon-กำลังซัก.png" :
-                      order.status === "delivering_to_customer" ? "/images/icon/icon-ไรเดอร์กำลังนำผ้าส่งคืน.png" :
-                      order.status === "delivering_to_store" ? "/images/icon/icon-ไรเดอร์กำลังนำผ้าส่งร้าน.png" :
-                      order.status === "picking_up" ? "/images/icon/icon-ไรเดอร์กำลังเข้ารับผ้า.png" :
+                      order.status === "delivering_to_customer" ? "/images/icon/icon-รับเบอร์กำลังนำผ้าส่งคืน.png" :
+                      order.status === "delivering_to_store" ? "/images/icon/icon-รับเบอร์กำลังนำผ้าส่งร้าน.png" :
+                      order.status === "picking_up" ? "/images/icon/icon-รับเบอร์กำลังเข้ารับผ้า.png" :
                       "/images/icon/icon-ร้านซักผ้า.png"
                     } 
                     alt={order.status}

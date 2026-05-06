@@ -2,7 +2,7 @@ import { D1Database } from "@cloudflare/workers-types";
 import { OrderStatus } from "@/types";
 import { 
   sendLinePush, 
-  riderAcceptedFlex, 
+  rubberAcceptedFlex, 
   deliveringToStoreFlex,
   washingOrderFlex, 
   readyForDeliveryFlex, 
@@ -19,7 +19,7 @@ export async function transitionOrderStatus(
   nextStatus: OrderStatus,
   env: any,
   options?: {
-    riderName?: string;
+    rubberName?: string;
     evidenceUrl?: string; // For Before/After evidence
   }
 ) {
@@ -74,8 +74,8 @@ export async function transitionOrderStatus(
 
     switch (nextStatus) {
       case "picking_up":
-        if (options?.riderName) {
-          flexMessage = riderAcceptedFlex(orderId, options.riderName);
+        if (options?.rubberName) {
+          flexMessage = rubberAcceptedFlex(orderId, options.rubberName);
         }
         break;
       case "delivering_to_store":
@@ -87,25 +87,18 @@ export async function transitionOrderStatus(
       case "ready_for_pickup":
         flexMessage = readyForDeliveryFlex(orderId);
         
-        // 🤖 Automation: Also broadcast to Riders Group (Category-based GP logic)
-        const notifyToken = env.LINE_NOTIFY_RIDER_TOKEN;
+        // 🤖 Automation: Also broadcast to Rubbers Group (Category-based GP logic)
+        const notifyToken = env.LINE_NOTIFY_RUBBER_TOKEN;
         if (notifyToken) {
-          const settingsRows = await db.prepare(`
-            SELECT key, value FROM system_settings WHERE key IN ('gp_rider_percent', 'rider_base_payout')
-          `).all();
-          const settings: any = {};
-          settingsRows.results.forEach((r: any) => settings[r.key] = r.value);
-          
-          // Use service specific GP if available, else platform default
-          const gpRiderPercent = order.serviceGp || parseFloat(settings.gp_rider_percent || "10");
-          const riderBasePayout = parseFloat(settings.rider_base_payout || "0");
-          
-          const deliveryFee = order.deliveryFee || 0;
-          const commission = (deliveryFee * gpRiderPercent) / 100;
-          const legEarn = ((deliveryFee - commission) + riderBasePayout) * 0.5;
+          // 🤖 Calculation based on strict skill.md algorithm
+          const distanceKm = order.distance_km || 0;
+          const singleTripFare = 50 + (distanceKm > 3 ? (distanceKm - 3) * 10 : 0);
+          const grossRubberFare = singleTripFare * 2;
+          const netRubberEarning = grossRubberFare - (grossRubberFare * 0.15) - 15;
+          const legEarn = netRubberEarning / 2;
 
           const { sendLineNotify } = await import("./line");
-          const notifyMsg = `\n🧺 ผ้าซักเสร็จแล้ว! [${orderId}]\nรอไรเดอร์ไปส่งคืนลูกค้า\nรายได้: ฿${legEarn}\nคลิกรับงาน: https://liff.line.me/${env.NEXT_PUBLIC_LIFF_ID}/rider`;
+          const notifyMsg = `\n🧺 ผ้าซักเสร็จแล้ว! [${orderId}]\nรอรับเบอร์ไปส่งคืนลูกค้า\nรายได้: ฿${legEarn.toFixed(2)}\nคลิกรับงาน: https://liff.line.me/${env.NEXT_PUBLIC_LIFF_ID}/rubber`;
           await sendLineNotify(notifyMsg, notifyToken).catch(() => {});
         }
         break;

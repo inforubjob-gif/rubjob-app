@@ -18,15 +18,15 @@ export default function BottomNav() {
 
   // Detect context from both hostname subdomain and pathname
   const hostname = typeof window !== "undefined" ? window.location.hostname : "";
-  const isStoreContext = pathname.startsWith("/store") || hostname.startsWith("store.");
-  const isRiderContext = pathname.startsWith("/rider") || hostname.startsWith("rider.");
+  const isStoreContext = pathname.startsWith("/partner-store") || hostname.startsWith("store.");
+  const isRubberContext = pathname.startsWith("/rubber") || hostname.startsWith("rubber.");
   const isAdminContext = pathname.startsWith("/admin") || hostname.startsWith("admin.");
-  const isProviderContext = pathname.startsWith("/provider") || hostname.startsWith("provider.");
+  const isProviderContext = pathname.startsWith("/partner-service") || hostname.startsWith("provider.");
   
   const isLandingContext = pathname.startsWith("/landing") || (
     !hostname.startsWith("app.") &&
     !hostname.startsWith("admin.") &&
-    !hostname.startsWith("rider.") &&
+    !hostname.startsWith("rubber.") &&
     !hostname.startsWith("store.") &&
     (hostname.includes("rubjob-all.com") ||
      hostname.includes("rubjob.com") ||
@@ -39,7 +39,7 @@ export default function BottomNav() {
   if (isAdminContext || isLandingContext) return null;
 
   // Hide on Authentication screens
-  if (pathname === "/store/login" || pathname === "/rider/login" || pathname === "/provider/login" || pathname.startsWith("/admin/login")) {
+  if (pathname === "/partner/login" || pathname === "/rubber/login" || pathname === "/partner/login" || pathname.startsWith("/admin/login")) {
     return null;
   }
 
@@ -81,75 +81,75 @@ export default function BottomNav() {
 
   const STORE_TABS: Tab[] = [
     {
-      href: "/store",
+      href: "/partner-store",
       label: t("store.navDashboard") || "Dashboard",
       icon: (active) => <Icons.Tasks size={24} strokeWidth={active ? 3 : 2} />,
     },
     {
-      href: "/store/orders",
+      href: "/partner-store/orders",
       label: t("store.navOrders") || "Orders",
       icon: (active) => <Icons.FileText size={24} strokeWidth={active ? 3 : 2} />,
     },
     {
-      href: "/store/wallet",
+      href: "/partner-store/wallet",
       label: t("store.navWallet") || "Wallet",
       icon: (active) => <Icons.Wallet size={24} strokeWidth={active ? 3 : 2} />,
     },
     {
-      href: "/store/profile",
+      href: "/partner-store/profile",
       label: t("store.navProfile") || "Profile",
       icon: (active) => <Icons.UserCog size={24} strokeWidth={active ? 3 : 2} />,
     },
   ];
 
-  const RIDER_TABS: Tab[] = [
+  const RUBBER_TABS: Tab[] = [
     {
-      href: "/rider",
-      label: t("rider.navDashboard") || "Tasks",
+      href: "/rubber",
+      label: t("rubber.navDashboard") || "Tasks",
       icon: (active) => <Icons.Tasks size={24} strokeWidth={active ? 3 : 2} />,
     },
     {
-      href: "/rider/orders",
-      label: t("rider.navOrders") || "Orders",
+      href: "/rubber/orders",
+      label: t("rubber.navOrders") || "Orders",
       icon: (active) => <Icons.FileText size={24} strokeWidth={active ? 3 : 2} />,
     },
     {
-      href: "/rider/wallet",
-      label: t("rider.navWallet") || "Earnings",
+      href: "/rubber/wallet",
+      label: t("rubber.navWallet") || "Earnings",
       icon: (active) => <Icons.Wallet size={24} strokeWidth={active ? 3 : 2} />,
     },
     {
-      href: "/rider/profile",
-      label: t("rider.navProfile") || "Profile",
+      href: "/rubber/profile",
+      label: t("rubber.navProfile") || "Profile",
       icon: (active) => <Icons.UserCog size={24} strokeWidth={active ? 3 : 2} />,
     },
   ];
 
   const PROVIDER_TABS: Tab[] = [
     {
-      href: "/provider",
+      href: "/partner-service",
       label: "งาน",
       icon: (active) => <Icons.Tasks size={24} strokeWidth={active ? 3 : 2} />,
     },
     {
-      href: "/provider/wallet",
+      href: "/partner-service/wallet",
       label: "รายได้",
       icon: (active) => <Icons.Wallet size={24} strokeWidth={active ? 3 : 2} />,
     },
     {
-      href: "/provider/profile",
+      href: "/partner-service/profile",
       label: "โปรไฟล์",
       icon: (active) => <Icons.UserCog size={24} strokeWidth={active ? 3 : 2} />,
     },
   ];
 
-  const tabs = isProviderContext ? PROVIDER_TABS : isRiderContext ? RIDER_TABS : (isStoreContext ? STORE_TABS : USER_TABS);
+  const tabs = isProviderContext ? PROVIDER_TABS : isRubberContext ? RUBBER_TABS : (isStoreContext ? STORE_TABS : USER_TABS);
 
   return (
     <nav className={`fixed bottom-0 left-0 right-0 z-50 bg-primary border-primary-dark/20 border-t shadow-[0_-8px_30px_rgba(255,159,28,0.25)] pb-[env(safe-area-inset-bottom,0px)]`}>
       <div className={`flex items-center justify-around h-16 max-w-lg mx-auto px-2 text-white/70`}>
         {tabs.map((tab) => {
-          const isActive = (tab.href === "/" || tab.href === "/store" || tab.href === "/rider" || tab.href === "/provider") 
+          const isActive = (tab.href === "/" || tab.href === "/partner-store" || tab.href === "/rubber" || tab.href === "/partner-service") 
             ? pathname === tab.href 
             : pathname.startsWith(tab.href);
           

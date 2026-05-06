@@ -15,13 +15,13 @@ export async function GET(req: Request) {
       SELECT p.*, 
              CASE 
                WHEN p.requesterType = 'store' THEN s.name
-               WHEN p.requesterType = 'rider' THEN r.name
+               WHEN p.requesterType = 'rubber' THEN r.name
                WHEN p.requesterType = 'provider' THEN pu.name
                ELSE 'Unknown'
              END as requesterName
       FROM payout_requests p
       LEFT JOIN stores s ON p.requesterId = s.id AND p.requesterType = 'store'
-      LEFT JOIN rider_users r ON p.requesterId = r.id AND p.requesterType = 'rider'
+      LEFT JOIN rubber_users r ON p.requesterId = r.id AND p.requesterType = 'rubber'
       LEFT JOIN provider_users pu ON p.requesterId = pu.id AND p.requesterType = 'provider'
       ORDER BY p.createdAt DESC
     `).all();

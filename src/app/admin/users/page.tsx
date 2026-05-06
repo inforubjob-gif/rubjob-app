@@ -171,7 +171,7 @@ export default function UsersAdminPage() {
                        >
                           <option value="user">{t("admin.users.roleCustomer")}</option>
                           <option value="store_admin">{t("admin.users.rolePartner")}</option>
-                          <option value="driver">{t("admin.users.roleRider")}</option>
+                          <option value="driver">{t("admin.users.roleRubber")}</option>
                        </select>
                     </td>
                     <td className="px-8 py-6">
@@ -272,7 +272,7 @@ export default function UsersAdminPage() {
                    <p className="text-[10px] font-black text-indigo-400 uppercase tracking-widest">{t("admin.users.labelRole")}</p>
                    <p className="text-lg font-black text-slate-900 mt-1 uppercase tracking-tight">
                      {selectedUser.role === 'store_admin' ? t("admin.users.rolePartner") : 
-                      selectedUser.role === 'driver' ? t("admin.users.roleRider") : 
+                      selectedUser.role === 'driver' ? t("admin.users.roleRubber") : 
                       t("admin.users.roleCustomer")}
                    </p>
                 </div>

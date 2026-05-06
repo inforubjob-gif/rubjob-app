@@ -8,7 +8,7 @@ export const runtime = "edge";
  * Validates a coupon code against current order value and user role
  * 
  * Body: { code: string, subtotal: number, userRole?: string }
- * userRole: 'customer' | 'rider' | 'store' (defaults to 'customer')
+ * userRole: 'customer' | 'rubber' | 'store' (defaults to 'customer')
  */
 export async function POST(req: Request) {
   try {
@@ -40,7 +40,7 @@ export async function POST(req: Request) {
       const allowedRoles = eligibleRoles.split(',').map((r: string) => r.trim());
       if (!allowedRoles.includes(role)) {
         const roleLabels: Record<string, string> = {
-          rider: 'ไรเดอร์',
+          rubber: 'รับเบอร์',
           store: 'ร้านค้า', 
           customer: 'ลูกค้า'
         };

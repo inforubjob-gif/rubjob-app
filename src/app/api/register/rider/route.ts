@@ -5,8 +5,8 @@ import { validateRequired, validatePhone } from "@/lib/validation";
 export const runtime = "edge";
 
 /**
- * POST /api/register/rider
- * Public endpoint for unauthenticated rider registration
+ * POST /api/register/rubber
+ * Public endpoint for unauthenticated rubber registration
  */
 export async function POST(req: Request) {
   try {
@@ -32,9 +32,9 @@ export async function POST(req: Request) {
       VALUES (?, ?, ?, 'driver')
     `).bind(tempId, name, phone).run();
 
-    // 3. Create entry in rider_users table (rider-specific data)
+    // 3. Create entry in rubber_users table (rubber-specific data)
     await db.prepare(`
-      INSERT INTO rider_users (id, email, password, name, phone, vehicleType, licensePlate, idNumber, status)
+      INSERT INTO rubber_users (id, email, password, name, phone, vehicleType, licensePlate, idNumber, status)
       VALUES (?, ?, 'pending_verification', ?, ?, ?, ?, ?, 'pending')
     `).bind(tempId, userEmail, name, phone, vehicleType, licensePlate, idNumber || "").run();
 
@@ -43,7 +43,7 @@ export async function POST(req: Request) {
       for (const doc of documents) {
         const docId = `DOC-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
         await db.prepare(`
-          INSERT INTO rider_documents (id, riderId, type, url, status)
+          INSERT INTO rubber_documents (id, rubberId, type, url, status)
           VALUES (?, ?, ?, ?, 'pending')
         `).bind(docId, tempId, doc.type, doc.url, 'pending').run();
       }
@@ -55,7 +55,7 @@ export async function POST(req: Request) {
       applicationId: tempId 
     });
   } catch (error: any) {
-    console.error("Public Rider Registration error:", error);
+    console.error("Public Rubber Registration error:", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

@@ -3,7 +3,7 @@ import type { Metadata, Viewport } from "next";
 export const metadata: Metadata = {
   title: "RUBJOB — ผู้จัดการชีวิต Life Operator",
   description:
-    "Professional laundry pickup & delivery platform. Riders, stores, and customers — all connected.",
+    "Professional laundry pickup & delivery platform. Rubbers, stores, and customers — all connected.",
   keywords: ["rubjob", "laundry", "pickup", "delivery", "LINE", "platform"],
   icons: {
     icon: "/images/rubjob-complete_logo-color.png",

@@ -108,9 +108,9 @@ export const zh = {
     account: "账户",
     logOut: "登出",
     verifiedHero: "已验证英雄",
-    incomingFromRider: "来自骑手的入库",
+    incomingFromRubber: "来自骑手的入库",
     processing: "洗衣处理中",
-    readyForRider: "等待骑手取回",
+    readyForRubber: "等待骑手取回",
     urgent: "紧急",
     timeLeft: "剩余时间",
     receiveFromDriver: "从司机处接收",
@@ -254,7 +254,7 @@ export const zh = {
     summaryTitle: "付款摘要",
     summary: {
       storeSection: "洗衣店部分",
-      riderSection: "配送部分 (骑手)",
+      rubberSection: "配送部分 (骑手)",
       package: "套餐",
       extraBag: "额外行李重量",
       subtotalLaundry: "洗衣小计",
@@ -420,7 +420,7 @@ export const zh = {
     pointsToGo: "还需 {points} 积分",
     inviteBtn: "邀请好友赚取积分",
   },
-  rider: {
+  rubber: {
     hero: "骑手",
     vehicleType: "车辆类型",
     vehicleTypePage: {

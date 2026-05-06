@@ -15,11 +15,11 @@ export async function GET(req: Request) {
     // 1. Clear existing identifying data
     await db.batch([
       db.prepare("DELETE FROM admin_users"),
-      db.prepare("DELETE FROM rider_users"),
+      db.prepare("DELETE FROM rubber_users"),
       db.prepare("DELETE FROM stores"),
       db.prepare("DELETE FROM users"),
       db.prepare("DELETE FROM orders"),
-      db.prepare("DELETE FROM rider_documents"),
+      db.prepare("DELETE FROM rubber_documents"),
       db.prepare("DELETE FROM store_services")
     ]);
 
@@ -47,23 +47,23 @@ export async function GET(req: Request) {
       VALUES (?, ?, ?, ?, ?, ?, 1, 10)
     `).bind('STORE-001', 'STORE-OWNER-001', 'Rubjob Flagship Store', 'Siam Square, Bangkok', 13.7444, 100.5312).run();
 
-    // 6. Create Demo Rider
+    // 6. Create Demo Rubber
     await db.prepare(`
       INSERT INTO users (id, displayName, pictureUrl, role)
       VALUES (?, ?, ?, ?)
-    `).bind('RIDER-001', 'Khun Rider', 'https://api.dicebear.com/7.x/avataaars/svg?seed=rider', 'driver').run();
+    `).bind('RUBBER-001', 'Khun Rubber', 'https://api.dicebear.com/7.x/avataaars/svg?seed=rubber', 'driver').run();
 
-    // 6.2 Also add to rider_users for admin panel management
+    // 6.2 Also add to rubber_users for admin panel management
     await db.prepare(`
-      INSERT INTO rider_users (id, email, password, name, phone, vehicleType, status)
+      INSERT INTO rubber_users (id, email, password, name, phone, vehicleType, status)
       VALUES (?, ?, ?, ?, ?, ?, ?)
-    `).bind('RIDER-001', 'rider@rubjob.com', 'password123', 'Khun Rider', '0812345678', 'bike', 'active').run();
+    `).bind('RUBBER-001', 'rubber@rubjob.com', 'password123', 'Khun Rubber', '0812345678', 'bike', 'active').run();
 
     // 7. Seed Initial System Settings
     const settings = [
       { key: 'is_open', value: 'true' },
       { key: 'gp_store_percent', value: '20' },
-      { key: 'gp_rider_percent', value: '10' },
+      { key: 'gp_rubber_percent', value: '10' },
       { key: 'min_order_amount', value: '100' },
       { key: 'radius_km', value: '10' }
     ];
@@ -84,7 +84,7 @@ export async function GET(req: Request) {
         mock_ids: {
           customer: "USER-001",
           store_owner: "STORE-OWNER-001",
-          rider: "RIDER-001"
+          rubber: "RUBBER-001"
         }
       }
     });

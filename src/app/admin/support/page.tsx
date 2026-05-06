@@ -5,19 +5,19 @@ import Card from "@/components/ui/Card";
 import { Icons } from "@/components/ui/Icons";
 import { useTranslation } from "@/components/providers/LanguageProvider";
 
-type FilterType = "all" | "customer" | "rider" | "store";
+type FilterType = "all" | "customer" | "rubber" | "store";
 
 const FILTER_CONFIG: Record<FilterType, { label: string; icon: string; color: string; bg: string }> = {
   all:      { label: "ทั้งหมด",  icon: "💬", color: "text-slate-700", bg: "bg-slate-100" },
   customer: { label: "ลูกค้า",   icon: "👤", color: "text-emerald-700", bg: "bg-emerald-50" },
-  rider:    { label: "ไรเดอร์",  icon: "🏍️", color: "text-blue-700", bg: "bg-blue-50" },
+  rubber:    { label: "รับเบอร์",  icon: "🏍️", color: "text-blue-700", bg: "bg-blue-50" },
   store:    { label: "ร้านค้า",  icon: "🏪", color: "text-purple-700", bg: "bg-purple-50" },
 };
 
 function getUserTypeBadge(userType: string) {
   switch (userType) {
-    case 'rider':
-      return { label: 'RIDER', icon: '🏍️', badgeClass: 'bg-blue-50 text-blue-600 ring-blue-200', dotClass: 'bg-blue-500' };
+    case 'rubber':
+      return { label: 'RUBBER', icon: '🏍️', badgeClass: 'bg-blue-50 text-blue-600 ring-blue-200', dotClass: 'bg-blue-500' };
     case 'store':
       return { label: 'STORE', icon: '🏪', badgeClass: 'bg-purple-50 text-purple-600 ring-purple-200', dotClass: 'bg-purple-500' };
     case 'unknown':
@@ -37,7 +37,7 @@ function getChannelBadge(channel: string) {
 export default function SupportCenterPage() {
   const { t } = useTranslation();
   const [tickets, setTickets] = useState<any[]>([]);
-  const [counts, setCounts] = useState<Record<string, number>>({ total: 0, customer: 0, rider: 0, store: 0, unknown: 0 });
+  const [counts, setCounts] = useState<Record<string, number>>({ total: 0, customer: 0, rubber: 0, store: 0, unknown: 0 });
   const [selectedTicketId, setSelectedTicketId] = useState<string | null>(null);
   const [messages, setMessages] = useState<any[]>([]);
   const [replyText, setReplyText] = useState("");
@@ -181,7 +181,7 @@ export default function SupportCenterPage() {
                       {/* User Type Dot Overlay */}
                       <div className={`absolute -bottom-1 -right-1 w-5 h-5 rounded-lg flex items-center justify-center shadow-md border-2 border-white ${badge.dotClass}`}>
                         <span className="text-[8px] text-white font-black">
-                          {tk.userType === 'rider' ? 'R' : tk.userType === 'store' ? 'S' : 'C'}
+                          {tk.userType === 'rubber' ? 'R' : tk.userType === 'store' ? 'S' : 'C'}
                         </span>
                       </div>
                     </div>
@@ -312,7 +312,7 @@ export default function SupportCenterPage() {
             
             {/* Quick Legend */}
             <div className="mt-8 flex flex-wrap justify-center gap-3">
-              {(['customer', 'rider', 'store'] as const).map(type => {
+              {(['customer', 'rubber', 'store'] as const).map(type => {
                 const badge = getUserTypeBadge(type);
                 return (
                   <div key={type} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold ${badge.badgeClass} ring-1`}>

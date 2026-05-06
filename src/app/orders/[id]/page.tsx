@@ -243,7 +243,7 @@ export default function OrderDetailPage() {
                 <p className="text-sm font-semibold text-foreground">
                   {isDeliveryPhase ? order.deliveryDriverName : order.pickupDriverName || "Driver Partner"}
                 </p>
-                <p className="text-xs text-muted">Rider ID: {(isDeliveryPhase ? order.deliveryDriverId : order.pickupDriverId)?.slice(-6).toUpperCase()}</p>
+                <p className="text-xs text-muted">Rubber ID: {(isDeliveryPhase ? order.deliveryDriverId : order.pickupDriverId)?.slice(-6).toUpperCase()}</p>
               </div>
               <a
                 href={`tel:${isDeliveryPhase ? order.deliveryDriverPhone : order.pickupDriverPhone}`}

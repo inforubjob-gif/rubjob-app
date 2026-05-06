@@ -7,13 +7,13 @@ import { Icons } from "@/components/ui/Icons";
 import Card from "@/components/ui/Card";
 import AdminDocumentUpload from "./AdminDocumentUpload";
 
-interface RiderFormProps {
+interface RubberFormProps {
   initialData?: any;
   isEdit?: boolean;
 }
 
 const DOCUMENT_TYPES = [
-  { id: 'profile_photo', label: 'Rider Profile Photo', icon: <Icons.User size={18} /> },
+  { id: 'profile_photo', label: 'Rubber Profile Photo', icon: <Icons.User size={18} /> },
   { id: 'id_card', label: 'ID Card / National Identity', icon: <Icons.User size={18} /> },
   { id: 'license', label: 'Driver License', icon: <Icons.Shield size={18} /> },
   { id: 'insurance', label: 'Vehicle Insurance / Act', icon: <Icons.Settings size={18} /> },
@@ -23,7 +23,7 @@ const DOCUMENT_TYPES = [
   { id: 'vehicle_right', label: 'Vehicle: Right Side', icon: <Icons.Bike size={18} /> },
 ];
 
-export default function RiderForm({ initialData, isEdit }: RiderFormProps) {
+export default function RubberForm({ initialData, isEdit }: RubberFormProps) {
   const router = useRouter();
   const { t } = useTranslation();
   const [isSaving, setIsSaving] = useState(false);
@@ -31,7 +31,7 @@ export default function RiderForm({ initialData, isEdit }: RiderFormProps) {
   const [formData, setFormData] = useState({
     name: initialData?.name || "",
     email: initialData?.email || "",
-    password: "", // Only for new riders
+    password: "", // Only for new rubbers
     phone: initialData?.phone || "",
     vehicleType: initialData?.vehicleType || "bike",
     address: initialData?.address || "",
@@ -71,18 +71,18 @@ export default function RiderForm({ initialData, isEdit }: RiderFormProps) {
     setIsSaving(true);
     
     try {
-      const res = await fetch("/api/admin/riders", {
+      const res = await fetch("/api/admin/rubbers", {
         method: isEdit ? "PUT" : "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...formData, id: initialData?.id })
       });
       
       if (res.ok) {
-        router.push("/admin/riders");
+        router.push("/admin/rubbers");
         router.refresh();
       } else {
           const err = await res.json();
-          alert(err.error || "Failed to save rider");
+          alert(err.error || "Failed to save rubber");
       }
     } catch (err) {
       console.error("Save failed", err);
@@ -94,14 +94,14 @@ export default function RiderForm({ initialData, isEdit }: RiderFormProps) {
   const handleApprove = async () => {
     setIsSaving(true);
     try {
-      const res = await fetch("/api/admin/riders", {
+      const res = await fetch("/api/admin/rubbers", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id: initialData.id, status: 'active' })
       });
       if (res.ok) {
-        showToast("Application Approved! Rider is now active.", "success");
-        router.push("/admin/riders");
+        showToast("Application Approved! Rubber is now active.", "success");
+        router.push("/admin/rubbers");
         router.refresh();
       }
     } catch (e) {
@@ -120,8 +120,8 @@ export default function RiderForm({ initialData, isEdit }: RiderFormProps) {
                  <Icons.Shield size={24} />
               </div>
               <div>
-                 <h3 className="font-black text-amber-900 uppercase tracking-tight">{t('admin.riders.form.pendingApplication')}</h3>
-                 <p className="text-xs font-bold text-amber-700/60 uppercase">{t('admin.riders.form.reviewDesc')}</p>
+                 <h3 className="font-black text-amber-900 uppercase tracking-tight">{t('admin.rubbers.form.pendingApplication')}</h3>
+                 <p className="text-xs font-bold text-amber-700/60 uppercase">{t('admin.rubbers.form.reviewDesc')}</p>
               </div>
            </div>
            <div className="flex items-center gap-3 w-full sm:w-auto">
@@ -131,13 +131,13 @@ export default function RiderForm({ initialData, isEdit }: RiderFormProps) {
                 disabled={isSaving}
                 className="flex-1 sm:flex-none px-8 py-3 bg-amber-500 text-white rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-amber-600 transition-all shadow-lg shadow-amber-500/20"
               >
-                {isSaving ? t('common.processing') : t('admin.riders.form.approve')}
+                {isSaving ? t('common.processing') : t('admin.rubbers.form.approve')}
               </button>
               <button 
                 type="button"
                 className="flex-1 sm:flex-none px-8 py-3 bg-white border-2 border-amber-200 text-amber-500 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-amber-100 transition-all"
               >
-                {t('admin.riders.form.reject')}
+                {t('admin.rubbers.form.reject')}
               </button>
            </div>
         </div>
@@ -152,7 +152,7 @@ export default function RiderForm({ initialData, isEdit }: RiderFormProps) {
                     <Icons.User size={20} />
                  </div>
                  <div>
-                   <h2 className="text-xl font-black text-slate-900 uppercase tracking-tight">{t('admin.riders.form.personnelIdentity')}</h2>
+                   <h2 className="text-xl font-black text-slate-900 uppercase tracking-tight">{t('admin.rubbers.form.personnelIdentity')}</h2>
                    {initialData?.displayId && (
                      <p className="text-[10px] font-black text-primary uppercase tracking-widest">{initialData.displayId}</p>
                    )}
@@ -171,7 +171,7 @@ export default function RiderForm({ initialData, isEdit }: RiderFormProps) {
                  
                  <div className="md:col-span-3 grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="md:col-span-2">
-                       <label className="text-[10px] uppercase font-black text-slate-400 tracking-widest block mb-1.5 ml-1">{t('admin.riders.form.fullName')}</label>
+                       <label className="text-[10px] uppercase font-black text-slate-400 tracking-widest block mb-1.5 ml-1">{t('admin.rubbers.form.fullName')}</label>
                        <input 
                          required
                          value={formData.name}
@@ -182,20 +182,20 @@ export default function RiderForm({ initialData, isEdit }: RiderFormProps) {
                     </div>
                     
                     <div>
-                       <label className="text-[10px] uppercase font-black text-slate-400 tracking-widest block mb-1.5 ml-1">{t('admin.riders.form.email')}</label>
+                       <label className="text-[10px] uppercase font-black text-slate-400 tracking-widest block mb-1.5 ml-1">{t('admin.rubbers.form.email')}</label>
                        <input 
                          required
                          disabled={isEdit}
                          value={formData.email}
                          onChange={e => setFormData({...formData, email: e.target.value})}
-                         placeholder="rider@rubjob.com"
+                         placeholder="rubber@rubjob.com"
                          className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-5 py-4 text-sm font-bold focus:outline-none focus:border-primary/50 transition-all disabled:opacity-50"
                        />
                     </div>
                     
                     {!isEdit && (
                        <div>
-                          <label className="text-[10px] uppercase font-black text-slate-400 tracking-widest block mb-1.5 ml-1">{t('admin.riders.form.password')}</label>
+                          <label className="text-[10px] uppercase font-black text-slate-400 tracking-widest block mb-1.5 ml-1">{t('admin.rubbers.form.password')}</label>
                           <input 
                             required
                             type="password"
@@ -210,7 +210,7 @@ export default function RiderForm({ initialData, isEdit }: RiderFormProps) {
               </div>
                  
                  <div>
-                    <label className="text-[10px] uppercase font-black text-slate-400 tracking-widest block mb-1.5 ml-1">{t('admin.riders.form.idNumber')}</label>
+                    <label className="text-[10px] uppercase font-black text-slate-400 tracking-widest block mb-1.5 ml-1">{t('admin.rubbers.form.idNumber')}</label>
                     <input 
                       value={formData.idNumber}
                       onChange={e => setFormData({...formData, idNumber: e.target.value})}
@@ -220,7 +220,7 @@ export default function RiderForm({ initialData, isEdit }: RiderFormProps) {
                  </div>
                  
                  <div>
-                    <label className="text-[10px] uppercase font-black text-slate-400 tracking-widest block mb-1.5 ml-1">{t('admin.riders.form.phone')}</label>
+                    <label className="text-[10px] uppercase font-black text-slate-400 tracking-widest block mb-1.5 ml-1">{t('admin.rubbers.form.phone')}</label>
                     <input 
                       value={formData.phone}
                       onChange={e => setFormData({...formData, phone: e.target.value})}
@@ -230,7 +230,7 @@ export default function RiderForm({ initialData, isEdit }: RiderFormProps) {
                  </div>
 
                  <div className="md:col-span-2">
-                    <label className="text-[10px] uppercase font-black text-slate-400 tracking-widest block mb-1.5 ml-1">{t('admin.riders.form.address')}</label>
+                    <label className="text-[10px] uppercase font-black text-slate-400 tracking-widest block mb-1.5 ml-1">{t('admin.rubbers.form.address')}</label>
                     <textarea 
                       rows={3}
                       value={formData.address}
@@ -246,7 +246,7 @@ export default function RiderForm({ initialData, isEdit }: RiderFormProps) {
                  <div className="w-10 h-10 rounded-xl bg-orange-50 text-orange-600 flex items-center justify-center">
                     <Icons.Shield size={20} />
                  </div>
-                 <h2 className="text-xl font-black text-slate-900 uppercase tracking-tight">{t('admin.riders.form.docs')}</h2>
+                 <h2 className="text-xl font-black text-slate-900 uppercase tracking-tight">{t('admin.rubbers.form.docs')}</h2>
               </div>
               
               <div className="space-y-6">
@@ -270,10 +270,10 @@ export default function RiderForm({ initialData, isEdit }: RiderFormProps) {
                                    'bg-white border-slate-100 text-slate-400'
                                 }`}
                              >
-                                <option value="none">{t('admin.riders.form.notSubmitted')}</option>
-                                <option value="pending">{t('admin.riders.form.pendingReview')}</option>
-                                <option value="verified">{t('admin.riders.form.verified')}</option>
-                                <option value="rejected">{t('admin.riders.form.rejected')}</option>
+                                <option value="none">{t('admin.rubbers.form.notSubmitted')}</option>
+                                <option value="pending">{t('admin.rubbers.form.pendingReview')}</option>
+                                <option value="verified">{t('admin.rubbers.form.verified')}</option>
+                                <option value="rejected">{t('admin.rubbers.form.rejected')}</option>
                              </select>
                           </div>
                           
@@ -284,7 +284,7 @@ export default function RiderForm({ initialData, isEdit }: RiderFormProps) {
                                onChange={(val) => handleDocChange(docType.id, 'url', val)}
                              />
                              <div>
-                                <label className="text-[9px] uppercase font-black text-slate-400 block mb-1 ml-1">{t('admin.riders.form.internalNotes')}</label>
+                                <label className="text-[9px] uppercase font-black text-slate-400 block mb-1 ml-1">{t('admin.rubbers.form.internalNotes')}</label>
                                 <textarea 
                                   rows={4}
                                   value={doc.notes}
@@ -305,7 +305,7 @@ export default function RiderForm({ initialData, isEdit }: RiderFormProps) {
                  <div className="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
                     <Icons.Camera size={20} />
                  </div>
-                 <h2 className="text-xl font-black text-slate-900 uppercase tracking-tight">{t('admin.riders.form.visualInspection')}</h2>
+                 <h2 className="text-xl font-black text-slate-900 uppercase tracking-tight">{t('admin.rubbers.form.visualInspection')}</h2>
               </div>
               
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -328,12 +328,12 @@ export default function RiderForm({ initialData, isEdit }: RiderFormProps) {
                  <div className="w-10 h-10 rounded-xl bg-white/10 text-white flex items-center justify-center">
                     <Icons.Bike size={20} />
                  </div>
-                 <h2 className="text-xl font-black uppercase tracking-tight">{t('admin.riders.form.vehicleSetup')}</h2>
+                 <h2 className="text-xl font-black uppercase tracking-tight">{t('admin.rubbers.form.vehicleSetup')}</h2>
               </div>
               
               <div className="space-y-6">
                  <div>
-                    <label className="text-[10px] uppercase font-black text-white/50 tracking-widest block mb-2 ml-1">{t('admin.riders.form.authorizedVehicle')}</label>
+                    <label className="text-[10px] uppercase font-black text-white/50 tracking-widest block mb-2 ml-1">{t('admin.rubbers.form.authorizedVehicle')}</label>
                     <select 
                       value={formData.vehicleType}
                       onChange={e => setFormData({...formData, vehicleType: e.target.value})}
@@ -345,7 +345,7 @@ export default function RiderForm({ initialData, isEdit }: RiderFormProps) {
                     </select>
                  </div>
                  <div>
-                    <label className="text-[10px] uppercase font-black text-white/50 tracking-widest block mb-2 ml-1">{t('admin.riders.form.licensePlate')}</label>
+                    <label className="text-[10px] uppercase font-black text-white/50 tracking-widest block mb-2 ml-1">{t('admin.rubbers.form.licensePlate')}</label>
                     <input 
                       value={formData.licensePlate}
                       onChange={e => setFormData({...formData, licensePlate: e.target.value})}
@@ -361,12 +361,12 @@ export default function RiderForm({ initialData, isEdit }: RiderFormProps) {
                  <div className="w-10 h-10 rounded-xl bg-primary/5 text-primary flex items-center justify-center">
                     <Icons.Wallet size={20} />
                  </div>
-                 <h2 className="text-xl font-black text-slate-900 uppercase tracking-tight">{t('admin.riders.form.payoutInfo')}</h2>
+                 <h2 className="text-xl font-black text-slate-900 uppercase tracking-tight">{t('admin.rubbers.form.payoutInfo')}</h2>
               </div>
               
               <div className="space-y-5">
                  <div>
-                    <label className="text-[10px] uppercase font-black text-slate-400 tracking-widest block mb-1.5 ml-1">{t('admin.riders.form.bankName')}</label>
+                    <label className="text-[10px] uppercase font-black text-slate-400 tracking-widest block mb-1.5 ml-1">{t('admin.rubbers.form.bankName')}</label>
                     <select 
                       value={formData.bankName}
                       onChange={e => setFormData({...formData, bankName: e.target.value})}
@@ -383,7 +383,7 @@ export default function RiderForm({ initialData, isEdit }: RiderFormProps) {
                     </select>
                  </div>
                  <div>
-                    <label className="text-[10px] uppercase font-black text-slate-400 tracking-widest block mb-1.5 ml-1">{t('admin.riders.form.accountNumber')}</label>
+                    <label className="text-[10px] uppercase font-black text-slate-400 tracking-widest block mb-1.5 ml-1">{t('admin.rubbers.form.accountNumber')}</label>
                     <input 
                       value={formData.accountNumber}
                       onChange={e => setFormData({...formData, accountNumber: e.target.value})}
@@ -392,7 +392,7 @@ export default function RiderForm({ initialData, isEdit }: RiderFormProps) {
                     />
                  </div>
                  <div>
-                    <label className="text-[10px] uppercase font-black text-slate-400 tracking-widest block mb-1.5 ml-1">{t('admin.riders.form.accountName')}</label>
+                    <label className="text-[10px] uppercase font-black text-slate-400 tracking-widest block mb-1.5 ml-1">{t('admin.rubbers.form.accountName')}</label>
                     <input 
                       value={formData.accountName}
                       onChange={e => setFormData({...formData, accountName: e.target.value})}
@@ -404,7 +404,7 @@ export default function RiderForm({ initialData, isEdit }: RiderFormProps) {
            </Card>
 
            <Card className="p-8 bg-white border border-slate-200/60 shadow-sm">
-              <label className="text-[10px] uppercase font-black text-slate-400 tracking-widest block mb-2 ml-1">{t('admin.riders.form.emergencyContact')}</label>
+              <label className="text-[10px] uppercase font-black text-slate-400 tracking-widest block mb-2 ml-1">{t('admin.rubbers.form.emergencyContact')}</label>
               <input 
                 value={formData.emergencyContact}
                 onChange={e => setFormData({...formData, emergencyContact: e.target.value})}
@@ -418,20 +418,20 @@ export default function RiderForm({ initialData, isEdit }: RiderFormProps) {
                 disabled={isSaving}
                 className="w-full bg-slate-900 text-white py-6 rounded-xl font-black text-xs uppercase tracking-[0.3em] shadow-2xl shadow-slate-300 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50"
               >
-                {isSaving ? t('admin.riders.form.syncing') : isEdit ? t('admin.riders.form.updateBtn') : t('admin.riders.form.authorizeBtn')}
+                {isSaving ? t('admin.rubbers.form.syncing') : isEdit ? t('admin.rubbers.form.updateBtn') : t('admin.rubbers.form.authorizeBtn')}
               </button>
               <button 
                 type="button"
                 onClick={() => router.back()}
                 className="w-full mt-4 bg-white border border-slate-200 text-slate-400 py-4 rounded-xl font-black text-[10px] uppercase tracking-widest hover:text-slate-900 transition-all"
               >
-                {t('admin.riders.form.exitProfiling')}
+                {t('admin.rubbers.form.exitProfiling')}
               </button>
            </div>
            
            {isEdit && (
               <div className="mt-8 p-6 bg-slate-50 rounded-xl space-y-3">
-                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t('admin.riders.form.statusControl')}</p>
+                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t('admin.rubbers.form.statusControl')}</p>
                  <select 
                    value={formData.status}
                    onChange={e => setFormData({...formData, status: e.target.value})}
@@ -439,8 +439,8 @@ export default function RiderForm({ initialData, isEdit }: RiderFormProps) {
                      formData.status === 'active' ? 'bg-emerald-50 border-emerald-100 text-emerald-600' : 'bg-rose-50 border-rose-100 text-rose-600'
                    }`}
                  >
-                    <option value="active">{t('admin.riders.form.operational')}</option>
-                    <option value="suspended">{t('admin.riders.form.suspended')}</option>
+                    <option value="active">{t('admin.rubbers.form.operational')}</option>
+                    <option value="suspended">{t('admin.rubbers.form.suspended')}</option>
                  </select>
               </div>
            )}

@@ -6,12 +6,12 @@ export const runtime = "edge";
 
 /**
  * Resolve the caller identity from cookies.
- * Returns { id, type } where type is 'rider' | 'store'.
+ * Returns { id, type } where type is 'rubber' | 'store'.
  */
 async function resolveIdentity(): Promise<{ id: string; type: string } | null> {
   const cookieStore = await cookies();
-  const riderToken = cookieStore.get("rider_token")?.value;
-  if (riderToken) return { id: riderToken, type: "rider" };
+  const rubberToken = cookieStore.get("rubber_token")?.value;
+  if (rubberToken) return { id: rubberToken, type: "rubber" };
   const storeToken = cookieStore.get("store_token")?.value;
   if (storeToken) return { id: storeToken, type: "store" };
   return null;
