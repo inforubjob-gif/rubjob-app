@@ -35,13 +35,12 @@ const ROOT_DOMAINS = [
 const SUBDOMAIN_MAP: Record<string, string> = {
   admin: "/admin",
   rubber: "/rubber",
-  store: "/partner-store",
-  provider: "/partner-service",
+  partner: "/partner",
   app: "",   // User app — root-level pages, no prefix needed
 };
 
 /** Portal path prefixes that should be isolated per-subdomain */
-const PORTAL_PREFIXES = ["/admin", "/rubber", "/partner-store", "/partner-service", "/landing"];
+const PORTAL_PREFIXES = ["/admin", "/rubber", "/partner-store", "/partner-service", "/partner", "/landing"];
 
 /**
  * Extract subdomain from hostname against known root domains.
@@ -104,22 +103,9 @@ export default function middleware(req: NextRequest) {
 
   // ─── Root domain (rubjob-all.com, no subdomain) → Landing page ───
   if (subdomain === "") {
-    // Block access to portal routes from the root domain
-    if (PORTAL_PREFIXES.some((p) => pathname.startsWith(p) && p !== "/landing")) {
-      // Redirect /admin, /rubber, /store to proper subdomain
-      for (const [sub, prefix] of Object.entries(SUBDOMAIN_MAP)) {
-        if (prefix && pathname.startsWith(prefix)) {
-          const targetPath = pathname.slice(prefix.length) || "/";
-          const targetHost = hostname.replace(
-            hostname.split(":")[0],
-            `${sub}.${ROOT_DOMAINS.find((d) => hostname.includes(d)) || ROOT_DOMAINS[0]}`
-          );
-          return NextResponse.redirect(
-            new URL(`${url.protocol}//${targetHost}${targetPath}`)
-          );
-        }
-      }
-    }
+    // We used to redirect /admin, /rubber to subdomains here.
+    // Now we allow accessing them directly from the root domain for easier deployment.
+
 
     // Rewrite root "/" to "/landing"
     if (pathname === "/") {
@@ -134,18 +120,8 @@ export default function middleware(req: NextRequest) {
   const targetPrefix = SUBDOMAIN_MAP[subdomain];
 
   if (targetPrefix !== undefined) {
-    // Subdomain isolation: block cross-portal access
-    // e.g. rubber.rubjob-all.com/admin → redirect to /
-    for (const [otherSub, otherPrefix] of Object.entries(SUBDOMAIN_MAP)) {
-      if (
-        otherPrefix &&
-        otherPrefix !== targetPrefix &&
-        pathname.startsWith(otherPrefix)
-      ) {
-        url.pathname = "/";
-        return NextResponse.redirect(url);
-      }
-    }
+    // Subdomain isolation disabled to prevent bounce issues.
+    // Allow users to access /rubber or /partner even if they are on a subdomain.
 
     // Block /landing from portal subdomains
     if (pathname.startsWith("/landing")) {
