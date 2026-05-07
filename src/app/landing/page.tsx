@@ -268,6 +268,167 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* ─── Line Integration Highlight ─── */}
+      <section id="line-app" className="relative z-10 py-24 bg-[#00B900]/5 overflow-hidden border-t border-[#00B900]/10">
+        
+        {/* Abstract Pattern background */}
+        <div className="absolute right-0 top-0 w-[40vw] h-[40vw] bg-[#00B900]/10 rounded-bl-full -z-10" />
+
+        {/* Mascot 13 (Peeking) reused here playfully */}
+        <div className="absolute top-1/2 -left-12 transform -translate-y-1/2 w-48 opacity-100 pointer-events-none hidden lg:block z-10">
+           <img src="/images/mascot-wink.png" alt="Mascot Deco" className="w-full h-auto drop-shadow-xl" />
+        </div>
+        
+        <div className="max-w-7xl mx-auto px-6 md:px-12 relative z-30">
+          <div className="flex flex-col lg:flex-row items-center gap-12">
+            <div className="flex-1 text-center lg:text-left">
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-[#00B900] text-white text-3xl shadow-xl shadow-[#00B900]/30 mb-6">
+                {t("landing.line.badge")}
+              </div>
+              <h2 className="text-4xl md:text-5xl font-black text-slate-900 mb-6 tracking-tight leading-tight">
+                {t("landing.line.title")} <span className="text-[#00B900]">{t("landing.line.titleSub")}</span>
+              </h2>
+              <p className="text-slate-600 text-lg mb-8 max-w-lg mx-auto lg:mx-0 leading-relaxed font-medium">
+                {t("landing.line.desc")} 
+                <br/><br/>
+                <span className="text-primary font-bold">{t("landing.line.footer")}</span>
+              </p>
+              
+              {/* App link removed per request */}
+            </div>
+
+            {/* Mascot Showcase Right */}
+            <div className="flex-1 relative w-full max-w-sm mx-auto flex items-center justify-center py-10">
+               {/* Confident Mascot */}
+               <div className="relative w-48 lg:w-64 animate-float z-20">
+                  <img src="/images/mascot-jump.png" alt="Mascot Confident" className="w-full h-auto drop-shadow-2xl" />
+               </div>
+               {/* Floating elements behind */}
+               <div className="absolute top-[20%] right-0 bg-white p-4 rounded-xl shadow-xl border border-slate-100 transform rotate-6 animate-float-delayed z-30">
+                 <p className="text-sm font-bold text-slate-800">{t("landing.line.hintApp")}</p>
+               </div>
+               <div className="absolute bottom-[10%] left-[-10%] bg-white p-4 rounded-xl shadow-xl border border-slate-100 transform -rotate-3 animate-float z-30">
+                 <p className="text-sm font-bold text-[#00B900]">{t("landing.line.hintLine")}</p>
+               </div>
+               <div className="absolute inset-0 bg-[#00B900]/20 rounded-full blur-3xl z-10 animate-pulse" />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ─── Premium Partnership Section 🚀 ─── */}
+      <section id="partnership" className="relative z-10 py-32 md:py-48 overflow-hidden bg-white">
+        {/* Abstract Background Shapes */}
+        <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-primary/5 rounded-full blur-[120px] -mr-96 -mt-96" />
+        <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-blue-500/5 rounded-full blur-[100px] -ml-48 -mb-48" />
+
+        <div className="max-w-7xl mx-auto px-6 md:px-12 relative z-10">
+          <div className="text-center max-w-3xl mx-auto mb-20 md:mb-28">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-slate-900 text-white rounded-full text-[10px] font-black uppercase tracking-[0.2em] mb-6 shadow-xl shadow-slate-900/20">
+              <span className="w-1.5 h-1.5 bg-primary rounded-full animate-pulse" />
+              {t("landing.partnership.badge")}
+            </div>
+            <h3 className="text-5xl md:text-7xl font-black text-slate-900 leading-[1.1] tracking-tight mb-8">
+               {t("landing.partnership.title")}<br/>
+               <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-orange-500 to-primary-dark">{t("landing.partnership.titleSub")}</span>
+            </h3>
+            <p className="text-xl text-slate-500 font-medium leading-relaxed">
+               {t("landing.partnership.subtitle")}
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12">
+            
+            {/* For Stores & Providers Card */}
+            <div className="group relative">
+               <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-700 blur-3xl -z-10 rounded-[48px]" />
+               <Card className="h-full p-10 md:p-14 bg-white border border-slate-100 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.05)] rounded-[48px] overflow-hidden flex flex-col transition-all duration-500 group-hover:-translate-y-2 group-hover:shadow-[0_48px_80px_-16px_rgba(255,165,0,0.15)] group-hover:border-primary/20">
+                  <div className="flex items-start justify-between mb-12">
+                    <div className="w-20 h-20 rounded-[28px] bg-gradient-to-br from-primary to-orange-500 text-white flex items-center justify-center shadow-2xl shadow-primary/30 group-hover:scale-110 group-hover:rotate-3 transition-all duration-500">
+                       <Icons.Store size={40} strokeWidth={2.5} />
+                    </div>
+                    <div className="px-4 py-2 bg-primary/5 border border-primary/10 rounded-full text-[10px] font-black text-primary uppercase tracking-[0.1em] h-fit">
+                       {t("landing.partnership.partner.badge")}
+                    </div>
+                  </div>
+                  
+                  <h4 className="text-4xl font-black text-slate-900 mb-6 group-hover:text-primary transition-colors">{t("landing.partnership.partner.title")}</h4>
+                  <p className="text-slate-500 text-lg mb-10 leading-relaxed font-medium">
+                    {t("landing.partnership.partner.desc")}
+                  </p>
+                  
+                  <div className="space-y-5 mb-14 flex-1">
+                    {[
+                      { icon: <Icons.CheckCircle className="text-primary" />, text: t("landing.partnership.partner.list.item1") },
+                      { icon: <Icons.CheckCircle className="text-primary" />, text: t("landing.partnership.partner.list.item2") },
+                      { icon: <Icons.CheckCircle className="text-primary" />, text: t("landing.partnership.partner.list.item3") }
+                    ].map((item, i) => (
+                      <div key={i} className="flex items-center gap-4 text-slate-600 font-bold group-hover:translate-x-1 transition-transform">
+                         <div className="w-6 h-6 shrink-0">{item.icon}</div>
+                         <span className="text-sm">{item.text}</span>
+                      </div>
+                    ))}
+                  </div>
+
+                   <Link 
+                    href="/register/partner"
+                    className="w-full py-6 bg-slate-900 text-white font-black text-center text-lg rounded-2xl hover:bg-primary transition-all duration-300 shadow-2xl shadow-slate-900/10 active:scale-[0.98] relative overflow-hidden group/btn"
+                  >
+                    <span className="relative z-10 uppercase tracking-widest">{t("landing.partnership.partner.cta")}</span>
+                    <div className="absolute inset-0 bg-gradient-to-r from-primary to-orange-500 opacity-0 group-hover/btn:opacity-100 transition-opacity duration-300" />
+                  </Link>
+               </Card>
+            </div>
+
+            {/* For Rubbers Card */}
+            <div className="group relative">
+               <div className="absolute inset-0 bg-gradient-to-br from-blue-500/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-700 blur-3xl -z-10 rounded-[48px]" />
+               <Card className="h-full p-10 md:p-14 bg-white border border-slate-100 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.05)] rounded-[48px] overflow-hidden flex flex-col transition-all duration-500 group-hover:-translate-y-2 group-hover:shadow-[0_48px_80px_-16px_rgba(59,130,246,0.15)] group-hover:border-blue-500/20">
+                  <div className="flex items-start justify-between mb-12">
+                    <div className="w-20 h-20 rounded-[28px] bg-gradient-to-br from-blue-500 to-indigo-600 text-white flex items-center justify-center shadow-2xl shadow-blue-500/30 group-hover:scale-110 group-hover:-rotate-3 transition-all duration-500">
+                       <Icons.Bike size={40} strokeWidth={2.5} />
+                    </div>
+                    <div className="px-4 py-2 bg-blue-50 border border-blue-100 rounded-full text-[10px] font-black text-blue-500 uppercase tracking-[0.1em] h-fit">
+                       {t("landing.partnership.rubber.badge")}
+                    </div>
+                  </div>
+                  
+                  <h4 className="text-4xl font-black text-slate-900 mb-6 group-hover:text-blue-600 transition-colors">{t("landing.partnership.rubber.title")}</h4>
+                  <p className="text-slate-500 text-lg mb-10 leading-relaxed font-medium">
+                    {t("landing.partnership.rubber.desc")}
+                  </p>
+                  
+                  <div className="space-y-5 mb-14 flex-1">
+                    {[
+                      { icon: <Icons.CheckCircle className="text-blue-500" />, text: t("landing.partnership.rubber.list.item1") },
+                      { icon: <Icons.CheckCircle className="text-blue-500" />, text: t("landing.partnership.rubber.list.item2") },
+                      { icon: <Icons.CheckCircle className="text-blue-500" />, text: t("landing.partnership.rubber.list.item3") }
+                    ].map((item, i) => (
+                      <div key={i} className="flex items-center gap-4 text-slate-600 font-bold group-hover:translate-x-1 transition-transform">
+                         <div className="w-6 h-6 shrink-0">{item.icon}</div>
+                         <span className="text-sm">{item.text}</span>
+                      </div>
+                    ))}
+                  </div>
+
+                   <Link 
+                    href="/register/rubber"
+                    className="w-full py-6 bg-slate-900 text-white font-black text-center text-lg rounded-2xl hover:bg-blue-600 transition-all duration-300 shadow-2xl shadow-slate-900/10 active:scale-[0.98] relative overflow-hidden group/btn"
+                  >
+                    <span className="relative z-10 uppercase tracking-widest">{t("landing.partnership.rubber.cta")}</span>
+                    <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-indigo-600 opacity-0 group-hover/btn:opacity-100 transition-opacity duration-300" />
+                  </Link>
+               </Card>
+            </div>
+
+          </div>
+        </div>
+
+        {/* Decorative Floating Elements */}
+        <div className="absolute top-1/2 left-0 w-24 h-24 bg-primary/20 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute top-1/3 right-0 w-32 h-32 bg-blue-500/10 rounded-full blur-3xl animate-pulse-delayed" />
+      </section>
+
       {/* ─── How it Works ─── */}
       <section id="how-it-works" className="relative z-10 py-24 bg-white border-t border-slate-100">
         <div className="max-w-7xl mx-auto px-6 md:px-12 flex flex-col lg:flex-row items-center gap-16">
@@ -486,166 +647,9 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ─── Line Integration Highlight ─── */}
-      <section id="line-app" className="relative z-10 py-24 bg-[#00B900]/5 overflow-hidden border-t border-[#00B900]/10">
-        
-        {/* Abstract Pattern background */}
-        <div className="absolute right-0 top-0 w-[40vw] h-[40vw] bg-[#00B900]/10 rounded-bl-full -z-10" />
 
-        {/* Mascot 13 (Peeking) reused here playfully */}
-        <div className="absolute top-1/2 -left-12 transform -translate-y-1/2 w-48 opacity-100 pointer-events-none hidden lg:block z-10">
-           <img src="/images/mascot-wink.png" alt="Mascot Deco" className="w-full h-auto drop-shadow-xl" />
-        </div>
-        
-        <div className="max-w-7xl mx-auto px-6 md:px-12 relative z-30">
-          <div className="flex flex-col lg:flex-row items-center gap-12">
-            <div className="flex-1 text-center lg:text-left">
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-[#00B900] text-white text-3xl shadow-xl shadow-[#00B900]/30 mb-6">
-                {t("landing.line.badge")}
-              </div>
-              <h2 className="text-4xl md:text-5xl font-black text-slate-900 mb-6 tracking-tight leading-tight">
-                {t("landing.line.title")} <span className="text-[#00B900]">{t("landing.line.titleSub")}</span>
-              </h2>
-              <p className="text-slate-600 text-lg mb-8 max-w-lg mx-auto lg:mx-0 leading-relaxed font-medium">
-                {t("landing.line.desc")} 
-                <br/><br/>
-                <span className="text-primary font-bold">{t("landing.line.footer")}</span>
-              </p>
-              
-              {/* App link removed per request */}
-            </div>
 
-            {/* Mascot Showcase Right */}
-            <div className="flex-1 relative w-full max-w-sm mx-auto flex items-center justify-center py-10">
-               {/* Confident Mascot */}
-               <div className="relative w-48 lg:w-64 animate-float z-20">
-                  <img src="/images/mascot-jump.png" alt="Mascot Confident" className="w-full h-auto drop-shadow-2xl" />
-               </div>
-               {/* Floating elements behind */}
-               <div className="absolute top-[20%] right-0 bg-white p-4 rounded-xl shadow-xl border border-slate-100 transform rotate-6 animate-float-delayed z-30">
-                 <p className="text-sm font-bold text-slate-800">{t("landing.line.hintApp")}</p>
-               </div>
-               <div className="absolute bottom-[10%] left-[-10%] bg-white p-4 rounded-xl shadow-xl border border-slate-100 transform -rotate-3 animate-float z-30">
-                 <p className="text-sm font-bold text-[#00B900]">{t("landing.line.hintLine")}</p>
-               </div>
-               <div className="absolute inset-0 bg-[#00B900]/20 rounded-full blur-3xl z-10 animate-pulse" />
-            </div>
-          </div>
-        </div>
-      </section>
 
-      {/* ─── Premium Partnership Section 🚀 ─── */}
-      <section id="partnership" className="relative z-10 py-32 md:py-48 overflow-hidden bg-white">
-        {/* Abstract Background Shapes */}
-        <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-primary/5 rounded-full blur-[120px] -mr-96 -mt-96" />
-        <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-blue-500/5 rounded-full blur-[100px] -ml-48 -mb-48" />
-
-        <div className="max-w-7xl mx-auto px-6 md:px-12 relative z-10">
-          <div className="text-center max-w-3xl mx-auto mb-20 md:mb-28">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-slate-900 text-white rounded-full text-[10px] font-black uppercase tracking-[0.2em] mb-6 shadow-xl shadow-slate-900/20">
-              <span className="w-1.5 h-1.5 bg-primary rounded-full animate-pulse" />
-              {t("landing.partnership.badge")}
-            </div>
-            <h3 className="text-5xl md:text-7xl font-black text-slate-900 leading-[1.1] tracking-tight mb-8">
-               {t("landing.partnership.title")}<br/>
-               <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-orange-500 to-primary-dark">{t("landing.partnership.titleSub")}</span>
-            </h3>
-            <p className="text-xl text-slate-500 font-medium leading-relaxed">
-               {t("landing.partnership.subtitle")}
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12">
-            
-            {/* For Stores & Providers Card */}
-            <div className="group relative">
-               <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-700 blur-3xl -z-10 rounded-[48px]" />
-               <Card className="h-full p-10 md:p-14 bg-white border border-slate-100 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.05)] rounded-[48px] overflow-hidden flex flex-col transition-all duration-500 group-hover:-translate-y-2 group-hover:shadow-[0_48px_80px_-16px_rgba(255,165,0,0.15)] group-hover:border-primary/20">
-                  <div className="flex items-start justify-between mb-12">
-                    <div className="w-20 h-20 rounded-[28px] bg-gradient-to-br from-primary to-orange-500 text-white flex items-center justify-center shadow-2xl shadow-primary/30 group-hover:scale-110 group-hover:rotate-3 transition-all duration-500">
-                       <Icons.Store size={40} strokeWidth={2.5} />
-                    </div>
-                    <div className="px-4 py-2 bg-primary/5 border border-primary/10 rounded-full text-[10px] font-black text-primary uppercase tracking-[0.1em] h-fit">
-                       {t("landing.partnership.partner.badge")}
-                    </div>
-                  </div>
-                  
-                  <h4 className="text-4xl font-black text-slate-900 mb-6 group-hover:text-primary transition-colors">{t("landing.partnership.partner.title")}</h4>
-                  <p className="text-slate-500 text-lg mb-10 leading-relaxed font-medium">
-                    {t("landing.partnership.partner.desc")}
-                  </p>
-                  
-                  <div className="space-y-5 mb-14 flex-1">
-                    {[
-                      { icon: <Icons.CheckCircle className="text-primary" />, text: t("landing.partnership.partner.list.item1") },
-                      { icon: <Icons.CheckCircle className="text-primary" />, text: t("landing.partnership.partner.list.item2") },
-                      { icon: <Icons.CheckCircle className="text-primary" />, text: t("landing.partnership.partner.list.item3") }
-                    ].map((item, i) => (
-                      <div key={i} className="flex items-center gap-4 text-slate-600 font-bold group-hover:translate-x-1 transition-transform">
-                         <div className="w-6 h-6 shrink-0">{item.icon}</div>
-                         <span className="text-sm">{item.text}</span>
-                      </div>
-                    ))}
-                  </div>
-
-                   <Link 
-                    href="/register/partner"
-                    className="w-full py-6 bg-slate-900 text-white font-black text-center text-lg rounded-2xl hover:bg-primary transition-all duration-300 shadow-2xl shadow-slate-900/10 active:scale-[0.98] relative overflow-hidden group/btn"
-                  >
-                    <span className="relative z-10 uppercase tracking-widest">{t("landing.partnership.partner.cta")}</span>
-                    <div className="absolute inset-0 bg-gradient-to-r from-primary to-orange-500 opacity-0 group-hover/btn:opacity-100 transition-opacity duration-300" />
-                  </Link>
-               </Card>
-            </div>
-
-            {/* For Rubbers Card */}
-            <div className="group relative">
-               <div className="absolute inset-0 bg-gradient-to-br from-blue-500/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-700 blur-3xl -z-10 rounded-[48px]" />
-               <Card className="h-full p-10 md:p-14 bg-white border border-slate-100 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.05)] rounded-[48px] overflow-hidden flex flex-col transition-all duration-500 group-hover:-translate-y-2 group-hover:shadow-[0_48px_80px_-16px_rgba(59,130,246,0.15)] group-hover:border-blue-500/20">
-                  <div className="flex items-start justify-between mb-12">
-                    <div className="w-20 h-20 rounded-[28px] bg-gradient-to-br from-blue-500 to-indigo-600 text-white flex items-center justify-center shadow-2xl shadow-blue-500/30 group-hover:scale-110 group-hover:-rotate-3 transition-all duration-500">
-                       <Icons.Bike size={40} strokeWidth={2.5} />
-                    </div>
-                    <div className="px-4 py-2 bg-blue-50 border border-blue-100 rounded-full text-[10px] font-black text-blue-500 uppercase tracking-[0.1em] h-fit">
-                       {t("landing.partnership.rubber.badge")}
-                    </div>
-                  </div>
-                  
-                  <h4 className="text-4xl font-black text-slate-900 mb-6 group-hover:text-blue-600 transition-colors">{t("landing.partnership.rubber.title")}</h4>
-                  <p className="text-slate-500 text-lg mb-10 leading-relaxed font-medium">
-                    {t("landing.partnership.rubber.desc")}
-                  </p>
-                  
-                  <div className="space-y-5 mb-14 flex-1">
-                    {[
-                      { icon: <Icons.CheckCircle className="text-blue-500" />, text: t("landing.partnership.rubber.list.item1") },
-                      { icon: <Icons.CheckCircle className="text-blue-500" />, text: t("landing.partnership.rubber.list.item2") },
-                      { icon: <Icons.CheckCircle className="text-blue-500" />, text: t("landing.partnership.rubber.list.item3") }
-                    ].map((item, i) => (
-                      <div key={i} className="flex items-center gap-4 text-slate-600 font-bold group-hover:translate-x-1 transition-transform">
-                         <div className="w-6 h-6 shrink-0">{item.icon}</div>
-                         <span className="text-sm">{item.text}</span>
-                      </div>
-                    ))}
-                  </div>
-
-                   <Link 
-                    href="/register/rubber"
-                    className="w-full py-6 bg-slate-900 text-white font-black text-center text-lg rounded-2xl hover:bg-blue-600 transition-all duration-300 shadow-2xl shadow-slate-900/10 active:scale-[0.98] relative overflow-hidden group/btn"
-                  >
-                    <span className="relative z-10 uppercase tracking-widest">{t("landing.partnership.rubber.cta")}</span>
-                    <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-indigo-600 opacity-0 group-hover/btn:opacity-100 transition-opacity duration-300" />
-                  </Link>
-               </Card>
-            </div>
-
-          </div>
-        </div>
-
-        {/* Decorative Floating Elements */}
-        <div className="absolute top-1/2 left-0 w-24 h-24 bg-primary/20 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute top-1/3 right-0 w-32 h-32 bg-blue-500/10 rounded-full blur-3xl animate-pulse-delayed" />
-      </section>
 
       {/* ─── Contact Channels ─── */}
       <section className="relative z-10 py-32 bg-[#fafbfd] overflow-hidden border-t border-slate-100">
