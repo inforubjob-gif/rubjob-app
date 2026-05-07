@@ -415,7 +415,24 @@ export default function RubberDashboard() {
                     variant="secondary" 
                     size="sm" 
                     className="mt-4 bg-white text-emerald-600 font-black uppercase text-[10px] py-2 px-6 rounded-lg active:scale-95 transition-all"
-                    onClick={() => router.push("/auth/link-line?type=rubber")}
+                    onClick={async () => {
+                      try {
+                        if (!rubber?.id) return;
+                        const res = await fetch(`/api/auth/link-line?type=rubber`);
+                        const data = await res.json() as any;
+                        if (!res.ok || !data.token) throw new Error("Failed to get linking token");
+                        const liffId = process.env.NEXT_PUBLIC_LIFF_ID_RUBBER || process.env.NEXT_PUBLIC_LIFF_ID;
+                        window.location.href = `https://liff.line.me/${liffId}/auth/link-line?type=rubber&id=${data.accountId}&token=${data.token}`;
+                      } catch (e) {
+                        console.error("LINE link error:", e);
+                        setAlertConfig({
+                          isOpen: true,
+                          title: t("common.error"),
+                          message: "ไม่สามารถเชื่อมต่อ LINE ได้ กรุณาลองใหม่อีกครั้ง",
+                          type: "error",
+                        });
+                      }
+                    }}
                   >
                     เชื่อมต่อตอนนี้
                   </Button>
