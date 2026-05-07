@@ -1136,12 +1136,14 @@ function BookingFlow() {
                     console.error("Phone sync failed", e);
                   }
                 }
+                // Auto-create order and proceed to payment
+                handleConfirm();
                 setStep("payment");
               }}
-              disabled={isTooFar}
-              className={isTooFar ? "bg-slate-300 text-slate-500 shadow-none border-transparent cursor-not-allowed" : ""}
+              disabled={isTooFar || isSubmitting}
+              className={(isTooFar || isSubmitting) ? "bg-slate-300 text-slate-500 shadow-none border-transparent cursor-not-allowed" : ""}
             >
-              {isTooFar ? t("booking.errors.tooFar") : t("common.confirm")}
+              {isSubmitting ? t("common.loading") : isTooFar ? t("booking.errors.tooFar") : t("common.confirm")}
             </Button>
           </div>
         )}
@@ -1150,25 +1152,14 @@ function BookingFlow() {
             fullWidth
             size="lg"
             isLoading={isSubmitting}
+            disabled={isSubmitting || !paymentQR}
+            className={(!paymentQR) ? "bg-slate-300 text-slate-500 shadow-none border-transparent cursor-not-allowed" : ""}
             onClick={() => {
-              if (isTooFar) return;
-              if (isBelowMinOrder) {
-                showToast(t("booking.errors.minOrder").replace("{amount}", minOrderAmount.toString()), "error");
-                return;
-              }
-              if (!selectedPayment) {
-                showToast(t("booking.selectPaymentDesc"), "error");
-                return;
-              }
-              handleConfirm();
+              if (activeOrderId) router.push(`/orders/${activeOrderId}`);
             }}
-            disabled={isSubmitting || isBelowMinOrder || isTooFar}
-            className={(isBelowMinOrder || isTooFar) ? "bg-slate-300 text-slate-500 shadow-none border-transparent cursor-not-allowed" : ""}
           >
             {isSubmitting ? t("common.loading") : 
-             isTooFar ? t("booking.errors.tooFar") :
-             isBelowMinOrder ? t("booking.errors.cannotPlaceOrder").replace("{amount}", minOrderAmount.toString()) : 
-             paymentQR ? t("booking.viewMyOrders") : `${t("booking.placeOrder")} — ฿${totalPrice}`}
+             paymentQR ? t("booking.viewMyOrders") : t("common.loading")}
           </Button>
         )}
       </div>
