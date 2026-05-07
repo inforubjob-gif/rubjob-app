@@ -78,36 +78,34 @@ export async function POST(req: Request, { params }: { params: Promise<{ type: s
         let senderName = '';
 
         if (!isManual) {
-          // Check rubber_users first
+          // Check all roles to support multi-role users
           const rubber = await db.prepare(
             `SELECT id, name FROM rubber_users WHERE lineUserId = ?`
           ).bind(userId).first() as any;
 
-          if (rubber) {
+          const user = await db.prepare(
+            `SELECT id, displayName FROM users WHERE id = ?`
+          ).bind(userId).first() as any;
+
+          if (rubber && user) {
+            userType = 'both';
+            senderName = rubber.name || user.displayName || '';
+          } else if (rubber) {
             userType = 'rubber';
             senderName = rubber.name || '';
+          } else if (user) {
+            userType = 'customer';
+            senderName = user.displayName || '';
           } else {
             // Check stores
             const store = await db.prepare(
               `SELECT id, name FROM stores WHERE lineUserId = ?`
             ).bind(userId).first() as any;
-
             if (store) {
               userType = 'store';
               senderName = store.name || '';
             } else {
-              // Check regular users (LINE Login)
-              const user = await db.prepare(
-                `SELECT id, displayName FROM users WHERE id = ?`
-              ).bind(userId).first() as any;
-
-              if (user) {
-                userType = 'customer';
-                senderName = user.displayName || '';
-              } else {
-                userType = 'unknown';
-                senderName = '';
-              }
+              userType = 'unknown';
             }
           }
         }
@@ -123,7 +121,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ type: s
 
         if (!ticketId) {
           ticketId = `TKT-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
-          const subjectPrefix = userType === 'rubber' ? '🏍️ Rubber' : userType === 'store' ? '🏪 Store' : '👤 Customer';
+          const subjectPrefix = userType === 'both' ? '👤🏍️ Both' : userType === 'rubber' ? '🏍️ Rubber' : userType === 'store' ? '🏪 Store' : '👤 Customer';
           await db.prepare(`
             INSERT INTO support_tickets (id, userId, channel, subject, status, userType, senderName)
             VALUES (?, ?, ?, ?, 'open', ?, ?)
@@ -152,5 +150,18 @@ export async function POST(req: Request, { params }: { params: Promise<{ type: s
   } catch (error: any) {
     console.error("LINE Webhook error:", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+}
+
+function getUserTypeStyle(type: string) {
+  switch (type) {
+    case 'rubber':
+      return { label: 'RUBBER', icon: '🏍️', badgeClass: 'bg-blue-50 text-blue-600 ring-blue-200', dotClass: 'bg-blue-500' };
+    case 'store':
+      return { label: 'STORE', icon: '🏪', badgeClass: 'bg-purple-50 text-purple-600 ring-purple-200', dotClass: 'bg-purple-500' };
+    case 'both':
+      return { label: 'BOTH', icon: '👤🏍️', badgeClass: 'bg-amber-50 text-amber-600 ring-amber-200', dotClass: 'bg-amber-500' };
+    default:
+      return { label: 'CUSTOMER', icon: '👤', badgeClass: 'bg-emerald-50 text-emerald-600 ring-emerald-200', dotClass: 'bg-emerald-500' };
   }
 }

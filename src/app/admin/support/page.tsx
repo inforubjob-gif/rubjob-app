@@ -22,6 +22,8 @@ function getUserTypeBadge(userType: string) {
       return { label: 'STORE', icon: '🏪', badgeClass: 'bg-purple-50 text-purple-600 ring-purple-200', dotClass: 'bg-purple-500' };
     case 'unknown':
       return { label: 'UNKNOWN', icon: '❓', badgeClass: 'bg-slate-50 text-slate-500 ring-slate-200', dotClass: 'bg-slate-400' };
+    case 'both':
+      return { label: 'BOTH', icon: '👤🏍️', badgeClass: 'bg-amber-50 text-amber-600 ring-amber-200', dotClass: 'bg-amber-500' };
     default:
       return { label: 'CUSTOMER', icon: '👤', badgeClass: 'bg-emerald-50 text-emerald-600 ring-emerald-200', dotClass: 'bg-emerald-500' };
   }
