@@ -106,19 +106,20 @@ export async function POST(req: Request) {
 
     // 🤖 Automation: Notify Store and Available Rubbers via LINE
     const env = getRequestContext().env;
-    const accessToken = env.LINE_CHANNEL_ACCESS_TOKEN;
+    const customerToken = env.LINE_CHANNEL_ACCESS_TOKEN;
+    const rubberToken = env.LINE_CHANNEL_ACCESS_TOKEN_RUBBER || customerToken;
     
-    if (accessToken) {
+    if (rubberToken) {
       const { 
         sendLinePush, 
         rubberNewJobFlex, 
         storeOrderAlertFlex 
       } = await import("@/lib/line");
 
-      // 1. Notify Store Owner
+      // 1. Notify Store Owner (Using Rubber Bot)
       const storeData = await db.prepare("SELECT lineUserId FROM stores WHERE id = ?").bind(storeId).first() as any;
       if (storeData?.lineUserId) {
-        await sendLinePush(storeData.lineUserId, [storeOrderAlertFlex(orderId)], accessToken).catch(() => {});
+        await sendLinePush(storeData.lineUserId, [storeOrderAlertFlex(orderId)], rubberToken).catch(() => {});
       }
 
       // 2. Broadcast to Online Rubbers
@@ -138,7 +139,7 @@ export async function POST(req: Request) {
         try {
           const prefs = JSON.parse(r.preferences || "{}");
           if (prefs.workStatus === true) {
-            await sendLinePush(r.lineUserId, [rubberNewJobFlex(orderId, 'pending', legEarn)], accessToken).catch(() => {});
+            await sendLinePush(r.lineUserId, [rubberNewJobFlex(orderId, 'pending', legEarn)], rubberToken).catch(() => {});
           }
         } catch (e) {}
       }
