@@ -232,7 +232,7 @@ export default function RubberSupportPage() {
       <div className="flex-1 px-5 pt-6 pb-24 space-y-4">
         {/* ── LINE OA Direct Contact ── */}
         <a
-          href="https://line.me/R/ti/p/@rubjob"
+          href="https://line.me/R/ti/p/@576juaqx"
           target="_blank"
           rel="noopener noreferrer"
           className="block bg-gradient-to-r from-green-600 to-emerald-500 p-5 rounded-xl shadow-xl shadow-green-900/20 text-white active:scale-[0.98] transition-all"
