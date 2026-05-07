@@ -23,25 +23,51 @@ export default function BottomNav() {
   const isAdminContext = pathname.startsWith("/admin") || hostname.startsWith("admin.");
   const isProviderContext = pathname.startsWith("/partner-service") || hostname.startsWith("provider.");
   
-  const isLandingContext = pathname.startsWith("/landing") || pathname.startsWith("/register") || (
-    !hostname.startsWith("app.") &&
-    !hostname.startsWith("admin.") &&
-    !hostname.startsWith("rubber.") &&
-    !hostname.startsWith("store.") &&
-    (hostname.includes("rubjob-all.com") ||
-     hostname.includes("rubjob.com") ||
-     hostname === "localhost" ||
-     hostname === "lvh.me") &&
-    pathname === "/"
-  );
-
-  // Hide on Admin portal and landing page
-  if (isAdminContext || isLandingContext) return null;
+  const isLandingContext = 
+    pathname.startsWith("/landing") || 
+    pathname.startsWith("/register") || 
+    pathname === "/terms" || 
+    pathname === "/privacy" || 
+    pathname === "/contact" ||
+    (
+      !hostname.startsWith("app.") &&
+      !hostname.startsWith("admin.") &&
+      !hostname.startsWith("rubber.") &&
+      !hostname.startsWith("store.") &&
+      (hostname.includes("rubjob-all.com") ||
+       hostname.includes("rubjob.com") ||
+       hostname === "localhost" ||
+       hostname === "lvh.me") &&
+      pathname === "/"
+    );
 
   // Hide on Authentication screens
-  if (pathname === "/partner/login" || pathname === "/rubber/login" || pathname === "/partner/login" || pathname.startsWith("/admin/login")) {
-    return null;
-  }
+  const isAuthPage = 
+    pathname === "/partner/login" || 
+    pathname === "/rubber/login" || 
+    pathname.startsWith("/admin/login") ||
+    pathname.startsWith("/auth/link-line");
+
+  // Determine if we are in a valid app context (Store, Rubber, Provider, or User App)
+  const isAppContext = 
+    isStoreContext || 
+    isRubberContext || 
+    isAdminContext || 
+    isProviderContext || 
+    pathname === "/" ||
+    pathname.startsWith("/orders") ||
+    pathname.startsWith("/booking") ||
+    pathname.startsWith("/promotions") ||
+    pathname.startsWith("/profile") ||
+    pathname.startsWith("/success") ||
+    pathname.startsWith("/support");
+
+  // Hide logic:
+  // 1. If it's an admin context (they use their own layout/nav usually, but BottomNav also checks)
+  // 2. If it's a landing context (landing page, register, terms, privacy, contact)
+  // 3. If it's an auth page
+  // 4. If it's NOT a valid app context (likely a 404 page)
+  if (isAdminContext || isLandingContext || isAuthPage || !isAppContext) return null;
 
   const USER_TABS: Tab[] = [
     {
