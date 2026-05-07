@@ -16,7 +16,10 @@ export async function GET(req: Request) {
     await ensureSchema(db);
 
     const { results: rubbers } = await db.prepare(`
-      SELECT * FROM rubber_users ORDER BY createdAt DESC
+      SELECT r.*, u.displayName as lineDisplayName 
+      FROM rubber_users r
+      LEFT JOIN users u ON r.lineUserId = u.id
+      ORDER BY r.createdAt DESC
     `).all();
 
     // Fetch documents for all rubbers

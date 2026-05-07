@@ -16,8 +16,7 @@ export default function RubberProfilePage() {
   const [showLanguageModal, setShowLanguageModal] = useState(false);
   const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
   const [prefs, setPrefs] = useState<any>({});
-  const [isLoading, setIsLoading] = useState(true);
-
+  const [rubberData, setRubberData] = useState<any>(null);
   const [rubberSession, setRubberSession] = useState<any>(null);
 
   useEffect(() => {
@@ -26,6 +25,7 @@ export default function RubberProfilePage() {
       if (localSession) {
         const parsed = JSON.parse(localSession);
         setRubberSession(parsed);
+        fetchRubberData(parsed.id);
         fetchPrefs(parsed.id);
       } else {
         router.push("/rubber/login");
@@ -35,6 +35,18 @@ export default function RubberProfilePage() {
       router.push("/rubber/login");
     }
   }, [router]);
+
+  async function fetchRubberData(rubberId: string) {
+    try {
+      const res = await fetch(`/api/admin/rubbers?id=${rubberId}`);
+      const data = await res.json() as any;
+      if (data.rubber) {
+        setRubberData(data.rubber);
+      }
+    } catch (err) {
+      console.error("Failed to fetch rubber data", err);
+    }
+  }
 
   async function fetchPrefs(rubberId: string) {
     try {
@@ -204,6 +216,36 @@ export default function RubberProfilePage() {
               </div>
               <Icons.Back size={14} className="text-slate-200 rotate-180 group-hover:text-primary transition-all group-hover:translate-x-1" />
             </button>
+          </Card>
+        </section>
+
+        {/* LINE Connection Status */}
+        <section>
+          <h2 className="text-[11px] font-black text-slate-900 uppercase tracking-[0.2em] mb-4 px-2">LINE Connectivity</h2>
+          <Card 
+            className={`p-6 rounded-[2rem] border transition-all duration-500 shadow-xl ${rubberData?.lineUserId ? 'bg-white border-green-100' : 'bg-slate-100 border-slate-200 shadow-none'}`}
+          >
+             <div className="flex items-center justify-between">
+               <div className="flex items-center gap-4">
+                  <div className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-500 shadow-lg ${rubberData?.lineUserId ? 'bg-green-50 text-green-500 shadow-green-100' : 'bg-slate-200 text-slate-400'}`}>
+                      <Icons.Line size={28} />
+                  </div>
+                  <div>
+                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">
+                        {rubberData?.lineUserId ? "Connected Account" : "Not Connected"}
+                      </p>
+                      <p className={`text-base font-black uppercase ${rubberData?.lineUserId ? 'text-green-600' : 'text-slate-500'}`}>
+                        {rubberData?.lineUserId ? (rubberData.lineDisplayName || "Connected") : "LINE NOT LINKED"}
+                      </p>
+                  </div>
+               </div>
+               <button 
+                  onClick={() => router.push("/rubber")}
+                  className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase transition-all ${rubberData?.lineUserId ? 'bg-green-50 text-green-600 border border-green-100' : 'bg-primary text-white shadow-lg shadow-primary/20'}`}
+               >
+                  {rubberData?.lineUserId ? "Reconnect" : "Connect"}
+               </button>
+             </div>
           </Card>
         </section>
 
