@@ -16,45 +16,71 @@ async function hashPin(pin: string) {
 }
 
 /**
+ * Self-healing: ensure walletPin column exists on the target table.
+ * Called before any PIN read/write operation.
+ */
+async function ensureWalletPinColumn(db: any, tableName: string) {
+  try {
+    await db.prepare(`ALTER TABLE ${tableName} ADD COLUMN walletPin TEXT`).run();
+  } catch (e) {
+    // Column already exists — ignore
+  }
+}
+
+/**
+ * Resolve the userId and tableName for PIN operations
+ */
+async function resolveUser(type: string, db: any, bodyUserId?: string): Promise<{ userId: string | null; tableName: string }> {
+  let userId: string | null = null;
+
+  if (type === "rubber") {
+    userId = await getRubberSession();
+    return { userId, tableName: "rubber_users" };
+  } else if (type === "store") {
+    userId = await getStoreSession();
+    return { userId, tableName: "stores" };
+  } else if (type === "customer") {
+    userId = bodyUserId || null;
+    return { userId, tableName: "users" };
+  }
+
+  return { userId: null, tableName: "users" };
+}
+
+/**
  * GET /api/user/pin?type=...
  * Check if the user has a PIN set
  */
 export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
-    const type = searchParams.get("type"); // 'rubber' or 'store'
+    const type = searchParams.get("type") || "customer";
     
     const context = getRequestContext();
     const db = context.env.DB;
     if (!db) return NextResponse.json({ error: "DB not found" }, { status: 500 });
+
+    const { tableName } = await resolveUser(type, db);
 
     let userId: string | null = null;
 
     if (type === "rubber") {
       userId = await getRubberSession();
     } else if (type === "store") {
-      const storeId = await getStoreSession();
-      if (storeId) {
-        const store = await db.prepare("SELECT ownerId FROM stores WHERE id = ?").bind(storeId).first() as any;
-        userId = store?.ownerId || null;
-      }
+      userId = await getStoreSession();
     } else if (type === "customer") {
       userId = searchParams.get("userId");
     }
+
     if (!userId) {
       console.warn(`[PIN] Unauthorized access attempt for type: ${type}`);
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    let user: any = null;
-    if (type === "rubber") {
-      user = await db.prepare("SELECT walletPin FROM rubber_users WHERE id = ?").bind(userId).first();
-    } else if (type === "store") {
-      const storeId = await getStoreSession();
-      user = await db.prepare("SELECT walletPin FROM stores WHERE id = ?").bind(storeId).first();
-    } else {
-      user = await db.prepare("SELECT walletPin FROM users WHERE id = ?").bind(userId).first();
-    }
+    // Self-healing: ensure column exists before reading
+    await ensureWalletPinColumn(db, tableName);
+
+    const user = await db.prepare(`SELECT walletPin FROM ${tableName} WHERE id = ?`).bind(userId).first() as any;
     
     return NextResponse.json({ 
       success: true, 
@@ -78,32 +104,27 @@ export async function POST(req: Request) {
     const db = context.env.DB;
     if (!db) return NextResponse.json({ error: "DB not found" }, { status: 500 });
 
-    let userId: string | null = null;
-
-    if (type === "rubber") {
-      userId = await getRubberSession();
-    } else if (type === "store") {
-      userId = await getStoreSession();
-    } else if (type === "customer") {
-      userId = bodyUserId;
-    }
+    const { userId, tableName } = await resolveUser(type, db, bodyUserId);
 
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const tableName = type === "rubber" ? "rubber_users" : type === "store" ? "stores" : "users";
+    // Self-healing: ensure column exists before any operation
+    await ensureWalletPinColumn(db, tableName);
 
     if (action === "setup") {
       if (!pin || pin.length !== 6) return NextResponse.json({ error: "Invalid PIN format" }, { status: 400 });
       
-      // Check if walletPin column exists (self-healing)
-      try {
-        await db.prepare(`ALTER TABLE ${tableName} ADD COLUMN walletPin TEXT`).run();
-      } catch (e) {}
-
       const hashedPin = await hashPin(pin);
-      await db.prepare(`UPDATE ${tableName} SET walletPin = ? WHERE id = ?`).bind(hashedPin, userId).run();
+      const result = await db.prepare(`UPDATE ${tableName} SET walletPin = ? WHERE id = ?`).bind(hashedPin, userId).run();
+      
+      // Verify the update actually affected a row
+      if (result?.meta?.changes === 0) {
+        console.error(`[PIN] No rows updated for ${type} userId=${userId} in table=${tableName}`);
+        return NextResponse.json({ error: "Account not found" }, { status: 404 });
+      }
+
       return NextResponse.json({ success: true });
     } 
     
