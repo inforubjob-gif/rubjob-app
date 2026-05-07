@@ -50,11 +50,15 @@ export async function POST(req: Request) {
       }
 
       const cookieStore = await cookies();
+      const hostname = req.headers.get("host") || "";
+      const rootDomain = ["rubjob-all.com", "rubjob.com", "rubjob-app.pages.dev", "lvh.me"].find(d => hostname.endsWith(d));
+
       cookieStore.set("provider_token", String(provider.id), {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
-        sameSite: "strict",
+        sameSite: "lax",
         path: "/",
+        domain: rootDomain ? `.${rootDomain}` : undefined,
         maxAge: 60 * 60 * 24 * 7 // 1 week
       });
 
