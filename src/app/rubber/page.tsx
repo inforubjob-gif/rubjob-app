@@ -417,16 +417,26 @@ export default function RubberDashboard() {
                     className="mt-4 bg-white text-emerald-600 font-black uppercase text-[10px] py-2 px-6 rounded-lg active:scale-95 transition-all"
                     onClick={async () => {
                       try {
-                        const res = await fetch(`/api/auth/link-line?accountId=${rubber.id}`);
+                        const res = await fetch(`/api/auth/link-line?accountId=${rubber?.id}`);
+                        if (!res.ok) {
+                          const errData = await res.json() as any;
+                          throw new Error(errData.error || "Failed to generate link token");
+                        }
                         const data = await res.json() as any;
                         const token = data.token;
                         const liffId = process.env.NEXT_PUBLIC_LIFF_ID_RUBBER || process.env.NEXT_PUBLIC_LIFF_ID;
-                        window.location.href = `https://liff.line.me/${liffId}/auth/link-line?type=rubber&id=${rubber.id}&token=${token}`;
-                      } catch (e) {
+                        
+                        if (!liffId) {
+                          throw new Error("LIFF ID is not configured (NEXT_PUBLIC_LIFF_ID_RUBBER)");
+                        }
+
+                        window.location.href = `https://liff.line.me/${liffId}/auth/link-line?type=rubber&id=${rubber?.id}&token=${token}`;
+                      } catch (e: any) {
+                        console.error("LINE Link Error:", e);
                         setAlertConfig({
                           isOpen: true,
                           title: t("common.error"),
-                          message: t("common.errorDesc"),
+                          message: e.message || t("common.errorDesc"),
                           type: "error",
                         });
                       }
