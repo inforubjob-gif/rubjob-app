@@ -1121,6 +1121,32 @@ export const en = {
       netCommission: "Net Profit (Pre-Remittance)",
       gpShare: "GP Split: Store-{store}% / Rubber-{rubber}%",
     },
+    orders: {
+      title: "Order Management",
+      subtitle: "Track and manage all orders in the system",
+      table: {
+        id: "Order ID",
+        status: "Status",
+        customer: "Customer",
+        store: "Store",
+        rubber: "Rubber",
+        total: "Total",
+        date: "Date",
+        photos: "Photos",
+        assignRider: "Assign Rider",
+        action: "Action",
+        noPhotos: "No Photos",
+        unassigned: "Unassigned",
+      },
+      markReady: "Mark Ready",
+      empty: "No orders found",
+      photoEvidence: "Photo Evidence",
+      waitAssign: "Wait for assignment",
+      sla: {
+        critical: "CRITICAL DELAY (5H+)",
+        breach: "SLA BREACH (3H+)",
+      }
+    },
     investor: {
       title: "Investor Relations",
       subtitle: "High-level financial reports and growth metrics",
@@ -1344,20 +1370,7 @@ export const en = {
         syncing: "Syncing promotions...",
       },
     },
-    orders: {
-      title: "Operational Orders",
-      subtitle: "Real-time tracking of operations across all stores",
-      empty: "No recent orders found",
-      table: {
-        id: "Order ID",
-        date: "Date",
-        status: "Status",
-        customer: "Customer",
-        total: "Total",
-        actions: "Actions",
-      },
-      viewJson: "View JSON Data",
-    },
+
     support: {
       title: "Support & Help Center",
       subtitle: "Live Inbox • All Channels",
