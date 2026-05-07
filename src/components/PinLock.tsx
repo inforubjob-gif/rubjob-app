@@ -200,10 +200,13 @@ export default function PinLock({ type, userId, onVerified, children }: PinLockP
         className="flex-1 flex flex-col items-center justify-center max-w-sm mx-auto w-full px-6 py-2 relative z-10 min-h-0"
         onClick={() => pinInputRef.current?.focus()}
       >
-        <div className="w-12 h-12 md:w-24 md:h-24 bg-white shadow-2xl shadow-primary/10 rounded-[1rem] md:rounded-[2.5rem] flex items-center justify-center mb-4 md:mb-10 border border-primary/10 relative shrink-0">
-          <div className="absolute inset-0 bg-primary/5 rounded-[1rem] md:rounded-[2.5rem] animate-pulse" />
-          <Icons.Shield size={24} className="text-primary relative z-10 md:hidden" fill={true} />
-          <Icons.Shield size={44} className="text-primary relative z-10 hidden md:block" fill={true} />
+        <div className="w-20 h-20 md:w-28 md:h-28 bg-white shadow-2xl shadow-primary/10 rounded-[1.5rem] md:rounded-[2rem] flex items-center justify-center mb-4 md:mb-10 border border-primary/10 relative shrink-0 p-4 md:p-6">
+          <div className="absolute inset-0 bg-primary/5 rounded-[1.5rem] md:rounded-[2rem] animate-pulse" />
+          <img 
+            src="/images/rubjob-complete_logo-color.png" 
+            alt="Rubjob Logo" 
+            className="w-full h-full object-contain relative z-10" 
+          />
         </div>
         
         <h1 className="text-lg md:text-2xl font-black text-slate-900 mb-1 text-center leading-tight">
