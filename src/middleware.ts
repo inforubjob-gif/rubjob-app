@@ -12,7 +12,7 @@ export const config = {
      * - lib (public lib assets)
      * - manifest.json (PWA manifest)
      */
-    "/((?!api|auth|_next/static|_next/image|favicon.ico|images|lib|manifest\\.json).*)",
+    "/((?!api|_next/static|_next/image|favicon.ico|images|lib|manifest\\.json).*)",
   ],
 };
 
