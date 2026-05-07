@@ -64,7 +64,7 @@ export async function GET(req: Request) {
  */
 export async function POST(req: Request) {
   try {
-    const { action, pin, type } = await req.json() as any;
+    const { action, pin, type, userId: bodyUserId } = await req.json() as any;
     
     const context = getRequestContext();
     const db = context.env.DB;
@@ -81,7 +81,7 @@ export async function POST(req: Request) {
         userId = store?.ownerId || null;
       }
     } else if (type === "customer") {
-      userId = (await req.clone().json() as any).userId;
+      userId = bodyUserId;
     }
 
     if (!userId) {

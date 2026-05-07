@@ -686,7 +686,7 @@ function SettingsContent() {
                         <input 
                           type="number" 
                           className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-6 py-4.5 text-2xl text-slate-900 font-black focus:border-indigo-500 transition-all outline-none font-mono text-center"
-                          placeholder="20"
+                          placeholder="10"
                           value={getSetting("gp_store_percent")}
                           onChange={(e) => updateLocalSetting("gp_store_percent", e.target.value)}
                         />
@@ -703,7 +703,7 @@ function SettingsContent() {
                         <input 
                           type="number" 
                           className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-6 py-4.5 text-2xl text-slate-900 font-black focus:border-orange-500 transition-all outline-none font-mono text-center"
-                          placeholder="10"
+                          placeholder="15"
                           value={getSetting("gp_rubber_percent")}
                           onChange={(e) => updateLocalSetting("gp_rubber_percent", e.target.value)}
                         />
@@ -712,22 +712,6 @@ function SettingsContent() {
                     </div>
                   </div>
 
-                  <div className="space-y-4">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t("admin.settings.financeLabelBasePayout")}</label>
-                    <div className="relative">
-                      <div className="absolute left-6 top-1/2 -translate-y-1/2 text-emerald-600 font-black text-xl">฿</div>
-                      <input 
-                        type="number" 
-                        className="w-full bg-emerald-50/30 border-2 border-emerald-100/50 rounded-xl pl-16 pr-6 py-6 text-3xl text-slate-900 font-black focus:border-emerald-500 transition-all outline-none font-mono"
-                        placeholder="25"
-                        value={getSetting("rubber_base_payout")}
-                        onChange={(e) => updateLocalSetting("rubber_base_payout", e.target.value)}
-                      />
-                      <div className="absolute right-8 top-1/2 -translate-y-1/2 flex items-center gap-2">
-                        <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                        <span className="text-[10px] font-black text-emerald-600 uppercase tracking-widest">{t("admin.settings.fixedRate")}</span>
-                      </div>
-                    </div>
                   </div>
                </div>
             </Card>

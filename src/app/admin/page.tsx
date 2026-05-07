@@ -11,7 +11,7 @@ export default function AdminDashboard() {
   const [stats, setStats] = useState({ 
     users: 0, rawUsers: 0, stores: 0, activeStores: 0, 
     orders: 0, revenue: 0, earnings: 0, 
-    gpStore: 20, gpRubber: 10,
+    gpStore: 10, gpRubber: 15,
     totalRubbers: 0, activeRubbers: 0,
     tables: [] as string[],
     inventory: {} as Record<string, number>,
@@ -39,8 +39,8 @@ export default function AdminDashboard() {
             orders: data.orders || 0,
             revenue: data.revenue || 0,
             earnings: data.earnings || 0,
-            gpStore: data.gpStore || 20,
-            gpRubber: data.gpRubber || 10,
+            gpStore: data.gpStore || 10,
+            gpRubber: data.gpRubber || 15,
             totalRubbers: data.totalRubbers || 0,
             activeRubbers: data.activeRubbers || 0,
             tables: data.tables || [],
@@ -115,7 +115,7 @@ export default function AdminDashboard() {
       ) : (
         <div className="stagger">
           <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div className="md:col-span-2 lg:col-span-1 group">
+            <Link href="/admin/users" className="md:col-span-2 lg:col-span-1 group">
               <Card className="h-full relative overflow-hidden bg-slate-900 border-slate-800 text-white shadow-2xl shadow-slate-900/20 group-hover:-translate-y-1 transition-all duration-500">
                 <div className="relative z-10 p-6">
                   <div className="flex items-center justify-between mb-8">
@@ -141,63 +141,69 @@ export default function AdminDashboard() {
                    <img src="/images/มาสคอต-เงิน.png" alt="" />
                 </div>
               </Card>
-            </div>
+            </Link>
 
             {/* Rubbers Card */}
-            <Card className="p-7 bg-white border border-slate-100 shadow-card hover:shadow-card-hover hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group">
-               <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-50/50 rounded-full blur-3xl -mr-12 -mt-12 group-hover:bg-emerald-100/50 transition-colors" />
-               <div className="w-14 h-14 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-6 shadow-inner group-hover:scale-110 transition-transform">
-                  <Icons.Car size={28} />
-               </div>
-               <div className="flex items-center justify-between mb-2">
-                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.15em]">{t("admin.dashboard.totalRubbers")}</p>
-                 <div className="flex items-center gap-1.5 bg-emerald-500/10 text-emerald-600 px-2 py-0.5 rounded-full border border-emerald-500/10">
-                    <div className="w-1 h-1 bg-emerald-500 rounded-full animate-pulse" />
-                    <span className="text-[9px] font-black">{Number(stats.activeRubbers)} {t("admin.dashboard.liveSync").split(' ')[0]}</span>
-                 </div>
-               </div>
-               <h2 className="text-4xl font-black text-slate-900 leading-none tracking-tighter">
-                 {Number(stats.activeRubbers)}<span className="text-slate-300 text-2xl font-bold mx-1">/</span>{Number(stats.totalRubbers)}
-               </h2>
-               <div className="mt-4 w-full h-1.5 bg-slate-50 rounded-full overflow-hidden">
-                  <div className="h-full bg-emerald-500 transition-all duration-1000 ease-out shadow-[0_0_8px_rgba(16,185,129,0.4)]" style={{ width: `${(Number(stats.activeRubbers) / (Number(stats.totalRubbers) || 1)) * 100}%` }} />
-               </div>
-            </Card>
+            <Link href="/admin/rubbers" className="block h-full group">
+              <Card className="p-7 h-full bg-white border border-slate-100 shadow-card hover:shadow-card-hover hover:-translate-y-1 transition-all duration-300 relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-50/50 rounded-full blur-3xl -mr-12 -mt-12 group-hover:bg-emerald-100/50 transition-colors" />
+                <div className="w-14 h-14 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-6 shadow-inner group-hover:scale-110 transition-transform">
+                   <Icons.Car size={28} />
+                </div>
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.15em]">{t("admin.dashboard.totalRubbers")}</p>
+                  <div className="flex items-center gap-1.5 bg-emerald-500/10 text-emerald-600 px-2 py-0.5 rounded-full border border-emerald-500/10">
+                     <div className="w-1 h-1 bg-emerald-500 rounded-full animate-pulse" />
+                     <span className="text-[9px] font-black">{Number(stats.activeRubbers)} {t("admin.dashboard.liveSync").split(' ')[0]}</span>
+                  </div>
+                </div>
+                <h2 className="text-4xl font-black text-slate-900 leading-none tracking-tighter">
+                  {Number(stats.activeRubbers)}<span className="text-slate-300 text-2xl font-bold mx-1">/</span>{Number(stats.totalRubbers)}
+                </h2>
+                <div className="mt-4 w-full h-1.5 bg-slate-50 rounded-full overflow-hidden">
+                   <div className="h-full bg-emerald-500 transition-all duration-1000 ease-out shadow-[0_0_8px_rgba(16,185,129,0.4)]" style={{ width: `${(Number(stats.activeRubbers) / (Number(stats.totalRubbers) || 1)) * 100}%` }} />
+                </div>
+              </Card>
+            </Link>
 
             {/* Stores Card */}
-            <Card className="p-7 bg-white border border-slate-100 shadow-card hover:shadow-card-hover hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group">
-               <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 rounded-full blur-3xl -mr-12 -mt-12 group-hover:bg-primary/10 transition-colors" />
-               <div className="w-14 h-14 rounded-xl bg-primary/10 text-primary flex items-center justify-center mb-6 shadow-inner group-hover:scale-110 transition-transform">
-                  <Icons.Office size={28} />
-               </div>
-               <div className="flex items-center justify-between mb-2">
-                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.15em]">{t("admin.nav.stores")}</p>
-                 <div className="flex items-center gap-1.5 bg-primary/10 text-primary px-2 py-0.5 rounded-full border border-primary/20">
-                    <div className="w-1 h-1 bg-primary rounded-full animate-pulse" />
-                    <span className="text-[9px] font-black">{Number(stats.activeStores)} {t("admin.dashboard.liveSync").split(' ')[0]}</span>
-                 </div>
-               </div>
-               <h2 className="text-4xl font-black text-slate-900 leading-none tracking-tighter">
-                 {Number(stats.activeStores)}<span className="text-slate-300 text-2xl font-bold mx-1">/</span>{Number(stats.stores)}
-               </h2>
-               <div className="mt-4 w-full h-1.5 bg-slate-50 rounded-full overflow-hidden">
-                  <div className="h-full bg-primary transition-all duration-1000 ease-out shadow-[0_0_8px_rgba(255,159,28,0.4)]" style={{ width: `${(Number(stats.activeStores) / (Number(stats.stores) || 1)) * 100}%` }} />
-               </div>
-            </Card>
+            <Link href="/admin/stores" className="block h-full group">
+              <Card className="p-7 h-full bg-white border border-slate-100 shadow-card hover:shadow-card-hover hover:-translate-y-1 transition-all duration-300 relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 rounded-full blur-3xl -mr-12 -mt-12 group-hover:bg-primary/10 transition-colors" />
+                <div className="w-14 h-14 rounded-xl bg-primary/10 text-primary flex items-center justify-center mb-6 shadow-inner group-hover:scale-110 transition-transform">
+                   <Icons.Office size={28} />
+                </div>
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.15em]">{t("admin.nav.stores")}</p>
+                  <div className="flex items-center gap-1.5 bg-primary/10 text-primary px-2 py-0.5 rounded-full border border-primary/20">
+                     <div className="w-1 h-1 bg-primary rounded-full animate-pulse" />
+                     <span className="text-[9px] font-black">{Number(stats.activeStores)} {t("admin.dashboard.liveSync").split(' ')[0]}</span>
+                  </div>
+                </div>
+                <h2 className="text-4xl font-black text-slate-900 leading-none tracking-tighter">
+                  {Number(stats.activeStores)}<span className="text-slate-300 text-2xl font-bold mx-1">/</span>{Number(stats.stores)}
+                </h2>
+                <div className="mt-4 w-full h-1.5 bg-slate-50 rounded-full overflow-hidden">
+                   <div className="h-full bg-primary transition-all duration-1000 ease-out shadow-[0_0_8px_rgba(255,159,28,0.4)]" style={{ width: `${(Number(stats.activeStores) / (Number(stats.stores) || 1)) * 100}%` }} />
+                </div>
+              </Card>
+            </Link>
 
             {/* Orders Card */}
-            <Card className="p-7 bg-white border border-slate-100 shadow-card hover:shadow-card-hover hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group">
-               <div className="absolute top-0 right-0 w-24 h-24 bg-amber-50/50 rounded-full blur-3xl -mr-12 -mt-12 group-hover:bg-amber-100/50 transition-colors" />
-               <div className="w-14 h-14 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center mb-6 shadow-inner group-hover:scale-110 transition-transform">
-                  <Icons.FileText size={28} />
-               </div>
-               <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.15em] mb-2">{t("admin.dashboard.totalOrders")}</p>
-               <h2 className="text-4xl font-black text-slate-900 leading-none tracking-tighter">{Number(stats.orders).toLocaleString()}</h2>
-               <div className="mt-4 flex items-center gap-1.5 font-bold text-[10px] text-slate-300">
-                  <span className="w-1 h-1 bg-slate-200 rounded-full" />
-                  {t("admin.dashboard.processedVol")}
-               </div>
-            </Card>
+            <Link href="/admin/orders" className="block h-full group">
+              <Card className="p-7 h-full bg-white border border-slate-100 shadow-card hover:shadow-card-hover hover:-translate-y-1 transition-all duration-300 relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-24 h-24 bg-amber-50/50 rounded-full blur-3xl -mr-12 -mt-12 group-hover:bg-amber-100/50 transition-colors" />
+                <div className="w-14 h-14 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center mb-6 shadow-inner group-hover:scale-110 transition-transform">
+                   <Icons.FileText size={28} />
+                </div>
+                <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.15em] mb-2">{t("admin.dashboard.totalOrders")}</p>
+                <h2 className="text-4xl font-black text-slate-900 leading-none tracking-tighter">{Number(stats.orders).toLocaleString()}</h2>
+                <div className="mt-4 flex items-center gap-1.5 font-bold text-[10px] text-slate-300">
+                   <span className="w-1 h-1 bg-slate-200 rounded-full" />
+                   {t("admin.dashboard.processedVol")}
+                </div>
+              </Card>
+            </Link>
 
             {/* Gross Revenue Card */}
             <Card className="p-7 bg-white border border-slate-100 shadow-card hover:shadow-card-hover hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group">

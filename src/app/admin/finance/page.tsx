@@ -66,7 +66,7 @@ export default function FinanceAdminPage() {
 
   const totalGross = transactions.reduce((acc, t) => acc + (t.totalPrice || 0), 0);
   const totalPlatformComission = transactions.reduce((acc, t) => {
-    const gp = t.gpPercent ? t.gpPercent / 100 : 0.3;
+    const gp = t.gpPercent ? t.gpPercent / 100 : 0.1;
     return acc + (t.totalPrice * gp);
   }, 0);
   const totalPartnerCut = totalGross - totalPlatformComission;
@@ -98,7 +98,7 @@ export default function FinanceAdminPage() {
          <Card className="p-6 bg-white border border-slate-200/60 shadow-sm">
             <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{t('admin.finance.stats.partnerDebt')}</p>
             <p className="text-2xl font-black text-rose-600">฿{totalPartnerCut.toLocaleString()}</p>
-            <p className="mt-4 text-[10px] font-bold text-slate-400 italic">Simulated 70:30 Split Ratio</p>
+            <p className="mt-4 text-[10px] font-bold text-slate-400 italic">Simulated 90:10 Split Ratio</p>
          </Card>
          <Card className="p-6 bg-slate-900 text-white shadow-2xl shadow-slate-300 border-none">
             <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{t('admin.finance.stats.platformCom')}</p>
@@ -166,7 +166,7 @@ export default function FinanceAdminPage() {
                        </td>
                        <td className="px-8 py-5 text-right font-black text-slate-900">฿{tx.totalPrice.toLocaleString()}</td>
                        <td className="px-8 py-5 text-right font-black text-emerald-600">
-                          ฿{(tx.totalPrice * (tx.gpPercent ? tx.gpPercent / 100 : 0.3)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                          ฿{(tx.totalPrice * (tx.gpPercent ? tx.gpPercent / 100 : 0.1)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                        </td>
                        <td className="px-8 py-5 text-right">
                           <button className="text-[9px] font-black uppercase tracking-widest text-primary hover:underline">{t('admin.finance.action.verify')}</button>

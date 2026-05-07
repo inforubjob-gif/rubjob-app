@@ -183,7 +183,7 @@ export default function PinLock({ type, userId, onVerified, children }: PinLockP
       <div className="absolute top-[-10%] right-[-10%] w-64 h-64 bg-primary/5 blur-3xl rounded-full pointer-events-none" />
 
       {/* Top Header */}
-      <header className="px-5 pt-14 pb-4 flex items-center relative z-[10002]">
+      <header className="px-5 pt-8 md:pt-14 pb-2 flex items-center relative z-[10002]">
         <button
           onClick={(e) => {
             e.preventDefault();
@@ -196,32 +196,32 @@ export default function PinLock({ type, userId, onVerified, children }: PinLockP
         </button>
       </header>
 
-      {/* Main Content Container */}
       <div 
-        className="flex-1 flex flex-col items-center justify-start max-w-sm mx-auto w-full pt-10 pb-20 relative z-10"
+        className="flex-1 flex flex-col items-center justify-center max-w-sm mx-auto w-full px-6 py-2 relative z-10 min-h-0"
         onClick={() => pinInputRef.current?.focus()}
       >
-        <div className="w-24 h-24 bg-white shadow-2xl shadow-primary/10 rounded-[2.5rem] flex items-center justify-center mb-10 border border-primary/10 relative">
-          <div className="absolute inset-0 bg-primary/5 rounded-[2.5rem] animate-pulse" />
-          <Icons.Shield size={44} className="text-primary relative z-10" fill={true} />
+        <div className="w-12 h-12 md:w-24 md:h-24 bg-white shadow-2xl shadow-primary/10 rounded-[1rem] md:rounded-[2.5rem] flex items-center justify-center mb-4 md:mb-10 border border-primary/10 relative shrink-0">
+          <div className="absolute inset-0 bg-primary/5 rounded-[1rem] md:rounded-[2.5rem] animate-pulse" />
+          <Icons.Shield size={24} className="text-primary relative z-10 md:hidden" fill={true} />
+          <Icons.Shield size={44} className="text-primary relative z-10 hidden md:block" fill={true} />
         </div>
         
-        <h1 className="text-2xl font-black text-slate-900 mb-3 text-center px-6 leading-tight">
+        <h1 className="text-lg md:text-2xl font-black text-slate-900 mb-1 text-center leading-tight">
           {step === "enter" ? t(`${type}.wallet.pin.enterTitle`) : 
            step === "setup" ? t(`${type}.wallet.pin.setupTitle`) : 
            t(`${type}.wallet.pin.confirmPin`)}
         </h1>
-        <p className="text-[13px] font-bold text-slate-400 mb-12 text-center px-10 leading-relaxed">
+        <p className="text-[10px] md:text-[13px] font-bold text-slate-400 mb-6 md:mb-12 text-center leading-relaxed">
           {t(`${type}.wallet.pin.instruction`)}
         </p>
 
         {/* PIN Dots Area */}
-        <div className="relative mb-14">
-          <div className="flex gap-5 relative z-20">
+        <div className="relative mb-6 md:mb-14">
+          <div className="flex gap-4 md:gap-5 relative z-20">
             {[...Array(6)].map((_, i) => (
               <div 
                 key={i} 
-                className={`w-5 h-5 rounded-full border-2 transition-all duration-300 ${
+                className={`w-4 h-4 md:w-5 md:h-5 rounded-full border-2 transition-all duration-300 ${
                   (step === "confirm" ? i < confirmPin.length : i < pin.length)
                     ? "bg-primary border-primary scale-110 shadow-xl shadow-primary/30" 
                     : "bg-white border-slate-200"
@@ -229,8 +229,6 @@ export default function PinLock({ type, userId, onVerified, children }: PinLockP
               />
             ))}
           </div>
-          
-          {/* Subtle line under dots */}
           <div className="absolute -bottom-4 left-0 right-0 h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
         </div>
 
@@ -244,15 +242,15 @@ export default function PinLock({ type, userId, onVerified, children }: PinLockP
         )}
 
         {/* Interaction Area */}
-        <div className="relative z-[60] flex flex-col items-center gap-6 mt-auto mb-10">
+        <div className="relative z-[60] flex flex-col items-center gap-4 mt-4">
           <button 
             onClick={() => pinInputRef.current?.focus()}
             className="flex flex-col items-center gap-2 group"
           >
-            <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center text-slate-300 group-active:scale-95 transition-all">
-              <Icons.Lock size={20} />
+            <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-slate-100 flex items-center justify-center text-slate-300 group-active:scale-95 transition-all">
+              <Icons.Lock size={18} />
             </div>
-            <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] animate-pulse">
+            <span className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] animate-pulse">
               {t("common.tapToEnterPin") || "แตะเพื่อใส่รหัส"}
             </span>
           </button>
@@ -265,7 +263,7 @@ export default function PinLock({ type, userId, onVerified, children }: PinLockP
                  setPin(""); 
                  setConfirmPin(""); 
                }}
-               className="px-6 py-2 rounded-full bg-slate-100 text-[10px] font-black text-slate-500 uppercase tracking-widest hover:bg-slate-200 transition-colors"
+               className="px-4 py-1.5 rounded-full bg-slate-100 text-[9px] font-black text-slate-500 uppercase tracking-widest hover:bg-slate-200 transition-colors"
              >
                {t("common.back")}
              </button>

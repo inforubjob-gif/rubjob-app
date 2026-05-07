@@ -68,12 +68,12 @@ export default function ActivityPage() {
                 <div className="w-16 h-16 shrink-0 transition-transform active:scale-95">
                   <img 
                     src={
-                      order.status === "completed" ? "/images/icon/เสร็จสิ้น.png" :
-                      order.status === "washing" ? "/images/icon/icon-กำลังซัก.png" :
-                      order.status === "delivering_to_customer" ? "/images/icon/icon-รับเบอร์กำลังนำผ้าส่งคืน.png" :
-                      order.status === "delivering_to_store" ? "/images/icon/icon-รับเบอร์กำลังนำผ้าส่งร้าน.png" :
-                      order.status === "picking_up" ? "/images/icon/icon-รับเบอร์กำลังเข้ารับผ้า.png" :
-                      "/images/icon/icon-ร้านซักผ้า.png"
+                      order.status === "completed" ? "/images/icon/status-completed.png" :
+                      order.status === "washing" ? "/images/icon/status-washing.png" :
+                      order.status === "delivering_to_customer" ? "/images/icon/status-delivering-customer.png" :
+                      order.status === "delivering_to_store" ? "/images/icon/status-delivering-store.png" :
+                      order.status === "picking_up" ? "/images/icon/status-picking-up.png" :
+                      "/images/icon/status-store.png"
                     } 
                     alt={order.status}
                     className="w-full h-full object-contain"
