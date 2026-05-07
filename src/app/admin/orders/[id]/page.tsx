@@ -1,13 +1,15 @@
 "use client";
 
+export const runtime = "edge";
+
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Card from "@/components/ui/Card";
 import Badge, { statusToBadgeVariant } from "@/components/ui/Badge";
 import { Icons } from "@/components/ui/Icons";
 import { useTranslation } from "@/components/providers/LanguageProvider";
+import { useToast } from "@/components/providers/ToastProvider";
 import GlobalSelect from "@/components/ui/GlobalSelect";
-import { showToast } from "@/components/ui/Toast";
 import Modal from "@/components/ui/Modal";
 
 const STATUS_FLOW = [
@@ -30,6 +32,7 @@ export default function AdminOrderDetailPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
   const { t } = useTranslation();
+  const { showToast } = useToast();
   const [order, setOrder] = useState<any>(null);
   const [riders, setRiders] = useState<any[]>([]);
   const [stores, setStores] = useState<any[]>([]);

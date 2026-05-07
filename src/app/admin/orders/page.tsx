@@ -8,10 +8,11 @@ import { Icons } from "@/components/ui/Icons";
 import { useTranslation } from "@/components/providers/LanguageProvider";
 import Modal from "@/components/ui/Modal";
 import GlobalSelect from "@/components/ui/GlobalSelect";
-import { showToast } from "@/components/ui/Toast";
+import { useToast } from "@/components/providers/ToastProvider";
 
 export default function AdminOrdersPage() {
   const { t } = useTranslation();
+  const { showToast } = useToast();
   const [orders, setOrders] = useState<any[]>([]);
   const [riders, setRiders] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
