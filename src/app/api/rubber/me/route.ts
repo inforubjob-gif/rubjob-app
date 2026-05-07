@@ -17,6 +17,10 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: "Database not connected" }, { status: 500 });
     }
 
+    // Ensure schema exists
+    const { ensureSchema } = await import("@/lib/db-init");
+    await ensureSchema(db);
+
     const rubber = await db.prepare(`
       SELECT id, name, email, status, pictureUrl, phone FROM rubber_users WHERE id = ?
     `).bind(rubberId).first();
