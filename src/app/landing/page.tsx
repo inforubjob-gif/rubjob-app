@@ -207,14 +207,7 @@ export default function LandingPage() {
           
           {/* Left Text Column */}
           <div className="flex-1 text-center lg:text-left z-20">
-            <div
-              className={`inline-flex items-center gap-2 px-5 py-2 bg-primary text-white rounded-full font-black text-[10px] uppercase tracking-[0.2em] mb-8 shadow-xl shadow-primary/20 transition-all duration-700 ${
-                mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
-              }`}
-            >
-              <span className="w-1.5 h-1.5 bg-white rounded-full animate-pulse" />
-              {t("landing.hero.badge")}
-            </div>
+
 
             <h1
               className={`text-6xl lg:text-7xl xl:text-[88px] font-black leading-[1.05] tracking-tight text-slate-900 mb-6 transition-all duration-700 delay-100 ${
