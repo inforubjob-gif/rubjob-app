@@ -73,7 +73,7 @@ export default function MapPicker({ lat, lng, onChange }: MapPickerProps) {
   const center: [number, number] = lat !== 0 && lng !== 0 ? [lat, lng] : [13.7563, 100.5018]; // Default to Bangkok
 
   return (
-    <div className="h-full w-full rounded-xl overflow-hidden border-2 border-slate-100 z-0">
+    <div className="min-h-[400px] h-full w-full rounded-xl overflow-hidden border-2 border-slate-100 z-0">
       <MapContainer center={center} zoom={13} style={{ height: "100%", width: "100%" }}>
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
