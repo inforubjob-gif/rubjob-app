@@ -191,12 +191,34 @@ export default function RubberDashboard() {
     return () => clearInterval(interval);
   }, [rubber?.id, workStatus, availableJobs.length]);
 
-  // Request notification permission
+  // 📱 PWA Installation Logic
+  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   useEffect(() => {
-    if (typeof window !== "undefined" && "Notification" in window) {
-      Notification.requestPermission();
-    }
+    const handleBeforeInstallPrompt = (e: any) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+    };
+    window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
+    return () => window.removeEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
   }, []);
+
+  const handleInstallClick = async () => {
+    if (!deferredPrompt) {
+      // Fallback for iOS/Safari or when prompt not available
+      setAlertConfig({
+        isOpen: true,
+        title: "ติดตั้งแอป",
+        message: "สำหรับ iPhone ให้กดปุ่ม 'แชร์' ด้านล่าง แล้วเลือก 'เพิ่มลงในหน้าจอโฮม' ครับ",
+        type: "warning"
+      });
+      return;
+    }
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    if (outcome === "accepted") {
+      setDeferredPrompt(null);
+    }
+  };
 
   return (
     <div className="flex flex-col min-h-screen bg-slate-50 relative overflow-hidden">
@@ -384,7 +406,7 @@ export default function RubberDashboard() {
             <Card className="bg-gradient-to-r from-green-600 to-emerald-500 border-none text-white p-5 shadow-xl shadow-green-900/20">
               <div className="flex items-start gap-4">
                 <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center shrink-0">
-                  <Icons.Bell className="text-white" size={24} />
+                  <Icons.Line size={32} />
                 </div>
                 <div className="flex-1">
                   <h3 className="font-black text-base uppercase leading-tight">เชื่อมต่อ LINE รับงาน</h3>
@@ -392,7 +414,7 @@ export default function RubberDashboard() {
                   <Button 
                     variant="secondary" 
                     size="sm" 
-                    className="mt-4 bg-white text-emerald-600 font-black uppercase text-[10px] py-2 px-6 rounded-lg"
+                    className="mt-4 bg-white text-emerald-600 font-black uppercase text-[10px] py-2 px-6 rounded-lg active:scale-95 transition-all"
                     onClick={async () => {
                       try {
                         const res = await fetch(`/api/auth/link-line?accountId=${rubber.id}`);
@@ -417,14 +439,26 @@ export default function RubberDashboard() {
             </Card>
           )}
 
-          <Card className="bg-slate-900/50 backdrop-blur-xl border border-white/5 text-white p-5">
+          <Card 
+            className="bg-slate-900/50 backdrop-blur-xl border border-white/5 text-white p-5 active:bg-slate-900/70 transition-colors cursor-pointer"
+            onClick={handleInstallClick}
+          >
             <div className="flex items-start gap-4">
               <div className="w-12 h-12 bg-primary/20 rounded-2xl flex items-center justify-center shrink-0">
                 <Icons.Logo variant="icon" size={24} />
               </div>
               <div className="flex-1">
-                <h3 className="font-black text-sm uppercase leading-tight">ติดตั้งแอปบนหน้าจอ</h3>
-                <p className="text-[10px] text-white/60 font-bold mt-1 leading-relaxed">กดที่ปุ่ม 'แชร์' ด้านล่าง แล้วเลือก 'เพิ่มลงในหน้าจอโฮม' เพื่อการใช้งานที่สะดวกเหมือนแอปจริงครับ</p>
+                <div className="flex items-center justify-between">
+                  <h3 className="font-black text-sm uppercase leading-tight">ติดตั้งแอปบนหน้าจอ</h3>
+                  {deferredPrompt && (
+                    <span className="text-[8px] bg-primary px-2 py-0.5 rounded-full animate-pulse">แนะนำ</span>
+                  )}
+                </div>
+                <p className="text-[10px] text-white/60 font-bold mt-1 leading-relaxed">
+                  {deferredPrompt 
+                    ? "กดที่นี่เพื่อติดตั้งแอป Rubjob ลงบนเครื่องของคุณได้ทันทีครับ" 
+                    : "กดที่ปุ่ม 'แชร์' ด้านล่าง แล้วเลือก 'เพิ่มลงในหน้าจอโฮม' เพื่อการใช้งานที่สะดวกเหมือนแอปจริงครับ"}
+                </p>
               </div>
             </div>
           </Card>
