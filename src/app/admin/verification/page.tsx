@@ -14,6 +14,7 @@ export default function VerificationCenterPage() {
   const [docs, setDocs] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedDoc, setSelectedDoc] = useState<any>(null);
+  const [reviewNotes, setReviewNotes] = useState("");
 
   useEffect(() => {
     fetchPendingDocs();
@@ -37,12 +38,13 @@ export default function VerificationCenterPage() {
       const res = await fetch("/api/admin/verification", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id, status, notes }),
+        body: JSON.stringify({ id, status, notes, partnerType: selectedDoc?.partnerType }),
       });
       if (res.ok) {
         showToast(`Document ${status}`, "success");
         setDocs(prev => prev.filter(d => d.id !== id));
         setSelectedDoc(null);
+        setReviewNotes("");
       }
     } catch (err) {
       showToast("Operation failed", "error");
@@ -102,8 +104,8 @@ export default function VerificationCenterPage() {
                    </div>
                 </div>
                 <div className="flex gap-2">
-                   <Button variant={"success" as any} size="sm" onClick={() => updateDocStatus(selectedDoc.id, 'verified')}>Approve</Button>
-                   <Button variant={"danger" as any} size="sm" onClick={() => updateDocStatus(selectedDoc.id, 'rejected')}>Reject</Button>
+                   <Button variant={"success" as any} size="sm" onClick={() => updateDocStatus(selectedDoc.id, 'verified', reviewNotes)}>Approve</Button>
+                   <Button variant={"danger" as any} size="sm" onClick={() => updateDocStatus(selectedDoc.id, 'rejected', reviewNotes)}>Reject</Button>
                 </div>
               </div>
 
@@ -126,6 +128,8 @@ export default function VerificationCenterPage() {
                  <div>
                     <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block">Admin Review Note</label>
                     <textarea 
+                      value={reviewNotes}
+                      onChange={(e) => setReviewNotes(e.target.value)}
                       placeholder="เหตุผลประกอบการพิจารณา (เช่น รูปภาพไม่ชัดเจน, ข้อมูลไม่ตรง)..."
                       className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl p-4 text-sm font-medium focus:border-primary outline-none transition-all"
                       rows={3}

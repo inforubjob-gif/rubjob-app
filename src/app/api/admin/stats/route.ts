@@ -67,19 +67,25 @@ export async function GET(req: Request) {
     const rubberEarnings = (totalDelivery * gpRubber) / 100;
     const totalPlatformEarnings = storeEarnings + rubberEarnings;
 
-    // 2. Full Table Inventory (Count rows in every table)
+    // 2. Full Table Inventory (Count rows in every table - batched for efficiency)
     const inventory: Record<string, number> = {};
     const tableListResult = await db.prepare("SELECT name FROM sqlite_master WHERE type='table'").all();
     const tableNamesList = tableListResult.results.map((r: any) => r.name).filter((n: string) => !n.startsWith('_'));
     
-    // Batch query counts for efficiency
-    for (const tableName of tableNamesList) {
-      try {
-        const countRes = await db.prepare(`SELECT COUNT(*) as count FROM "${tableName}"`).first();
-        inventory[tableName] = (countRes as any)?.count || 0;
-      } catch (err) {
-        inventory[tableName] = -1; // Error marker
+    // Use db.batch() to count all tables in a single round-trip
+    try {
+      const countQueries = tableNamesList.map((name: string) => 
+        db.prepare(`SELECT '${name}' as tbl, COUNT(*) as count FROM "${name}"`)
+      );
+      if (countQueries.length > 0) {
+        const batchResults = await db.batch(countQueries);
+        batchResults.forEach((result: any) => {
+          const row = result.results?.[0];
+          if (row) inventory[row.tbl] = row.count || 0;
+        });
       }
+    } catch (err) {
+      console.warn("Batch inventory count failed, skipping:", err);
     }
 
     return NextResponse.json({ 
