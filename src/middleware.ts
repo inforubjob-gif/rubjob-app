@@ -12,7 +12,7 @@ export const config = {
      * - lib (public lib assets)
      * - manifest.json (PWA manifest)
      */
-    "/((?!api|_next/static|_next/image|favicon.ico|images|lib|manifest\\.json).*)",
+    "/((?!api|auth|_next/static|_next/image|favicon.ico|images|lib|manifest\\.json).*)",
   ],
 };
 
@@ -121,7 +121,7 @@ export default function middleware(req: NextRequest) {
 
     // For root domain, rewrite paths to serve from the /landing directory
     // e.g. rubjob.com/register/rubber -> serves from src/app/landing/register/rubber
-    if (!pathname.startsWith("/landing") && !pathname.startsWith("/api") && !pathname.includes(".")) {
+    if (!pathname.startsWith("/landing") && !pathname.startsWith("/api") && !pathname.startsWith("/auth") && !pathname.includes(".")) {
       url.pathname = `/landing${pathname === "/" ? "" : pathname}`;
       return NextResponse.rewrite(url);
     }
@@ -157,7 +157,7 @@ export default function middleware(req: NextRequest) {
 
     let response;
     // Rewrite: prepend portal prefix if not already present
-    if (targetPrefix && !pathname.startsWith(targetPrefix)) {
+    if (targetPrefix && !pathname.startsWith(targetPrefix) && !pathname.startsWith("/auth")) {
       url.pathname = `${targetPrefix}${pathname}`;
       response = NextResponse.rewrite(url);
     } else if (targetPrefix && pathname.startsWith(targetPrefix)) {
