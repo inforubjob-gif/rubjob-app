@@ -129,8 +129,14 @@ export default function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
-  // ─── Known portal subdomains (admin, rubber, store, app) ───
+  // 3. Subdomain rewrite logic
   const targetPrefix = SUBDOMAIN_MAP[subdomain];
+
+  // Shared routes (like /auth) should NOT be rewritten to a subdomain folder.
+  // They serve as global routes accessible from all portals.
+  if (pathname.startsWith("/auth")) {
+    return NextResponse.next();
+  }
 
   if (targetPrefix !== undefined) {
     // Subdomain isolation: redirect cross-portal access to the correct subdomain
