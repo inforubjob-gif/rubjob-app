@@ -5,8 +5,12 @@ import { useRouter } from "next/navigation";
 import { Icons } from "@/components/ui/Icons";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
+import GlobalInput from "@/components/ui/GlobalInput";
+import ConfirmModal from "@/components/ui/ConfirmModal";
+import { useTranslation } from "@/components/providers/LanguageProvider";
 
 export default function RubberRegisterPage() {
+  const { t } = useTranslation();
   const router = useRouter();
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
@@ -25,6 +29,7 @@ export default function RubberRegisterPage() {
   });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, field: string) => {
     const file = e.target.files?.[0];
@@ -67,12 +72,12 @@ export default function RubberRegisterPage() {
       const data = await res.json() as any;
 
       if (res.ok) {
-        router.push("/rubber/login?registered=true");
+        setShowSuccessModal(true);
       } else {
-        setError(data.error || "Failed to register");
+        setError(data.error || t("common.error"));
       }
     } catch (err) {
-      setError("An error occurred. Please try again.");
+      setError(t("common.errorDesc"));
     } finally {
       setIsLoading(false);
     }
@@ -95,18 +100,18 @@ export default function RubberRegisterPage() {
           <div className="w-8 h-8 rounded-xl bg-slate-900 text-white flex items-center justify-center group-hover:bg-primary transition-colors">
             <Icons.Back size={16} />
           </div>
-          <span className="text-[10px] font-black uppercase tracking-widest text-slate-900">Back to Home</span>
+          <span className="text-[10px] font-black uppercase tracking-widest text-slate-900">{t("common.back")}</span>
         </button>
 
         {/* Header */}
         <div className="text-center mb-16">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-white border border-slate-200 rounded-full text-[10px] font-black uppercase tracking-widest text-slate-400 mb-8 shadow-sm">
-             Rubber Onboarding
+             {t("register.rubber.title")}
           </div>
           <h1 className="text-4xl md:text-6xl font-black tracking-tight leading-tight mb-4">
-             ร่วมทีม <span className="text-primary">RUBJOB</span>
+             {t("register.rubber.subtitle").split(" ")[0]} <span className="text-primary">{t("register.rubber.subtitle").split(" ")[1] || "RUBJOB"}</span>
           </h1>
-          <p className="text-slate-500 font-medium text-lg">สร้างรายได้ที่มั่นคง พร้อมอิสระในการใช้ชีวิต</p>
+          <p className="text-slate-500 font-medium text-lg">{t("register.rubber.subtitle")}</p>
           
           {/* Progress Bar */}
           <div className="flex items-center justify-center gap-3 mt-12">
@@ -130,28 +135,46 @@ export default function RubberRegisterPage() {
                       <Icons.User size={24} />
                    </div>
                    <div>
-                      <h3 className="text-xl font-black text-slate-900 leading-none">ข้อมูลพื้นฐาน</h3>
+                      <h3 className="text-xl font-black text-slate-900 leading-none">{t("register.rubber.step1Title")}</h3>
                       <p className="text-xs font-bold text-slate-400 mt-1 uppercase tracking-widest">General Information</p>
                    </div>
                 </div>
                 <div className="grid grid-cols-1 gap-6">
-                  <div className="space-y-2">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">ชื่อ-นามสกุล (ภาษาไทย)</label>
-                    <input type="text" required className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-6 py-4.5 text-lg font-bold focus:border-primary focus:bg-white outline-none transition-all placeholder:text-slate-300" placeholder="สมชาย รับจบ" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">อีเมล</label>
-                    <input type="email" required className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-6 py-4.5 text-lg font-bold focus:border-primary focus:bg-white outline-none transition-all" placeholder="rubber@rubjob.com" value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} />
-                  </div>
+                  <GlobalInput 
+                    label={t("register.rubber.nameLabel")}
+                    required
+                    variant="large"
+                    placeholder="สมชาย รับจบ"
+                    value={formData.name}
+                    onChange={(e) => setFormData({...formData, name: e.target.value})}
+                  />
+                  <GlobalInput 
+                    label={t("register.rubber.emailLabel")}
+                    type="email"
+                    required
+                    variant="large"
+                    placeholder="rubber@rubjob.com"
+                    value={formData.email}
+                    onChange={(e) => setFormData({...formData, email: e.target.value})}
+                  />
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">เบอร์โทรศัพท์</label>
-                      <input type="tel" required className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-6 py-4.5 text-lg font-bold focus:border-primary focus:bg-white outline-none transition-all" value={formData.phone} onChange={(e) => setFormData({...formData, phone: e.target.value})} />
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">รหัสผ่าน</label>
-                      <input type="password" required className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-6 py-4.5 text-lg font-bold focus:border-primary focus:bg-white outline-none transition-all" placeholder="••••••••" value={formData.password} onChange={(e) => setFormData({...formData, password: e.target.value})} />
-                    </div>
+                    <GlobalInput 
+                      label={t("register.rubber.phoneLabel")}
+                      type="tel"
+                      required
+                      variant="large"
+                      value={formData.phone}
+                      onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                    />
+                    <GlobalInput 
+                      label={t("register.rubber.passwordLabel")}
+                      type="password"
+                      required
+                      variant="large"
+                      placeholder="••••••••"
+                      value={formData.password}
+                      onChange={(e) => setFormData({...formData, password: e.target.value})}
+                    />
                   </div>
                 </div>
               </div>
@@ -164,7 +187,7 @@ export default function RubberRegisterPage() {
                       <Icons.Truck size={24} />
                    </div>
                    <div>
-                      <h3 className="text-xl font-black text-slate-900 leading-none">ข้อมูลพาหนะและยืนยันตัวตน</h3>
+                      <h3 className="text-xl font-black text-slate-900 leading-none">{t("register.rubber.step2Title")}</h3>
                       <p className="text-xs font-bold text-slate-400 mt-1 uppercase tracking-widest">Vehicle & Verification</p>
                    </div>
                 </div>
@@ -174,19 +197,29 @@ export default function RubberRegisterPage() {
                       <div className={`w-16 h-16 rounded-2xl flex items-center justify-center transition-colors ${formData.vehicleType === v ? 'bg-primary text-white' : 'bg-slate-100'}`}>
                         {v === 'bike' ? <Icons.Bike size={32} /> : <Icons.Truck size={32} />}
                       </div>
-                      <span className="text-xs font-black uppercase tracking-widest">{v === 'bike' ? 'มอเตอร์ไซค์' : 'รถยนต์'}</span>
+                      <span className="text-xs font-black uppercase tracking-widest">{v === 'bike' ? t("register.rubber.vehicleBike") : t("register.rubber.vehicleCar")}</span>
                     </button>
                   ))}
                 </div>
                 <div className="space-y-6">
-                  <div className="space-y-2">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">เลขทะเบียนรถ</label>
-                    <input type="text" required className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-6 py-4.5 text-lg font-bold focus:border-primary outline-none transition-all uppercase" placeholder="กข 1234 กทม." value={formData.licensePlate} onChange={(e) => setFormData({...formData, licensePlate: e.target.value})} />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">เลขบัตรประชาชน (13 หลัก)</label>
-                    <input type="text" required className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-6 py-4.5 text-lg font-bold focus:border-primary outline-none transition-all font-mono" placeholder="X-XXXX-XXXXX-XX-X" value={formData.idNumber} onChange={(e) => setFormData({...formData, idNumber: e.target.value})} />
-                  </div>
+                  <GlobalInput 
+                    label={t("register.rubber.licensePlateLabel")}
+                    required
+                    variant="large"
+                    className="uppercase"
+                    placeholder="กข 1234 กทม."
+                    value={formData.licensePlate}
+                    onChange={(e) => setFormData({...formData, licensePlate: e.target.value})}
+                  />
+                  <GlobalInput 
+                    label={t("register.rubber.idNumberLabel")}
+                    required
+                    variant="large"
+                    className="font-mono"
+                    placeholder="X-XXXX-XXXXX-XX-X"
+                    value={formData.idNumber}
+                    onChange={(e) => setFormData({...formData, idNumber: e.target.value})}
+                  />
                 </div>
               </div>
             )}
@@ -198,13 +231,13 @@ export default function RubberRegisterPage() {
                       <Icons.Wallet size={24} />
                    </div>
                    <div>
-                      <h3 className="text-xl font-black text-slate-900 leading-none">ช่องทางการรับเงิน</h3>
+                      <h3 className="text-xl font-black text-slate-900 leading-none">{t("register.rubber.step3Title")}</h3>
                       <p className="text-xs font-bold text-slate-400 mt-1 uppercase tracking-widest">Financial Payout</p>
                    </div>
                 </div>
                 <div className="space-y-6">
                   <div className="space-y-2">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">เลือกธนาคาร</label>
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t("register.rubber.bankLabel")}</label>
                     <div className="grid grid-cols-2 gap-3">
                       {['KBank', 'SCB', 'BBL', 'PromptPay'].map((bank) => (
                         <button key={bank} type="button" onClick={() => setFormData({...formData, bankName: bank})} className={`py-4 rounded-xl border-2 font-black text-xs transition-all ${formData.bankName === bank ? 'border-emerald-500 bg-emerald-50 text-emerald-600' : 'border-slate-100 text-slate-400'}`}>
@@ -213,14 +246,21 @@ export default function RubberRegisterPage() {
                       ))}
                     </div>
                   </div>
-                  <div className="space-y-2">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">เลขบัญชี / เบอร์พร้อมเพย์</label>
-                    <input type="text" required className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-6 py-4.5 text-2xl font-black focus:border-emerald-500 outline-none transition-all font-mono" value={formData.accountNumber} onChange={(e) => setFormData({...formData, accountNumber: e.target.value})} />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">ชื่อบัญชี (ภาษาไทย)</label>
-                    <input type="text" required className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-6 py-4.5 text-lg font-bold focus:border-emerald-500 outline-none transition-all" value={formData.accountName} onChange={(e) => setFormData({...formData, accountName: e.target.value})} />
-                  </div>
+                  <GlobalInput 
+                    label={t("register.rubber.accountNumberLabel")}
+                    required
+                    variant="large"
+                    className="font-mono"
+                    value={formData.accountNumber}
+                    onChange={(e) => setFormData({...formData, accountNumber: e.target.value})}
+                  />
+                  <GlobalInput 
+                    label={t("register.rubber.accountNameLabel")}
+                    required
+                    variant="large"
+                    value={formData.accountName}
+                    onChange={(e) => setFormData({...formData, accountName: e.target.value})}
+                  />
                 </div>
               </div>
             )}
@@ -232,38 +272,38 @@ export default function RubberRegisterPage() {
                       <Icons.Shield size={24} />
                    </div>
                    <div>
-                      <h3 className="text-xl font-black text-slate-900 leading-none">อัปโหลดหลักฐานเอกสาร</h3>
+                      <h3 className="text-xl font-black text-slate-900 leading-none">{t("register.rubber.step4Title")}</h3>
                       <p className="text-xs font-bold text-slate-400 mt-1 uppercase tracking-widest">Document Verification</p>
                    </div>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-3">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">รูปบัตรประชาชน (ID Card)</label>
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t("register.rubber.idCardLabel")}</label>
                     <div className="relative aspect-[3/2] bg-slate-50 border-2 border-dashed border-slate-200 rounded-[32px] flex flex-col items-center justify-center overflow-hidden hover:border-primary hover:bg-primary/5 transition-all group">
                       {formData.idCardUrl ? (
-                        <img src={formData.idCardUrl} className="w-full h-full object-cover" />
+                        <img src={formData.idCardUrl} alt="ID Card" className="w-full h-full object-cover" />
                       ) : (
                         <>
                           <div className="w-12 h-12 rounded-full bg-white shadow-sm flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
                             <Icons.Refresh size={20} className="text-slate-300 group-hover:text-primary" />
                           </div>
-                          <span className="text-[10px] font-black text-slate-400 uppercase tracking-tighter">Tap to upload</span>
+                          <span className="text-[10px] font-black text-slate-400 uppercase tracking-tighter">{t("register.rubber.tapUpload")}</span>
                         </>
                       )}
                       <input type="file" required className="absolute inset-0 opacity-0 cursor-pointer" onChange={(e) => handleFileUpload(e, 'idCardUrl')} />
                     </div>
                   </div>
                   <div className="space-y-3">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">รูปใบขับขี่ (Driver License)</label>
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t("register.rubber.licenseLabel")}</label>
                     <div className="relative aspect-[3/2] bg-slate-50 border-2 border-dashed border-slate-200 rounded-[32px] flex flex-col items-center justify-center overflow-hidden hover:border-blue-500 hover:bg-blue-50 transition-all group">
                       {formData.licenseUrl ? (
-                        <img src={formData.licenseUrl} className="w-full h-full object-cover" />
+                        <img src={formData.licenseUrl} alt="License" className="w-full h-full object-cover" />
                       ) : (
                         <>
                           <div className="w-12 h-12 rounded-full bg-white shadow-sm flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
                             <Icons.ArrowRight size={20} className="text-slate-300 group-hover:text-blue-500" />
                           </div>
-                          <span className="text-[10px] font-black text-slate-400 uppercase tracking-tighter">Tap to upload</span>
+                          <span className="text-[10px] font-black text-slate-400 uppercase tracking-tighter">{t("register.rubber.tapUpload")}</span>
                         </>
                       )}
                       <input type="file" required className="absolute inset-0 opacity-0 cursor-pointer" onChange={(e) => handleFileUpload(e, 'licenseUrl')} />
@@ -286,7 +326,7 @@ export default function RubberRegisterPage() {
                   onClick={() => setStep(step - 1)} 
                   className="px-10 py-5 bg-white border-2 border-slate-100 text-slate-400 rounded-2xl font-black uppercase text-xs hover:bg-slate-50 transition-all active:scale-95"
                 >
-                  Back
+                  {t("common.back")}
                 </button>
               )}
               <Button 
@@ -297,7 +337,7 @@ export default function RubberRegisterPage() {
                 className="bg-slate-900 text-white py-6 rounded-2xl font-black uppercase shadow-2xl shadow-slate-900/20 hover:bg-slate-800 transition-all group"
               >
                 <div className="flex items-center justify-center gap-3">
-                  <span>{step === 4 ? 'Confirm & Finish' : 'Next Step'}</span>
+                  <span>{step === 4 ? t("register.rubber.submitButton") : t("register.rubber.nextButton")}</span>
                   {step < 4 && <Icons.ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />}
                 </div>
               </Button>
@@ -314,6 +354,17 @@ export default function RubberRegisterPage() {
           </div>
         </div>
       </div>
+
+      <ConfirmModal 
+        isOpen={showSuccessModal}
+        onClose={() => {
+          setShowSuccessModal(false);
+          router.push("/rubber/login?registered=true");
+        }}
+        title={t("common.success")}
+        message={t("register.partner.submitSuccess")} // Using common success key if rubber one missing or similar
+        type="success"
+      />
     </div>
   );
 }

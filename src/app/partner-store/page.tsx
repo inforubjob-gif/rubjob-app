@@ -14,6 +14,8 @@ import Modal from "@/components/ui/Modal";
 
 // Operational state for Store
 
+import ConfirmModal from "@/components/ui/ConfirmModal";
+
 export default function StoreDashboard() {
   const { t } = useTranslation();
   const { store, logout } = useStoreAuth();
@@ -23,6 +25,12 @@ export default function StoreDashboard() {
   const [workStatus, setWorkStatus] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
+  const [alertConfig, setAlertConfig] = useState<{ isOpen: boolean; title: string; message: string; type: "success" | "error" }>({
+    isOpen: false,
+    title: "",
+    message: "",
+    type: "error"
+  });
 
   // Lifted state
   const [incomingOrders, setIncomingOrders] = useState<any[]>([]);
@@ -211,7 +219,7 @@ export default function StoreDashboard() {
                     activeTab === tab ? "bg-white text-primary shadow-lg scale-[1.02]" : "text-slate-400 hover:text-slate-600"
                   }`}
                 >
-                {tab === "incoming" ? "รอรับ" : tab === "washing" ? "กำลังซัก" : "รอส่ง"}
+                {tab === "incoming" ? t("store.tabs.incoming") : tab === "washing" ? t("store.tabs.washing") : t("store.tabs.readyToDeliver")}
               </button>
             ))}
           </div>
@@ -338,7 +346,12 @@ export default function StoreDashboard() {
                         const liffId = process.env.NEXT_PUBLIC_LIFF_ID;
                         window.location.href = `https://liff.line.me/${liffId}/auth/link-line?type=store&id=${store.id}&token=${token}`;
                       } catch (e) {
-                        alert("เกิดข้อผิดพลาดในการสร้างลิงก์เชื่อมต่อ");
+                        setAlertConfig({
+                          isOpen: true,
+                          title: t("common.error"),
+                          message: t("common.errorDesc"),
+                          type: "error"
+                        });
                       }
                     }}
                   >
@@ -399,6 +412,14 @@ export default function StoreDashboard() {
           </div>
         </Modal>
       )}
+
+      <ConfirmModal 
+        isOpen={alertConfig.isOpen}
+        onClose={() => setAlertConfig({ ...alertConfig, isOpen: false })}
+        title={alertConfig.title}
+        message={alertConfig.message}
+        type={alertConfig.type}
+      />
     </div>
   );
 }

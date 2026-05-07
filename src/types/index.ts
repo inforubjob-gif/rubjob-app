@@ -35,6 +35,8 @@ export type OrderType = "logistics" | "direct_service";
 export type OrderStatus =
   | "pending"
   | "picking_up"
+  | "at_shop"
+  | "ready_for_return"
   | "delivering_to_store"
   | "washing"
   | "ready_for_pickup"
@@ -65,6 +67,10 @@ export interface Order {
   totalPrice: number;
   pickupDriverId?: string;
   deliveryDriverId?: string;
+  pickupPhotoUrl?: string;
+  dropoffShopPhotoUrl?: string;
+  arrivedAtShopAt?: string;
+  lastNotifiedAt?: string;
   createdAt: string;
   updatedAt: string;
 }

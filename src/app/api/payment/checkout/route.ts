@@ -18,16 +18,26 @@ export async function POST(req: Request) {
 
     // Access Env from Cloudflare context
     const env = getRequestContext().env;
-    const stripeSecretKey = env?.STRIPE_SECRET_KEY;
     const db = env?.DB;
 
-    if (!db || !stripeSecretKey) {
-      return NextResponse.json({ error: "Missing DB or Stripe Configuration" }, { status: 500 });
+    if (!db) {
+      return NextResponse.json({ error: "Missing DB Connection" }, { status: 500 });
+    }
+
+    // Try Env first, then DB
+    let stripeSecretKey = env?.STRIPE_SECRET_KEY;
+    if (!stripeSecretKey) {
+      const setting = await db.prepare("SELECT value FROM system_settings WHERE key = 'stripe_secret_key'").first() as { value: string };
+      stripeSecretKey = setting?.value;
+    }
+
+    if (!stripeSecretKey) {
+      return NextResponse.json({ error: "Stripe Secret Key not configured" }, { status: 500 });
     }
 
     // Initialize Stripe
     const stripe = new Stripe(stripeSecretKey, {
-      apiVersion: "2026-03-25.dahlia", // Use latest stable version compatible with Edge
+      apiVersion: "2024-06-20", // Use a stable version
       httpClient: Stripe.createFetchHttpClient(), // Required for Edge Runtime
     });
 

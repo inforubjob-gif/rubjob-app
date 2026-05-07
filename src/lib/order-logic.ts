@@ -41,18 +41,24 @@ export async function transitionOrderStatus(
     return { success: false, message: "Order is already closed" };
   }
 
-  // 3. Update Database (Including evidence if applicable)
+  // 3. Update Database (Including evidence and timestamps)
   let query = "UPDATE orders SET status = ?, updatedAt = CURRENT_TIMESTAMP";
   const params: any[] = [nextStatus];
 
   if (options?.evidenceUrl) {
-    if (nextStatus === "picking_up" || nextStatus === "accepted") {
-      query += ", evidenceBeforeUrl = ?";
+    if (nextStatus === "picking_up") {
+      query += ", pickupPhotoUrl = ?, evidenceBeforeUrl = ?";
+      params.push(options.evidenceUrl, options.evidenceUrl);
+    } else if (nextStatus === "at_shop") {
+      query += ", dropoffShopPhotoUrl = ?, arrivedAtShopAt = CURRENT_TIMESTAMP";
       params.push(options.evidenceUrl);
     } else if (nextStatus === "completed") {
       query += ", evidenceAfterUrl = ?";
       params.push(options.evidenceUrl);
     }
+  } else if (nextStatus === "at_shop") {
+    // Even if no photo, record the timestamp
+    query += ", arrivedAtShopAt = CURRENT_TIMESTAMP";
   }
 
   query += " WHERE id = ?";
@@ -78,19 +84,17 @@ export async function transitionOrderStatus(
           flexMessage = rubberAcceptedFlex(orderId, options.rubberName);
         }
         break;
+      case "at_shop":
       case "delivering_to_store":
         flexMessage = deliveringToStoreFlex(orderId);
         break;
-      case "washing":
-        flexMessage = washingOrderFlex(orderId);
-        break;
+      case "ready_for_return":
       case "ready_for_pickup":
         flexMessage = readyForDeliveryFlex(orderId);
         
-        // 🤖 Automation: Also broadcast to Rubbers Group (Category-based GP logic)
+        // 🤖 Automation: Also broadcast to Rubbers Group
         const notifyToken = env.LINE_NOTIFY_RUBBER_TOKEN;
         if (notifyToken) {
-          // 🤖 Calculation based on strict skill.md algorithm
           const distanceKm = order.distance_km || 0;
           const singleTripFare = 50 + (distanceKm > 3 ? (distanceKm - 3) * 10 : 0);
           const grossRubberFare = singleTripFare * 2;
@@ -129,6 +133,8 @@ function tStatus(status: string) {
   const map: Record<string, string> = {
     accepted: "รับงานแล้ว",
     in_progress: "กำลังดำเนินการ",
+    at_shop: "ถึงร้านแล้ว",
+    ready_for_return: "ซักเสร็จพร้อมส่ง",
     completed: "สำเร็จ"
   };
   return map[status] || status;

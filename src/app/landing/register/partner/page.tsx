@@ -5,8 +5,13 @@ import { useRouter } from "next/navigation";
 import { Icons } from "@/components/ui/Icons";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
+import GlobalInput from "@/components/ui/GlobalInput";
+import GlobalTextarea from "@/components/ui/GlobalTextarea";
+import ConfirmModal from "@/components/ui/ConfirmModal";
+import { useTranslation } from "@/components/providers/LanguageProvider";
 
 export default function PartnerRegisterPage() {
+  const { t } = useTranslation();
   const router = useRouter();
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
@@ -25,6 +30,7 @@ export default function PartnerRegisterPage() {
   });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, field: string) => {
     const file = e.target.files?.[0];
@@ -67,13 +73,12 @@ export default function PartnerRegisterPage() {
       const data = await res.json() as any;
 
       if (res.ok) {
-        alert("ลงทะเบียนเรียบร้อย! เจ้าหน้าที่จะตรวจสอบข้อมูลภายใน 24 ชม.");
-        router.push("/landing");
+        setShowSuccessModal(true);
       } else {
-        setError(data.error || "Failed to register");
+        setError(data.error || t("common.error"));
       }
     } catch (err) {
-      setError("An error occurred. Please try again.");
+      setError(t("common.errorDesc"));
     } finally {
       setIsLoading(false);
     }
@@ -96,18 +101,18 @@ export default function PartnerRegisterPage() {
           <div className="w-8 h-8 rounded-xl bg-slate-900 text-white flex items-center justify-center group-hover:bg-primary transition-colors">
             <Icons.Back size={16} />
           </div>
-          <span className="text-[10px] font-black uppercase tracking-widest text-slate-900">Back to Home</span>
+          <span className="text-[10px] font-black uppercase tracking-widest text-slate-900">{t("register.partner.backButton")}</span>
         </button>
 
         {/* Header */}
         <div className="text-center mb-16">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-slate-900 text-white rounded-full text-[10px] font-black uppercase tracking-[0.2em] mb-8 shadow-2xl shadow-slate-900/20">
-             Partner Onboarding
+             {t("register.partner.title")}
           </div>
           <h1 className="text-4xl md:text-6xl font-black tracking-tight leading-tight mb-4">
-             ร่วมเป็น <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-orange-500">พาร์ทเนอร์</span>
+             {t("register.partner.subtitle").split(",")[0]} <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-orange-500">{t("register.partner.subtitle").split(",")[1] || ""}</span>
           </h1>
-          <p className="text-slate-500 font-medium text-lg">ขยายฐานลูกค้า และอัปเกรดธุรกิจสู่ระดับมืออาชีพ</p>
+          <p className="text-slate-500 font-medium text-lg">{t("register.partner.subtitle")}</p>
           
           {/* Timeline Progress */}
           <div className="flex items-center justify-center gap-4 mt-12">
@@ -128,43 +133,64 @@ export default function PartnerRegisterPage() {
               <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500">
                 <div className="flex items-center justify-between mb-2">
                    <div>
-                      <h3 className="text-2xl font-black text-slate-900">ข้อมูลผู้สมัคร</h3>
+                      <h3 className="text-2xl font-black text-slate-900">{t("register.partner.step1Title")}</h3>
                       <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">Basic Profile</p>
                    </div>
                 </div>
 
                 <div className="space-y-4">
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">ประเภทพาร์ทเนอร์</label>
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t("register.partner.typeLabel")}</label>
                   <div className="grid grid-cols-2 gap-4">
-                    {['store', 'specialist'].map((t) => (
+                    {['store', 'specialist'].map((t_key) => (
                       <button 
-                        key={t} type="button" onClick={() => setFormData({...formData, type: t as any})} 
-                        className={`p-6 rounded-[32px] border-2 flex flex-col items-center gap-3 transition-all duration-500 ${formData.type === t ? 'border-primary bg-primary/5 text-primary shadow-xl shadow-primary/10' : 'border-slate-50 text-slate-400 hover:border-slate-100'}`}
+                        key={t_key} type="button" onClick={() => setFormData({...formData, type: t_key as any})} 
+                        className={`p-6 rounded-[32px] border-2 flex flex-col items-center gap-3 transition-all duration-500 ${formData.type === t_key ? 'border-primary bg-primary/5 text-primary shadow-xl shadow-primary/10' : 'border-slate-50 text-slate-400 hover:border-slate-100'}`}
                       >
-                        <div className={`w-14 h-14 rounded-2xl flex items-center justify-center ${formData.type === t ? 'bg-primary text-white' : 'bg-slate-50'}`}>
-                          {t === 'store' ? <Icons.Store size={28} /> : <Icons.User size={28} />}
+                        <div className={`w-14 h-14 rounded-2xl flex items-center justify-center ${formData.type === t_key ? 'bg-primary text-white' : 'bg-slate-50'}`}>
+                          {t_key === 'store' ? <Icons.Store size={28} /> : <Icons.User size={28} />}
                         </div>
-                        <span className="text-[10px] font-black uppercase tracking-widest">{t === 'store' ? 'ร้านค้า / พาร์ทเนอร์' : 'มืออาชีพ / ผู้ให้บริการ'}</span>
+                        <span className="text-[10px] font-black uppercase tracking-widest">{t_key === 'store' ? t("register.partner.typeStore") : t("register.partner.typeSpecialist")}</span>
                       </button>
                     ))}
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">ชื่อ-นามสกุล</label>
-                    <input type="text" required className="w-full bg-slate-50/50 border-2 border-slate-100 rounded-2xl px-6 py-4.5 text-lg font-bold focus:border-primary focus:bg-white outline-none transition-all" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">เบอร์โทรศัพท์</label>
-                    <input type="tel" required className="w-full bg-slate-50/50 border-2 border-slate-100 rounded-2xl px-6 py-4.5 text-lg font-bold focus:border-primary focus:bg-white outline-none transition-all" value={formData.phone} onChange={(e) => setFormData({...formData, phone: e.target.value})} />
-                  </div>
+                  <GlobalInput 
+                    label={t("register.partner.nameLabel")}
+                    required
+                    variant="large"
+                    value={formData.name}
+                    onChange={(e) => setFormData({...formData, name: e.target.value})}
+                  />
+                  <GlobalInput 
+                    label={t("register.partner.phoneLabel")}
+                    type="tel"
+                    required
+                    variant="large"
+                    value={formData.phone}
+                    onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                  />
                 </div>
                 
-                <div className="space-y-2">
-                   <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">บัญชีผู้ใช้งาน (Email & Password)</label>
-                   <input type="email" required className="w-full bg-slate-50/50 border-2 border-slate-100 rounded-2xl px-6 py-4.5 text-lg font-bold focus:border-primary focus:bg-white outline-none transition-all mb-4" placeholder="Email" value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} />
-                   <input type="password" required className="w-full bg-slate-50/50 border-2 border-slate-100 rounded-2xl px-6 py-4.5 text-lg font-bold focus:border-primary focus:bg-white outline-none transition-all" placeholder="Password" value={formData.password} onChange={(e) => setFormData({...formData, password: e.target.value})} />
+                <div className="space-y-4">
+                   <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t("register.partner.accountLabel")}</label>
+                   <GlobalInput 
+                     type="email"
+                     required
+                     variant="large"
+                     placeholder="Email"
+                     value={formData.email}
+                     onChange={(e) => setFormData({...formData, email: e.target.value})}
+                   />
+                   <GlobalInput 
+                     type="password"
+                     required
+                     variant="large"
+                     placeholder="Password"
+                     value={formData.password}
+                     onChange={(e) => setFormData({...formData, password: e.target.value})}
+                   />
                 </div>
               </div>
             )}
@@ -176,19 +202,26 @@ export default function PartnerRegisterPage() {
                       <Icons.Store size={28} />
                    </div>
                    <div>
-                      <h3 className="text-2xl font-black text-slate-900 leading-none">รายละเอียดบริการ</h3>
+                      <h3 className="text-2xl font-black text-slate-900 leading-none">{t("register.partner.step2Title")}</h3>
                       <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">Service & Location</p>
                    </div>
                 </div>
                 <div className="space-y-6">
-                  <div className="space-y-2">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">ชื่อร้าน / ชื่อแบรนด์บริการ</label>
-                    <input type="text" required className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-6 py-4.5 text-xl font-bold focus:border-primary outline-none transition-all" placeholder="RUBJOB Cleaning Service" value={formData.storeName} onChange={(e) => setFormData({...formData, storeName: e.target.value})} />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">ที่ตั้ง / พื้นที่ให้บริการ (ระบุโดยละเอียด)</label>
-                    <textarea required rows={4} className="w-full bg-slate-50 border-2 border-slate-100 rounded-3xl px-6 py-4.5 text-lg font-bold focus:border-primary outline-none transition-all leading-relaxed" value={formData.storeAddress} onChange={(e) => setFormData({...formData, storeAddress: e.target.value})} />
-                  </div>
+                  <GlobalInput 
+                    label={t("register.partner.storeNameLabel")}
+                    required
+                    variant="large"
+                    placeholder="RUBJOB Cleaning Service"
+                    value={formData.storeName}
+                    onChange={(e) => setFormData({...formData, storeName: e.target.value})}
+                  />
+                  <GlobalTextarea 
+                    label={t("register.partner.locationLabel")}
+                    required
+                    rows={4}
+                    value={formData.storeAddress}
+                    onChange={(e) => setFormData({...formData, storeAddress: e.target.value})}
+                  />
                 </div>
               </div>
             )}
@@ -200,13 +233,13 @@ export default function PartnerRegisterPage() {
                       <Icons.Wallet size={28} />
                    </div>
                    <div>
-                      <h3 className="text-2xl font-black text-slate-900 leading-none">ช่องทางรับรายได้</h3>
+                      <h3 className="text-2xl font-black text-slate-900 leading-none">{t("register.partner.step3Title")}</h3>
                       <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">Payout Settings</p>
                    </div>
                 </div>
                 <div className="space-y-6">
                   <div className="space-y-2">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">ธนาคารปลายทาง</label>
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t("register.partner.bankLabel")}</label>
                     <div className="grid grid-cols-2 gap-3">
                       {['KBank', 'SCB', 'BBL', 'KTB'].map((bank) => (
                         <button key={bank} type="button" onClick={() => setFormData({...formData, bankName: bank})} className={`py-4 rounded-xl border-2 font-black text-xs transition-all ${formData.bankName === bank ? 'border-emerald-500 bg-emerald-50 text-emerald-600 shadow-lg shadow-emerald-500/10' : 'border-slate-50 text-slate-300 hover:border-slate-100'}`}>
@@ -215,14 +248,21 @@ export default function PartnerRegisterPage() {
                       ))}
                     </div>
                   </div>
-                  <div className="space-y-2">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">เลขบัญชีธนาคาร</label>
-                    <input type="text" required className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-6 py-4.5 text-2xl font-black focus:border-emerald-500 outline-none transition-all font-mono tracking-wider" value={formData.accountNumber} onChange={(e) => setFormData({...formData, accountNumber: e.target.value})} />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">ชื่อเจ้าของบัญชี</label>
-                    <input type="text" required className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-6 py-4.5 text-lg font-bold focus:border-emerald-500 outline-none transition-all" value={formData.accountName} onChange={(e) => setFormData({...formData, accountName: e.target.value})} />
-                  </div>
+                  <GlobalInput 
+                    label={t("register.partner.accountNumberLabel")}
+                    required
+                    variant="large"
+                    className="font-mono tracking-wider"
+                    value={formData.accountNumber}
+                    onChange={(e) => setFormData({...formData, accountNumber: e.target.value})}
+                  />
+                  <GlobalInput 
+                    label={t("register.partner.accountNameLabel")}
+                    required
+                    variant="large"
+                    value={formData.accountName}
+                    onChange={(e) => setFormData({...formData, accountName: e.target.value})}
+                  />
                 </div>
               </div>
             )}
@@ -234,38 +274,38 @@ export default function PartnerRegisterPage() {
                       <Icons.Shield size={28} />
                    </div>
                    <div>
-                      <h3 className="text-2xl font-black text-slate-900 leading-none">เอกสารตรวจสอบธุรกิจ</h3>
+                      <h3 className="text-2xl font-black text-slate-900 leading-none">{t("register.partner.step4Title")}</h3>
                       <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">Verification Documents</p>
                    </div>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   <div className="space-y-3">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">บัตรประชาชนผู้สมัคร</label>
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t("register.partner.idCardLabel")}</label>
                     <div className="relative aspect-video bg-slate-50 border-2 border-dashed border-slate-100 rounded-[32px] flex flex-col items-center justify-center overflow-hidden hover:border-primary hover:bg-primary/5 transition-all group">
                       {formData.idCardUrl ? (
-                        <img src={formData.idCardUrl} className="w-full h-full object-cover" />
+                        <img src={formData.idCardUrl} alt="ID Card" className="w-full h-full object-cover" />
                       ) : (
                         <>
                           <div className="w-14 h-14 rounded-2xl bg-white shadow-sm flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
                              <Icons.User size={24} className="text-slate-200 group-hover:text-primary" />
                           </div>
-                          <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Upload ID Card</span>
+                          <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t("register.partner.uploadIdCard")}</span>
                         </>
                       )}
                       <input type="file" required className="absolute inset-0 opacity-0 cursor-pointer" onChange={(e) => handleFileUpload(e, 'idCardUrl')} />
                     </div>
                   </div>
                   <div className="space-y-3">
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">ใบทะเบียนการค้า / หนังสือรับรอง</label>
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t("register.partner.businessDocLabel")}</label>
                     <div className="relative aspect-video bg-slate-50 border-2 border-dashed border-slate-100 rounded-[32px] flex flex-col items-center justify-center overflow-hidden hover:border-violet-500 hover:bg-violet-50 transition-all group">
                       {formData.businessDocUrl ? (
-                        <img src={formData.businessDocUrl} className="w-full h-full object-cover" />
+                        <img src={formData.businessDocUrl} alt="Business Doc" className="w-full h-full object-cover" />
                       ) : (
                         <>
                           <div className="w-14 h-14 rounded-2xl bg-white shadow-sm flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
                              <Icons.Payment size={24} className="text-slate-200 group-hover:text-violet-500" />
                           </div>
-                          <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Upload Business Doc</span>
+                          <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t("register.partner.uploadBusinessDoc")}</span>
                         </>
                       )}
                       <input type="file" required className="absolute inset-0 opacity-0 cursor-pointer" onChange={(e) => handleFileUpload(e, 'businessDocUrl')} />
@@ -283,7 +323,7 @@ export default function PartnerRegisterPage() {
 
             <div className="flex items-center gap-6 pt-6">
               {step > 1 && (
-                <button type="button" onClick={() => setStep(step - 1)} className="px-10 py-5 bg-white border-2 border-slate-50 text-slate-400 rounded-2xl font-black uppercase text-xs hover:bg-slate-50 transition-all">Back</button>
+                <button type="button" onClick={() => setStep(step - 1)} className="px-10 py-5 bg-white border-2 border-slate-50 text-slate-400 rounded-2xl font-black uppercase text-xs hover:bg-slate-50 transition-all">{t("register.partner.backButton")}</button>
               )}
               <Button 
                 type="submit" 
@@ -293,7 +333,7 @@ export default function PartnerRegisterPage() {
                 className="bg-slate-900 text-white py-6 rounded-2xl font-black uppercase shadow-[0_20px_40px_-10px_rgba(0,0,0,0.2)] hover:bg-primary hover:shadow-primary/30 transition-all active:scale-[0.98] group"
               >
                 <div className="flex items-center justify-center gap-3">
-                  <span>{step === 4 ? 'Submit Application' : 'Continue to Next Step'}</span>
+                  <span>{step === 4 ? t("register.partner.submitButton") : t("register.partner.nextButton")}</span>
                   {step < 4 && <Icons.ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />}
                 </div>
               </Button>
@@ -301,6 +341,17 @@ export default function PartnerRegisterPage() {
           </form>
         </Card>
       </div>
+
+      <ConfirmModal 
+        isOpen={showSuccessModal}
+        onClose={() => {
+          setShowSuccessModal(false);
+          router.push("/landing");
+        }}
+        title={t("register.partner.submitSuccess")}
+        message={t("register.partner.submitSuccess")}
+        type="success"
+      />
     </div>
   );
 }

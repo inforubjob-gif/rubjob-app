@@ -17,3 +17,6 @@ migrations_dir = "db"
 [[r2_buckets]]
 binding = "UPLOADS"
 bucket_name = "rubjob-uploads"
+
+[triggers]
+crons = ["*/10 * * * *"] # Every 10 minutes to check SLA breaches

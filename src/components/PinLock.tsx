@@ -164,7 +164,7 @@ export default function PinLock({ type, userId, onVerified, children }: PinLockP
 
   if (isLoading && !pin && !confirmPin) {
     return (
-      <div className="flex-1 flex items-center justify-center bg-slate-50 min-h-[400px]">
+      <div className="flex-1 flex items-center justify-center bg-white min-h-[400px]">
         <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
       </div>
     );
@@ -176,67 +176,85 @@ export default function PinLock({ type, userId, onVerified, children }: PinLockP
 
   return (
     <div 
-      className="fixed inset-0 bg-slate-50 z-[10000] flex flex-col touch-none"
+      className="fixed inset-0 bg-[#F8FAFC] z-[10000] flex flex-col touch-none overflow-hidden"
     >
-      {/* Top Header with Back Button - High Z-index to be clickable */}
-      <header className="px-5 pt-12 pb-4 flex items-center relative z-[10002]">
+      {/* Premium Background Decoration */}
+      <div className="absolute top-0 left-0 right-0 h-64 bg-gradient-to-b from-primary/10 to-transparent pointer-events-none" />
+      <div className="absolute top-[-10%] right-[-10%] w-64 h-64 bg-primary/5 blur-3xl rounded-full pointer-events-none" />
+
+      {/* Top Header */}
+      <header className="px-5 pt-14 pb-4 flex items-center relative z-[10002]">
         <button
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
             router.back();
           }}
-          className="w-10 h-10 rounded-xl bg-white shadow-md border border-slate-100 flex items-center justify-center text-slate-900 active:scale-95 transition-transform pointer-events-auto"
+          className="w-12 h-12 rounded-2xl bg-white shadow-xl shadow-slate-200/50 border border-slate-100 flex items-center justify-center text-slate-900 active:scale-95 transition-all pointer-events-auto"
         >
-          <Icons.Back size={18} />
+          <Icons.Back size={20} />
         </button>
       </header>
 
-      {/* Moved items up with pt-8 and justify-start to avoid keyboard overlap */}
+      {/* Main Content Container */}
       <div 
-        className="flex-1 flex flex-col items-center justify-start max-w-sm mx-auto w-full pt-8 pb-20 relative z-10"
+        className="flex-1 flex flex-col items-center justify-start max-w-sm mx-auto w-full pt-10 pb-20 relative z-10"
         onClick={() => pinInputRef.current?.focus()}
       >
-        <div className="w-20 h-20 bg-primary/10 text-primary rounded-3xl flex items-center justify-center mb-8 shadow-xl shadow-primary/5">
-          <Icons.Lock size={40} />
+        <div className="w-24 h-24 bg-white shadow-2xl shadow-primary/10 rounded-[2.5rem] flex items-center justify-center mb-10 border border-primary/10 relative">
+          <div className="absolute inset-0 bg-primary/5 rounded-[2.5rem] animate-pulse" />
+          <Icons.Shield size={44} className="text-primary relative z-10" fill={true} />
         </div>
         
-        <h1 className="text-xl font-black text-slate-900 mb-2">
+        <h1 className="text-2xl font-black text-slate-900 mb-3 text-center px-6 leading-tight">
           {step === "enter" ? t(`${type}.wallet.pin.enterTitle`) : 
            step === "setup" ? t(`${type}.wallet.pin.setupTitle`) : 
            t(`${type}.wallet.pin.confirmPin`)}
         </h1>
-        <p className="text-xs font-bold text-slate-400 mb-10 text-center px-4">
+        <p className="text-[13px] font-bold text-slate-400 mb-12 text-center px-10 leading-relaxed">
           {t(`${type}.wallet.pin.instruction`)}
         </p>
 
-        {/* PIN Dots - Moved higher to avoid keyboard */}
-        <div className="flex gap-4 mb-8 relative z-20">
-          {[...Array(6)].map((_, i) => (
-            <div 
-              key={i} 
-              className={`w-4 h-4 rounded-full border-2 transition-all duration-300 ${
-                (step === "confirm" ? i < confirmPin.length : i < pin.length)
-                  ? "bg-primary border-primary scale-110 shadow-lg shadow-primary/30" 
-                  : "bg-white border-slate-200"
-              }`}
-            />
-          ))}
+        {/* PIN Dots Area */}
+        <div className="relative mb-14">
+          <div className="flex gap-5 relative z-20">
+            {[...Array(6)].map((_, i) => (
+              <div 
+                key={i} 
+                className={`w-5 h-5 rounded-full border-2 transition-all duration-300 ${
+                  (step === "confirm" ? i < confirmPin.length : i < pin.length)
+                    ? "bg-primary border-primary scale-110 shadow-xl shadow-primary/30" 
+                    : "bg-white border-slate-200"
+                }`}
+              />
+            ))}
+          </div>
+          
+          {/* Subtle line under dots */}
+          <div className="absolute -bottom-4 left-0 right-0 h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
         </div>
 
         {error && (
-          <p className="text-[11px] font-black text-rose-500 mb-6 animate-shake bg-rose-50 px-4 py-2 rounded-full border border-rose-100 relative z-20">
-            {error}
-          </p>
+          <div className="mb-8 animate-shake">
+            <p className="text-[11px] font-black text-white bg-rose-500 px-5 py-2.5 rounded-full shadow-lg shadow-rose-500/20 relative z-20 flex items-center gap-2">
+              <Icons.AlertCircle size={14} />
+              {error}
+            </p>
+          </div>
         )}
 
-        {/* Manual Focus Trigger for Mobile */}
-        <div className="relative z-[60] flex flex-col items-center gap-4">
+        {/* Interaction Area */}
+        <div className="relative z-[60] flex flex-col items-center gap-6 mt-auto mb-10">
           <button 
             onClick={() => pinInputRef.current?.focus()}
-            className="text-[10px] font-black text-slate-300 uppercase tracking-widest animate-pulse px-6 py-2"
+            className="flex flex-col items-center gap-2 group"
           >
-            {t("common.tapToEnterPin") || "แตะเพื่อใส่รหัส"}
+            <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center text-slate-300 group-active:scale-95 transition-all">
+              <Icons.Lock size={20} />
+            </div>
+            <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] animate-pulse">
+              {t("common.tapToEnterPin") || "แตะเพื่อใส่รหัส"}
+            </span>
           </button>
 
           {step === "confirm" && (
@@ -247,14 +265,14 @@ export default function PinLock({ type, userId, onVerified, children }: PinLockP
                  setPin(""); 
                  setConfirmPin(""); 
                }}
-               className="text-xs font-black text-primary uppercase cursor-pointer py-2"
+               className="px-6 py-2 rounded-full bg-slate-100 text-[10px] font-black text-slate-500 uppercase tracking-widest hover:bg-slate-200 transition-colors"
              >
                {t("common.back")}
              </button>
           )}
         </div>
 
-        {/* Hidden Input - covering only the bottom area to avoid blocking back button */}
+        {/* Hidden Input Layer */}
         <input
           ref={pinInputRef}
           type="tel"
@@ -271,8 +289,13 @@ export default function PinLock({ type, userId, onVerified, children }: PinLockP
             }
           }}
           autoFocus
-          className="absolute bottom-0 left-0 right-0 h-2/3 opacity-0 z-[50] cursor-default"
+          className="absolute inset-0 opacity-0 z-[50] cursor-default caret-transparent"
         />
+      </div>
+
+      {/* Decorative Brand Tag */}
+      <div className="absolute bottom-6 left-0 right-0 flex justify-center opacity-20 pointer-events-none">
+        <Icons.Logo size={14} variant="icon" />
       </div>
     </div>
   );

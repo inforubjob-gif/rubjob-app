@@ -6,6 +6,10 @@ import Button from "@/components/ui/Button";
 import { Icons } from "@/components/ui/Icons";
 import { useLiff } from "@/components/providers/LiffProvider";
 import dynamic from "next/dynamic";
+import GlobalInput from "@/components/ui/GlobalInput";
+import GlobalTextarea from "@/components/ui/GlobalTextarea";
+import { useTranslation } from "@/components/providers/LanguageProvider";
+import { useToast } from "@/components/providers/ToastProvider";
 
 const MapPicker = dynamic(() => import("@/components/ui/MapPicker"), {
   ssr: false,
@@ -18,6 +22,8 @@ interface OnboardingFlowProps {
 
 export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
   const { profile } = useLiff();
+  const { t } = useTranslation();
+  const { showToast } = useToast();
   const [step, setStep] = useState<1 | 2>(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -48,7 +54,7 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
 
   async function handlePhoneSubmit() {
     if (!validatePhone(phone)) {
-      setPhoneError("กรุณากรอกเบอร์โทรให้ถูกต้อง (เช่น 081-234-5678)");
+      setPhoneError(t("onboarding.phoneError"));
       return;
     }
     setPhoneError("");
@@ -69,6 +75,7 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
       setStep(2);
     } catch (err) {
       console.error("Failed to save phone:", err);
+      showToast(t("common.error"), "error");
     } finally {
       setIsSubmitting(false);
     }
@@ -103,6 +110,7 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
       onComplete();
     } catch (err) {
       console.error("Failed to save address:", err);
+      showToast(t("common.error"), "error");
     } finally {
       setIsSubmitting(false);
     }
@@ -121,12 +129,12 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
             <Icons.Logo size={80} variant="icon" />
           </div>
           <h1 className="text-xl font-black text-white">
-            {step === 1 ? "ยินดีต้อนรับ! 🎉" : "เพิ่มที่อยู่ของคุณ"}
+            {step === 1 ? t("onboarding.welcomeTitle") : t("onboarding.addressTitle")}
           </h1>
           <p className="text-sm text-white/80 mt-1 font-medium">
             {step === 1
-              ? "กรุณากรอกเบอร์โทรเพื่อเริ่มใช้งาน"
-              : "เพิ่มที่อยู่สำหรับเข้ารับ-ส่งผ้า"}
+              ? t("onboarding.phoneSubtitle")
+              : t("onboarding.addressSubtitle")}
           </p>
         </div>
 
@@ -148,13 +156,13 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
                   <Icons.Phone size={22} />
                 </div>
                 <div>
-                  <h3 className="text-base font-black text-foreground">เบอร์โทรศัพท์</h3>
-                  <p className="text-xs text-muted mt-0.5">ใช้สำหรับติดต่อเรื่องออเดอร์</p>
+                  <h3 className="text-base font-black text-foreground">{t("onboarding.phoneLabel")}</h3>
+                  <p className="text-xs text-muted mt-0.5">{t("onboarding.phoneDesc")}</p>
                 </div>
               </div>
 
               <div className="relative">
-                <input
+                <GlobalInput
                   type="tel"
                   inputMode="numeric"
                   value={phone}
@@ -163,21 +171,14 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
                     setPhoneError("");
                   }}
                   placeholder="08X-XXX-XXXX"
-                  className={`w-full bg-slate-50 border-2 rounded-xl px-5 py-4 text-lg font-bold text-center focus:outline-none focus:ring-4 transition-all duration-300 ${
-                    phoneError
-                      ? "border-red-300 focus:ring-red-100 focus:border-red-400"
-                      : "border-slate-100 focus:ring-primary/20 focus:border-primary"
-                  }`}
+                  error={phoneError}
+                  variant="default"
+                  className="text-center text-lg"
                 />
               </div>
-              {phoneError && (
-                <p className="text-xs text-red-500 font-bold mt-2 text-center animate-fade-in">
-                  {phoneError}
-                </p>
-              )}
 
               <p className="text-[11px] text-muted text-center mt-3 opacity-70">
-                เราจะไม่แชร์เบอร์โทรของคุณกับบุคคลอื่น
+                {t("onboarding.phonePrivacy")}
               </p>
             </Card>
 
@@ -188,7 +189,7 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
               disabled={phone.replace(/\D/g, "").length < 10}
               onClick={handlePhoneSubmit}
             >
-              ถัดไป →
+              {t("onboarding.nextButton")}
             </Button>
           </div>
         )}
@@ -202,21 +203,25 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
                   <Icons.MapPin size={22} />
                 </div>
                 <div>
-                  <h3 className="text-base font-black text-foreground">ที่อยู่สำหรับรับ-ส่งผ้า</h3>
-                  <p className="text-xs text-muted mt-0.5">เพิ่มที่อยู่แรกของคุณ</p>
+                  <h3 className="text-base font-black text-foreground">{t("onboarding.addressLabel")}</h3>
+                  <p className="text-xs text-muted mt-0.5">{t("onboarding.addressFirstDesc")}</p>
                 </div>
               </div>
 
               <div className="space-y-4">
                 {/* Address label */}
                 <div>
-                  <label className="text-xs font-bold text-slate-500 mb-1.5 block">ชื่อที่อยู่</label>
+                  <label className="text-xs font-bold text-slate-500 mb-1.5 block">{t("onboarding.labelTitle")}</label>
                   <div className="flex gap-2 mb-2">
-                    {["🏠 บ้าน", "🏢 ออฟฟิศ", "🏨 คอนโด"].map((preset) => {
-                      const label = preset.slice(2).trim();
+                    {[
+                      { key: "labelHome", text: t("onboarding.labelHome") },
+                      { key: "labelOffice", text: t("onboarding.labelOffice") },
+                      { key: "labelCondo", text: t("onboarding.labelCondo") },
+                    ].map((item) => {
+                      const label = item.text.slice(2).trim();
                       return (
                         <button
-                          key={label}
+                          key={item.key}
                           onClick={() => setAddressLabel(label)}
                           className={`flex-1 py-2.5 px-2 rounded-xl text-xs font-bold transition-all duration-300 border-2 ${
                             addressLabel === label
@@ -224,47 +229,45 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
                               : "border-slate-100 bg-white text-slate-500 hover:bg-slate-50"
                           }`}
                         >
-                          {preset}
+                          {item.text}
                         </button>
                       );
                     })}
                   </div>
-                  <input
+                  <GlobalInput
                     type="text"
                     value={addressLabel}
                     onChange={(e) => setAddressLabel(e.target.value)}
-                    placeholder="หรือพิมพ์ชื่อเอง..."
-                    className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-4 py-3 text-sm font-medium focus:outline-none focus:ring-4 focus:ring-primary/20 focus:border-primary transition-all"
+                    placeholder={t("onboarding.labelCustomPlaceholder")}
+                    variant="default"
                   />
                 </div>
 
                 {/* Address details */}
                 <div>
-                  <label className="text-xs font-bold text-slate-500 mb-1.5 block">รายละเอียดที่อยู่</label>
-                  <textarea
+                  <label className="text-xs font-bold text-slate-500 mb-1.5 block">{t("onboarding.detailsLabel")}</label>
+                  <GlobalTextarea
                     value={addressDetails}
                     onChange={(e) => setAddressDetails(e.target.value)}
-                    placeholder="เช่น 123/4 ซ.สุขุมวิท 55 แขวงคลองตัน..."
+                    placeholder={t("onboarding.detailsPlaceholder")}
                     rows={3}
-                    className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-4 py-3 text-sm font-medium focus:outline-none focus:ring-4 focus:ring-primary/20 focus:border-primary transition-all resize-none"
                   />
                 </div>
 
                 {/* Note */}
                 <div>
-                  <label className="text-xs font-bold text-slate-500 mb-1.5 block">หมายเหตุ (ไม่จำเป็น)</label>
-                  <input
-                    type="text"
+                  <label className="text-xs font-bold text-slate-500 mb-1.5 block">{t("onboarding.noteLabel")}</label>
+                  <GlobalTextarea
                     value={addressNote}
                     onChange={(e) => setAddressNote(e.target.value)}
-                    placeholder='เช่น "ตึก A ชั้น 5 ห้อง 502"'
-                    className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-4 py-3 text-sm font-medium focus:outline-none focus:ring-4 focus:ring-primary/20 focus:border-primary transition-all"
+                    placeholder={t("onboarding.notePlaceholder")}
+                    rows={2}
                   />
                 </div>
 
                 {/* Pin location with real map */}
                 <div className="space-y-2">
-                  <label className="text-xs font-bold text-slate-500 mb-1.5 block">ปักหมุดตำแหน่ง</label>
+                  <label className="text-xs font-bold text-slate-500 mb-1.5 block">{t("onboarding.pinLabel")}</label>
                   <div className="h-52 w-full rounded-xl overflow-hidden border-2 border-slate-100">
                     <MapPicker
                       lat={pinLat || 0}
@@ -273,7 +276,9 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
                     />
                   </div>
                   <p className={`text-xs font-bold ${pinSet ? "text-emerald-600" : "text-slate-400"}`}>
-                    {pinSet ? `📍 ปักหมุดแล้ว (${pinLat}, ${pinLng})` : "แตะแผนที่เพื่อปักหมุดตำแหน่ง"}
+                    {pinSet 
+                      ? t("onboarding.pinSet").replace("{lat}", String(pinLat)).replace("{lng}", String(pinLng))
+                      : t("onboarding.pinPrompt")}
                   </p>
                 </div>
               </div>
@@ -293,7 +298,7 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
                 disabled={!addressLabel.trim() || !addressDetails.trim()}
                 onClick={handleAddressSubmit}
               >
-                เริ่มใช้งาน RUBJOB 🚀
+                {t("onboarding.startButton")}
               </Button>
             </div>
           </div>

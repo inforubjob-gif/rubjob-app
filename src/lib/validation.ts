@@ -3,27 +3,27 @@
  * Native logic to minimize dependencies
  */
 
-export const validateRequired = (value: any, fieldName: string) => {
+export const validateRequired = (value: unknown, fieldName: string): void => {
   if (value === undefined || value === null || value === "" || (Array.isArray(value) && value.length === 0)) {
     throw new Error(`${fieldName} is required`);
   }
 };
 
-export const validatePhone = (phone: string) => {
+export const validatePhone = (phone: string): void => {
   const phoneRegex = /^[0-9+ ]{9,15}$/;
   if (!phoneRegex.test(phone)) {
     throw new Error("Invalid phone number format");
   }
 };
 
-export const validateEmail = (email: string) => {
+export const validateEmail = (email: string): void => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(email)) {
     throw new Error("Invalid email format");
   }
 };
 
-export const validateNumber = (value: any, fieldName: string, options?: { min?: number; max?: number }) => {
+export const validateNumber = (value: unknown, fieldName: string, options?: { min?: number; max?: number }): number => {
   const num = Number(value);
   if (isNaN(num)) {
     throw new Error(`${fieldName} must be a number`);
@@ -37,8 +37,11 @@ export const validateNumber = (value: any, fieldName: string, options?: { min?: 
   return num;
 };
 
-export const tryParseJSON = (value: any, fieldName: string) => {
-  if (typeof value === "object") return value;
+export const tryParseJSON = (value: unknown, fieldName: string): unknown => {
+  if (typeof value === "object" && value !== null) return value;
+  if (typeof value !== "string") {
+    throw new Error(`Invalid input type for ${fieldName}, expected string or object`);
+  }
   try {
     return JSON.parse(value);
   } catch (e) {

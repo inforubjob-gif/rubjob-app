@@ -1,9 +1,21 @@
 import { getRequestContext } from "@cloudflare/next-on-pages";
 import { NextResponse } from "next/server";
+import { getAdminSession, getRubberSession, getStoreSession } from "@/lib/auth-server";
 
 export const runtime = "edge";
 
 export async function POST(req: Request) {
+  // Security Upgrade: Only authenticated users can upload
+  const [admin, rubber, store] = await Promise.all([
+    getAdminSession(),
+    getRubberSession(),
+    getStoreSession()
+  ]);
+
+  if (!admin && !rubber && !store) {
+    return NextResponse.json({ error: "Unauthorized: No valid session found" }, { status: 401 });
+  }
+
   try {
     const formData = await req.formData();
     const file = formData.get("file") as File;

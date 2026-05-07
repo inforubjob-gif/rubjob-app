@@ -1,21 +1,19 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { Icons } from "@/components/ui/Icons";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
-
-const AVAILABLE_SKILLS = [
-  { id: "gecko_catcher", name: "จับตุ๊กแก 🦎", defaultPrice: 300, defaultUnit: "ครั้ง" },
-  { id: "fortune_telling", name: "ดูดวง 🔮", defaultPrice: 500, defaultUnit: "ชม." },
-  { id: "life_management", name: "จัดการชีวิต 📋", defaultPrice: 400, defaultUnit: "ชม." },
-  { id: "companion_friend", name: "เพื่อนยามเหงา 💬", defaultPrice: 250, defaultUnit: "ชม." },
-  { id: "home_cleaning", name: "ทำความสะอาดบ้าน 🧹", defaultPrice: 500, defaultUnit: "ครั้ง" },
-  { id: "personal_assistant", name: "ผู้ช่วยส่วนตัว 🤝", defaultPrice: 1000, defaultUnit: "วัน" },
-];
+import GlobalInput from "@/components/ui/GlobalInput";
+import GlobalTextarea from "@/components/ui/GlobalTextarea";
+import GlobalSelect from "@/components/ui/GlobalSelect";
+import { useTranslation } from "@/components/providers/LanguageProvider";
+import { useToast } from "@/components/providers/ToastProvider";
 
 export default function ProviderSetupPage() {
+  const { t } = useTranslation();
+  const { showToast } = useToast();
   const router = useRouter();
   const [provider, setProvider] = useState<any>(null);
   const [name, setName] = useState("");
@@ -25,6 +23,15 @@ export default function ProviderSetupPage() {
   const [pricing, setPricing] = useState<Record<string, number>>({});
   const [pricingUnit, setPricingUnit] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const AVAILABLE_SKILLS = useMemo(() => [
+    { id: "gecko_catcher", name: t("provider.gig.categories.gecko_catcher"), defaultPrice: 300, defaultUnit: t("provider.gig.units.session") },
+    { id: "fortune_telling", name: t("provider.gig.categories.fortune_telling"), defaultPrice: 500, defaultUnit: t("provider.gig.units.hour") },
+    { id: "life_management", name: t("provider.gig.categories.life_management"), defaultPrice: 400, defaultUnit: t("provider.gig.units.hour") },
+    { id: "companion_friend", name: t("provider.gig.categories.companion_friend"), defaultPrice: 250, defaultUnit: t("provider.gig.units.hour") },
+    { id: "home_cleaning", name: t("provider.gig.categories.home_cleaning"), defaultPrice: 500, defaultUnit: t("provider.gig.units.session") },
+    { id: "personal_assistant", name: t("provider.gig.categories.personal_assistant"), defaultPrice: 1000, defaultUnit: "วัน" }, // 'วัน' not in units yet
+  ], [t]);
 
   useEffect(() => {
     const session = localStorage.getItem("rubjob_provider_session");
@@ -72,8 +79,8 @@ export default function ProviderSetupPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name.trim()) return alert("กรุณาระบุชื่อของคุณ");
-    if (selectedSkills.length === 0) return alert("กรุณาเลือกบริการอย่างน้อย 1 ประเภท");
+    if (!name.trim()) return showToast(t("provider.setup.nameRequired"), "error");
+    if (selectedSkills.length === 0) return showToast(t("provider.setup.skillRequired"), "error");
 
     setIsSubmitting(true);
     try {
@@ -107,13 +114,13 @@ export default function ProviderSetupPage() {
         };
         localStorage.setItem("rubjob_provider_session", JSON.stringify(newSession));
         
-        alert("ส่งข้อมูลลงทะเบียนเรียบร้อย รอทีมงานอนุมัติครับ");
+        showToast(t("provider.setup.submitSuccess"), "success");
         router.push("/partner-service");
       } else {
-        alert(data.error || "เกิดข้อผิดพลาด");
+        showToast(data.error || t("provider.dashboard.genericError"), "error");
       }
     } catch (err) {
-      alert("ไม่สามารถบันทึกข้อมูลได้");
+      showToast(t("provider.setup.submitError"), "error");
     } finally {
       setIsSubmitting(false);
     }
@@ -131,9 +138,9 @@ export default function ProviderSetupPage() {
           </button>
           <Icons.Logo variant="icon-white" size={32} />
         </div>
-        <h1 className="text-2xl font-black text-white uppercase mt-2">สร้างบริการของฉัน</h1>
+        <h1 className="text-2xl font-black text-white uppercase mt-2">{t("register.partner.title")}</h1>
         <p className="text-white/80 text-xs font-bold leading-relaxed mt-2 max-w-xs">
-          กำหนดโปรไฟล์ เลือกสิ่งที่ถนัด และตั้งราคาบริการของคุณเองได้อย่างอิสระเพื่อรับงานบน RUBJOB
+          {t("register.partner.subtitle")}
         </p>
       </div>
 
@@ -142,48 +149,40 @@ export default function ProviderSetupPage() {
         <Card className="p-6">
           <h2 className="text-sm font-black text-slate-800 uppercase mb-4 flex items-center gap-2">
             <span className="w-6 h-6 rounded-md bg-primary/10 text-primary flex items-center justify-center text-xs">1</span>
-            ข้อมูลส่วนตัว
+            {t("register.partner.step1Title")}
           </h2>
           
           <div className="space-y-4">
-            <div>
-              <label className="text-xs font-black text-slate-400">ชื่อผู้ให้บริการ / นามแฝง *</label>
-              <input
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="เช่น ป้าแม่บ้าน, ทนายคิม, น้องสปาย"
-                className="w-full mt-1 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold focus:ring-2 focus:ring-primary/20"
-                required
-              />
-            </div>
-            <div>
-              <label className="text-xs font-black text-slate-400">เบอร์โทรศัพท์ติดต่อ</label>
-              <input
-                type="tel"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                placeholder="08X-XXX-XXXX"
-                className="w-full mt-1 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold focus:ring-2 focus:ring-primary/20"
-              />
-            </div>
-            <div>
-              <label className="text-xs font-black text-slate-400">แนะนำตัวสั้นๆ ให้ลูกค้ารู้จัก</label>
-              <textarea
-                value={bio}
-                onChange={(e) => setBio(e.target.value)}
-                placeholder="อธิบายประสบการณ์ หรือความเชี่ยวชาญของคุณ..."
-                rows={3}
-                className="w-full mt-1 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium focus:ring-2 focus:ring-primary/20 resize-none"
-              />
-            </div>
+            <GlobalInput
+              label={t("register.partner.nameLabel") + " *"}
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder={t("provider.gig.titlePlaceholder")}
+              variant="default"
+              required
+            />
+            <GlobalInput
+              label={t("register.partner.phoneLabel")}
+              type="tel"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              placeholder="08X-XXX-XXXX"
+              variant="default"
+            />
+            <GlobalTextarea
+              label={t("provider.gig.descPlaceholder")}
+              value={bio}
+              onChange={(e) => setBio(e.target.value)}
+              placeholder={t("provider.gig.descPlaceholder")}
+              rows={3}
+            />
           </div>
         </Card>
 
         <Card className="p-6">
           <h2 className="text-sm font-black text-slate-800 uppercase mb-4 flex items-center gap-2">
             <span className="w-6 h-6 rounded-md bg-primary/10 text-primary flex items-center justify-center text-xs">2</span>
-            เลือกทักษะและตั้งราคา
+            {t("register.partner.step2Title")}
           </h2>
 
           <div className="space-y-4">
@@ -213,28 +212,26 @@ export default function ProviderSetupPage() {
                   {isSelected && (
                     <div className="bg-orange-50/50 p-4 border-t border-orange-100/50 flex gap-3 animate-in slide-in-from-top-2">
                       <div className="flex-1">
-                        <label className="text-[10px] font-black text-primary-dark/60 uppercase">ราคา</label>
-                        <div className="relative">
-                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-bold">฿</span>
-                          <input 
-                            type="number"
-                            value={pricing[skill.id] || ""}
-                            onChange={(e) => handlePriceChange(skill.id, e.target.value)}
-                            className="w-full bg-white border border-slate-200 rounded-lg pl-8 pr-3 py-2 text-sm font-bold focus:ring-2 focus:ring-primary/20"
-                          />
-                        </div>
+                        <GlobalInput
+                          label={t("common.price")}
+                          type="number"
+                          value={pricing[skill.id] || ""}
+                          onChange={(e) => handlePriceChange(skill.id, e.target.value)}
+                          variant="default"
+                          icon={<span className="text-slate-400 font-bold">฿</span>}
+                        />
                       </div>
-                      <div className="w-[100px]">
-                        <label className="text-[10px] font-black text-primary-dark/60 uppercase">ต่อ</label>
-                        <select
-                          value={pricingUnit[skill.id] || "ครั้ง"}
+                      <div className="w-[120px]">
+                        <GlobalSelect
+                          label={t("common.unit")}
+                          value={pricingUnit[skill.id] || t("provider.gig.units.session")}
                           onChange={(e) => handleUnitChange(skill.id, e.target.value)}
-                          className="w-full bg-white border border-slate-200 rounded-lg px-2 py-2 text-sm font-bold focus:ring-2 focus:ring-primary/20"
-                        >
-                          <option value="ครั้ง">ครั้ง</option>
-                          <option value="ชม.">ชม.</option>
-                          <option value="วัน">วัน</option>
-                        </select>
+                          options={[
+                            { label: t("provider.gig.units.session"), value: t("provider.gig.units.session") },
+                            { label: t("provider.gig.units.hour"), value: t("provider.gig.units.hour") },
+                            { label: "วัน", value: "วัน" },
+                          ]}
+                        />
                       </div>
                     </div>
                   )}
@@ -247,7 +244,7 @@ export default function ProviderSetupPage() {
         {/* Info Card */}
         <div className="bg-slate-200/50 rounded-xl p-4 text-center">
           <p className="text-xs text-slate-500 font-bold">
-            💡 บริการเหล่านี้จะไปปรากฏบนหน้าจอหลักของแอป RUBJOB เพื่อให้ลูกค้าเลือกใช้บริการและทักหาคุณโดยตรง
+            💡 {t("register.partner.subtitle")}
           </p>
         </div>
 
@@ -259,7 +256,7 @@ export default function ProviderSetupPage() {
             isLoading={isSubmitting}
             className="bg-primary hover:bg-primary-dark text-white rounded-xl py-5 font-black uppercase text-sm shadow-xl shadow-primary-dark/20 active:scale-95 transition-transform"
           >
-            บันทึกและเปิดรับงาน
+            {t("register.partner.submitButton")}
           </Button>
         </div>
       </form>

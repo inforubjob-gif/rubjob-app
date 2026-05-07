@@ -3,15 +3,14 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Card from "@/components/ui/Card";
-import Badge, { statusToBadgeVariant, statusLabel } from "@/components/ui/Badge";
+import Badge, { statusToBadgeVariant } from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
 import { Icons, getServiceIcon, IconCircle } from "@/components/ui/Icons";
 import { useTranslation } from "@/components/providers/LanguageProvider";
 
 import Modal from "@/components/ui/Modal";
 import Skeleton from "@/components/ui/Skeleton";
-
-// Operational state for Rubber
+import ConfirmModal from "@/components/ui/ConfirmModal";
 
 export default function RubberDashboard() {
   const { t } = useTranslation();
@@ -23,6 +22,12 @@ export default function RubberDashboard() {
   const [selectedJob, setSelectedJob] = useState<any | null>(null);
   const [rubber, setRubber] = useState<any>(null);
   const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
+  const [alertConfig, setAlertConfig] = useState<{ isOpen: boolean; title: string; message: string; type: "success" | "error" | "warning" }>({
+    isOpen: false,
+    title: "",
+    message: "",
+    type: "error",
+  });
 
   // Lifted state
   const [availableJobs, setAvailableJobs] = useState<any[]>([]);
@@ -126,10 +131,20 @@ export default function RubberDashboard() {
         // Navigate to the job details page for next steps
         router.push(`/rubber/orders/${jobId}`);
       } else {
-        alert(data.error || t("rubber.acceptJobError"));
+        setAlertConfig({
+          isOpen: true,
+          title: t("common.error"),
+          message: data.error || t("rubber.acceptJobError"),
+          type: "error",
+        });
       }
     } catch (err) {
-      alert(t("rubber.networkError"));
+      setAlertConfig({
+        isOpen: true,
+        title: t("common.error"),
+        message: t("rubber.networkError"),
+        type: "error",
+      });
     } finally {
       setIsLoading(false);
     }
@@ -386,7 +401,12 @@ export default function RubberDashboard() {
                         const liffId = process.env.NEXT_PUBLIC_LIFF_ID;
                         window.location.href = `https://liff.line.me/${liffId}/auth/link-line?type=rubber&id=${rubber.id}&token=${token}`;
                       } catch (e) {
-                        alert("เกิดข้อผิดพลาดในการสร้างลิงก์เชื่อมต่อ");
+                        setAlertConfig({
+                          isOpen: true,
+                          title: t("common.error"),
+                          message: t("common.errorDesc"),
+                          type: "error",
+                        });
                       }
                     }}
                   >
@@ -536,6 +556,14 @@ export default function RubberDashboard() {
           </div>
         </div>
       </Modal>
+
+      <ConfirmModal 
+        isOpen={alertConfig.isOpen}
+        onClose={() => setAlertConfig({ ...alertConfig, isOpen: false })}
+        title={alertConfig.title}
+        message={alertConfig.message}
+        type={alertConfig.type}
+      />
     </div>
   );
 }

@@ -11,16 +11,29 @@ export const runtime = "edge";
 export async function POST(req: Request) {
   const env = getRequestContext().env;
   const db = env?.DB;
-  const stripeSecretKey = env?.STRIPE_SECRET_KEY;
-  const webhookSecret = env?.STRIPE_WEBHOOK_SECRET;
 
-  if (!db || !stripeSecretKey || !webhookSecret) {
-    return NextResponse.json({ error: "Missing Server Configuration" }, { status: 500 });
+  if (!db) return NextResponse.json({ error: "DB not found" }, { status: 500 });
+
+  // Try Env first, then DB
+  let stripeSecretKey = env?.STRIPE_SECRET_KEY;
+  if (!stripeSecretKey) {
+    const setting = await db.prepare("SELECT value FROM system_settings WHERE key = 'stripe_secret_key'").first() as { value: string };
+    stripeSecretKey = setting?.value;
+  }
+
+  let webhookSecret = env?.STRIPE_WEBHOOK_SECRET;
+  if (!webhookSecret) {
+    const setting = await db.prepare("SELECT value FROM system_settings WHERE key = 'stripe_webhook_secret'").first() as { value: string };
+    webhookSecret = setting?.value;
+  }
+
+  if (!stripeSecretKey || !webhookSecret) {
+    return NextResponse.json({ error: "Missing Stripe Server Configuration" }, { status: 500 });
   }
 
   // Initialize Stripe
   const stripe = new Stripe(stripeSecretKey, {
-    apiVersion: "2026-03-25.dahlia",
+    apiVersion: "2024-06-20",
     httpClient: Stripe.createFetchHttpClient(),
   });
 

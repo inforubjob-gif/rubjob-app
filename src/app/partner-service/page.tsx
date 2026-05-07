@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import Card from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
@@ -8,15 +8,8 @@ import Button from "@/components/ui/Button";
 import { Icons } from "@/components/ui/Icons";
 import Modal from "@/components/ui/Modal";
 import Skeleton from "@/components/ui/Skeleton";
-
-const SKILL_LABELS: Record<string, string> = {
-  gecko_catcher: "จับตุ๊กแก 🦎",
-  fortune_telling: "ดูดวง 🔮",
-  life_management: "จัดการชีวิต 📋",
-  companion_friend: "เพื่อนยามเหงา 💬",
-  home_cleaning: "ทำความสะอาดบ้าน 🧹",
-  personal_assistant: "ผู้ช่วยส่วนตัว 🤝",
-};
+import { useTranslation } from "@/components/providers/LanguageProvider";
+import { useToast } from "@/components/providers/ToastProvider";
 
 const STATUS_COLORS: Record<string, string> = {
   pending: "bg-amber-100 text-amber-700",
@@ -26,6 +19,8 @@ const STATUS_COLORS: Record<string, string> = {
 };
 
 export default function ProviderDashboard() {
+  const { t } = useTranslation();
+  const { showToast } = useToast();
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<"available" | "active">("available");
   const [isLoading, setIsLoading] = useState(true);
@@ -36,6 +31,18 @@ export default function ProviderDashboard() {
   const [activeJobs, setActiveJobs] = useState<any[]>([]);
   const [balance, setBalance] = useState(0);
   const [verificationStatus, setVerificationStatus] = useState<"active" | "pending" | "unregistered" | "rejected">("pending");
+
+  const SKILL_LABELS = useMemo<Record<string, string>>(() => ({
+    gecko_catcher: t("provider.gig.categories.gecko_catcher"),
+    fortune_telling: t("provider.gig.categories.fortune_telling"),
+    life_management: t("provider.gig.categories.life_management"),
+    companion_friend: t("provider.gig.categories.companion_friend"),
+    home_cleaning: t("provider.gig.categories.home_cleaning"),
+    personal_assistant: t("provider.gig.categories.personal_assistant"),
+    graphic_design: t("provider.gig.categories.graphic_design"),
+    tutor: t("provider.gig.categories.tutor"),
+    developer: t("provider.gig.categories.developer"),
+  }), [t]);
 
   useEffect(() => {
     const localSession = localStorage.getItem("rubjob_provider_session");
@@ -53,7 +60,6 @@ export default function ProviderDashboard() {
     if (!providerId) return;
     setIsLoading(true);
     try {
-      // Fetch preferences (work status)
       const prefRes = await fetch(`/api/users/preferences?userId=${providerId}`);
       const prefData = await prefRes.json() as any;
       if (prefData.preferences?.workStatus !== undefined) {
@@ -73,7 +79,6 @@ export default function ProviderDashboard() {
       if (data.available) setAvailableJobs(data.available);
       if (data.active) setActiveJobs(data.active);
 
-      // Fetch wallet balance
       const walRes = await fetch(`/api/provider/wallet?providerId=${providerId}`);
       const walData = await walRes.json() as any;
       if (walData.balance !== undefined) setBalance(walData.balance);
@@ -111,14 +116,13 @@ export default function ProviderDashboard() {
       const data = await res.json() as any;
       if (res.ok && data.success) {
         setSelectedJob(null);
-        // Refresh
         fetchProviderData(provider.id);
         setActiveTab("active");
       } else {
-        alert(data.error || "ไม่สามารถรับงานได้");
+        showToast(data.error || t("provider.dashboard.acceptError"), "error");
       }
     } catch (err) {
-      alert("เกิดข้อผิดพลาดในการเชื่อมต่อ");
+      showToast(t("provider.dashboard.connectionError"), "error");
     } finally {
       setIsLoading(false);
     }
@@ -136,10 +140,10 @@ export default function ProviderDashboard() {
       if (res.ok && data.success) {
         fetchProviderData(provider.id);
       } else {
-        alert(data.error || "เกิดข้อผิดพลาด");
+        showToast(data.error || t("provider.dashboard.genericError"), "error");
       }
     } catch (err) {
-      alert("เกิดข้อผิดพลาดในการเชื่อมต่อ");
+      showToast(t("provider.dashboard.connectionError"), "error");
     } finally {
       setIsLoading(false);
     }
@@ -153,10 +157,8 @@ export default function ProviderDashboard() {
 
   return (
     <div className="flex flex-col min-h-screen bg-slate-50 relative overflow-hidden">
-      {/* Background Gradient — Provider */}
       <div className="absolute top-0 left-0 right-0 h-[380px] bg-gradient-to-b from-primary via-primary-dark to-slate-50 z-0" />
 
-      {/* Header */}
       <header className="relative z-10 px-5 pt-3 pb-6">
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-4">
@@ -164,10 +166,10 @@ export default function ProviderDashboard() {
             <div className="min-w-0">
               <p className="text-xs text-white font-black uppercase leading-tight mb-2 flex items-center gap-2">
                 <span className="w-1.5 h-1.5 rounded-full bg-white/50 animate-pulse" />
-                ผู้ให้บริการ — Provider
+                {t("provider.dashboard.title")}
               </p>
               <h1 className="text-3xl font-black text-white truncate drop-shadow-md leading-none">
-                {provider?.name || "ผู้ให้บริการ"}
+                {provider?.name || t("provider.dashboard.providerFallback")}
               </h1>
             </div>
           </div>
@@ -179,7 +181,6 @@ export default function ProviderDashboard() {
           </button>
         </div>
 
-        {/* Work Status Toggle */}
         <Card className="mb-6 bg-white/10 backdrop-blur-xl border border-white/20 shadow-xl shadow-primary-dark/20 rounded-xl p-4 text-white">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -187,9 +188,9 @@ export default function ProviderDashboard() {
                 <Icons.Shield size={20} />
               </div>
               <div>
-                <p className="text-xs font-black text-white/50 uppercase leading-none mb-1">สถานะรับงาน</p>
+                <p className="text-xs font-black text-white/50 uppercase leading-none mb-1">{t("provider.profile.workStatus")}</p>
                 <p className="text-sm font-black uppercase">
-                  {workStatus ? "กำลังรับงาน" : "พักเบรค"}
+                  {workStatus ? t("provider.dashboard.receivingJobs") : t("provider.dashboard.onBreak")}
                 </p>
               </div>
             </div>
@@ -202,21 +203,19 @@ export default function ProviderDashboard() {
           </div>
         </Card>
 
-        {/* Stats */}
         <div className="grid grid-cols-2 gap-4 text-center">
           <div className="bg-white/10 backdrop-blur-md p-4 rounded-xl border border-white/10">
-            <p className="text-xs font-black text-white/50 uppercase">งานวันนี้</p>
+            <p className="text-xs font-black text-white/50 uppercase">{t("provider.nav.jobs")}</p>
             <p className="text-2xl font-black mt-1 text-white">{activeJobs.length}</p>
           </div>
           <div className="bg-white/10 backdrop-blur-md p-4 rounded-xl border border-white/10">
-            <p className="text-xs font-black text-white/50 uppercase">รายได้สะสม</p>
+            <p className="text-xs font-black text-white/50 uppercase">{t("provider.nav.earnings")}</p>
             <p className="text-3xl font-black mt-1 text-white">
               ฿{balance.toLocaleString()}
             </p>
           </div>
         </div>
 
-        {/* Skills Badge */}
         {provider?.skills && provider.skills.length > 0 && (
           <div className="mt-6 flex flex-wrap gap-2">
             {provider.skills.map((skill: string) => (
@@ -228,7 +227,6 @@ export default function ProviderDashboard() {
         )}
       </header>
 
-      {/* Tabs */}
       <div className="relative z-10 px-5 space-y-7 pt-2 animate-fade-in">
         <div className="bg-slate-100 p-1.5 rounded-xl flex shadow-inner border border-slate-200/50">
           <button
@@ -237,7 +235,7 @@ export default function ProviderDashboard() {
               activeTab === "available" ? "bg-white text-primary shadow-lg scale-[1.02]" : "text-slate-400 hover:text-slate-600"
             }`}
           >
-            งานที่ว่างอยู่
+            {t("provider.dashboard.statusPending")}
           </button>
           <button
             onClick={() => setActiveTab("active")}
@@ -245,12 +243,11 @@ export default function ProviderDashboard() {
               activeTab === "active" ? "bg-white text-primary shadow-lg scale-[1.02]" : "text-slate-400 hover:text-slate-600"
             }`}
           >
-            งานของฉัน
+            {t("provider.nav.jobs")}
           </button>
         </div>
       </div>
 
-      {/* Content */}
       <div className="flex-1 px-5 pt-6 space-y-7 pb-24 animate-fade-in">
         {isLoading ? (
           <div className="space-y-4">
@@ -271,15 +268,15 @@ export default function ProviderDashboard() {
                 <div className="w-24 h-24 bg-orange-100 rounded-xl flex items-center justify-center border border-orange-200 shadow-xl mb-8">
                   <Icons.Logo variant="icon" size={48} />
                 </div>
-                <h2 className="text-2xl font-black text-slate-900 uppercase">ลงทะเบียนผู้ให้บริการ</h2>
+                <h2 className="text-2xl font-black text-slate-900 uppercase">{t("register.partner.title")}</h2>
                 <p className="text-sm text-slate-500 font-bold mt-3 leading-relaxed max-w-[280px]">
-                  สมัครเป็นผู้ให้บริการกับ RUBJOB<br/>เลือกทักษะและตั้งราคาบริการของคุณเอง
+                  {t("register.partner.subtitle")}
                 </p>
                 <Button 
                   onClick={() => router.push("/partner-service/setup")}
                   className="mt-8 bg-slate-900 text-white px-8 py-5 rounded-xl font-black uppercase shadow-xl active:scale-95 transition-all"
                 >
-                  สมัครเป็นผู้ให้บริการ
+                  {t("register.partner.title")}
                 </Button>
               </>
             ) : (
@@ -291,19 +288,19 @@ export default function ProviderDashboard() {
                   </div>
                 </div>
                 <h2 className="text-xl font-black text-slate-900 uppercase">
-                  {verificationStatus === "pending" ? "รอการอนุมัติ" : "ไม่ผ่านการอนุมัติ"}
+                  {verificationStatus === "pending" ? t("provider.dashboard.pendingApproval") : t("provider.dashboard.rejected")}
                 </h2>
                 <p className="text-sm text-slate-500 font-bold mt-3 leading-relaxed max-w-[280px]">
                   {verificationStatus === "pending" 
-                    ? "ทีมงานกำลังตรวจสอบข้อมูลของคุณ กรุณารอสักครู่ครับ" 
-                    : "กรุณาติดต่อแอดมินเพื่อขอข้อมูลเพิ่มเติม"}
+                    ? t("provider.dashboard.pendingApprovalDesc") 
+                    : t("provider.dashboard.rejectedDesc")}
                 </p>
                 <Button 
                   variant="secondary"
                   className="mt-8 w-full max-w-[200px] bg-white border border-slate-200 text-slate-900 py-4 rounded-xl font-black text-[10px] uppercase"
                   onClick={() => window.location.reload()}
                 >
-                  รีเฟรช
+                  {t("common.refresh")}
                 </Button>
               </>
             )}
@@ -313,8 +310,8 @@ export default function ProviderDashboard() {
             {activeTab === "available" ? (
               <div className="space-y-4">
                 <div className="flex items-center justify-between px-1">
-                  <h2 className="text-base font-black text-slate-400 uppercase">งานใหม่</h2>
-                  <span className="text-xs font-bold bg-orange-100 text-primary px-2 py-0.5 rounded-full">{availableJobs.length} งาน</span>
+                  <h2 className="text-base font-black text-slate-400 uppercase">{t("provider.dashboard.statusPending")}</h2>
+                  <span className="text-xs font-bold bg-orange-100 text-primary px-2 py-0.5 rounded-full">{availableJobs.length} {t("provider.nav.jobs")}</span>
                 </div>
 
                 {availableJobs.length === 0 ? (
@@ -322,7 +319,7 @@ export default function ProviderDashboard() {
                     <div className="w-20 h-20 bg-slate-50 rounded-xl flex items-center justify-center mb-4 border border-slate-100 grayscale opacity-40">
                       <Icons.Logo variant="icon" size={40} />
                     </div>
-                    <p className="text-xs font-black text-slate-300 uppercase">ยังไม่มีงานใหม่</p>
+                    <p className="text-xs font-black text-slate-300 uppercase">{t("provider.dashboard.statusPending")}</p>
                   </div>
                 ) : (
                   availableJobs.map((job) => (
@@ -338,7 +335,7 @@ export default function ProviderDashboard() {
                             </span>
                           </div>
                           <h3 className="font-bold text-slate-900 mb-1 leading-tight">
-                            {job.customerName || "ลูกค้า"}
+                            {job.customerName || t("provider.dashboard.customerFallback")}
                           </h3>
                           <p className="text-xs text-slate-400 font-bold">
                             ฿{job.totalPrice?.toLocaleString()} · {job.id}
@@ -347,14 +344,14 @@ export default function ProviderDashboard() {
                       </div>
                       <div className="grid grid-cols-2 gap-2 mt-4">
                         <Button variant="secondary" size="sm" onClick={() => setSelectedJob(job)}>
-                          รายละเอียด
+                          {t("provider.dashboard.jobDetail")}
                         </Button>
                         <Button
                           size="sm"
                           className="bg-primary hover:bg-primary-dark shadow-lg shadow-primary-dark/20 active:scale-95 transition-transform"
                           onClick={() => handleAcceptJob(job.id)}
                         >
-                          รับงาน
+                          {t("common.confirm")}
                         </Button>
                       </div>
                     </Card>
@@ -364,7 +361,7 @@ export default function ProviderDashboard() {
             ) : (
               <div className="space-y-4">
                 <div className="flex items-center justify-between px-1">
-                  <h2 className="text-sm font-black text-slate-400 uppercase">งานที่กำลังทำ</h2>
+                  <h2 className="text-sm font-black text-slate-400 uppercase">{t("provider.nav.jobs")}</h2>
                 </div>
 
                 {activeJobs.length === 0 ? (
@@ -372,7 +369,7 @@ export default function ProviderDashboard() {
                     <div className="w-20 h-20 bg-slate-50 rounded-xl flex items-center justify-center mb-4 border border-slate-100 grayscale opacity-40">
                       <Icons.Logo variant="icon" size={40} />
                     </div>
-                    <p className="text-[10px] font-black text-slate-300 uppercase">ยังไม่มีงานที่กำลังดำเนินการ</p>
+                    <p className="text-[10px] font-black text-slate-300 uppercase">{t("provider.dashboard.genericError")}</p>
                   </div>
                 ) : (
                   activeJobs.map((job) => (
@@ -387,7 +384,7 @@ export default function ProviderDashboard() {
                         </div>
                         <div className="text-right min-w-[80px]">
                           <span className={`text-[10px] font-black px-2 py-1 rounded-lg ${job.status === 'pending' ? 'bg-amber-100 text-amber-600' : STATUS_COLORS[job.status]}`}>
-                            {job.status === "pending" ? "รอกดรับงาน" : job.status === "accepted" ? "รับงานแล้ว" : "กำลังดำเนินการ"}
+                            {job.status === "pending" ? t("provider.dashboard.statusPending") : job.status === "accepted" ? t("provider.dashboard.statusAccepted") : t("provider.dashboard.statusInProgress")}
                           </span>
                           <p className="text-xs font-bold text-slate-900 mt-1">฿{job.totalPrice?.toLocaleString()}</p>
                         </div>
@@ -400,7 +397,7 @@ export default function ProviderDashboard() {
                             size="sm"
                             onClick={() => handleAcceptJob(job.id)}
                           >
-                            รับงานนี้
+                            {t("common.confirm")}
                           </Button>
                         )}
                         {job.status === "accepted" && (
@@ -410,7 +407,7 @@ export default function ProviderDashboard() {
                             size="sm"
                             onClick={() => handleAction(job.id, "start")}
                           >
-                            เริ่มดำเนินการ
+                            {t("provider.dashboard.statusInProgress")}
                           </Button>
                         )}
                         {job.status === "in_progress" && (
@@ -420,7 +417,7 @@ export default function ProviderDashboard() {
                             size="sm"
                             onClick={() => handleAction(job.id, "complete")}
                           >
-                            ✅ เสร็จสิ้นงาน
+                            {t("common.finish")}
                           </Button>
                         )}
                       </div>
@@ -433,10 +430,7 @@ export default function ProviderDashboard() {
         )}
       </div>
 
-      {/* Bottom Nav removed, using AppWrapper BottomNav */}
-
-      {/* Job Detail Modal */}
-      <Modal isOpen={!!selectedJob} onClose={() => setSelectedJob(null)} title="รายละเอียดงาน">
+      <Modal isOpen={!!selectedJob} onClose={() => setSelectedJob(null)} title={t("provider.dashboard.jobDetail")}>
         {selectedJob && (
           <div className="w-full space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
             <div className="bg-orange-50 rounded-xl p-6 border border-orange-100 text-center">
@@ -451,7 +445,7 @@ export default function ProviderDashboard() {
                   <Icons.User size={20} />
                 </div>
                 <div>
-                  <p className="text-sm font-black text-slate-900">{selectedJob.customerName || "ลูกค้า"}</p>
+                  <p className="text-sm font-black text-slate-900">{selectedJob.customerName || t("provider.dashboard.customerFallback")}</p>
                   <p className="text-xs text-slate-400 font-bold">{selectedJob.id}</p>
                 </div>
               </div>

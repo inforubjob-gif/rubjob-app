@@ -10,6 +10,9 @@ import type { ServiceType, Address, Store } from "@/types";
 import { Icons, getServiceIcon, IconCircle } from "@/components/ui/Icons";
 import Modal from "@/components/ui/Modal";
 import { calculateOrderPrice } from "@/utils/pricing";
+import { loadStripe, Stripe } from "@stripe/stripe-js";
+import { Elements } from "@stripe/react-stripe-js";
+import PromptPayCheckout from "@/components/checkout/PromptPayCheckout";
 
 function getDistanceKm(lat1: number, lon1: number, lat2: number, lon2: number) {
   const R = 6371; 
@@ -82,6 +85,25 @@ function BookingFlow() {
   const [systemSettings, setSystemSettings] = useState<any>({});
   const [paymentQR, setPaymentQR] = useState<string | null>(null);
   const [activeOrderId, setActiveOrderId] = useState<string | null>(null);
+  const [publishableKey, setPublishableKey] = useState<string | null>(null);
+  const [stripePromise, setStripePromise] = useState<Promise<Stripe | null> | null>(null);
+
+  // Fetch Payment Config
+  useEffect(() => {
+    async function fetchConfig() {
+      try {
+        const res = await fetch("/api/payment/config");
+        const data = await res.json() as any;
+        if (data.publishableKey) {
+          setPublishableKey(data.publishableKey);
+          setStripePromise(loadStripe(data.publishableKey));
+        }
+      } catch (err) {
+        console.error("Failed to fetch payment config", err);
+      }
+    }
+    fetchConfig();
+  }, []);
 
   // Auto-assign store based on selected address
   function autoAssignStore(address: Address, stores: any[]): Store | null {
@@ -231,7 +253,7 @@ function BookingFlow() {
 
   const service = dbServices.find((s) => s.id === selectedService);
 
-  const locale = language === "th" ? "th" : language === "zh" ? "zh" : "en";
+  const locale = language === "th" ? "th" : "en";
 
   // Date/time constraints and generation...
   const dates = useMemo(() => {
@@ -661,12 +683,12 @@ function BookingFlow() {
                   </div>
                 </label>
 
-                <label className={`flex items-center justify-between p-3.5 rounded-xl border-2 cursor-pointer transition-all ${deliverySpeed === "express" ? "border-[ff9f1c] bg-[#fff8e1] shadow-md shadow-[ff9f1c]/10" : "border-slate-100 bg-white hover:bg-slate-50"}`} onClick={() => setDeliverySpeed("express")}>
+                <label className={`flex items-center justify-between p-3.5 rounded-xl border-2 cursor-pointer transition-all ${deliverySpeed === "express" ? "border-primary bg-[#fff8e1] shadow-md shadow-primary/10" : "border-slate-100 bg-white hover:bg-slate-50"}`} onClick={() => setDeliverySpeed("express")}>
                   <div className="flex flex-col">
-                    <span className="text-sm font-bold text-[ff9f1c]">{t("booking.speed.expressTitle")}</span>
-                    <span className="text-xs text-[ff9f1c]/80 block mt-0.5">{t("booking.speed.expressDesc").replace("{fee}", Math.ceil(totalDeliveryBase + 20).toString())}</span>
+                    <span className="text-sm font-bold text-primary">{t("booking.speed.expressTitle")}</span>
+                    <span className="text-xs text-primary/80 block mt-0.5">{t("booking.speed.expressDesc").replace("{fee}", Math.ceil(totalDeliveryBase + 20).toString())}</span>
                   </div>
-                  <div className={`w-5 h-5 rounded-full flex items-center justify-center transition-colors ${deliverySpeed === "express" ? "bg-[ff9f1c] text-white" : "border-2 border-slate-200"}`}>
+                  <div className={`w-5 h-5 rounded-full flex items-center justify-center transition-colors ${deliverySpeed === "express" ? "bg-primary text-white" : "border-2 border-slate-200"}`}>
                     {deliverySpeed === "express" && <span className="text-xs font-bold leading-none flex items-center justify-center pt-0.5">✓</span>}
                   </div>
                 </label>
@@ -984,37 +1006,43 @@ function BookingFlow() {
                 }`} 
                 onClick={() => setSelectedPayment("promptpay")}
               >
-                <div className="bg-[#1a3d6d] px-5 py-2.5 rounded-xl flex items-center gap-3">
-                  <div className="w-7 h-7 bg-white rounded-lg flex items-center justify-center">
-                    <span className="text-[11px] font-black text-[#1a3d6d]">PP</span>
-                  </div>
-                  <span className="text-base font-black text-white">PromptPay</span>
-                </div>
-                
-                <div className="bg-white p-4 rounded-xl shadow-inner border border-slate-100 relative overflow-hidden">
-                  <img 
-                    src={paymentQR || `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=00020101021129370016A000000677010111011300660000000005802TH5303764580215${totalPrice}.006304`}
-                    alt="PromptPay QR" 
-                    className="w-48 h-48 object-contain"
-                  />
-                  {(selectedPayment !== "promptpay" || !paymentQR) && (
-                    <div className="absolute inset-0 bg-white/60 backdrop-blur-[1px] flex items-center justify-center">
-                      <div className="w-12 h-12 bg-primary text-white rounded-full flex items-center justify-center shadow-xl">
-                        {isSubmitting ? <Icons.Loading className="animate-spin" /> : <Icons.Payment size={24} />}
+                {paymentQR && stripePromise ? (
+                   <Elements stripe={stripePromise} options={{ clientSecret: paymentQR, appearance: { theme: 'stripe' } }}>
+                      <PromptPayCheckout clientSecret={paymentQR} />
+                   </Elements>
+                ) : (
+                  <>
+                    <div className="bg-[#1a3d6d] px-5 py-2.5 rounded-xl flex items-center gap-3">
+                      <div className="w-7 h-7 bg-white rounded-lg flex items-center justify-center">
+                        <span className="text-[11px] font-black text-[#1a3d6d]">PP</span>
+                      </div>
+                      <span className="text-base font-black text-white">PromptPay</span>
+                    </div>
+                    
+                    <div className="bg-white p-4 rounded-xl shadow-inner border border-slate-100 relative overflow-hidden">
+                      <img 
+                        src={`https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=00020101021129370016A000000677010111011300660000000005802TH5303764580215${totalPrice}.006304`}
+                        alt="PromptPay Placeholder" 
+                        className="w-48 h-48 object-contain opacity-20 grayscale"
+                      />
+                      <div className="absolute inset-0 bg-white/60 backdrop-blur-[1px] flex items-center justify-center">
+                        <div className="w-12 h-12 bg-primary text-white rounded-full flex items-center justify-center shadow-xl">
+                          {isSubmitting ? <Icons.Loading className="animate-spin" /> : <Icons.Payment size={24} />}
+                        </div>
                       </div>
                     </div>
-                  )}
-                </div>
-                
-                <div className="text-center">
-                  <div className="flex items-baseline justify-center gap-1">
-                    <span className="text-sm font-bold text-muted">{t("booking.amountDue")}</span>
-                    <span className="text-2xl font-black text-foreground">฿{totalPrice}</span>
-                  </div>
-                  <p className="text-xs text-primary-dark font-bold mt-1 uppercase">
-                    {paymentQR ? t("booking.paymentDoneNote") : t("booking.instantConfirmation")}
-                  </p>
-                </div>
+                    
+                    <div className="text-center">
+                      <div className="flex items-baseline justify-center gap-1">
+                        <span className="text-sm font-bold text-muted">{t("booking.amountDue")}</span>
+                        <span className="text-2xl font-black text-foreground">฿{totalPrice}</span>
+                      </div>
+                      <p className="text-xs text-primary-dark font-bold mt-1 uppercase">
+                        {t("booking.instantConfirmation")}
+                      </p>
+                    </div>
+                  </>
+                )}
               </Card>
             </div>
 

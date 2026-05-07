@@ -9,6 +9,8 @@ import { useTranslation } from "@/components/providers/LanguageProvider";
 import { useStoreAuth } from "@/components/providers/StoreProvider";
 import PinLock from "@/components/PinLock";
 
+import ConfirmModal from "@/components/ui/ConfirmModal";
+
 export default function StoreWalletPage() {
   const { t } = useTranslation();
   const { store } = useStoreAuth();
@@ -22,6 +24,12 @@ export default function StoreWalletPage() {
   const [balance, setBalance] = useState(0);
   const [transactions, setTransactions] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [alertConfig, setAlertConfig] = useState<{ isOpen: boolean; title: string; message: string; type: "success" | "error" | "warning" }>({
+    isOpen: false,
+    title: "",
+    message: "",
+    type: "error",
+  });
 
   useEffect(() => {
     if (!store?.id) return;
@@ -43,7 +51,12 @@ export default function StoreWalletPage() {
 
   const handleWithdraw = async () => {
     if (!amount || !bankName || !accountNumber) {
-      alert(t("store.wallet.alertBankInfo"));
+      setAlertConfig({
+        isOpen: true,
+        title: t("common.error"),
+        message: t("store.wallet.alertBankInfo"),
+        type: "error",
+      });
       return;
     }
     setIsProcessing(true);
@@ -64,10 +77,21 @@ export default function StoreWalletPage() {
         fetchWalletData();
       } else {
         const data = await res.json() as any;
-        alert(data.error || t("store.wallet.withdrawError"));
+        setAlertConfig({
+          isOpen: true,
+          title: t("common.error"),
+          message: data.error || t("store.wallet.withdrawError"),
+          type: "error",
+        });
       }
     } catch (err) {
       console.error("Withdrawal error:", err);
+      setAlertConfig({
+        isOpen: true,
+        title: t("common.error"),
+        message: t("common.errorDesc"),
+        type: "error",
+      });
     } finally {
       setIsProcessing(false);
     }
@@ -113,7 +137,7 @@ export default function StoreWalletPage() {
                     {trx.amount > 0 ? <Icons.Payment size={20} /> : <Icons.Clock size={20} />}
                   </div>
                   <div className="flex-1">
-                    <p className="text-sm font-bold text-slate-900">{trx.type}</p>
+                    <p className="text-sm font-bold text-slate-900">{t(`store.wallet.types.${trx.type}`) || trx.type}</p>
                     <p className="text-[10px] text-slate-400 font-medium uppercase">
                       {new Date(trx.date).toLocaleDateString('th-TH', { 
                         day: 'numeric', 
@@ -134,11 +158,11 @@ export default function StoreWalletPage() {
             </div>
           </section>
 
-          <Card className="p-6 bg-orange-50 border-2 border-orange-100 shadow-sm">
+          <Card className="p-6 bg-primary/5 border-2 border-primary/10 shadow-sm">
               <h3 className="text-sm font-black text-primary mb-2 uppercase">{t("store.wallet.commissionRate")}</h3>
               <p className="text-xs text-slate-500 leading-relaxed mb-4 font-bold">{t("store.wallet.commissionDesc")}</p>
-              <div className="h-1.5 bg-white rounded-full overflow-hidden border border-orange-100">
-                  <div className="h-full bg-primary w-[85%] shadow-[0_0_8px_rgba(255,159,28,0.5)]" />
+              <div className="h-2 bg-white rounded-full overflow-hidden border border-primary/10">
+                  <div className="h-full bg-primary w-[90%] shadow-[0_0_12px_rgba(255,159,28,0.4)]" />
               </div>
           </Card>
         </div>
@@ -167,21 +191,21 @@ export default function StoreWalletPage() {
                 <div className="w-full grid grid-cols-1 gap-3">
                    <input 
                      type="text" 
-                     placeholder={t("rubber.wallet.bankNamePlaceholder")} 
+                     placeholder={t("store.wallet.bankNamePlaceholder")} 
                      value={bankName}
                      onChange={(e) => setBankName(e.target.value)}
                      className="w-full bg-slate-50 rounded-xl px-4 py-3 text-sm font-bold outline-none focus:ring-2 focus:ring-primary/20"
                    />
                    <input 
                      type="text" 
-                     placeholder={t("rubber.wallet.accountNumberPlaceholder")} 
+                     placeholder={t("store.wallet.accountNumberPlaceholder")} 
                      value={accountNumber}
                      onChange={(e) => setAccountNumber(e.target.value)}
                      className="w-full bg-slate-50 rounded-xl px-4 py-3 text-sm font-bold outline-none focus:ring-2 focus:ring-primary/20"
                    />
                    <input 
                      type="text" 
-                     placeholder={t("rubber.wallet.accountNamePlaceholder")} 
+                     placeholder={t("store.wallet.accountNamePlaceholder")} 
                      value={accountName}
                      onChange={(e) => setAccountName(e.target.value)}
                      className="w-full bg-slate-50 rounded-xl px-4 py-3 text-sm font-bold outline-none focus:ring-2 focus:ring-primary/20"
@@ -199,7 +223,7 @@ export default function StoreWalletPage() {
                      disabled={!amount || parseInt(amount) < 100 || (Number(amount) > balance) || isProcessing}
                      className="w-full py-5 bg-primary text-white rounded-xl font-black uppercase shadow-2xl shadow-primary/30"
                   >
-                     {isProcessing ? t("rubber.wallet.processing") : t("store.wallet.confirmWithdraw")}
+                     {isProcessing ? t("store.wallet.processing") : t("store.wallet.confirmWithdraw")}
                   </Button>
                   <button 
                     onClick={closeModal}
@@ -226,6 +250,14 @@ export default function StoreWalletPage() {
             </div>
           )}
         </Modal>
+
+        <ConfirmModal 
+          isOpen={alertConfig.isOpen}
+          onClose={() => setAlertConfig({ ...alertConfig, isOpen: false })}
+          title={alertConfig.title}
+          message={alertConfig.message}
+          type={alertConfig.type}
+        />
       </div>
     </PinLock>
   );

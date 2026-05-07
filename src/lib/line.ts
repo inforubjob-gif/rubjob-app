@@ -5,7 +5,9 @@
  * Requires LINE_CHANNEL_ACCESS_TOKEN in environment variables.
  */
 
-export async function sendLinePush(userId: string, messages: any[], accessToken: string) {
+import { LineMessage, LineTextMessage, LineFlexMessage, LinePushResponse } from "@/types/line";
+
+export async function sendLinePush(userId: string, messages: LineMessage[], accessToken: string): Promise<LinePushResponse | null> {
   if (!accessToken) {
     console.warn("LINE_CHANNEL_ACCESS_TOKEN is not set. Skipping notification.");
     return null;
@@ -29,7 +31,7 @@ export async function sendLinePush(userId: string, messages: any[], accessToken:
       throw new Error(`LINE API error: ${JSON.stringify(error)}`);
     }
 
-    return await response.json();
+    return await response.json() as LinePushResponse;
   } catch (error) {
     console.error("Failed to send LINE push notification:", error);
     return null;
@@ -39,7 +41,7 @@ export async function sendLinePush(userId: string, messages: any[], accessToken:
 /**
  * Helper to create a text message
  */
-export const textMessage = (text: string) => ({
+export const textMessage = (text: string): LineTextMessage => ({
   type: "text",
   text,
 });
@@ -47,7 +49,7 @@ export const textMessage = (text: string) => ({
 /**
  * Helper to create a Flex Message for Booking Confirmation
  */
-export const bookingConfirmationFlex = (orderId: string, serviceName: string, totalPrice: number) => ({
+export const bookingConfirmationFlex = (orderId: string, serviceName: string, totalPrice: number): LineFlexMessage => ({
   type: "flex",
   altText: "ยืนยันการขอรับบริการ Rubjob",
   contents: {
@@ -169,7 +171,7 @@ export const bookingConfirmationFlex = (orderId: string, serviceName: string, to
 /**
  * Flex Message for Order Status Update
  */
-export const orderStatusUpdateFlex = (orderId: string, statusText: string, description: string, color: string = "#3b82f6") => ({
+export const orderStatusUpdateFlex = (orderId: string, statusText: string, description: string, color: string = "#3b82f6"): LineFlexMessage => ({
   type: "flex",
   altText: `อัพเดทสถานะออเดอร์ ${orderId}`,
   contents: {
@@ -250,37 +252,37 @@ export const orderStatusUpdateFlex = (orderId: string, statusText: string, descr
 /**
  * Flex Message for Rubber Accepted
  */
-export const rubberAcceptedFlex = (orderId: string, rubberName: string) => 
+export const rubberAcceptedFlex = (orderId: string, rubberName: string): LineFlexMessage => 
   orderStatusUpdateFlex(orderId, "มี Rubber รับงานแล้ว!", `คุณ ${rubberName} กำลังเดินทางไปรับผ้าของคุณครับ`, "#10b981");
 
 /**
  * Flex Message for Washing
  */
-export const washingOrderFlex = (orderId: string) => 
+export const washingOrderFlex = (orderId: string): LineFlexMessage => 
   orderStatusUpdateFlex(orderId, "กำลังซักรีด...", `ออเดอร์ของคุณเข้าสู่กระบวนการซักรีดแล้วครับ`, "#6366f1");
 
 /**
  * Flex Message for Rubber heading to Store
  */
-export const deliveringToStoreFlex = (orderId: string) => 
+export const deliveringToStoreFlex = (orderId: string): LineFlexMessage => 
   orderStatusUpdateFlex(orderId, "กำลังนำส่งร้านซัก", `รับเบอร์ได้รับผ้าของคุณแล้ว และกำลังเดินทางไปที่ร้านซักให้คุณครับ`, "#3b82f6");
 
 /**
  * Flex Message for Ready for Delivery
  */
-export const readyForDeliveryFlex = (orderId: string) => 
+export const readyForDeliveryFlex = (orderId: string): LineFlexMessage => 
   orderStatusUpdateFlex(orderId, "ผ้าซักเสร็จแล้ว! ✨", `ออเดอร์ของคุณซักเสร็จเรียบร้อยแล้ว กำลังรอรับเบอร์มารับเพื่อนำไปส่งคืนให้คุณครับ`, "#f59e0b");
 
 /**
  * Flex Message for Rubber heading to Customer
  */
-export const deliveringToCustomerFlex = (orderId: string) => 
+export const deliveringToCustomerFlex = (orderId: string): LineFlexMessage => 
   orderStatusUpdateFlex(orderId, "กำลังนำผ้าไปส่งคืน", `รับเบอร์ได้รับผ้าสะอาดของคุณแล้ว และกำลังเดินทางไปส่งคืนให้คุณที่บ้านครับ`, "#10b981");
 
 /**
  * Flex Message for New Job Available (For Rubbers)
  */
-export const rubberNewJobFlex = (orderId: string, type: string, earn: number) => 
+export const rubberNewJobFlex = (orderId: string, type: string, earn: number): LineFlexMessage => 
   orderStatusUpdateFlex(
     orderId, 
     "💸 มีงานใหม่เข้า!", 
@@ -291,7 +293,7 @@ export const rubberNewJobFlex = (orderId: string, type: string, earn: number) =>
 /**
  * Flex Message for New Order Received (For Stores)
  */
-export const storeOrderAlertFlex = (orderId: string) => 
+export const storeOrderAlertFlex = (orderId: string): LineFlexMessage => 
   orderStatusUpdateFlex(
     orderId, 
     "🧺 ออเดอร์ใหม่เข้า!", 
@@ -302,7 +304,7 @@ export const storeOrderAlertFlex = (orderId: string) =>
 /**
  * Flex Message for Completed
  */
-export const orderCompletedFlex = (orderId: string) => ({
+export const orderCompletedFlex = (orderId: string): LineFlexMessage => ({
   type: "flex",
   altText: "ออเดอร์ส่งสำเร็จแล้ว!",
   contents: {

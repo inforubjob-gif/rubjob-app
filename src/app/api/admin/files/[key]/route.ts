@@ -1,6 +1,6 @@
 import { getRequestContext } from "@cloudflare/next-on-pages";
 import { NextResponse } from "next/server";
-import { getAdminSession } from "@/lib/auth-server";
+import { getAdminSession, getRubberSession, getStoreSession } from "@/lib/auth-server";
 
 export const runtime = "edge";
 
@@ -8,8 +8,16 @@ export async function GET(
   req: Request,
   { params }: { params: Promise<{ key: string }> }
 ) {
-  const session = await getAdminSession();
-  if (!session) return new Response("Unauthorized", { status: 401 });
+  // Security Upgrade: Check for any valid platform session
+  const [admin, rubber, store] = await Promise.all([
+    getAdminSession(),
+    getRubberSession(),
+    getStoreSession()
+  ]);
+
+  if (!admin && !rubber && !store) {
+    return new Response("Unauthorized: No valid session found", { status: 401 });
+  }
 
   try {
     const { key } = await params;

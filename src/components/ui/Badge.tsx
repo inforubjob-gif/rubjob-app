@@ -20,29 +20,39 @@ const variantStyles: Record<BadgeVariant, string> = {
  * Maps an OrderStatus to a Badge variant for consistent status coloring
  */
 export function statusToBadgeVariant(status: OrderStatus): BadgeVariant {
-  const map: Record<OrderStatus, BadgeVariant> = {
+  const map: Record<string, BadgeVariant> = {
     pending: "warning",
+    accepted: "info",
     picking_up: "info",
-    delivering_to_store: "info",
+    in_progress: "info",
+    at_shop: "warning",
     washing: "warning",
+    ready_for_return: "info",
+    ready_for_pickup: "info",
+    delivering_to_store: "info",
     delivering_to_customer: "info",
     completed: "success",
     cancelled: "danger",
   };
-  return map[status];
+  return (map[status] || "default") as BadgeVariant;
 }
 
 export function statusLabel(status: OrderStatus): string {
-  const labels: Record<OrderStatus, string> = {
+  const labels: Record<string, string> = {
     pending: "Pending",
+    accepted: "Accepted",
     picking_up: "Picking Up",
-    delivering_to_store: "Delivering to Store",
+    in_progress: "In Progress",
+    at_shop: "At Shop",
     washing: "Washing",
+    ready_for_return: "Ready for Return",
+    ready_for_pickup: "Ready for Pickup",
+    delivering_to_store: "Delivering to Store",
     delivering_to_customer: "Delivering to Customer",
     completed: "Completed",
     cancelled: "Cancelled",
   };
-  return labels[status];
+  return labels[status] || status;
 }
 
 export default function Badge({

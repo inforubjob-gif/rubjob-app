@@ -86,8 +86,8 @@ export default function RubberOrderDetailPage() {
   // Define steps that require photo
   const photoSteps: Record<string, string> = {
     "picking_up": "pickupUser",
-    "delivering_to_store": "deliveryStore",
-    "ready_for_pickup": "pickupStore",
+    "at_shop": "deliveryStore",
+    "ready_for_return": "pickupStore",
     "delivering_to_customer": "deliveryUser",
   };
 
@@ -105,7 +105,11 @@ export default function RubberOrderDetailPage() {
 
   const handleUpdateStatus = async (nextStatus: string, photoOverride?: string) => {
     const activePhoto = photoOverride || photo;
-    if (currentPhotoStep && !activePhoto) {
+    
+    // Skill.md Section 11: Mandatory photos for pickup and shop drop-off
+    const needsPhoto = status === "picking_up" || status === "at_shop";
+    
+    if (needsPhoto && !activePhoto) {
       // Automatically trigger camera if photo is missing
       setAutoSubmitAfterPhoto(true);
       photoUploadRef.current?.triggerCapture();
@@ -124,7 +128,7 @@ export default function RubberOrderDetailPage() {
       setAutoSubmitAfterPhoto(false);
       
       // Auto-redirection for states that end the current rubber leg
-      if (nextStatus === "washing" || nextStatus === "completed") {
+      if (nextStatus === "at_shop" || nextStatus === "completed") {
         setTimeout(() => {
           router.push("/rubber");
         }, 2000);
@@ -138,9 +142,9 @@ export default function RubberOrderDetailPage() {
 
   const getNextStatus = (currentStatus: string) => {
     switch(currentStatus) {
-        case "picking_up": return "delivering_to_store";
-        case "delivering_to_store": return "washing";
-        case "ready_for_pickup": return "delivering_to_customer";
+        case "picking_up": return "at_shop";
+        case "at_shop": return "at_shop"; // Wait for Admin to change to ready_for_return
+        case "ready_for_return": return "delivering_to_customer";
         case "delivering_to_customer": return "completed";
         default: return currentStatus;
     }
@@ -337,7 +341,46 @@ export default function RubberOrderDetailPage() {
              </div>
           </Card>
 
-          {currentPhotoStep && (
+          {(status === "ready_for_return" || status === "delivering_to_customer") && (
+            <Card className="p-6 border-none shadow-xl shadow-primary/5 rounded-[2rem] bg-slate-900 text-white relative overflow-hidden group">
+               <div className="absolute top-0 right-0 w-32 h-32 bg-primary/20 rounded-full blur-3xl -mr-16 -mt-16" />
+               <div className="relative z-10">
+                  <div className="flex items-center gap-3 mb-4">
+                     <div className="w-8 h-8 rounded-lg bg-primary/20 text-primary flex items-center justify-center">
+                        <Icons.Search size={18} />
+                     </div>
+                     <h3 className="text-sm font-black uppercase tracking-wider">{t("rubber.visualIdentification") || "Visual Identification"}</h3>
+                  </div>
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4 leading-relaxed">
+                     {t("rubber.photoGuide") || "Use these photos to identify the correct basket/bag at the shop."}
+                  </p>
+                  <div className="grid grid-cols-2 gap-3">
+                     <div className="space-y-2">
+                        <p className="text-[9px] font-black text-primary uppercase">{t("rubber.photoStep.pickupUser") || "From Customer"}</p>
+                        <div className="aspect-square rounded-xl bg-slate-800 overflow-hidden border border-white/10">
+                           {order?.pickupPhotoUrl ? (
+                             <img src={order.pickupPhotoUrl} className="w-full h-full object-cover" alt="Pickup" />
+                           ) : (
+                             <div className="w-full h-full flex items-center justify-center text-slate-600 italic text-[9px]">No photo</div>
+                           )}
+                        </div>
+                     </div>
+                     <div className="space-y-2">
+                        <p className="text-[9px] font-black text-primary uppercase">{t("rubber.photoStep.deliveryStore") || "At Shop"}</p>
+                        <div className="aspect-square rounded-xl bg-slate-800 overflow-hidden border border-white/10">
+                           {order?.dropoffShopPhotoUrl ? (
+                             <img src={order.dropoffShopPhotoUrl} className="w-full h-full object-cover" alt="At Shop" />
+                           ) : (
+                             <div className="w-full h-full flex items-center justify-center text-slate-600 italic text-[9px]">No photo</div>
+                           )}
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </Card>
+          )}
+
+          {currentPhotoStep && status !== "at_shop" && (
              <Card className="p-6 border-none shadow-xl shadow-primary/5 rounded-[2rem] bg-white border border-primary/10 relative overflow-hidden group">
                 <div className="absolute -top-10 -right-10 w-32 h-32 bg-primary/5 rounded-full blur-2xl transition-all group-hover:bg-primary/10" />
                 <PhotoUpload 
@@ -369,8 +412,8 @@ export default function RubberOrderDetailPage() {
                 className="bg-primary text-white hover:bg-primary-dark shadow-2xl shadow-primary/30 py-6 text-base font-black rounded-xl uppercase"
              >
                 {status === "picking_up" ? t("rubber.orderDetail.btnPickup") : 
-                 status === "delivering_to_store" ? t("rubber.orderDetail.btnHandover") : 
-                 status === "ready_for_pickup" ? t("staff.receiveFromDriver") : 
+                 status === "at_shop" ? t("rubber.orderDetail.btnHandover") : 
+                 status === "ready_for_return" ? t("staff.receiveFromDriver") : 
                  status === "delivering_to_customer" ? t("rubber.orderDetail.btnFinish") : t("rubber.orderDetail.btnUpdateTask")}
              </Button>
            )}

@@ -28,13 +28,13 @@ const FEATURES = [
   { 
     icon: <IconCircle variant="orange" size="lg"><Icons.Relax size={32} strokeWidth={2.5} /></IconCircle>, 
     title: "Relax & Rest", 
-    titleColor: "text-[#ff8a00]",
+    titleColor: "text-primary",
     desc: "คืนเวลาพักผ่อนให้คุณจัดการทุกเรื่องผ้าให้เสร็จสรรพ ครบในที่เดียว ชีวิตง่ายขึ้นทันที" 
   },
   { 
     icon: <IconCircle variant="yellow" size="lg"><Icons.Smile size={32} strokeWidth={2.5} /></IconCircle>, 
     title: "Happy Status", 
-    titleColor: "text-[#ffce00]",
+    titleColor: "text-secondary",
     desc: "อัปเดตสถานะทุกขั้นตอน ไม่ต้องคอยตามหรือกังวลใจ ให้คุณยิ้มได้ในทุกวัน" 
   },
   { 
@@ -52,13 +52,13 @@ const FEATURES = [
   { 
     icon: <IconCircle variant="orange" size="lg"><Icons.Lightbulb size={32} strokeWidth={2.5} /></IconCircle>, 
     title: "Smart Delivery", 
-    titleColor: "text-[#ff8a00]",
+    titleColor: "text-primary",
     desc: "แพ็กเรียบร้อย ส่งถึงมือ จบงานแบบไม่ต้องคิดต่อ ด้วยระบบจัดการที่ชาญฉลาด" 
   },
   { 
     icon: <IconCircle variant="yellow" size="lg"><Icons.Check size={32} strokeWidth={3} /></IconCircle>, 
     title: "Perfect Quality", 
-    titleColor: "text-[#ffce00]",
+    titleColor: "text-secondary",
     desc: "มาตรฐานความสะอาดระดับมืออาชีพ ตรวจสอบทุกชิ้นก่อนส่งคืนถึงมือคุณ" 
   },
 ];

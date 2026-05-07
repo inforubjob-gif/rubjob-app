@@ -36,6 +36,8 @@ const SUBDOMAIN_MAP: Record<string, string> = {
   admin: "/admin",
   rubber: "/rubber",
   partner: "/partner",
+  store: "/partner-store",
+  provider: "/partner-service",
   app: "",   // User app — root-level pages, no prefix needed
 };
 

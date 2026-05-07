@@ -7,6 +7,8 @@ import Modal from "@/components/ui/Modal";
 import { Icons } from "@/components/ui/Icons";
 import { useTranslation } from "@/components/providers/LanguageProvider";
 import PinLock from "@/components/PinLock";
+import GlobalInput from "@/components/ui/GlobalInput";
+import ConfirmModal from "@/components/ui/ConfirmModal";
 
 export default function RubberWalletPage() {
   const { t } = useTranslation();
@@ -20,6 +22,12 @@ export default function RubberWalletPage() {
   const [balance, setBalance] = useState(0);
   const [transactions, setTransactions] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [alertConfig, setAlertConfig] = useState<{ isOpen: boolean; title: string; message: string; type: "success" | "error" | "warning" }>({
+    isOpen: false,
+    title: "",
+    message: "",
+    type: "error",
+  });
 
   const [rubberSession, setRubberSession] = useState<any>(null);
 
@@ -60,7 +68,12 @@ export default function RubberWalletPage() {
 
   const handleWithdraw = async () => {
     if (!amount || !bankName || !accountNumber) {
-      alert(t("rubber.wallet.alertBankInfo"));
+      setAlertConfig({
+        isOpen: true,
+        title: t("common.error"),
+        message: t("rubber.wallet.alertBankInfo"),
+        type: "error",
+      });
       return;
     }
     setIsProcessing(true);
@@ -79,9 +92,23 @@ export default function RubberWalletPage() {
       if (res.ok) {
         setIsSuccess(true);
         fetchWalletData();
+      } else {
+        const data = await res.json() as any;
+        setAlertConfig({
+          isOpen: true,
+          title: t("common.error"),
+          message: data.error || t("common.errorDesc"),
+          type: "error",
+        });
       }
     } catch (err) {
       console.error(err);
+      setAlertConfig({
+        isOpen: true,
+        title: t("common.error"),
+        message: t("common.errorDesc"),
+        type: "error",
+      });
     } finally {
       setIsProcessing(false);
     }
@@ -179,26 +206,20 @@ export default function RubberWalletPage() {
                 </div>
 
                 <div className="w-full grid grid-cols-1 gap-3">
-                   <input 
-                     type="text" 
+                   <GlobalInput 
                      placeholder={t("rubber.wallet.bankNamePlaceholder")} 
                      value={bankName}
                      onChange={(e) => setBankName(e.target.value)}
-                     className="w-full bg-slate-50 rounded-xl px-4 py-3 text-sm font-bold outline-none focus:ring-2 focus:ring-primary/20"
                    />
-                   <input 
-                     type="text" 
+                   <GlobalInput 
                      placeholder={t("rubber.wallet.accountNumberPlaceholder")} 
                      value={accountNumber}
                      onChange={(e) => setAccountNumber(e.target.value)}
-                     className="w-full bg-slate-50 rounded-xl px-4 py-3 text-sm font-bold outline-none focus:ring-2 focus:ring-primary/20"
                    />
-                   <input 
-                     type="text" 
+                   <GlobalInput 
                      placeholder={t("rubber.wallet.accountNamePlaceholder")} 
                      value={accountName}
                      onChange={(e) => setAccountName(e.target.value)}
-                     className="w-full bg-slate-50 rounded-xl px-4 py-3 text-sm font-bold outline-none focus:ring-2 focus:ring-primary/20"
                    />
                 </div>
                
@@ -240,6 +261,14 @@ export default function RubberWalletPage() {
             </div>
           )}
         </Modal>
+
+        <ConfirmModal 
+          isOpen={alertConfig.isOpen}
+          onClose={() => setAlertConfig({ ...alertConfig, isOpen: false })}
+          title={alertConfig.title}
+          message={alertConfig.message}
+          type={alertConfig.type}
+        />
       </div>
     </PinLock>
    );
