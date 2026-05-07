@@ -134,7 +134,7 @@ export default function AdminOrdersPage() {
                             {sla !== "none" && (
                               <div className={`mt-2 flex items-center gap-1.5 text-[9px] font-black uppercase tracking-widest ${sla === 'critical' ? 'text-rose-500' : 'text-amber-500'}`}>
                                 <Icons.AlertCircle size={10} />
-                                {sla === 'critical' ? 'CRITICAL DELAY (5H+)' : 'SLA BREACH (3H+)'}
+                                {sla === 'critical' ? t('admin.orders.sla.critical') : t('admin.orders.sla.breach')}
                               </div>
                             )}
                           </div>
@@ -147,7 +147,7 @@ export default function AdminOrdersPage() {
                         <td className="px-6 py-6">
                           <div className="flex flex-col">
                             <span className="text-slate-900 font-black tracking-tight">{order.customerName}</span>
-                            <span className="text-xs font-bold text-slate-400">{order.customerPhone || 'No Phone'}</span>
+                            <span className="text-xs font-bold text-slate-400">{order.customerPhone || t('common.notSet')}</span>
                           </div>
                         </td>
                         <td className="px-6 py-6">
@@ -169,7 +169,7 @@ export default function AdminOrdersPage() {
                                 </button>
                               )}
                               {!order.pickupPhotoUrl && !order.dropoffShopPhotoUrl && (
-                                <span className="text-[10px] font-bold text-slate-300 italic">No Photos</span>
+                                <span className="text-[10px] font-bold text-slate-300 italic">{t('admin.orders.table.noPhotos')}</span>
                               )}
                            </div>
                         </td>
@@ -179,7 +179,7 @@ export default function AdminOrdersPage() {
                                 value={order.pickupDriverId || ""}
                                 onChange={(val) => handleUpdateOrder(order.id, { pickupDriverId: val })}
                                 options={[
-                                  { label: "Unassigned", value: "" },
+                                  { label: t('admin.orders.table.unassigned'), value: "" },
                                   ...riders.map(r => ({ label: `${r.name} (${r.displayId})`, value: r.id }))
                                 ]}
                                 disabled={isUpdating === order.id}
@@ -197,7 +197,7 @@ export default function AdminOrdersPage() {
                               </button>
                            )}
                            {order.status === "pending" && (
-                              <span className="text-[10px] font-black text-primary uppercase tracking-widest animate-pulse">Wait for assign</span>
+                              <span className="text-[10px] font-black text-primary uppercase tracking-widest animate-pulse">{t('admin.orders.waitAssign')}</span>
                            )}
                         </td>
                       </tr>
@@ -210,7 +210,7 @@ export default function AdminOrdersPage() {
         </Card>
       </div>
 
-      <Modal isOpen={!!selectedPhoto} onClose={() => setSelectedPhoto(null)} title="Photo Evidence">
+      <Modal isOpen={!!selectedPhoto} onClose={() => setSelectedPhoto(null)} title={t('admin.orders.photoEvidence')}>
          <div className="p-4 bg-slate-50 flex items-center justify-center min-h-[400px]">
             {selectedPhoto && (
               <img src={selectedPhoto} className="max-w-full max-h-[70vh] rounded-xl shadow-2xl border-4 border-white" alt="Evidence" />
