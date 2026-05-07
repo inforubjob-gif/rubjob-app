@@ -7,7 +7,7 @@ export const runtime = "edge";
 
 /**
  * PATCH /api/admin/orders/[id]
- * Admin manually updates order status or assigns riders
+ * Admin Command Center — update status, assign riders/stores, add notes
  */
 export async function PATCH(
   request: Request,
@@ -21,28 +21,29 @@ export async function PATCH(
   try {
     const { id } = await params;
     const body = await request.json();
-    const { status, pickupDriverId, deliveryDriverId } = body;
+    const { status, pickupDriverId, deliveryDriverId, storeId, staffNote } = body;
     const db = getRequestContext().env.DB;
 
-    if (pickupDriverId || deliveryDriverId) {
-      let updateQuery = "UPDATE orders SET updatedAt = CURRENT_TIMESTAMP";
-      const updateParams: any[] = [];
+    // Self-healing: ensure staffNote column exists
+    try { await db.prepare("ALTER TABLE orders ADD COLUMN staffNote TEXT").run(); } catch (e) {}
 
-      if (pickupDriverId) {
-        updateQuery += ", pickupDriverId = ?";
-        updateParams.push(pickupDriverId);
-      }
-      if (deliveryDriverId) {
-        updateQuery += ", deliveryDriverId = ?";
-        updateParams.push(deliveryDriverId);
-      }
+    // Build dynamic update query for field assignments
+    const fields: string[] = [];
+    const values: any[] = [];
 
-      updateQuery += " WHERE id = ?";
-      updateParams.push(id);
+    if (pickupDriverId !== undefined) { fields.push("pickupDriverId = ?"); values.push(pickupDriverId || null); }
+    if (deliveryDriverId !== undefined) { fields.push("deliveryDriverId = ?"); values.push(deliveryDriverId || null); }
+    if (storeId !== undefined) { fields.push("storeId = ?"); values.push(storeId || null); }
+    if (staffNote !== undefined) { fields.push("staffNote = ?"); values.push(staffNote); }
 
-      await db.prepare(updateQuery).bind(...updateParams).run();
+    if (fields.length > 0) {
+      fields.push("updatedAt = CURRENT_TIMESTAMP");
+      const query = `UPDATE orders SET ${fields.join(", ")} WHERE id = ?`;
+      values.push(id);
+      await db.prepare(query).bind(...values).run();
     }
 
+    // Handle status transition (with LINE notifications)
     if (status) {
       const result = await transitionOrderStatus(
         db,

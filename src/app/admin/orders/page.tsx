@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import Card from "@/components/ui/Card";
 import Badge, { statusToBadgeVariant } from "@/components/ui/Badge";
 import { Icons } from "@/components/ui/Icons";
@@ -115,6 +116,7 @@ export default function AdminOrdersPage() {
                     <th className="px-6 py-5">{t('admin.orders.table.id')}</th>
                     <th className="px-6 py-5">{t('admin.orders.table.status')}</th>
                     <th className="px-6 py-5">{t('admin.orders.table.customer')}</th>
+                    <th className="px-6 py-5">ร้านซัก</th>
                     <th className="px-6 py-5">{t('admin.orders.table.photos')}</th>
                     <th className="px-6 py-5">{t('admin.orders.table.assignRider')}</th>
                     <th className="px-6 py-5">{t('admin.orders.table.action')}</th>
@@ -128,8 +130,8 @@ export default function AdminOrdersPage() {
                     return (
                       <tr key={order.id} className={`${rowClass} transition-colors group`}>
                         <td className="px-6 py-6">
-                          <div className="flex flex-col">
-                            <span className="font-mono text-[11px] font-bold text-slate-900 mb-1">#{order.id.slice(-6).toUpperCase()}</span>
+                          <Link href={`/admin/orders/${order.id}`} className="flex flex-col hover:text-primary transition-colors">
+                            <span className="font-mono text-[11px] font-bold text-slate-900 mb-1 hover:text-primary">#{order.id.slice(-6).toUpperCase()}</span>
                             <span className="text-[10px] text-slate-400 font-bold">{new Date(order.createdAt).toLocaleTimeString()}</span>
                             {sla !== "none" && (
                               <div className={`mt-2 flex items-center gap-1.5 text-[9px] font-black uppercase tracking-widest ${sla === 'critical' ? 'text-rose-500' : 'text-amber-500'}`}>
@@ -137,7 +139,7 @@ export default function AdminOrdersPage() {
                                 {sla === 'critical' ? t('admin.orders.sla.critical') : t('admin.orders.sla.breach')}
                               </div>
                             )}
-                          </div>
+                          </Link>
                         </td>
                         <td className="px-6 py-6">
                           <Badge variant={statusToBadgeVariant(order.status)} className="shadow-sm">
@@ -146,9 +148,14 @@ export default function AdminOrdersPage() {
                         </td>
                         <td className="px-6 py-6">
                           <div className="flex flex-col">
-                            <span className="text-slate-900 font-black tracking-tight">{order.customerName}</span>
+                            <span className="text-slate-900 font-black tracking-tight">{order.customerName || 'ไม่ระบุ'}</span>
                             <span className="text-xs font-bold text-slate-400">{order.customerPhone || t('common.notSet')}</span>
                           </div>
+                        </td>
+                        <td className="px-6 py-6">
+                          <span className={`text-xs font-bold ${order.storeName ? 'text-primary' : 'text-slate-300 italic'}`}>
+                            {order.storeName || 'ยังไม่ระบุ'}
+                          </span>
                         </td>
                         <td className="px-6 py-6">
                            <div className="flex items-center gap-2">
