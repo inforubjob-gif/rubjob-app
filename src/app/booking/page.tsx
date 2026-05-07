@@ -1138,8 +1138,10 @@ function BookingFlow() {
                 }
                 setStep("payment");
               }}
+              disabled={isTooFar}
+              className={isTooFar ? "bg-slate-300 text-slate-500 shadow-none border-transparent cursor-not-allowed" : ""}
             >
-              {t("common.confirm")}
+              {isTooFar ? t("booking.errors.tooFar") : t("common.confirm")}
             </Button>
           </div>
         )}
@@ -1149,6 +1151,7 @@ function BookingFlow() {
             size="lg"
             isLoading={isSubmitting}
             onClick={() => {
+              if (isTooFar) return;
               if (isBelowMinOrder) {
                 showToast(t("booking.errors.minOrder").replace("{amount}", minOrderAmount.toString()), "error");
                 return;
@@ -1159,9 +1162,12 @@ function BookingFlow() {
               }
               handleConfirm();
             }}
-            className={isBelowMinOrder ? "bg-slate-300 text-slate-500 shadow-none border-transparent" : ""}
+            disabled={isSubmitting || isBelowMinOrder || isTooFar}
+            className={(isBelowMinOrder || isTooFar) ? "bg-slate-300 text-slate-500 shadow-none border-transparent cursor-not-allowed" : ""}
           >
-            {isSubmitting ? t("common.loading") : isBelowMinOrder ? t("booking.errors.cannotPlaceOrder").replace("{amount}", minOrderAmount.toString()) : 
+            {isSubmitting ? t("common.loading") : 
+             isTooFar ? t("booking.errors.tooFar") :
+             isBelowMinOrder ? t("booking.errors.cannotPlaceOrder").replace("{amount}", minOrderAmount.toString()) : 
              paymentQR ? t("booking.viewMyOrders") : `${t("booking.placeOrder")} — ฿${totalPrice}`}
           </Button>
         )}
@@ -1252,6 +1258,35 @@ function BookingFlow() {
                   </div>
                </button>
             ))}
+         </div>
+      </Modal>
+      
+      {/* Too Far Modal */}
+      <Modal isOpen={isTooFar} onClose={() => {}} title={t("booking.errors.tooFarTitle") || "อยู่นอกพื้นที่บริการ"}>
+         <div className="flex flex-col items-center justify-center py-10 px-5 text-center">
+            <div className="w-24 h-24 bg-rose-50 text-rose-500 rounded-full flex items-center justify-center mb-8 animate-pulse">
+               <Icons.AlertCircle size={48} />
+            </div>
+            <h2 className="text-xl font-black text-slate-900 mb-3 uppercase tracking-tight">
+               {t("booking.errors.tooFarTitle") || "ขออภัย คุณอยู่นอกพื้นที่บริการ"}
+            </h2>
+            <p className="text-sm font-bold text-slate-500 leading-relaxed mb-10">
+               {t("booking.errors.tooFarDesc") || "เราให้บริการในรัศมีไม่เกิน 10 กม. จากร้านสาขาเท่านั้น\nปัจจุบันที่อยู่ของคุณห่างจากร้าน"} <span className="text-rose-500 font-black">{distanceKm.toFixed(1)} กม.</span>
+            </p>
+            <Button 
+               fullWidth 
+               variant="outline" 
+               className="rounded-2xl border-2 py-4 font-black"
+               onClick={() => router.push("/profile/addresses")}
+            >
+               {t("profile.myAddress")}
+            </Button>
+            <button 
+               onClick={() => router.push("/")}
+               className="mt-6 text-[10px] font-black text-slate-400 uppercase tracking-widest"
+            >
+               {t("common.goHome")}
+            </button>
          </div>
       </Modal>
     </div>
