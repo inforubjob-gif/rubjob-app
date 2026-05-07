@@ -373,7 +373,7 @@ export const en = {
       noPhone: "Please provide a contact phone number",
       tooFar: "Sorry, the distance exceeds 10 km. Service unavailable.",
       tooFarTitle: "Out of Service Area",
-      tooFarDesc: "We only provide services within a 10 km radius of our store.\nYour current location is",
+      tooFarDesc: "Sorry, your address is out of service area.\nPlease specify a new address.",
     },
     loginRequiredTitle: "Login to Book",
     loginRequiredDesc: "Please log in via LINE to start booking a laundry service.",

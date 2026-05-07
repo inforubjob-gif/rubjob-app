@@ -1253,31 +1253,28 @@ function BookingFlow() {
       </Modal>
       
       {/* Too Far Modal */}
-      <Modal isOpen={isTooFar} onClose={() => {}} title={t("booking.errors.tooFarTitle") || "อยู่นอกพื้นที่บริการ"}>
-         <div className="flex flex-col items-center justify-center py-10 px-5 text-center">
+      <Modal isOpen={isTooFar} onClose={() => router.push("/")} title={t("booking.errors.tooFarTitle") || "อยู่นอกพื้นที่บริการ"}>
+         <div 
+           className="flex flex-col items-center justify-center py-10 px-5 text-center cursor-pointer active:opacity-80 transition-opacity"
+           onClick={() => router.push("/")}
+         >
             <div className="w-24 h-24 bg-rose-50 text-rose-500 rounded-full flex items-center justify-center mb-8 animate-pulse">
                <Icons.AlertCircle size={48} />
             </div>
             <h2 className="text-xl font-black text-slate-900 mb-3 uppercase tracking-tight">
-               {t("booking.errors.tooFarTitle") || "ขออภัย คุณอยู่นอกพื้นที่บริการ"}
+               {t("booking.errors.tooFarTitle") || "อยู่นอกพื้นที่บริการ"}
             </h2>
-            <p className="text-sm font-bold text-slate-500 leading-relaxed mb-10">
-               {t("booking.errors.tooFarDesc") || "เราให้บริการในรัศมีไม่เกิน 10 กม. จากร้านสาขาเท่านั้น\nปัจจุบันที่อยู่ของคุณห่างจากร้าน"} <span className="text-rose-500 font-black">{distanceKm.toFixed(1)} กม.</span>
+            <p className="text-sm font-bold text-slate-500 leading-relaxed whitespace-pre-line">
+               {t("booking.errors.tooFarDesc")}
             </p>
-            <Button 
-               fullWidth 
-               variant="outline" 
-               className="rounded-2xl border-2 py-4 font-black"
-               onClick={() => router.push("/profile/addresses")}
-            >
-               {t("profile.myAddress")}
-            </Button>
-            <button 
-               onClick={() => router.push("/")}
-               className="mt-6 text-[10px] font-black text-slate-400 uppercase tracking-widest"
-            >
-               {t("common.goHome")}
-            </button>
+            <div className="mt-12 w-full">
+              <Button 
+                 fullWidth 
+                 className="rounded-2xl py-4 font-black shadow-lg shadow-primary/20"
+              >
+                 {t("common.goHome")}
+              </Button>
+            </div>
          </div>
       </Modal>
     </div>
