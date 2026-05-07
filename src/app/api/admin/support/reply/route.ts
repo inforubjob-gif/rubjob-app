@@ -40,7 +40,9 @@ export async function POST(req: Request) {
       let channelToken = result?.value;
       
       if (!channelToken) {
-        if (ticket.channel === 'rubber_line') {
+        if (ticket.channel === 'help_line') {
+          channelToken = env.LINE_CHANNEL_ACCESS_TOKEN_HELP || env.LINE_CHANNEL_ACCESS_TOKEN;
+        } else if (ticket.channel === 'rubber_line') {
           channelToken = env.LINE_CHANNEL_ACCESS_TOKEN_RUBBER || env.LINE_CHANNEL_ACCESS_TOKEN;
         } else {
           channelToken = env.LINE_CHANNEL_ACCESS_TOKEN;
