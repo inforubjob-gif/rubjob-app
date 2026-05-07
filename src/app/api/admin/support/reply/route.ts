@@ -35,7 +35,17 @@ export async function POST(req: Request) {
     if (ticket.channel.includes('line')) {
       const channelKeyToken = `line_token_${ticket.channel.replace('_line', '')}`;
       const result = await db.prepare(`SELECT value FROM system_settings WHERE key = ?`).bind(channelKeyToken).first() as { value: string };
-      const channelToken = result?.value;
+      
+      // Select token: Priority 1: D1 Database, Priority 2: Environment Variables
+      let channelToken = result?.value;
+      
+      if (!channelToken) {
+        if (ticket.channel === 'rubber_line') {
+          channelToken = env.LINE_CHANNEL_ACCESS_TOKEN_RUBBER || env.LINE_CHANNEL_ACCESS_TOKEN;
+        } else {
+          channelToken = env.LINE_CHANNEL_ACCESS_TOKEN;
+        }
+      }
 
       if (channelToken) {
         const lineRes = await fetch("https://api.line.me/v2/bot/message/push", {
