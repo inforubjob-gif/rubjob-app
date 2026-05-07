@@ -105,7 +105,7 @@ export default function StoreProfilePage() {
         {/* Status Section */}
         <section>
           <Card 
-            className={`p-6 rounded-[2rem] border transition-all duration-500 shadow-xl ${workStatus ? 'bg-white border-emerald-100' : 'bg-slate-100 border-slate-200 shadow-none'}`}
+            className={`p-4 rounded-[2rem] border transition-all duration-500 shadow-xl ${workStatus ? 'bg-white border-emerald-100' : 'bg-slate-100 border-slate-200 shadow-none'}`}
           >
              <div className="flex items-center justify-between">
                <div className="flex items-center gap-4">
@@ -135,7 +135,7 @@ export default function StoreProfilePage() {
           <Card className="divide-y divide-slate-50 overflow-hidden shadow-2xl rounded-[2.5rem] bg-white border border-slate-100">
             <button
               onClick={() => setShowLanguageModal(true)}
-              className="w-full flex items-center gap-5 px-6 py-6 hover:bg-slate-50 transition-colors text-left group"
+              className="w-full flex items-center gap-5 px-6 py-3 hover:bg-slate-50 transition-colors text-left group"
             >
               <IconCircle variant="ghost" size="md">
                 <Icons.Globe size={20} />
@@ -149,7 +149,7 @@ export default function StoreProfilePage() {
 
             <button
               onClick={() => router.push("/partner-store/services")}
-              className="w-full flex items-center gap-5 px-6 py-6 hover:bg-slate-50 transition-colors text-left group"
+              className="w-full flex items-center gap-5 px-6 py-3 hover:bg-slate-50 transition-colors text-left group"
             >
               <IconCircle variant="ghost" size="md">
                 <Icons.Clipboard size={20} />
@@ -163,7 +163,7 @@ export default function StoreProfilePage() {
 
             <button
               onClick={() => router.push("/partner-store/profile/active-hours")}
-              className="w-full flex items-center gap-5 px-6 py-6 hover:bg-slate-50 transition-colors text-left group"
+              className="w-full flex items-center gap-5 px-6 py-3 hover:bg-slate-50 transition-colors text-left group"
             >
               <IconCircle variant="ghost" size="md">
                 <Icons.Clock size={20} />
@@ -177,7 +177,7 @@ export default function StoreProfilePage() {
 
             <button
               onClick={() => router.push("/partner-store/profile/payout-method")}
-              className="w-full flex items-center gap-5 px-6 py-6 hover:bg-slate-50 transition-colors text-left group"
+              className="w-full flex items-center gap-5 px-6 py-3 hover:bg-slate-50 transition-colors text-left group"
             >
               <IconCircle variant="ghost" size="md">
                 <Icons.Payment size={20} />
@@ -199,7 +199,7 @@ export default function StoreProfilePage() {
           <Card className="overflow-hidden shadow-2xl rounded-[2.5rem] bg-white border border-slate-100">
             <button
               onClick={() => router.push("/partner-store/support")}
-              className="w-full flex items-center gap-5 px-6 py-6 hover:bg-slate-50 transition-colors text-left group"
+              className="w-full flex items-center gap-5 px-6 py-3 hover:bg-slate-50 transition-colors text-left group"
             >
               <IconCircle variant="ghost" size="md">
                 <Icons.Chat size={20} />
@@ -216,7 +216,7 @@ export default function StoreProfilePage() {
         {/* Logout Button */}
         <button
           onClick={() => logout("/partner-store")}
-          className="w-full flex items-center gap-5 px-6 py-6 bg-slate-900 text-white rounded-[2.5rem] shadow-2xl hover:bg-rose-600 transition-all duration-500 group"
+          className="w-full flex items-center gap-5 px-6 py-4 bg-slate-900 text-white rounded-[2.5rem] shadow-2xl hover:bg-rose-600 transition-all duration-500 group"
         >
           <div className="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
             <Icons.LogOut size={20} className="group-hover:rotate-12 transition-transform" />

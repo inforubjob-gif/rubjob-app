@@ -89,7 +89,7 @@ export default function ProviderProfilePage() {
       {/* Content */}
       <div className="px-5 -mt-6 space-y-4 pb-24 relative z-10">
         {/* Marketplace Gigs Card */}
-        <Card className="p-6">
+        <Card className="p-4">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-xs font-black text-slate-400 uppercase tracking-wider">บริการที่ฉันเปิดรับงาน</h3>
             <span className="text-[10px] font-bold text-primary-dark bg-primary/10 px-2 py-0.5 rounded-full uppercase">Dynamic Marketplace</span>
@@ -138,14 +138,14 @@ export default function ProviderProfilePage() {
 
         {/* Bio */}
         {provider.bio && (
-          <Card className="p-6">
+          <Card className="p-4">
             <h3 className="text-xs font-black text-slate-400 uppercase mb-3">แนะนำตัว</h3>
             <p className="text-sm text-slate-600 font-medium leading-relaxed">{provider.bio}</p>
           </Card>
         )}
 
         {/* LINE ID Setting */}
-        <Card className="p-6">
+        <Card className="p-4">
           <div className="flex items-center gap-3 mb-4">
             <div className="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center text-emerald-600">
                <Icons.Line size={18} />
@@ -191,7 +191,7 @@ export default function ProviderProfilePage() {
         <Card className="p-2 divide-y divide-slate-50">
           <button 
             onClick={() => router.push("/partner-service/wallet")}
-            className="w-full flex items-center gap-4 p-4 hover:bg-slate-50 rounded-xl transition-colors"
+            className="w-full flex items-center gap-4 p-3 hover:bg-slate-50 rounded-xl transition-colors"
           >
             <div className="w-10 h-10 rounded-xl bg-orange-100 flex items-center justify-center text-primary-dark">
               <Icons.CreditCard size={20} />
@@ -209,7 +209,7 @@ export default function ProviderProfilePage() {
           fullWidth
           variant="secondary"
           onClick={handleLogout}
-          className="py-5 rounded-xl font-black uppercase text-xs text-rose-500 border-rose-200 hover:bg-rose-50 transition-colors"
+          className="py-4 rounded-xl font-black uppercase text-xs text-rose-500 border-rose-200 hover:bg-rose-50 transition-colors"
         >
           ออกจากระบบ
         </Button>

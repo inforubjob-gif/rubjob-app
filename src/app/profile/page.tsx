@@ -194,7 +194,7 @@ export default function ProfilePage() {
                   <Link
                     key={item.label}
                     href={item.href}
-                    className="w-full flex items-center gap-4 px-4 py-4 hover:bg-slate-50 transition-colors text-left group"
+                    className="w-full flex items-center gap-4 px-4 py-3 hover:bg-slate-50 transition-colors text-left group"
                   >
                     {content}
                   </Link>
@@ -205,7 +205,7 @@ export default function ProfilePage() {
                 <button
                   key={item.label}
                   onClick={item.onClick}
-                  className="w-full flex items-center gap-4 px-4 py-4 hover:bg-slate-50 transition-colors text-left group"
+                  className="w-full flex items-center gap-4 px-4 py-3 hover:bg-slate-50 transition-colors text-left group"
                 >
                   {content}
                 </button>
@@ -215,7 +215,7 @@ export default function ProfilePage() {
             {/* Logout Button */}
             <button
               onClick={() => logout()}
-              className="w-full flex items-center gap-4 px-4 py-5 hover:bg-rose-50 transition-colors text-left group border-t border-slate-50"
+              className="w-full flex items-center gap-4 px-4 py-4 hover:bg-rose-50 transition-colors text-left group border-t border-slate-50"
             >
               <IconCircle variant="ghost" size="md" className="group-hover:text-rose-600 transition-colors">
                 <Icons.Lock size={20} />
