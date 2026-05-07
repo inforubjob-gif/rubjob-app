@@ -52,8 +52,8 @@ export async function GET(req: Request) {
         (SELECT createdAt FROM support_messages WHERE ticketId = t.id ORDER BY createdAt DESC LIMIT 1) as lastMessageAt
       FROM support_tickets t
       LEFT JOIN users u ON t.userId = u.id AND (t.userType = 'customer' OR t.userType IS NULL OR t.userType = 'unknown')
-      LEFT JOIN rubber_users r ON t.userId = r.lineUserId AND t.userType = 'rubber'
-      LEFT JOIN stores s ON t.userId = s.lineUserId AND t.userType = 'store'
+      LEFT JOIN rubber_users r ON t.userId = r.id AND t.userType = 'rubber'
+      LEFT JOIN stores s ON t.userId = s.id AND t.userType = 'store'
       ${filterClause ? filterClause.replace('WHERE', (filterClause ? 'WHERE' : '')) : ''}
       ORDER BY lastMessageAt DESC NULLS LAST, t.updatedAt DESC
     `).all();
