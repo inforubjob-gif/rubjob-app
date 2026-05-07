@@ -13,7 +13,7 @@ export async function GET(request: Request) {
       const order = await db.prepare(`
         SELECT o.*, u.displayName as customerName, u.phone as customerPhone, u.pictureUrl as customerPicture
         FROM orders o
-        JOIN users u ON o.userId = u.id
+        LEFT JOIN users u ON o.userId = u.id
         WHERE o.id = ?
       `).bind(id).first();
       return NextResponse.json({ order });
@@ -23,7 +23,7 @@ export async function GET(request: Request) {
     const orders = await db.prepare(`
       SELECT o.*, u.displayName as customerName
       FROM orders o
-      JOIN users u ON o.userId = u.id
+      LEFT JOIN users u ON o.userId = u.id
       ORDER BY o.createdAt DESC
       LIMIT 100
     `).all();

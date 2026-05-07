@@ -1,7 +1,5 @@
 "use client";
 
-export const runtime = 'edge';
-
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Card from "@/components/ui/Card";
@@ -41,7 +39,7 @@ export default function AdminOrderDetailPage() {
     <div className="max-w-5xl mx-auto pb-20 space-y-8">
       <header className="flex items-center gap-4">
         <button onClick={() => router.back()} className="w-10 h-10 rounded-xl bg-white border border-slate-200 flex items-center justify-center hover:bg-slate-50 transition-all">
-          <Icons.Phone className="rotate-180" size={18} />
+          <Icons.Back size={18} />
         </button>
         <div>
           <h1 className="text-2xl font-black text-slate-900 uppercase">ออเดอร์ #{order.id}</h1>
@@ -136,7 +134,7 @@ export default function AdminOrderDetailPage() {
               <div className="space-y-4 border-t border-slate-50 pt-4">
                  <div>
                     <p className="text-[9px] font-black text-slate-300 uppercase mb-1">ที่อยู่จัดส่ง</p>
-                    <p className="text-xs font-bold text-slate-600 leading-relaxed">{typeof order.address === 'string' ? JSON.parse(order.address).label : order.address?.label}</p>
+                    <p className="text-xs font-bold text-slate-600 leading-relaxed">{(() => { try { return typeof order.address === 'string' ? JSON.parse(order.address)?.label : order.address?.label; } catch { return order.address || 'ไม่ระบุ'; } })()}</p>
                  </div>
               </div>
            </Card>
