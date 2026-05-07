@@ -420,7 +420,7 @@ export default function RubberDashboard() {
                         const res = await fetch(`/api/auth/link-line?accountId=${rubber.id}`);
                         const data = await res.json() as any;
                         const token = data.token;
-                        const liffId = process.env.NEXT_PUBLIC_LIFF_ID;
+                        const liffId = process.env.NEXT_PUBLIC_LIFF_ID_RUBBER || process.env.NEXT_PUBLIC_LIFF_ID;
                         window.location.href = `https://liff.line.me/${liffId}/auth/link-line?type=rubber&id=${rubber.id}&token=${token}`;
                       } catch (e) {
                         setAlertConfig({

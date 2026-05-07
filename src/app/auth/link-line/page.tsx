@@ -13,7 +13,7 @@ function LinkLineContent() {
   useEffect(() => {
     async function initLiffAndLink() {
       try {
-        const liffId = process.env.NEXT_PUBLIC_LIFF_ID;
+        const liffId = process.env.NEXT_PUBLIC_LIFF_ID_RUBBER || process.env.NEXT_PUBLIC_LIFF_ID;
         if (!liffId) throw new Error("LIFF ID not configured");
 
         await liff.init({ liffId });

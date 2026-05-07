@@ -5,7 +5,8 @@ compatibility_flags = [ "nodejs_compat" ]
 pages_build_output_dir = ".vercel/output/static"
 
 [vars]
-NEXT_PUBLIC_LIFF_ID = "2010005557-lH15wycZ"
+NEXT_PUBLIC_LIFF_ID = "2009652089-lRGKgXfJ"
+NEXT_PUBLIC_LIFF_ID_RUBBER = "2010005557-lH15wycZ"
 
 [[d1_databases]]
 binding = "DB" # The binding name available in your worker/app

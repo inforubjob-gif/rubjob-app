@@ -34,7 +34,9 @@ export function useLiff() {
 }
 
 // ─── Real LIFF Provider ───
-const LIFF_ID = process.env.NEXT_PUBLIC_LIFF_ID ?? "";
+const LIFF_ID = typeof window !== 'undefined' && window.location.hostname.startsWith('rubber.') 
+  ? (process.env.NEXT_PUBLIC_LIFF_ID_RUBBER || process.env.NEXT_PUBLIC_LIFF_ID || "")
+  : (process.env.NEXT_PUBLIC_LIFF_ID ?? "");
 
 export default function LiffProvider({ children }: { children: ReactNode }) {
   const [ctx, setCtx] = useState<LiffContextValue>({

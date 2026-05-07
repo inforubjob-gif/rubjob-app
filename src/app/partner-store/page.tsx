@@ -343,7 +343,7 @@ export default function StoreDashboard() {
                         const res = await fetch(`/api/auth/link-line?accountId=${store.id}`);
                         const data = await res.json() as any;
                         const token = data.token;
-                        const liffId = process.env.NEXT_PUBLIC_LIFF_ID;
+                        const liffId = process.env.NEXT_PUBLIC_LIFF_ID_RUBBER || process.env.NEXT_PUBLIC_LIFF_ID;
                         window.location.href = `https://liff.line.me/${liffId}/auth/link-line?type=store&id=${store.id}&token=${token}`;
                       } catch (e) {
                         setAlertConfig({
