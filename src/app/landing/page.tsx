@@ -140,20 +140,14 @@ export default function LandingPage() {
     {
       name: t("landing.contact.list.facebook.name"),
       desc: t("landing.contact.list.facebook.desc"),
-      icon: <Icons.Facebook size={40} />,
-      bgClass: "bg-gradient-to-br from-blue-400 to-blue-600 text-white"
+      icon: <Icons.Facebook size={64} />,
+      bgClass: ""
     },
     {
       name: t("landing.contact.list.line.name"),
       desc: t("landing.contact.list.line.desc"),
-      icon: <Icons.Line size={40} />,
-      bgClass: "bg-gradient-to-br from-[#00B900] to-[#009b00] text-white"
-    },
-    {
-      name: t("landing.contact.list.call.name"),
-      desc: t("landing.contact.list.call.desc"),
-      icon: "📞",
-      bgClass: "bg-gradient-to-br from-orange-400 to-primary text-white"
+      icon: <Icons.Line size={64} />,
+      bgClass: ""
     }
   ];
 
@@ -661,10 +655,10 @@ export default function LandingPage() {
             {t("landing.contact.title")} <span className="text-primary">{t("landing.contact.titleSub")}</span>
           </h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
             {CONTACTS.map((contact, i) => (
               <div key={i} className="group bg-white p-10 rounded-[40px] shadow-sm hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border border-slate-50 flex flex-col items-center">
-                <div className={`w-20 h-20 rounded-[24px] flex items-center justify-center text-3xl shadow-xl mb-8 group-hover:scale-110 transition-transform ${contact.bgClass}`}>
+                <div className={`flex items-center justify-center mb-8 group-hover:scale-110 transition-transform ${contact.bgClass || ""}`}>
                   {contact.icon}
                 </div>
                 <h4 className="text-2xl font-black text-slate-900 group-hover:text-primary transition-colors mb-2">{contact.name}</h4>

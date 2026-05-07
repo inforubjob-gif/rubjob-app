@@ -186,8 +186,8 @@ export default function ContactPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                  {/* LINE Channel */}
                  <a href="https://line.me/R/ti/p/@rubjob" target="_blank" rel="noopener noreferrer" className="group p-6 bg-white rounded-[32px] border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-green-500/10 transition-all duration-300 hover:-translate-y-1 flex items-center gap-4">
-                  <div className="w-14 h-14 rounded-2xl bg-[#00B900] text-white flex items-center justify-center shadow-lg shadow-[#00B900]/20 group-hover:rotate-12 transition-transform">
-                    <Icons.Line size={32} />
+                  <div className="flex items-center justify-center group-hover:rotate-12 transition-transform">
+                    <Icons.Line size={48} />
                   </div>
                   <div>
                     <h3 className="text-lg font-black text-slate-800">{t("landingContact.lineTitle")}</h3>
@@ -196,9 +196,9 @@ export default function ContactPage() {
                 </a>
 
                 {/* Facebook Channel */}
-                <a href="#" className="group p-6 bg-white rounded-[32px] border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-blue-500/10 transition-all duration-300 hover:-translate-y-1 flex items-center gap-4">
-                  <div className="w-14 h-14 rounded-2xl bg-blue-600 text-white flex items-center justify-center shadow-lg shadow-blue-600/20 group-hover:-rotate-12 transition-transform">
-                    <Icons.Facebook size={32} />
+                 <a href="#" className="group p-6 bg-white rounded-[32px] border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-blue-500/10 transition-all duration-300 hover:-translate-y-1 flex items-center gap-4">
+                  <div className="flex items-center justify-center group-hover:-rotate-12 transition-transform">
+                    <Icons.Facebook size={48} />
                   </div>
                   <div>
                     <h3 className="text-lg font-black text-slate-800">{t("landingContact.facebookTitle")}</h3>
