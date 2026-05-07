@@ -439,13 +439,13 @@ export default function LandingPage() {
                  className="w-full h-auto object-contain drop-shadow-2xl"
                />
                {/* Hovering widget */}
-               <div className="absolute -top-10 -right-5 bg-white p-4 rounded-2xl shadow-xl z-30 flex items-center gap-3 border border-slate-100 transform rotate-6">
-                  <div className="text-3xl bg-amber-50 rounded-xl p-2">🚚</div>
+                <div className="absolute -top-10 -right-5 bg-white p-4 rounded-2xl shadow-xl z-30 flex items-center gap-3 border border-slate-100 transform rotate-6 hover:rotate-0 transition-transform duration-500">
+                  <div className="text-3xl bg-primary/10 rounded-xl p-2 animate-bounce">🚚</div>
                   <div>
-                     <p className="text-xs font-bold text-slate-800">{t("landing.howItWorks.widgetTitle")}</p>
-                     <p className="text-[10px] text-slate-400">{t("landing.howItWorks.widgetDesc")}</p>
+                     <p className="text-xs font-black text-slate-800">{t("landing.howItWorks.widgetTitle")}</p>
+                     <p className="text-[10px] text-primary font-bold">{t("landing.howItWorks.widgetDesc")}</p>
                   </div>
-               </div>
+                </div>
              </div>
            </div>
 
@@ -456,16 +456,17 @@ export default function LandingPage() {
                 <h3 className="text-4xl md:text-5xl font-black text-slate-900 leading-tight">{t("landing.howItWorks.title")}<br/> {t("landing.howItWorks.titleSub")}</h3>
               </div>
 
-             <div className="space-y-8 relative before:absolute before:inset-0 before:ml-10 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-1 before:bg-gradient-to-b before:from-transparent before:via-slate-200 before:to-transparent">
+             <div className="space-y-12 relative before:absolute before:inset-0 before:ml-10 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-1 before:bg-gradient-to-b before:from-transparent before:via-primary/30 before:to-transparent">
                
                {STEPS.map((step, i) => (
                  <div key={i} className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
-                   <div className="flex items-center justify-center w-20 h-20 rounded-full border-4 border-white bg-slate-50 text-slate-400 group-hover:text-primary group-hover:bg-primary-light group-hover:border-primary shadow-lg shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 transition-all duration-300 group-hover:scale-110 z-10 text-2xl font-black">
+                   <div className="flex items-center justify-center w-20 h-20 rounded-full border-4 border-white bg-primary/10 text-primary group-hover:text-white group-hover:bg-primary shadow-xl shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 transition-all duration-500 group-hover:scale-125 group-hover:shadow-primary/30 z-10 text-3xl font-black">
                      {step.number}
                    </div>
-                   <div className="w-[calc(100%-6rem)] md:w-[calc(50%-4rem)] p-6 rounded-3xl bg-white border border-slate-100 shadow-sm group-hover:shadow-md transition-all duration-300 group-hover:-translate-y-1">
-                     <h4 className="text-xl font-bold text-slate-800 mb-2">{step.title}</h4>
-                     <p className="text-slate-500 text-sm leading-relaxed">{step.desc}</p>
+                   <div className="w-[calc(100%-6rem)] md:w-[calc(50%-4rem)] p-8 rounded-3xl bg-white border border-slate-100 shadow-sm group-hover:shadow-2xl group-hover:shadow-primary/5 transition-all duration-500 group-hover:-translate-y-2 relative overflow-hidden">
+                     <div className="absolute top-0 left-0 w-1.5 h-0 bg-primary transition-all duration-500 group-hover:h-full" />
+                     <h4 className="text-2xl font-black text-slate-800 mb-3 group-hover:text-primary transition-colors">{step.title}</h4>
+                     <p className="text-slate-500 text-base leading-relaxed font-medium">{step.desc}</p>
                    </div>
                  </div>
                ))}
