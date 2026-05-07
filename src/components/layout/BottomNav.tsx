@@ -56,6 +56,7 @@ export default function BottomNav() {
     isProviderContext || 
     pathname === "/" ||
     pathname.startsWith("/orders") ||
+    pathname.startsWith("/activity") ||
     pathname.startsWith("/booking") ||
     pathname.startsWith("/promotions") ||
     pathname.startsWith("/profile") ||
