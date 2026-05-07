@@ -931,6 +931,12 @@ export const en = {
       verifiedHero: "Verified Rubber",
       selectLanguage: "Select Language",
       vehicleType: "Vehicle Info",
+      startWorkTitle: "Start Receiving Jobs?",
+      stopWorkTitle: "Pause Receiving Jobs?",
+      startWorkConfirm: "Are you ready to start receiving new orders?",
+      stopWorkConfirm: "Are you sure you want to pause receiving orders?",
+      startWorkDesc: "Once you start, you will receive real-time notifications for new orders.",
+      stopWorkDesc: "Once paused, you won't see new orders until you toggle your status back on.",
     },
     payoutMethodPage: {
       title: "Payout Method",

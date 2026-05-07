@@ -827,6 +827,12 @@ export const th = {
         verifiedHero: "รับเบอร์ระดับ",
         selectLanguage: "เลือกภาษา",
         vehicleType: "ข้อมูลยานพาหนะ",
+        startWorkTitle: "เริ่มรับงาน?",
+        stopWorkTitle: "หยุดรับงานชั่วคราว?",
+        startWorkConfirm: "พร้อมเริ่มรับงานแล้วใช่หรือไม่?",
+        stopWorkConfirm: "ต้องการหยุดรับงานใช่หรือไม่?",
+        startWorkDesc: "เมื่อเริ่มรับงาน คุณจะเริ่มได้รับแจ้งเตือนออเดอร์ใหม่ทันที",
+        stopWorkDesc: "เมื่อหยุดรับงาน คุณจะไม่เห็นออเดอร์ใหม่ๆ จนกว่าจะเปิดสถานะอีกครั้ง",
       },
       payoutMethodPage: {
         title: "ช่องทางการรับเงิน",
