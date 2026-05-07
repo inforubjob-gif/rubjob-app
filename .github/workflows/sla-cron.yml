@@ -1,0 +1,14 @@
+name: SLA Monitoring Cron
+on:
+  schedule:
+    - cron: '*/10 * * * *' # รันทุก 10 นาที
+  workflow_dispatch: # เปิดให้กดรันเองได้
+
+jobs:
+  ping-cron:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping RubJob SLA Cron
+        run: |
+          curl -X GET "https://rubjob-all.com.com/api/admin/orders/cron" \
+          -H "x-cron-key: ${{ secrets.CRON_KEY }}"
