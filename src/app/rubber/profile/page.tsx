@@ -161,7 +161,7 @@ export default function RubberProfilePage() {
           <Card className="divide-y divide-slate-50 overflow-hidden shadow-2xl rounded-[2.5rem] bg-white border border-slate-100">
             <button
               onClick={() => setShowLanguageModal(true)}
-              className="w-full flex items-center gap-5 px-6 py-6 hover:bg-slate-50 transition-colors text-left group"
+              className="w-full flex items-center gap-5 px-6 py-4 hover:bg-slate-50 transition-colors text-left group"
             >
               <IconCircle variant="ghost" size="md">
                 <Icons.Globe size={20} />
@@ -175,7 +175,7 @@ export default function RubberProfilePage() {
 
             <button
               onClick={() => router.push("/rubber/profile/service-area")}
-              className="w-full flex items-center gap-5 px-6 py-6 hover:bg-slate-50 transition-colors text-left group"
+              className="w-full flex items-center gap-5 px-6 py-4 hover:bg-slate-50 transition-colors text-left group"
             >
               <IconCircle variant="ghost" size="md">
                 <Icons.MapPin size={20} />
@@ -189,7 +189,7 @@ export default function RubberProfilePage() {
 
             <button
               onClick={() => router.push("/rubber/profile/vehicle-type")}
-              className="w-full flex items-center gap-5 px-6 py-6 hover:bg-slate-50 transition-colors text-left group"
+              className="w-full flex items-center gap-5 px-6 py-4 hover:bg-slate-50 transition-colors text-left group"
             >
               <IconCircle variant="ghost" size="md">
                 <Icons.Bike size={20} />
@@ -203,7 +203,7 @@ export default function RubberProfilePage() {
 
             <button
               onClick={() => router.push("/rubber/profile/payout-method")}
-              className="w-full flex items-center gap-5 px-6 py-6 hover:bg-slate-50 transition-colors text-left group"
+              className="w-full flex items-center gap-5 px-6 py-4 hover:bg-slate-50 transition-colors text-left group"
             >
               <IconCircle variant="ghost" size="md">
                 <Icons.Payment size={20} />
@@ -223,7 +223,7 @@ export default function RubberProfilePage() {
         <section>
           <h2 className="text-[11px] font-black text-slate-900 uppercase tracking-[0.2em] mb-4 px-2">LINE Connectivity</h2>
           <Card 
-            className={`p-6 rounded-[2rem] border transition-all duration-500 shadow-xl ${rubberData?.lineUserId ? 'bg-white border-green-100' : 'bg-slate-100 border-slate-200 shadow-none'}`}
+            className={`p-5 rounded-[2rem] border transition-all duration-500 shadow-xl ${rubberData?.lineUserId ? 'bg-white border-green-100' : 'bg-slate-100 border-slate-200 shadow-none'}`}
           >
              <div className="flex items-center justify-between">
                <div className="flex items-center gap-4">
@@ -255,7 +255,7 @@ export default function RubberProfilePage() {
           <Card className="overflow-hidden shadow-2xl rounded-[2.5rem] bg-white border border-slate-100">
             <button
               onClick={() => router.push("/rubber/support")}
-              className="w-full flex items-center gap-5 px-6 py-6 hover:bg-slate-50 transition-colors text-left group"
+              className="w-full flex items-center gap-5 px-6 py-4 hover:bg-slate-50 transition-colors text-left group"
             >
               <IconCircle variant="ghost" size="md">
                 <Icons.Chat size={20} />
@@ -278,7 +278,7 @@ export default function RubberProfilePage() {
             localStorage.removeItem("rubjob_rubber_session");
             router.push("/rubber/login");
           }}
-          className="w-full flex items-center gap-5 px-6 py-6 bg-slate-900 text-white rounded-[2.5rem] shadow-2xl hover:bg-rose-600 transition-all duration-500 group"
+          className="w-full flex items-center gap-5 px-6 py-5 bg-slate-900 text-white rounded-[2.5rem] shadow-2xl hover:bg-rose-600 transition-all duration-500 group"
         >
           <div className="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
             <Icons.LogOut size={20} className="group-hover:rotate-12 transition-transform" />
