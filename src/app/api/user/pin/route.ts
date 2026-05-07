@@ -46,7 +46,15 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const user = await db.prepare("SELECT walletPin FROM users WHERE id = ?").bind(userId).first() as any;
+    let user: any = null;
+    if (type === "rubber") {
+      user = await db.prepare("SELECT walletPin FROM rubber_users WHERE id = ?").bind(userId).first();
+    } else if (type === "store") {
+      const storeId = await getStoreSession();
+      user = await db.prepare("SELECT walletPin FROM stores WHERE id = ?").bind(storeId).first();
+    } else {
+      user = await db.prepare("SELECT walletPin FROM users WHERE id = ?").bind(userId).first();
+    }
     
     return NextResponse.json({ 
       success: true, 
@@ -75,30 +83,32 @@ export async function POST(req: Request) {
     if (type === "rubber") {
       userId = await getRubberSession();
     } else if (type === "store") {
-      const storeId = await getStoreSession();
-      if (storeId) {
-        const store = await db.prepare("SELECT ownerId FROM stores WHERE id = ?").bind(storeId).first() as any;
-        userId = store?.ownerId || null;
-      }
+      userId = await getStoreSession();
     } else if (type === "customer") {
       userId = bodyUserId;
     }
 
     if (!userId) {
-      console.warn(`[PIN] Unauthorized POST attempt for action: ${action}, type: ${type}`);
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    const tableName = type === "rubber" ? "rubber_users" : type === "store" ? "stores" : "users";
+
     if (action === "setup") {
       if (!pin || pin.length !== 6) return NextResponse.json({ error: "Invalid PIN format" }, { status: 400 });
+      
+      // Check if walletPin column exists (self-healing)
+      try {
+        await db.prepare(`ALTER TABLE ${tableName} ADD COLUMN walletPin TEXT`).run();
+      } catch (e) {}
+
       const hashedPin = await hashPin(pin);
-      await db.prepare("UPDATE users SET walletPin = ? WHERE id = ?").bind(hashedPin, userId).run();
-      console.log(`[PIN] Successfully setup PIN for user: ${userId}`);
+      await db.prepare(`UPDATE ${tableName} SET walletPin = ? WHERE id = ?`).bind(hashedPin, userId).run();
       return NextResponse.json({ success: true });
     } 
     
     if (action === "verify") {
-      const user = await db.prepare("SELECT walletPin FROM users WHERE id = ?").bind(userId).first() as any;
+      const user = await db.prepare(`SELECT walletPin FROM ${tableName} WHERE id = ?`).bind(userId).first() as any;
       if (!user?.walletPin) return NextResponse.json({ error: "PIN not set" }, { status: 400 });
       
       const hashedPin = await hashPin(pin);
