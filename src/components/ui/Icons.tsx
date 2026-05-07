@@ -107,15 +107,20 @@ export const Icons = {
   TrendingUp: (props: IconProps) => <MaterialIcon name="trending_up" {...props} />,
   CreditCard: (props: IconProps) => <MaterialIcon name="credit_card" {...props} />,
   Line: (props: IconProps) => (
-    <svg 
-      viewBox="0 0 24 24" 
-      fill="currentColor" 
-      width={props.size || 24} 
-      height={props.size || 24} 
-      className={props.className}
-    >
-      <path d="M24 10.304c0-5.369-5.383-9.738-12-9.738s-12 4.369-12 9.738c0 4.814 4.269 8.846 10.036 9.608.391.084.922.258 1.183.592.214.275.14.705.068 1.076l-.31 1.868c-.12.724-.555 2.834.238 1.55 1.554-2.516 4.67-4.482 6.787-8.127C21.82 15.111 24 12.924 24 10.304zm-14.765 3.162h-1.92V7.112a.379.379 0 0 0-.379-.379.379.379 0 0 0 .379.379v6.731a.372.372 0 0 0 .379.379h2.3a.379.379 0 0 0 .379-.379.379.379 0 0 0-.38-.379zm3.899-6.353a.379.379 0 0 0-.379.379v6.731a.379.379 0 0 0 .379.379.379.379 0 0 0 .379-.379V7.112a.379.379 0 0 0-.379-.379zm1.748 0a.379.379 0 0 0-.379.379v6.731a.379.379 0 0 0 .375.379.379.379 0 0 0 .379-.379V9.167l3.208 4.621a.379.379 0 0 0 .31.164h.004a.379.379 0 0 0 .379-.379V7.112a.379.379 0 0 0-.379-.379.379.379 0 0 0-.379.379v4.3l-3.21-4.622a.379.379 0 0 0-.308-.164zm10.742 3.161V7.112a.379.379 0 0 0-.379-.379h-2.3a.379.379 0 0 0-.379.379.379.379 0 0 0 .379.379h1.92v1.517H21.5a.379.379 0 0 0-.379.379.379.379 0 0 0 .379.379h1.921v1.516H21.5a.379.379 0 0 0-.379.379.379.379 0 0 0 .379.379h2.3a.379.379 0 0 0 .379-.379.379.379 0 0 0-.379-.379z" />
-    </svg>
+    <img 
+      src="/images/LINE_logo.svg" 
+      alt="LINE" 
+      style={{ width: props.size || 24, height: props.size || 24 }}
+      className={`object-contain ${props.className || ""}`}
+    />
+  ),
+  Facebook: (props: IconProps) => (
+    <img 
+      src="/images/facebook-logo.webp" 
+      alt="Facebook" 
+      style={{ width: props.size || 24, height: props.size || 24 }}
+      className={`object-contain ${props.className || ""}`}
+    />
   ),
   HomeCleaning: (props: IconProps) => <MaterialIcon name="cleaning_services" {...props} />,
   Assistant: (props: IconProps) => <MaterialIcon name="support_agent" {...props} />,

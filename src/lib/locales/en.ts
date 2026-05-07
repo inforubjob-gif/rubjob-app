@@ -136,7 +136,7 @@ export const en = {
       }
     },
     line: {
-      badge: "💬",
+      badge: "",
       title: "Use via LINE",
       titleSub: "Save phone space",
       desc: "RUBJOB is more than just laundry; it's a Life Operator system preparing to serve you in various ways, all within the LINE app you use every day.",

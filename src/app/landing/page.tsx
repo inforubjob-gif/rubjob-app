@@ -140,13 +140,13 @@ export default function LandingPage() {
     {
       name: t("landing.contact.list.facebook.name"),
       desc: t("landing.contact.list.facebook.desc"),
-      icon: "📘",
+      icon: <Icons.Facebook size={40} />,
       bgClass: "bg-gradient-to-br from-blue-400 to-blue-600 text-white"
     },
     {
       name: t("landing.contact.list.line.name"),
       desc: t("landing.contact.list.line.desc"),
-      icon: "💬",
+      icon: <Icons.Line size={40} />,
       bgClass: "bg-gradient-to-br from-[#00B900] to-[#009b00] text-white"
     },
     {
@@ -282,8 +282,8 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-6 md:px-12 relative z-30">
           <div className="flex flex-col lg:flex-row items-center gap-12">
             <div className="flex-1 text-center lg:text-left">
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-[#00B900] text-white text-3xl shadow-xl shadow-[#00B900]/30 mb-6">
-                {t("landing.line.badge")}
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-[#00B900] text-white shadow-xl shadow-[#00B900]/30 mb-6">
+                <Icons.Line size={40} />
               </div>
               <h2 className="text-4xl md:text-5xl font-black text-slate-900 mb-6 tracking-tight leading-tight">
                 {t("landing.line.title")} <span className="text-[#00B900]">{t("landing.line.titleSub")}</span>

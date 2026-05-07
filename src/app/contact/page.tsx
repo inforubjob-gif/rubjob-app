@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useTranslation } from "@/components/providers/LanguageProvider";
+import { Icons } from "@/components/ui/Icons";
 
 function FAQItem({ question, answer }: { question: string, answer: string }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -86,8 +87,8 @@ export default function ContactPage() {
               <div className="grid grid-cols-1 gap-6">
                 {/* LINE Channel */}
                 <a href="https://line.me/R/ti/p/@rubjob" target="_blank" rel="noopener noreferrer" className="group p-8 bg-white rounded-[32px] border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-green-500/10 transition-all duration-300 hover:-translate-y-1 flex items-center gap-6">
-                  <div className="w-20 h-20 rounded-3xl bg-[#00B900] text-white flex items-center justify-center text-4xl shadow-lg shadow-[#00B900]/20 group-hover:scale-110 transition-transform">
-                    💬
+                  <div className="w-20 h-20 rounded-3xl bg-[#00B900] text-white flex items-center justify-center shadow-lg shadow-[#00B900]/20 group-hover:scale-110 transition-transform">
+                    <Icons.Line size={48} />
                   </div>
                   <div>
                     <h3 className="text-2xl font-black text-slate-800 mb-1">{t("landingContact.lineTitle")}</h3>
@@ -98,8 +99,8 @@ export default function ContactPage() {
 
                 {/* Facebook Channel */}
                 <a href="#" className="group p-8 bg-white rounded-[32px] border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-blue-500/10 transition-all duration-300 hover:-translate-y-1 flex items-center gap-6">
-                  <div className="w-20 h-20 rounded-3xl bg-blue-600 text-white flex items-center justify-center text-4xl shadow-lg shadow-blue-600/20 group-hover:scale-110 transition-transform">
-                    📘
+                  <div className="w-20 h-20 rounded-3xl bg-blue-600 text-white flex items-center justify-center shadow-lg shadow-blue-600/20 group-hover:scale-110 transition-transform">
+                    <Icons.Facebook size={48} />
                   </div>
                   <div>
                     <h3 className="text-2xl font-black text-slate-800 mb-1">{t("landingContact.facebookTitle")}</h3>
