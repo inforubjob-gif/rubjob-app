@@ -166,9 +166,9 @@ export default function LandingPage() {
     <div className="min-h-dvh bg-[#fafbfd] text-slate-800 font-sans overflow-x-hidden relative">
       {/* ─── Ambient Glowing Orbs (Light Theme Adaptation) ─── */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
-        <div className="absolute top-[-10%] left-[-5%] w-[800px] h-[800px] rounded-full bg-primary/10 blur-[120px] mix-blend-multiply opacity-70 animate-pulse-gold" />
-        <div className="absolute top-[20%] right-[-10%] w-[600px] h-[600px] rounded-full bg-amber-200/40 blur-[150px] mix-blend-multiply opacity-60" />
-        <div className="absolute bottom-[10%] left-[10%] w-[500px] h-[500px] rounded-full bg-orange-100/60 blur-[100px] mix-blend-multiply opacity-80" />
+        <div className="absolute top-[-10%] left-[-5%] w-[800px] h-[800px] rounded-full bg-primary/20 blur-[120px] mix-blend-multiply opacity-70 animate-pulse-gold" />
+        <div className="absolute top-[20%] right-[-10%] w-[600px] h-[600px] rounded-full bg-primary/10 blur-[150px] mix-blend-multiply opacity-60" />
+        <div className="absolute bottom-[10%] left-[10%] w-[500px] h-[500px] rounded-full bg-primary/15 blur-[100px] mix-blend-multiply opacity-80" />
       </div>
 
       {/* ─── Navigation ─── */}
@@ -182,10 +182,19 @@ export default function LandingPage() {
             />
           </div>
           
-          <div className="hidden md:flex items-center gap-8 text-sm font-bold text-slate-600">
-            <a href="#how-it-works" className="hover:text-primary transition-colors">{t("landing.nav.howItWorks")}</a>
-            <a href="#features" className="hover:text-primary transition-colors">{t("landing.nav.features")}</a>
-            <a href="#line-app" className="hover:text-primary transition-colors">{t("landing.nav.lineApp")}</a>
+          <div className="hidden md:flex items-center gap-10 text-sm font-bold text-slate-600">
+            <a href="#how-it-works" className="hover:text-primary relative group py-2">
+              {t("landing.nav.howItWorks")}
+              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full" />
+            </a>
+            <a href="#features" className="hover:text-primary relative group py-2">
+              {t("landing.nav.features")}
+              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full" />
+            </a>
+            <a href="#line-app" className="hover:text-primary relative group py-2">
+              {t("landing.nav.lineApp")}
+              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full" />
+            </a>
           </div>
 
           {/* App link removed as per request to decouple website from app */}
@@ -199,11 +208,11 @@ export default function LandingPage() {
           {/* Left Text Column */}
           <div className="flex-1 text-center lg:text-left z-20">
             <div
-              className={`inline-flex items-center gap-2 px-5 py-2 bg-primary/10 rounded-full text-primary-dark font-black text-sm uppercase tracking-widest border border-primary/20 mb-8 shadow-sm transition-all duration-700 ${
+              className={`inline-flex items-center gap-2 px-5 py-2 bg-primary text-white rounded-full font-black text-[10px] uppercase tracking-[0.2em] mb-8 shadow-xl shadow-primary/20 transition-all duration-700 ${
                 mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
               }`}
             >
-              <span className="w-2.5 h-2.5 bg-primary rounded-full animate-pulse" />
+              <span className="w-1.5 h-1.5 bg-white rounded-full animate-pulse" />
               {t("landing.hero.badge")}
             </div>
 
@@ -235,9 +244,10 @@ export default function LandingPage() {
                 mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
               }`}
             >
-              <a href="#how-it-works" className="px-10 py-4 bg-slate-900 hover:bg-slate-800 text-white font-black text-base rounded-2xl shadow-xl hover:shadow-2xl transition-all hover:-translate-y-1 active:translate-y-0 flex items-center justify-center gap-3 group">
-                  <img src="/images/mascot-peek.png" alt="" className="w-5 h-5 object-contain group-hover:-translate-y-1 transition-transform" />
-                  {t("landing.hero.cta")}
+              <a href="#how-it-works" className="px-10 py-5 bg-primary hover:bg-primary-dark text-white font-black text-lg rounded-2xl shadow-xl shadow-primary/30 hover:shadow-2xl hover:shadow-primary/40 transition-all hover:-translate-y-1 active:translate-y-0 flex items-center justify-center gap-3 group overflow-hidden relative">
+                  <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+                  <img src="/images/mascot-peek.png" alt="" className="w-6 h-6 object-contain group-hover:-translate-y-1 transition-transform relative z-10" />
+                  <span className="relative z-10 uppercase tracking-widest">{t("landing.hero.cta")}</span>
                 </a>
             </div>
           </div>
@@ -670,7 +680,7 @@ export default function LandingPage() {
       </section>
 
       {/* ─── Footer ─── */}
-      <footer className="relative z-10 border-t border-slate-200 bg-white pt-16 pb-6">
+      <footer className="relative z-10 border-t-4 border-primary bg-white pt-16 pb-6">
         
         {/* Chilling Mascot 10 */}
         <div className="absolute -top-[70px] left-1/2 transform -translate-x-1/2 sm:translate-x-0 sm:right-[15%] sm:left-auto w-28 animate-float z-20">
