@@ -247,7 +247,7 @@ export default function RubberProfilePage() {
                       const data = await res.json() as any;
                       if (!res.ok || !data.token) throw new Error("Failed to get linking token");
                       const liffId = process.env.NEXT_PUBLIC_LIFF_ID_RUBBER || process.env.NEXT_PUBLIC_LIFF_ID;
-                      window.location.href = `https://liff.line.me/${liffId}/auth/link-line?type=rubber&id=${data.accountId}&token=${data.token}`;
+                      window.location.href = `https://liff.line.me/${liffId}/link-line?type=rubber&id=${data.accountId}&token=${data.token}`;
                     } catch (e) {
                       console.error("LINE link error:", e);
                       alert("ไม่สามารถเชื่อมต่อ LINE ได้ กรุณาลองใหม่อีกครั้ง");
