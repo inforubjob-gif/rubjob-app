@@ -128,3 +128,35 @@ export async function PUT(req: Request) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
+
+/**
+ * PATCH /api/user/addresses
+ * Sets an address as default
+ */
+export async function PATCH(req: Request) {
+  try {
+    const body = (await req.json() as any) as any;
+    const { id, userId, isDefault } = body;
+    
+    if (!id || !userId) {
+      return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+    }
+
+    const db = getRequestContext().env.DB;
+    if (!db) {
+      return NextResponse.json({ error: "D1 Database binding 'DB' not found" }, { status: 500 });
+    }
+
+    if (isDefault) {
+      // Unset other defaults for this user
+      await db.prepare(`UPDATE addresses SET isDefault = 0 WHERE userId = ?`).bind(userId).run();
+      // Set this one as default
+      await db.prepare(`UPDATE addresses SET isDefault = 1 WHERE id = ?`).bind(id).run();
+    }
+
+    return NextResponse.json({ success: true });
+  } catch (error: any) {
+    console.error("Patch address error:", error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+}

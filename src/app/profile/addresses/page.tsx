@@ -63,7 +63,16 @@ export default function ManageAddressesPage() {
 
       const data = await res.json() as any;
       if (data.success) {
-        router.back();
+        // Update local state to reflect the new default
+        setAddresses(prev => prev.map(a => ({
+          ...a,
+          isDefault: a.id === addr.id
+        })));
+        
+        // Optional: brief delay before going back to show the selection state
+        setTimeout(() => {
+           router.back();
+        }, 300);
       } else {
         alert(data.error || "Failed to select address");
       }
