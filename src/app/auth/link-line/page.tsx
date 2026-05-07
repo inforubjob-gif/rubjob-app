@@ -13,22 +13,32 @@ function LinkLineContent() {
   useEffect(() => {
     async function initLiffAndLink() {
       try {
+        const type = searchParams.get("type"); // rubber or store
+        let accountId = searchParams.get("id");
+        let token = searchParams.get("token");
+
+        // 1. Initialize LIFF
         const liffId = process.env.NEXT_PUBLIC_LIFF_ID_RUBBER || process.env.NEXT_PUBLIC_LIFF_ID;
         if (!liffId) throw new Error("LIFF ID not configured");
 
         await liff.init({ liffId });
 
         if (!liff.isLoggedIn()) {
-          liff.login();
+          liff.login({ redirectUri: window.location.href });
           return;
         }
 
         const profile = await liff.getProfile();
         const lineUserId = profile.userId;
 
-        const type = searchParams.get("type"); // rubber or store
-        const accountId = searchParams.get("id");
-        const token = searchParams.get("token");
+        // 2. If missing id/token, try to get them from session
+        if (!accountId || !token) {
+          const sessionRes = await fetch(`/api/auth/link-line?type=${type || 'rubber'}`);
+          if (!sessionRes.ok) throw new Error("Please log in to the app before linking LINE.");
+          const sessionData = await sessionRes.json() as any;
+          accountId = sessionData.accountId;
+          token = sessionData.token;
+        }
 
         if (!type || !accountId || !token) {
           setStatus("error");
@@ -36,6 +46,7 @@ function LinkLineContent() {
           return;
         }
 
+        // 3. Link account
         const res = await fetch("/api/auth/link-line", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -46,7 +57,6 @@ function LinkLineContent() {
 
         if (res.ok && data.success) {
           setStatus("success");
-          // Close LIFF automatically after 3 seconds
           setTimeout(() => liff.closeWindow(), 3000);
         } else {
           setStatus("error");

@@ -73,11 +73,22 @@ export async function POST(req: Request) {
 export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
-    const accountId = searchParams.get("accountId");
-
-    if (!accountId) return NextResponse.json({ error: "AccountId required" }, { status: 400 });
+    const type = searchParams.get("type") || "rubber";
+    let accountId = searchParams.get("accountId");
 
     const db = getRequestContext().env.DB;
+
+    // If accountId is not provided, try to get it from the session
+    if (!accountId) {
+      const { getRubberSession, getStoreSession } = await import("@/lib/auth-server");
+      if (type === "rubber") {
+        accountId = await getRubberSession();
+      } else if (type === "store") {
+        accountId = await getStoreSession();
+      }
+    }
+
+    if (!accountId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     
     // Self-healing: Table for linking tokens
     try {
@@ -97,7 +108,7 @@ export async function GET(req: Request) {
       INSERT INTO link_tokens (token, accountId) VALUES (?, ?)
     `).bind(token, accountId).run();
 
-    return NextResponse.json({ token });
+    return NextResponse.json({ token, accountId });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }

@@ -223,29 +223,29 @@ export default function RubberDashboard() {
   return (
     <div className="flex flex-col min-h-screen bg-slate-50 relative overflow-hidden">
       {/* Background Gradient Layer */}
-      <div className="absolute top-0 left-0 right-0 h-[380px] bg-gradient-to-b from-primary via-primary to-slate-50 z-0" />
+      <div className="absolute top-0 left-0 right-0 h-[280px] bg-gradient-to-b from-primary via-primary to-slate-50 z-0" />
 
       {/* Dashboard Mascot Accent */}
-      <div className="fixed -bottom-20 -right-20 w-80 opacity-[0.04] pointer-events-none select-none z-0 rotate-12 group hover:opacity-[0.08] transition-opacity">
+      <div className="fixed -bottom-10 -right-10 w-48 opacity-[0.04] pointer-events-none select-none z-0 rotate-12 group hover:opacity-[0.08] transition-opacity">
         <img src="/images/มาสคอต-ขี่รถ.png" alt="" />
       </div>
 
       {/* Rubber Header */}
-      <header className="relative z-10 px-5 pt-3 pb-6">
-        <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center gap-4">
-            <Icons.Logo variant="icon-white" size={56} />
+      <header className="relative z-10 px-5 pt-10 pb-4">
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-3">
+            <Icons.Logo variant="icon-white" size={48} />
             <div className="min-w-0">
-              <p className="text-xs text-white font-black uppercase leading-tight mb-2 flex items-center gap-2">
+              <p className="text-[10px] text-white font-black uppercase leading-tight mb-1 flex items-center gap-1.5">
                 <span className="w-1.5 h-1.5 rounded-full bg-white/50 animate-pulse" />
                 {t("rubber.hero")}
               </p>
-              <h1 className="text-3xl font-black text-white truncate drop-shadow-md leading-none">{rubber?.name || t("common.guest")}</h1>
+              <h1 className="text-xl font-black text-white truncate drop-shadow-md leading-none">{rubber?.name || t("common.guest")}</h1>
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <button className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/20 shadow-md shadow-primary-dark/10 active:scale-90 transition-transform">
-              <Icons.Bell size={20} className="text-white" />
+            <button className="w-9 h-9 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/20 shadow-md shadow-primary-dark/10 active:scale-90 transition-transform">
+              <Icons.Bell size={18} className="text-white" />
             </button>
           </div>
         </div>
@@ -415,32 +415,7 @@ export default function RubberDashboard() {
                     variant="secondary" 
                     size="sm" 
                     className="mt-4 bg-white text-emerald-600 font-black uppercase text-[10px] py-2 px-6 rounded-lg active:scale-95 transition-all"
-                    onClick={async () => {
-                      try {
-                        const res = await fetch(`/api/auth/link-line?accountId=${rubber?.id}`);
-                        if (!res.ok) {
-                          const errData = await res.json() as any;
-                          throw new Error(errData.error || "Failed to generate link token");
-                        }
-                        const data = await res.json() as any;
-                        const token = data.token;
-                        const liffId = process.env.NEXT_PUBLIC_LIFF_ID_RUBBER || process.env.NEXT_PUBLIC_LIFF_ID;
-                        
-                        if (!liffId) {
-                          throw new Error("LIFF ID is not configured (NEXT_PUBLIC_LIFF_ID_RUBBER)");
-                        }
-
-                        window.location.href = `https://liff.line.me/${liffId}/auth/link-line?type=rubber&id=${rubber?.id}&token=${token}`;
-                      } catch (e: any) {
-                        console.error("LINE Link Error:", e);
-                        setAlertConfig({
-                          isOpen: true,
-                          title: t("common.error"),
-                          message: e.message || t("common.errorDesc"),
-                          type: "error",
-                        });
-                      }
-                    }}
+                    onClick={() => router.push("/auth/link-line?type=rubber")}
                   >
                     เชื่อมต่อตอนนี้
                   </Button>
