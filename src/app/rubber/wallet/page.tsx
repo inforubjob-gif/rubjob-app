@@ -145,12 +145,104 @@ export default function RubberWalletPage() {
         </header>
 
         <div className="flex-1 px-5 py-8 space-y-6 pb-24 animate-fade-in">
+          <section className="animate-in fade-in slide-in-from-bottom-4 duration-700 delay-150">
+            <h2 className="text-[11px] font-black text-slate-900 uppercase tracking-[0.2em] mb-4 px-2">Earnings Insight</h2>
+            <Card className="p-6 bg-white border border-slate-100 shadow-2xl rounded-[2.5rem]">
+              <div className="flex items-center justify-between mb-8">
+                <div>
+                  <h3 className="text-sm font-black text-slate-900">Weekly Performance</h3>
+                  <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Last 7 Days</p>
+                </div>
+                <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center text-primary">
+                  <Icons.Stars size={20} />
+                </div>
+              </div>
+
+              {/* Chart Implementation */}
+              <div className="flex items-end justify-between h-32 gap-2 mb-6">
+                {(() => {
+                  const last7Days = [...Array(7)].map((_, i) => {
+                    const d = new Date();
+                    d.setDate(d.getDate() - (6 - i));
+                    return d;
+                  });
+
+                  const dayEarnings = last7Days.map(date => {
+                    const dayStr = date.toDateString();
+                    const total = transactions
+                      .filter(t => t.amount > 0 && new Date(t.date).toDateString() === dayStr)
+                      .reduce((acc, t) => acc + Number(t.amount), 0);
+                    return { date, total };
+                  });
+
+                  const maxEarning = Math.max(...dayEarnings.map(d => d.total), 100);
+
+                  return dayEarnings.map((d, i) => {
+                    const height = (d.total / maxEarning) * 100;
+                    const isToday = d.date.toDateString() === new Date().toDateString();
+                    
+                    return (
+                      <div key={i} className="flex-1 flex flex-col items-center gap-2 group cursor-pointer">
+                        <div className="relative w-full h-full flex items-end justify-center">
+                           {/* Tooltip on hover */}
+                           <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-[9px] font-black py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-20">
+                             ฿{d.total.toLocaleString()}
+                           </div>
+                           {/* Bar */}
+                           <div 
+                             className={`w-full rounded-t-lg transition-all duration-700 ease-out ${isToday ? 'bg-primary shadow-lg shadow-primary/30' : 'bg-slate-100 group-hover:bg-primary/30'}`}
+                             style={{ height: `${Math.max(height, 5)}%` }}
+                           />
+                        </div>
+                        <span className={`text-[9px] font-black uppercase ${isToday ? 'text-primary' : 'text-slate-400'}`}>
+                          {d.date.toLocaleDateString('en-US', { weekday: 'short' })}
+                        </span>
+                      </div>
+                    );
+                  });
+                })()}
+              </div>
+
+              {/* Today's Breakdown */}
+              <div className="border-t border-slate-50 pt-6">
+                 <div className="flex items-center justify-between mb-4">
+                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Time Breakdown (Today)</p>
+                    <p className="text-[10px] font-black text-emerald-500 uppercase">Real-time</p>
+                 </div>
+                 <div className="space-y-3">
+                    {(() => {
+                      const todayStr = new Date().toDateString();
+                      const todayTrx = transactions
+                        .filter(t => t.amount > 0 && new Date(t.date).toDateString() === todayStr)
+                        .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+                      if (todayTrx.length === 0) {
+                        return <p className="text-center py-4 text-[10px] text-slate-300 font-bold uppercase italic">No earnings yet today</p>;
+                      }
+
+                      return todayTrx.map((t, idx) => (
+                        <div key={idx} className="flex items-center justify-between">
+                           <div className="flex items-center gap-3">
+                              <div className="w-1.5 h-1.5 bg-primary rounded-full" />
+                              <p className="text-[11px] font-black text-slate-700 uppercase tracking-tight">
+                                {new Date(t.date).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' })}
+                              </p>
+                           </div>
+                           <p className="text-xs font-black text-slate-900">฿{Number(t.amount).toLocaleString()}</p>
+                        </div>
+                      ));
+                    })()}
+                 </div>
+              </div>
+            </Card>
+          </section>
+
           <section>
-            <h2 className="text-xs font-black text-slate-400 uppercase mb-4 px-1">{t("rubber.wallet.history")}</h2>
+            <h2 className="text-[11px] font-black text-slate-900 uppercase tracking-[0.2em] mb-4 px-2">{t("rubber.wallet.history")}</h2>
             <div className="space-y-3">
               {transactions.map((trx) => (
-                <div key={trx.id} className="bg-white p-4 rounded-xl border border-slate-100 shadow-sm flex items-center gap-4">
-                  <div className={`w-11 h-11 rounded-full flex items-center justify-center ${trx.amount > 0 ? 'bg-green-50 text-green-600' : 'bg-slate-100 text-slate-600'}`}>
+                <div key={trx.id} className="bg-white p-4 rounded-xl border border-slate-100 shadow-sm flex items-center gap-4 hover:shadow-md transition-shadow">
+                  <div className={`w-11 h-11 rounded-full flex items-center justify-center ${trx.amount > 0 ? 'bg-emerald-50 text-emerald-500' : 'bg-slate-100 text-slate-600'}`}>
                     {trx.amount > 0 ? <Icons.Payment size={20} /> : <Icons.Clock size={20} />}
                   </div>
                   <div className="flex-1">
@@ -165,21 +257,24 @@ export default function RubberWalletPage() {
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className={`text-sm font-black ${trx.amount > 0 ? 'text-green-600' : 'text-slate-900'}`}>
+                    <p className={`text-sm font-black ${trx.amount > 0 ? 'text-emerald-500' : 'text-slate-900'}`}>
                       {trx.amount > 0 ? `+฿${(Number(trx.amount) || 0).toLocaleString()}` : `-฿${(Math.abs(Number(trx.amount) || 0)).toLocaleString()}`}
                     </p>
-                    <p className="text-[9px] font-bold text-slate-400 uppercase">{t(`rubber.wallet.statuses.${trx.status}`) || trx.status}</p>
+                    <Badge variant={trx.status === 'completed' || trx.status === 'success' ? 'success' : 'warning'} className="text-[8px] font-black uppercase py-0.5 px-2">
+                       {t(`rubber.wallet.statuses.${trx.status}`) || trx.status}
+                    </Badge>
                   </div>
                 </div>
               ))}
             </div>
           </section>
 
-          <Card className="p-6 bg-orange-50 border-2 border-orange-100 shadow-sm">
-              <h3 className="text-sm font-black text-primary mb-2 uppercase">{t("rubber.wallet.commissionRate")}</h3>
-              <p className="text-xs text-slate-500 leading-relaxed mb-4 font-bold">{t("rubber.wallet.commissionDesc")}</p>
-              <div className="h-1.5 bg-white rounded-full overflow-hidden border border-orange-100">
-                  <div className="h-full bg-primary w-[85%] shadow-[0_0_8px_rgba(255,159,28,0.5)]" />
+          <Card className="p-6 bg-slate-900 text-white border-none shadow-2xl rounded-[2.5rem] relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full -mr-16 -mt-16 blur-2xl" />
+              <h3 className="text-xs font-black text-primary mb-2 uppercase tracking-widest">{t("rubber.wallet.commissionRate")}</h3>
+              <p className="text-[11px] text-white/50 leading-relaxed mb-4 font-bold uppercase tracking-tight">{t("rubber.wallet.commissionDesc")}</p>
+              <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
+                  <div className="h-full bg-primary w-[85%] shadow-[0_0_12px_rgba(255,159,28,0.8)]" />
               </div>
           </Card>
         </div>
