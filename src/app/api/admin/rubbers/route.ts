@@ -12,6 +12,30 @@ export async function GET(req: Request) {
     if (!db) return NextResponse.json({ error: "D1 not found" }, { status: 500 });
 
     // Self-healing: Ensure required columns and tables exist
+    try {
+      await db.prepare(`
+        CREATE TABLE IF NOT EXISTS rubber_users (
+          id TEXT PRIMARY KEY,
+          email TEXT UNIQUE NOT NULL,
+          password TEXT NOT NULL,
+          name TEXT,
+          phone TEXT,
+          vehicleType TEXT,
+          status TEXT DEFAULT 'active',
+          address TEXT,
+          idNumber TEXT,
+          licensePlate TEXT,
+          emergencyContact TEXT,
+          rubber_number INTEGER,
+          bankName TEXT,
+          accountNumber TEXT,
+          accountName TEXT,
+          pictureUrl TEXT,
+          createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
+        )
+      `).run();
+    } catch (e) {}
+
     try { await db.prepare("ALTER TABLE rubber_users ADD COLUMN rubber_number INTEGER").run(); } catch(e) {}
     try { await db.prepare("ALTER TABLE rubber_users ADD COLUMN pictureUrl TEXT").run(); } catch(e) {}
     try { await db.prepare("ALTER TABLE rubber_users ADD COLUMN bankName TEXT").run(); } catch(e) {}
@@ -64,6 +88,30 @@ export async function POST(req: Request) {
     if (!db) return NextResponse.json({ error: "D1 not found" }, { status: 500 });
 
     // Self-healing: Ensure required columns exist
+    try {
+      await db.prepare(`
+        CREATE TABLE IF NOT EXISTS rubber_users (
+          id TEXT PRIMARY KEY,
+          email TEXT UNIQUE NOT NULL,
+          password TEXT NOT NULL,
+          name TEXT,
+          phone TEXT,
+          vehicleType TEXT,
+          status TEXT DEFAULT 'active',
+          address TEXT,
+          idNumber TEXT,
+          licensePlate TEXT,
+          emergencyContact TEXT,
+          rubber_number INTEGER,
+          bankName TEXT,
+          accountNumber TEXT,
+          accountName TEXT,
+          pictureUrl TEXT,
+          createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
+        )
+      `).run();
+    } catch (e) {}
+
     try { await db.prepare("ALTER TABLE rubber_users ADD COLUMN rubber_number INTEGER").run(); } catch(e) {}
     try { await db.prepare("ALTER TABLE rubber_users ADD COLUMN pictureUrl TEXT").run(); } catch(e) {}
     try { await db.prepare("ALTER TABLE rubber_users ADD COLUMN bankName TEXT").run(); } catch(e) {}

@@ -8,8 +8,8 @@ CREATE TABLE IF NOT EXISTS admin_users (
   createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
--- Rider Users Table (Created exclusively by Admin)
-CREATE TABLE IF NOT EXISTS rider_users (
+-- Rubber Users Table (Created exclusively by Admin)
+CREATE TABLE IF NOT EXISTS rubber_users (
   id TEXT PRIMARY KEY,
   email TEXT UNIQUE NOT NULL,
   password TEXT NOT NULL,
@@ -21,23 +21,24 @@ CREATE TABLE IF NOT EXISTS rider_users (
   idNumber TEXT, -- National ID
   licensePlate TEXT, -- Vehicle plate number
   emergencyContact TEXT,
-  rider_number INTEGER, -- Sequential ID counter
+  rubber_number INTEGER, -- Sequential ID counter
   bankName TEXT,
   accountNumber TEXT,
   accountName TEXT,
+  pictureUrl TEXT,
   createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
--- Rider Documents Table
-CREATE TABLE IF NOT EXISTS rider_documents (
+-- Rubber Documents Table
+CREATE TABLE IF NOT EXISTS rubber_documents (
   id TEXT PRIMARY KEY,
-  riderId TEXT NOT NULL,
+  rubberId TEXT NOT NULL,
   type TEXT NOT NULL, -- id_card, license, insurance
   status TEXT DEFAULT 'pending', -- pending, verified, rejected
   url TEXT,
   notes TEXT,
   createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (riderId) REFERENCES rider_users(id) ON DELETE CASCADE
+  FOREIGN KEY (rubberId) REFERENCES rubber_users(id) ON DELETE CASCADE
 );
 
 -- Users Table
@@ -148,8 +149,8 @@ CREATE TABLE IF NOT EXISTS orders (
   FOREIGN KEY (storeId) REFERENCES stores(id),
   FOREIGN KEY (providerId) REFERENCES specialist_profiles(id),
   FOREIGN KEY (serviceId) REFERENCES services(id),
-  FOREIGN KEY (pickupDriverId) REFERENCES rider_users(id),
-  FOREIGN KEY (deliveryDriverId) REFERENCES rider_users(id)
+  FOREIGN KEY (pickupDriverId) REFERENCES rubber_users(id),
+  FOREIGN KEY (deliveryDriverId) REFERENCES rubber_users(id)
 );
 
 -- Addresses Table
