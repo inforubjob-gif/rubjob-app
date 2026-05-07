@@ -6,6 +6,10 @@ import { useTranslation } from "@/components/providers/LanguageProvider";
 import { Icons } from "@/components/ui/Icons";
 import Card from "@/components/ui/Card";
 import AdminDocumentUpload from "./AdminDocumentUpload";
+import GlobalInput from "@/components/ui/GlobalInput";
+import GlobalTextarea from "@/components/ui/GlobalTextarea";
+import GlobalSelect from "@/components/ui/GlobalSelect";
+import { useToast } from "@/components/providers/ToastProvider";
 
 interface RubberFormProps {
   initialData?: any;
@@ -26,6 +30,7 @@ const DOCUMENT_TYPES = [
 export default function RubberForm({ initialData, isEdit }: RubberFormProps) {
   const router = useRouter();
   const { t } = useTranslation();
+  const { showToast } = useToast();
   const [isSaving, setIsSaving] = useState(false);
   
   const [formData, setFormData] = useState({
@@ -78,11 +83,12 @@ export default function RubberForm({ initialData, isEdit }: RubberFormProps) {
       });
       
       if (res.ok) {
+        showToast(isEdit ? t('admin.rubbers.form.errors.updateSuccess') : t('admin.rubbers.form.errors.approveSuccess'), "success");
         router.push("/admin/rubbers");
         router.refresh();
       } else {
           const err = await res.json();
-          alert(err.error || "Failed to save rubber");
+          showToast(err.error || t('admin.rubbers.form.errors.saveFailed'), "error");
       }
     } catch (err) {
       console.error("Save failed", err);
@@ -100,7 +106,7 @@ export default function RubberForm({ initialData, isEdit }: RubberFormProps) {
         body: JSON.stringify({ id: initialData.id, status: 'active' })
       });
       if (res.ok) {
-        showToast("Application Approved! Rubber is now active.", "success");
+        showToast(t('admin.rubbers.form.errors.approveSuccess'), "success");
         router.push("/admin/rubbers");
         router.refresh();
       }
@@ -171,38 +177,36 @@ export default function RubberForm({ initialData, isEdit }: RubberFormProps) {
                  
                  <div className="md:col-span-3 grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="md:col-span-2">
-                       <label className="text-[10px] uppercase font-black text-slate-400 tracking-widest block mb-1.5 ml-1">{t('admin.rubbers.form.fullName')}</label>
-                       <input 
+                       <GlobalInput
+                         label={t('admin.rubbers.form.fullName')}
                          required
                          value={formData.name}
                          onChange={e => setFormData({...formData, name: e.target.value})}
-                         placeholder="e.g. Somchai Laundry"
-                         className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-5 py-4 text-sm font-bold focus:outline-none focus:border-primary/50 transition-all font-mono tracking-tight"
+                         placeholder={t('admin.rubbers.form.placeholders.fullName')}
+                         className="font-mono tracking-tight"
                        />
                     </div>
                     
                     <div>
-                       <label className="text-[10px] uppercase font-black text-slate-400 tracking-widest block mb-1.5 ml-1">{t('admin.rubbers.form.email')}</label>
-                       <input 
+                       <GlobalInput
+                         label={t('admin.rubbers.form.email')}
                          required
                          disabled={isEdit}
                          value={formData.email}
                          onChange={e => setFormData({...formData, email: e.target.value})}
-                         placeholder="rubber@rubjob.com"
-                         className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-5 py-4 text-sm font-bold focus:outline-none focus:border-primary/50 transition-all disabled:opacity-50"
+                         placeholder={t('admin.rubbers.form.placeholders.email')}
                        />
                     </div>
                     
                     {!isEdit && (
                        <div>
-                          <label className="text-[10px] uppercase font-black text-slate-400 tracking-widest block mb-1.5 ml-1">{t('admin.rubbers.form.password')}</label>
-                          <input 
+                          <GlobalInput
+                            label={t('admin.rubbers.form.password')}
                             required
                             type="password"
                             value={formData.password}
                             onChange={e => setFormData({...formData, password: e.target.value})}
-                            placeholder="••••••••"
-                            className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-5 py-4 text-sm font-bold focus:outline-none focus:border-primary/50 transition-all px-10 relative"
+                            placeholder={t('admin.rubbers.form.placeholders.password')}
                           />
                        </div>
                     )}
@@ -210,33 +214,32 @@ export default function RubberForm({ initialData, isEdit }: RubberFormProps) {
               </div>
                  
                  <div>
-                    <label className="text-[10px] uppercase font-black text-slate-400 tracking-widest block mb-1.5 ml-1">{t('admin.rubbers.form.idNumber')}</label>
-                    <input 
+                    <GlobalInput
+                      label={t('admin.rubbers.form.idNumber')}
                       value={formData.idNumber}
                       onChange={e => setFormData({...formData, idNumber: e.target.value})}
-                      placeholder="X-XXXX-XXXXX-XX-X"
-                      className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-5 py-4 text-sm font-bold focus:outline-none focus:border-primary/50 transition-all font-mono"
+                      placeholder={t('admin.rubbers.form.placeholders.idNumber')}
+                      className="font-mono"
                     />
                  </div>
                  
                  <div>
-                    <label className="text-[10px] uppercase font-black text-slate-400 tracking-widest block mb-1.5 ml-1">{t('admin.rubbers.form.phone')}</label>
-                    <input 
+                    <GlobalInput
+                      label={t('admin.rubbers.form.phone')}
                       value={formData.phone}
                       onChange={e => setFormData({...formData, phone: e.target.value})}
-                      placeholder="08X-XXX-XXXX"
-                      className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-5 py-4 text-sm font-bold focus:outline-none focus:border-primary/50 transition-all font-mono"
+                      placeholder={t('admin.rubbers.form.placeholders.phone')}
+                      className="font-mono"
                     />
                  </div>
 
                  <div className="md:col-span-2">
-                    <label className="text-[10px] uppercase font-black text-slate-400 tracking-widest block mb-1.5 ml-1">{t('admin.rubbers.form.address')}</label>
-                    <textarea 
+                    <GlobalTextarea 
+                      label={t('admin.rubbers.form.address')}
                       rows={3}
                       value={formData.address}
-                      onChange={e => setFormData({...formData, address: e.target.value})}
-                      placeholder="Detailed address as per ID card..."
-                      className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-5 py-4 text-sm font-bold focus:outline-none focus:border-primary/50 transition-all"
+                      onChange={e => setFormData({...formData, address: (e.target as HTMLTextAreaElement).value})}
+                      placeholder={t('admin.rubbers.form.placeholders.address')}
                     />
                  </div>
            </Card>
@@ -261,36 +264,38 @@ export default function RubberForm({ initialData, isEdit }: RubberFormProps) {
                                 </div>
                                 <span className="text-sm font-black text-slate-900">{docType.label}</span>
                              </div>
-                             <select 
+                             <GlobalSelect 
                                 value={doc.status}
                                 onChange={e => handleDocChange(docType.id, 'status', e.target.value)}
-                                className={`text-[10px] font-black uppercase px-3 py-1.5 rounded-lg border-2 focus:outline-none ${
+                                fullWidth={false}
+                                className={`text-[10px] font-black uppercase px-3 py-1.5 rounded-lg border-2 focus:outline-none !py-1 !px-2 ${
                                    doc.status === 'verified' ? 'bg-emerald-50 border-emerald-100 text-emerald-600' :
                                    doc.status === 'rejected' ? 'bg-rose-50 border-rose-100 text-rose-600' :
                                    'bg-white border-slate-100 text-slate-400'
                                 }`}
-                             >
-                                <option value="none">{t('admin.rubbers.form.notSubmitted')}</option>
-                                <option value="pending">{t('admin.rubbers.form.pendingReview')}</option>
-                                <option value="verified">{t('admin.rubbers.form.verified')}</option>
-                                <option value="rejected">{t('admin.rubbers.form.rejected')}</option>
-                             </select>
+                                options={[
+                                   { value: 'none', label: t('admin.rubbers.form.notSubmitted') },
+                                   { value: 'pending', label: t('admin.rubbers.form.pendingReview') },
+                                   { value: 'verified', label: t('admin.rubbers.form.verified') },
+                                   { value: 'rejected', label: t('admin.rubbers.form.rejected') },
+                                ]}
+                             />
                           </div>
                           
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                              <AdminDocumentUpload 
-                               label="Document Photo"
+                               label={t('admin.rubbers.form.docs')}
                                value={doc.id || doc.url}
                                onChange={(val) => handleDocChange(docType.id, 'url', val)}
                              />
                              <div>
-                                <label className="text-[9px] uppercase font-black text-slate-400 block mb-1 ml-1">{t('admin.rubbers.form.internalNotes')}</label>
-                                <textarea 
+                                <GlobalTextarea 
+                                  label={t('admin.rubbers.form.internalNotes')}
                                   rows={4}
                                   value={doc.notes}
-                                  onChange={e => handleDocChange(docType.id, 'notes', e.target.value)}
-                                  placeholder="e.g. Checked with DLT database"
-                                  className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-xs font-bold focus:outline-none focus:border-indigo-400 transition-all font-medium"
+                                  onChange={e => handleDocChange(docType.id, 'notes', (e.target as HTMLTextAreaElement).value)}
+                                  placeholder={t('admin.rubbers.form.placeholders.notes')}
+                                  className="text-xs"
                                 />
                              </div>
                           </div>
@@ -333,24 +338,25 @@ export default function RubberForm({ initialData, isEdit }: RubberFormProps) {
               
               <div className="space-y-6">
                  <div>
-                    <label className="text-[10px] uppercase font-black text-white/50 tracking-widest block mb-2 ml-1">{t('admin.rubbers.form.authorizedVehicle')}</label>
-                    <select 
+                    <GlobalSelect 
+                      label={t('admin.rubbers.form.authorizedVehicle')}
                       value={formData.vehicleType}
                       onChange={e => setFormData({...formData, vehicleType: e.target.value})}
-                      className="w-full bg-white/10 border-2 border-white/10 rounded-xl px-5 py-4 text-sm font-bold focus:outline-none focus:border-white/30 transition-all"
-                    >
-                       <option value="bike">Motorbike (Flash/Standard)</option>
-                       <option value="car">Car (Express/Suites)</option>
-                       <option value="truck">Truck (L-Bulk/Corporate)</option>
-                    </select>
+                      className="bg-white/10 border-white/10 text-white [&>option]:text-slate-900"
+                      options={[
+                         { value: 'bike', label: 'Motorbike (Flash/Standard)' },
+                         { value: 'car', label: 'Car (Express/Suites)' },
+                         { value: 'truck', label: 'Truck (L-Bulk/Corporate)' },
+                      ]}
+                    />
                  </div>
                  <div>
-                    <label className="text-[10px] uppercase font-black text-white/50 tracking-widest block mb-2 ml-1">{t('admin.rubbers.form.licensePlate')}</label>
-                    <input 
+                    <GlobalInput 
+                      label={t('admin.rubbers.form.licensePlate')}
                       value={formData.licensePlate}
                       onChange={e => setFormData({...formData, licensePlate: e.target.value})}
-                      placeholder="กข 1234 กทม"
-                      className="w-full bg-white/10 border-2 border-white/10 rounded-xl px-5 py-4 text-sm font-bold focus:outline-none focus:border-white/30 transition-all uppercase placeholder:text-white/20"
+                      placeholder={t('admin.rubbers.form.placeholders.licensePlate')}
+                      className="bg-white/10 border-white/10 text-white placeholder:text-white/20 uppercase"
                     />
                  </div>
               </div>
@@ -366,57 +372,58 @@ export default function RubberForm({ initialData, isEdit }: RubberFormProps) {
               
               <div className="space-y-5">
                  <div>
-                    <label className="text-[10px] uppercase font-black text-slate-400 tracking-widest block mb-1.5 ml-1">{t('admin.rubbers.form.bankName')}</label>
-                    <select 
+                    <GlobalSelect 
+                      label={t('admin.rubbers.form.bankName')}
                       value={formData.bankName}
                       onChange={e => setFormData({...formData, bankName: e.target.value})}
-                      className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-5 py-3.5 text-sm font-bold focus:outline-none focus:border-primary/50 transition-all font-mono"
-                    >
-                       <option value="">Select Bank / PromptPay</option>
-                       <option value="PromptPay">PromptPay (Mobile/ID)</option>
-                       <option value="KBank">Kasikorn (KBank)</option>
-                       <option value="SCB">Siam Commercial (SCB)</option>
-                       <option value="BBL">Bangkok Bank (BBL)</option>
-                       <option value="KTB">Krungthai (KTB)</option>
-                       <option value="Krungsri">Krungsri (BAY)</option>
-                       <option value="TTB">TMBThanachart (TTB)</option>
-                    </select>
-                 </div>
-                 <div>
-                    <label className="text-[10px] uppercase font-black text-slate-400 tracking-widest block mb-1.5 ml-1">{t('admin.rubbers.form.accountNumber')}</label>
-                    <input 
-                      value={formData.accountNumber}
-                      onChange={e => setFormData({...formData, accountNumber: e.target.value})}
-                      placeholder="000-0-00000-0"
-                      className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-5 py-3.5 text-sm font-bold focus:outline-none focus:border-primary/50 transition-all font-mono"
+                      className="font-mono"
+                      options={[
+                         { value: '', label: 'Select Bank / PromptPay' },
+                         { value: 'PromptPay', label: 'PromptPay (Mobile/ID)' },
+                         { value: 'KBank', label: 'Kasikorn (KBank)' },
+                         { value: 'SCB', label: 'Siam Commercial (SCB)' },
+                         { value: 'BBL', label: 'Bangkok Bank (BBL)' },
+                         { value: 'KTB', label: 'Krungthai (KTB)' },
+                         { value: 'Krungsri', label: 'Krungsri (BAY)' },
+                         { value: 'TTB', label: 'TMBThanachart (TTB)' },
+                      ]}
                     />
                  </div>
                  <div>
-                    <label className="text-[10px] uppercase font-black text-slate-400 tracking-widest block mb-1.5 ml-1">{t('admin.rubbers.form.accountName')}</label>
-                    <input 
+                    <GlobalInput 
+                      label={t('admin.rubbers.form.accountNumber')}
+                      value={formData.accountNumber}
+                      onChange={e => setFormData({...formData, accountNumber: e.target.value})}
+                      placeholder={t('admin.rubbers.form.placeholders.bankAccount')}
+                      className="font-mono"
+                    />
+                 </div>
+                 <div>
+                    <GlobalInput 
+                      label={t('admin.rubbers.form.accountName')}
                       value={formData.accountName}
                       onChange={e => setFormData({...formData, accountName: e.target.value})}
-                      placeholder="As shown in bank book"
-                      className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-5 py-3.5 text-sm font-bold focus:outline-none focus:border-primary/50 transition-all font-mono"
+                      placeholder={t('admin.rubbers.form.placeholders.accountName')}
+                      className="font-mono"
                     />
                  </div>
               </div>
            </Card>
 
            <Card className="p-8 bg-white border border-slate-200/60 shadow-sm">
-              <label className="text-[10px] uppercase font-black text-slate-400 tracking-widest block mb-2 ml-1">{t('admin.rubbers.form.emergencyContact')}</label>
-              <input 
+              <GlobalInput 
+                label={t('admin.rubbers.form.emergencyContact')}
                 value={formData.emergencyContact}
                 onChange={e => setFormData({...formData, emergencyContact: e.target.value})}
-                placeholder="Name & Relationship (Phone)"
-                className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-5 py-4 text-sm font-bold focus:outline-none focus:border-primary/50 transition-all text-slate-600"
+                placeholder={t('admin.rubbers.form.placeholders.emergency')}
+                className="text-slate-600"
               />
            </Card>
 
            <div className="pt-4">
               <button 
                 disabled={isSaving}
-                className="w-full bg-slate-900 text-white py-6 rounded-xl font-black text-xs uppercase tracking-[0.3em] shadow-2xl shadow-slate-300 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50"
+                className="w-full bg-primary text-white py-6 rounded-xl font-black text-xs uppercase tracking-[0.3em] shadow-2xl shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50"
               >
                 {isSaving ? t('admin.rubbers.form.syncing') : isEdit ? t('admin.rubbers.form.updateBtn') : t('admin.rubbers.form.authorizeBtn')}
               </button>
@@ -432,16 +439,17 @@ export default function RubberForm({ initialData, isEdit }: RubberFormProps) {
            {isEdit && (
               <div className="mt-8 p-6 bg-slate-50 rounded-xl space-y-3">
                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t('admin.rubbers.form.statusControl')}</p>
-                 <select 
-                   value={formData.status}
-                   onChange={e => setFormData({...formData, status: e.target.value})}
-                   className={`w-full px-4 py-3 rounded-xl text-xs font-black uppercase tracking-tight border-2 focus:outline-none ${
-                     formData.status === 'active' ? 'bg-emerald-50 border-emerald-100 text-emerald-600' : 'bg-rose-50 border-rose-100 text-rose-600'
-                   }`}
-                 >
-                    <option value="active">{t('admin.rubbers.form.operational')}</option>
-                    <option value="suspended">{t('admin.rubbers.form.suspended')}</option>
-                 </select>
+                 <GlobalSelect 
+                    value={formData.status}
+                    onChange={e => setFormData({...formData, status: e.target.value})}
+                    className={`text-xs font-black uppercase tracking-tight border-2 focus:outline-none ${
+                      formData.status === 'active' ? 'bg-emerald-50 border-emerald-100 text-emerald-600' : 'bg-rose-50 border-rose-100 text-rose-600'
+                    }`}
+                    options={[
+                       { value: 'active', label: t('admin.rubbers.form.operational') },
+                       { value: 'suspended', label: t('admin.rubbers.form.suspended') },
+                    ]}
+                 />
               </div>
            )}
         </div>

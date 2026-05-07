@@ -1436,6 +1436,24 @@ export const th = {
           operational: "พร้อมปฏิบัติงาน (Active)",
           suspended: "ระงับการเข้าถึง",
           syncing: "กำลังซิงค์ข้อมูลอัตลักษณ์...",
+          placeholders: {
+            fullName: "เช่น นายสมชาย สายเสมอ",
+            email: "rubber@rubjob.com",
+            password: "รหัสผ่าน 8 หลักขึ้นไป",
+            idNumber: "เลขบัตร 13 หลัก",
+            phone: "08X-XXX-XXXX",
+            address: "ที่อยู่ตามทะเบียนบ้านโดยละเอียด",
+            licensePlate: "กข 1234 กทม",
+            bankAccount: "ระบุเลขบัญชีที่ถูกต้อง",
+            accountName: "ชื่อตามหน้าสมุดบัญชี",
+            emergency: "ชื่อและเบอร์โทรติดต่อฉุกเฉิน",
+            notes: "บันทึกผลการตรวจสอบจากระบบกรมการขนส่ง...",
+          },
+          errors: {
+            saveFailed: "ไม่สามารถบันทึกข้อมูลรับเบอร์ได้",
+            approveSuccess: "อนุมัติการสมัครเรียบร้อยแล้ว รับเบอร์พร้อมรับงาน",
+            updateSuccess: "อัปเดตข้อมูลสำเร็จ",
+          }
         }
       },
     },

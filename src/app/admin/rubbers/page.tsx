@@ -8,6 +8,7 @@ import Badge from "@/components/ui/Badge";
 import { Icons } from "@/components/ui/Icons";
 import { useToast } from "@/components/providers/ToastProvider";
 import Skeleton from "@/components/ui/Skeleton";
+import GlobalInput from "@/components/ui/GlobalInput";
 
 export default function RubberManagementAdminPage() {
   const { t } = useTranslation();
@@ -91,21 +92,17 @@ export default function RubberManagementAdminPage() {
           <p className="text-slate-500 text-sm md:text-base font-medium mt-1">{t('admin.rubbers.list.subtitle')}</p>
         </div>
         <div className="flex flex-col sm:flex-row items-center gap-4 w-full md:w-auto">
-          <div className="flex bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm w-full md:w-80 group focus-within:ring-4 focus-within:ring-primary/10 transition-all">
-            <div className="px-5 py-3 bg-slate-50 border-r border-slate-100 text-slate-400 group-focus-within:text-primary transition-colors flex items-center shrink-0">
-              <Icons.Search size={18} />
-            </div>
-            <input 
-              type="text" 
-              placeholder={t('admin.users.searchPlaceholder')} 
-              className="px-5 py-3 outline-none text-sm font-bold flex-1 bg-white" 
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
-          </div>
+          <GlobalInput
+            variant="search"
+            placeholder={t('admin.users.searchPlaceholder')}
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            icon={<Icons.Search size={18} />}
+            className="w-full md:w-80"
+          />
           <Link 
             href="/admin/rubbers/new"
-            className="px-8 py-3.5 bg-slate-900 text-white rounded-xl text-xs font-black uppercase tracking-widest shadow-xl shadow-slate-200 flex items-center justify-center gap-2 hover:bg-slate-800 transition-all active:scale-95 w-full sm:w-auto shrink-0"
+            className="px-8 py-3.5 bg-primary text-white rounded-xl text-xs font-black uppercase tracking-widest shadow-xl shadow-primary/20 flex items-center justify-center gap-2 hover:bg-primary-heavy transition-all active:scale-95 w-full sm:w-auto shrink-0"
           >
             <Icons.Plus size={16} /> {t('admin.rubbers.list.newBtn')}
           </Link>
@@ -197,9 +194,9 @@ export default function RubberManagementAdminPage() {
                           })}
                        </div>
                     </td>
-                    <td className="px-8 py-6">
-                       <span className="text-xs font-black text-slate-600 font-mono italic">{rubber.phone || "No phone"}</span>
-                    </td>
+                     <td className="px-8 py-6">
+                        <span className="text-xs font-black text-slate-600 font-mono italic">{rubber.phone || t('common.notSet')}</span>
+                     </td>
                      <td className="px-8 py-6">
                         <Badge variant={
                           rubber.status === 'active' ? "success" : 
