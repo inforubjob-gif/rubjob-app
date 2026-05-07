@@ -109,7 +109,7 @@ export default function middleware(req: NextRequest) {
     if (PORTAL_PREFIXES.some((p) => pathname.startsWith(p) && p !== "/landing")) {
       // Redirect /admin, /rubber, /partner to proper subdomain
       for (const [sub, prefix] of Object.entries(SUBDOMAIN_MAP)) {
-        if (prefix && pathname.startsWith(prefix)) {
+        if (prefix && (pathname === prefix || pathname.startsWith(prefix + "/"))) {
           const hostWithoutPort = hostname.split(":")[0];
           const rootDomain = ROOT_DOMAINS.find((d) => hostWithoutPort.endsWith(d)) || ROOT_DOMAINS[0];
           const targetHost = url.port ? `${sub}.${rootDomain}:${url.port}` : `${sub}.${rootDomain}`;
@@ -139,7 +139,7 @@ export default function middleware(req: NextRequest) {
       if (
         otherPrefix &&
         otherPrefix !== targetPrefix &&
-        pathname.startsWith(otherPrefix)
+        (pathname === otherPrefix || pathname.startsWith(otherPrefix + "/"))
       ) {
         const hostWithoutPort = hostname.split(":")[0];
         const rootDomain = ROOT_DOMAINS.find((d) => hostWithoutPort.endsWith(d)) || ROOT_DOMAINS[0];

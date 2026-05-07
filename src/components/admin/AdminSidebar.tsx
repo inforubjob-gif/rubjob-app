@@ -18,15 +18,15 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
   const { t, language, setLanguage } = useTranslation();
 
   const NAV_ITEMS = [
-    { label: t("admin.nav.dashboard"), href: "/admin", icon: <Icons.Tasks size={20} />, permission: "dashboard" },
-    { label: t("admin.nav.orders"), href: "/admin/orders", icon: <Icons.FileText size={20} />, permission: "orders" },
-    { label: t("admin.nav.users"), href: "/admin/users", icon: <Icons.User size={20} />, permission: "users" },
-    { label: t("admin.nav.stores"), href: "/admin/stores", icon: <Icons.Office size={20} />, permission: "stores" },
-    { label: t("admin.nav.rubbers"), href: "/admin/rubbers", icon: <Icons.Car size={20} />, permission: "rubbers" },
-    { label: t("admin.nav.providers"), href: "/admin/providers", icon: <Icons.Stars size={20} />, permission: "stores" },
-    { label: t("admin.nav.coupons"), href: "/admin/coupons", icon: <Icons.Ticket size={20} />, permission: "coupons" },
-    { label: t("admin.nav.finance"), href: "/admin/finance", icon: <Icons.Wallet size={20} />, permission: "finance" },
-    { label: t("admin.nav.support"), href: "/admin/support", icon: <Icons.Chat size={20} />, permission: "support" },
+    { label: t("admin.nav.dashboard"), href: "/", icon: <Icons.Tasks size={20} />, permission: "dashboard" },
+    { label: t("admin.nav.orders"), href: "/orders", icon: <Icons.FileText size={20} />, permission: "orders" },
+    { label: t("admin.nav.users"), href: "/users", icon: <Icons.User size={20} />, permission: "users" },
+    { label: t("admin.nav.stores"), href: "/stores", icon: <Icons.Office size={20} />, permission: "stores" },
+    { label: t("admin.nav.rubbers"), href: "/rubbers", icon: <Icons.Car size={20} />, permission: "rubbers" },
+    { label: t("admin.nav.providers"), href: "/providers", icon: <Icons.Stars size={20} />, permission: "stores" },
+    { label: t("admin.nav.coupons"), href: "/coupons", icon: <Icons.Ticket size={20} />, permission: "coupons" },
+    { label: t("admin.nav.finance"), href: "/finance", icon: <Icons.Wallet size={20} />, permission: "finance" },
+    { label: t("admin.nav.support"), href: "/support", icon: <Icons.Chat size={20} />, permission: "support" },
   ].filter(item => hasPermission(item.permission));
 
   return (
@@ -63,11 +63,9 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
         
         <nav className="flex-1 px-5 py-6 space-y-1.5 overflow-y-auto no-scrollbar">
           {NAV_ITEMS.map((item) => {
-             const cleanHref = item.href.replace("/admin", "");
-             const isActive = item.href === "/admin" 
-               ? (pathname === "/admin" || pathname === "/")
-               : (pathname === item.href || pathname.startsWith(item.href + "/") || 
-                  (cleanHref !== "" && (pathname === cleanHref || pathname.startsWith(cleanHref + "/"))));
+             const isActive = item.href === "/" 
+               ? (pathname === "/" || pathname === "/admin")
+               : (pathname === item.href || pathname.startsWith(item.href + "/"));
              
              return (
                <Link 
