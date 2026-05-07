@@ -233,9 +233,24 @@ export default function SupportCenterPage() {
                        {selectedTicket?.userName || t('admin.common.customer')}
                      </h2>
                      {typeBadge && (
-                       <span className={`text-[9px] font-black uppercase px-2 py-1 rounded-lg ring-1 ${typeBadge.badgeClass}`}>
+                       <button 
+                         onClick={async () => {
+                           if (selectedTicket.userType === 'both' || selectedTicket.userType === 'rubber' || selectedTicket.userType === 'customer') {
+                             const nextType = selectedTicket.userType === 'rubber' ? 'customer' : 'rubber';
+                             // Quick update (UI only for now, would need API to persist)
+                             const res = await fetch(`/api/admin/support/tickets/${selectedTicket.id}/type`, {
+                               method: 'POST',
+                               headers: { 'Content-Type': 'application/json' },
+                               body: JSON.stringify({ userType: nextType })
+                             });
+                             if (res.ok) fetchTickets();
+                           }
+                         }}
+                         className={`text-[9px] font-black uppercase px-2 py-1 rounded-lg ring-1 transition-all active:scale-95 ${typeBadge.badgeClass} ${selectedTicket.userType === 'both' ? 'animate-pulse cursor-pointer hover:brightness-95' : ''}`}
+                         title="Click to switch role if user has multiple roles"
+                       >
                          {typeBadge.label}
-                       </span>
+                       </button>
                      )}
                    </div>
                    <div className="flex items-center gap-3 mt-1">
