@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { Icons } from "@/components/ui/Icons";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
@@ -94,7 +95,7 @@ export default function RubberRegisterPage() {
       <div className="relative z-10 max-w-2xl mx-auto px-6 py-20 md:py-32">
         {/* Back Button */}
         <button 
-          onClick={() => router.push('/landing')}
+          onClick={() => router.push('/')}
           className="absolute top-8 left-6 md:top-12 md:left-0 group flex items-center gap-3 px-5 py-2.5 bg-white/50 backdrop-blur-md border border-white rounded-2xl hover:bg-white hover:shadow-xl transition-all duration-300 active:scale-95"
         >
           <div className="w-8 h-8 rounded-xl bg-slate-900 text-white flex items-center justify-center group-hover:bg-primary transition-colors">
@@ -134,17 +135,16 @@ export default function RubberRegisterPage() {
                    <div className="w-12 h-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center">
                       <Icons.User size={24} />
                    </div>
-                   <div>
-                      <h3 className="text-xl font-black text-slate-900 leading-none">{t("register.rubber.step1Title")}</h3>
-                      <p className="text-xs font-bold text-slate-400 mt-1 uppercase tracking-widest">General Information</p>
-                   </div>
+                    <div>
+                       <h3 className="text-xl font-black text-slate-900 leading-none">{t("register.rubber.step1Title")}</h3>
+                       <p className="text-xs font-bold text-slate-400 mt-1 uppercase tracking-widest">{t("register.rubber.step1Header")}</p>
+                    </div>
                 </div>
                 <div className="grid grid-cols-1 gap-6">
                   <GlobalInput 
                     label={t("register.rubber.nameLabel")}
                     required
-                    variant="large"
-                    placeholder="สมชาย รับจบ"
+                    placeholder={t("register.rubber.nameLabel")}
                     value={formData.name}
                     onChange={(e) => setFormData({...formData, name: e.target.value})}
                   />
@@ -152,8 +152,7 @@ export default function RubberRegisterPage() {
                     label={t("register.rubber.emailLabel")}
                     type="email"
                     required
-                    variant="large"
-                    placeholder="rubber@rubjob.com"
+                    placeholder={t("register.rubber.emailLabel")}
                     value={formData.email}
                     onChange={(e) => setFormData({...formData, email: e.target.value})}
                   />
@@ -170,7 +169,6 @@ export default function RubberRegisterPage() {
                       label={t("register.rubber.passwordLabel")}
                       type="password"
                       required
-                      variant="large"
                       placeholder="••••••••"
                       value={formData.password}
                       onChange={(e) => setFormData({...formData, password: e.target.value})}
@@ -186,10 +184,10 @@ export default function RubberRegisterPage() {
                    <div className="w-12 h-12 rounded-2xl bg-blue-50 text-blue-500 flex items-center justify-center">
                       <Icons.Truck size={24} />
                    </div>
-                   <div>
-                      <h3 className="text-xl font-black text-slate-900 leading-none">{t("register.rubber.step2Title")}</h3>
-                      <p className="text-xs font-bold text-slate-400 mt-1 uppercase tracking-widest">Vehicle & Verification</p>
-                   </div>
+                    <div>
+                       <h3 className="text-xl font-black text-slate-900 leading-none">{t("register.rubber.step2Title")}</h3>
+                       <p className="text-xs font-bold text-slate-400 mt-1 uppercase tracking-widest">{t("register.rubber.step2Header")}</p>
+                    </div>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   {['bike', 'car'].map((v) => (
@@ -205,9 +203,8 @@ export default function RubberRegisterPage() {
                   <GlobalInput 
                     label={t("register.rubber.licensePlateLabel")}
                     required
-                    variant="large"
                     className="uppercase"
-                    placeholder="กข 1234 กทม."
+                    placeholder={t("register.rubber.licensePlateLabel")}
                     value={formData.licensePlate}
                     onChange={(e) => setFormData({...formData, licensePlate: e.target.value})}
                   />
@@ -216,7 +213,7 @@ export default function RubberRegisterPage() {
                     required
                     variant="large"
                     className="font-mono"
-                    placeholder="X-XXXX-XXXXX-XX-X"
+                    placeholder={t("register.rubber.idNumberLabel")}
                     value={formData.idNumber}
                     onChange={(e) => setFormData({...formData, idNumber: e.target.value})}
                   />
@@ -230,10 +227,10 @@ export default function RubberRegisterPage() {
                    <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
                       <Icons.Wallet size={24} />
                    </div>
-                   <div>
-                      <h3 className="text-xl font-black text-slate-900 leading-none">{t("register.rubber.step3Title")}</h3>
-                      <p className="text-xs font-bold text-slate-400 mt-1 uppercase tracking-widest">Financial Payout</p>
-                   </div>
+                    <div>
+                       <h3 className="text-xl font-black text-slate-900 leading-none">{t("register.rubber.step3Title")}</h3>
+                       <p className="text-xs font-bold text-slate-400 mt-1 uppercase tracking-widest">{t("register.rubber.step3Header")}</p>
+                    </div>
                 </div>
                 <div className="space-y-6">
                   <div className="space-y-2">
@@ -271,10 +268,10 @@ export default function RubberRegisterPage() {
                    <div className="w-12 h-12 rounded-2xl bg-orange-50 text-orange-500 flex items-center justify-center">
                       <Icons.Shield size={24} />
                    </div>
-                   <div>
-                      <h3 className="text-xl font-black text-slate-900 leading-none">{t("register.rubber.step4Title")}</h3>
-                      <p className="text-xs font-bold text-slate-400 mt-1 uppercase tracking-widest">Document Verification</p>
-                   </div>
+                    <div>
+                       <h3 className="text-xl font-black text-slate-900 leading-none">{t("register.rubber.step4Title")}</h3>
+                       <p className="text-xs font-bold text-slate-400 mt-1 uppercase tracking-widest">{t("register.rubber.step4Header")}</p>
+                    </div>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-3">
@@ -347,7 +344,7 @@ export default function RubberRegisterPage() {
 
         <div className="text-center mt-12 space-y-4">
           <p className="text-sm font-bold text-slate-400">
-            Have an account? <a href="/rubber/login" className="text-primary hover:underline font-black">Sign In</a>
+            {t("register.rubber.hasAccount")} <Link href="/rubber/login" className="text-primary hover:underline font-black">{t("register.rubber.signIn")}</Link>
           </p>
           <div className="flex items-center justify-center gap-8 pt-8 opacity-30 grayscale">
             <Icons.Logo size={80} />
@@ -362,7 +359,7 @@ export default function RubberRegisterPage() {
           router.push("/rubber/login?registered=true");
         }}
         title={t("common.success")}
-        message={t("register.partner.submitSuccess")} // Using common success key if rubber one missing or similar
+        message={t("register.rubber.submitSuccess")}
         type="success"
       />
     </div>

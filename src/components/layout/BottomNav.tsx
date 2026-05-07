@@ -23,7 +23,7 @@ export default function BottomNav() {
   const isAdminContext = pathname.startsWith("/admin") || hostname.startsWith("admin.");
   const isProviderContext = pathname.startsWith("/partner-service") || hostname.startsWith("provider.");
   
-  const isLandingContext = pathname.startsWith("/landing") || (
+  const isLandingContext = pathname.startsWith("/landing") || pathname.startsWith("/register") || (
     !hostname.startsWith("app.") &&
     !hostname.startsWith("admin.") &&
     !hostname.startsWith("rubber.") &&

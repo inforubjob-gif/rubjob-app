@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { Icons } from "@/components/ui/Icons";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
@@ -95,7 +96,7 @@ export default function PartnerRegisterPage() {
       <div className="relative z-10 max-w-2xl mx-auto px-6 py-20 md:py-32">
         {/* Back Button */}
         <button 
-          onClick={() => router.push('/landing')}
+          onClick={() => router.push('/')}
           className="absolute top-8 left-6 md:top-12 md:left-0 group flex items-center gap-3 px-5 py-2.5 bg-white/50 backdrop-blur-md border border-white rounded-2xl hover:bg-white hover:shadow-xl transition-all duration-300 active:scale-95"
         >
           <div className="w-8 h-8 rounded-xl bg-slate-900 text-white flex items-center justify-center group-hover:bg-primary transition-colors">
@@ -134,7 +135,7 @@ export default function PartnerRegisterPage() {
                 <div className="flex items-center justify-between mb-2">
                    <div>
                       <h3 className="text-2xl font-black text-slate-900">{t("register.partner.step1Title")}</h3>
-                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">Basic Profile</p>
+                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">{t("register.partner.step1Header")}</p>
                    </div>
                 </div>
 
@@ -178,8 +179,7 @@ export default function PartnerRegisterPage() {
                    <GlobalInput 
                      type="email"
                      required
-                     variant="large"
-                     placeholder="Email"
+                     placeholder={t("common.email")}
                      value={formData.email}
                      onChange={(e) => setFormData({...formData, email: e.target.value})}
                    />
@@ -187,7 +187,7 @@ export default function PartnerRegisterPage() {
                      type="password"
                      required
                      variant="large"
-                     placeholder="Password"
+                     placeholder={t("common.password")}
                      value={formData.password}
                      onChange={(e) => setFormData({...formData, password: e.target.value})}
                    />
@@ -203,7 +203,7 @@ export default function PartnerRegisterPage() {
                    </div>
                    <div>
                       <h3 className="text-2xl font-black text-slate-900 leading-none">{t("register.partner.step2Title")}</h3>
-                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">Service & Location</p>
+                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">{t("register.partner.step2Header")}</p>
                    </div>
                 </div>
                 <div className="space-y-6">
@@ -211,7 +211,7 @@ export default function PartnerRegisterPage() {
                     label={t("register.partner.storeNameLabel")}
                     required
                     variant="large"
-                    placeholder="RUBJOB Cleaning Service"
+                    placeholder={t("register.partner.storeNameLabel")}
                     value={formData.storeName}
                     onChange={(e) => setFormData({...formData, storeName: e.target.value})}
                   />
@@ -234,7 +234,7 @@ export default function PartnerRegisterPage() {
                    </div>
                    <div>
                       <h3 className="text-2xl font-black text-slate-900 leading-none">{t("register.partner.step3Title")}</h3>
-                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">Payout Settings</p>
+                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">{t("register.partner.step3Header")}</p>
                    </div>
                 </div>
                 <div className="space-y-6">
@@ -275,7 +275,7 @@ export default function PartnerRegisterPage() {
                    </div>
                    <div>
                       <h3 className="text-2xl font-black text-slate-900 leading-none">{t("register.partner.step4Title")}</h3>
-                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">Verification Documents</p>
+                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">{t("register.partner.step4Header")}</p>
                    </div>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -346,7 +346,7 @@ export default function PartnerRegisterPage() {
         isOpen={showSuccessModal}
         onClose={() => {
           setShowSuccessModal(false);
-          router.push("/landing");
+          router.push("/");
         }}
         title={t("register.partner.submitSuccess")}
         message={t("register.partner.submitSuccess")}

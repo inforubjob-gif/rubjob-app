@@ -29,9 +29,13 @@ function PermissionGate({ children }: { children: React.ReactNode }) {
       "/admin/settings": "settings",
     };
 
-    const requiredPermission = Object.entries(pathPermissionMap).find(([path]) => 
-      pathname.startsWith(path)
-    )?.[1];
+    // Improved: Check both prefixed and clean paths, supporting nested routes
+    const requiredPermission = Object.entries(pathPermissionMap).find(([path]) => {
+      const cleanPath = path.replace("/admin", "");
+      if (pathname === path || pathname.startsWith(path + "/")) return true;
+      if (cleanPath !== "" && (pathname === cleanPath || pathname.startsWith(cleanPath + "/"))) return true;
+      return false;
+    })?.[1];
 
     if (requiredPermission && !hasPermission(requiredPermission)) {
       console.warn(`Unauthorized access to ${pathname}.`);

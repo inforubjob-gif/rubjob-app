@@ -63,9 +63,11 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
         
         <nav className="flex-1 px-5 py-6 space-y-1.5 overflow-y-auto no-scrollbar">
           {NAV_ITEMS.map((item) => {
+             const cleanHref = item.href.replace("/admin", "");
              const isActive = item.href === "/admin" 
-               ? pathname === "/admin" 
-               : pathname.startsWith(item.href);
+               ? (pathname === "/admin" || pathname === "/")
+               : (pathname === item.href || pathname.startsWith(item.href + "/") || 
+                  (cleanHref !== "" && (pathname === cleanHref || pathname.startsWith(cleanHref + "/"))));
              
              return (
                <Link 

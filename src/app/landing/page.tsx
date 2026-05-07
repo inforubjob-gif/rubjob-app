@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import Card from "@/components/ui/Card";
 import { Icons, IconCircle } from "@/components/ui/Icons";
+import { useTranslation } from "@/components/providers/LanguageProvider";
+import Link from "next/link";
 
 /** Resolve the app subdomain URL dynamically based on current hostname */
 function getPortalUrl(subdomain: string): string {
@@ -24,126 +26,6 @@ function getPortalUrl(subdomain: string): string {
 
 
 
-const FEATURES = [
-  { 
-    icon: <IconCircle variant="orange" size="lg"><Icons.Relax size={32} strokeWidth={2.5} /></IconCircle>, 
-    title: "Relax & Rest", 
-    titleColor: "text-primary",
-    desc: "คืนเวลาพักผ่อนให้คุณจัดการทุกเรื่องผ้าให้เสร็จสรรพ ครบในที่เดียว ชีวิตง่ายขึ้นทันที" 
-  },
-  { 
-    icon: <IconCircle variant="yellow" size="lg"><Icons.Smile size={32} strokeWidth={2.5} /></IconCircle>, 
-    title: "Happy Status", 
-    titleColor: "text-secondary",
-    desc: "อัปเดตสถานะทุกขั้นตอน ไม่ต้องคอยตามหรือกังวลใจ ให้คุณยิ้มได้ในทุกวัน" 
-  },
-  { 
-    icon: <IconCircle variant="white" size="lg"><Icons.Settings size={32} strokeWidth={2.5} /></IconCircle>, 
-    title: "Customizable", 
-    titleColor: "text-slate-800",
-    desc: "เลือกเวลาได้ มีด่วนพิเศษ ปรับแต่งชีวิตได้ตามต้องการ พร้อมซัพพอร์ตตลอดเวลา" 
-  },
-  { 
-    icon: <IconCircle variant="black" size="lg"><Icons.HeartHand size={32} strokeWidth={2.5} /></IconCircle>, 
-    title: "Trustworthy", 
-    titleColor: "text-slate-900",
-    desc: "บริการสม่ำเสมอ สร้างความไว้วางใจในระยะยาว เหมือนมีคนดูแลครอบครัวแทนคุณ" 
-  },
-  { 
-    icon: <IconCircle variant="orange" size="lg"><Icons.Lightbulb size={32} strokeWidth={2.5} /></IconCircle>, 
-    title: "Smart Delivery", 
-    titleColor: "text-primary",
-    desc: "แพ็กเรียบร้อย ส่งถึงมือ จบงานแบบไม่ต้องคิดต่อ ด้วยระบบจัดการที่ชาญฉลาด" 
-  },
-  { 
-    icon: <IconCircle variant="yellow" size="lg"><Icons.Check size={32} strokeWidth={3} /></IconCircle>, 
-    title: "Perfect Quality", 
-    titleColor: "text-secondary",
-    desc: "มาตรฐานความสะอาดระดับมืออาชีพ ตรวจสอบทุกชิ้นก่อนส่งคืนถึงมือคุณ" 
-  },
-];
-
-const STEPS = [
-  { number: "01", title: "กดสั่งซัก", desc: "เข้าแอปผ่านไลน์ เลือกบริการที่ต้องการได้ทันที" },
-  { number: "02", title: "รับเบอร์ไปรับ", desc: "รอรับเบอร์มารับผ้าถึงหน้าบ้าน นำส่งไปร้านซัก" },
-  { number: "03", title: "ตรวจเช็ค & ซัก", desc: "ร้านซักมืออาชีพดำเนินงาน คุณสามารถเช็กสถานะได้เสมอ" },
-  { number: "04", title: "ส่งคืนสุดประทับใจ", desc: "รับผ้าที่หอมสะอาด กลับมาถึงมือคุณอย่างสมบูรณ์แบบ" },
-];
-
-const TESTIMONIALS = [
-  {
-    rating: 5,
-    quote: "แค่มี LINE ก็หมดปัญหาเรื่องซักผ้า ประหยัดเวลาชีวิตไปได้เยอะมาก ๆ สะดวกสุด ๆ ค่า",
-    author: "น้องฟ้า",
-    role: "นิสิตมหาวิทยาลัย",
-    iconColor: "bg-orange-100 text-orange-500",
-    icon: "👩🏻",
-  },
-  {
-    rating: 5,
-    quote: "ไม่ต้องโหลดแอปเพิ่มให้เปลืองเมมฯ ระบบติดตามสถานะก็เป๊ะ รับเบอร์มารับตรงเวลามาก",
-    author: "คุณตั้ม",
-    role: "พนักงานออฟฟิศ",
-    iconColor: "bg-blue-100 text-blue-500",
-    icon: "👨🏻‍💻",
-  },
-  {
-    rating: 5,
-    quote: "ผ้าหอมสะอาด แพ็คมาอย่างดี รู้สึกเหมือนมีคนช่วยจัดการชีวิตให้จริง ๆ ค่ะ วางใจได้เลย",
-    author: "พี่แอน",
-    role: "คุณแม่บ้าน",
-    iconColor: "bg-emerald-100 text-emerald-500",
-    icon: "👩🏻‍🍳",
-  },
-];
-
-const FAQS = [
-  {
-    q: "ใช้งานแพลตฟอร์มนี้ต้องโหลดแอปพลิเคชันไหม?",
-    a: "ไม่จำเป็นเลยครับ! คุณสามารถทำทุกอย่างตั้งแต่กดสั่งซัก เช็กสถานะ ไปจนถึงการชำระเงินผ่านทาง LINE ของเราได้ทั้งหมด ช่วยประหยัดพื้นที่ในโทรศัพท์ของคุณได้เต็มที่"
-  },
-  {
-    q: "ราคาค่าบริการซักผ้าคิดอย่างไร?",
-    a: "ราคาจะถูกคำนวณตามแพ็กเกจที่คุณเลือกและมาตรฐานของร้านซักในละแวกของคุณ โดยระบบจะแสดงราคาให้ทราบล่วงหน้าอย่างชัดเจนก่อนที่คุณจะกดยืนยันออเดอร์"
-  },
-  {
-    q: "ใช้เวลาซักและจัดส่งนานเท่าไหร่?",
-    a: "ระยะเวลาขึ้นอยู่กับประเภทบริการที่คุณเลือก โดยมีตั้งแต่แบบด่วนพิเศษ (เสร็จภายใน 24 ชม.) ไปจนถึงแบบปกติ คุณสามารถติดตามสถานะแบบเรียลไทม์ได้ตลอดจากใน LINE"
-  },
-  {
-    q: "หากเสื้อผ้าเกิดความเสียหาย มีการรับประกันไหม?",
-    a: "แน่นอนครับ RUBJOB มีนโยบายรับประกันความเสียหายและสูญหาย เพื่อให้คุณมั่นใจได้ว่าเสื้อผ้าทุกชิ้นจะได้รับการดูแลเป็นอย่างดีโดยพาร์ทเนอร์ร้านมืออาชีพของเรา"
-  },
-  {
-    q: "จะเปลี่ยนที่อยู่รับ-ส่งผ้าต้องทำอย่างไร?",
-    a: "คุณสามารถแก้ไขหรือเปลี่ยนที่อยู่ใหม่ผ่านหน้าจอระบบบัญชีส่วนตัวบน LINE ได้เลยในขั้นตอนก่อนที่จะกดยืนยันเรียกรับเบอร์เข้ารับผ้าครับ"
-  },
-  {
-    q: "สามารถจ่ายเงินผ่านช่องทางไหนได้บ้าง?",
-    a: "รองรับการชำระเงินดิจิทัลเต็มรูปแบบ ไม่ว่าจะเป็น PromptPay, บัตรเครดิต/เดบิต, หรือตัดผ่านระบบสะสมคะแนน สะดวกและปลอดภัย 100%"
-  }
-];
-
-const CONTACTS = [
-  {
-    name: "Facebook",
-    desc: "อัปเดตข่าวสารและโปรโมชัน",
-    icon: "📘",
-    bgClass: "bg-gradient-to-br from-blue-400 to-blue-600 text-white"
-  },
-  {
-    name: "LINE Official",
-    desc: "ทักแชทสอบถาม แอดมินตอบไว",
-    icon: "💬",
-    bgClass: "bg-gradient-to-br from-[#00B900] to-[#009b00] text-white"
-  },
-  {
-    name: "Call Center",
-    desc: "ติดต่อแจ้งปัญหาฉุกเฉิน",
-    icon: "📞",
-    bgClass: "bg-gradient-to-br from-orange-400 to-primary text-white"
-  }
-];
 
 function FAQItem({ question, answer }: { question: string, answer: string }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -168,8 +50,112 @@ function FAQItem({ question, answer }: { question: string, answer: string }) {
 }
 
 export default function LandingPage() {
+  const { t } = useTranslation();
   const [mounted, setMounted] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+
+  const FEATURES = [
+    { 
+      icon: <IconCircle variant="orange" size="lg"><Icons.Relax size={32} strokeWidth={2.5} /></IconCircle>, 
+      title: t("landing.features.list.relax.title"), 
+      titleColor: "text-primary",
+      desc: t("landing.features.list.relax.desc") 
+    },
+    { 
+      icon: <IconCircle variant="yellow" size="lg"><Icons.Smile size={32} strokeWidth={2.5} /></IconCircle>, 
+      title: t("landing.features.list.happy.title"), 
+      titleColor: "text-secondary",
+      desc: t("landing.features.list.happy.desc") 
+    },
+    { 
+      icon: <IconCircle variant="white" size="lg"><Icons.Settings size={32} strokeWidth={2.5} /></IconCircle>, 
+      title: t("landing.features.list.custom.title"), 
+      titleColor: "text-slate-800",
+      desc: t("landing.features.list.custom.desc") 
+    },
+    { 
+      icon: <IconCircle variant="black" size="lg"><Icons.HeartHand size={32} strokeWidth={2.5} /></IconCircle>, 
+      title: t("landing.features.list.trust.title"), 
+      titleColor: "text-slate-900",
+      desc: t("landing.features.list.trust.desc") 
+    },
+    { 
+      icon: <IconCircle variant="orange" size="lg"><Icons.Lightbulb size={32} strokeWidth={2.5} /></IconCircle>, 
+      title: t("landing.features.list.smart.title"), 
+      titleColor: "text-primary",
+      desc: t("landing.features.list.smart.desc") 
+    },
+    { 
+      icon: <IconCircle variant="yellow" size="lg"><Icons.Check size={32} strokeWidth={3} /></IconCircle>, 
+      title: t("landing.features.list.perfect.title"), 
+      titleColor: "text-secondary",
+      desc: t("landing.features.list.perfect.desc") 
+    },
+  ];
+
+  const STEPS = [
+    { number: "01", title: t("landing.howItWorks.steps.step1.title"), desc: t("landing.howItWorks.steps.step1.desc") },
+    { number: "02", title: t("landing.howItWorks.steps.step2.title"), desc: t("landing.howItWorks.steps.step2.desc") },
+    { number: "03", title: t("landing.howItWorks.steps.step3.title"), desc: t("landing.howItWorks.steps.step3.desc") },
+    { number: "04", title: t("landing.howItWorks.steps.step4.title"), desc: t("landing.howItWorks.steps.step4.desc") },
+  ];
+
+  const TESTIMONIALS = [
+    {
+      rating: 5,
+      quote: t("landing.testimonials.list.fah.quote"),
+      author: t("landing.testimonials.list.fah.author"),
+      role: t("landing.testimonials.list.fah.role"),
+      iconColor: "bg-orange-100 text-orange-500",
+      icon: "👩🏻",
+    },
+    {
+      rating: 5,
+      quote: t("landing.testimonials.list.tum.quote"),
+      author: t("landing.testimonials.list.tum.author"),
+      role: t("landing.testimonials.list.tum.role"),
+      iconColor: "bg-blue-100 text-blue-500",
+      icon: "👨🏻‍💻",
+    },
+    {
+      rating: 5,
+      quote: t("landing.testimonials.list.ann.quote"),
+      author: t("landing.testimonials.list.ann.author"),
+      role: t("landing.testimonials.list.ann.role"),
+      iconColor: "bg-emerald-100 text-emerald-500",
+      icon: "👩🏻‍🍳",
+    },
+  ];
+
+  const FAQS = [
+    { q: t("landing.faq.list.q1.q"), a: t("landing.faq.list.q1.a") },
+    { q: t("landing.faq.list.q2.q"), a: t("landing.faq.list.q2.a") },
+    { q: t("landing.faq.list.q3.q"), a: t("landing.faq.list.q3.a") },
+    { q: t("landing.faq.list.q4.q"), a: t("landing.faq.list.q4.a") },
+    { q: t("landing.faq.list.q5.q"), a: t("landing.faq.list.q5.a") },
+    { q: t("landing.faq.list.q6.q"), a: t("landing.faq.list.q6.a") },
+  ];
+
+  const CONTACTS = [
+    {
+      name: t("landing.contact.list.facebook.name"),
+      desc: t("landing.contact.list.facebook.desc"),
+      icon: "📘",
+      bgClass: "bg-gradient-to-br from-blue-400 to-blue-600 text-white"
+    },
+    {
+      name: t("landing.contact.list.line.name"),
+      desc: t("landing.contact.list.line.desc"),
+      icon: "💬",
+      bgClass: "bg-gradient-to-br from-[#00B900] to-[#009b00] text-white"
+    },
+    {
+      name: t("landing.contact.list.call.name"),
+      desc: t("landing.contact.list.call.desc"),
+      icon: "📞",
+      bgClass: "bg-gradient-to-br from-orange-400 to-primary text-white"
+    }
+  ];
 
   useEffect(() => {
     setMounted(true);
@@ -203,9 +189,9 @@ export default function LandingPage() {
           </div>
           
           <div className="hidden md:flex items-center gap-8 text-sm font-bold text-slate-600">
-            <a href="#how-it-works" className="hover:text-primary transition-colors">How it works</a>
-            <a href="#features" className="hover:text-primary transition-colors">Features</a>
-            <a href="#line-app" className="hover:text-primary transition-colors">Line App</a>
+            <a href="#how-it-works" className="hover:text-primary transition-colors">{t("landing.nav.howItWorks")}</a>
+            <a href="#features" className="hover:text-primary transition-colors">{t("landing.nav.features")}</a>
+            <a href="#line-app" className="hover:text-primary transition-colors">{t("landing.nav.lineApp")}</a>
           </div>
 
           {/* App link removed as per request to decouple website from app */}
@@ -224,7 +210,7 @@ export default function LandingPage() {
               }`}
             >
               <span className="w-2.5 h-2.5 bg-primary rounded-full animate-pulse" />
-              ผู้จัดการชีวิต — Life Operator 👌🏻
+              {t("landing.hero.badge")}
             </div>
 
             <h1
@@ -232,10 +218,10 @@ export default function LandingPage() {
                 mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
               }`}
             >
-               รับจบทุกเรื่อง
+               {t("landing.hero.title")}
               <br />
               <span className="relative inline-block pb-2">
-                แทนคุณ
+                {t("landing.hero.titleSub")}
                 <svg className="absolute w-full h-5 left-0 -bottom-2 text-amber-300" viewBox="0 0 100 10" preserveAspectRatio="none">
                   <path d="M0 5 Q 50 10 100 0" stroke="currentColor" strokeWidth="4" fill="transparent" strokeLinecap="round" />
                 </svg>
@@ -247,7 +233,7 @@ export default function LandingPage() {
                 mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
               }`}
             >
-               ไม่ต้องคิด ไม่ต้องกังวล บริการซักอบรีดที่เหมือนมีคนจัดการชีวิตแทนคุณ ปล่อยให้เป็นหน้าที่เรา
+               {t("landing.hero.subtitle")}
             </p>
 
             <div
@@ -257,7 +243,7 @@ export default function LandingPage() {
             >
               <a href="#how-it-works" className="px-10 py-4 bg-slate-900 hover:bg-slate-800 text-white font-black text-base rounded-2xl shadow-xl hover:shadow-2xl transition-all hover:-translate-y-1 active:translate-y-0 flex items-center justify-center gap-3 group">
                   <img src="/images/mascot-peek.png" alt="" className="w-5 h-5 object-contain group-hover:-translate-y-1 transition-transform" />
-                  ดูฟีเจอร์การใช้งาน
+                  {t("landing.hero.cta")}
                 </a>
             </div>
           </div>
@@ -298,8 +284,8 @@ export default function LandingPage() {
                <div className="absolute -top-10 -right-5 bg-white p-4 rounded-2xl shadow-xl z-30 flex items-center gap-3 border border-slate-100 transform rotate-6">
                   <div className="text-3xl bg-amber-50 rounded-xl p-2">🚚</div>
                   <div>
-                     <p className="text-xs font-bold text-slate-800">ถึงหน้าบ้านคุณ</p>
-                     <p className="text-[10px] text-slate-400">ไม่ต้องยกตะกร้าให้เหนื่อย</p>
+                     <p className="text-xs font-bold text-slate-800">{t("landing.howItWorks.widgetTitle")}</p>
+                     <p className="text-[10px] text-slate-400">{t("landing.howItWorks.widgetDesc")}</p>
                   </div>
                </div>
              </div>
@@ -307,10 +293,10 @@ export default function LandingPage() {
 
            {/* Section Right: Steps Details */}
            <div className="w-full lg:w-2/3">
-             <div className="text-center lg:text-left mb-16">
-               <h2 className="text-sm font-black text-primary uppercase tracking-widest mb-3">How it works</h2>
-               <h3 className="text-4xl md:text-5xl font-black text-slate-900 leading-tight">ไม่ต้องคิด ไม่ต้องกังวล<br/> เราจัดการให้</h3>
-             </div>
+              <div className="text-center lg:text-left mb-16">
+                <h2 className="text-sm font-black text-primary uppercase tracking-widest mb-3">{t("landing.howItWorks.badge")}</h2>
+                <h3 className="text-4xl md:text-5xl font-black text-slate-900 leading-tight">{t("landing.howItWorks.title")}<br/> {t("landing.howItWorks.titleSub")}</h3>
+              </div>
 
              <div className="space-y-8 relative before:absolute before:inset-0 before:ml-10 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-1 before:bg-gradient-to-b before:from-transparent before:via-slate-200 before:to-transparent">
                
@@ -343,9 +329,9 @@ export default function LandingPage() {
           
           <div className="flex flex-col lg:flex-row items-end justify-between gap-8 mb-16 relative">
             <div className="max-w-2xl">
-              <h2 className="text-sm font-black text-primary uppercase tracking-widest mb-3">Core Features</h2>
-              <h3 className="text-4xl md:text-5xl font-black text-slate-900 mb-6">ความมืออาชีพ<br/>ที่คุณวางใจได้</h3>
-              <p className="text-slate-500 text-lg">รวบรวมเทคโนโลยีและการจัดการที่ดีที่สุดไว้เพื่อยกระดับวงการซักรีด ปลอดภัยและทันสมัยที่สุด</p>
+              <h2 className="text-sm font-black text-primary uppercase tracking-widest mb-3">{t("landing.features.badge")}</h2>
+              <h3 className="text-4xl md:text-5xl font-black text-slate-900 mb-6">{t("landing.features.title")}<br/>{t("landing.features.titleSub")}</h3>
+              <p className="text-slate-500 text-lg">{t("landing.features.subtitle")}</p>
             </div>
             
             {/* Mascot Decorating Features */}
@@ -355,9 +341,9 @@ export default function LandingPage() {
                  alt="Rubjob Mascot Hanging Clothes" 
                  className="w-full h-auto object-contain drop-shadow-xl"
                />
-               <div className="absolute top-10 -left-10 bg-white p-3 rounded-xl shadow-xl border border-slate-100 transform -rotate-6">
-                 <p className="text-xs font-bold text-primary">ดูแลอย่างทะนุถนอม ✨</p>
-               </div>
+                <div className="absolute top-10 -left-10 bg-white p-3 rounded-xl shadow-xl border border-slate-100 transform -rotate-6">
+                  <p className="text-xs font-bold text-primary">{t("landing.features.mascotHint")}</p>
+                </div>
             </div>
           </div>
 
@@ -385,16 +371,16 @@ export default function LandingPage() {
           {/* Left Text & Stats */}
           <div className="flex-1 text-center lg:text-left z-20">
             <div className="inline-block px-4 py-1.5 bg-primary/10 text-primary-dark font-black text-xs uppercase tracking-widest rounded-full mb-6">
-              Testimonials
+              {t("landing.testimonials.badge")}
             </div>
             
             <h2 className="text-4xl md:text-5xl lg:text-6xl font-black text-slate-900 mb-6 leading-tight">
-              ความไว้วางใจจาก<br/>
-              <span className="text-primary">ผู้ใช้จริงของเรา</span>
+              {t("landing.testimonials.title")}<br/>
+              <span className="text-primary">{t("landing.testimonials.titleSub")}</span>
             </h2>
             
             <p className="text-slate-500 text-lg mb-10 max-w-lg mx-auto lg:mx-0 leading-relaxed font-medium">
-              RUBJOB เปลี่ยนเรื่องซักผ้าที่ยุ่งยากให้กลายเป็นเรื่องง่าย สะดวก รวดเร็ว และไม่ต้องกังวลเรื่องเวลาอีกต่อไป พิสูจน์แล้วจากผู้ใช้งานจริง
+              {t("landing.testimonials.subtitle")}
             </p>
 
             <div className="flex flex-col sm:flex-row items-center sm:items-start lg:items-center justify-center lg:justify-start gap-8 sm:gap-16">
@@ -404,7 +390,7 @@ export default function LandingPage() {
                 </div>
                 <div>
                   <h4 className="text-3xl font-black text-primary">10k+</h4>
-                  <p className="text-sm font-bold text-slate-400 mt-1">ออเดอร์จัดส่งแล้ว</p>
+                  <p className="text-sm font-bold text-slate-400 mt-1">{t("landing.testimonials.stats.orders")}</p>
                 </div>
               </div>
               
@@ -414,7 +400,7 @@ export default function LandingPage() {
                 </div>
                 <div>
                   <h4 className="text-3xl font-black text-blue-500">4.9/5</h4>
-                  <p className="text-sm font-bold text-slate-400 mt-1">คะแนนความพึงพอใจ</p>
+                  <p className="text-sm font-bold text-slate-400 mt-1">{t("landing.testimonials.stats.rating")}</p>
                 </div>
               </div>
             </div>
@@ -474,10 +460,10 @@ export default function LandingPage() {
           
           <div className="text-center mb-16">
             <div className="inline-block px-4 py-1.5 bg-primary/10 text-primary-dark font-black text-xs uppercase tracking-widest rounded-full mb-6">
-              Frequently Asked Question
+              {t("landing.faq.badge")}
             </div>
             <h2 className="text-4xl md:text-5xl font-black text-slate-900 leading-tight">
-              ข้อสงสัย <span className="text-primary">ที่พบบ่อย?</span>
+              {t("landing.faq.title")} <span className="text-primary">{t("landing.faq.titleSub")}</span>
             </h2>
           </div>
 
@@ -515,15 +501,15 @@ export default function LandingPage() {
           <div className="flex flex-col lg:flex-row items-center gap-12">
             <div className="flex-1 text-center lg:text-left">
               <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-[#00B900] text-white text-3xl shadow-xl shadow-[#00B900]/30 mb-6">
-                💬
+                {t("landing.line.badge")}
               </div>
               <h2 className="text-4xl md:text-5xl font-black text-slate-900 mb-6 tracking-tight leading-tight">
-                ใช้งานผ่าน <span className="text-[#00B900]">LINE</span><br/>ไม่ต้องโหลดแอปให้เปลืองพื้นที่
+                {t("landing.line.title")} <span className="text-[#00B900]">{t("landing.line.titleSub")}</span>
               </h2>
               <p className="text-slate-600 text-lg mb-8 max-w-lg mx-auto lg:mx-0 leading-relaxed font-medium">
-                เพราะความจริงแล้ว <span className="font-bold text-slate-900">RUBJOB</span> คือระบบ Life Operator ที่เตรียมให้บริการคุณหลากหลายด้านมากกว่าแค่เรื่องซักผ้า และทุกอย่างอัดแน่นรวมอยู่ใน LINE แชทที่คุณคุ้นเคย 
+                {t("landing.line.desc")} 
                 <br/><br/>
-                <span className="text-primary font-bold">รับจบทุกเรื่องแทนคุณของจริง! 👌🏻</span>
+                <span className="text-primary font-bold">{t("landing.line.footer")}</span>
               </p>
               
               {/* App link removed per request */}
@@ -537,10 +523,10 @@ export default function LandingPage() {
                </div>
                {/* Floating elements behind */}
                <div className="absolute top-[20%] right-0 bg-white p-4 rounded-xl shadow-xl border border-slate-100 transform rotate-6 animate-float-delayed z-30">
-                 <p className="text-sm font-bold text-slate-800">ไม่ต้องโหลดแอป 🚫📲</p>
+                 <p className="text-sm font-bold text-slate-800">{t("landing.line.hintApp")}</p>
                </div>
                <div className="absolute bottom-[10%] left-[-10%] bg-white p-4 rounded-xl shadow-xl border border-slate-100 transform -rotate-3 animate-float z-30">
-                 <p className="text-sm font-bold text-[#00B900]">มีแค่ LINE ก็พอ 💬✅</p>
+                 <p className="text-sm font-bold text-[#00B900]">{t("landing.line.hintLine")}</p>
                </div>
                <div className="absolute inset-0 bg-[#00B900]/20 rounded-full blur-3xl z-10 animate-pulse" />
             </div>
@@ -558,14 +544,14 @@ export default function LandingPage() {
           <div className="text-center max-w-3xl mx-auto mb-20 md:mb-28">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-slate-900 text-white rounded-full text-[10px] font-black uppercase tracking-[0.2em] mb-6 shadow-xl shadow-slate-900/20">
               <span className="w-1.5 h-1.5 bg-primary rounded-full animate-pulse" />
-              Empowering Partners
+              {t("landing.partnership.badge")}
             </div>
             <h3 className="text-5xl md:text-7xl font-black text-slate-900 leading-[1.1] tracking-tight mb-8">
-               ร่วมขับเคลื่อนอนาคต<br/>
-               <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-orange-500 to-primary-dark">ไปกับ RUBJOB</span>
+               {t("landing.partnership.title")}<br/>
+               <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-orange-500 to-primary-dark">{t("landing.partnership.titleSub")}</span>
             </h3>
             <p className="text-xl text-slate-500 font-medium leading-relaxed">
-               เปิดโอกาสการสร้างรายได้ที่ไร้ขีดจำกัด ไม่ว่าคุณจะเป็นร้านค้ามืออาชีพ หรือรับเบอร์ที่ต้องการอิสระ เรามีระบบที่พร้อมซัพพอร์ตคุณในทุกก้าว
+               {t("landing.partnership.subtitle")}
             </p>
           </div>
 
@@ -580,20 +566,20 @@ export default function LandingPage() {
                        <Icons.Store size={40} strokeWidth={2.5} />
                     </div>
                     <div className="px-4 py-2 bg-primary/5 border border-primary/10 rounded-full text-[10px] font-black text-primary uppercase tracking-[0.1em] h-fit">
-                       Partner (พาร์ทเนอร์)
+                       {t("landing.partnership.partner.badge")}
                     </div>
                   </div>
                   
-                  <h4 className="text-4xl font-black text-slate-900 mb-6 group-hover:text-primary transition-colors">สำหรับร้านค้า<br/>และมืออาชีพ</h4>
+                  <h4 className="text-4xl font-black text-slate-900 mb-6 group-hover:text-primary transition-colors">{t("landing.partnership.partner.title")}</h4>
                   <p className="text-slate-500 text-lg mb-10 leading-relaxed font-medium">
-                    เปลี่ยนธุรกิจของคุณให้เป็นระบบดิจิทัล 100% เพิ่มฐานลูกค้าในพื้นที่ และจัดการทุกอย่างผ่านระบบหลังบ้านที่ทรงพลังที่สุด
+                    {t("landing.partnership.partner.desc")}
                   </p>
                   
                   <div className="space-y-5 mb-14 flex-1">
                     {[
-                      { icon: <Icons.CheckCircle className="text-primary" />, text: "เพิ่มฐานลูกค้าและออเดอร์จาก LINE" },
-                      { icon: <Icons.CheckCircle className="text-primary" />, text: "ระบบจัดการรายรับและถอนเงินรายวัน" },
-                      { icon: <Icons.CheckCircle className="text-primary" />, text: "เครื่องมือวิเคราะห์ยอดขายและคูปอง" }
+                      { icon: <Icons.CheckCircle className="text-primary" />, text: t("landing.partnership.partner.list.item1") },
+                      { icon: <Icons.CheckCircle className="text-primary" />, text: t("landing.partnership.partner.list.item2") },
+                      { icon: <Icons.CheckCircle className="text-primary" />, text: t("landing.partnership.partner.list.item3") }
                     ].map((item, i) => (
                       <div key={i} className="flex items-center gap-4 text-slate-600 font-bold group-hover:translate-x-1 transition-transform">
                          <div className="w-6 h-6 shrink-0">{item.icon}</div>
@@ -602,13 +588,13 @@ export default function LandingPage() {
                     ))}
                   </div>
 
-                  <a 
-                    href="/landing/register/partner"
+                   <Link 
+                    href="/register/partner"
                     className="w-full py-6 bg-slate-900 text-white font-black text-center text-lg rounded-2xl hover:bg-primary transition-all duration-300 shadow-2xl shadow-slate-900/10 active:scale-[0.98] relative overflow-hidden group/btn"
                   >
-                    <span className="relative z-10 uppercase tracking-widest">สมัครเป็นพาร์ทเนอร์</span>
+                    <span className="relative z-10 uppercase tracking-widest">{t("landing.partnership.partner.cta")}</span>
                     <div className="absolute inset-0 bg-gradient-to-r from-primary to-orange-500 opacity-0 group-hover/btn:opacity-100 transition-opacity duration-300" />
-                  </a>
+                  </Link>
                </Card>
             </div>
 
@@ -621,20 +607,20 @@ export default function LandingPage() {
                        <Icons.Bike size={40} strokeWidth={2.5} />
                     </div>
                     <div className="px-4 py-2 bg-blue-50 border border-blue-100 rounded-full text-[10px] font-black text-blue-500 uppercase tracking-[0.1em] h-fit">
-                       Delivery Hero
+                       {t("landing.partnership.rubber.badge")}
                     </div>
                   </div>
                   
-                  <h4 className="text-4xl font-black text-slate-900 mb-6 group-hover:text-blue-600 transition-colors">สำหรับรับเบอร์<br/>ฮีโร่รับ-ส่ง</h4>
+                  <h4 className="text-4xl font-black text-slate-900 mb-6 group-hover:text-blue-600 transition-colors">{t("landing.partnership.rubber.title")}</h4>
                   <p className="text-slate-500 text-lg mb-10 leading-relaxed font-medium">
-                    รับงานอิสระ รายได้ดี มีงานต่อเนื่องในพื้นที่ที่คุณคุ้นเคย พร้อมระบบนำทางที่แม่นยำและโบนัสพิเศษ
+                    {t("landing.partnership.rubber.desc")}
                   </p>
                   
                   <div className="space-y-5 mb-14 flex-1">
                     {[
-                      { icon: <Icons.CheckCircle className="text-blue-500" />, text: "ค่ารอบที่เป็นธรรมและโบนัส Surge" },
-                      { icon: <Icons.CheckCircle className="text-blue-500" />, text: "ประกันอุบัติเหตุและความคุ้มครอง" },
-                      { icon: <Icons.CheckCircle className="text-blue-500" />, text: "อิสระในการเลือกเวลาทำงานเอง" }
+                      { icon: <Icons.CheckCircle className="text-blue-500" />, text: t("landing.partnership.rubber.list.item1") },
+                      { icon: <Icons.CheckCircle className="text-blue-500" />, text: t("landing.partnership.rubber.list.item2") },
+                      { icon: <Icons.CheckCircle className="text-blue-500" />, text: t("landing.partnership.rubber.list.item3") }
                     ].map((item, i) => (
                       <div key={i} className="flex items-center gap-4 text-slate-600 font-bold group-hover:translate-x-1 transition-transform">
                          <div className="w-6 h-6 shrink-0">{item.icon}</div>
@@ -643,13 +629,13 @@ export default function LandingPage() {
                     ))}
                   </div>
 
-                  <a 
-                    href="/landing/register/rubber"
+                   <Link 
+                    href="/register/rubber"
                     className="w-full py-6 bg-slate-900 text-white font-black text-center text-lg rounded-2xl hover:bg-blue-600 transition-all duration-300 shadow-2xl shadow-slate-900/10 active:scale-[0.98] relative overflow-hidden group/btn"
                   >
-                    <span className="relative z-10 uppercase tracking-widest">สมัครเป็นรับเบอร์</span>
+                    <span className="relative z-10 uppercase tracking-widest">{t("landing.partnership.rubber.cta")}</span>
                     <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-indigo-600 opacity-0 group-hover/btn:opacity-100 transition-opacity duration-300" />
-                  </a>
+                  </Link>
                </Card>
             </div>
 
@@ -665,10 +651,10 @@ export default function LandingPage() {
       <section className="relative z-10 py-32 bg-[#fafbfd] overflow-hidden border-t border-slate-100">
         <div className="max-w-7xl mx-auto px-6 md:px-12 text-center">
           <div className="inline-block px-5 py-2 bg-slate-100 text-slate-500 font-black text-[10px] uppercase tracking-[0.2em] rounded-full mb-8">
-            Connect with us
+            {t("landing.contact.badge")}
           </div>
           <h2 className="text-5xl md:text-6xl font-black text-slate-900 mb-20 leading-tight">
-            เราพร้อมให้ <span className="text-primary">คำปรึกษา</span>
+            {t("landing.contact.title")} <span className="text-primary">{t("landing.contact.titleSub")}</span>
           </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -700,15 +686,15 @@ export default function LandingPage() {
             className="h-24 md:h-[120px] w-auto object-contain mb-4 transform scale-125" 
           />
           <p className="text-slate-500 max-w-sm mx-auto text-sm mb-6">
-            ผู้จัดการชีวิต (Life Operator) 👋🏼
+            {t("landing.footer.motto")}
           </p>
 
           <div className="w-full border-t border-slate-100 pt-6 flex flex-col md:flex-row items-center justify-between gap-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">
             <span>© 2026 RUBJOB. All rights reserved.</span>
             <div className="flex items-center gap-4 sm:gap-6">
-              <a href="/privacy" className="hover:text-primary transition-colors">Privacy Policy</a>
-              <a href="/terms" className="hover:text-primary transition-colors">Terms of Service</a>
-              <a href="/contact" className="hover:text-primary transition-colors">Contact Support</a>
+              <Link href="/privacy" className="hover:text-primary transition-colors">{t("landing.footer.privacy")}</Link>
+              <Link href="/terms" className="hover:text-primary transition-colors">{t("landing.footer.terms")}</Link>
+              <Link href="/contact" className="hover:text-primary transition-colors">{t("landing.footer.support")}</Link>
             </div>
           </div>
         </div>

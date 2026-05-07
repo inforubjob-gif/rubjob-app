@@ -119,9 +119,10 @@ export default function middleware(req: NextRequest) {
       }
     }
 
-    // Rewrite root "/" to "/landing"
-    if (pathname === "/") {
-      url.pathname = "/landing";
+    // For root domain, rewrite paths to serve from the /landing directory
+    // e.g. rubjob.com/register/rubber -> serves from src/app/landing/register/rubber
+    if (!pathname.startsWith("/landing") && !pathname.startsWith("/api") && !pathname.includes(".")) {
+      url.pathname = `/landing${pathname === "/" ? "" : pathname}`;
       return NextResponse.rewrite(url);
     }
 
@@ -159,6 +160,12 @@ export default function middleware(req: NextRequest) {
     if (targetPrefix && !pathname.startsWith(targetPrefix)) {
       url.pathname = `${targetPrefix}${pathname}`;
       response = NextResponse.rewrite(url);
+    } else if (targetPrefix && pathname.startsWith(targetPrefix)) {
+      // Strip prefix and redirect to clean URL for better subdomain isolation
+      // e.g. admin.rubjob.com/admin/orders -> admin.rubjob.com/orders
+      const cleanPath = pathname.slice(targetPrefix.length) || "/";
+      url.pathname = cleanPath;
+      return NextResponse.redirect(url);
     } else {
       response = NextResponse.next();
     }

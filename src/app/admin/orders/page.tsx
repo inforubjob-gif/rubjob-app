@@ -38,7 +38,7 @@ export default function AdminOrdersPage() {
 
   async function fetchRiders() {
     try {
-      const res = await fetch("/api/admin/riders");
+      const res = await fetch("/api/admin/rubbers");
       const data = await res.json() as any;
       if (data.rubbers) setRiders(data.rubbers);
     } catch (err) {

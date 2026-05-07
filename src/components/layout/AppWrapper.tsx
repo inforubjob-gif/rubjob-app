@@ -25,6 +25,7 @@ export default function AppWrapper({ children }: { children: React.ReactNode }) 
   // Landing and legal pages should bypass LIFF/onboarding entirely
   const isLanding = typeof window !== "undefined" && (
     window.location.pathname.startsWith("/landing") ||
+    window.location.pathname.startsWith("/register") ||
     window.location.pathname.startsWith("/privacy") ||
     window.location.pathname.startsWith("/terms") ||
     window.location.pathname.startsWith("/contact") ||

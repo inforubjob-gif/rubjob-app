@@ -17,7 +17,7 @@ export default function NotFound() {
       <div className="relative z-10 w-full max-w-lg mx-auto">
         <div className="mb-2 relative">
           <img 
-            src="/images/มาสคอต-404.png" 
+            src="/images/mascot-404.png" 
             alt="Confused Mascot 404" 
             className="w-full max-w-[320px] mx-auto animate-float drop-shadow-2xl"
           />
