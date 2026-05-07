@@ -286,8 +286,8 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-6 md:px-12 relative z-30">
           <div className="flex flex-col lg:flex-row items-center gap-12">
             <div className="flex-1 text-center lg:text-left">
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-[#00B900] text-white shadow-xl shadow-[#00B900]/30 mb-6">
-                <Icons.Line size={40} />
+              <div className="inline-flex items-center justify-center mb-6">
+                <Icons.Line size={64} />
               </div>
               <h2 className="text-4xl md:text-5xl font-black text-slate-900 mb-6 tracking-tight leading-tight">
                 {t("landing.line.title")} <span className="text-[#00B900]">{t("landing.line.titleSub")}</span>
