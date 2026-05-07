@@ -202,13 +202,14 @@ export async function ensureSchema(db: D1Database) {
     CREATE TABLE IF NOT EXISTS support_tickets (
       id TEXT PRIMARY KEY,
       userId TEXT NOT NULL,
+      userType TEXT DEFAULT 'customer',
+      orderId TEXT,
       channel TEXT NOT NULL,
       status TEXT DEFAULT 'open',
       subject TEXT,
       assignedAdminId TEXT,
       createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
-      updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
-      FOREIGN KEY (userId) REFERENCES users(id)
+      updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP
     );
 
     CREATE TABLE IF NOT EXISTS support_messages (
