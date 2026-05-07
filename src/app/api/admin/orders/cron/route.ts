@@ -11,7 +11,7 @@ export async function GET(request: Request) {
   // Simple auth check for cron (e.g., header key)
   const authHeader = request.headers.get("x-cron-key");
   if (process.env.CRON_KEY && authHeader !== process.env.CRON_KEY) {
-    // return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   try {
