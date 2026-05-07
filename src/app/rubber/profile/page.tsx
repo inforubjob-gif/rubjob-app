@@ -161,7 +161,7 @@ export default function RubberProfilePage() {
           <Card className="divide-y divide-slate-50 overflow-hidden shadow-2xl rounded-[2.5rem] bg-white border border-slate-100">
             <button
               onClick={() => setShowLanguageModal(true)}
-              className="w-full flex items-center gap-5 px-6 py-4 hover:bg-slate-50 transition-colors text-left group"
+              className="w-full flex items-center gap-5 px-6 py-3 hover:bg-slate-50 transition-colors text-left group"
             >
               <IconCircle variant="ghost" size="md">
                 <Icons.Globe size={20} />
@@ -175,7 +175,7 @@ export default function RubberProfilePage() {
 
             <button
               onClick={() => router.push("/rubber/profile/service-area")}
-              className="w-full flex items-center gap-5 px-6 py-4 hover:bg-slate-50 transition-colors text-left group"
+              className="w-full flex items-center gap-5 px-6 py-3 hover:bg-slate-50 transition-colors text-left group"
             >
               <IconCircle variant="ghost" size="md">
                 <Icons.MapPin size={20} />
@@ -189,7 +189,7 @@ export default function RubberProfilePage() {
 
             <button
               onClick={() => router.push("/rubber/profile/vehicle-type")}
-              className="w-full flex items-center gap-5 px-6 py-4 hover:bg-slate-50 transition-colors text-left group"
+              className="w-full flex items-center gap-5 px-6 py-3 hover:bg-slate-50 transition-colors text-left group"
             >
               <IconCircle variant="ghost" size="md">
                 <Icons.Bike size={20} />
@@ -203,7 +203,7 @@ export default function RubberProfilePage() {
 
             <button
               onClick={() => router.push("/rubber/profile/payout-method")}
-              className="w-full flex items-center gap-5 px-6 py-4 hover:bg-slate-50 transition-colors text-left group"
+              className="w-full flex items-center gap-5 px-6 py-3 hover:bg-slate-50 transition-colors text-left group"
             >
               <IconCircle variant="ghost" size="md">
                 <Icons.Payment size={20} />
@@ -255,7 +255,7 @@ export default function RubberProfilePage() {
           <Card className="overflow-hidden shadow-2xl rounded-[2.5rem] bg-white border border-slate-100">
             <button
               onClick={() => router.push("/rubber/support")}
-              className="w-full flex items-center gap-5 px-6 py-4 hover:bg-slate-50 transition-colors text-left group"
+              className="w-full flex items-center gap-5 px-6 py-3 hover:bg-slate-50 transition-colors text-left group"
             >
               <IconCircle variant="ghost" size="md">
                 <Icons.Chat size={20} />
@@ -278,7 +278,7 @@ export default function RubberProfilePage() {
             localStorage.removeItem("rubjob_rubber_session");
             router.push("/rubber/login");
           }}
-          className="w-full flex items-center gap-5 px-6 py-5 bg-slate-900 text-white rounded-[2.5rem] shadow-2xl hover:bg-rose-600 transition-all duration-500 group"
+          className="w-full flex items-center gap-5 px-6 py-4 bg-slate-900 text-white rounded-[2.5rem] shadow-2xl hover:bg-rose-600 transition-all duration-500 group"
         >
           <div className="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
             <Icons.LogOut size={20} className="group-hover:rotate-12 transition-transform" />

@@ -21,7 +21,15 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: "Database not found" }, { status: 500 });
     }
 
-    const user = await db.prepare(`SELECT * FROM users WHERE id = ?`).bind(userId).first();
+    // Determine table based on ID prefix
+    const tableName = userId.startsWith("RDR-") ? "rubber_users" : "users";
+    
+    // Check if column exists (self-healing)
+    try {
+      await db.prepare(`ALTER TABLE ${tableName} ADD COLUMN preferences TEXT`).run();
+    } catch (e) {}
+
+    const user = await db.prepare(`SELECT preferences FROM ${tableName} WHERE id = ?`).bind(userId).first() as any;
     
     if (!user) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
@@ -38,7 +46,7 @@ export async function GET(req: Request) {
 
     return NextResponse.json({ preferences });
   } catch (error: any) {
-    console.error("GET constraints/preferences error:", error);
+    console.error("GET preferences error:", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
@@ -61,9 +69,12 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Database not found" }, { status: 500 });
     }
 
+    const tableName = userId.startsWith("RDR-") ? "rubber_users" : "users";
+
     // Step 1: Read existing preferences
-    const user = await db.prepare(`SELECT * FROM users WHERE id = ?`).bind(userId).first();
+    const user = await db.prepare(`SELECT preferences FROM ${tableName} WHERE id = ?`).bind(userId).first() as any;
     let currentPrefs = {};
+    
     if (user && user.preferences) {
       try {
         currentPrefs = JSON.parse(user.preferences as string);
@@ -75,18 +86,16 @@ export async function POST(req: Request) {
     // Step 2: Merge preferences
     const newPrefs = { ...currentPrefs, ...updates };
 
-    // Step 3: Write back, with fallback logic to add the column if it doesn't exist
+    // Step 3: Write back
     try {
-      await db.prepare(`UPDATE users SET preferences = ? WHERE id = ?`)
+      await db.prepare(`UPDATE ${tableName} SET preferences = ? WHERE id = ?`)
         .bind(JSON.stringify(newPrefs), userId)
         .run();
     } catch (err: any) {
       // If error indicates column doesn't exist, try to add it
       if (err.message && err.message.includes("no column")) {
-         console.log("Column 'preferences' not found. Attempting to create it via ALTER TABLE...");
-         await db.prepare(`ALTER TABLE users ADD COLUMN preferences TEXT;`).run();
-         // Retry update
-         await db.prepare(`UPDATE users SET preferences = ? WHERE id = ?`)
+         await db.prepare(`ALTER TABLE ${tableName} ADD COLUMN preferences TEXT;`).run();
+         await db.prepare(`UPDATE ${tableName} SET preferences = ? WHERE id = ?`)
            .bind(JSON.stringify(newPrefs), userId)
            .run();
       } else {
