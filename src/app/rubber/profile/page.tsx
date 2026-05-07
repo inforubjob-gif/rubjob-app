@@ -240,7 +240,7 @@ export default function RubberProfilePage() {
                   </div>
                </div>
                <button 
-                  onClick={() => router.push("/rubber")}
+                  onClick={() => router.push("/auth/link-line?type=rubber")}
                   className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase transition-all ${rubberData?.lineUserId ? 'bg-green-50 text-green-600 border border-green-100' : 'bg-primary text-white shadow-lg shadow-primary/20'}`}
                >
                   {rubberData?.lineUserId ? "Reconnect" : "Connect"}
