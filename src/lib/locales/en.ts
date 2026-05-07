@@ -249,6 +249,8 @@ export const en = {
       noDateTime: "Please select a pickup date and time",
       noPhone: "Please provide a contact phone number",
       tooFar: "Sorry, the distance exceeds 10 km. Service unavailable.",
+      tooFarTitle: "Out of Service Area",
+      tooFarDesc: "We only provide services within a 10 km radius of our store.\nYour current location is",
     },
     loginRequiredTitle: "Login to Book",
     loginRequiredDesc: "Please log in via LINE to start booking a laundry service.",
