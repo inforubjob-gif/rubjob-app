@@ -108,7 +108,7 @@ export const Icons = {
   CreditCard: (props: IconProps) => <MaterialIcon name="credit_card" {...props} />,
   Line: (props: IconProps) => (
     <img 
-      src="/images/LINE_logo.svg" 
+      src="/images/LINE_logo.png" 
       alt="LINE" 
       style={{ width: props.size || 24, height: props.size || 24 }}
       className={`object-contain ${props.className || ""}`}
