@@ -56,10 +56,11 @@ export const bookingConfirmationFlex = (orderId: string, serviceName: string, to
     type: "bubble",
     hero: {
       type: "image",
-      url: "https://images.unsplash.com/photo-1545173168-9f1967e49549?w=800&q=80",
+      url: "https://app.rubjob-all.com/images/mascot-ready.png",
       size: "full",
       aspectRatio: "20:13",
-      aspectMode: "cover",
+      aspectMode: "fit",
+      backgroundColor: "#FFF7ED"
     },
     body: {
       type: "box",
@@ -311,10 +312,11 @@ export const orderCompletedFlex = (orderId: string): LineFlexMessage => ({
     type: "bubble",
     hero: {
       type: "image",
-      url: "https://images.unsplash.com/photo-1521791136064-7986c29596ad?w=800&q=80",
+      url: "https://app.rubjob-all.com/images/mascot-chill.png",
       size: "full",
       aspectRatio: "20:13",
-      aspectMode: "cover",
+      aspectMode: "fit",
+      backgroundColor: "#F0Fdf4"
     },
     body: {
       type: "box",
