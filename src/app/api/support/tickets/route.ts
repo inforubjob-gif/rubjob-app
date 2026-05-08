@@ -81,6 +81,14 @@ export async function POST(req: Request) {
   try { await db.prepare("ALTER TABLE support_tickets ADD COLUMN userType TEXT DEFAULT 'customer'").run(); } catch (e) {}
   try { await db.prepare("ALTER TABLE support_tickets ADD COLUMN orderId TEXT").run(); } catch (e) {}
 
+  // Ensure userId exists in users table (FK constraint)
+  // Rubber/Store IDs live in separate tables but FK references users(id)
+  try {
+    const role = identity.type === "rubber" ? "driver" : identity.type === "store" ? "store_admin" : "user";
+    await db.prepare(`INSERT OR IGNORE INTO users (id, role, displayName) VALUES (?, ?, ?)`)
+      .bind(identity.id, role, identity.type === "rubber" ? "Rubber" : "Store").run();
+  } catch (e) {}
+
   const body = await req.json() as any as { subject?: string; ticketId?: string; message: string };
   const { subject, ticketId, message } = body;
 
