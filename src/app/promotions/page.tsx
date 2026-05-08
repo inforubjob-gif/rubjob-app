@@ -58,8 +58,10 @@ export default function PromotionsPage() {
     fetchCoupons();
   }, []);
 
-  const totalPoints = orders.reduce((acc, order) => acc + (order.totalPrice || 0), 0);
-  const nextTierPoints = 1500;
+  // Points formula: Every ฿100 spent = 1 point
+  const totalPoints = Math.floor(orders.reduce((acc, order) => acc + (order.totalPrice || 0), 0) / 100);
+  const currentTier = totalPoints >= 300 ? 'diamond' : totalPoints >= 150 ? 'gold' : totalPoints >= 50 ? 'silver' : 'bronze';
+  const nextTierPoints = totalPoints >= 300 ? 300 : totalPoints >= 150 ? 300 : totalPoints >= 50 ? 150 : 50;
   const progress = Math.min((totalPoints / nextTierPoints) * 100, 100);
   const pointsToGo = Math.max(nextTierPoints - totalPoints, 0);
 
@@ -158,7 +160,7 @@ export default function PromotionsPage() {
               <div className="space-y-4">
                 <div className="flex justify-between items-end">
                   <span className="text-[11px] font-bold text-slate-200">
-                    {t("promotions.nextTier")} <span className="text-white font-black">{totalPoints >= 1500 ? t("tiers.diamond") : t("tiers.gold")}</span>
+                    {t("promotions.nextTier")} <span className="text-white font-black">{t(`tiers.${currentTier === 'diamond' ? 'diamond' : currentTier === 'gold' ? 'diamond' : currentTier === 'silver' ? 'gold' : 'silver'}`)}</span>
                   </span>
                   <span className="text-[10px] font-black text-white bg-white/20 px-2.5 py-1 rounded-lg backdrop-blur-md">
                     {t("promotions.pointsToGo").replace("{points}", pointsToGo.toString())}
@@ -173,11 +175,13 @@ export default function PromotionsPage() {
               </div>
 
               <button 
-                onClick={handleInviteFriend}
-                className="w-full mt-8 py-4 bg-[#ff9f1c] text-white rounded-xl text-[14px] font-black tracking-wide shadow-2xl shadow-[#ff9f1c]/30 active:scale-95 transition-all outline-none"
+                onClick={() => router.push('/booking')}
+                className="w-full mt-8 py-4 bg-[#ff9f1c] text-white rounded-xl text-[14px] font-black tracking-wide shadow-2xl shadow-[#ff9f1c]/30 active:scale-95 transition-all outline-none flex items-center justify-center gap-2"
               >
-                {t("promotions.inviteBtn")}
+                <Icons.Guarantee size={18} />
+                {t("promotions.redeemBtn")}
               </button>
+              <p className="text-[10px] text-white/40 font-bold text-center mt-3 uppercase tracking-wider">ทุกๆ ฿100 ที่ใช้บริการ = 1 คะแนน</p>
             </div>
           </div>
         </div>

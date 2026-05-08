@@ -545,6 +545,7 @@ export const th = {
       nextTier: "ระดับถัดไป:",
       pointsToGo: "อีก {points} คะแนนสะสม",
       inviteBtn: "เชิญเพื่อนเพื่อเก็บคะแนน",
+      redeemBtn: "แลกคะแนน",
     },
     store: {
       tabs: {

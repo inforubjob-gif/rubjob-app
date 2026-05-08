@@ -607,6 +607,7 @@ export const en = {
     nextTier: "Next Tier:",
     pointsToGo: "{points} points to go",
     inviteBtn: "Invite Friends to Earn Points",
+    redeemBtn: "Redeem Points",
   },
   store: {
     tabs: {
