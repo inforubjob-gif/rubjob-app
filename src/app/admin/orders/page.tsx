@@ -195,18 +195,27 @@ export default function AdminOrdersPage() {
                            </div>
                         </td>
                         <td className="px-6 py-6">
-                           {order.status === "at_shop" && (
-                              <button
-                                onClick={() => handleUpdateOrder(order.id, { status: "ready_for_return" })}
-                                disabled={isUpdating === order.id}
-                                className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white text-[10px] font-black uppercase tracking-widest rounded-xl shadow-lg shadow-emerald-500/20 transition-all active:scale-95"
-                              >
-                                {t('admin.orders.markReady')}
-                              </button>
-                           )}
-                           {order.status === "pending" && (
-                              <span className="text-[10px] font-black text-primary uppercase tracking-widest animate-pulse">{t('admin.orders.waitAssign')}</span>
-                           )}
+                           <div className="flex items-center gap-2">
+                             {order.status === "at_shop" && (
+                                <button
+                                  onClick={() => handleUpdateOrder(order.id, { status: "ready_for_return" })}
+                                  disabled={isUpdating === order.id}
+                                  className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white text-[10px] font-black uppercase tracking-widest rounded-xl shadow-lg shadow-emerald-500/20 transition-all active:scale-95"
+                                >
+                                  {t('admin.orders.markReady')}
+                                </button>
+                             )}
+                             {order.status === "pending" && (
+                                <span className="text-[10px] font-black text-primary uppercase tracking-widest animate-pulse mr-2">{t('admin.orders.waitAssign')}</span>
+                             )}
+                             <Link 
+                               href={`/admin/orders/${order.id}`}
+                               className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white text-[10px] font-black uppercase tracking-widest rounded-xl shadow-lg shadow-slate-900/20 transition-all active:scale-95 whitespace-nowrap flex items-center gap-1"
+                             >
+                               <Icons.FileText size={12} />
+                               รายละเอียด
+                             </Link>
+                           </div>
                         </td>
                       </tr>
                     );
