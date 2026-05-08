@@ -80,6 +80,7 @@ export const Icons = {
   ArrowRight: (props: IconProps) => <MaterialIcon name="arrow_forward" {...props} />,
   ChevronRight: (props: IconProps) => <MaterialIcon name="chevron_right" {...props} />,
   Close: (props: IconProps) => <MaterialIcon name="close" {...props} />,
+  Backspace: (props: IconProps) => <MaterialIcon name="backspace" {...props} />,
   Info: (props: IconProps) => <MaterialIcon name="info" {...props} />,
   Alert: (props: IconProps) => <MaterialIcon name="warning" {...props} />,
   AlertCircle: (props: IconProps) => <MaterialIcon name="error_outline" {...props} />,

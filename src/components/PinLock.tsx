@@ -197,8 +197,7 @@ export default function PinLock({ type, userId, onVerified, children }: PinLockP
       </header>
 
       <div 
-        className="flex-1 flex flex-col items-center justify-start pt-8 max-w-sm mx-auto w-full px-6 pb-24 relative z-10 min-h-0"
-        onClick={() => pinInputRef.current?.focus()}
+        className="flex flex-col items-center justify-start pt-8 max-w-sm mx-auto w-full px-6 pb-8 relative z-10 min-h-0"
       >
         <div className="w-20 h-20 md:w-28 md:h-28 bg-white shadow-2xl shadow-primary/10 rounded-[1.5rem] md:rounded-[2rem] flex items-center justify-center mb-4 md:mb-10 border border-primary/10 relative shrink-0 p-4 md:p-6">
           <div className="absolute inset-0 bg-primary/5 rounded-[1.5rem] md:rounded-[2rem] animate-pulse" />
@@ -219,26 +218,7 @@ export default function PinLock({ type, userId, onVerified, children }: PinLockP
         </p>
 
         {/* PIN Dots Area */}
-        <div className="relative mb-6 md:mb-14 w-full flex justify-center">
-          {/* Hidden Input Layer positioned directly over dots to help iOS scroll to it */}
-          <input
-            ref={pinInputRef}
-            type="tel"
-            inputMode="numeric"
-            pattern="[0-9]*"
-            maxLength={6}
-            value={step === "confirm" ? confirmPin : pin}
-            onChange={(e) => {
-              const val = e.target.value.replace(/\D/g, "").slice(0, 6);
-              if (step === "confirm") {
-                setConfirmPin(val);
-              } else {
-                setPin(val);
-              }
-            }}
-            autoFocus
-            className="absolute inset-0 opacity-0 z-[50] cursor-default caret-transparent w-full h-full"
-          />
+        <div className="relative mb-6 md:mb-10 w-full flex justify-center">
           <div className="flex gap-4 md:gap-5 relative z-20 pointer-events-none">
             {[...Array(6)].map((_, i) => (
               <div 
@@ -263,34 +243,51 @@ export default function PinLock({ type, userId, onVerified, children }: PinLockP
           </div>
         )}
 
-        {/* Interaction Area */}
-        <div className="relative z-[60] flex flex-col items-center gap-4 mt-4">
-          <button 
-            onClick={() => pinInputRef.current?.focus()}
-            className="flex flex-col items-center gap-2 group"
-          >
-            <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-slate-100 flex items-center justify-center text-slate-300 group-active:scale-95 transition-all">
-              <Icons.Lock size={18} />
+        {/* Custom Numpad Area */}
+        <div className="w-full max-w-[280px] mx-auto mt-2 z-20">
+          <div className="grid grid-cols-3 gap-y-4 gap-x-6">
+            {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
+              <button
+                key={num}
+                onClick={() => handleNumberClick(num)}
+                className="w-16 h-16 mx-auto rounded-full bg-white border border-slate-100 shadow-sm flex items-center justify-center text-2xl font-black text-slate-800 active:bg-slate-50 active:scale-95 transition-all focus:outline-none"
+              >
+                {num}
+              </button>
+            ))}
+            <div className="flex items-center justify-center">
+               {step === "confirm" && (
+                 <button 
+                   onClick={(e) => { 
+                     e.stopPropagation();
+                     setStep("setup"); 
+                     setPin(""); 
+                     setConfirmPin(""); 
+                   }}
+                   className="w-12 h-12 rounded-full flex items-center justify-center text-slate-400 active:bg-slate-100 transition-all focus:outline-none"
+                 >
+                   <Icons.Back size={24} />
+                 </button>
+               )}
             </div>
-            <span className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] animate-pulse">
-              {t("common.tapToEnterPin") || "แตะเพื่อใส่รหัส"}
-            </span>
-          </button>
-
-          {step === "confirm" && (
-             <button 
-               onClick={(e) => { 
-                 e.stopPropagation();
-                 setStep("setup"); 
-                 setPin(""); 
-                 setConfirmPin(""); 
-               }}
-               className="px-4 py-1.5 rounded-full bg-slate-100 text-[9px] font-black text-slate-500 uppercase tracking-widest hover:bg-slate-200 transition-colors"
-             >
-               {t("common.back")}
-             </button>
-          )}
+            <button
+              onClick={() => handleNumberClick(0)}
+              className="w-16 h-16 mx-auto rounded-full bg-white border border-slate-100 shadow-sm flex items-center justify-center text-2xl font-black text-slate-800 active:bg-slate-50 active:scale-95 transition-all focus:outline-none"
+            >
+              0
+            </button>
+            <div className="flex items-center justify-center">
+              <button
+                onClick={handleDelete}
+                className="w-16 h-16 rounded-full flex items-center justify-center text-slate-500 active:bg-slate-100 transition-all focus:outline-none"
+              >
+                <Icons.Backspace size={28} />
+              </button>
+            </div>
+          </div>
         </div>
+
+
 
         {/* Deleted absolute hidden input, moved to dots container */}
       </div>
