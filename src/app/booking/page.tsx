@@ -259,7 +259,7 @@ function BookingFlow() {
   const dates = useMemo(() => {
     return Array.from({ length: 7 }, (_, i) => {
       const d = new Date();
-      d.setDate(d.getDate() + i + 1);
+      d.setDate(d.getDate() + i);
       return {
         value: d.toISOString().slice(0, 10),
         day: d.toLocaleDateString(locale, { weekday: "short" }),
@@ -269,15 +269,42 @@ function BookingFlow() {
     });
   }, [locale]);
 
+  const isSlotPassed = useCallback((slotStartTime: string, dateVal: string) => {
+    const now = new Date();
+    // Use local time comparison
+    const todayStr = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+    if (dateVal > todayStr) return false;
+    if (dateVal < todayStr) return true;
+
+    const [slotH, slotM] = slotStartTime.split(":").map(Number);
+    const currentH = now.getHours();
+    const currentM = now.getMinutes();
+
+    // Disable if current time has passed the start time (with a 30 min buffer optionally, here strictly)
+    return currentH > slotH || (currentH === slotH && currentM >= slotM);
+  }, []);
+
   // Set default pickup date/slot
   useEffect(() => {
     if (!pickupDate && dates.length > 0) {
-      setPickupDate(dates[0].value);
+      const validDate = dates.find(d => TIME_SLOTS.some(s => !isSlotPassed(s.startTime, d.value)));
+      setPickupDate(validDate ? validDate.value : dates[0].value);
     }
-    if (!pickupSlot && TIME_SLOTS.length > 0) {
-      setPickupSlot(TIME_SLOTS[0].id);
+  }, [dates, pickupDate, isSlotPassed]);
+
+  // Ensure selected slot is valid for the selected date
+  useEffect(() => {
+    if (pickupDate && TIME_SLOTS.length > 0) {
+      const validSlots = TIME_SLOTS.filter(s => !isSlotPassed(s.startTime, pickupDate));
+      if (validSlots.length > 0) {
+        if (!pickupSlot || isSlotPassed(TIME_SLOTS.find(s => s.id === pickupSlot)?.startTime || "00:00", pickupDate)) {
+          setPickupSlot(validSlots[0].id);
+        }
+      } else {
+        setPickupSlot(""); // No slots available for this day
+      }
     }
-  }, [dates, pickupDate, pickupSlot]);
+  }, [pickupDate, pickupSlot, isSlotPassed]);
 
   const distanceKm = selectedStore && selectedAddress?.lat && selectedAddress?.lng 
     ? getDistanceKm(selectedAddress.lat, selectedAddress.lng, selectedStore.lat, selectedStore.lng)
@@ -644,15 +671,27 @@ function BookingFlow() {
                   ))}
                 </div>
                 <div className="grid grid-cols-2 gap-2">
-                  {TIME_SLOTS.map((slot) => (
-                    <button
-                      key={slot.id}
-                      onClick={() => setPickupSlot(slot.id)}
-                      className={`py-3 px-2 rounded-xl text-center transition-all duration-300 ${pickupSlot === slot.id ? "bg-primary text-white shadow-md shadow-primary/20 scale-[1.02]" : "bg-white text-foreground hover:bg-slate-100 border border-border"}`}
-                    >
-                      <p className="text-xs font-bold">{t(`timeSlots.${slot.id}`) || slot.label}</p>
-                    </button>
-                  ))}
+                  {TIME_SLOTS.map((slot) => {
+                    const isDisabled = isSlotPassed(slot.startTime, pickupDate);
+                    return (
+                      <button
+                        key={slot.id}
+                        disabled={isDisabled}
+                        onClick={() => setPickupSlot(slot.id)}
+                        className={`py-3 px-2 rounded-xl text-center transition-all duration-300 ${
+                          isDisabled 
+                            ? "bg-slate-50 text-slate-300 border border-transparent cursor-not-allowed opacity-50" 
+                            : pickupSlot === slot.id 
+                              ? "bg-primary text-white shadow-md shadow-primary/20 scale-[1.02]" 
+                              : "bg-white text-foreground hover:bg-slate-100 border border-border"
+                        }`}
+                      >
+                        <p className={`text-xs font-bold ${isDisabled ? "line-through decoration-slate-300/50" : ""}`}>
+                          {t(`timeSlots.${slot.id}`) || slot.label}
+                        </p>
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             </section>
