@@ -176,7 +176,7 @@ export default function PinLock({ type, userId, onVerified, children }: PinLockP
 
   return (
     <div 
-      className="fixed inset-0 bg-[#F8FAFC] z-[10000] flex flex-col touch-none overflow-hidden"
+      className="fixed inset-0 bg-[#F8FAFC] z-[10000] flex flex-col overflow-y-auto"
     >
       {/* Premium Background Decoration */}
       <div className="absolute top-0 left-0 right-0 h-64 bg-gradient-to-b from-primary/10 to-transparent pointer-events-none" />
@@ -197,7 +197,7 @@ export default function PinLock({ type, userId, onVerified, children }: PinLockP
       </header>
 
       <div 
-        className="flex-1 flex flex-col items-center justify-center max-w-sm mx-auto w-full px-6 py-2 relative z-10 min-h-0"
+        className="flex-1 flex flex-col items-center justify-start pt-8 max-w-sm mx-auto w-full px-6 pb-24 relative z-10 min-h-0"
         onClick={() => pinInputRef.current?.focus()}
       >
         <div className="w-20 h-20 md:w-28 md:h-28 bg-white shadow-2xl shadow-primary/10 rounded-[1.5rem] md:rounded-[2rem] flex items-center justify-center mb-4 md:mb-10 border border-primary/10 relative shrink-0 p-4 md:p-6">
@@ -219,8 +219,27 @@ export default function PinLock({ type, userId, onVerified, children }: PinLockP
         </p>
 
         {/* PIN Dots Area */}
-        <div className="relative mb-6 md:mb-14">
-          <div className="flex gap-4 md:gap-5 relative z-20">
+        <div className="relative mb-6 md:mb-14 w-full flex justify-center">
+          {/* Hidden Input Layer positioned directly over dots to help iOS scroll to it */}
+          <input
+            ref={pinInputRef}
+            type="tel"
+            inputMode="numeric"
+            pattern="[0-9]*"
+            maxLength={6}
+            value={step === "confirm" ? confirmPin : pin}
+            onChange={(e) => {
+              const val = e.target.value.replace(/\D/g, "").slice(0, 6);
+              if (step === "confirm") {
+                setConfirmPin(val);
+              } else {
+                setPin(val);
+              }
+            }}
+            autoFocus
+            className="absolute inset-0 opacity-0 z-[50] cursor-default caret-transparent w-full h-full"
+          />
+          <div className="flex gap-4 md:gap-5 relative z-20 pointer-events-none">
             {[...Array(6)].map((_, i) => (
               <div 
                 key={i} 
@@ -232,7 +251,7 @@ export default function PinLock({ type, userId, onVerified, children }: PinLockP
               />
             ))}
           </div>
-          <div className="absolute -bottom-4 left-0 right-0 h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
+          <div className="absolute -bottom-4 left-0 right-0 h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent pointer-events-none" />
         </div>
 
         {error && (
@@ -273,25 +292,7 @@ export default function PinLock({ type, userId, onVerified, children }: PinLockP
           )}
         </div>
 
-        {/* Hidden Input Layer */}
-        <input
-          ref={pinInputRef}
-          type="tel"
-          inputMode="numeric"
-          pattern="[0-9]*"
-          maxLength={6}
-          value={step === "confirm" ? confirmPin : pin}
-          onChange={(e) => {
-            const val = e.target.value.replace(/\D/g, "").slice(0, 6);
-            if (step === "confirm") {
-              setConfirmPin(val);
-            } else {
-              setPin(val);
-            }
-          }}
-          autoFocus
-          className="absolute inset-0 opacity-0 z-[50] cursor-default caret-transparent"
-        />
+        {/* Deleted absolute hidden input, moved to dots container */}
       </div>
 
       {/* Decorative Brand Tag */}
