@@ -57,9 +57,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       <AdminAuthGate>
         <PermissionGate>
           <ToastProvider>
-            <div className="fixed inset-0 z-50 bg-slate-50 flex flex-col lg:flex-row overflow-hidden font-sans text-slate-900">
+            <div className="fixed inset-0 z-50 bg-slate-50 flex flex-col md:flex-row overflow-hidden font-sans text-slate-900">
             {/* Mobile Header */}
-            <header className="lg:hidden h-20 bg-slate-900 border-b border-slate-800 flex items-center justify-between px-6 shrink-0 z-[55]">
+            <header className="md:hidden h-20 bg-slate-900 border-b border-slate-800 flex items-center justify-between px-6 shrink-0 z-[55]">
               <div className="flex items-center gap-3">
                  <div className="p-2 bg-primary rounded-xl shadow-lg shadow-primary/20">
                     <Icons.Logo size={24} variant="white" />

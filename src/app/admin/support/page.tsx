@@ -174,9 +174,9 @@ export default function SupportCenterPage() {
  const channelBadge = selectedTicket ? getChannelBadge(selectedTicket.channel) : null;
 
  return (
-  <div className="h-[calc(100vh-120px)] flex gap-6 overflow-hidden">
+  <div className="h-[calc(100vh-120px)] flex gap-6 overflow-hidden relative">
    {/* ─── Sidebar: Ticket List ─── */}
-   <div className="w-80 flex flex-col gap-4 h-full">
+   <div className={`w-full md:w-72 lg:w-80 flex-col gap-4 h-full shrink-0 transition-all ${selectedTicketId ? 'hidden md:flex' : 'flex'}`}>
     <header>
      <h1 className="text-2xl font-black text-slate-900 tracking-tight">{t('admin.support.title')}</h1>
      <p className="text-xs text-slate-500 font-bold uppercase tracking-wider mt-1">{t('admin.support.subtitle')}</p>
@@ -274,13 +274,19 @@ export default function SupportCenterPage() {
    </div>
 
    {/* ─── Main: Chat Conversation ─── */}
-   <div className="flex-1 h-full">
+   <div className={`flex-1 h-full w-full md:w-auto absolute md:relative inset-0 bg-slate-50 md:bg-transparent z-10 md:z-auto transition-all ${selectedTicketId ? 'block' : 'hidden md:block'}`}>
     {selectedTicketId ? (
      <Card className="h-full flex flex-col bg-white border border-slate-200/60 shadow-xl rounded-xl overflow-hidden">
       {/* Header */}
-      <header className="px-8 py-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/20">
-       <div className="flex items-center gap-4">
-         <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-xl font-black ${typeBadge ? typeBadge.badgeClass : 'bg-primary/10'}`}>
+      <header className="px-4 md:px-8 py-4 md:py-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/20">
+       <div className="flex items-center gap-3 md:gap-4">
+         <button 
+           onClick={() => setSelectedTicketId(null)} 
+           className="md:hidden p-2 rounded-lg bg-white shadow-sm border border-slate-100 shrink-0 text-slate-500 hover:text-slate-900 active:scale-95 transition-all"
+         >
+           <Icons.ChevronLeft size={20} />
+         </button>
+         <div className={`w-10 h-10 md:w-12 md:h-12 shrink-0 rounded-xl flex items-center justify-center text-xl font-black ${typeBadge ? typeBadge.badgeClass : 'bg-primary/10'}`}>
           {typeBadge?.icon || selectedTicket?.userName?.[0]?.toUpperCase() || 'C'}
          </div>
          <div>
@@ -352,7 +358,7 @@ export default function SupportCenterPage() {
       <div className="flex-1 overflow-y-auto p-8 space-y-6 bg-slate-50/30">
        {messages.map((m) => (
         <div key={m.id} className={`flex ${m.senderType === 'admin' ? 'justify-end' : 'justify-start'} animate-fade-in`}>
-         <div className={`max-w-[70%] group`}>
+         <div className={`max-w-[85%] md:max-w-[75%] lg:max-w-[70%] group`}>
           <div className={`px-5 py-3.5 rounded-xl shadow-sm text-sm font-medium leading-relaxed
            ${m.senderType === 'admin' 
             ? 'bg-slate-900 text-white rounded-tr-none' 
@@ -373,20 +379,20 @@ export default function SupportCenterPage() {
       </div>
 
       {/* Input Area */}
-      <div className="p-6 border-t border-slate-100 bg-white">
-        <div className="bg-slate-50 rounded-xl p-2 pl-6 flex items-center gap-3 border border-slate-100 ring-4 ring-slate-50/50">
+      <div className="p-4 md:p-6 border-t border-slate-100 bg-white">
+        <div className="bg-slate-50 rounded-xl p-2 pl-4 md:pl-6 flex items-center gap-3 border border-slate-100 ring-4 ring-slate-50/50">
          <input 
           type="text"
           value={replyText}
           onChange={e => setReplyText(e.target.value)}
           onKeyDown={e => e.key === 'Enter' && handleSendReply()}
           placeholder={t('admin.support.typePlaceholder')}
-          className="flex-1 bg-transparent border-none focus:ring-0 text-sm font-bold text-slate-700 placeholder:text-slate-400"
+          className="flex-1 bg-transparent border-none focus:ring-0 text-sm font-bold text-slate-700 placeholder:text-slate-400 min-h-[44px]"
          />
          <button 
           onClick={handleSendReply}
           disabled={isSending || !replyText.trim()}
-          className="bg-primary text-white w-12 h-12 rounded-[1.1rem] flex items-center justify-center shadow-lg shadow-primary/20 hover:scale-105 active:scale-95 transition-all disabled:opacity-50"
+          className="bg-primary text-white w-12 h-12 md:w-14 md:h-14 rounded-[1.1rem] shrink-0 flex items-center justify-center shadow-lg shadow-primary/20 hover:scale-105 active:scale-95 transition-all disabled:opacity-50"
          >
           {isSending ? <Icons.Refresh size={20} className="animate-spin" /> : <Icons.Settings size={20} className="rotate-90" />}
          </button>

@@ -115,7 +115,7 @@ export default function AdminDashboard() {
    ) : (
     <div className="stagger">
      <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-      <Link href="/admin/users" className="md:col-span-2 lg:col-span-1 group">
+      <Link href="/admin/users" className="md:col-span-1 lg:col-span-1 group">
        <Card className="h-full relative overflow-hidden bg-slate-900 border-slate-800 text-white shadow-2xl shadow-slate-900/20 group-hover:-translate-y-1 transition-all duration-500">
         <div className="relative z-10 p-6">
          <div className="flex items-center justify-between mb-8">

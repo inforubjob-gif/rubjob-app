@@ -34,20 +34,20 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
       {/* Mobile Backdrop */}
       {isOpen && (
         <div 
-          className="fixed inset-0 bg-slate-950/40 backdrop-blur-sm z-[60] lg:hidden transition-opacity duration-300 animate-fade-in"
+          className="fixed inset-0 bg-slate-950/40 backdrop-blur-sm z-[60] md:hidden transition-opacity duration-300 animate-fade-in"
           onClick={onClose}
         />
       )}
 
       <aside 
-        className={`fixed inset-y-0 left-0 z-[70] w-72 bg-slate-900 text-slate-300 flex flex-col shrink-0 h-full border-r border-slate-800 transition-transform duration-300 cubic-bezier(0.4, 0, 0.2, 1) lg:static lg:translate-x-0 ${
-          isOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full lg:translate-x-0'
+        className={`fixed inset-y-0 left-0 z-[70] w-72 md:w-20 lg:w-72 bg-slate-900 text-slate-300 flex flex-col shrink-0 h-full border-r border-slate-800 transition-all duration-300 cubic-bezier(0.4, 0, 0.2, 1) md:static md:translate-x-0 ${
+          isOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full md:translate-x-0'
         }`}
       >
-        <div className="h-24 flex items-center justify-between px-8 bg-slate-950/50 border-b border-white/5 shrink-0">
+        <div className="h-24 flex items-center justify-between md:justify-center lg:justify-between px-8 md:px-0 lg:px-8 bg-slate-950/50 border-b border-white/5 shrink-0">
           <div className="flex items-center">
             <Icons.Logo size={36} variant="white" />
-            <span className="ml-4 font-black text-white tracking-[0.2em] leading-tight uppercase">
+            <span className="ml-4 font-black text-white tracking-[0.2em] leading-tight uppercase block md:hidden lg:block">
               RUBJOB<br/>
               <span className="text-[10px] text-primary-light font-black uppercase">{t("admin.nav.portal")}</span>
             </span>
@@ -55,13 +55,13 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
           
           <button 
             onClick={onClose}
-            className="lg:hidden p-2 rounded-lg bg-white/5 text-slate-400 hover:text-white"
+            className="md:hidden p-2 rounded-lg bg-white/5 text-slate-400 hover:text-white"
           >
             <Icons.Close size={20} />
           </button>
         </div>
         
-        <nav className="flex-1 px-5 py-6 space-y-1.5 overflow-y-auto no-scrollbar">
+        <nav className="flex-1 px-5 md:px-2 lg:px-5 py-6 space-y-1.5 overflow-y-auto no-scrollbar">
           {NAV_ITEMS.map((item) => {
              const isActive = item.href === "/" 
                ? (pathname === "/" || pathname === "/admin")
@@ -71,44 +71,46 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
                <Link 
                  key={item.href} 
                  href={item.href}
+                 title={item.label}
                  onClick={() => {
-                   if (window.innerWidth < 1024) onClose();
+                   if (window.innerWidth < 768) onClose();
                  }}
-                 className={`flex items-center gap-4 px-4 py-3.5 rounded-xl text-sm font-bold transition-all ${
+                 className={`flex items-center gap-4 md:gap-0 lg:gap-4 px-4 md:px-0 lg:px-4 py-3.5 md:py-4 lg:py-3.5 md:justify-center lg:justify-start rounded-xl text-sm font-bold transition-all group ${
                    isActive 
                      ? 'bg-primary text-white shadow-lg shadow-primary/20' 
                      : 'text-slate-400 hover:bg-white/5 hover:text-white'
                  }`}
                >
-                 <span className={isActive ? "text-white" : "text-slate-500"}>{item.icon}</span>
-                 {item.label}
+                 <span className={`${isActive ? "text-white" : "text-slate-500"} group-hover:scale-110 transition-transform`}>{item.icon}</span>
+                 <span className="block md:hidden lg:block whitespace-nowrap">{item.label}</span>
                </Link>
              );
           })}
         </nav>
 
         {/* Unified Account & Settings Card */}
-        <div className="p-4 border-t border-white/5 bg-slate-950/20 shrink-0">
+        <div className="p-4 md:p-2 lg:p-4 border-t border-white/5 bg-slate-950/20 shrink-0">
            <Link 
              href="/admin/settings?tab=profile"
+             title={admin?.name}
              onClick={() => {
-               if (window.innerWidth < 1024) onClose();
+               if (window.innerWidth < 768) onClose();
              }}
-             className={`block group bg-white/5 rounded-xl p-4 border border-white/5 shadow-inner transition-all hover:bg-white/10 hover:border-white/10 ${pathname === '/admin/settings' ? 'ring-2 ring-primary ring-offset-2 ring-offset-slate-900 bg-white/10' : ''}`}
+             className={`block group bg-white/5 rounded-xl p-4 md:p-2 lg:p-4 border border-white/5 shadow-inner transition-all hover:bg-white/10 hover:border-white/10 ${pathname === '/admin/settings' ? 'ring-2 ring-primary ring-offset-2 ring-offset-slate-900 bg-white/10' : ''}`}
            >
-              <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center justify-between md:justify-center lg:justify-between gap-3">
                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-xl bg-primary/20 border border-primary/30 flex items-center justify-center text-primary overflow-hidden shrink-0 shadow-lg group-hover:scale-105 transition-transform font-black">
+                    <div className="w-12 h-12 md:w-10 md:h-10 lg:w-12 lg:h-12 rounded-xl bg-primary/20 border border-primary/30 flex items-center justify-center text-primary overflow-hidden shrink-0 shadow-lg group-hover:scale-105 transition-transform font-black">
                        {admin?.avatarUrl ? <img src={admin.avatarUrl} className="w-full h-full object-cover" /> : admin?.name?.[0]?.toUpperCase()}
                     </div>
-                    <div className="min-w-0">
+                    <div className="min-w-0 block md:hidden lg:block">
                        <p className="font-black text-white text-xs truncate uppercase tracking-tight leading-none mb-1.5">{admin?.name}</p>
                        <div className="flex items-center gap-2">
                           <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{admin?.role?.replace('_', ' ')}</span>
                        </div>
                     </div>
                  </div>
-                 <div className="w-8 h-8 rounded-xl bg-white/5 flex items-center justify-center text-slate-500 group-hover:text-primary group-hover:bg-primary/10 transition-all">
+                 <div className="w-8 h-8 rounded-xl bg-white/5 flex items-center justify-center text-slate-500 group-hover:text-primary group-hover:bg-primary/10 transition-all block md:hidden lg:block shrink-0">
                     <Icons.Settings size={18} />
                  </div>
               </div>
