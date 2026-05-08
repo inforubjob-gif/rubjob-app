@@ -274,7 +274,7 @@ export default function SupportCenterPage() {
    </div>
 
    {/* ─── Main: Chat Conversation ─── */}
-   <div className={`flex-1 h-full w-full md:w-auto absolute md:relative inset-0 bg-slate-50 md:bg-transparent z-10 md:z-auto transition-all ${selectedTicketId ? 'block' : 'hidden md:block'}`}>
+   <div className={`flex-1 h-full absolute md:relative inset-0 bg-slate-50 md:bg-transparent z-[100] md:z-auto transition-all ${selectedTicketId ? 'block' : 'hidden md:block'}`}>
     {selectedTicketId ? (
      <Card className="h-full flex flex-col bg-white border border-slate-200/60 shadow-xl rounded-xl overflow-hidden">
       {/* Header */}
