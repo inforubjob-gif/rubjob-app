@@ -216,7 +216,7 @@ export default function RubberManagementAdminPage() {
             </Badge>
            </td>
           <td className="px-4 py-6 text-right">
-            <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-all">
+            <div className="flex justify-end gap-2 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-all">
               <Link 
                href={`/admin/rubbers/${rubber.id}`}
                className="w-10 h-10 bg-slate-100 hover:bg-primary hover:text-white text-slate-500 rounded-xl flex items-center justify-center transition-all shadow-sm active:scale-95"

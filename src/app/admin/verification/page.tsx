@@ -115,10 +115,10 @@ export default function VerificationCenterPage() {
          ) : (
           <div className="text-white/20 font-black text-2xl uppercase italic">No Image Preview</div>
          )}
-         <a 
+          <a 
           href={selectedDoc.url} 
           target="_blank" 
-          className="absolute bottom-4 right-4 bg-white/10 hover:bg-white/20 backdrop-blur-md text-white px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all opacity-0 group-hover:opacity-100"
+          className="absolute bottom-4 right-4 bg-white/10 hover:bg-white/20 backdrop-blur-md text-white px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all opacity-100 lg:opacity-0 lg:group-hover:opacity-100"
          >
           Open Full Screen
          </a>

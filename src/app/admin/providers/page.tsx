@@ -126,7 +126,7 @@ export default function ProvidersAdminPage() {
             </Badge>
           </td>
           <td className="px-4 py-6 text-right">
-            <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-all">
+            <div className="flex justify-end gap-2 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-all">
              {p.status !== 'active' && (
               <button 
                onClick={() => updateStatus(p.id, 'active')}

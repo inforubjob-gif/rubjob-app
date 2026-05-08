@@ -245,7 +245,7 @@ export default function AdminOrderDetailPage() {
           {photo.url ? (
            <>
             <img src={photo.url} className="w-full h-full object-cover" alt={photo.label} />
-            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-all flex items-center justify-center">
+            <div className="absolute inset-0 bg-black/40 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-all flex items-center justify-center">
              <Icons.Search size={20} className="text-white" />
             </div>
            </>
