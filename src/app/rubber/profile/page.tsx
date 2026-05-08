@@ -239,24 +239,26 @@ export default function RubberProfilePage() {
                       </p>
                   </div>
                </div>
-               <button 
-                  onClick={async () => {
-                    try {
-                      if (!rubberSession?.id) return;
-                      const res = await fetch(`/api/auth/link-line?type=rubber`);
-                      const data = await res.json() as any;
-                      if (!res.ok || !data.token) throw new Error("Failed to get linking token");
-                      const liffId = process.env.NEXT_PUBLIC_LIFF_ID_RUBBER || process.env.NEXT_PUBLIC_LIFF_ID;
-                      window.location.href = `https://liff.line.me/${liffId}/link-line?type=rubber&id=${data.accountId}&token=${data.token}`;
-                    } catch (e) {
-                      console.error("LINE link error:", e);
-                      alert("ไม่สามารถเชื่อมต่อ LINE ได้ กรุณาลองใหม่อีกครั้ง");
-                    }
-                  }}
-                  className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase transition-all ${rubberData?.lineUserId ? 'bg-green-50 text-green-600 border border-green-100' : 'bg-primary text-white shadow-lg shadow-primary/20'}`}
-               >
-                  {rubberData?.lineUserId ? "Reconnect" : "Connect"}
-               </button>
+               {!rubberData?.lineUserId && (
+                 <button 
+                    onClick={async () => {
+                      try {
+                        if (!rubberSession?.id) return;
+                        const res = await fetch(`/api/auth/link-line?type=rubber`);
+                        const data = await res.json() as any;
+                        if (!res.ok || !data.token) throw new Error("Failed to get linking token");
+                        const liffId = process.env.NEXT_PUBLIC_LIFF_ID_RUBBER || process.env.NEXT_PUBLIC_LIFF_ID;
+                        window.location.href = `https://liff.line.me/${liffId}/link-line?type=rubber&id=${data.accountId}&token=${data.token}`;
+                      } catch (e) {
+                        console.error("LINE link error:", e);
+                        alert("ไม่สามารถเชื่อมต่อ LINE ได้ กรุณาลองใหม่อีกครั้ง");
+                      }
+                    }}
+                    className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase transition-all bg-primary text-white shadow-lg shadow-primary/20`}
+                 >
+                    Connect
+                 </button>
+               )}
              </div>
           </Card>
         </section>

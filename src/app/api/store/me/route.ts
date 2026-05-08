@@ -20,8 +20,14 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: "Database not found" }, { status: 500 });
     }
 
+    // Self-healing: ensure lineUserId column exists
+    try { await db.prepare("ALTER TABLE stores ADD COLUMN lineUserId TEXT").run(); } catch(e) {}
+
     const store = await db.prepare(`
-      SELECT id, name, email FROM stores WHERE id = ? AND isActive = 1
+      SELECT s.id, s.name, s.email, s.lineUserId, u.displayName as lineDisplayName 
+      FROM stores s
+      LEFT JOIN users u ON s.lineUserId = u.id
+      WHERE s.id = ? AND s.isActive = 1
     `).bind(storeId).first() as any;
 
     if (store) {
@@ -30,7 +36,9 @@ export async function GET(req: Request) {
         store: {
           id: store.id,
           name: store.name,
-          email: store.email
+          email: store.email,
+          lineUserId: store.lineUserId,
+          lineDisplayName: store.lineDisplayName
         }
       });
     } else {

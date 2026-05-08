@@ -21,9 +21,15 @@ export async function GET(req: Request) {
     const { ensureSchema } = await import("@/lib/db-init");
     await ensureSchema(db);
 
+    // Self-healing: ensure lineUserId column exists
+    try { await db.prepare("ALTER TABLE rubber_users ADD COLUMN lineUserId TEXT").run(); } catch(e) {}
+
     const rubber = await db.prepare(`
-      SELECT id, name, email, status, pictureUrl, phone FROM rubber_users WHERE id = ?
-    `).bind(rubberId).first();
+      SELECT r.id, r.name, r.email, r.status, r.pictureUrl, r.phone, r.lineUserId, u.displayName as lineDisplayName
+      FROM rubber_users r
+      LEFT JOIN users u ON r.lineUserId = u.id
+      WHERE r.id = ?
+    `).bind(rubberId).first() as any;
 
     if (rubber) {
       return NextResponse.json({ 
@@ -34,7 +40,9 @@ export async function GET(req: Request) {
           email: rubber.email,
           status: rubber.status,
           pictureUrl: rubber.pictureUrl,
-          phone: rubber.phone
+          phone: rubber.phone,
+          lineUserId: rubber.lineUserId,
+          lineDisplayName: rubber.lineDisplayName
         }
       });
     } else {
