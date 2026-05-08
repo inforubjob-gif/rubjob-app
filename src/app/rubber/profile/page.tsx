@@ -182,7 +182,7 @@ export default function RubberProfilePage() {
               </IconCircle>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-bold text-slate-800">{t("rubber.profile.serviceArea")}</p>
-                <p className="text-[11px] text-slate-400 font-bold uppercase tracking-wider">{prefs?.serviceArea || t("common.notSet")}</p>
+                <p className="text-[11px] text-slate-400 font-bold uppercase tracking-wider">{prefs?.serviceAreaCoords ? `${Number(prefs.serviceAreaCoords.lat).toFixed(4)}, ${Number(prefs.serviceAreaCoords.lng).toFixed(4)}` : t("common.notSet")}</p>
               </div>
               <Icons.Back size={14} className="text-slate-200 rotate-180 group-hover:text-primary transition-all group-hover:translate-x-1" />
             </button>
@@ -196,7 +196,7 @@ export default function RubberProfilePage() {
               </IconCircle>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-bold text-slate-800">{t("rubber.profile.vehicleType") || t("rubber.vehicleType")}</p>
-                <p className="text-[11px] text-slate-400 font-bold uppercase tracking-wider">{prefs?.vehicleType || t("common.notSet")}</p>
+                <p className="text-[11px] text-slate-400 font-bold uppercase tracking-wider">{prefs?.vehicleType ? ({motorcycle: 'มอเตอร์ไซค์', car: 'รถยนต์', van: 'รถตู้/กระบะ'} as Record<string,string>)[prefs.vehicleType] || prefs.vehicleType : (rubberData?.vehicleType || t("common.notSet"))}</p>
               </div>
               <Icons.Back size={14} className="text-slate-200 rotate-180 group-hover:text-primary transition-all group-hover:translate-x-1" />
             </button>
@@ -211,7 +211,7 @@ export default function RubberProfilePage() {
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-bold text-slate-800">{t("rubber.profile.payoutMethod")}</p>
                 <p className="text-[11px] text-slate-400 font-bold uppercase tracking-wider">
-                  {prefs?.payoutMethod ? `${prefs.payoutMethod.bank ? prefs.payoutMethod.bank.toUpperCase() : 'Account'} ***${prefs.payoutMethod.account?.slice(-4) || ''}` : t("common.notSet")}
+                  {prefs?.payoutMethod ? `${prefs.payoutMethod.bank ? prefs.payoutMethod.bank.toUpperCase() : 'Account'} ***${prefs.payoutMethod.account?.slice(-4) || ''}` : (rubberData?.bankName ? `${rubberData.bankName.toUpperCase()} ***${rubberData.accountNumber?.slice(-4) || ''}` : t("common.notSet"))}
                 </p>
               </div>
               <Icons.Back size={14} className="text-slate-200 rotate-180 group-hover:text-primary transition-all group-hover:translate-x-1" />
