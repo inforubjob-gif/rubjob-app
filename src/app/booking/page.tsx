@@ -54,7 +54,7 @@ function BookingFlow() {
     } catch(e) { return null; }
   }, [pkgDataParam]);
 
-  const { profile } = useLiff();
+  const { profile, login, isReady } = useLiff();
   const { t, language } = useTranslation();
   const { showToast } = useToast();
   const [step, setStep] = useState<BookingStep>(validInitService ? "details" : "service");
@@ -448,6 +448,16 @@ function BookingFlow() {
       </div>
     );
   }
+  
+  // 1.5 Wait for LIFF Initialization
+  if (!isReady) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-dvh bg-slate-50 gap-4">
+        <div className="w-12 h-12 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
+        <p className="text-sm font-black text-slate-400 uppercase tracking-widest">กำลังเชื่อมต่อระบบ LINE...</p>
+      </div>
+    );
+  }
 
   // 2. Error State
   if (dataError) {
@@ -481,10 +491,7 @@ function BookingFlow() {
         </p>
         <Button 
           className="mt-10 w-full rounded-2xl font-black py-4 shadow-xl shadow-primary/20"
-          onClick={() => {
-            // Trigger LIFF login or redirect to login page if available
-            window.location.href = "/";
-          }}
+          onClick={() => login()}
         >
           {t("common.login")}
         </Button>

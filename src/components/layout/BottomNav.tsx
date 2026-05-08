@@ -43,6 +43,7 @@ export default function BottomNav() {
 
   // Hide on Authentication screens and full-screen pages
   const isAuthPage = 
+    pathname === "/login" ||
     pathname === "/partner/login" || 
     pathname === "/rubber/login" || 
     pathname.startsWith("/admin/login") ||
