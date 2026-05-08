@@ -284,7 +284,7 @@ export default function SupportCenterPage() {
            onClick={() => setSelectedTicketId(null)} 
            className="md:hidden p-2 rounded-lg bg-white shadow-sm border border-slate-100 shrink-0 text-slate-500 hover:text-slate-900 active:scale-95 transition-all"
          >
-           <Icons.ChevronLeft size={20} />
+           <Icons.Back size={20} />
          </button>
          <div className={`w-10 h-10 md:w-12 md:h-12 shrink-0 rounded-xl flex items-center justify-center text-xl font-black ${typeBadge ? typeBadge.badgeClass : 'bg-primary/10'}`}>
           {typeBadge?.icon || selectedTicket?.userName?.[0]?.toUpperCase() || 'C'}
