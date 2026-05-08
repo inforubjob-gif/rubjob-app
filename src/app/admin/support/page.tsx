@@ -47,16 +47,46 @@ export default function SupportCenterPage() {
   const [isSending, setIsSending] = useState(false);
   const [activeFilter, setActiveFilter] = useState<FilterType>("all");
   const chatEndRef = useRef<HTMLDivElement>(null);
+  const prevMessagesLength = useRef(0);
+  const prevTicketsRef = useRef<Record<string, string>>({});
+
+  const playNotificationSound = () => {
+    try {
+      const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const oscillator = audioCtx.createOscillator();
+      const gainNode = audioCtx.createGain();
+      
+      oscillator.connect(gainNode);
+      gainNode.connect(audioCtx.destination);
+      
+      oscillator.type = 'sine';
+      oscillator.frequency.setValueAtTime(880, audioCtx.currentTime);
+      oscillator.frequency.exponentialRampToValueAtTime(440, audioCtx.currentTime + 0.15);
+      
+      gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.3);
+      
+      oscillator.start();
+      oscillator.stop(audioCtx.currentTime + 0.3);
+    } catch (e) {
+      console.error("Audio API not supported");
+    }
+  };
 
   useEffect(() => {
     fetchTickets();
-    const interval = setInterval(fetchTickets, 10000); // Polling every 10s
+    const interval = setInterval(fetchTickets, 8000); // Polling every 8s
     return () => clearInterval(interval);
   }, [activeFilter]);
 
   useEffect(() => {
     if (selectedTicketId) {
+      prevMessagesLength.current = 0; // Reset on new ticket select
       fetchMessages(selectedTicketId);
+      const interval = setInterval(() => {
+        fetchMessages(selectedTicketId);
+      }, 4000); // Fast polling for active chat
+      return () => clearInterval(interval);
     }
   }, [selectedTicketId]);
 
@@ -69,7 +99,23 @@ export default function SupportCenterPage() {
       const filterParam = activeFilter !== "all" ? `&filter=${activeFilter}` : "";
       const res = await fetch(`/api/admin/support/tickets?_=${Date.now()}${filterParam}`);
       const data = await res.json() as any;
-      if (data.tickets) setTickets(data.tickets);
+      if (data.tickets) {
+        setTickets(data.tickets);
+        
+        let hasNew = false;
+        for (const t of data.tickets) {
+          const prevTime = prevTicketsRef.current[t.id];
+          if (prevTime && t.lastMessageAt && prevTime !== t.lastMessageAt) {
+            // Found a ticket that was updated (but ensure it's not our own message just sent)
+            if (t.senderName !== t('admin.common.adminBadge') && t.lastMessageAt > prevTime) {
+               hasNew = true;
+            }
+          }
+          prevTicketsRef.current[t.id] = t.lastMessageAt || t.updatedAt;
+        }
+        
+        if (hasNew) playNotificationSound();
+      }
       if (data.counts) setCounts(data.counts);
     } catch (err) {
       console.error("Failed to fetch tickets:", err);
@@ -82,7 +128,17 @@ export default function SupportCenterPage() {
     try {
       const res = await fetch(`/api/admin/support/tickets?id=${id}`);
       const data = await res.json() as any;
-      if (data.messages) setMessages(data.messages);
+      if (data.messages) {
+        setMessages(data.messages);
+        
+        if (prevMessagesLength.current > 0 && data.messages.length > prevMessagesLength.current) {
+          const lastMsg = data.messages[data.messages.length - 1];
+          if (lastMsg.senderType !== 'admin') {
+            playNotificationSound();
+          }
+        }
+        prevMessagesLength.current = data.messages.length;
+      }
     } catch (err) {
       console.error("Failed to fetch messages:", err);
     }
