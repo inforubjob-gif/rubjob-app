@@ -130,6 +130,7 @@ export default function AdminOrderDetailPage() {
  const currentStep = STATUS_FLOW.findIndex(s => s.key === order.status);
 
  return (
+  <>
   <div className="max-w-6xl mx-auto pb-20 space-y-8 animate-fade-in">
    {/* Header */}
    <header className="flex items-center gap-4 flex-wrap">
@@ -484,6 +485,8 @@ export default function AdminOrderDetailPage() {
     </div>
    </div>
 
+   </div>
+
    {/* Photo Modal */}
    <Modal isOpen={!!selectedPhoto} onClose={() => setSelectedPhoto(null)} title="ดูรูปภาพ">
     <div className="p-4 bg-slate-900 flex items-center justify-center min-h-[400px] rounded-b-xl">
@@ -534,6 +537,6 @@ export default function AdminOrderDetailPage() {
      </div>
     </div>
    </Modal>
-  </div>
+  </>
  );
 }
