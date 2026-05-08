@@ -766,6 +766,73 @@ function SettingsContent() {
                </div>
             </Card>
           </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-8">
+            {/* LINE OA Card */}
+            <Card className="p-10 bg-white border border-slate-100 shadow-xl rounded-xl relative overflow-hidden group">
+               <div className="absolute top-0 right-0 w-32 h-32 bg-green-500/10 blur-[80px] -mr-16 -mt-16 group-hover:bg-green-500/20 transition-all duration-700" />
+               
+               <div className="flex items-center gap-4 mb-10 relative z-10">
+                  <div className="w-14 h-14 rounded-xl bg-green-50 text-green-600 flex items-center justify-center shadow-inner">
+                    <Icons.Line size={28} />
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-black text-slate-900 tracking-tight">ตั้งค่าการแจ้งเตือน LINE</h2>
+                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mt-0.5">รับส่งข้อความแชทผ่าน LINE OA</p>
+                  </div>
+               </div>
+
+               <div className="space-y-6 relative z-10">
+                  <div className="space-y-4">
+                     <h3 className="text-xs font-black text-green-600 uppercase tracking-widest">LINE แจ้งเตือนทั่วไป (Regular)</h3>
+                     <div className="space-y-2">
+                       <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Channel Secret</label>
+                       <input 
+                         type="password" 
+                         className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-6 py-4 text-sm text-slate-900 font-black focus:border-green-500 transition-all outline-none"
+                         placeholder="ใส่ Channel Secret"
+                         value={getSetting("line_secret_regular")}
+                         onChange={(e) => updateLocalSetting("line_secret_regular", e.target.value)}
+                       />
+                     </div>
+                     <div className="space-y-2">
+                       <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Channel Access Token</label>
+                       <input 
+                         type="password" 
+                         className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-6 py-4 text-sm text-slate-900 font-black focus:border-green-500 transition-all outline-none"
+                         placeholder="ใส่ Access Token"
+                         value={getSetting("line_token_regular")}
+                         onChange={(e) => updateLocalSetting("line_token_regular", e.target.value)}
+                       />
+                     </div>
+                  </div>
+
+                  <div className="space-y-4 pt-6 border-t border-slate-50">
+                     <h3 className="text-xs font-black text-green-600 uppercase tracking-widest">LINE สำหรับคนขับ (Rubber)</h3>
+                     <div className="space-y-2">
+                       <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Channel Secret</label>
+                       <input 
+                         type="password" 
+                         className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-6 py-4 text-sm text-slate-900 font-black focus:border-green-500 transition-all outline-none"
+                         placeholder="ใส่ Channel Secret"
+                         value={getSetting("line_secret_rubber")}
+                         onChange={(e) => updateLocalSetting("line_secret_rubber", e.target.value)}
+                       />
+                     </div>
+                     <div className="space-y-2">
+                       <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Channel Access Token</label>
+                       <input 
+                         type="password" 
+                         className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-6 py-4 text-sm text-slate-900 font-black focus:border-green-500 transition-all outline-none"
+                         placeholder="ใส่ Access Token"
+                         value={getSetting("line_token_rubber")}
+                         onChange={(e) => updateLocalSetting("line_token_rubber", e.target.value)}
+                       />
+                     </div>
+                  </div>
+               </div>
+            </Card>
+          </div>
         </div>
       )}
 
