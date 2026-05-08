@@ -554,14 +554,6 @@ function BookingFlow() {
                 <div className="flex-1 min-w-0">
                   <h3 className="text-base font-black text-foreground">{t(`orders.services.${svc.id}`) || svc.name}</h3>
                   <p className="text-xs text-muted mt-1 leading-relaxed opacity-90">{t(`serviceDesc.${svc.id}`) || svc.description}</p>
-                  <div className="flex items-center gap-2 mt-2">
-                    <span className="text-xs font-black text-primary-dark bg-primary/10 px-2 py-0.5 rounded-md">
-                      {t("booking.fromPrice")} ฿{svc.basePrice}/{svc.unit === "hour" ? t("booking.hours") : svc.unit === "session" ? t("home.perSession") : t("home.perPiece")}
-                    </span>
-                    <span className="text-xs font-bold text-slate-400">
-                      ~{svc.estimatedDays} {t("booking.dayTurnaround")}
-                    </span>
-                  </div>
                 </div>
                 {selectedService === svc.id && (
                   <div className="w-7 h-7 bg-primary shadow-md shadow-primary/40 rounded-full flex items-center justify-center text-white text-sm shrink-0">
