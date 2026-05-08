@@ -123,25 +123,28 @@ export async function POST(req: Request) {
       }
 
       // 2. Broadcast to Online Rubbers
-      // We look for rubbers who have linked LINE and have workStatus = true in preferences
-      const rubbers = await db.prepare(`
-        SELECT ru.lineUserId, u.preferences
-        FROM rubber_users ru
-        JOIN users u ON ru.id = u.id
-        WHERE ru.lineUserId IS NOT NULL
-      `).all();
+      // ONLY broadcast immediately if payment method is cash.
+      // If PromptPay/Card, we broadcast from the Stripe Webhook after payment succeeds.
+      if (paymentMethod === 'cash') {
+        const rubbers = await db.prepare(`
+          SELECT ru.lineUserId, u.preferences
+          FROM rubber_users ru
+          JOIN users u ON ru.id = u.id
+          WHERE ru.lineUserId IS NOT NULL
+        `).all();
 
-      // 15% commission + 15 THB Platform Fee
-      const totalOrderEarn = deliveryFee - (deliveryFee * 0.15) - 15;
-      const legEarn = totalOrderEarn * 0.5;
+        // 15% commission + 15 THB Platform Fee
+        const totalOrderEarn = deliveryFee - (deliveryFee * 0.15) - 15;
+        const legEarn = totalOrderEarn * 0.5;
 
-      for (const r of (rubbers.results as any[])) {
-        try {
-          const prefs = JSON.parse(r.preferences || "{}");
-          if (prefs.workStatus === true) {
-            await sendLinePush(r.lineUserId, [rubberNewJobFlex(orderId, 'pending', legEarn)], rubberToken).catch(() => {});
-          }
-        } catch (e) {}
+        for (const r of (rubbers.results as any[])) {
+          try {
+            const prefs = JSON.parse(r.preferences || "{}");
+            if (prefs.workStatus === true) {
+              await sendLinePush(r.lineUserId, [rubberNewJobFlex(orderId, 'pending', legEarn)], rubberToken).catch(() => {});
+            }
+          } catch (e) {}
+        }
       }
     }
 

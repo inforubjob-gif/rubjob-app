@@ -72,6 +72,42 @@ export async function POST(req: Request) {
           `).bind(orderId).run();
 
           console.log(`✅ Order ${orderId} marked as PAID via Stripe Webhook`);
+
+          // Broadcast to Online Rubbers via LINE
+          try {
+            const orderData = await db.prepare("SELECT deliveryFee FROM orders WHERE id = ?").bind(orderId).first() as any;
+            if (orderData) {
+              const deliveryFee = orderData.deliveryFee || 0;
+              const customerToken = env.LINE_CHANNEL_ACCESS_TOKEN;
+              const rubberToken = env.LINE_CHANNEL_ACCESS_TOKEN_RUBBER || customerToken;
+              
+              if (rubberToken) {
+                const { sendLinePush, rubberNewJobFlex } = await import("@/lib/line");
+                
+                const rubbers = await db.prepare(`
+                  SELECT ru.lineUserId, u.preferences
+                  FROM rubber_users ru
+                  JOIN users u ON ru.id = u.id
+                  WHERE ru.lineUserId IS NOT NULL
+                `).all();
+
+                // 15% commission + 15 THB Platform Fee
+                const totalOrderEarn = deliveryFee - (deliveryFee * 0.15) - 15;
+                const legEarn = totalOrderEarn * 0.5;
+
+                for (const r of (rubbers.results as any[])) {
+                  try {
+                    const prefs = JSON.parse(r.preferences || "{}");
+                    if (prefs.workStatus === true) {
+                      await sendLinePush(r.lineUserId, [rubberNewJobFlex(orderId, 'pending', legEarn)], rubberToken).catch(() => {});
+                    }
+                  } catch (e) {}
+                }
+              }
+            }
+          } catch (e) {
+            console.error("Failed to broadcast to rubbers from webhook:", e);
+          }
         }
         break;
 
