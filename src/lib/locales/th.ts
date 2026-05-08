@@ -574,12 +574,6 @@ export const th = {
       navWallet: "รายได้",
       navProfile: "โปรไฟล์",
       wallet: {
-        earningsInsight: "ข้อมูลรายได้เชิงลึก",
-        weeklyPerformance: "สรุปรายได้รายสัปดาห์",
-        last7Days: "7 วันล่าสุด",
-        timeBreakdown: "รายได้วันนี้ตามช่วงเวลา",
-        realTime: "เรียลไทม์",
-        noEarningsToday: "ยังไม่มีรายได้ในวันนี้",
         availableBalance: "ยอดเงินคงเหลือ",
         withdraw: "ถอนเงิน",
         history: "ประวัติรายได้",
@@ -781,6 +775,12 @@ export const th = {
       photoStepDesc: "กรุณาถ่ายภาพก่อนดำเนินการขั้นตอนนี้",
       earnAmountLabel: "ยอดรายได้ที่จะได้รับ",
       wallet: {
+        earningsInsight: "ข้อมูลรายได้เชิงลึก",
+        weeklyPerformance: "สรุปรายได้รายสัปดาห์",
+        last7Days: "7 วันล่าสุด",
+        timeBreakdown: "รายได้วันนี้ตามช่วงเวลา",
+        realTime: "เรียลไทม์",
+        noEarningsToday: "ยังไม่มีรายได้ในวันนี้",
         balance: "ยอดเงินคงเหลือ",
         withdraw: "แจ้งถอนเงิน",
         history: "ประวัติรายได้",
@@ -799,10 +799,14 @@ export const th = {
         types: {
           job_completion: "เสร็จสิ้นงาน",
           withdrawal: "ถอนเงิน",
+          "Pickup Earnings": "รายได้จากการรับผ้า",
+          "Delivery Earnings": "รายได้จากการส่งผ้า",
+          "Withdrawal": "ถอนเงิน",
         },
         statuses: {
           pending: "รอดำเนินการ",
           completed: "สำเร็จ",
+          success: "สำเร็จ",
           failed: "ไม่สำเร็จ",
         },
         pin: {

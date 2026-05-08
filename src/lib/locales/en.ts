@@ -906,6 +906,7 @@ export const en = {
       statuses: {
         pending: "Pending",
         completed: "Success",
+        success: "Success",
         failed: "Failed",
       },
       pin: {
