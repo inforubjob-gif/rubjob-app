@@ -326,7 +326,25 @@ export default function SupportCenterPage() {
               </div>
               <div className="flex items-center gap-2">
                 <button className="p-3 text-slate-400 hover:bg-slate-50 rounded-xl transition-all"><Icons.FileText size={20} /></button>
-                <button className="bg-emerald-50 text-emerald-600 px-5 py-2.5 rounded-xl font-bold text-xs hover:bg-emerald-100 transition-all">{t('admin.support.resolveBtn')}</button>
+                {selectedTicket?.status === 'open' && (
+                  <button 
+                    onClick={async () => {
+                      if (!confirm("ยืนยันการปิดตั๋วปัญหานี้?")) return;
+                      const res = await fetch(`/api/admin/support/tickets/${selectedTicket.id}`, {
+                        method: 'PATCH',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ status: 'resolved' })
+                      });
+                      if (res.ok) {
+                        setSelectedTicketId(null);
+                        fetchTickets();
+                      }
+                    }}
+                    className="bg-emerald-50 text-emerald-600 px-5 py-2.5 rounded-xl font-bold text-xs hover:bg-emerald-100 transition-all active:scale-95"
+                  >
+                    {t('admin.support.resolveBtn')}
+                  </button>
+                )}
               </div>
             </header>
 
