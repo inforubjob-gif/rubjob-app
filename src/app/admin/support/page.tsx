@@ -274,9 +274,9 @@ export default function SupportCenterPage() {
    </div>
 
    {/* ─── Main: Chat Conversation ─── */}
-   <div className={`flex-1 h-full absolute md:relative inset-0 bg-slate-50 md:bg-transparent z-[100] md:z-auto transition-all ${selectedTicketId ? 'block' : 'hidden md:block'}`}>
+   <div className={`flex-1 h-full w-full md:w-auto transition-all ${selectedTicketId ? 'flex' : 'hidden md:flex'}`}>
     {selectedTicketId ? (
-     <Card className="h-full flex flex-col bg-white border border-slate-200/60 shadow-xl rounded-xl overflow-hidden">
+     <Card className="w-full h-full flex flex-col bg-white border border-slate-200/60 shadow-xl rounded-xl overflow-hidden">
       {/* Header */}
       <header className="px-4 md:px-8 py-4 md:py-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/20">
        <div className="flex items-center gap-3 md:gap-4">
@@ -400,7 +400,7 @@ export default function SupportCenterPage() {
       </div>
      </Card>
     ) : (
-     <div className="h-full flex flex-col items-center justify-center text-center p-10 bg-white/50 border-2 border-dashed border-slate-200 rounded-xl">
+     <div className="w-full h-full flex flex-col items-center justify-center text-center p-10 bg-white/50 border-2 border-dashed border-slate-200 rounded-xl">
       <div className="w-24 h-24 bg-slate-100 rounded-full flex items-center justify-center mb-6 text-slate-300">
         <Icons.Chat size={48} />
       </div>
