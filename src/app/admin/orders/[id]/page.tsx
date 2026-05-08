@@ -238,49 +238,36 @@ export default function AdminOrderDetailPage() {
         />
        </div>
 
-       {/* Status Transition Buttons — Large Touch Friendly */}
-       {nextStatuses.length > 0 && (
-        <div>
-         <label className="text-[10px] font-black text-white/40 uppercase block mb-3">⚡ เปลี่ยนสถานะ — กดปุ่มด้านล่าง</label>
-         
-         {/* Next Immediate Status — Primary CTA */}
+       {/* Status Transition Buttons — Automated Flow with Manual Override */}
+       <div>
+        <label className="text-[10px] font-black text-white/40 uppercase block mb-3">⚡ อัปเดตสถานะ (ระบบทำงานอัตโนมัติ)</label>
+        
+        {/* Only manual intervention needed: Dispatch return rider when shop is done */}
+        {order.status === "ready_for_return" ? (
          <button
-          onClick={() => setConfirmModal(nextStatuses[0])}
+          onClick={() => setConfirmModal({ key: "delivering_to_customer", label: "กำลังส่งคืนลูกค้า (เรียกไรเดอร์)", icon: "🏍️" })}
           disabled={isUpdating}
           className="w-full py-5 bg-emerald-500 hover:bg-emerald-400 text-white text-lg font-black rounded-2xl shadow-xl shadow-emerald-500/30 transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-3 mb-4"
          >
-          <span className="text-2xl">{nextStatuses[0].icon}</span>
-          <span>เปลี่ยนเป็น: {nextStatuses[0].label}</span>
+          <span className="text-2xl">🏍️</span>
+          <span>เรียกไรเดอร์ไปรับผ้าที่ร้านซัก</span>
           <Icons.ChevronRight size={20} />
          </button>
-         
-         {/* Other future statuses — Secondary */}
-         {nextStatuses.length > 1 && (
-          <div className="grid grid-cols-2 gap-2 mb-4">
-           {nextStatuses.slice(1).map(ns => (
-            <button
-             key={ns.key}
-             onClick={() => setConfirmModal(ns)}
-             disabled={isUpdating}
-             className="py-4 bg-white/10 hover:bg-white/20 text-white text-sm font-black rounded-xl backdrop-blur-sm border border-white/10 transition-all active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2"
-            >
-             <span className="text-lg">{ns.icon}</span>
-             <span>{ns.label}</span>
-            </button>
-           ))}
-          </div>
-         )}
+        ) : (
+         <div className="w-full py-4 bg-white/5 border border-white/10 rounded-xl text-center mb-4">
+          <p className="text-xs font-bold text-white/40 uppercase">รออัปเดตสถานะอัตโนมัติจากฝั่งไรเดอร์/ร้านซัก</p>
+         </div>
+        )}
 
-         {/* Cancel — Danger */}
-         <button
-          onClick={() => setConfirmModal({ key: 'cancelled', label: 'ยกเลิกงาน', icon: '❌' })}
-          disabled={isUpdating}
-          className="w-full py-4 bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 text-sm font-black rounded-xl border border-rose-500/20 transition-all active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2"
-         >
-          ❌ ยกเลิกงาน
-         </button>
-        </div>
-       )}
+        {/* Cancel — Danger */}
+        <button
+         onClick={() => setConfirmModal({ key: 'cancelled', label: 'ยกเลิกงาน', icon: '❌' })}
+         disabled={isUpdating}
+         className="w-full py-4 bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 text-sm font-black rounded-xl border border-rose-500/20 transition-all active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2"
+        >
+         ❌ ยกเลิกงาน
+        </button>
+       </div>
       </Card>
      )}
 
