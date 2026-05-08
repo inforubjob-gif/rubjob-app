@@ -126,7 +126,7 @@ export default function ProfilePage() {
             )}
             <div className="flex items-center gap-2 mt-1">
               <span className="px-2.5 py-1 bg-white/20 backdrop-blur-md rounded-full text-xs font-bold uppercase">
-                {tier} {t("tiers.member")}
+                {language === "th" ? `สมาชิก${tier}` : `${tier} ${t("tiers.member")}`}
               </span>
               <button className="w-6 h-6 bg-white/20 rounded-lg flex items-center justify-center text-white/70">
                 <Icons.Bell size={12} />
