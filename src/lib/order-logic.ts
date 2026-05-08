@@ -25,10 +25,9 @@ export async function transitionOrderStatus(
 ) {
   // 1. Fetch Order & User Info (Include service GP)
   const order = await db.prepare(`
-    SELECT o.*, u.displayName as customerName, u.id as customerLineId, s.gpPercent as serviceGp
+    SELECT o.*, u.displayName as customerName, u.id as customerLineId
     FROM orders o
     JOIN users u ON o.userId = u.id
-    JOIN services s ON o.serviceId = s.id
     WHERE o.id = ?
   `).bind(orderId).first() as any;
 
