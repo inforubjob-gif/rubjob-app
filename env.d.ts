@@ -10,6 +10,10 @@ interface CloudflareEnv {
   STRIPE_WEBHOOK_SECRET?: string;
   LINE_CHANNEL_ACCESS_TOKEN?: string;
   LINE_CHANNEL_SECRET?: string;
+  LINE_CHANNEL_ACCESS_TOKEN_RUBBER?: string;
+  LINE_CHANNEL_ACCESS_TOKEN_HELP?: string;
+  LINE_CHANNEL_ACCESS_TOKEN_REGULAR?: string;
+  LINE_ADMIN_GROUP_ID?: string;
 }
 
 declare namespace NodeJS {

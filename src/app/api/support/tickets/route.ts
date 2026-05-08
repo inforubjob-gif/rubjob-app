@@ -1,6 +1,7 @@
 import { getRequestContext } from "@cloudflare/next-on-pages";
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
+import { notifyAdminLine } from "@/lib/support-notify";
 
 export const runtime = "edge";
 
@@ -75,6 +76,7 @@ export async function POST(req: Request) {
   if (!identity) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const db = getRequestContext().env.DB;
+  const env = getRequestContext().env as any;
   if (!db) return NextResponse.json({ error: "DB not found" }, { status: 500 });
 
   // Self-healing
@@ -97,6 +99,7 @@ export async function POST(req: Request) {
   }
 
   let targetTicketId = ticketId;
+  let isNewTicket = false;
 
   if (!targetTicketId) {
     // Create new ticket
@@ -106,6 +109,7 @@ export async function POST(req: Request) {
       VALUES (?, ?, 'in_app', 'open', ?, ?)
     `).bind(newId, identity.id, subject || "ติดต่อแอดมิน", identity.type).run();
     targetTicketId = newId;
+    isNewTicket = true;
   } else {
     // Verify ownership
     const ticket = await db.prepare(
@@ -125,6 +129,31 @@ export async function POST(req: Request) {
   await db.prepare(`
     UPDATE support_tickets SET updatedAt = CURRENT_TIMESTAMP, status = 'open' WHERE id = ?
   `).bind(targetTicketId).run();
+
+  // ── Forward to Admin LINE Group (non-blocking) ──
+  // Look up user name for the notification
+  let userName = "ไม่ระบุชื่อ";
+  try {
+    if (identity.type === 'rubber') {
+      const ru = await db.prepare("SELECT name FROM rubber_users WHERE id = ?").bind(identity.id).first() as any;
+      if (ru?.name) userName = ru.name;
+    } else if (identity.type === 'store') {
+      const st = await db.prepare("SELECT name FROM stores WHERE id = ?").bind(identity.id).first() as any;
+      if (st?.name) userName = st.name;
+    } else {
+      const usr = await db.prepare("SELECT displayName FROM users WHERE id = ?").bind(identity.id).first() as any;
+      if (usr?.displayName) userName = usr.displayName;
+    }
+  } catch (e) {}
+
+  // Fire-and-forget: don't block the response
+  notifyAdminLine({
+    userName,
+    userType: identity.type as any,
+    ticketId: targetTicketId,
+    message: message.trim(),
+    isNewTicket,
+  }, env).catch(err => console.error("[support-notify] background error:", err));
 
   return NextResponse.json({ success: true, ticketId: targetTicketId });
 }
