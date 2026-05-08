@@ -394,10 +394,10 @@ export const en = {
     viewMyOrders: "View My Orders",
     speed: {
       standardTitle: "Standard Delivery",
-      standardDesc: "Delivery within 24 hours (Fee ฿{fee})",
+      standardDesc: "Delivery within 24 hours (Round trip ฿{halfFee}/leg, total ฿{fee})",
       standardShort: "Standard (24h)",
       expressTitle: "Express Delivery ⚡",
-      expressDesc: "Delivery within 6 hours (Fee ฿{fee})",
+      expressDesc: "Delivery within 6 hours (Round trip ฿{halfFee}/leg, total ฿{fee})",
       expressShort: "Express (6h)",
     },
     distanceNote: "* Delivery fee includes extra distance ({distance} km)",

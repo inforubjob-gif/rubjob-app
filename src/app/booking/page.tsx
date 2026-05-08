@@ -707,7 +707,7 @@ function BookingFlow() {
                 <label className={`flex items-center justify-between p-3.5 rounded-xl border-2 cursor-pointer transition-all ${deliverySpeed === "standard" ? "border-primary bg-primary/5 shadow-md shadow-primary/5" : "border-slate-100 bg-white hover:bg-slate-50"}`} onClick={() => setDeliverySpeed("standard")}>
                   <div className="flex flex-col">
                     <span className="text-sm font-bold text-foreground">{t("booking.speed.standardTitle")}</span>
-                    <span className="text-xs text-muted block mt-0.5">{t("booking.speed.standardDesc").replace("{fee}", Math.ceil(totalDeliveryBase).toString())}</span>
+                    <span className="text-xs text-muted block mt-0.5">{t("booking.speed.standardDesc").replace("{fee}", Math.ceil(totalDeliveryBase).toString()).replace("{halfFee}", Math.ceil(totalDeliveryBase / 2).toString())}</span>
                   </div>
                   <div className={`w-5 h-5 rounded-full flex items-center justify-center transition-colors ${deliverySpeed === "standard" ? "bg-primary text-white" : "border-2 border-slate-200"}`}>
                     {deliverySpeed === "standard" && <span className="text-xs font-bold leading-none flex items-center justify-center pt-0.5">✓</span>}
@@ -717,7 +717,7 @@ function BookingFlow() {
                 <label className={`flex items-center justify-between p-3.5 rounded-xl border-2 cursor-pointer transition-all ${deliverySpeed === "express" ? "border-primary bg-[#fff8e1] shadow-md shadow-primary/10" : "border-slate-100 bg-white hover:bg-slate-50"}`} onClick={() => setDeliverySpeed("express")}>
                   <div className="flex flex-col">
                     <span className="text-sm font-bold text-primary">{t("booking.speed.expressTitle")}</span>
-                    <span className="text-xs text-primary/80 block mt-0.5">{t("booking.speed.expressDesc").replace("{fee}", Math.ceil(totalDeliveryBase + 20).toString())}</span>
+                    <span className="text-xs text-primary/80 block mt-0.5">{t("booking.speed.expressDesc").replace("{fee}", Math.ceil(totalDeliveryBase + 20).toString()).replace("{halfFee}", Math.ceil((totalDeliveryBase + 20) / 2).toString())}</span>
                   </div>
                   <div className={`w-5 h-5 rounded-full flex items-center justify-center transition-colors ${deliverySpeed === "express" ? "bg-primary text-white" : "border-2 border-slate-200"}`}>
                     {deliverySpeed === "express" && <span className="text-xs font-bold leading-none flex items-center justify-center pt-0.5">✓</span>}

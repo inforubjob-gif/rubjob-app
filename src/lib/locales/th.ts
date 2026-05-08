@@ -330,10 +330,10 @@ export const th = {
       viewMyOrders: "ดูประวัติการสั่งซื้อ",
       speed: {
         standardTitle: "มาตรฐาน (บริการรอบมาตรฐาน)",
-        standardDesc: "รับผ้าภายใน 6-12 ชม. (ค่าส่ง ฿{fee})",
+        standardDesc: "รับผ้าภายใน 6-12 ชม. (ค่าส่งไปกลับ รอบละ ฿{halfFee} รวม ฿{fee})",
         standardShort: "มาตรฐาน (6-12 ชม.)",
         expressTitle: "ด่วนพิเศษ (บริการด่วนภายในวัน) ⚡",
-        expressDesc: "รับผ้าภายใน 2-6 ชม. (ค่าส่ง ฿{fee})",
+        expressDesc: "รับผ้าภายใน 2-6 ชม. (ค่าส่งไปกลับ รอบละ ฿{halfFee} รวม ฿{fee})",
         expressShort: "ด่วนพิเศษ (2-6 ชม.)",
       },
       distanceNote: "* ค่าจัดส่งคำนวณรวมระยะทางเพิ่ม ({distance} กม.) แล้ว",
