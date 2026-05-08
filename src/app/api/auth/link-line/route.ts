@@ -18,6 +18,10 @@ export async function POST(req: Request) {
     const db = getRequestContext().env.DB;
     if (!db) return NextResponse.json({ error: "Database not found" }, { status: 500 });
 
+    // Self-healing: ensure lineUserId column exists
+    try { await db.prepare("ALTER TABLE rubber_users ADD COLUMN lineUserId TEXT").run(); } catch (e) {}
+    try { await db.prepare("ALTER TABLE stores ADD COLUMN lineUserId TEXT").run(); } catch (e) {}
+
     // 1. Validate the linking token (Nonce)
     // We expect a token that was generated in the previous session
     const tokenRecord = await db.prepare(`
@@ -90,7 +94,9 @@ export async function GET(req: Request) {
 
     if (!accountId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     
-    // Self-healing: Table for linking tokens
+    // Self-healing: Ensure lineUserId columns + link_tokens table exist
+    try { await db.prepare("ALTER TABLE rubber_users ADD COLUMN lineUserId TEXT").run(); } catch (e) {}
+    try { await db.prepare("ALTER TABLE stores ADD COLUMN lineUserId TEXT").run(); } catch (e) {}
     try {
       await db.prepare(`
         CREATE TABLE IF NOT EXISTS link_tokens (

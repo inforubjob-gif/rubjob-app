@@ -114,7 +114,7 @@ export default function middleware(req: NextRequest) {
           const rootDomain = ROOT_DOMAINS.find((d) => hostWithoutPort.endsWith(d)) || ROOT_DOMAINS[0];
           const targetHost = url.port ? `${sub}.${rootDomain}:${url.port}` : `${sub}.${rootDomain}`;
           const targetPath = pathname.slice(prefix.length) || "/";
-          return NextResponse.redirect(new URL(`${url.protocol}//${targetHost}${targetPath}`));
+          return NextResponse.redirect(new URL(`${url.protocol}//${targetHost}${targetPath}${url.search}`));
         }
       }
     }
@@ -151,7 +151,7 @@ export default function middleware(req: NextRequest) {
         const rootDomain = ROOT_DOMAINS.find((d) => hostWithoutPort.endsWith(d)) || ROOT_DOMAINS[0];
         const targetHost = url.port ? `${otherSub}.${rootDomain}:${url.port}` : `${otherSub}.${rootDomain}`;
         const targetPath = pathname.slice(otherPrefix.length) || "/";
-        return NextResponse.redirect(new URL(`${url.protocol}//${targetHost}${targetPath}`));
+        return NextResponse.redirect(new URL(`${url.protocol}//${targetHost}${targetPath}${url.search}`));
       }
     }
 
