@@ -5,15 +5,49 @@ import Card from "@/components/ui/Card";
 import Badge, { statusToBadgeVariant } from "@/components/ui/Badge";
 import { Icons } from "@/components/ui/Icons";
 import { useTranslation } from "@/components/providers/LanguageProvider";
+import { useToast } from "@/components/providers/ToastProvider";
+import Link from "next/link";
 
 type TabType = 'revenue' | 'payouts';
 
 export default function FinanceAdminPage() {
  const { t } = useTranslation();
+ const { showToast } = useToast();
  const [activeTab, setActiveTab] = useState<TabType>('revenue');
  const [transactions, setTransactions] = useState<any[]>([]);
  const [payouts, setPayouts] = useState<any[]>([]);
  const [isLoading, setIsLoading] = useState(true);
+
+ const handleExport = () => {
+  if (!transactions.length) {
+   showToast(t('admin.finance.empty.revenue'), 'warning');
+   return;
+  }
+  
+  const headers = ['Order ID', 'Store Name', 'Date', 'Gross (THB)', 'Platform Commission (THB)', 'Partner Cut (THB)'];
+  const csvRows = [headers.join(',')];
+  
+  transactions.forEach(tx => {
+   const gross = tx.totalPrice || 0;
+   const commission = gross * (tx.gpPercent ? tx.gpPercent / 100 : 0.1);
+   const partnerCut = gross - commission;
+   const storeName = tx.storeName ? `"${tx.storeName}"` : "Direct / Independent";
+   const date = new Date(tx.createdAt).toLocaleDateString();
+   
+   csvRows.push(`${tx.id},${storeName},${date},${gross},${commission.toFixed(2)},${partnerCut.toFixed(2)}`);
+  });
+  
+  const blob = new Blob(['\uFEFF' + csvRows.join('\n')], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.setAttribute('download', `rubjob_finance_export_${new Date().toISOString().split('T')[0]}.csv`);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  
+  showToast(t('admin.common.toast.updated', { item: 'Report' }), 'success');
+ };
 
  useEffect(() => {
   if (activeTab === 'revenue') {
@@ -79,7 +113,7 @@ export default function FinanceAdminPage() {
       <p className="text-slate-500 text-sm md:text-base font-medium mt-1">{t('admin.finance.subtitle')}</p>
     </div>
     <div className="flex gap-2 w-full sm:w-auto">
-      <button className="px-5 py-3 bg-emerald-600 text-white rounded-xl text-sm font-bold shadow-lg shadow-emerald-200 flex items-center justify-center gap-2 hover:bg-emerald-700 transition-colors w-full sm:w-auto">
+      <button onClick={handleExport} className="px-5 py-3 bg-emerald-600 text-white rounded-xl text-sm font-bold shadow-lg shadow-emerald-200 flex items-center justify-center gap-2 hover:bg-emerald-700 transition-all active:scale-95 w-full sm:w-auto">
         <Icons.FileText size={16} /> {t('admin.finance.exportBtn')}
       </button>
     </div>
@@ -169,7 +203,7 @@ export default function FinanceAdminPage() {
              ฿{(tx.totalPrice * (tx.gpPercent ? tx.gpPercent / 100 : 0.1)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </td>
             <td className="px-4 py-5 text-right">
-             <button className="text-[9px] font-black uppercase tracking-widest text-primary hover:underline">{t('admin.finance.action.verify')}</button>
+             <Link href={`/admin/orders/${tx.id}`} className="text-[9px] font-black uppercase tracking-widest text-primary hover:underline">{t('admin.finance.action.verify')}</Link>
             </td>
            </tr>
           ))}
