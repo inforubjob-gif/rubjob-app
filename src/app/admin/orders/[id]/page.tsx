@@ -2,7 +2,7 @@
 
 export const runtime = "edge";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Card from "@/components/ui/Card";
 import Badge, { statusToBadgeVariant } from "@/components/ui/Badge";
@@ -40,10 +40,35 @@ export default function AdminOrderDetailPage() {
  const [isUpdating, setIsUpdating] = useState(false);
  const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
  const [staffNote, setStaffNote] = useState("");
+ const [confirmModal, setConfirmModal] = useState<{ key: string; label: string; icon: string } | null>(null);
+ const [elapsedTime, setElapsedTime] = useState("00:00:00");
+ const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
  useEffect(() => {
   if (id) { fetchOrder(); fetchRiders(); fetchStores(); }
  }, [id]);
+
+ // ── Live Elapsed Timer ──
+ useEffect(() => {
+  if (timerRef.current) clearInterval(timerRef.current);
+  if (!order?.updatedAt && !order?.createdAt) return;
+  
+  const startTime = new Date(order.updatedAt || order.createdAt).getTime();
+  
+  function tick() {
+   const now = Date.now();
+   const diff = Math.max(0, now - startTime);
+   const hrs = Math.floor(diff / 3600000);
+   const mins = Math.floor((diff % 3600000) / 60000);
+   const secs = Math.floor((diff % 60000) / 1000);
+   setElapsedTime(
+    `${String(hrs).padStart(2, '0')}:${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`
+   );
+  }
+  tick();
+  timerRef.current = setInterval(tick, 1000);
+  return () => { if (timerRef.current) clearInterval(timerRef.current); };
+ }, [order?.updatedAt, order?.createdAt]);
 
  async function fetchOrder() {
   setIsLoading(true);
@@ -118,9 +143,24 @@ export default function AdminOrderDetailPage() {
     <Badge variant={statusToBadgeVariant(order.status)} className="text-sm px-4 py-2">{STATUS_FLOW.find(s => s.key === order.status)?.label || order.status}</Badge>
    </header>
 
-   {/* ── Status Pipeline ── */}
+   {/* ── Status Pipeline + Timer ── */}
    <Card className="p-6 bg-white border border-slate-100">
-    <h2 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-5">สถานะงาน (Order Pipeline)</h2>
+    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5">
+     <h2 className="text-[10px] font-black text-slate-400 uppercase tracking-widest">สถานะงาน (Order Pipeline)</h2>
+     {/* ── Elapsed Timer ── */}
+     {order.status !== 'completed' && order.status !== 'cancelled' && (
+      <div className="flex items-center gap-3 bg-slate-900 text-white px-5 py-3 rounded-2xl shadow-lg">
+       <div className="w-3 h-3 rounded-full bg-red-500 animate-pulse shadow-lg shadow-red-500/50" />
+       <div className="flex flex-col">
+        <span className="text-[8px] font-black uppercase tracking-widest text-white/40">เวลาที่ใช้ไป</span>
+        <span className="text-xl font-black font-mono tracking-wider">{elapsedTime}</span>
+       </div>
+       <div className="ml-2 text-[8px] font-black uppercase text-white/30 max-w-[80px] leading-tight">
+        นับจากอัปเดตล่าสุด
+       </div>
+      </div>
+     )}
+    </div>
     <div className="flex items-center gap-1 overflow-x-auto pb-2">
      {STATUS_FLOW.map((step, i) => {
       const isCurrent = step.key === order.status;
@@ -197,29 +237,47 @@ export default function AdminOrderDetailPage() {
         />
        </div>
 
-       {/* Status Transition Buttons */}
+       {/* Status Transition Buttons — Large Touch Friendly */}
        {nextStatuses.length > 0 && (
         <div>
-         <label className="text-[10px] font-black text-white/40 uppercase block mb-3">⚡ เปลี่ยนสถานะ</label>
-         <div className="flex flex-wrap gap-2">
-          {nextStatuses.map(ns => (
-           <button
-            key={ns.key}
-            onClick={() => handleUpdate({ status: ns.key })}
-            disabled={isUpdating}
-            className="px-4 py-2.5 bg-white/10 hover:bg-white/20 text-white text-xs font-black rounded-xl backdrop-blur-sm border border-white/10 transition-all active:scale-95 disabled:opacity-50"
-           >
-            {ns.icon} {ns.label}
-           </button>
-          ))}
-          <button
-           onClick={() => handleUpdate({ status: "cancelled" })}
-           disabled={isUpdating}
-           className="px-4 py-2.5 bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 text-xs font-black rounded-xl border border-rose-500/20 transition-all active:scale-95 disabled:opacity-50"
-          >
-           ❌ ยกเลิกงาน
-          </button>
-         </div>
+         <label className="text-[10px] font-black text-white/40 uppercase block mb-3">⚡ เปลี่ยนสถานะ — กดปุ่มด้านล่าง</label>
+         
+         {/* Next Immediate Status — Primary CTA */}
+         <button
+          onClick={() => setConfirmModal(nextStatuses[0])}
+          disabled={isUpdating}
+          className="w-full py-5 bg-emerald-500 hover:bg-emerald-400 text-white text-lg font-black rounded-2xl shadow-xl shadow-emerald-500/30 transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-3 mb-4"
+         >
+          <span className="text-2xl">{nextStatuses[0].icon}</span>
+          <span>เปลี่ยนเป็น: {nextStatuses[0].label}</span>
+          <Icons.ChevronRight size={20} />
+         </button>
+         
+         {/* Other future statuses — Secondary */}
+         {nextStatuses.length > 1 && (
+          <div className="grid grid-cols-2 gap-2 mb-4">
+           {nextStatuses.slice(1).map(ns => (
+            <button
+             key={ns.key}
+             onClick={() => setConfirmModal(ns)}
+             disabled={isUpdating}
+             className="py-4 bg-white/10 hover:bg-white/20 text-white text-sm font-black rounded-xl backdrop-blur-sm border border-white/10 transition-all active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2"
+            >
+             <span className="text-lg">{ns.icon}</span>
+             <span>{ns.label}</span>
+            </button>
+           ))}
+          </div>
+         )}
+
+         {/* Cancel — Danger */}
+         <button
+          onClick={() => setConfirmModal({ key: 'cancelled', label: 'ยกเลิกงาน', icon: '❌' })}
+          disabled={isUpdating}
+          className="w-full py-4 bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 text-sm font-black rounded-xl border border-rose-500/20 transition-all active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2"
+         >
+          ❌ ยกเลิกงาน
+         </button>
         </div>
        )}
       </Card>
@@ -430,6 +488,50 @@ export default function AdminOrderDetailPage() {
    <Modal isOpen={!!selectedPhoto} onClose={() => setSelectedPhoto(null)} title="ดูรูปภาพ">
     <div className="p-4 bg-slate-900 flex items-center justify-center min-h-[400px] rounded-b-xl">
      {selectedPhoto && <img src={selectedPhoto} className="max-w-full max-h-[70vh] rounded-xl shadow-2xl" alt="Evidence" />}
+    </div>
+   </Modal>
+
+   {/* ── Status Change Confirmation Modal ── */}
+   <Modal isOpen={!!confirmModal} onClose={() => setConfirmModal(null)} title="ยืนยันเปลี่ยนสถานะ">
+    <div className="p-6 space-y-6">
+     <div className="text-center">
+      <div className="w-20 h-20 mx-auto rounded-full bg-amber-50 flex items-center justify-center text-4xl mb-4 shadow-lg shadow-amber-100">
+       {confirmModal?.icon}
+      </div>
+      <p className="text-lg font-black text-slate-900 mb-1">ยืนยันเปลี่ยนสถานะ?</p>
+      <p className="text-sm text-slate-500 font-medium">
+       คุณกำลังจะเปลี่ยนสถานะจาก <span className="font-black text-slate-700">{STATUS_FLOW.find(s => s.key === order.status)?.label}</span>{' '}
+       ไปเป็น <span className="font-black text-primary">{confirmModal?.label}</span>
+      </p>
+      {confirmModal?.key === 'cancelled' && (
+       <div className="mt-3 p-3 bg-rose-50 rounded-xl border border-rose-100">
+        <p className="text-xs font-black text-rose-600">⚠️ การยกเลิกงานไม่สามารถย้อนกลับได้</p>
+       </div>
+      )}
+     </div>
+     <div className="grid grid-cols-2 gap-3">
+      <button
+       onClick={() => setConfirmModal(null)}
+       className="py-4 bg-slate-100 text-slate-600 font-black text-sm rounded-xl hover:bg-slate-200 transition-all active:scale-95"
+      >
+       ยกเลิก
+      </button>
+      <button
+       onClick={async () => {
+        if (!confirmModal) return;
+        setConfirmModal(null);
+        await handleUpdate({ status: confirmModal.key });
+       }}
+       disabled={isUpdating}
+       className={`py-4 text-white font-black text-sm rounded-xl transition-all active:scale-95 disabled:opacity-50 ${
+        confirmModal?.key === 'cancelled'
+         ? 'bg-rose-500 hover:bg-rose-600 shadow-lg shadow-rose-500/30'
+         : 'bg-emerald-500 hover:bg-emerald-600 shadow-lg shadow-emerald-500/30'
+       }`}
+      >
+       {isUpdating ? 'กำลังอัปเดต...' : 'ยืนยัน'}
+      </button>
+     </div>
     </div>
    </Modal>
   </div>
