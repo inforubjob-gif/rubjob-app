@@ -61,8 +61,8 @@ export default function StatusTimeline({ currentStatus, orderType = "logistics" 
       {steps.map((step, index) => {
         // Map step key to index in statusOrder
         const stepIdx = statusOrder.indexOf(step.key);
-        const isDone = stepIdx < currentIdx;
-        const isCurrent = step.key === currentStatus || (step.key === "completed" && currentStatus === "completed");
+        const isDone = stepIdx < currentIdx || (step.key === "completed" && currentStatus === "completed");
+        const isCurrent = step.key === currentStatus;
         const isFuture = stepIdx > currentIdx && !isCurrent;
         
         return (
@@ -93,7 +93,7 @@ export default function StatusTimeline({ currentStatus, orderType = "logistics" 
                 <h4 className={`text-sm font-black uppercase ${isCurrent ? "text-primary-dark" : "text-slate-700"}`}>
                   {t(`orders.status.${step.key}`)}
                 </h4>
-                {isCurrent && (
+                {isCurrent && !isDone && (
                   <span className="flex h-2 w-2 rounded-full bg-primary animate-ping" />
                 )}
               </div>
