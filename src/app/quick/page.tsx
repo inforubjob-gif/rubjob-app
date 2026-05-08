@@ -17,6 +17,8 @@ export default function QuickBookPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
+  const [step, setStep] = useState<"confirm" | "payment">("confirm");
+  const [activeOrderId, setActiveOrderId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!profile?.userId) {
@@ -101,10 +103,11 @@ export default function QuickBookPage() {
       if (!res.ok || !bookingData.success) throw new Error(bookingData.error || "Booking failed");
       
       const orderId = bookingData.orderId;
+      setActiveOrderId(orderId);
 
-      // 2. We skip showing QR here to make it truly 1-click if possible,
-      // but if QR is needed, we should redirect to order detail page so they can scan it.
-      router.push(`/orders/${orderId}`);
+      // 2. We show the payment step so they can scan the QR
+      setStep("payment");
+      setIsSubmitting(false);
 
     } catch (err: any) {
       console.error(err);
@@ -159,91 +162,138 @@ export default function QuickBookPage() {
       </header>
 
       <main className="flex-1 p-5 pb-32 animate-fade-in">
-        <div className="mb-6">
-          <h2 className="text-sm font-black text-slate-500 uppercase tracking-widest mb-1">ทำรายการเดิมซ้ำ</h2>
-          <p className="text-slate-800 font-medium text-sm">
-            ระบบจะอิงข้อมูลจากออเดอร์ล่าสุดของคุณ และเลือกเวลาเข้ารับผ้าที่เร็วที่สุดของวันนี้
-          </p>
-        </div>
+        {step === "confirm" ? (
+          <>
+            <div className="mb-6">
+              <h2 className="text-sm font-black text-slate-500 uppercase tracking-widest mb-1">ทำรายการเดิมซ้ำ</h2>
+              <p className="text-slate-800 font-medium text-sm">
+                ระบบจะอิงข้อมูลจากออเดอร์ล่าสุดของคุณ และเลือกเวลาเข้ารับผ้าที่เร็วที่สุดของวันนี้
+              </p>
+            </div>
 
-        <Card className="p-0 overflow-hidden mb-6 border-slate-200">
-          <div className="p-4 border-b border-slate-100 flex items-center gap-4 bg-white">
-            <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center text-primary shrink-0">
-              {getServiceIcon(recentOrder.serviceId, { size: 24 })}
-            </div>
-            <div>
-              <h3 className="font-black text-slate-900 uppercase">{t(`orders.services.${recentOrder.serviceId}`) || recentOrder.serviceId}</h3>
-              <p className="text-xs text-slate-500 font-medium">รูปแบบที่คุณใช้เป็นประจำ</p>
-            </div>
-          </div>
-          
-          <div className="p-4 space-y-4 bg-slate-50/50">
-            <div className="flex gap-3">
-              <IconCircle variant="black" size="sm" className="shrink-0 mt-0.5">
-                <Icons.FileText size={12} />
-              </IconCircle>
-              <div>
-                <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">รายการที่เลือก</p>
-                {recentOrder.items?.map((item: any, i: number) => (
-                  <p key={i} className="text-sm font-medium text-slate-900">• {item.name}</p>
-                ))}
+            <Card className="p-0 overflow-hidden mb-6 border-slate-200">
+              <div className="p-4 border-b border-slate-100 flex items-center gap-4 bg-white">
+                <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center text-primary shrink-0">
+                  {getServiceIcon(recentOrder.serviceId, { size: 24 })}
+                </div>
+                <div>
+                  <h3 className="font-black text-slate-900 uppercase">{t(`orders.services.${recentOrder.serviceId}`) || recentOrder.serviceId}</h3>
+                  <p className="text-xs text-slate-500 font-medium">รูปแบบที่คุณใช้เป็นประจำ</p>
+                </div>
               </div>
-            </div>
+              
+              <div className="p-4 space-y-4 bg-slate-50/50">
+                <div className="flex gap-3">
+                  <IconCircle variant="black" size="sm" className="shrink-0 mt-0.5">
+                    <Icons.FileText size={12} />
+                  </IconCircle>
+                  <div>
+                    <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">รายการที่เลือก</p>
+                    {recentOrder.items?.map((item: any, i: number) => (
+                      <p key={i} className="text-sm font-medium text-slate-900">• {item.name}</p>
+                    ))}
+                  </div>
+                </div>
 
-            <div className="flex gap-3">
-              <IconCircle variant="blue" size="sm" className="shrink-0 mt-0.5">
-                <Icons.MapPin size={12} />
-              </IconCircle>
-              <div>
-                <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">สถานที่รับ-ส่ง</p>
-                <p className="text-sm font-medium text-slate-900">{recentOrder.address?.detail || recentOrder.address?.address || "ไม่มีระบุ"}</p>
+                <div className="flex gap-3">
+                  <IconCircle variant="blue" size="sm" className="shrink-0 mt-0.5">
+                    <Icons.MapPin size={12} />
+                  </IconCircle>
+                  <div>
+                    <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">สถานที่รับ-ส่ง</p>
+                    <p className="text-sm font-medium text-slate-900">{recentOrder.address?.detail || recentOrder.address?.address || "ไม่มีระบุ"}</p>
+                  </div>
+                </div>
+
+                <div className="flex gap-3">
+                  <IconCircle variant="yellow" size="sm" className="shrink-0 mt-0.5">
+                    <Icons.Bell size={12} />
+                  </IconCircle>
+                  <div>
+                    <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">ความเร็วจัดส่ง</p>
+                    <p className="text-sm font-medium text-slate-900">{recentOrder.scheduledDate}</p>
+                  </div>
+                </div>
               </div>
-            </div>
 
-            <div className="flex gap-3">
-              <IconCircle variant="yellow" size="sm" className="shrink-0 mt-0.5">
-                <Icons.Bell size={12} />
-              </IconCircle>
-              <div>
-                <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">ความเร็วจัดส่ง</p>
-                <p className="text-sm font-medium text-slate-900">{recentOrder.scheduledDate}</p>
+              <div className="p-4 bg-white border-t border-slate-100 flex items-center justify-between">
+                <span className="font-black text-slate-600 uppercase">ยอดรวมสุทธิ</span>
+                <span className="text-xl font-black text-primary">฿{Math.ceil(recentOrder.totalPrice)}</span>
               </div>
+            </Card>
+
+            {error && (
+              <div className="mb-6 p-4 bg-red-50 text-red-600 rounded-xl text-sm font-medium border border-red-100 flex items-start gap-2">
+                <Icons.Close size={18} className="shrink-0 mt-0.5" />
+                <p>{error}</p>
+              </div>
+            )}
+          </>
+        ) : (
+          <div className="flex flex-col items-center justify-center pt-8 pb-12 animate-fade-in">
+            <div className="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mb-6 shadow-xl shadow-green-100/50">
+              <Icons.Check size={32} strokeWidth={3} />
             </div>
-          </div>
+            <h2 className="text-xl font-black text-slate-900 mb-2 uppercase tracking-tight">การจองด่วนสำเร็จ</h2>
+            <p className="text-sm text-slate-500 mb-8 text-center max-w-[280px]">
+              สแกน QR Code เพื่อชำระเงิน หรือคลิกดูรายละเอียดออเดอร์เพื่อชำระภายหลัง
+            </p>
 
-          <div className="p-4 bg-white border-t border-slate-100 flex items-center justify-between">
-            <span className="font-black text-slate-600 uppercase">ยอดรวมสุทธิ</span>
-            <span className="text-xl font-black text-primary">฿{Math.ceil(recentOrder.totalPrice)}</span>
-          </div>
-        </Card>
-
-        {error && (
-          <div className="mb-6 p-4 bg-red-50 text-red-600 rounded-xl text-sm font-medium border border-red-100 flex items-start gap-2">
-            <Icons.Close size={18} className="shrink-0 mt-0.5" />
-            <p>{error}</p>
+            <Card className="w-full max-w-sm overflow-hidden flex flex-col items-center p-6 border-slate-200">
+              <div className="bg-[#1a3d6d] px-5 py-2.5 rounded-xl flex items-center gap-3 mb-6 w-full justify-center">
+                <div className="w-7 h-7 bg-white rounded-lg flex items-center justify-center">
+                  <span className="text-[11px] font-black text-[#1a3d6d]">PP</span>
+                </div>
+                <span className="text-base font-black text-white">PromptPay</span>
+              </div>
+              
+              <div className="bg-white p-4 rounded-xl shadow-inner border border-slate-100 relative overflow-hidden mb-6">
+                <img 
+                  src={`https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=00020101021129370016A000000677010111011300660000000005802TH5303764580215${Math.ceil(recentOrder.totalPrice)}.006304`}
+                  alt="PromptPay QR" 
+                  className="w-48 h-48 object-contain"
+                />
+              </div>
+              
+              <div className="text-center w-full">
+                <div className="flex items-baseline justify-center gap-1">
+                  <span className="text-sm font-bold text-slate-500">ยอดชำระสุทธิ</span>
+                  <span className="text-3xl font-black text-slate-900">฿{Math.ceil(recentOrder.totalPrice)}</span>
+                </div>
+              </div>
+            </Card>
           </div>
         )}
       </main>
 
       {/* Floating Action Button */}
       <div className="fixed bottom-0 left-0 right-0 p-5 bg-gradient-to-t from-slate-50 via-slate-50 to-transparent z-40">
-        <button
-          onClick={handleConfirm}
-          disabled={isSubmitting}
-          className="w-full bg-primary text-white py-4 rounded-2xl font-black text-sm uppercase tracking-wider shadow-lg shadow-primary/30 flex items-center justify-center gap-2 active:scale-[0.98] transition-all disabled:opacity-50"
-        >
-          {isSubmitting ? (
-            <>
-              <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-              <span>กำลังดำเนินการ...</span>
-            </>
-          ) : (
-            <>
-              <Icons.Check size={20} strokeWidth={3} />
-              ยืนยันการจองด่วน
-            </>
-          )}
-        </button>
+        {step === "confirm" ? (
+          <button
+            onClick={handleConfirm}
+            disabled={isSubmitting}
+            className="w-full bg-primary text-white py-4 rounded-2xl font-black text-sm uppercase tracking-wider shadow-lg shadow-primary/30 flex items-center justify-center gap-2 active:scale-[0.98] transition-all disabled:opacity-50"
+          >
+            {isSubmitting ? (
+              <>
+                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                <span>กำลังดำเนินการ...</span>
+              </>
+            ) : (
+              <>
+                <Icons.Check size={20} strokeWidth={3} />
+                ยืนยันการจองด่วน
+              </>
+            )}
+          </button>
+        ) : (
+          <button
+            onClick={() => router.push(`/orders/${activeOrderId}`)}
+            className="w-full bg-slate-900 text-white py-4 rounded-2xl font-black text-sm uppercase tracking-wider shadow-lg flex items-center justify-center gap-2 active:scale-[0.98] transition-all"
+          >
+            ไปหน้าออเดอร์ของฉัน
+          </button>
+        )}
       </div>
     </div>
   );
