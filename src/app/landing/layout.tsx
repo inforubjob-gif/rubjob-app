@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next";
 
 export const metadata: Metadata = {
-  title: "RUBJOB — ผู้จัดการชีวิต Life Operator",
+  title: "RUBJOB — เรื่องยุ่งยาก เรารับจบให้",
   description:
     "Professional laundry pickup & delivery platform. Rubbers, stores, and customers — all connected.",
   keywords: ["rubjob", "laundry", "pickup", "delivery", "LINE", "platform"],
@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     },
   },
   openGraph: {
-    title: "RUBJOB — ผู้จัดการชีวิต Life Operator",
+    title: "RUBJOB — เรื่องยุ่งยาก เรารับจบให้",
     description: "ไม่ต้องคิด ไม่ต้องกังวล บริการซักอบรีดที่เหมือนมีคนจัดการชีวิตแทนคุณ รวดเร็ว สะอาด และตรวจสอบสถานะได้ตลอดเวลา",
     url: "https://rubjob.com",
     siteName: "RUBJOB",

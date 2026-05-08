@@ -45,7 +45,7 @@ export const th = {
       review: "ตรวจสอบ",
       remove: "นำออก",
       tapToEnterPin: "แตะเพื่อใส่รหัส",
-      lifeOperator: "RUBJOB - ผู้จัดการชีวิต LIFE OPERATOR",
+      lifeOperator: "RUBJOB - เรื่องยุ่งยาก เรารับจบให้",
     },
     home: {
       activeOrders: "ออเดอร์ปัจจุบัน",
@@ -1488,7 +1488,7 @@ export const th = {
         lineApp: "Line App",
       },
       hero: {
-        badge: "ผู้จัดการชีวิต — Life Operator 👌🏻",
+        badge: "เรื่องยุ่งยาก เรารับจบให้ 👌🏻",
         title: "รับจบทุกเรื่อง",
         titleSub: "แทนคุณ",
         subtitle: "ไม่ต้องคิด ไม่ต้องกังวล บริการซักอบรีดที่เหมือนมีคนจัดการชีวิตแทนคุณ ปล่อยให้เป็นหน้าที่เรา",
@@ -1598,7 +1598,7 @@ export const th = {
         }
       },
       footer: {
-        motto: "ผู้จัดการชีวิต (Life Operator) 👋🏼",
+        motto: "เรื่องยุ่งยาก เรารับจบให้ 👋🏼",
         privacy: "Privacy Policy",
         terms: "Terms of Service",
         support: "Contact Support",

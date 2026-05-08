@@ -46,7 +46,7 @@ export default function LoginView() {
       {/* Footer to match Rubber look */}
       <div className="absolute bottom-8 left-0 right-0 text-center px-6">
         <p className="text-xs text-slate-400 font-bold uppercase leading-relaxed drop-shadow-sm">
-          RUBJOB - ผู้จัดการชีวิต LIFE OPERATOR
+          RUBJOB - เรื่องยุ่งยาก เรารับจบให้
         </p>
       </div>
     </div>
