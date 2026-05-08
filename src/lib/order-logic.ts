@@ -96,18 +96,48 @@ export async function transitionOrderStatus(
       case "ready_for_pickup":
         flexMessage = readyForDeliveryFlex(orderId);
         
-        // 🤖 Automation: Also broadcast to Rubbers Group
-        const notifyToken = env.LINE_NOTIFY_RUBBER_TOKEN;
-        if (notifyToken) {
-          const distanceKm = order.distance_km || 0;
-          const singleTripFare = 50 + (distanceKm > 3 ? (distanceKm - 3) * 10 : 0);
-          const grossRubberFare = singleTripFare * 2;
-          const netRubberEarning = grossRubberFare - (grossRubberFare * 0.15) - 15;
-          const legEarn = netRubberEarning / 2;
+        // 🤖 Automation: Also broadcast to Rubbers via Push Message
+        try {
+          const deliveryFee = order.deliveryFee || 0;
+          let customerToken = env.LINE_CHANNEL_ACCESS_TOKEN;
+          let rubberToken = env.LINE_CHANNEL_ACCESS_TOKEN_RUBBER;
 
-          const { sendLineNotify } = await import("./line");
-          const notifyMsg = `\n🧺 ผ้าซักเสร็จแล้ว! [${orderId}]\nรอรับเบอร์ไปส่งคืนลูกค้า\nรายได้: ฿${legEarn.toFixed(2)}\nคลิกรับงาน: https://liff.line.me/${env.NEXT_PUBLIC_LIFF_ID}/rubber`;
-          await sendLineNotify(notifyMsg, notifyToken).catch(() => {});
+          if (!customerToken) {
+            const setting = await db.prepare("SELECT value FROM system_settings WHERE key = 'line_channel_access_token_regular'").first() as any;
+            if (setting?.value) customerToken = setting.value;
+          }
+          if (!rubberToken) {
+            const setting = await db.prepare("SELECT value FROM system_settings WHERE key = 'line_channel_access_token_rubber'").first() as any;
+            if (setting?.value) rubberToken = setting.value;
+          }
+          
+          rubberToken = rubberToken || customerToken;
+
+          if (rubberToken) {
+            const { sendLinePush, rubberNewJobFlex } = await import("./line");
+            
+            const rubbers = await db.prepare(`
+              SELECT lineUserId, preferences
+              FROM rubber_users
+              WHERE lineUserId IS NOT NULL
+            `).all();
+
+            // 15% commission + 15 THB Platform Fee
+            const totalOrderEarn = deliveryFee - (deliveryFee * 0.15) - 15;
+            const legEarn = totalOrderEarn * 0.5;
+
+            for (const r of (rubbers.results as any[])) {
+              try {
+                const prefs = JSON.parse(r.preferences || "{}");
+                if (prefs.workStatus === true) {
+                  // Re-use rubberNewJobFlex but maybe pass 'ready_for_return' status
+                  await sendLinePush(r.lineUserId, [rubberNewJobFlex(orderId, nextStatus, legEarn)], rubberToken).catch(() => {});
+                }
+              } catch (e) {}
+            }
+          }
+        } catch (e) {
+          console.error("Failed to broadcast ready_for_return to rubbers:", e);
         }
         break;
       case "delivering_to_customer":
