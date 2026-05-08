@@ -12,7 +12,7 @@ import GlobalInput from "@/components/ui/GlobalInput";
 import ConfirmModal from "@/components/ui/ConfirmModal";
 
 export default function RubberWalletPage() {
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [amount, setAmount] = useState("");
   const [bankName, setBankName] = useState("");
@@ -147,12 +147,12 @@ export default function RubberWalletPage() {
 
         <div className="flex-1 px-5 py-8 space-y-6 pb-24 animate-fade-in">
           <section className="animate-in fade-in slide-in-from-bottom-4 duration-700 delay-150">
-            <h2 className="text-[11px] font-black text-slate-900 uppercase tracking-[0.2em] mb-4 px-2">Earnings Insight</h2>
+            <h2 className="text-[11px] font-black text-slate-900 uppercase tracking-[0.2em] mb-4 px-2">{t("rubber.wallet.earningsInsight") || "Earnings Insight"}</h2>
             <Card className="p-6 bg-white border border-slate-100 shadow-2xl rounded-[2.5rem]">
               <div className="flex items-center justify-between mb-8">
                 <div>
-                  <h3 className="text-sm font-black text-slate-900">Weekly Performance</h3>
-                  <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Last 7 Days</p>
+                  <h3 className="text-sm font-black text-slate-900">{t("rubber.wallet.weeklyPerformance") || "Weekly Performance"}</h3>
+                  <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">{t("rubber.wallet.last7Days") || "Last 7 Days"}</p>
                 </div>
                 <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center text-primary">
                   <Icons.Stars size={20} />
@@ -196,7 +196,7 @@ export default function RubberWalletPage() {
                            />
                         </div>
                         <span className={`text-[9px] font-black uppercase ${isToday ? 'text-primary' : 'text-slate-400'}`}>
-                          {d.date.toLocaleDateString('en-US', { weekday: 'short' })}
+                          {d.date.toLocaleDateString(language === 'en' ? 'en-US' : 'th-TH', { weekday: 'short' })}
                         </span>
                       </div>
                     );
@@ -207,8 +207,8 @@ export default function RubberWalletPage() {
               {/* Today's Breakdown */}
               <div className="border-t border-slate-50 pt-6">
                  <div className="flex items-center justify-between mb-4">
-                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Time Breakdown (Today)</p>
-                    <p className="text-[10px] font-black text-emerald-500 uppercase">Real-time</p>
+                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t("rubber.wallet.timeBreakdown") || "Time Breakdown (Today)"}</p>
+                    <p className="text-[10px] font-black text-emerald-500 uppercase">{t("rubber.wallet.realTime") || "Real-time"}</p>
                  </div>
                  <div className="space-y-3">
                     {(() => {
@@ -218,7 +218,7 @@ export default function RubberWalletPage() {
                         .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
                       if (todayTrx.length === 0) {
-                        return <p className="text-center py-4 text-[10px] text-slate-300 font-bold uppercase italic">No earnings yet today</p>;
+                        return <p className="text-center py-4 text-[10px] text-slate-300 font-bold uppercase italic">{t("rubber.wallet.noEarningsToday") || "No earnings yet today"}</p>;
                       }
 
                       return todayTrx.map((t, idx) => (

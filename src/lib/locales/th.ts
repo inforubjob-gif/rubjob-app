@@ -574,6 +574,12 @@ export const th = {
       navWallet: "รายได้",
       navProfile: "โปรไฟล์",
       wallet: {
+        earningsInsight: "ข้อมูลรายได้เชิงลึก",
+        weeklyPerformance: "สรุปรายได้รายสัปดาห์",
+        last7Days: "7 วันล่าสุด",
+        timeBreakdown: "รายได้วันนี้ตามช่วงเวลา",
+        realTime: "เรียลไทม์",
+        noEarningsToday: "ยังไม่มีรายได้ในวันนี้",
         availableBalance: "ยอดเงินคงเหลือ",
         withdraw: "ถอนเงิน",
         history: "ประวัติรายได้",

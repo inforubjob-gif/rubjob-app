@@ -875,6 +875,12 @@ export const en = {
     photoStepDesc: "Photo required for this step",
     earnAmountLabel: "Earnings to be received",
     wallet: {
+      earningsInsight: "Earnings Insight",
+      weeklyPerformance: "Weekly Performance",
+      last7Days: "Last 7 Days",
+      timeBreakdown: "Time Breakdown (Today)",
+      realTime: "Real-time",
+      noEarningsToday: "No earnings yet today",
       balance: "Balance",
       withdraw: "Withdraw",
       history: "Earnings History",
