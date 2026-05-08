@@ -77,8 +77,14 @@ export default function PromptPayCheckout({ clientSecret }: PromptPayCheckoutPro
             id="payment-element" 
             options={{
               layout: "tabs",
+              fields: {
+                billingDetails: {
+                  email: "never"
+                }
+              },
               defaultValues: {
                 billingDetails: {
+                  email: "customer@rubjob.com",
                   address: {
                     country: "TH"
                   }
