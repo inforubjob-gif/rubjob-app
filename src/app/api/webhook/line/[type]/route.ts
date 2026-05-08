@@ -19,8 +19,28 @@ export async function POST(req: Request, { params }: { params: Promise<{ type: s
     const db = getRequestContext().env.DB as any;
     if (!db) return NextResponse.json({ error: "D1 not found" }, { status: 500 });
     
+    // Create webhook_logs for debugging
+    try {
+      await db.prepare(`
+        CREATE TABLE IF NOT EXISTS webhook_logs (
+          id TEXT PRIMARY KEY,
+          channel TEXT,
+          payload TEXT,
+          error TEXT,
+          createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
+        )
+      `).run();
+    } catch(e) {}
+
     const channelType = (await params).type; // 'regular' or 'help'
     const bodyText = await req.text();
+    
+    // Log the incoming request
+    const logId = `LOG-${Date.now()}`;
+    try {
+      await db.prepare(`INSERT INTO webhook_logs (id, channel, payload) VALUES (?, ?, ?)`).bind(logId, channelType, bodyText).run();
+    } catch(e) {}
+
     let body: any = {};
     try { body = JSON.parse(bodyText); } catch(e) {}
     
@@ -57,6 +77,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ type: s
       const hash = btoa(String.fromCharCode(...hashArray));
 
       if (channelSecret && hash !== signature) {
+        try { await db.prepare(`UPDATE webhook_logs SET error = 'Signature mismatch' WHERE id = ?`).bind(logId).run(); } catch(e) {}
         return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
       }
     }
@@ -159,6 +180,12 @@ export async function POST(req: Request, { params }: { params: Promise<{ type: s
     return NextResponse.json({ success: true });
   } catch (error: any) {
     console.error("LINE Webhook error:", error);
+    try {
+      const db = getRequestContext().env.DB as any;
+      if (db) {
+        await db.prepare(`UPDATE webhook_logs SET error = ? WHERE id = (SELECT id FROM webhook_logs ORDER BY createdAt DESC LIMIT 1)`).bind(error.stack || error.message).run();
+      }
+    } catch(e) {}
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
