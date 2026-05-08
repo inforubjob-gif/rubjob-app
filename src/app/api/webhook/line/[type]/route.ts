@@ -64,6 +64,8 @@ export async function POST(req: Request, { params }: { params: Promise<{ type: s
     // Self-healing: ensure columns exist
     try { await db.prepare("ALTER TABLE support_tickets ADD COLUMN userType TEXT DEFAULT 'customer'").run(); } catch (e) {}
     try { await db.prepare("ALTER TABLE support_tickets ADD COLUMN senderName TEXT").run(); } catch (e) {}
+    try { await db.prepare("ALTER TABLE rubber_users ADD COLUMN lineUserId TEXT").run(); } catch (e) {}
+    try { await db.prepare("ALTER TABLE stores ADD COLUMN lineUserId TEXT").run(); } catch (e) {}
 
     const events = body.events || [];
 
