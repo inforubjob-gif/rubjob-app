@@ -677,6 +677,24 @@ function BookingFlow() {
                     </button>
                   ))}
                 </div>
+
+                {/* Outside business hours banner */}
+                {(() => {
+                  const allSlotsDisabled = TIME_SLOTS.every(s => isSlotPassed(s.startTime, pickupDate));
+                  if (!allSlotsDisabled) return null;
+                  return (
+                    <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-start gap-3 animate-fade-in">
+                      <div className="w-10 h-10 bg-amber-100 text-amber-600 rounded-xl flex items-center justify-center shrink-0 mt-0.5">
+                        <Icons.Bell size={20} strokeWidth={2.5} />
+                      </div>
+                      <div>
+                        <p className="text-sm font-black text-amber-800">{t("booking.outsideHoursTitle")}</p>
+                        <p className="text-xs text-amber-600 font-bold mt-1 leading-relaxed">{t("booking.outsideHoursDesc")}</p>
+                      </div>
+                    </div>
+                  );
+                })()}
+
                 <div className="grid grid-cols-2 gap-2">
                   {TIME_SLOTS.map((slot) => {
                     const isDisabled = isSlotPassed(slot.startTime, pickupDate);

@@ -389,6 +389,8 @@ export const en = {
     expires: "Expires",
     off: "Off",
     pickupSelectTime: "Select Pickup Date & Time (7:00–17:00)",
+    outsideHoursTitle: "🕐 Outside Business Hours",
+    outsideHoursDesc: "Service hours are 09:00 - 17:00. Please select the next available day for pickup.",
     paymentDoneNote: "Press button below after payment is completed",
     identifyPhone: "Enter phone number for pickup contact",
     viewMyOrders: "View My Orders",
