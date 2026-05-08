@@ -11,7 +11,11 @@ export async function GET(req: Request) {
     const db = getRequestContext().env.DB;
     if (!db) return NextResponse.json({ error: "D1 not found" }, { status: 500 });
 
-    // Self-healing: ensure eligibleRoles column exists
+    // Self-healing: ensure all columns exist
+    try { await db.prepare("ALTER TABLE coupons ADD COLUMN title TEXT").run(); } catch (e) {}
+    try { await db.prepare("ALTER TABLE coupons ADD COLUMN description TEXT").run(); } catch (e) {}
+    try { await db.prepare("ALTER TABLE coupons ADD COLUMN isVisible INTEGER DEFAULT 1").run(); } catch (e) {}
+    try { await db.prepare("ALTER TABLE coupons ADD COLUMN maxDiscount REAL").run(); } catch (e) {}
     try { await db.prepare("ALTER TABLE coupons ADD COLUMN eligibleRoles TEXT DEFAULT 'all'").run(); } catch (e) {}
 
     const { results } = await db.prepare(`
@@ -34,6 +38,10 @@ export async function POST(req: Request) {
     if (!db) return NextResponse.json({ error: "D1 not found" }, { status: 500 });
 
     // Self-healing
+    try { await db.prepare("ALTER TABLE coupons ADD COLUMN title TEXT").run(); } catch (e) {}
+    try { await db.prepare("ALTER TABLE coupons ADD COLUMN description TEXT").run(); } catch (e) {}
+    try { await db.prepare("ALTER TABLE coupons ADD COLUMN isVisible INTEGER DEFAULT 1").run(); } catch (e) {}
+    try { await db.prepare("ALTER TABLE coupons ADD COLUMN maxDiscount REAL").run(); } catch (e) {}
     try { await db.prepare("ALTER TABLE coupons ADD COLUMN eligibleRoles TEXT DEFAULT 'all'").run(); } catch (e) {}
 
     if (!code || !type || !value) return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
@@ -65,6 +73,10 @@ export async function PUT(req: Request) {
     if (!db) return NextResponse.json({ error: "D1 not found" }, { status: 500 });
 
     // Self-healing
+    try { await db.prepare("ALTER TABLE coupons ADD COLUMN title TEXT").run(); } catch (e) {}
+    try { await db.prepare("ALTER TABLE coupons ADD COLUMN description TEXT").run(); } catch (e) {}
+    try { await db.prepare("ALTER TABLE coupons ADD COLUMN isVisible INTEGER DEFAULT 1").run(); } catch (e) {}
+    try { await db.prepare("ALTER TABLE coupons ADD COLUMN maxDiscount REAL").run(); } catch (e) {}
     try { await db.prepare("ALTER TABLE coupons ADD COLUMN eligibleRoles TEXT DEFAULT 'all'").run(); } catch (e) {}
 
     if (!id) return NextResponse.json({ error: "Missing ID" }, { status: 400 });
