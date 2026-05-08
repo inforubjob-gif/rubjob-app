@@ -38,8 +38,10 @@ export async function GET(req: Request) {
     const totalDelivery = revResult.totalDelivery || 0;
 
     const settings = (coreStats[4].results || []) as { key: string, value: string }[];
-    const gpStore = Number(settings.find(s => s.key === 'gp_store_percent')?.value) || 10;
-    const gpRubber = Number(settings.find(s => s.key === 'gp_rubber_percent')?.value) || 15;
+    const gpStoreRaw = settings.find(s => s.key === 'gp_store_percent')?.value;
+    const gpRubberRaw = settings.find(s => s.key === 'gp_rubber_percent')?.value;
+    const gpStore = gpStoreRaw !== undefined ? Number(gpStoreRaw) : 10;
+    const gpRubber = gpRubberRaw !== undefined ? Number(gpRubberRaw) : 15;
 
     // Step 2: Extended Stats (Pulling from specialized tables)
     let totalRubbers = 0;

@@ -61,6 +61,11 @@ export async function transitionOrderStatus(
     query += ", arrivedAtShopAt = CURRENT_TIMESTAMP";
   }
 
+  // Auto-mark payment as paid when order is completed
+  if (nextStatus === "completed") {
+    query += ", paymentStatus = CASE WHEN paymentStatus = 'pending' THEN 'paid' ELSE paymentStatus END";
+  }
+
   query += " WHERE id = ?";
   params.push(orderId);
 
