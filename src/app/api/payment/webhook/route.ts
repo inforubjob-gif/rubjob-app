@@ -78,17 +78,27 @@ export async function POST(req: Request) {
             const orderData = await db.prepare("SELECT deliveryFee FROM orders WHERE id = ?").bind(orderId).first() as any;
             if (orderData) {
               const deliveryFee = orderData.deliveryFee || 0;
-              const customerToken = env.LINE_CHANNEL_ACCESS_TOKEN;
-              const rubberToken = env.LINE_CHANNEL_ACCESS_TOKEN_RUBBER || customerToken;
+              let customerToken = env.LINE_CHANNEL_ACCESS_TOKEN;
+              let rubberToken = env.LINE_CHANNEL_ACCESS_TOKEN_RUBBER;
+
+              if (!customerToken) {
+                const setting = await db.prepare("SELECT value FROM system_settings WHERE key = 'line_channel_access_token_regular'").first() as any;
+                if (setting?.value) customerToken = setting.value;
+              }
+              if (!rubberToken) {
+                const setting = await db.prepare("SELECT value FROM system_settings WHERE key = 'line_channel_access_token_rubber'").first() as any;
+                if (setting?.value) rubberToken = setting.value;
+              }
+              
+              rubberToken = rubberToken || customerToken;
               
               if (rubberToken) {
                 const { sendLinePush, rubberNewJobFlex } = await import("@/lib/line");
                 
                 const rubbers = await db.prepare(`
-                  SELECT ru.lineUserId, u.preferences
-                  FROM rubber_users ru
-                  JOIN users u ON ru.id = u.id
-                  WHERE ru.lineUserId IS NOT NULL
+                  SELECT lineUserId, preferences
+                  FROM rubber_users
+                  WHERE lineUserId IS NOT NULL
                 `).all();
 
                 // 15% commission + 15 THB Platform Fee

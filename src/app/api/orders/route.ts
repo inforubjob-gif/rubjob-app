@@ -106,8 +106,21 @@ export async function POST(req: Request) {
 
     // 🤖 Automation: Notify Store and Available Rubbers via LINE
     const env = getRequestContext().env;
-    const customerToken = env.LINE_CHANNEL_ACCESS_TOKEN;
-    const rubberToken = env.LINE_CHANNEL_ACCESS_TOKEN_RUBBER || customerToken;
+    let customerToken = env.LINE_CHANNEL_ACCESS_TOKEN;
+    let rubberToken = env.LINE_CHANNEL_ACCESS_TOKEN_RUBBER;
+
+    // Fallback to database settings if env vars are not set
+    if (!customerToken) {
+      const setting = await db.prepare("SELECT value FROM system_settings WHERE key = 'line_channel_access_token_regular'").first() as any;
+      if (setting?.value) customerToken = setting.value;
+    }
+    if (!rubberToken) {
+      const setting = await db.prepare("SELECT value FROM system_settings WHERE key = 'line_channel_access_token_rubber'").first() as any;
+      if (setting?.value) rubberToken = setting.value;
+    }
+
+    // Ultimate fallback for rubber token is customer token (though not recommended for different OAs)
+    rubberToken = rubberToken || customerToken;
     
     if (rubberToken) {
       const { 
@@ -127,10 +140,9 @@ export async function POST(req: Request) {
       // If PromptPay/Card, we broadcast from the Stripe Webhook after payment succeeds.
       if (paymentMethod === 'cash') {
         const rubbers = await db.prepare(`
-          SELECT ru.lineUserId, u.preferences
-          FROM rubber_users ru
-          JOIN users u ON ru.id = u.id
-          WHERE ru.lineUserId IS NOT NULL
+          SELECT lineUserId, preferences
+          FROM rubber_users
+          WHERE lineUserId IS NOT NULL
         `).all();
 
         // 15% commission + 15 THB Platform Fee
