@@ -142,6 +142,11 @@ export default function AdminGlobalNotifier() {
                     key={idx}
                     onClick={() => {
                       setIsOpen(false);
+                      setHasNew(false);
+                      if (audioRef.current) {
+                        audioRef.current.pause();
+                        audioRef.current.currentTime = 0;
+                      }
                       router.push(alert.link);
                     }}
                     className="w-full text-left mb-2 p-3 rounded-2xl bg-white border border-slate-100 hover:border-slate-300 transition-all flex items-start gap-3 active:scale-95"
@@ -166,6 +171,10 @@ export default function AdminGlobalNotifier() {
         onClick={() => {
           setIsOpen(!isOpen);
           setHasNew(false);
+          if (audioRef.current) {
+            audioRef.current.pause();
+            audioRef.current.currentTime = 0;
+          }
         }}
         className={`w-14 h-14 rounded-full flex items-center justify-center pointer-events-auto transition-all shadow-xl active:scale-95 ${
           hasNew ? "bg-red-500 text-white shadow-red-500/30 animate-bounce" : "bg-slate-900 text-white shadow-slate-900/20"
