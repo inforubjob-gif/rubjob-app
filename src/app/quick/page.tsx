@@ -236,7 +236,7 @@ export default function QuickBookPage() {
             </div>
             <h2 className="text-xl font-black text-slate-900 mb-2 uppercase tracking-tight">การจองด่วนสำเร็จ</h2>
             <p className="text-sm text-slate-500 mb-8 text-center max-w-[280px]">
-              สแกน QR Code เพื่อชำระเงิน หรือคลิกดูรายละเอียดออเดอร์เพื่อชำระภายหลัง
+              สแกน QR Code เพื่อชำระเงิน<br/><span className="text-rose-500 font-bold">*ต้องชำระเงินก่อนระบบถึงจะเริ่มดำเนินการ</span>
             </p>
 
             <Card className="w-full max-w-sm overflow-hidden flex flex-col items-center p-6 border-slate-200">
@@ -291,7 +291,7 @@ export default function QuickBookPage() {
             onClick={() => router.push(`/orders/${activeOrderId}`)}
             className="w-full bg-slate-900 text-white py-4 rounded-2xl font-black text-sm uppercase tracking-wider shadow-lg flex items-center justify-center gap-2 active:scale-[0.98] transition-all"
           >
-            ไปหน้าออเดอร์ของฉัน
+            ไปหน้าออเดอร์ (เพื่อตรวจสอบสถานะ)
           </button>
         )}
       </div>
