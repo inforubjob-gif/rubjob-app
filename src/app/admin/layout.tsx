@@ -9,6 +9,7 @@ import { AdminProvider, useAdmin } from "@/components/providers/AdminProvider";
 import { usePathname, useRouter } from "next/navigation";
 import { LanguageProvider } from "@/components/providers/LanguageProvider";
 import { useTranslation } from "@/components/providers/LanguageProvider";
+import AdminGlobalNotifier from "@/components/admin/AdminGlobalNotifier";
 
 function PermissionGate({ children }: { children: React.ReactNode }) {
   const { admin, hasPermission, isLoading } = useAdmin();
@@ -84,12 +85,15 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             />
             
             {/* Main Content Area */}
-            <div className="flex-1 flex flex-col h-full overflow-hidden bg-slate-50/50">
+            <div className="flex-1 flex flex-col h-full overflow-hidden bg-slate-50/50 relative">
               <main className="flex-1 overflow-y-auto relative p-4 md:p-8 no-scrollbar">
                 <div className="max-w-7xl mx-auto w-full">
                   {children}
                 </div>
               </main>
+              
+              {/* Global Real-time Alerts */}
+              <AdminGlobalNotifier />
             </div>
             </div>
           </ToastProvider>
