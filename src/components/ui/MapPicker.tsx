@@ -5,6 +5,14 @@ import L from "leaflet";
 import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 
+// Ensure Leaflet CSS is loaded (CDN fallback for edge runtime)
+if (typeof document !== "undefined" && !document.querySelector('link[href*="leaflet"]')) {
+  const link = document.createElement("link");
+  link.rel = "stylesheet";
+  link.href = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
+  document.head.appendChild(link);
+}
+
 // Fix for default marker icons in Leaflet with Next.js
 const DefaultIcon = L.icon({
   iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
@@ -73,8 +81,8 @@ export default function MapPicker({ lat, lng, onChange }: MapPickerProps) {
   const center: [number, number] = lat !== 0 && lng !== 0 ? [lat, lng] : [13.7563, 100.5018]; // Default to Bangkok
 
   return (
-    <div className="min-h-[400px] h-full w-full rounded-xl overflow-hidden border-2 border-slate-100 z-0">
-      <MapContainer center={center} zoom={13} style={{ height: "100%", width: "100%" }}>
+    <div className="w-full rounded-xl overflow-hidden border-2 border-slate-100 z-0" style={{ minHeight: "400px", height: "400px" }}>
+      <MapContainer center={center} zoom={13} style={{ height: "400px", width: "100%", minHeight: "400px" }}>
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
