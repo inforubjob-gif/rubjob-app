@@ -893,6 +893,9 @@ export const en = {
       types: {
         job_completion: "Job Completed",
         withdrawal: "Withdrawal",
+        "Pickup Earnings": "Pickup Earnings",
+        "Delivery Earnings": "Delivery Earnings",
+        "Withdrawal": "Withdrawal",
       },
       statuses: {
         pending: "Pending",

@@ -261,8 +261,8 @@ export default function RubberWalletPage() {
                     <p className={`text-sm font-black ${trx.amount > 0 ? 'text-emerald-500' : 'text-slate-900'}`}>
                       {trx.amount > 0 ? `+฿${(Number(trx.amount) || 0).toLocaleString()}` : `-฿${(Math.abs(Number(trx.amount) || 0)).toLocaleString()}`}
                     </p>
-                    <Badge variant={trx.status === 'completed' || trx.status === 'success' ? 'success' : 'warning'} className="text-[8px] font-black uppercase py-0.5 px-2">
-                       {t(`rubber.wallet.statuses.${trx.status}`) || trx.status}
+                    <Badge variant={trx.status?.toLowerCase() === 'completed' || trx.status?.toLowerCase() === 'success' ? 'success' : 'warning'} className="text-[8px] font-black uppercase py-0.5 px-2">
+                       {t(`rubber.wallet.statuses.${trx.status?.toLowerCase()}`) || trx.status}
                     </Badge>
                   </div>
                 </div>
