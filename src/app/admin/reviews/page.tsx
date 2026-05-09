@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Icons } from "@/components/ui/Icons";
-import { format } from "date-fns";
+
 import { useToast } from "@/components/providers/ToastProvider";
 
 interface Review {
@@ -103,7 +103,7 @@ export default function ReviewsPage() {
                 reviews.map((review) => (
                   <tr key={review.orderId} className="hover:bg-slate-50/50 transition-colors">
                     <td className="py-4 px-6 whitespace-nowrap text-sm text-slate-500">
-                      {format(new Date(review.createdAt), "dd MMM yyyy, HH:mm")}
+                      {new Date(review.createdAt).toLocaleString("en-GB", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })}
                     </td>
                     <td className="py-4 px-6">
                       <div className="flex items-center gap-3">
