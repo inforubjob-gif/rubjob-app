@@ -938,7 +938,7 @@ export const en = {
     takePhoto: "Take Proof Photo",
     photoRequired: "Photo required before confirmation",
     login: {
-      portal: "Rubber (RUBBER)",
+      portal: "RUBBER",
     },
     photoStep: {
       pickupUser: "Pickup from Customer",
@@ -1067,7 +1067,7 @@ export const en = {
         emailLabel: "Username / Email",
         passwordLabel: "Password",
         button: "Login to Start Working",
-        portal: "Rubber (RUBBER)",
+        portal: "RUBBER",
         footer: "For registered rubbers only.\nContact @RUBJOB_HELP if you have issues.",
       }
     },

@@ -838,7 +838,7 @@ export const th = {
       takePhoto: "ถ่ายรูปเพื่อยืนยัน",
       photoRequired: "ต้องถ่ายรูปก่อนยืนยัน",
       login: {
-        portal: "รับเบอร์ (RUBBER)",
+        portal: "RUBBER",
       },
       photoStep: {
         pickupUser: "ถ่ายรูปขณะรับผ้าจากลูกค้า",
