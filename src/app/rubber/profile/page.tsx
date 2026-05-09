@@ -36,9 +36,9 @@ export default function RubberProfilePage() {
     }
   }, [router]);
 
-  async function fetchRubberData(rubberId: string) {
+  async function fetchRubberData() {
     try {
-      const res = await fetch(`/api/admin/rubbers?id=${rubberId}`);
+      const res = await fetch(`/api/rubber/me`);
       const data = await res.json() as any;
       if (data.rubber) {
         setRubberData(data.rubber);

@@ -25,7 +25,7 @@ export async function GET(req: Request) {
     try { await db.prepare("ALTER TABLE rubber_users ADD COLUMN lineUserId TEXT").run(); } catch(e) {}
 
     const rubber = await db.prepare(`
-      SELECT r.id, r.name, r.email, r.status, r.pictureUrl, r.phone, r.lineUserId, u.displayName as lineDisplayName
+      SELECT r.id, r.name, r.email, r.status, r.pictureUrl, r.phone, r.lineUserId, r.vehicleType, r.bankName, r.accountNumber, u.displayName as lineDisplayName
       FROM rubber_users r
       LEFT JOIN users u ON r.lineUserId = u.id
       WHERE r.id = ?
@@ -41,6 +41,9 @@ export async function GET(req: Request) {
           status: rubber.status,
           pictureUrl: rubber.pictureUrl,
           phone: rubber.phone,
+          vehicleType: rubber.vehicleType,
+          bankName: rubber.bankName,
+          accountNumber: rubber.accountNumber,
           lineUserId: rubber.lineUserId,
           lineDisplayName: rubber.lineDisplayName
         }
