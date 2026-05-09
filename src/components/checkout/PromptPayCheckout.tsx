@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   PaymentElement,
   useStripe,
@@ -12,43 +12,54 @@ import { useTranslation } from "@/components/providers/LanguageProvider";
 
 interface PromptPayCheckoutProps {
   clientSecret: string;
+  autoConfirm?: boolean;
 }
 
-export default function PromptPayCheckout({ clientSecret }: PromptPayCheckoutProps) {
+export default function PromptPayCheckout({ clientSecret, autoConfirm }: PromptPayCheckoutProps) {
   const stripe = useStripe();
   const elements = useElements();
   const { t } = useTranslation();
 
   const [message, setMessage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isElementReady, setIsElementReady] = useState(false);
+  const hasAutoConfirmed = useRef(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!stripe || !elements) {
-      return;
+  // Auto-confirm: when PaymentElement is ready and autoConfirm is true,
+  // automatically submit the payment to generate the QR code
+  useEffect(() => {
+    if (autoConfirm && isElementReady && stripe && elements && !hasAutoConfirmed.current && !isLoading) {
+      hasAutoConfirmed.current = true;
+      doConfirm();
     }
+  }, [autoConfirm, isElementReady, stripe, elements]);
+
+  const doConfirm = async () => {
+    if (!stripe || !elements) return;
 
     setIsLoading(true);
 
     const { error } = await stripe.confirmPayment({
       elements,
       confirmParams: {
-        // Make sure to change this to your payment completion page
         return_url: `${window.location.origin}/success`,
       },
-      // Defer redirect to handle polling if needed, but for PromptPay 
-      // Stripe usually handles the redirect once the user confirms.
-      // In LINE Mini-app, we often stay on page or redirect to a success page.
     });
 
-    if (error.type === "card_error" || error.type === "validation_error") {
-      setMessage(error.message || "An error occurred.");
-    } else {
-      setMessage("An unexpected error occurred.");
+    if (error) {
+      if (error.type === "card_error" || error.type === "validation_error") {
+        setMessage(error.message || "An error occurred.");
+      } else {
+        setMessage(error.message || "An unexpected error occurred.");
+      }
     }
 
     setIsLoading(false);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    doConfirm();
   };
 
   return (
@@ -74,7 +85,8 @@ export default function PromptPayCheckout({ clientSecret }: PromptPayCheckoutPro
       <form id="payment-form" onSubmit={handleSubmit} className="space-y-6">
         <div className="bg-white rounded-xl p-6 border border-slate-100 shadow-xl shadow-slate-200/50">
            <PaymentElement 
-            id="payment-element" 
+            id="payment-element"
+            onReady={() => setIsElementReady(true)}
             options={{
               layout: "tabs",
               fields: {

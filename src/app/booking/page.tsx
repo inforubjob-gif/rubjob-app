@@ -1063,7 +1063,7 @@ function BookingFlow() {
               >
                 {paymentQR && stripePromise ? (
                    <Elements stripe={stripePromise} options={{ clientSecret: paymentQR, appearance: { theme: 'stripe' } }}>
-                      <PromptPayCheckout clientSecret={paymentQR} />
+                      <PromptPayCheckout clientSecret={paymentQR} autoConfirm />
                    </Elements>
                 ) : (
                   <>
