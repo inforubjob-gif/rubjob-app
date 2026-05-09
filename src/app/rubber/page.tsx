@@ -277,24 +277,24 @@ export default function RubberDashboard() {
         </div>
 
         {/* Work Status Toggle (Dashboard Version) */}
-        <Card className="mb-6 bg-white/10 backdrop-blur-xl border border-white/20 shadow-xl shadow-primary-dark/20 rounded-xl p-4 text-white">
+        <Card className="mb-6 bg-white/10 backdrop-blur-xl border border-white/20 shadow-lg shadow-primary-dark/20 rounded-xl p-3 text-white">
            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                  <IconCircle variant={workStatus ? "green" : "slate"} size="md">
-                      <Icons.Shield size={24} />
-                  </IconCircle>
+              <div className="flex items-center gap-2.5">
+                  <div className={`w-9 h-9 rounded-lg flex items-center justify-center transition-all shadow-sm ${workStatus ? 'bg-emerald-400/20 text-emerald-300' : 'bg-white/10 text-white/60'}`}>
+                      <Icons.Shield size={18} />
+                  </div>
                   <div>
-                      <p className="text-xs font-black text-white/50 uppercase leading-none mb-1">{t("rubber.profile.workStatus")}</p>
-                      <p className="text-sm font-black uppercase">
+                      <p className="text-[9px] font-black text-white/50 uppercase leading-none mb-0.5">{t("rubber.profile.workStatus")}</p>
+                      <p className="text-sm font-black uppercase leading-none">
                         {workStatus ? t("rubber.profile.receivingJobs") : t("rubber.profile.notReceiving")}
                       </p>
                   </div>
               </div>
               <button 
                 onClick={() => setIsStatusModalOpen(true)}
-                className={`w-14 h-8 rounded-full p-1 transition-all duration-300 ${workStatus ? 'bg-white shadow-lg shadow-white/20' : 'bg-white/20'}`}
+                className={`w-11 h-6 rounded-full p-0.5 transition-all duration-300 ${workStatus ? 'bg-white shadow-md shadow-white/20' : 'bg-white/20'}`}
               >
-                <div className={`w-6 h-6 rounded-full shadow-md transition-all duration-300 ${workStatus ? 'bg-primary transform translate-x-6' : 'bg-white'}`} />
+                <div className={`w-5 h-5 rounded-full shadow-sm transition-all duration-300 ${workStatus ? 'bg-primary transform translate-x-5' : 'bg-white'}`} />
               </button>
            </div>
         </Card>

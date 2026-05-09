@@ -131,25 +131,25 @@ export default function RubberProfilePage() {
         {/* Status Section */}
         <section>
           <Card 
-            className={`p-6 rounded-[2rem] border transition-all duration-500 shadow-xl ${workStatus ? 'bg-white border-emerald-100' : 'bg-slate-100 border-slate-200 shadow-none'}`}
+            className={`p-4 rounded-2xl border transition-all duration-500 shadow-md ${workStatus ? 'bg-white border-emerald-100' : 'bg-slate-100 border-slate-200 shadow-none'}`}
           >
              <div className="flex items-center justify-between">
-               <div className="flex items-center gap-4">
-                  <div className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-500 shadow-lg ${workStatus ? 'bg-emerald-50 text-emerald-500 shadow-emerald-100' : 'bg-slate-200 text-slate-400'}`}>
-                      <Icons.Shield size={28} />
+               <div className="flex items-center gap-3">
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-500 shadow-sm ${workStatus ? 'bg-emerald-50 text-emerald-500 shadow-emerald-100' : 'bg-slate-200 text-slate-400'}`}>
+                      <Icons.Shield size={20} />
                   </div>
                   <div>
-                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">{t("rubber.profile.workStatus")}</p>
-                      <p className={`text-base font-black uppercase ${workStatus ? 'text-emerald-600' : 'text-slate-500'}`}>
+                      <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none mb-0.5">{t("rubber.profile.workStatus")}</p>
+                      <p className={`text-sm font-black uppercase leading-none ${workStatus ? 'text-emerald-600' : 'text-slate-500'}`}>
                         {workStatus ? t("rubber.profile.receivingJobs") : t("rubber.profile.notReceiving")}
                       </p>
                   </div>
                </div>
                <button 
                   onClick={() => setIsStatusModalOpen(true)}
-                  className={`w-16 h-9 rounded-full p-1.5 transition-all duration-500 ${workStatus ? 'bg-emerald-500 shadow-lg shadow-emerald-200' : 'bg-slate-300'}`}
+                  className={`w-11 h-6 rounded-full p-0.5 transition-all duration-500 ${workStatus ? 'bg-emerald-500 shadow-md shadow-emerald-200' : 'bg-slate-300'}`}
                >
-                  <div className={`w-6 h-6 rounded-full bg-white shadow-md transition-all duration-500 ${workStatus ? 'translate-x-7' : 'translate-x-0'}`} />
+                  <div className={`w-5 h-5 rounded-full bg-white shadow-sm transition-all duration-500 ${workStatus ? 'translate-x-5' : 'translate-x-0'}`} />
                </button>
              </div>
           </Card>
