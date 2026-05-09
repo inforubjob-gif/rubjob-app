@@ -17,6 +17,13 @@ export default function ProfilePage() {
   const [tempName, setTempName] = useState("");
   const [showLanguageModal, setShowLanguageModal] = useState(false);
 
+
+
+  const [orders, setOrders] = useState<any[]>([]);
+  const [addresses, setAddresses] = useState<any[]>([]);
+  const [phone, setPhone] = useState<string | null>(null);
+  const [isDataLoading, setIsDataLoading] = useState(true);
+
   const MENU_ITEMS = [
     { icon: <Icons.MapPin size={20} />, label: t("profile.myAddress"), description: addresses.length > 0 ? `${addresses.length} ที่อยู่ที่บันทึกไว้` : t("profile.addressDesc"), href: "/profile/addresses" },
     { icon: <Icons.Payment size={20} />, label: t("profile.paymentMethods"), description: t("profile.paymentMethodsDesc"), href: "/profile/payments" },
@@ -30,11 +37,6 @@ export default function ProfilePage() {
     { icon: <Icons.FileText size={20} />, label: t("profile.termsOfService"), description: t("profile.termsOfServiceDesc"), href: "/profile/tos" },
     { icon: <Icons.Lock size={20} />, label: t("profile.privacyPolicy"), description: t("profile.privacyPolicyDesc"), href: "/profile/privacy" },
   ];
-
-  const [orders, setOrders] = useState<any[]>([]);
-  const [addresses, setAddresses] = useState<any[]>([]);
-  const [phone, setPhone] = useState<string | null>(null);
-  const [isDataLoading, setIsDataLoading] = useState(true);
 
   // Fetch real data
   useEffect(() => {
