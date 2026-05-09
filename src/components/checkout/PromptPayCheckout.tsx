@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import {
   PaymentElement,
   useStripe,
@@ -203,9 +204,9 @@ export default function PromptPayCheckout({ clientSecret, autoConfirm }: PromptP
   };
 
   return (
-    <div className="w-full max-w-md mx-auto space-y-6 animate-fade-in">
+    <div className="w-full max-w-md mx-auto space-y-6">
       {/* 📱 Specialized Mobile UX for LINE Mini-app */}
-      <div className="bg-blue-50 border-2 border-blue-100 rounded-xl p-5 flex items-start gap-4 shadow-sm">
+      <div className="bg-blue-50 border-2 border-blue-100 rounded-xl p-5 flex items-start gap-4 shadow-sm animate-fade-in">
         <div className="w-12 h-12 bg-blue-600 text-white rounded-xl flex items-center justify-center shrink-0 shadow-lg shadow-blue-600/20">
            <Icons.Camera size={24} strokeWidth={2.5} />
         </div>
@@ -222,7 +223,7 @@ export default function PromptPayCheckout({ clientSecret, autoConfirm }: PromptP
         </div>
       </div>
 
-      <div className="space-y-6">
+      <div className="space-y-6 animate-fade-in">
         <div className="bg-white rounded-xl p-6 border border-slate-100 shadow-xl shadow-slate-200/50 flex flex-col items-center justify-center min-h-[300px]">
           {qrCodeUrl ? (
             <div className="flex flex-col items-center animate-scale-in w-full">
@@ -274,8 +275,8 @@ export default function PromptPayCheckout({ clientSecret, autoConfirm }: PromptP
         </div>
       </div>
 
-      {generatedQrUrl && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm animate-fade-in" onClick={() => setGeneratedQrUrl(null)}>
+      {generatedQrUrl && typeof document !== "undefined" && createPortal(
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm animate-fade-in" onClick={() => setGeneratedQrUrl(null)}>
           <div className="bg-white rounded-3xl p-5 w-full max-w-sm flex flex-col items-center animate-scale-in" onClick={e => e.stopPropagation()}>
             <div className="w-12 h-12 bg-emerald-100 text-emerald-500 rounded-full flex items-center justify-center mb-3">
               <Icons.Download size={24} />
@@ -296,7 +297,7 @@ export default function PromptPayCheckout({ clientSecret, autoConfirm }: PromptP
             </button>
           </div>
         </div>
-      )}
+      , document.body)}
     </div>
   );
 }
