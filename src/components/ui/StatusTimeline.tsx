@@ -45,30 +45,38 @@ const DIRECT_ORDER: OrderStatus[] = [
 interface StatusTimelineProps {
   currentStatus: OrderStatus;
   orderType?: OrderType;
+  paymentStatus?: string;
 }
 
-export default function StatusTimeline({ currentStatus, orderType = "logistics" }: StatusTimelineProps) {
+export default function StatusTimeline({ currentStatus, orderType = "logistics", paymentStatus }: StatusTimelineProps) {
   const { t } = useTranslation();
   
   const isDirect = orderType === "direct_service";
-  const steps = isDirect ? DIRECT_STEPS : LOGISTICS_STEPS;
+  const steps = isDirect ? [...DIRECT_STEPS] : [...LOGISTICS_STEPS];
   const statusOrder = isDirect ? DIRECT_ORDER : LOGISTICS_ORDER;
   
   const currentIdx = statusOrder.indexOf(currentStatus);
+
+  // If unpaid, replace the first step to reflect waiting for payment
+  const isUnpaid = paymentStatus === "pending" && currentStatus === "pending";
+  if (isUnpaid) {
+    steps[0] = { key: "pending_payment" as any, icon: Icons.Wallet, variant: "orange" };
+  }
 
   // Determine which step is currently active in the UI
   let activeStepIdx = 0;
   let currentStepInfo = steps[0];
 
   steps.forEach((step, index) => {
-    const stepIdx = statusOrder.indexOf(step.key);
+    // Treat pending_payment as position 0
+    const stepIdx = step.key === ("pending_payment" as any) ? 0 : statusOrder.indexOf(step.key);
     if (currentIdx >= stepIdx) {
       activeStepIdx = index;
       currentStepInfo = step;
     }
   });
 
-  // If we are at a status not in the steps array (like 'pending'), show the first step as pending
+  // If we are at a status not in the steps array (like 'pending'), show the first step
   if (currentIdx === 0) {
     activeStepIdx = 0;
     currentStepInfo = steps[0];
@@ -89,7 +97,7 @@ export default function StatusTimeline({ currentStatus, orderType = "logistics" 
         
         <div className="flex items-center justify-between">
           {steps.map((step, index) => {
-            const stepIdx = statusOrder.indexOf(step.key);
+            const stepIdx = step.key === ("pending_payment" as any) ? 0 : statusOrder.indexOf(step.key);
             const isDone = stepIdx < currentIdx || (step.key === "completed" && currentStatus === "completed");
             const isCurrent = index === activeStepIdx && currentStatus !== "completed";
             
@@ -120,7 +128,9 @@ export default function StatusTimeline({ currentStatus, orderType = "logistics" 
         <div className="flex-1 min-w-0">
           <div className="flex items-center justify-between gap-2">
             <h4 className="text-sm font-black uppercase text-slate-900 truncate">
-              {t(`orders.status.${currentStepInfo.key}`)}
+              {currentStepInfo.key === "pending_payment" 
+                ? "รอการชำระเงิน"
+                : t(`orders.status.${currentStepInfo.key}`)}
             </h4>
             {currentStatus !== "completed" && (
               <span className="flex h-2 w-2 rounded-full bg-primary animate-ping shrink-0" />
@@ -129,8 +139,10 @@ export default function StatusTimeline({ currentStatus, orderType = "logistics" 
           <p className="text-xs text-slate-500 mt-0.5 truncate">
             {currentStatus === "completed" 
               ? t("orders.status.completed") 
-              : currentIdx === 0 
-                ? t("common.pending") 
+              : currentIdx === 0 && !isUnpaid
+                ? "กำลังค้นหาคนขับเพื่อเข้ารับ"
+                : currentIdx === 0 && isUnpaid
+                ? "กรุณาชำระเงินเพื่อดำเนินการต่อ"
                 : t("common.processing")}
           </p>
         </div>
