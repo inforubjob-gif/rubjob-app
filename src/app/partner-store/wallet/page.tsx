@@ -160,10 +160,7 @@ export default function StoreWalletPage() {
 
           <Card className="p-6 bg-primary/5 border-2 border-primary/10 shadow-sm">
               <h3 className="text-sm font-black text-primary mb-2 uppercase">{t("store.wallet.commissionRate")}</h3>
-              <p className="text-xs text-slate-500 leading-relaxed mb-4 font-bold">{t("store.wallet.commissionDesc")}</p>
-              <div className="h-2 bg-white rounded-full overflow-hidden border border-primary/10">
-                  <div className="h-full bg-primary w-[90%] shadow-[0_0_12px_rgba(255,159,28,0.4)]" />
-              </div>
+              <p className="text-xs text-slate-500 leading-relaxed font-bold">{t("store.wallet.commissionDesc")}</p>
           </Card>
         </div>
 
@@ -220,7 +217,7 @@ export default function StoreWalletPage() {
                   
                   <Button 
                      onClick={handleWithdraw}
-                     disabled={!amount || parseInt(amount) < 100 || (Number(amount) > balance) || isProcessing}
+                     disabled={!amount || parseInt(amount) < 300 || (Number(amount) > balance) || isProcessing}
                      className="w-full py-5 bg-primary text-white rounded-xl font-black uppercase shadow-2xl shadow-primary/30"
                   >
                      {isProcessing ? t("store.wallet.processing") : t("store.wallet.confirmWithdraw")}

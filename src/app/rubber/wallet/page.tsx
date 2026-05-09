@@ -273,10 +273,7 @@ export default function RubberWalletPage() {
           <Card className="p-6 bg-slate-900 text-white border-none shadow-2xl rounded-[2.5rem] relative overflow-hidden">
               <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full -mr-16 -mt-16 blur-2xl" />
               <h3 className="text-xs font-black text-primary mb-2 uppercase tracking-widest">{t("rubber.wallet.commissionRate")}</h3>
-              <p className="text-[11px] text-white/50 leading-relaxed mb-4 font-bold uppercase tracking-tight">{t("rubber.wallet.commissionDesc")}</p>
-              <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
-                  <div className="h-full bg-primary w-[85%] shadow-[0_0_12px_rgba(255,159,28,0.8)]" />
-              </div>
+              <p className="text-[11px] text-white/50 leading-relaxed font-bold uppercase tracking-tight">{t("rubber.wallet.commissionDesc")}</p>
           </Card>
         </div>
 
@@ -327,7 +324,7 @@ export default function RubberWalletPage() {
                   
                   <Button 
                      onClick={handleWithdraw}
-                     disabled={!amount || parseInt(amount) < 100 || parseInt(amount) > balance || isProcessing}
+                     disabled={!amount || parseInt(amount) < 300 || parseInt(amount) > balance || isProcessing}
                      className="w-full py-5 bg-primary text-white rounded-xl font-black uppercase shadow-2xl shadow-primary/30"
                   >
                      {isProcessing ? t("rubber.wallet.processing") : t("rubber.wallet.confirmWithdraw")}

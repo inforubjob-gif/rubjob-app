@@ -34,8 +34,8 @@ export default function ProviderWalletPage() {
 
   const handleWithdraw = async () => {
     const amt = parseFloat(withdrawAmount);
-    if (!amt || amt < 100) {
-      alert("ยอดถอนขั้นต่ำ 100 บาท");
+    if (!amt || amt < 300) {
+      alert("ยอดถอนขั้นต่ำ 300 บาท");
       return;
     }
     try {
@@ -93,7 +93,7 @@ export default function ProviderWalletPage() {
               placeholder="0"
               className="w-full bg-slate-50 rounded-xl px-4 py-4 text-2xl font-black text-center border-none focus:ring-2 focus:ring-primary/20 mb-4"
             />
-            <p className="text-[10px] text-slate-400 font-bold text-center mb-4">ถอนขั้นต่ำ 100 บาท</p>
+            <p className="text-[10px] text-slate-400 font-bold text-center mb-4">ถอนขั้นต่ำ 300 บาท</p>
             <Button
               fullWidth
               onClick={handleWithdraw}
@@ -109,7 +109,7 @@ export default function ProviderWalletPage() {
       <div className="px-5 mb-6">
         <Card className="bg-orange-50 border border-orange-100 p-4">
           <p className="text-xs font-bold text-primary-dark">
-            💡 อัตราค่าธรรมเนียมแพลตฟอร์ม 15% — คุณได้รับ 85% ของแต่ละงาน
+            💡 ได้รับเงินภายใน 24 ชม. หลังจากกดถอน — (กำหนดยอดถอนขั้นต่ำ 300 บาท)
           </p>
         </Card>
       </div>

@@ -109,8 +109,8 @@ export async function POST(req: Request) {
     }
 
     const { amount } = await req.json() as any;
-    if (!amount || amount < 100) {
-      return NextResponse.json({ error: "ยอดถอนขั้นต่ำ 100 บาท" }, { status: 400 });
+    if (!amount || amount < 300) {
+      return NextResponse.json({ error: "ยอดถอนขั้นต่ำ 300 บาท" }, { status: 400 });
     }
 
     const db = getRequestContext().env.DB;
