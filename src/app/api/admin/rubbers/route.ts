@@ -27,11 +27,19 @@ export async function GET(req: Request) {
       SELECT * FROM rubber_documents
     `).all();
 
-    const rubbersWithDocs = rubbers.map((r: any) => ({
-      ...r,
-      displayId: r.rubber_number ? `RD-${String(r.rubber_number).padStart(4, '0')}` : r.id,
-      documents: docs.filter((d: any) => d.rubberId === r.id)
-    }));
+    const rubbersWithDocs = rubbers.map((r: any) => {
+      let workStatus = false;
+      try {
+        const prefs = r.preferences ? JSON.parse(r.preferences) : {};
+        workStatus = !!prefs.workStatus;
+      } catch (e) {}
+      return {
+        ...r,
+        workStatus,
+        displayId: r.rubber_number ? `RD-${String(r.rubber_number).padStart(4, '0')}` : r.id,
+        documents: docs.filter((d: any) => d.rubberId === r.id)
+      };
+    });
 
     return NextResponse.json({ rubbers: rubbersWithDocs });
   } catch (error: any) {

@@ -17,9 +17,13 @@ export default function RubberManagementAdminPage() {
  const [filteredRubbers, setFilteredRubbers] = useState<any[]>([]);
  const [search, setSearch] = useState("");
  const [isLoading, setIsLoading] = useState(true);
+ const [lastRefresh, setLastRefresh] = useState<Date | null>(null);
 
+ // Initial fetch + auto-polling every 10 seconds for real-time work status
  useEffect(() => {
   fetchRubbers();
+  const interval = setInterval(() => fetchRubbers(true), 10000);
+  return () => clearInterval(interval);
  }, []);
 
  useEffect(() => {
@@ -33,19 +37,19 @@ export default function RubberManagementAdminPage() {
   );
  }, [search, rubbers]);
 
- async function fetchRubbers() {
-  setIsLoading(true);
+ async function fetchRubbers(silent = false) {
+  if (!silent) setIsLoading(true);
   try {
    const res = await fetch("/api/admin/rubbers");
    const data = await res.json() as any;
    if (data.rubbers) {
     setRubbers(data.rubbers);
-    setFilteredRubbers(data.rubbers);
+    setLastRefresh(new Date());
    }
   } catch (err) {
    console.error("Failed to fetch rubbers:", err);
   } finally {
-   setIsLoading(false);
+   if (!silent) setIsLoading(false);
   }
  }
 
@@ -90,6 +94,13 @@ export default function RubberManagementAdminPage() {
     <div>
      <h1 className="text-2xl md:text-3xl font-black text-slate-900 tracking-tight lowercase">{t('admin.rubbers.list.title')}</h1>
      <p className="text-slate-500 text-sm md:text-base font-medium mt-1">{t('admin.rubbers.list.subtitle')}</p>
+     {lastRefresh && (
+      <div className="flex items-center gap-2 mt-2">
+       <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
+       <span className="text-[10px] font-bold text-slate-400">อัพเดทอัตโนมัติทุก 10 วินาที • {lastRefresh.toLocaleTimeString('th-TH')}</span>
+       <button onClick={() => fetchRubbers(true)} className="text-[10px] font-black text-primary hover:underline ml-1">รีเฟรชตอนนี้</button>
+      </div>
+     )}
     </div>
     <div className="flex flex-col sm:flex-row items-center gap-4 w-full md:w-auto">
      <GlobalInput
@@ -135,6 +146,7 @@ export default function RubberManagementAdminPage() {
          <th className="px-4 py-5">{t('admin.rubbers.list.table.vehicle')}</th>
          <th className="px-4 py-5">{t('admin.rubbers.form.docs')}</th>
          <th className="px-4 py-5">{t('admin.rubbers.list.table.contact')}</th>
+         <th className="px-4 py-5">สถานะรับงาน</th>
          <th className="px-4 py-5">{t('admin.rubbers.list.table.status')}</th>
          <th className="px-4 py-5 text-right">{t('admin.rubbers.list.table.actions')}</th>
         </tr>
@@ -203,6 +215,14 @@ export default function RubberManagementAdminPage() {
           </td>
            <td className="px-4 py-6">
             <span className="text-xs font-black text-slate-600 font-mono italic">{rubber.phone || t('common.notSet')}</span>
+           </td>
+           <td className="px-4 py-6">
+            <div className="flex items-center gap-2">
+             <div className={`w-2.5 h-2.5 rounded-full transition-colors ${rubber.workStatus ? 'bg-emerald-500 shadow-lg shadow-emerald-500/40 animate-pulse' : 'bg-slate-300'}`} />
+             <span className={`text-xs font-black uppercase ${rubber.workStatus ? 'text-emerald-600' : 'text-slate-400'}`}>
+              {rubber.workStatus ? 'ออนไลน์' : 'ออฟไลน์'}
+             </span>
+            </div>
            </td>
            <td className="px-4 py-6">
             <Badge variant={
