@@ -18,6 +18,7 @@ export default function BottomNav() {
 
   // Detect context from both hostname subdomain and pathname
   const hostname = typeof window !== "undefined" ? window.location.hostname : "";
+  const isOnSubdomain = hostname.startsWith("rubber.") || hostname.startsWith("store.") || hostname.startsWith("admin.") || hostname.startsWith("provider.");
   const isStoreContext = pathname.startsWith("/partner-store") || hostname.startsWith("store.");
   const isRubberContext = pathname.startsWith("/rubber") || hostname.startsWith("rubber.");
   const isAdminContext = pathname.startsWith("/admin") || hostname.startsWith("admin.");
@@ -73,6 +74,22 @@ export default function BottomNav() {
   // 4. If it's NOT a valid app context (likely a 404 page)
   if (isAdminContext || isLandingContext || isAuthPage || !isAppContext) return null;
 
+  // ── Subdomain-aware path helper ──
+  // When on rubber.rubjob-all.com, middleware rewrites "/" → "/rubber" internally,
+  // but usePathname() returns "/" (the browser URL). So tab hrefs must use clean
+  // paths ("/", "/orders") instead of prefixed paths ("/rubber", "/rubber/orders").
+  const portalPrefix = isRubberContext && hostname.startsWith("rubber.") ? "/rubber"
+    : isStoreContext && hostname.startsWith("store.") ? "/partner-store"
+    : isProviderContext && hostname.startsWith("provider.") ? "/partner-service"
+    : "";
+
+  function cleanHref(href: string): string {
+    if (!portalPrefix) return href;
+    if (href === portalPrefix) return "/";
+    if (href.startsWith(portalPrefix + "/")) return href.slice(portalPrefix.length);
+    return href;
+  }
+
   const USER_TABS: Tab[] = [
     {
       href: "/",
@@ -111,22 +128,22 @@ export default function BottomNav() {
 
   const STORE_TABS: Tab[] = [
     {
-      href: "/partner-store",
+      href: cleanHref("/partner-store"),
       label: t("store.navDashboard") || "Dashboard",
       icon: (active) => <Icons.Tasks size={24} strokeWidth={active ? 3 : 2} />,
     },
     {
-      href: "/partner-store/orders",
+      href: cleanHref("/partner-store/orders"),
       label: t("store.navOrders") || "Orders",
       icon: (active) => <Icons.FileText size={24} strokeWidth={active ? 3 : 2} />,
     },
     {
-      href: "/partner-store/wallet",
+      href: cleanHref("/partner-store/wallet"),
       label: t("store.navWallet") || "Wallet",
       icon: (active) => <Icons.Wallet size={24} strokeWidth={active ? 3 : 2} />,
     },
     {
-      href: "/partner-store/profile",
+      href: cleanHref("/partner-store/profile"),
       label: t("store.navProfile") || "Profile",
       icon: (active) => <Icons.UserCog size={24} strokeWidth={active ? 3 : 2} />,
     },
@@ -134,22 +151,22 @@ export default function BottomNav() {
 
   const RUBBER_TABS: Tab[] = [
     {
-      href: "/rubber",
+      href: cleanHref("/rubber"),
       label: t("rubber.navDashboard") || "Tasks",
       icon: (active) => <Icons.Tasks size={24} strokeWidth={active ? 3 : 2} />,
     },
     {
-      href: "/rubber/orders",
+      href: cleanHref("/rubber/orders"),
       label: t("rubber.navOrders") || "Orders",
       icon: (active) => <Icons.FileText size={24} strokeWidth={active ? 3 : 2} />,
     },
     {
-      href: "/rubber/wallet",
+      href: cleanHref("/rubber/wallet"),
       label: t("rubber.navWallet") || "Earnings",
       icon: (active) => <Icons.Wallet size={24} strokeWidth={active ? 3 : 2} />,
     },
     {
-      href: "/rubber/profile",
+      href: cleanHref("/rubber/profile"),
       label: t("rubber.navProfile") || "Profile",
       icon: (active) => <Icons.UserCog size={24} strokeWidth={active ? 3 : 2} />,
     },
@@ -157,17 +174,17 @@ export default function BottomNav() {
 
   const PROVIDER_TABS: Tab[] = [
     {
-      href: "/partner-service",
+      href: cleanHref("/partner-service"),
       label: "งาน",
       icon: (active) => <Icons.Tasks size={24} strokeWidth={active ? 3 : 2} />,
     },
     {
-      href: "/partner-service/wallet",
+      href: cleanHref("/partner-service/wallet"),
       label: "รายได้",
       icon: (active) => <Icons.Wallet size={24} strokeWidth={active ? 3 : 2} />,
     },
     {
-      href: "/partner-service/profile",
+      href: cleanHref("/partner-service/profile"),
       label: "โปรไฟล์",
       icon: (active) => <Icons.UserCog size={24} strokeWidth={active ? 3 : 2} />,
     },
@@ -179,8 +196,8 @@ export default function BottomNav() {
     <nav className={`fixed bottom-0 left-0 right-0 z-50 bg-primary border-primary-dark/20 border-t shadow-[0_-8px_30px_rgba(255,159,28,0.25)] pb-[env(safe-area-inset-bottom,0px)]`}>
       <div className={`flex items-center justify-around h-16 max-w-lg mx-auto px-2 text-white/70`}>
         {tabs.map((tab) => {
-          const isActive = (tab.href === "/" || tab.href === "/partner-store" || tab.href === "/rubber" || tab.href === "/partner-service") 
-            ? pathname === tab.href 
+          const isActive = tab.href === "/"
+            ? pathname === "/"
             : pathname.startsWith(tab.href);
           
           const isBooking = tab.href === "/booking";
