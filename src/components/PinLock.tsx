@@ -158,7 +158,7 @@ export default function PinLock({ type, userId, onVerified, children }: PinLockP
   const currentValue = step === "confirm" ? confirmPin : pin;
 
   return (
-    <div className="fixed inset-0 bg-white z-[10000] flex flex-col">
+    <div className="fixed inset-0 bg-white z-40 flex flex-col pb-20">
       {/* Subtle brand gradient at top */}
       <div className="absolute top-0 left-0 right-0 h-48 bg-gradient-to-b from-primary/5 to-transparent pointer-events-none" />
 
@@ -272,6 +272,7 @@ export default function PinLock({ type, userId, onVerified, children }: PinLockP
         </div>
         {/* Safe area padding for phones with home indicator */}
         <div className="h-[env(safe-area-inset-bottom,0px)] bg-[#FAFAFA]" />
+        <div className="h-4 bg-[#FAFAFA]" /> {/* Extra padding for BottomNav */}
       </div>
     </div>
   );
