@@ -125,7 +125,7 @@ export default function RubberWalletPage() {
     <PinLock type="rubber" onVerified={() => {}}>
       <div className="flex flex-col min-h-dvh bg-slate-50">
         <header className="bg-primary text-white px-5 pt-12 pb-10 rounded-b-[3rem] shadow-xl relative overflow-hidden text-center">
-          <div className="absolute top-0 right-0 w-40 h-40 bg-white/20 rounded-full -mr-20 -mt-20 blur-3xl" />
+          <div className="absolute top-0 right-0 w-40 h-40 bg-white/20 rounded-full -mr-20 -mt-20 blur-3xl pointer-events-none" />
           <div className="relative z-10">
             <p className="text-[10px] font-black text-white/50 uppercase mb-2">{t("rubber.wallet.balance")}</p>
             <div className="flex items-baseline justify-center gap-2 mb-8 text-white">
@@ -138,10 +138,10 @@ export default function RubberWalletPage() {
                >
                   <Icons.Payment size={18} className="mr-2" /> {t("rubber.wallet.withdraw")}
                </Button>
-               <button className="w-14 h-14 rounded-xl bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/20 active:scale-95 transition-transform shadow-lg">
+               <button onClick={() => document.getElementById('history-section')?.scrollIntoView({ behavior: 'smooth' })} className="w-14 h-14 shrink-0 relative z-20 rounded-xl bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/20 active:scale-95 transition-transform shadow-lg">
                   <Icons.Clock size={20} className="text-white" />
                </button>
-               <button onClick={() => router.push('/rubber/profile/payout-method')} className="w-14 h-14 rounded-xl bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/20 active:scale-95 transition-transform shadow-lg">
+               <button onClick={() => router.push('/rubber/profile/payout-method')} className="w-14 h-14 shrink-0 relative z-20 rounded-xl bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/20 active:scale-95 transition-transform shadow-lg">
                   <Icons.Settings size={20} className="text-white" />
                </button>
             </div>
@@ -241,7 +241,7 @@ export default function RubberWalletPage() {
             </Card>
           </section>
 
-          <section>
+          <section id="history-section">
             <h2 className="text-[11px] font-black text-slate-900 uppercase tracking-[0.2em] mb-4 px-2">{t("rubber.wallet.history")}</h2>
             <div className="space-y-3">
               {transactions.map((trx) => (
