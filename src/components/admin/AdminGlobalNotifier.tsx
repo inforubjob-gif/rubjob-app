@@ -62,7 +62,7 @@ export default function AdminGlobalNotifier() {
               title: "ออเดอร์ค้างที่ร้านนานเกินไป",
               desc: `มี ${slaOrders.length} ออเดอร์อยู่ที่ร้านนานกว่า 3 ชั่วโมง`,
               link: "/admin/orders",
-              icon: Icons.AlertTriangle
+              icon: Icons.Alert
             });
           }
         }
@@ -79,7 +79,7 @@ export default function AdminGlobalNotifier() {
               title: "ข้อความช่วยเหลือใหม่",
               desc: `มี ${unread.length} แชทที่รอการตอบกลับ`,
               link: "/admin/support",
-              icon: Icons.Message
+              icon: Icons.Chat
             });
           }
         }
