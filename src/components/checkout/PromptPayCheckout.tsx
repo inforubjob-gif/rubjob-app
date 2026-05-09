@@ -48,7 +48,7 @@ export default function PromptPayCheckout({ clientSecret, autoConfirm }: PromptP
             name: "Customer",
           },
         },
-      });
+      }, { handleActions: false });
 
       if (error) {
         setMessage(error.message || "An error occurred.");
