@@ -274,13 +274,13 @@ export default function RubberDashboard() {
         </Card>
 
         <div className="grid grid-cols-2 gap-4 text-center">
-          <div className="bg-white/10 backdrop-blur-md p-4 rounded-xl border border-white/10">
-            <p className="text-xs font-black text-white/50 uppercase">{t("rubber.tasksToday")}</p>
-            <p className="text-2xl font-black mt-1 text-white">{activeJobs.length}</p>
+          <div className="bg-white/80 backdrop-blur-md p-4 rounded-xl border border-white shadow-sm">
+            <p className="text-xs font-black text-slate-500 uppercase">{t("rubber.tasksToday")}</p>
+            <p className="text-2xl font-black mt-1 text-slate-800">{activeJobs.length}</p>
           </div>
-          <div className="bg-white/10 backdrop-blur-md p-4 rounded-xl border border-white/10">
-            <p className="text-xs font-black text-white/50 uppercase">{t("rubber.earnings")}</p>
-            <p className="text-3xl font-black mt-1 text-white">
+          <div className="bg-white/80 backdrop-blur-md p-4 rounded-xl border border-white shadow-sm">
+            <p className="text-xs font-black text-slate-500 uppercase">{t("rubber.earnings")}</p>
+            <p className="text-3xl font-black mt-1 text-slate-800">
               ฿{Math.ceil(balance).toLocaleString()}
             </p>
           </div>

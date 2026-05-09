@@ -189,18 +189,18 @@ export default function BottomNav() {
             <Link
               key={tab.href}
               href={tab.href}
-              className={`relative flex flex-col items-center justify-center gap-1 flex-1 h-full transition-all duration-300 ${
+              className={`relative flex flex-col items-center justify-center gap-1 flex-1 h-full transition-all duration-300 group ${
                 isActive 
-                  ? "text-white drop-shadow-md" 
-                   : "text-white/70 hover:text-white/90"
+                  ? "text-white drop-shadow-md -translate-y-1" 
+                   : "text-white/60 hover:text-white hover:-translate-y-1"
               }`}
             >
-              <div className={`flex items-center justify-center p-1.5 rounded-xl transition-all ${
-                isActive && !isBooking ? "bg-white/20 scale-110 shadow-inner" : ""
+              <div className={`flex items-center justify-center p-2 rounded-xl transition-all duration-300 ${
+                isActive && !isBooking ? "bg-white text-primary scale-[1.15] shadow-lg shadow-black/10" : "group-hover:bg-white/10"
               }`}>
                 {tab.icon(isActive)}
               </div>
-              <span className={`text-[10px] font-black uppercase leading-tight ${isActive ? "opacity-100" : "opacity-60"}`}>
+              <span className={`text-[10px] font-black uppercase leading-tight transition-all duration-300 ${isActive ? "opacity-100 scale-105" : "opacity-60 group-hover:opacity-100"}`}>
                 {tab.label}
               </span>
             </Link>
