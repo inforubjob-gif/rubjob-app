@@ -10,8 +10,15 @@ import { TIME_SLOTS } from "@/lib/constants";
 
 export default function QuickBookPage() {
   const router = useRouter();
-  const { profile } = useLiff();
+  const { profile, isReady, login, isLoggedIn } = useLiff();
   const { t, language } = useTranslation();
+
+  // Auto-login: if LIFF is ready but user is not logged in, trigger login automatically
+  useEffect(() => {
+    if (isReady && !isLoggedIn && !profile?.userId) {
+      login();
+    }
+  }, [isReady, isLoggedIn, profile?.userId, login]);
 
   const [recentOrder, setRecentOrder] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);

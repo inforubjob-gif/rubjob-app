@@ -177,7 +177,9 @@ export default function LiffProvider({ children }: { children: ReactNode }) {
     try {
       const liff = (await import("@line/liff")).default;
       if (!liff.isLoggedIn()) {
-        liff.login();
+        // Preserve current path so user returns to the same page after login
+        const currentUrl = window.location.href;
+        liff.login({ redirectUri: currentUrl });
       }
     } catch (err) {
       console.error("[RUBJOB] Login failed:", err);
