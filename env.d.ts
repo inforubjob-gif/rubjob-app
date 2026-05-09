@@ -19,6 +19,8 @@ interface CloudflareEnv {
 declare namespace NodeJS {
   interface ProcessEnv {
     NEXT_PUBLIC_LIFF_ID?: string;
+    NEXT_PUBLIC_LIFF_ID_RUBBER?: string;
+    NEXT_PUBLIC_LIFF_ID_QUICK?: string;
     NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY?: string;
     ADMIN_EMAIL?: string;
     ADMIN_PASSWORD?: string;

@@ -34,9 +34,21 @@ export function useLiff() {
 }
 
 // ─── Real LIFF Provider ───
-const LIFF_ID = typeof window !== 'undefined' && window.location.hostname.startsWith('rubber.') 
-  ? (process.env.NEXT_PUBLIC_LIFF_ID_RUBBER || process.env.NEXT_PUBLIC_LIFF_ID || "")
-  : (process.env.NEXT_PUBLIC_LIFF_ID ?? "");
+const LIFF_ID = (() => {
+  if (typeof window === 'undefined') return process.env.NEXT_PUBLIC_LIFF_ID ?? "";
+  const host = window.location.hostname;
+  const path = window.location.pathname;
+  
+  // Rubber portal uses its own LIFF app
+  if (host.startsWith('rubber.')) {
+    return process.env.NEXT_PUBLIC_LIFF_ID_RUBBER || process.env.NEXT_PUBLIC_LIFF_ID || "";
+  }
+  // Quick Book page uses its own LIFF app
+  if (path.startsWith('/quick')) {
+    return process.env.NEXT_PUBLIC_LIFF_ID_QUICK || process.env.NEXT_PUBLIC_LIFF_ID || "";
+  }
+  return process.env.NEXT_PUBLIC_LIFF_ID ?? "";
+})();
 
 export default function LiffProvider({ children }: { children: ReactNode }) {
   const [ctx, setCtx] = useState<LiffContextValue>({
