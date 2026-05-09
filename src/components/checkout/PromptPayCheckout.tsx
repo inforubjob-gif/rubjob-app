@@ -39,6 +39,14 @@ export default function PromptPayCheckout({ clientSecret, autoConfirm }: PromptP
 
     setIsLoading(true);
 
+    // MUST call elements.submit() before confirmPayment when using PaymentElement
+    const { error: submitError } = await elements.submit();
+    if (submitError) {
+      setMessage(submitError.message || "An error occurred.");
+      setIsLoading(false);
+      return;
+    }
+
     const { error } = await stripe.confirmPayment({
       elements,
       confirmParams: {
