@@ -497,6 +497,9 @@ export const en = {
     needHelp: "Need Help?",
     contactSupport: "Contact support via LINE",
     lineOnly: "This feature is only available in the LINE app.",
+    cancelOrder: "Cancel Order",
+    confirmCancel: "Are you sure you want to cancel this order?",
+    cancelSuccess: "Order cancelled successfully",
     status: {
       picking_up: "Picking Up",
       delivering_to_store: "Sending to Store",

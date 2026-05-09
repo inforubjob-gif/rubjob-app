@@ -435,6 +435,9 @@ export const th = {
       needHelp: "ต้องการความช่วยเหลือ?",
       contactSupport: "ติดต่อฝ่ายช่วยเหลือผ่าน LINE",
       lineOnly: "ฟีเจอร์นี้ใช้ได้เฉพาะในแอป LINE เท่านั้น",
+      cancelOrder: "ยกเลิกออเดอร์",
+      confirmCancel: "คุณแน่ใจหรือไม่ที่จะยกเลิกออเดอร์นี้?",
+      cancelSuccess: "ยกเลิกออเดอร์สำเร็จ",
       status: {
         picking_up: "กำลังเข้าไปรับผ้า",
         delivering_to_store: "กำลังนำส่งร้านซัก",
