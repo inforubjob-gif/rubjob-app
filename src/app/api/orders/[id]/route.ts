@@ -77,3 +77,49 @@ export async function GET(
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
+
+/**
+ * PATCH /api/orders/[id]
+ * Updates an order (e.g. Cancel order)
+ */
+export async function PATCH(
+  req: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await params;
+    const body = await req.json() as { action: string };
+    
+    if (body.action !== "cancel") {
+      return NextResponse.json({ error: "Invalid action" }, { status: 400 });
+    }
+
+    const db = getRequestContext().env.DB;
+    if (!db) {
+      return NextResponse.json({ error: "D1 Database binding 'DB' not found" }, { status: 500 });
+    }
+
+    // Check if order can be cancelled
+    const order = await db.prepare("SELECT status, paymentStatus, paymentMethod FROM orders WHERE id = ?").bind(id).first() as any;
+    if (!order) {
+      return NextResponse.json({ error: "Order not found" }, { status: 404 });
+    }
+
+    // Only allow cancellation if order is pending and NOT paid (unless cash)
+    if (order.status !== "pending") {
+      return NextResponse.json({ error: "ไม่สามารถยกเลิกออเดอร์ที่กำลังดำเนินการได้" }, { status: 400 });
+    }
+    
+    if (order.paymentMethod !== "cash" && order.paymentStatus === "paid") {
+      return NextResponse.json({ error: "ไม่สามารถยกเลิกออเดอร์ที่ชำระเงินแล้วได้ กรุณาติดต่อแอดมิน" }, { status: 400 });
+    }
+
+    await db.prepare("UPDATE orders SET status = 'cancelled', updatedAt = CURRENT_TIMESTAMP WHERE id = ?").bind(id).run();
+
+    return NextResponse.json({ success: true, message: "Order cancelled successfully" });
+  } catch (error: any) {
+    console.error("Update order error:", error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+}
+

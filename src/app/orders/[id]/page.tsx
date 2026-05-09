@@ -37,6 +37,30 @@ export default function OrderDetailPage() {
   const [isSubmittingReview, setIsSubmittingReview] = useState(false);
   const [stripePromise, setStripePromise] = useState<Promise<Stripe | null> | null>(null);
   const [clientSecret, setClientSecret] = useState<string | null>(null);
+  const [isCancelling, setIsCancelling] = useState(false);
+
+  const handleCancelOrder = async () => {
+    if (!confirm(t("orders.confirmCancel") || "คุณแน่ใจหรือไม่ว่าต้องการยกเลิกออเดอร์นี้? (สามารถยกเลิกได้ก่อนชำระเงินหรือเริ่มดำเนินการเท่านั้น)")) return;
+    setIsCancelling(true);
+    try {
+      const res = await fetch(`/api/orders/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "cancel" }),
+      });
+      const data = await res.json() as any;
+      if (!res.ok) {
+        alert(data.error || "Failed to cancel order");
+        return;
+      }
+      alert(t("orders.cancelSuccess") || "ยกเลิกออเดอร์สำเร็จ");
+      window.location.reload();
+    } catch (e) {
+      alert("Error cancelling order");
+    } finally {
+      setIsCancelling(false);
+    }
+  };
 
   const handleSubmitReview = async () => {
     if (rating === 0) return;
@@ -372,6 +396,22 @@ export default function OrderDetailPage() {
             </Button>
           </div>
         </Card>
+
+        {/* Cancel Order Button */}
+        {order.status === "pending" && (order.paymentStatus === "pending" || order.paymentMethod === "cash") && (
+          <div className="pt-4">
+            <Button
+              variant="outline"
+              fullWidth
+              className="text-rose-500 border-rose-200 hover:bg-rose-50 font-bold active:scale-95 transition-all"
+              onClick={handleCancelOrder}
+              disabled={isCancelling}
+              isLoading={isCancelling}
+            >
+              {t("orders.cancelOrder") || "ยกเลิกออเดอร์ (Cancel Order)"}
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   );
