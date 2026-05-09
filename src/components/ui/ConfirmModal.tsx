@@ -1,7 +1,6 @@
 "use client";
 
 import Modal from "./Modal";
-import Button from "./Button";
 import { useTranslation } from "@/components/providers/LanguageProvider";
 
 type ConfirmVariant = "default" | "danger";
@@ -17,11 +16,6 @@ interface ConfirmModalProps {
   variant?: ConfirmVariant;
   isLoading?: boolean;
 }
-
-const confirmButtonStyles: Record<ConfirmVariant, string> = {
-  default: "bg-primary hover:bg-primary-heavy text-white shadow-lg shadow-primary/20",
-  danger: "bg-rose-500 hover:bg-rose-600 text-white shadow-lg shadow-rose-500/20",
-};
 
 export default function ConfirmModal({
   isOpen,
@@ -39,29 +33,32 @@ export default function ConfirmModal({
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={title}>
       {description && (
-        <p className="text-sm text-slate-500 font-medium text-center mb-8 leading-relaxed">
+        <p className="text-sm text-slate-500 font-medium text-center mb-8 leading-relaxed max-w-[320px] mx-auto">
           {description}
         </p>
       )}
       <div className="flex gap-3 w-full">
-        <Button
-          variant="outline"
-          size="lg"
-          fullWidth
+        {/* Cancel — subtle soft button */}
+        <button
           onClick={onClose}
           disabled={isLoading}
-          className="rounded-xl font-black"
+          className="flex-1 rounded-2xl py-4 text-sm font-black text-slate-500 bg-slate-100 active:bg-slate-200 active:scale-[0.97] transition-all disabled:opacity-50"
         >
           {cancelLabel || t("common.cancel")}
-        </Button>
+        </button>
+
+        {/* Confirm — bold branded button */}
         <button
           onClick={onConfirm}
           disabled={isLoading}
           className={`
-            flex-1 rounded-xl py-3.5 text-sm font-black uppercase tracking-wider
-            transition-all duration-150 active:scale-[0.96]
+            flex-1 rounded-2xl py-4 text-sm font-black uppercase tracking-wider
+            transition-all duration-150 active:scale-[0.97]
             disabled:opacity-50 disabled:pointer-events-none
-            ${confirmButtonStyles[variant]}
+            ${variant === "danger"
+              ? "bg-gradient-to-b from-rose-500 to-rose-600 text-white shadow-lg shadow-rose-500/25"
+              : "bg-gradient-to-b from-primary to-[#e88a00] text-white shadow-lg shadow-primary/25"
+            }
           `}
         >
           {isLoading ? (
