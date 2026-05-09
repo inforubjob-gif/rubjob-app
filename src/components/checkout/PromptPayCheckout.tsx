@@ -104,15 +104,22 @@ export default function PromptPayCheckout({ clientSecret, autoConfirm }: PromptP
       ctx.fillStyle = "#ffffff";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      // Draw Header Banner (Rubjob Orange)
-      ctx.fillStyle = "#f97316";
+      // Draw Header Banner (Rubjob CI Orange)
+      ctx.fillStyle = "#FF9F1C";
       ctx.fillRect(0, 0, canvas.width, 140);
 
-      // Draw "RUBJOB" text in banner
-      ctx.fillStyle = "#ffffff";
-      ctx.font = "900 48px 'Helvetica Neue', Helvetica, Arial, sans-serif";
-      ctx.textAlign = "center";
-      ctx.fillText("RUBJOB", canvas.width / 2, 85);
+      // Load and Draw Rubjob Logo
+      const logoImg = new Image();
+      logoImg.crossOrigin = "anonymous";
+      await new Promise((resolve, reject) => {
+        logoImg.onload = resolve;
+        logoImg.onerror = reject;
+        // In case the app is deployed to a subpath, window.location.origin is safer
+        logoImg.src = `${window.location.origin}/images/rubjob-complete_Text-white.png`;
+      });
+      const logoHeight = 60;
+      const logoWidth = (logoImg.width / logoImg.height) * logoHeight;
+      ctx.drawImage(logoImg, (canvas.width - logoWidth) / 2, 40, logoWidth, logoHeight);
 
       // Load QR Image
       const qrImg = new Image();
@@ -136,8 +143,9 @@ export default function PromptPayCheckout({ clientSecret, autoConfirm }: PromptP
 
       // Draw Amount
       if (paymentAmount) {
-        ctx.fillStyle = "#f97316";
+        ctx.fillStyle = "#FF9F1C";
         ctx.font = "900 64px 'Helvetica Neue', Helvetica, Arial, sans-serif";
+        ctx.textAlign = "center";
         ctx.fillText(`฿${paymentAmount.toLocaleString()}`, canvas.width / 2, 740);
       }
 
