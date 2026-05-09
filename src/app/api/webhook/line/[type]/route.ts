@@ -91,9 +91,20 @@ export async function POST(req: Request, { params }: { params: Promise<{ type: s
     const events = body.events || [];
 
     for (const event of events) {
-      if (isManual || (event.type === "message" && event.message.type === "text")) {
+      if (isManual || (event.type === "message" && ["text", "image", "sticker"].includes(event.message.type))) {
         const userId = isManual ? body.userId : event.source.userId;
-        const text = isManual ? body.message : event.message.text;
+        let text = "";
+        
+        if (isManual) {
+          text = body.message;
+        } else if (event.message.type === "text") {
+          text = event.message.text;
+        } else if (event.message.type === "image") {
+          text = `[IMAGE:${event.message.id}]`;
+        } else if (event.message.type === "sticker") {
+          text = `[STICKER:${event.message.stickerId}]`;
+        }
+
         const channelKey = isManual ? "in_app" : `${channelType}_line`;
 
         // ── Auto-detect User Type ──

@@ -256,7 +256,11 @@ export default function SupportCenterPage() {
             </span>
            </div>
            <p className="text-xs text-slate-500 truncate leading-relaxed">
-            {tk.lastMessage || t('admin.support.openingTicket')}
+            {tk.lastMessage?.startsWith("[IMAGE:") 
+              ? "📸 ส่งรูปภาพ" 
+              : tk.lastMessage?.startsWith("[STICKER:") 
+              ? "✨ ส่งสติ๊กเกอร์" 
+              : (tk.lastMessage || t('admin.support.openingTicket'))}
            </p>
            {/* Channel Source */}
            <div className="flex items-center gap-2 mt-1.5">
@@ -356,25 +360,50 @@ export default function SupportCenterPage() {
 
       {/* Message Area */}
       <div className="flex-1 overflow-y-auto p-8 space-y-6 bg-slate-50/30">
-       {messages.map((m) => (
-        <div key={m.id} className={`flex ${m.senderType === 'admin' ? 'justify-end' : 'justify-start'} animate-fade-in`}>
-         <div className={`max-w-[85%] md:max-w-[75%] lg:max-w-[70%] group`}>
-          <div className={`px-5 py-3.5 rounded-xl shadow-sm text-sm font-medium leading-relaxed
-           ${m.senderType === 'admin' 
-            ? 'bg-slate-900 text-white rounded-tr-none' 
-            : 'bg-white text-slate-700 border border-slate-100 rounded-tl-none'}`}
-          >
-           {m.content}
+       {messages.map((m) => {
+        const isImage = m.content.startsWith("[IMAGE:") && m.content.endsWith("]");
+        const isSticker = m.content.startsWith("[STICKER:") && m.content.endsWith("]");
+        let imageId = "";
+        let stickerId = "";
+        
+        if (isImage) imageId = m.content.replace("[IMAGE:", "").replace("]", "");
+        if (isSticker) stickerId = m.content.replace("[STICKER:", "").replace("]", "");
+
+        return (
+         <div key={m.id} className={`flex ${m.senderType === 'admin' ? 'justify-end' : 'justify-start'} animate-fade-in`}>
+          <div className={`max-w-[85%] md:max-w-[75%] lg:max-w-[70%] group`}>
+           <div className={`
+             ${isImage || isSticker ? 'bg-transparent shadow-none' : `px-5 py-3.5 rounded-xl shadow-sm text-sm font-medium leading-relaxed
+             ${m.senderType === 'admin' 
+              ? 'bg-slate-900 text-white rounded-tr-none' 
+              : 'bg-white text-slate-700 border border-slate-100 rounded-tl-none'}`}
+           `}>
+            {isImage ? (
+              <img 
+                src={`/api/admin/support/image?messageId=${imageId}&channel=${selectedTicket?.channel}`} 
+                alt="LINE Image" 
+                className={`max-w-xs md:max-w-sm rounded-2xl shadow-md border-2 border-white object-cover ${m.senderType === 'admin' ? 'rounded-tr-none' : 'rounded-tl-none'}`}
+              />
+            ) : isSticker ? (
+              <img 
+                src={`https://stickershop.line-scdn.net/stickershop/v1/sticker/${stickerId}/android/sticker.png`} 
+                alt="LINE Sticker" 
+                className="w-32 h-32 object-contain drop-shadow-md"
+              />
+            ) : (
+              m.content
+            )}
+           </div>
+           <p className={`text-[10px] font-bold text-slate-400 mt-1.5 px-2 ${m.senderType === 'admin' ? 'text-right' : 'text-left'}`}>
+            {m.senderType === 'admin' 
+             ? t('admin.support.you') 
+             : `${typeBadge?.icon || '👤'} ${selectedTicket?.userName || t('admin.common.customer')}`
+            } • {new Date(m.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+           </p>
           </div>
-          <p className={`text-[10px] font-bold text-slate-400 mt-1.5 px-2 ${m.senderType === 'admin' ? 'text-right' : 'text-left'}`}>
-           {m.senderType === 'admin' 
-            ? t('admin.support.you') 
-            : `${typeBadge?.icon || '👤'} ${selectedTicket?.userName || t('admin.common.customer')}`
-           } • {new Date(m.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-          </p>
          </div>
-        </div>
-       ))}
+        );
+       })}
        <div ref={chatEndRef} />
       </div>
 
