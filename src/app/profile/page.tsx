@@ -18,7 +18,7 @@ export default function ProfilePage() {
   const [showLanguageModal, setShowLanguageModal] = useState(false);
 
   const MENU_ITEMS = [
-    { icon: <Icons.MapPin size={20} />, label: t("profile.myAddress"), description: t("profile.addressDesc"), href: "/profile/addresses" },
+    { icon: <Icons.MapPin size={20} />, label: t("profile.myAddress"), description: addresses.length > 0 ? `${addresses.length} ที่อยู่ที่บันทึกไว้` : t("profile.addressDesc"), href: "/profile/addresses" },
     { icon: <Icons.Payment size={20} />, label: t("profile.paymentMethods"), description: t("profile.paymentMethodsDesc"), href: "/profile/payments" },
     { icon: <Icons.Bell size={20} />, label: t("profile.notifications"), description: t("profile.notificationsDesc"), href: "/profile/notifications" },
     { 
@@ -137,39 +137,7 @@ export default function ProfilePage() {
       </header>
 
       <div className="relative z-10 flex-1 px-5 -mt-4 space-y-6 pb-24 animate-fade-in">
-        {/* Saved Addresses */}
-        <section>
-          <div className="flex items-center justify-between mb-3 px-1">
-            <h2 className="text-base font-black text-slate-900 uppercase">{t("profile.myAddress")}</h2>
-            <Link 
-              href="/profile/addresses" 
-              className="text-xs font-bold text-primary bg-white px-3 py-1.5 rounded-full shadow-sm active:scale-95 transition-transform"
-            >
-              {t("profile.addNewAddress")}
-            </Link>
-          </div>
-          <div className="space-y-2">
-            {addresses.length === 0 && !isDataLoading && (
-              <p className="text-center py-4 text-xs text-muted">
-                {t("profile.noAddress") || "No saved addresses yet."}
-              </p>
-            )}
-            {addresses.map((addr) => (
-              <Card key={addr.id} className="p-4" hoverable>
-                <div className="flex items-center gap-4">
-                  <IconCircle variant="orange" size="md">
-                    {addr.label.toLowerCase().includes("home") || addr.label.toLowerCase().includes("บ้าน") ? <Icons.Home size={22} strokeWidth={2.5} /> : <Icons.Office size={22} strokeWidth={2.5} />}
-                  </IconCircle>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-bold text-slate-900">{addr.label}</p>
-                    <p className="text-[11px] text-slate-400 truncate">{addr.details}</p>
-                  </div>
-                  <Icons.Back size={14} className="text-slate-300 rotate-180" />
-                </div>
-              </Card>
-            ))}
-          </div>
-        </section>
+
 
         {/* Settings Menu */}
         <section>
