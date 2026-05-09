@@ -452,6 +452,47 @@ export default function RubberForm({ initialData, isEdit }: RubberFormProps) {
                  />
               </div>
            )}
+
+           {isEdit && (
+              <Card className="mt-6 p-6 bg-white border border-rose-100 shadow-sm">
+                 <div className="flex items-center gap-3 mb-4">
+                    <div className="w-10 h-10 rounded-xl bg-rose-50 text-rose-500 flex items-center justify-center">
+                       <Icons.Shield size={20} />
+                    </div>
+                    <div>
+                       <h3 className="text-sm font-black text-slate-900 uppercase">รีเซ็ต PIN กระเป๋าเงิน</h3>
+                       <p className="text-[10px] font-medium text-slate-400">ใช้เมื่อ Rubber แจ้งลืมรหัส PIN 6 หลัก</p>
+                    </div>
+                 </div>
+                 <p className="text-xs text-slate-500 mb-4 leading-relaxed">
+                    เมื่อกดรีเซ็ต PIN จะถูกลบออก และ Rubber จะต้องตั้ง PIN ใหม่ในครั้งถัดไปที่เปิดหน้ากระเป๋าเงิน
+                 </p>
+                 <button
+                    type="button"
+                    onClick={async () => {
+                      if (!confirm("ยืนยันรีเซ็ต PIN ของ Rubber คนนี้?")) return;
+                      try {
+                        const res = await fetch("/api/user/pin", {
+                          method: "POST",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({ action: "reset", type: "rubber", userId: initialData?.id })
+                        });
+                        const data = await res.json() as any;
+                        if (data.success) {
+                          showToast("รีเซ็ต PIN สำเร็จแล้ว", "success");
+                        } else {
+                          showToast(data.error || "เกิดข้อผิดพลาด", "error");
+                        }
+                      } catch (err) {
+                        showToast("ไม่สามารถรีเซ็ต PIN ได้", "error");
+                      }
+                    }}
+                    className="w-full py-3 bg-rose-500 text-white rounded-xl font-black text-xs uppercase tracking-widest hover:bg-rose-600 transition-all shadow-lg shadow-rose-500/20 active:scale-[0.98]"
+                 >
+                    🔓 รีเซ็ต PIN
+                 </button>
+              </Card>
+           )}
         </div>
       </div>
     </form>

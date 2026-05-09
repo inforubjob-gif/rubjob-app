@@ -140,6 +140,28 @@ export async function POST(req: Request) {
       }
     }
 
+    // Admin-only: Reset a user's PIN (clears it so they must set up a new one)
+    if (action === "reset") {
+      // Verify admin session via cookie
+      const adminCookie = req.headers.get("cookie")?.split(";").find(c => c.trim().startsWith("admin_session="));
+      if (!adminCookie) {
+        return NextResponse.json({ error: "Admin access required" }, { status: 403 });
+      }
+
+      const targetUserId = bodyUserId;
+      const targetType = type || "rubber";
+      const targetTable = targetType === "rubber" ? "rubber_users" : targetType === "store" ? "stores" : "users";
+
+      if (!targetUserId) {
+        return NextResponse.json({ error: "Missing userId" }, { status: 400 });
+      }
+
+      await ensureWalletPinColumn(db, targetTable);
+      await db.prepare(`UPDATE ${targetTable} SET walletPin = NULL WHERE id = ?`).bind(targetUserId).run();
+
+      return NextResponse.json({ success: true, message: "PIN has been reset" });
+    }
+
     return NextResponse.json({ error: "Invalid action" }, { status: 400 });
   } catch (error: any) {
     console.error("PIN operation error:", error);
