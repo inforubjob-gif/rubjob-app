@@ -17,6 +17,7 @@ export default function AdminGlobalNotifier() {
   const [hasNew, setHasNew] = useState(false);
   
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const viewedAlertsContent = useRef<Record<string, number>>({});
   
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -45,6 +46,7 @@ export default function AdminGlobalNotifier() {
               type: "warning",
               title: "ออเดอร์รอการมอบหมาย",
               desc: `มี ${pending.length} ออเดอร์ที่รอมอบหมายให้คนขับ`,
+              count: pending.length,
               link: "/admin/orders",
               icon: Icons.Clock
             });
@@ -62,6 +64,7 @@ export default function AdminGlobalNotifier() {
               type: "critical",
               title: "ออเดอร์ค้างที่ร้านนานเกินไป",
               desc: `มี ${slaOrders.length} ออเดอร์อยู่ที่ร้านนานกว่า 3 ชั่วโมง`,
+              count: slaOrders.length,
               link: "/admin/orders",
               icon: Icons.Alert
             });
@@ -79,6 +82,7 @@ export default function AdminGlobalNotifier() {
               type: "info",
               title: "ข้อความช่วยเหลือใหม่",
               desc: `มี ${unread.length} แชทที่รอการตอบกลับ`,
+              count: unread.length,
               link: "/admin/support",
               icon: Icons.Chat
             });
@@ -86,17 +90,26 @@ export default function AdminGlobalNotifier() {
         }
       }
       
-      setAlerts(prev => {
-        // If there are more alerts now than before or content changed
-        if (newAlerts.length > 0 && JSON.stringify(newAlerts) !== JSON.stringify(prev)) {
-          setHasNew(true);
-          setDismissed([]); // Un-dismiss when there are updates
-          try {
-            audioRef.current?.play().catch(() => {});
-          } catch(e) {}
-        }
-        return newAlerts;
-      });
+      let isNew = false;
+      const changedIds: string[] = [];
+      
+      for (const alert of newAlerts) {
+         const lastViewedCount = viewedAlertsContent.current[alert.id] || 0;
+         if (alert.count > lastViewedCount) {
+            isNew = true;
+            changedIds.push(alert.id);
+         }
+      }
+      
+      if (isNew) {
+        setHasNew(true);
+        setDismissed(prev => prev.filter(id => !changedIds.includes(id)));
+        try {
+          audioRef.current?.play().catch(() => {});
+        } catch(e) {}
+      }
+      
+      setAlerts(newAlerts);
       
     } catch (e) {
       console.error(e);
@@ -172,6 +185,14 @@ export default function AdminGlobalNotifier() {
       {/* Floating Bell Button */}
       <button
         onClick={() => {
+          if (!isOpen && alerts.length > 0) {
+             alerts.forEach(a => {
+                const lastViewedCount = viewedAlertsContent.current[a.id] || 0;
+                if (a.count >= lastViewedCount) {
+                   viewedAlertsContent.current[a.id] = a.count;
+                }
+             });
+          }
           setIsOpen(!isOpen);
           setHasNew(false);
           if (audioRef.current) {
@@ -184,9 +205,9 @@ export default function AdminGlobalNotifier() {
         }`}
       >
         <Icons.Bell size={24} className={hasNew ? "animate-pulse" : ""} />
-        {alerts.filter(a => !dismissed.includes(a.id)).length > 0 && !hasNew && (
+        {alerts.filter(a => !dismissed.includes(a.id) && a.count > (viewedAlertsContent.current[a.id] || 0)).length > 0 && !hasNew && (
           <span className="absolute top-0 right-0 w-4 h-4 bg-red-500 rounded-full border-2 border-white flex items-center justify-center text-[8px] font-black">
-            {alerts.filter(a => !dismissed.includes(a.id)).length}
+            {alerts.filter(a => !dismissed.includes(a.id) && a.count > (viewedAlertsContent.current[a.id] || 0)).length}
           </span>
         )}
       </button>
