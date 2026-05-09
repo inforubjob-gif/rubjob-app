@@ -310,11 +310,10 @@ function BookingFlow() {
     ? getDistanceKm(selectedAddress.lat, selectedAddress.lng, selectedStore.lat, selectedStore.lng)
     : 5.1; 
   
-  // Single Trip Fare = 50 + (Distance > 3 ? (Distance - 3) * 10 : 0)
-  // Gross Rubber Fare (round trip) = Single Trip Fare * 2
-  const singleTripBase = 50;
-  const singleTripDistanceBonus = distanceKm > 3 ? (distanceKm - 3) * 10 : 0;
-  const totalDeliveryBase = (singleTripBase + singleTripDistanceBonus) * 2;
+  // Round Trip Delivery Fare = 50 base + (roundTripKm > 3 ? (roundTripKm - 3) * 10 : 0)
+  const roundTripKm = distanceKm * 2;
+  const roundTripDistanceBonus = roundTripKm > 3 ? (roundTripKm - 3) * 10 : 0;
+  const totalDeliveryBase = 50 + roundTripDistanceBonus;
     
   // Pricing Logic (2026 Strategy)
   let pricing: any = { customerTotal: 0, breakdown: { laundry: 0, delivery: 0, addons: 0 } };
@@ -749,7 +748,7 @@ function BookingFlow() {
                   </div>
                 </label>
               </div>
-              {singleTripDistanceBonus > 0 && <span className="text-[10px] text-muted block mt-2 ml-1">{t("booking.distanceNote").replace("{distance}", distanceKm.toFixed(1))}</span>}
+              {roundTripDistanceBonus > 0 && <span className="text-[10px] text-muted block mt-2 ml-1">{t("booking.distanceNote").replace("{distance}", distanceKm.toFixed(1))}</span>}
             </section>
 
             {/* Luggage Size & Folding Option - Only for Laundry */}

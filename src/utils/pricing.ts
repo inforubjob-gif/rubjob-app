@@ -42,12 +42,12 @@ export function calculateOrderPrice(details: {
 
   const laundryPlatformGP = laundryCost * 0.10;
 
-  // 2. Delivery Fee Calculation (คำนวณแบบไป-กลับ x2)
-  let singleTripFare = 50;
-  if (distanceKm > 3) {
-    singleTripFare += ((distanceKm - 3) * 10);
+  // 2. Delivery Fee Calculation (รวมระยะไปกลับก่อน แล้วคิดค่าส่งครั้งเดียว)
+  const roundTripKm = distanceKm * 2;
+  let deliveryFee = 50; // base fare ครั้งเดียว
+  if (roundTripKm > 3) {
+    deliveryFee += ((roundTripKm - 3) * 10);
   }
-  const deliveryFee = singleTripFare * 2; // Gross Rubber Fare (ราคารวมไป-กลับ)
 
   // Rubber Deductions
   const rubberComm = deliveryFee * 0.15;
