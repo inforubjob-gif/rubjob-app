@@ -33,6 +33,7 @@ export default function RubberDashboard() {
   const [availableJobs, setAvailableJobs] = useState<any[]>([]);
   const [activeJobs, setActiveJobs] = useState<any[]>([]);
   const [balance, setBalance] = useState(0);
+  const [todayEarnings, setTodayEarnings] = useState(0);
   const [unreadNotifCount, setUnreadNotifCount] = useState(0);
 
   const [verificationStatus, setVerificationStatus] = useState<"active" | "pending" | "unregistered" | "rejected">("pending");
@@ -105,10 +106,11 @@ export default function RubberDashboard() {
       if (data.available) setAvailableJobs(data.available);
       if (data.active) setActiveJobs(data.active);
 
-      // Fetch Balance
+      // Fetch Balance & Today's Earnings
       const walRes = await fetch(`/api/rubber/wallet?rubberId=${rubberId}`);
       const walData = await walRes.json() as any;
       if (walData.balance !== undefined) setBalance(walData.balance);
+      if (walData.todayEarnings !== undefined) setTodayEarnings(walData.todayEarnings);
     } catch (err) {
       console.error("Failed to fetch rubber dashboard data:", err);
     } finally {
@@ -303,9 +305,9 @@ export default function RubberDashboard() {
             <p className="text-2xl font-black mt-1 text-slate-800">{activeJobs.length}</p>
           </div>
           <div className="bg-white/80 backdrop-blur-md p-4 rounded-xl border border-white shadow-sm">
-            <p className="text-xs font-black text-slate-500 uppercase">{t("rubber.earnings")}</p>
+            <p className="text-xs font-black text-slate-500 uppercase">รายได้วันนี้</p>
             <p className="text-3xl font-black mt-1 text-slate-800">
-              ฿{Math.ceil(balance).toLocaleString()}
+              ฿{Math.ceil(todayEarnings).toLocaleString()}
             </p>
           </div>
         </div>

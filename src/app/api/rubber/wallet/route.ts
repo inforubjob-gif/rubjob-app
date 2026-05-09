@@ -30,7 +30,14 @@ export async function GET(req: Request) {
     `).bind(rubberId, rubberId).all();
 
     let totalEarnings = 0;
+    let todayEarnings = 0;
     const history: any[] = [];
+    
+    // Thailand timezone start of day
+    const now = new Date();
+    const thTime = new Date(now.getTime() + 7 * 60 * 60 * 1000);
+    thTime.setUTCHours(0, 0, 0, 0);
+    const todayStartUTC = new Date(thTime.getTime() - 7 * 60 * 60 * 1000).getTime();
 
     (ordersRes.results as any[]).forEach(o => {
       // 15% commission + 15 THB Platform Fee
@@ -41,6 +48,12 @@ export async function GET(req: Request) {
       const pickupCompletedStatuses = ['washing', 'ready_for_pickup', 'delivering_to_customer', 'completed'];
       if (o.pickupDriverId === rubberId && pickupCompletedStatuses.includes(o.status)) {
         totalEarnings += legEarn;
+        
+        // Check if earned today
+        if (new Date(o.createdAt).getTime() >= todayStartUTC) {
+          todayEarnings += legEarn;
+        }
+
         history.push({
           id: `${o.id}-P`,
           type: "Pickup Earnings",
@@ -53,6 +66,12 @@ export async function GET(req: Request) {
       // Leg 2: Delivery (Earned only if status is 'completed')
       if (o.deliveryDriverId === rubberId && o.status === 'completed') {
         totalEarnings += legEarn;
+
+        // Check if earned today
+        if (new Date(o.createdAt).getTime() >= todayStartUTC) {
+          todayEarnings += legEarn;
+        }
+
         history.push({
           id: `${o.id}-D`,
           type: "Delivery Earnings",
@@ -93,6 +112,7 @@ export async function GET(req: Request) {
 
     return NextResponse.json({ 
       balance: Math.max(0, balance),
+      todayEarnings: Math.max(0, todayEarnings),
       transactions: transactions.slice(0, 20)
     });
 
