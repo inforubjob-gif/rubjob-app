@@ -49,8 +49,7 @@ export default function BottomNav() {
     pathname === "/rubber/login" || 
     pathname.startsWith("/admin/login") ||
     pathname.startsWith("/auth/link-line") ||
-    pathname.startsWith("/rubber/link-line") ||
-    pathname.endsWith("/support");  // Hide on support chat pages (input bar conflicts)
+    pathname.startsWith("/rubber/link-line");
 
   // Determine if we are in a valid app context (Store, Rubber, Provider, or User App)
   const isAppContext = 
