@@ -16,11 +16,14 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: "D1 Database binding 'DB' not found" }, { status: 500 });
     }
 
-    const { results } = await db.prepare(`
+    let { results } = await db.prepare(`
       SELECT * FROM services 
       WHERE isActive = 1 AND category = 'laundry'
       ORDER BY category ASC, name ASC
     `).all();
+
+    // The user requested to keep only 4 services. We will remove 'iron_only' to make room for 'duvet_washing'
+    results = results.filter((r: any) => r.id !== "iron_only");
 
     // Fallback: Inject duvet washing if it doesn't exist in D1 yet
     const hasDuvet = results.some((r: any) => r.id === "duvet_washing");
