@@ -345,8 +345,8 @@ export default function OrderDetailPage() {
         {/* Support */}
         <Card className="p-4 bg-surface-alt">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-primary shrink-0">
-              <Icons.Phone size={20} />
+            <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-[#06C755] shrink-0">
+              <Icons.Line size={24} />
             </div>
             <div className="flex-1">
               <p className="text-sm font-semibold text-foreground">{t("orders.needHelp")}</p>
