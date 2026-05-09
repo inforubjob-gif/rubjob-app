@@ -95,7 +95,19 @@ export async function POST(req: Request) {
         env.LINE_CHANNEL_ACCESS_TOKEN
       ).catch(err => console.error("LINE push error (customer):", err));
 
-      // 2. Broadcast to Rubbers Group (Now using In-App Polling & Web Push - 100% Free)
+      // 2. Broadcast to Admin Group
+      const userRecord = await db.prepare("SELECT displayName FROM users WHERE id = ?").bind(userId).first() as { displayName: string };
+      const customerName = userRecord?.displayName || "ลูกค้าทั่วไป";
+      
+      const { notifyAdminNewOrder } = await import("@/lib/support-notify");
+      notifyAdminNewOrder({
+        orderId,
+        customerName,
+        serviceName,
+        totalPrice
+      }, env).catch(err => console.error("Admin push error:", err));
+
+      // 3. Broadcast to Rubbers Group (Now using In-App Polling & Web Push - 100% Free)
       // Since LINE Notify is discontinued, we rely on our built-in real-time update system
       // Rubbers who are "Online" will get a Sound Alert and In-App notification within 15s.
     }

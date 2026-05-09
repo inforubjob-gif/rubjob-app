@@ -201,3 +201,65 @@ export async function notifyAdminLine(
     return false;
   }
 }
+
+export async function notifyAdminNewOrder(
+  params: { orderId: string; customerName: string; serviceName: string; totalPrice: number },
+  env: any
+): Promise<boolean> {
+  const groupId = env.LINE_ADMIN_GROUP_ID;
+  const accessToken = env.LINE_CHANNEL_ACCESS_TOKEN_HELP || env.LINE_CHANNEL_ACCESS_TOKEN;
+
+  if (!groupId || !accessToken) return false;
+
+  try {
+    await fetch("https://api.line.me/v2/bot/message/push", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${accessToken}`,
+      },
+      body: JSON.stringify({
+        to: groupId,
+        messages: [{
+          type: "text",
+          text: `🚨 ออเดอร์ใหม่เข้า!\nรหัส: ${params.orderId}\nลูกค้า: ${params.customerName}\nบริการ: ${params.serviceName}\nราคา: ฿${params.totalPrice}\n\nตรวจสอบ: https://admin.rubjob-all.com`
+        }]
+      })
+    });
+    return true;
+  } catch (e) {
+    console.error("Notify admin new order error:", e);
+    return false;
+  }
+}
+
+export async function notifyAdminDelayedOrder(
+  params: { orderId: string; storeName: string; hours: number },
+  env: any
+): Promise<boolean> {
+  const groupId = env.LINE_ADMIN_GROUP_ID;
+  const accessToken = env.LINE_CHANNEL_ACCESS_TOKEN_HELP || env.LINE_CHANNEL_ACCESS_TOKEN;
+
+  if (!groupId || !accessToken) return false;
+
+  try {
+    await fetch("https://api.line.me/v2/bot/message/push", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${accessToken}`,
+      },
+      body: JSON.stringify({
+        to: groupId,
+        messages: [{
+          type: "text",
+          text: `⚠️ ออเดอร์ค้างที่ร้าน!\nรหัส: ${params.orderId}\nร้าน: ${params.storeName}\nเวลา: ${params.hours} ชั่วโมงแล้ว\n\nตรวจสอบ: https://admin.rubjob-all.com`
+        }]
+      })
+    });
+    return true;
+  } catch (e) {
+    console.error("Notify admin delayed order error:", e);
+    return false;
+  }
+}
