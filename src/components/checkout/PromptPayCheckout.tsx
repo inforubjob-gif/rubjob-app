@@ -20,49 +20,56 @@ export default function PromptPayCheckout({ clientSecret, autoConfirm }: PromptP
   const elements = useElements();
   const { t } = useTranslation();
 
-  const [message, setMessage] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isElementReady, setIsElementReady] = useState(false);
-  const hasAutoConfirmed = useRef(false);
+  const [qrCodeUrl, setQrCodeUrl] = useState<string | null>(null);
 
-  // Auto-confirm: when PaymentElement is ready and autoConfirm is true,
-  // automatically submit the payment to generate the QR code
   useEffect(() => {
-    if (autoConfirm && isElementReady && stripe && elements && !hasAutoConfirmed.current && !isLoading) {
+    if (autoConfirm && stripe && !hasAutoConfirmed.current && !isLoading && !qrCodeUrl) {
       hasAutoConfirmed.current = true;
       doConfirm();
     }
-  }, [autoConfirm, isElementReady, stripe, elements]);
+  }, [autoConfirm, stripe]);
 
   const doConfirm = async () => {
-    if (!stripe || !elements) return;
+    if (!stripe) return;
 
     setIsLoading(true);
+    setMessage(null);
 
-    // MUST call elements.submit() before confirmPayment when using PaymentElement
-    const { error: submitError } = await elements.submit();
-    if (submitError) {
-      setMessage(submitError.message || "An error occurred.");
-      setIsLoading(false);
-      return;
-    }
+    try {
+      const { error, paymentIntent } = await stripe.confirmPromptPayPayment(clientSecret, {
+        payment_method: {
+          billing_details: {
+            email: "customer@rubjob.com",
+            name: "Customer",
+          },
+        },
+      });
 
-    const { error } = await stripe.confirmPayment({
-      elements,
-      confirmParams: {
-        return_url: `${window.location.origin}/success`,
-      },
-    });
-
-    if (error) {
-      if (error.type === "card_error" || error.type === "validation_error") {
+      if (error) {
         setMessage(error.message || "An error occurred.");
-      } else {
-        setMessage(error.message || "An unexpected error occurred.");
+      } else if (
+        paymentIntent &&
+        paymentIntent.status === "requires_action" &&
+        paymentIntent.next_action?.type === "promptpay_display_qr_code"
+      ) {
+        const qrUrl = (paymentIntent.next_action as any).promptpay_display_qr_code.image_url_svg || 
+                      (paymentIntent.next_action as any).promptpay_display_qr_code.image_url_png ||
+                      (paymentIntent.next_action as any).promptpay_display_qr_code.hosted_instructions_url;
+        
+        if (qrUrl.includes('.svg') || qrUrl.includes('.png')) {
+           setQrCodeUrl(qrUrl);
+        } else {
+           // Fallback to iframe or redirect if only hosted instructions are available
+           window.location.href = qrUrl;
+        }
+      } else if (paymentIntent && paymentIntent.status === "succeeded") {
+        window.location.href = "/success";
       }
+    } catch (err: any) {
+      setMessage(err?.message || "An unexpected error occurred while confirming payment.");
+    } finally {
+      setIsLoading(false);
     }
-
-    setIsLoading(false);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -90,39 +97,33 @@ export default function PromptPayCheckout({ clientSecret, autoConfirm }: PromptP
         </div>
       </div>
 
-      <form id="payment-form" onSubmit={handleSubmit} className="space-y-6">
-        <div className="bg-white rounded-xl p-6 border border-slate-100 shadow-xl shadow-slate-200/50">
-           <PaymentElement 
-            id="payment-element"
-            onReady={() => setIsElementReady(true)}
-            options={{
-              layout: "tabs",
-              fields: {
-                billingDetails: {
-                  email: "never"
-                }
-              },
-              defaultValues: {
-                billingDetails: {
-                  email: "customer@rubjob.com",
-                  address: {
-                    country: "TH"
-                  }
-                }
-              }
-            }}
-          />
+      <div className="space-y-6">
+        <div className="bg-white rounded-xl p-6 border border-slate-100 shadow-xl shadow-slate-200/50 flex flex-col items-center justify-center min-h-[300px]">
+          {qrCodeUrl ? (
+            <div className="flex flex-col items-center animate-scale-in">
+              <img src={qrCodeUrl} alt="PromptPay QR Code" className="w-64 h-64 object-contain mb-4 border-4 border-slate-50 rounded-xl shadow-inner" />
+              <p className="text-sm font-bold text-slate-500 uppercase tracking-widest animate-pulse">Waiting for payment...</p>
+            </div>
+          ) : (
+            <div className="w-full flex flex-col items-center justify-center space-y-4">
+              {!isLoading && !message && (
+                <Icons.Payment size={48} className="text-slate-200" />
+              )}
+              {isLoading && (
+                <Icons.Refresh size={32} className="text-primary animate-spin" />
+              )}
+              <Button
+                disabled={isLoading || !stripe}
+                onClick={handleSubmit}
+                fullWidth
+                className="bg-primary text-white py-5 rounded-xl font-black uppercase shadow-2xl shadow-primary/30 active:scale-95 transition-all text-sm"
+                isLoading={isLoading}
+              >
+                {isLoading ? t("orders.payment.processing") : t("orders.payment.confirmPayment")}
+              </Button>
+            </div>
+          )}
         </div>
-
-        <Button
-          disabled={isLoading || !stripe || !elements}
-          id="submit"
-          fullWidth
-          className="bg-primary text-white py-5 rounded-xl font-black uppercase shadow-2xl shadow-primary/30 active:scale-95 transition-all text-sm"
-          isLoading={isLoading}
-        >
-          {isLoading ? t("orders.payment.processing") : t("orders.payment.confirmPayment")}
-        </Button>
 
         {/* Show any error or success messages */}
         {message && (
@@ -130,7 +131,7 @@ export default function PromptPayCheckout({ clientSecret, autoConfirm }: PromptP
             {message}
           </div>
         )}
-      </form>
+      </div>
 
       <div className="text-center">
         <div className="inline-flex items-center gap-2 px-4 py-2 bg-slate-100 rounded-full text-[10px] font-black text-slate-400 uppercase">
