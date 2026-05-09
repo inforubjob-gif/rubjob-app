@@ -6,7 +6,7 @@ import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import { Icons } from "@/components/ui/Icons";
 import { useTranslation } from "@/components/providers/LanguageProvider";
-
+import BankSelector from "@/components/ui/BankSelector";
 import { useEffect } from "react";
 import PinLock from "@/components/PinLock";
 
@@ -120,20 +120,11 @@ export default function PayoutMethodPage() {
             </div>
 
             {method === "bank" && (
-              <div className="space-y-2">
-                <label className="text-[10px] font-black text-slate-400 uppercase ml-1">{t("rubber.payoutMethodPage.bankName")}</label>
-                <select
-                  value={bankName}
-                  onChange={(e) => setBankName(e.target.value)}
-                  className="w-full bg-slate-50 rounded-xl px-4 py-4 font-bold text-slate-900 outline-none focus:ring-2 focus:ring-primary/20 transition-all border border-slate-100 appearance-none"
-                >
-                  <option value="">{t("rubber.payoutMethodPage.selectBank")}</option>
-                  <option value="kbank">Kasikorn Bank (K-Bank)</option>
-                  <option value="scb">Siam Commercial Bank (SCB)</option>
-                  <option value="bbl">Bangkok Bank (BBL)</option>
-                  <option value="ktb">Krungthai Bank (KTB)</option>
-                </select>
-              </div>
+              <BankSelector
+                value={bankName}
+                onChange={setBankName}
+                label={t("rubber.payoutMethodPage.bankName")}
+              />
             )}
 
             <div className="space-y-2">
