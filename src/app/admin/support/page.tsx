@@ -465,7 +465,7 @@ export default function SupportCenterPage() {
          className="absolute top-6 right-6 w-12 h-12 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white transition-colors"
          onClick={() => setPreviewImage(null)}
        >
-         <Icons.X size={24} />
+         <Icons.Close size={24} />
        </button>
        <img 
          src={previewImage} 
