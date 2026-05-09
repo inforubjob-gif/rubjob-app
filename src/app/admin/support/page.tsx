@@ -256,9 +256,9 @@ export default function SupportCenterPage() {
             </span>
            </div>
            <p className="text-xs text-slate-500 truncate leading-relaxed">
-            {tk.lastMessage?.startsWith("[IMAGE:") 
+            {typeof tk.lastMessage === 'string' && tk.lastMessage.trim().startsWith("[IMAGE:") 
               ? "📸 ส่งรูปภาพ" 
-              : tk.lastMessage?.startsWith("[STICKER:") 
+              : typeof tk.lastMessage === 'string' && tk.lastMessage.trim().startsWith("[STICKER:") 
               ? "✨ ส่งสติ๊กเกอร์" 
               : (tk.lastMessage || t('admin.support.openingTicket'))}
            </p>
@@ -361,13 +361,14 @@ export default function SupportCenterPage() {
       {/* Message Area */}
       <div className="flex-1 overflow-y-auto p-8 space-y-6 bg-slate-50/30">
        {messages.map((m) => {
-        const isImage = m.content.startsWith("[IMAGE:") && m.content.endsWith("]");
-        const isSticker = m.content.startsWith("[STICKER:") && m.content.endsWith("]");
+        const contentStr = typeof m.content === 'string' ? m.content.trim() : "";
+        const isImage = contentStr.startsWith("[IMAGE:") && contentStr.endsWith("]");
+        const isSticker = contentStr.startsWith("[STICKER:") && contentStr.endsWith("]");
         let imageId = "";
         let stickerId = "";
         
-        if (isImage) imageId = m.content.replace("[IMAGE:", "").replace("]", "");
-        if (isSticker) stickerId = m.content.replace("[STICKER:", "").replace("]", "");
+        if (isImage) imageId = contentStr.replace("[IMAGE:", "").replace("]", "");
+        if (isSticker) stickerId = contentStr.replace("[STICKER:", "").replace("]", "");
 
         return (
          <div key={m.id} className={`flex ${m.senderType === 'admin' ? 'justify-end' : 'justify-start'} animate-fade-in`}>
