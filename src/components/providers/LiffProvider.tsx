@@ -107,8 +107,17 @@ export default function LiffProvider({ children }: { children: ReactNode }) {
         const isInClient = liff.isInClient();
 
         if (!isLoggedIn) {
-          // Auto-login: redirect to LINE login and return to the current page
-          liff.login({ redirectUri: window.location.href });
+          // Only auto-login via LINE on the Customer app portal
+          // Rubber, Admin, Store, Provider portals use their own email/password login
+          const host = window.location.hostname;
+          const isPortalSubdomain = /^(rubber|admin|store|provider)\./i.test(host);
+          
+          if (!isPortalSubdomain) {
+            liff.login({ redirectUri: window.location.href });
+          } else {
+            // Non-customer portals: just set ready state without auto-login
+            setCtx(prev => ({ ...prev, isReady: true, isInClient }));
+          }
           return;
         }
 
