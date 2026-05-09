@@ -116,10 +116,17 @@ export default function LiffProvider({ children }: { children: ReactNode }) {
         const host = window.location.hostname;
         const path = window.location.pathname;
         const isPortalSubdomain = /^(rubber|admin|store|provider)\./i.test(host) || /^\/(rubber|admin|store|provider)(\/|$)/i.test(path);
+        
+        const isLanding = path.startsWith("/landing") ||
+                          path.startsWith("/register") ||
+                          path.startsWith("/terms") ||
+                          path.startsWith("/privacy") ||
+                          path.startsWith("/contact") ||
+                          (!host.startsWith("app.") && !isPortalSubdomain && path === "/");
 
         await liff.init({ 
           liffId: LIFF_ID,
-          withLoginOnExternalBrowser: !isPortalSubdomain
+          withLoginOnExternalBrowser: (!isPortalSubdomain && !isLanding)
         });
 
         const isLoggedIn = liff.isLoggedIn();
@@ -127,15 +134,11 @@ export default function LiffProvider({ children }: { children: ReactNode }) {
 
         if (!isLoggedIn) {
           // Only auto-login via LINE on the Customer app portal
-          // Rubber, Admin, Store, Provider portals use their own email/password login
-          const host = window.location.hostname;
-          const path = window.location.pathname;
-          const isPortalSubdomain = /^(rubber|admin|store|provider)\./i.test(host) || /^\/(rubber|admin|store|provider)(\/|$)/i.test(path);
-          
-          if (!isPortalSubdomain) {
+          // Rubber, Admin, Store, Provider portals and Landing page use their own auth flow or none
+          if (!isPortalSubdomain && !isLanding) {
             liff.login({ redirectUri: window.location.href });
           } else {
-            // Non-customer portals: just set ready state without auto-login
+            // Non-customer portals and Landing page: just set ready state without auto-login
             setCtx(prev => ({ ...prev, isReady: true, isInClient }));
           }
           return;
