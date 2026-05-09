@@ -5,23 +5,23 @@ import Modal from "./Modal";
 import { Icons } from "./Icons";
 
 export const THAI_BANKS = [
-  { id: "kbank", name: "ธนาคารกสิกรไทย", logo: "/images/logo-bank/กสิกร.png" },
-  { id: "scb", name: "ธนาคารไทยพาณิชย์", logo: "/images/logo-bank/ไทยพาณิช.png" },
-  { id: "bbl", name: "ธนาคารกรุงเทพ", logo: "/images/logo-bank/กรุงเทพ.png" },
-  { id: "ktb", name: "ธนาคารกรุงไทย", logo: "/images/logo-bank/กรุงไทย.png" },
-  { id: "bay", name: "ธนาคารกรุงศรีอยุธยา", logo: "/images/logo-bank/กรุงศรี.png" },
+  { id: "kbank", name: "ธนาคารกสิกรไทย", logo: "/images/logo-bank/kbank.png" },
+  { id: "scb", name: "ธนาคารไทยพาณิชย์", logo: "/images/logo-bank/scb.png" },
+  { id: "bbl", name: "ธนาคารกรุงเทพ", logo: "/images/logo-bank/bbl.png" },
+  { id: "ktb", name: "ธนาคารกรุงไทย", logo: "/images/logo-bank/ktb.png" },
+  { id: "bay", name: "ธนาคารกรุงศรีอยุธยา", logo: "/images/logo-bank/bay.png" },
   { id: "ttb", name: "ทีเอ็มบีธนชาต (ttb)", logo: "/images/logo-bank/ttb.png" },
-  { id: "gsb", name: "ธนาคารออมสิน", logo: "/images/logo-bank/ออมสิน.png" },
-  { id: "baac", name: "ธ.ก.ส.", logo: "/images/logo-bank/ธนาคาร ธกส.png" },
-  { id: "ghb", name: "ธนาคารอาคารสงเคราะห์", logo: "/images/logo-bank/ธอส.png" },
+  { id: "gsb", name: "ธนาคารออมสิน", logo: "/images/logo-bank/gsb.png" },
+  { id: "baac", name: "ธ.ก.ส.", logo: "/images/logo-bank/baac.png" },
+  { id: "ghb", name: "ธนาคารอาคารสงเคราะห์", logo: "/images/logo-bank/ghb.png" },
   { id: "uob", name: "ธนาคารยูโอบี", logo: "/images/logo-bank/UOB.png" },
   { id: "cimb", name: "ธนาคารซีไอเอ็มบี", logo: "/images/logo-bank/Cimb.png" },
-  { id: "tisco", name: "ธนาคารทิสโก้", logo: "/images/logo-bank/ทิสโก้.png" },
-  { id: "kkp", name: "ธนาคารเกียรตินาคินภัทร", logo: "/images/logo-bank/เกียรตินาคิน.png" },
-  { id: "lh", name: "ธนาคารแลนด์ แอนด์ เฮ้าส์", logo: "/images/logo-bank/แลนด์แลนด์เฮ้าท์ .png" },
-  { id: "ibank", name: "ธนาคารอิสลามแห่งประเทศไทย", logo: "/images/logo-bank/ธนาคารอิสลาม.png" },
+  { id: "tisco", name: "ธนาคารทิสโก้", logo: "/images/logo-bank/tisco.png" },
+  { id: "kkp", name: "ธนาคารเกียรตินาคินภัทร", logo: "/images/logo-bank/kkp.png" },
+  { id: "lh", name: "ธนาคารแลนด์ แอนด์ เฮ้าส์", logo: "/images/logo-bank/lh.png" },
+  { id: "ibank", name: "ธนาคารอิสลามแห่งประเทศไทย", logo: "/images/logo-bank/ibank.png" },
   { id: "icbc", name: "ธนาคารไอซีบีซี", logo: "/images/logo-bank/ICBC.png" },
-  { id: "boc", name: "ธนาคารแห่งประเทศจีน", logo: "/images/logo-bank/ธนาคารแห่งประเทศจีน.png" },
+  { id: "boc", name: "ธนาคารแห่งประเทศจีน", logo: "/images/logo-bank/boc.png" },
 ];
 
 interface BankSelectorProps {
