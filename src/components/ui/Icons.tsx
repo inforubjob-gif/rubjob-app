@@ -70,6 +70,7 @@ export const Icons = {
   DryClean: (props: IconProps) => <MaterialIcon name="dry_cleaning" {...props} />,
   IronOnly: (props: IconProps) => <MaterialIcon name="iron" {...props} />,
   WashIron: (props: IconProps) => <MaterialIcon name="local_laundry_service" {...props} />,
+  DuvetWashing: (props: IconProps) => <MaterialIcon name="bed" {...props} />,
 
   // Locations
   Home: (props: IconProps) => <MaterialIcon name="home" {...props} />,
@@ -203,6 +204,7 @@ export function getServiceIcon(id: string, props: IconProps = {}) {
     case "dry_clean": return <Icons.DryClean {...props} />;
     case "iron_only": return <Icons.IronOnly {...props} />;
     case "wash_iron": return <Icons.WashIron {...props} />;
+    case "duvet_washing": return <Icons.DuvetWashing {...props} />;
     case "home_cleaning": return <Icons.HomeCleaning {...props} />;
     case "personal_assistant": return <Icons.Assistant {...props} />;
     case "companionship": return <Icons.Companionship {...props} />;

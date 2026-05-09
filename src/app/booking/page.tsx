@@ -571,16 +571,20 @@ function BookingFlow() {
         {step === "service" && (
           <div className="space-y-4 stagger">
             {dbServices.map((svc) => (
-              <Card
-                key={svc.id}
-                hoverable
-                onClick={() => setSelectedService(svc.id as ServiceType)}
-                className={`p-5 flex items-center gap-4 transition-all duration-300 border-2 ${
-                  selectedService === svc.id
-                    ? "bg-primary/5 border-primary shadow-xl shadow-primary/20 scale-[1.02] ring-4 ring-primary/10"
-                    : "border-slate-100 hover:border-slate-200"
-                }`}
-              >
+                <Card
+                  key={svc.id}
+                  hoverable
+                  onClick={() => {
+                    setSelectedService(svc.id as ServiceType);
+                    if (svc.id === "duvet_washing") setBagSize("28kg");
+                    setStep("details");
+                  }}
+                  className={`p-5 flex items-center gap-4 transition-all duration-300 border-2 ${
+                    selectedService === svc.id
+                      ? "bg-primary/5 border-primary shadow-xl shadow-primary/20 scale-[1.02] ring-4 ring-primary/10"
+                      : "border-slate-100 hover:border-slate-200"
+                  }`}
+                >
                 <IconCircle variant={selectedService === svc.id ? "orange" : "white"} size="lg" className="shrink-0">
                   {getServiceIcon(svc.id, { size: 28 })}
                 </IconCircle>
@@ -601,6 +605,39 @@ function BookingFlow() {
         {/* ─── Step: Details ─── */}
         {step === "details" && (
           <div className="space-y-5 animate-fade-in">
+            {/* Service Selection (Editable) */}
+            <section>
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="text-sm font-black text-foreground flex items-center gap-2 uppercase tracking-tight">
+                  <IconCircle variant="green" size="sm">
+                    <Icons.WashFold size={14} strokeWidth={3} />
+                  </IconCircle> บริการที่เลือก
+                </h3>
+              </div>
+              {service && (
+                <Card
+                  hoverable
+                  onClick={() => setStep("service")}
+                  className="p-4 transition-all duration-300 border-2 border-slate-100 hover:border-primary/50 bg-white shadow-sm flex items-center justify-between group"
+                >
+                  <div className="flex items-start gap-3 flex-1">
+                    <IconCircle variant="orange" size="md">
+                      {getServiceIcon(service.id, { size: 20 })}
+                    </IconCircle>
+                    <div className="flex-1">
+                      <p className="text-sm font-black text-slate-800">{t(`orders.services.${service.id}`) || service.name}</p>
+                      <p className="text-[11px] text-slate-500 mt-1 line-clamp-1">{t(`serviceDesc.${service.id}`) || service.description}</p>
+                    </div>
+                  </div>
+                  <div className="pl-3 border-l border-slate-100 ml-3 shrink-0">
+                    <div className="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-primary/10 group-hover:text-primary transition-colors">
+                      <Icons.Edit size={16} />
+                    </div>
+                  </div>
+                </Card>
+              )}
+            </section>
+
             {/* Address selection */}
             <section>
               <div className="flex items-center justify-between mb-2">
@@ -620,36 +657,34 @@ function BookingFlow() {
                 {dbAddresses.length === 0 && (
                   <p className="text-center py-4 text-xs text-muted">{t("booking.noAddress")}</p>
                 )}
-                {dbAddresses.map((addr) => (
+                {selectedAddress && (
                   <Card
-                    key={addr.id}
                     hoverable
-                    onClick={() => setSelectedAddress(addr)}
-                    className={`p-3.5 transition-all duration-300 border-2 ${
-                      selectedAddress?.id === addr.id
-                        ? "bg-primary/5 border-primary shadow-lg shadow-primary/10 -translate-y-0.5"
-                        : "border-transparent"
-                    }`}
+                    onClick={() => router.push("/profile/addresses?redirect=/booking")}
+                    className="p-4 transition-all duration-300 border-2 border-slate-100 hover:border-primary/50 bg-white shadow-sm flex items-center justify-between group"
                   >
-                    <div className="flex items-start gap-2">
-                      <IconCircle variant={selectedAddress?.id === addr.id ? "orange" : "slate"} size="md">
-                        {addr.label.toLowerCase().includes("home") || addr.label.toLowerCase().includes("บ้าน") ? <Icons.Home size={20} /> : <Icons.Office size={20} />}
+                    <div className="flex items-start gap-3 flex-1">
+                      <IconCircle variant="orange" size="md">
+                        {selectedAddress.label.toLowerCase().includes("home") || selectedAddress.label.toLowerCase().includes("บ้าน") ? <Icons.Home size={20} /> : <Icons.Office size={20} />}
                       </IconCircle>
-                      <div>
-                        <p className={`text-sm font-bold transition-colors ${
-                          selectedAddress?.id === addr.id ? "text-primary-dark" : "text-foreground"
-                        }`}>{addr.label}</p>
-                        <p className="text-xs text-muted mt-0.5">{addr.details}</p>
-                        {addr.note && (
-                          <div className="flex items-center gap-1.5 mt-1 text-primary-dark">
+                      <div className="flex-1">
+                        <p className="text-sm font-bold text-slate-800">{selectedAddress.label}</p>
+                        <p className="text-xs text-slate-500 mt-1 line-clamp-2">{selectedAddress.details}</p>
+                        {selectedAddress.note && (
+                          <div className="flex items-center gap-1 mt-1.5 text-primary-dark">
                             <Icons.FileText size={12} strokeWidth={3} />
-                            <p className="text-xs">{addr.note}</p>
+                            <p className="text-xs">{selectedAddress.note}</p>
                           </div>
                         )}
                       </div>
                     </div>
+                    <div className="pl-3 border-l border-slate-100 ml-3 shrink-0">
+                      <div className="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-primary/10 group-hover:text-primary transition-colors">
+                        <Icons.Edit size={16} />
+                      </div>
+                    </div>
                   </Card>
-                ))}
+                )}
               </div>
 
               {/* Auto-assigned store is hidden from the user per requirements */}
@@ -760,21 +795,31 @@ function BookingFlow() {
                   </IconCircle>
                   {t("booking.bagSizeTitle")}
                 </h3>
-                
-                <div className="grid grid-cols-2 gap-2 mb-4">
-                  {(["9kg", "14kg", "18kg", "28kg"] as const).map((size) => (
-                    <label key={size} className={`flex flex-col items-center justify-center p-3.5 rounded-xl border-2 cursor-pointer transition-all ${bagSize === size ? "border-primary bg-primary/5 shadow-md shadow-primary/10" : "border-slate-100 bg-white hover:bg-slate-50"}`} onClick={() => setBagSize(size)}>
-                      <span className="text-sm font-black text-foreground">{size}</span>
-                      <span className="text-[10px] text-muted font-bold">
-                        {size === "9kg" ? "~25-30 ชิ้น" : 
-                         size === "14kg" ? "~40-50 ชิ้น" : 
-                         size === "18kg" ? "~60-70 ชิ้น" : 
-                         "~80-100 ชิ้น"}
+                {selectedService === "duvet_washing" ? (
+                  <div className="grid grid-cols-1 mb-4">
+                    <label className="flex flex-col items-center justify-center p-4 rounded-xl border-2 border-primary bg-primary/5 shadow-md shadow-primary/10">
+                      <span className="text-sm font-black text-foreground">ขนาดใหญ่สุด (28kg)</span>
+                      <span className="text-[10px] text-muted font-bold mt-1">
+                        รองรับผ้านวมขนาดใหญ่
                       </span>
-                      {size === "28kg" && <span className="text-[10px] text-primary-dark font-black mt-1">+฿20</span>}
                     </label>
-                  ))}
-                </div>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-2 gap-2 mb-4">
+                    {(["9kg", "14kg", "18kg", "28kg"] as const).map((size) => (
+                      <label key={size} className={`flex flex-col items-center justify-center p-3.5 rounded-xl border-2 cursor-pointer transition-all ${bagSize === size ? "border-primary bg-primary/5 shadow-md shadow-primary/10" : "border-slate-100 bg-white hover:bg-slate-50"}`} onClick={() => setBagSize(size)}>
+                        <span className="text-sm font-black text-foreground">{size}</span>
+                        <span className="text-[10px] text-muted font-bold">
+                          {size === "9kg" ? "~25-30 ชิ้น" : 
+                           size === "14kg" ? "~40-50 ชิ้น" : 
+                           size === "18kg" ? "~60-70 ชิ้น" : 
+                           "~80-100 ชิ้น"}
+                        </span>
+                        {size === "28kg" && <span className="text-[10px] text-primary-dark font-black mt-1">+฿20</span>}
+                      </label>
+                    ))}
+                  </div>
+                )}
 
                 <h3 className="text-sm font-black text-foreground mb-2 flex items-center gap-2 uppercase tracking-tight">
                   <IconCircle variant="yellow" size="sm">

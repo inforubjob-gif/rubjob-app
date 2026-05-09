@@ -22,6 +22,23 @@ export async function GET(req: Request) {
       ORDER BY category ASC, name ASC
     `).all();
 
+    // Fallback: Inject duvet washing if it doesn't exist in D1 yet
+    const hasDuvet = results.some((r: any) => r.id === "duvet_washing");
+    if (!hasDuvet) {
+      results.push({
+        id: "duvet_washing",
+        name: "Duvet Washing",
+        category: "laundry",
+        description: "บริการซักผ้านวม",
+        basePrice: 199,
+        unit: "piece",
+        icon: "duvet_washing",
+        estimatedDays: 2,
+        isActive: 1,
+        gpPercent: 15
+      });
+    }
+
     // Fetch dynamic provider gigs
     let providerGigs: any[] = [];
     try {
