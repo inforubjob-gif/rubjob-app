@@ -118,9 +118,10 @@ export default function PromptPayCheckout({ clientSecret, autoConfirm }: PromptP
         // In case the app is deployed to a subpath, window.location.origin is safer
         logoImg.src = `${window.location.origin}/images/rubjob-complete_Text-white.png`;
       });
-      const logoHeight = 60;
+      const logoHeight = 90;
       const logoWidth = (logoImg.width / logoImg.height) * logoHeight;
-      ctx.drawImage(logoImg, (canvas.width - logoWidth) / 2, 40, logoWidth, logoHeight);
+      const logoY = (140 - logoHeight) / 2;
+      ctx.drawImage(logoImg, (canvas.width - logoWidth) / 2, logoY, logoWidth, logoHeight);
 
       // Load QR Image
       const qrImg = new Image();
@@ -140,6 +141,7 @@ export default function PromptPayCheckout({ clientSecret, autoConfirm }: PromptP
       // Draw "Scan to Pay" text
       ctx.fillStyle = "#334155";
       ctx.font = "bold 28px 'Helvetica Neue', Helvetica, Arial, sans-serif";
+      ctx.textAlign = "center";
       ctx.fillText("สแกนเพื่อชำระเงิน / Scan to Pay", canvas.width / 2, 660);
 
       // Draw Amount
