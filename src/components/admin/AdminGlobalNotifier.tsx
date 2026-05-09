@@ -12,6 +12,7 @@ export default function AdminGlobalNotifier() {
   const { admin } = useAdmin();
   
   const [alerts, setAlerts] = useState<any[]>([]);
+  const [dismissed, setDismissed] = useState<string[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [hasNew, setHasNew] = useState(false);
   
@@ -86,9 +87,10 @@ export default function AdminGlobalNotifier() {
       }
       
       setAlerts(prev => {
-        // If there are more alerts now than before, trigger sound and red dot
+        // If there are more alerts now than before or content changed
         if (newAlerts.length > 0 && JSON.stringify(newAlerts) !== JSON.stringify(prev)) {
           setHasNew(true);
+          setDismissed([]); // Un-dismiss when there are updates
           try {
             audioRef.current?.play().catch(() => {});
           } catch(e) {}
@@ -119,17 +121,17 @@ export default function AdminGlobalNotifier() {
             <h3 className="font-black text-sm uppercase tracking-widest flex items-center gap-2">
               <Icons.Bell size={16} /> การแจ้งเตือน
             </h3>
-            <span className="text-[10px] px-2 py-0.5 bg-white/20 rounded-full">{alerts.length} รายการ</span>
+            <span className="text-[10px] px-2 py-0.5 bg-white/20 rounded-full">{alerts.filter(a => !dismissed.includes(a.id)).length} รายการ</span>
           </div>
           
           <div className="max-h-96 overflow-y-auto p-2 no-scrollbar bg-slate-50">
-            {alerts.length === 0 ? (
+            {alerts.filter(a => !dismissed.includes(a.id)).length === 0 ? (
               <div className="p-8 text-center text-slate-400">
                 <Icons.CheckCircle size={32} className="mx-auto mb-2 opacity-50" />
                 <p className="text-xs font-bold uppercase tracking-widest">ไม่มีการแจ้งเตือน</p>
               </div>
             ) : (
-              alerts.map((alert, idx) => {
+              alerts.filter(a => !dismissed.includes(a.id)).map((alert, idx) => {
                 const Icon = alert.icon;
                 const colors = {
                   warning: "bg-orange-100 text-orange-600 border-orange-200",
@@ -139,10 +141,11 @@ export default function AdminGlobalNotifier() {
 
                 return (
                   <button
-                    key={idx}
+                    key={alert.id || idx}
                     onClick={() => {
                       setIsOpen(false);
                       setHasNew(false);
+                      setDismissed(prev => [...prev, alert.id]);
                       if (audioRef.current) {
                         audioRef.current.pause();
                         audioRef.current.currentTime = 0;
@@ -181,9 +184,9 @@ export default function AdminGlobalNotifier() {
         }`}
       >
         <Icons.Bell size={24} className={hasNew ? "animate-pulse" : ""} />
-        {alerts.length > 0 && !hasNew && (
+        {alerts.filter(a => !dismissed.includes(a.id)).length > 0 && !hasNew && (
           <span className="absolute top-0 right-0 w-4 h-4 bg-red-500 rounded-full border-2 border-white flex items-center justify-center text-[8px] font-black">
-            {alerts.length}
+            {alerts.filter(a => !dismissed.includes(a.id)).length}
           </span>
         )}
       </button>
