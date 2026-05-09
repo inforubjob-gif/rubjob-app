@@ -4,7 +4,7 @@ export const metadata: Metadata = {
   title: "RUBJOB — เรื่องยุ่งยาก เรารับจบให้",
   description:
     "Professional laundry pickup & delivery platform. Rubbers, stores, and customers — all connected.",
-  keywords: ["rubjob", "laundry", "pickup", "delivery", "LINE", "platform"],
+  keywords: ["rubjob", "laundry", "pickup", "delivery", "LINE", "platform", "รับซักอบรีด", "ซักผ้าออนไลน์", "ซักแห้ง", "ซักผ้าส่งถึงบ้าน", "แอปซักผ้า", "ร้านซักรีด", "แม่บ้าน"],
   icons: {
     icon: "/images/rubjob-complete_logo-color.png",
     apple: "/images/rubjob-complete_logo-color.png",
