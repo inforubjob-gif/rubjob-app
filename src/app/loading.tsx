@@ -9,7 +9,7 @@ export default function Loading() {
         {/* Mascot Illustration */}
         <div className="mb-10 relative">
           <img 
-            src="/images/มาสคอต-ตากผ้า.png" 
+            src="/images/mascot-hanging.png" 
             alt="Loading Mascot" 
             className="w-full max-w-[240px] mx-auto animate-float drop-shadow-2xl"
           />
