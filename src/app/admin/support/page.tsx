@@ -46,6 +46,7 @@ export default function SupportCenterPage() {
  const [isLoading, setIsLoading] = useState(true);
  const [isSending, setIsSending] = useState(false);
  const [activeFilter, setActiveFilter] = useState<FilterType>("all");
+ const [previewImage, setPreviewImage] = useState<string | null>(null);
  const chatEndRef = useRef<HTMLDivElement>(null);
  const prevMessagesLength = useRef(0);
  const prevTicketsRef = useRef<Record<string, string>>({});
@@ -383,7 +384,8 @@ export default function SupportCenterPage() {
               <img 
                 src={`/api/admin/support/image?messageId=${imageId}&channel=${selectedTicket?.channel}`} 
                 alt="LINE Image" 
-                className={`max-w-xs md:max-w-sm rounded-2xl shadow-md border-2 border-white object-cover ${m.senderType === 'admin' ? 'rounded-tr-none' : 'rounded-tl-none'}`}
+                onClick={() => setPreviewImage(`/api/admin/support/image?messageId=${imageId}&channel=${selectedTicket?.channel}`)}
+                className={`max-w-xs md:max-w-sm rounded-2xl shadow-md border-2 border-white object-cover cursor-pointer hover:opacity-90 transition-opacity ${m.senderType === 'admin' ? 'rounded-tr-none' : 'rounded-tl-none'}`}
               />
             ) : isSticker ? (
               <img 
@@ -452,6 +454,27 @@ export default function SupportCenterPage() {
      </div>
     )}
    </div>
+
+   {/* ─── Image Preview Modal ─── */}
+   {previewImage && (
+     <div 
+       className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-fade-in"
+       onClick={() => setPreviewImage(null)}
+     >
+       <button 
+         className="absolute top-6 right-6 w-12 h-12 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white transition-colors"
+         onClick={() => setPreviewImage(null)}
+       >
+         <Icons.X size={24} />
+       </button>
+       <img 
+         src={previewImage} 
+         alt="Preview" 
+         className="max-w-full max-h-[90vh] object-contain rounded-xl shadow-2xl scale-in"
+         onClick={(e) => e.stopPropagation()}
+       />
+     </div>
+   )}
   </div>
  );
 }

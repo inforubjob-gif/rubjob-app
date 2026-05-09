@@ -51,8 +51,10 @@ export async function GET(req: Request) {
       return new Response("Failed to fetch image", { status: response.status });
     }
 
-    // Return the image blob directly
-    return new Response(response.body, {
+    // Read to array buffer to avoid streaming issues in edge runtime
+    const buffer = await response.arrayBuffer();
+
+    return new Response(buffer, {
       headers: {
         "Content-Type": response.headers.get("Content-Type") || "image/jpeg",
         "Cache-Control": "public, max-age=31536000",
