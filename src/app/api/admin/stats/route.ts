@@ -51,8 +51,8 @@ export async function GET(req: Request) {
     try {
       const extended = await db.batch([
         db.prepare("SELECT COUNT(*) as total FROM rubber_users"),
-        db.prepare("SELECT COUNT(*) as total FROM rubber_users WHERE status = 'active'"),
-        db.prepare("SELECT COUNT(*) as total FROM stores WHERE status = 'active'")
+        db.prepare(`SELECT COUNT(*) as total FROM rubber_users WHERE status = 'active' AND (preferences IS NULL OR json_extract(preferences, '$.workStatus') IS NULL OR json_extract(preferences, '$.workStatus') NOT IN (0, 'false', false))`),
+        db.prepare(`SELECT COUNT(*) as total FROM stores WHERE status = 'active' AND (preferences IS NULL OR json_extract(preferences, '$.workStatus') IS NULL OR json_extract(preferences, '$.workStatus') NOT IN (0, 'false', false))`)
       ]);
       
       totalRubbers = extended[0].results?.[0]?.total || 0;
