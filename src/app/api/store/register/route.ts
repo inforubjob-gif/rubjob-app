@@ -6,7 +6,7 @@ export const runtime = "edge";
 export async function POST(req: Request) {
   try {
     const payload = await req.json() as any;
-    const { email, password, name, phone, type, storeName, storeAddress, bankName, accountNumber, accountName, idCardUrl, businessDocUrl } = payload;
+    const { email, password, name, phone, type, storeName, storeAddress, province, area, bankName, accountNumber, accountName, idCardUrl, businessDocUrl } = payload;
     const db = getRequestContext().env.DB;
     if (!db) return NextResponse.json({ error: "D1 not found" }, { status: 500 });
 
@@ -22,10 +22,11 @@ export async function POST(req: Request) {
     // 2. If Store, create Store entry with bank info
     if (type === 'store') {
       const storeId = `STR-${Math.random().toString(36).substr(2, 6).toUpperCase()}`;
+      const fullAddress = province ? `${storeAddress}\nย่าน/ตำบล: ${area || '-'}\nจังหวัด: ${province}` : storeAddress;
       await db.prepare(`
         INSERT INTO stores (id, ownerId, name, address, status, bankName, accountNumber, accountName)
         VALUES (?, ?, ?, ?, 'pending', ?, ?, ?)
-      `).bind(storeId, userId, storeName || name, storeAddress || "", bankName || "", accountNumber || "", accountName || "").run();
+      `).bind(storeId, userId, storeName || name, fullAddress || "", bankName || "", accountNumber || "", accountName || "").run();
 
       // 3. Store Documents
       if (idCardUrl) {

@@ -73,64 +73,42 @@ export async function POST(req: Request) {
 
           console.log(`✅ Order ${orderId} marked as PAID via Stripe Webhook`);
 
-          // Broadcast to Online Rubbers via LINE
+          // Broadcast to Online Rubbers via LINE (Geo-Filtered)
           try {
             const orderData = await db.prepare(`
-              SELECT o.deliveryFee, o.userId, o.totalPrice, o.serviceId, s.name as serviceName, p.title as gigName
+              SELECT o.deliveryFee, o.userId, o.totalPrice, o.serviceId, o.address,
+                     s.name as serviceName, p.title as gigName
               FROM orders o
               LEFT JOIN services s ON o.serviceId = s.id
               LEFT JOIN provider_services p ON o.serviceId = p.id
               WHERE o.id = ?
             `).bind(orderId).first() as any;
             if (orderData) {
-              const deliveryFee = orderData.deliveryFee || 0;
+              // Notify Customer that payment is successful
               let customerToken = env.LINE_CHANNEL_ACCESS_TOKEN;
-              let rubberToken = env.LINE_CHANNEL_ACCESS_TOKEN_RUBBER;
-
               if (!customerToken) {
                 const setting = await db.prepare("SELECT value FROM system_settings WHERE key = 'line_channel_access_token_regular'").first() as any;
                 if (setting?.value) customerToken = setting.value;
               }
-              if (!rubberToken) {
-                const setting = await db.prepare("SELECT value FROM system_settings WHERE key = 'line_channel_access_token_rubber'").first() as any;
-                if (setting?.value) rubberToken = setting.value;
-              }
               
-              rubberToken = rubberToken || customerToken;
-              
-              if (rubberToken) {
-                const { sendLinePush, rubberNewJobFlex } = await import("@/lib/line");
-                
-                // Notify Customer that payment is successful and order is confirmed
-                if (customerToken && orderData.userId) {
-                  const serviceName = orderData.serviceName || orderData.gigName || "Laundry Service";
-                  const { bookingConfirmationFlex } = await import("@/lib/line");
-                  sendLinePush(
-                    orderData.userId, 
-                    [bookingConfirmationFlex(orderId, serviceName, orderData.totalPrice || 0)],
-                    customerToken
-                  ).catch(err => console.error("Customer push error in webhook:", err));
-                }
-                
-                const rubbers = await db.prepare(`
-                  SELECT lineUserId, preferences
-                  FROM rubber_users
-                  WHERE lineUserId IS NOT NULL
-                `).all();
-
-                // 15% commission + 15 THB Platform Fee
-                const totalOrderEarn = deliveryFee - (deliveryFee * 0.15) - 15;
-                const legEarn = totalOrderEarn * 0.5;
-
-                for (const r of (rubbers.results as any[])) {
-                  try {
-                    const prefs = JSON.parse(r.preferences || "{}");
-                    if (prefs.workStatus === true) {
-                      await sendLinePush(r.lineUserId, [rubberNewJobFlex(orderId, 'pending', legEarn)], rubberToken).catch(() => {});
-                    }
-                  } catch (e) {}
-                }
+              if (customerToken && orderData.userId) {
+                const serviceName = orderData.serviceName || orderData.gigName || "Laundry Service";
+                const { sendLinePush, bookingConfirmationFlex } = await import("@/lib/line");
+                sendLinePush(
+                  orderData.userId, 
+                  [bookingConfirmationFlex(orderId, serviceName, orderData.totalPrice || 0)],
+                  customerToken
+                ).catch(err => console.error("Customer push error in webhook:", err));
               }
+
+              // Geo-Filtered Broadcast to matching rubbers only
+              const { broadcastToEligibleRubbers } = await import("@/lib/dispatch");
+              await broadcastToEligibleRubbers(
+                db, env, orderId,
+                orderData.address,
+                orderData.deliveryFee || 0,
+                'pending'
+              );
             }
           } catch (e) {
             console.error("Failed to broadcast to rubbers from webhook:", e);

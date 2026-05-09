@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Icons } from "@/components/ui/Icons";
@@ -22,6 +22,8 @@ export default function PartnerRegisterPage() {
     phone: "",
     type: "store", 
     storeName: "",
+    province: "",
+    area: "",
     storeAddress: "",
     bankName: "",
     accountNumber: "",
@@ -32,6 +34,21 @@ export default function PartnerRegisterPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [openRegions, setOpenRegions] = useState<{province: string, areas: string[]}[]>([]);
+
+
+
+  useEffect(() => {
+     fetch("/api/public/settings")
+       .then(res => res.json())
+       .then((data: any) => {
+          if (data.settings?.open_regions) {
+             setOpenRegions(data.settings.open_regions);
+          }
+       }).catch(() => {});
+  }, []);
+
+  const selectedRegion = openRegions.find(r => r.province === formData.province);
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, field: string) => {
     const file = e.target.files?.[0];
@@ -215,6 +232,47 @@ export default function PartnerRegisterPage() {
                     value={formData.storeName}
                     onChange={(e) => setFormData({...formData, storeName: e.target.value})}
                   />
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-3">
+                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">จังหวัด (เปิดรับเฉพาะพื้นที่กำหนด)</label>
+                      <div className="relative">
+                        <select
+                          required
+                          className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl p-4 text-sm font-bold text-slate-700 appearance-none focus:border-primary focus:bg-white outline-none transition-all"
+                          value={formData.province}
+                          onChange={(e) => setFormData({ ...formData, province: e.target.value, area: "" })}
+                        >
+                          <option value="" disabled>-- เลือกจังหวัด --</option>
+                          {openRegions.map((r) => (
+                            <option key={r.province} value={r.province}>{r.province}</option>
+                          ))}
+                        </select>
+                        <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                          <Icons.ArrowRight size={16} className="rotate-90" />
+                        </div>
+                      </div>
+                    </div>
+                    <div className="space-y-3">
+                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">ย่าน/อำเภอ</label>
+                      <div className="relative">
+                        <select
+                          required
+                          disabled={!selectedRegion || selectedRegion.areas.length === 0}
+                          className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl p-4 text-sm font-bold text-slate-700 appearance-none focus:border-primary focus:bg-white outline-none transition-all disabled:opacity-50"
+                          value={formData.area}
+                          onChange={(e) => setFormData({ ...formData, area: e.target.value })}
+                        >
+                          <option value="" disabled>-- เลือกย่าน --</option>
+                          {selectedRegion?.areas.map((a) => (
+                            <option key={a} value={a}>{a}</option>
+                          ))}
+                        </select>
+                        <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                          <Icons.ArrowRight size={16} className="rotate-90" />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                   <GlobalTextarea 
                     label={t("register.partner.locationLabel")}
                     required

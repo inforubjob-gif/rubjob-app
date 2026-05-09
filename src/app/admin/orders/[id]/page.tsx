@@ -17,6 +17,7 @@ const STATUS_FLOW = [
  { key: "picking_up", label: "ไรเดอร์ไปรับผ้า", icon: "🏍️" },
  { key: "delivering_to_store", label: "กำลังส่งร้านซัก", icon: "🚚" },
  { key: "at_shop", label: "อยู่ที่ร้านซัก", icon: "🏪" },
+ { key: "washing", label: "กำลังซัก", icon: "🧺" },
  { key: "ready_for_return", label: "ซักเสร็จ รอส่งคืน", icon: "✅" },
  { key: "delivering_to_customer", label: "กำลังส่งคืนลูกค้า", icon: "📦" },
  { key: "completed", label: "สำเร็จ", icon: "🎉" },
@@ -238,36 +239,104 @@ export default function AdminOrderDetailPage() {
         />
        </div>
 
-       {/* Status Transition Buttons — Automated Flow with Manual Override */}
-       <div>
-        <label className="text-[10px] font-black text-white/40 uppercase block mb-3">⚡ อัปเดตสถานะ (ระบบทำงานอัตโนมัติ)</label>
-        
-        {/* Only manual intervention needed: Dispatch return rider when shop is done */}
-        {order.status === "ready_for_return" ? (
-         <button
-          onClick={() => setConfirmModal({ key: "delivering_to_customer", label: "กำลังส่งคืนลูกค้า (เรียกไรเดอร์)", icon: "🏍️" })}
-          disabled={isUpdating}
-          className="w-full py-5 bg-emerald-500 hover:bg-emerald-400 text-white text-lg font-black rounded-2xl shadow-xl shadow-emerald-500/30 transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-3 mb-4"
-         >
-          <span className="text-2xl">🏍️</span>
-          <span>เรียกไรเดอร์ไปรับผ้าที่ร้านซัก</span>
-          <Icons.ChevronRight size={20} />
-         </button>
-        ) : (
-         <div className="w-full py-4 bg-white/5 border border-white/10 rounded-xl text-center mb-4">
-          <p className="text-xs font-bold text-white/40 uppercase">รออัปเดตสถานะอัตโนมัติจากฝั่งไรเดอร์/ร้านซัก</p>
-         </div>
-        )}
+        {/* Status Transition Buttons - Full Admin Control Tower */}
+        <div>
+         <label className="text-[10px] font-black text-white/40 uppercase block mb-3">⚡ อัปเดตสถานะ (Admin Control Tower)</label>
+         
+         <div className="grid grid-cols-1 gap-3">
+          {/* Washing - Admin triggers on behalf of the store */}
+          {(order.status === "at_shop" || order.status === "delivering_to_store") && (
+           <button
+            onClick={() => setConfirmModal({ key: "washing", label: "กำลังซัก (ร้านเริ่มซักแล้ว)", icon: "🧺" })}
+            disabled={isUpdating}
+            className="w-full py-5 bg-blue-500 hover:bg-blue-400 text-white text-lg font-black rounded-2xl shadow-xl shadow-blue-500/30 transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-3"
+           >
+            <span className="text-2xl">🧺</span>
+            <span>เริ่มซักผ้า (Washing)</span>
+            <Icons.ChevronRight size={20} />
+           </button>
+          )}
 
-        {/* Cancel — Danger */}
-        <button
-         onClick={() => setConfirmModal({ key: 'cancelled', label: 'ยกเลิกงาน', icon: '❌' })}
-         disabled={isUpdating}
-         className="w-full py-4 bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 text-sm font-black rounded-xl border border-rose-500/20 transition-all active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2"
-        >
-         ❌ ยกเลิกงาน
-        </button>
-       </div>
+          {/* Ready for return - Admin marks when store is done */}
+          {(order.status === "washing" || order.status === "at_shop") && (
+           <button
+            onClick={() => setConfirmModal({ key: "ready_for_return", label: "ซักเสร็จ พร้อมส่งคืน", icon: "✅" })}
+            disabled={isUpdating}
+            className="w-full py-5 bg-emerald-500 hover:bg-emerald-400 text-white text-lg font-black rounded-2xl shadow-xl shadow-emerald-500/30 transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-3"
+           >
+            <span className="text-2xl">✅</span>
+            <span>ซักเสร็จแล้ว พร้อมส่งคืน</span>
+            <Icons.ChevronRight size={20} />
+           </button>
+          )}
+
+          {/* Dispatch return rider */}
+          {order.status === "ready_for_return" && (
+           <button
+            onClick={() => setConfirmModal({ key: "delivering_to_customer", label: "กำลังส่งคืนลูกค้า (เรียกไรเดอร์)", icon: "🏍️" })}
+            disabled={isUpdating}
+            className="w-full py-5 bg-amber-500 hover:bg-amber-400 text-white text-lg font-black rounded-2xl shadow-xl shadow-amber-500/30 transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-3"
+           >
+            <span className="text-2xl">🏍️</span>
+            <span>เรียกไรเดอร์ไปรับผ้าที่ร้านซัก</span>
+            <Icons.ChevronRight size={20} />
+           </button>
+          )}
+
+          {/* Complete */}
+          {order.status === "delivering_to_customer" && (
+           <button
+            onClick={() => setConfirmModal({ key: "completed", label: "สำเร็จ (ส่งถึงลูกค้าแล้ว)", icon: "🎉" })}
+            disabled={isUpdating}
+            className="w-full py-5 bg-violet-500 hover:bg-violet-400 text-white text-lg font-black rounded-2xl shadow-xl shadow-violet-500/30 transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-3"
+           >
+            <span className="text-2xl">🎉</span>
+            <span>ส่งถึงลูกค้าแล้ว — ปิดงาน</span>
+            <Icons.ChevronRight size={20} />
+           </button>
+          )}
+
+          {/* Pending/Picking up - Show informational state */}
+          {(order.status === "pending" || order.status === "picking_up") && (
+           <div className="w-full py-4 bg-white/5 border border-white/10 rounded-xl text-center">
+            <p className="text-xs font-bold text-white/40 uppercase">
+             {order.status === "pending" 
+              ? "⏳ รอไรเดอร์กดรับงาน..." 
+              : "🏍️ ไรเดอร์กำลังเดินทางไปรับผ้า..."}
+            </p>
+           </div>
+          )}
+
+          {/* Manual Override - For edge cases */}
+          <details className="group">
+           <summary className="cursor-pointer text-[10px] font-black text-white/30 uppercase tracking-widest hover:text-white/60 transition-colors py-2 flex items-center gap-2">
+            <Icons.Settings size={12} /> Manual Override (สำหรับกรณีพิเศษ)
+           </summary>
+           <div className="mt-2 grid grid-cols-2 gap-2">
+            {nextStatuses.map(s => (
+             <button
+              key={s.key}
+              onClick={() => setConfirmModal(s)}
+              disabled={isUpdating}
+              className="py-3 bg-white/10 hover:bg-white/20 text-white text-xs font-black rounded-xl transition-all active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2 border border-white/5"
+             >
+              <span>{s.icon}</span>
+              <span>{s.label}</span>
+             </button>
+            ))}
+           </div>
+          </details>
+         </div>
+
+         {/* Cancel - Danger Zone */}
+         <button
+          onClick={() => setConfirmModal({ key: 'cancelled', label: 'ยกเลิกงาน', icon: '❌' })}
+          disabled={isUpdating}
+          className="mt-4 w-full py-4 bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 text-sm font-black rounded-xl border border-rose-500/20 transition-all active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2"
+         >
+          ❌ ยกเลิกงาน
+         </button>
+        </div>
       </Card>
      )}
 

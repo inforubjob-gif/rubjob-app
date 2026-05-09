@@ -93,50 +93,24 @@ export async function transitionOrderStatus(
       case "delivering_to_store":
         flexMessage = deliveringToStoreFlex(orderId);
         break;
+      case "washing":
+        // Notify customer their clothes are being washed
+        const { washingOrderFlex: washFlex } = await import("./line");
+        flexMessage = washFlex(orderId);
+        break;
       case "ready_for_return":
       case "ready_for_pickup":
         flexMessage = readyForDeliveryFlex(orderId);
         
-        // 🤖 Automation: Also broadcast to Rubbers via Push Message
+        // 🤖 Automation: Broadcast to Geo-Matching Rubbers via Push Message
         try {
-          const deliveryFee = order.deliveryFee || 0;
-          let customerToken = env.LINE_CHANNEL_ACCESS_TOKEN;
-          let rubberToken = env.LINE_CHANNEL_ACCESS_TOKEN_RUBBER;
-
-          if (!customerToken) {
-            const setting = await db.prepare("SELECT value FROM system_settings WHERE key = 'line_channel_access_token_regular'").first() as any;
-            if (setting?.value) customerToken = setting.value;
-          }
-          if (!rubberToken) {
-            const setting = await db.prepare("SELECT value FROM system_settings WHERE key = 'line_channel_access_token_rubber'").first() as any;
-            if (setting?.value) rubberToken = setting.value;
-          }
-          
-          rubberToken = rubberToken || customerToken;
-
-          if (rubberToken) {
-            const { sendLinePush, rubberNewJobFlex } = await import("./line");
-            
-            const rubbers = await db.prepare(`
-              SELECT lineUserId, preferences
-              FROM rubber_users
-              WHERE lineUserId IS NOT NULL
-            `).all();
-
-            // 15% commission + 15 THB Platform Fee
-            const totalOrderEarn = deliveryFee - (deliveryFee * 0.15) - 15;
-            const legEarn = totalOrderEarn * 0.5;
-
-            for (const r of (rubbers.results as any[])) {
-              try {
-                const prefs = JSON.parse(r.preferences || "{}");
-                if (prefs.workStatus === true) {
-                  // Re-use rubberNewJobFlex but maybe pass 'ready_for_return' status
-                  await sendLinePush(r.lineUserId, [rubberNewJobFlex(orderId, nextStatus, legEarn)], rubberToken).catch(() => {});
-                }
-              } catch (e) {}
-            }
-          }
+          const { broadcastToEligibleRubbers } = await import("./dispatch");
+          await broadcastToEligibleRubbers(
+            db, env, orderId,
+            order.address,
+            order.deliveryFee || 0,
+            nextStatus
+          );
         } catch (e) {
           console.error("Failed to broadcast ready_for_return to rubbers:", e);
         }
@@ -183,6 +157,7 @@ function tStatus(status: string) {
     accepted: "รับงานแล้ว",
     in_progress: "กำลังดำเนินการ",
     at_shop: "ถึงร้านแล้ว",
+    washing: "กำลังซัก",
     ready_for_return: "ซักเสร็จพร้อมส่ง",
     completed: "สำเร็จ"
   };

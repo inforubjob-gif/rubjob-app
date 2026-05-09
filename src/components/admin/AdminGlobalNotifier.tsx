@@ -93,11 +93,22 @@ export default function AdminGlobalNotifier() {
       let isNew = false;
       const changedIds: string[] = [];
       
+      const currentAlertIds = newAlerts.map(a => a.id);
+      
+      // Reset viewed count for alerts that disappeared (count = 0)
+      for (const id in viewedAlertsContent.current) {
+        if (!currentAlertIds.includes(id)) {
+           viewedAlertsContent.current[id] = 0;
+        }
+      }
+
       for (const alert of newAlerts) {
          const lastViewedCount = viewedAlertsContent.current[alert.id] || 0;
          if (alert.count > lastViewedCount) {
             isNew = true;
             changedIds.push(alert.id);
+         } else if (alert.count < lastViewedCount) {
+            viewedAlertsContent.current[alert.id] = alert.count;
          }
       }
       
@@ -159,6 +170,7 @@ export default function AdminGlobalNotifier() {
                       setIsOpen(false);
                       setHasNew(false);
                       setDismissed(prev => [...prev, alert.id]);
+                      viewedAlertsContent.current[alert.id] = alert.count;
                       if (audioRef.current) {
                         audioRef.current.pause();
                         audioRef.current.currentTime = 0;
@@ -201,15 +213,24 @@ export default function AdminGlobalNotifier() {
           }
         }}
         className={`w-14 h-14 rounded-full flex items-center justify-center pointer-events-auto transition-all shadow-xl active:scale-95 ${
-          hasNew ? "bg-red-500 text-white shadow-red-500/30 animate-bounce" : "bg-slate-900 text-white shadow-slate-900/20"
+          hasNew ? "bg-red-500 text-white shadow-red-500/30 ring-4 ring-red-500/20" : "bg-slate-900 text-white shadow-slate-900/20"
         }`}
       >
         <Icons.Bell size={24} className={hasNew ? "animate-pulse" : ""} />
-        {alerts.filter(a => !dismissed.includes(a.id) && a.count > (viewedAlertsContent.current[a.id] || 0)).length > 0 && !hasNew && (
-          <span className="absolute top-0 right-0 w-4 h-4 bg-red-500 rounded-full border-2 border-white flex items-center justify-center text-[8px] font-black">
-            {alerts.filter(a => !dismissed.includes(a.id) && a.count > (viewedAlertsContent.current[a.id] || 0)).length}
-          </span>
-        )}
+        {(() => {
+          const unreadTotal = alerts
+            .filter(a => !dismissed.includes(a.id) && a.count > (viewedAlertsContent.current[a.id] || 0))
+            .reduce((sum, a) => sum + a.count, 0);
+          
+          if (unreadTotal > 0) {
+            return (
+              <span className={`absolute top-0 right-0 min-w-5 h-5 px-1 bg-red-500 rounded-full border-2 ${hasNew ? "border-red-600 text-white" : "border-slate-900 text-white"} flex items-center justify-center text-[10px] font-black`}>
+                {unreadTotal > 99 ? '99+' : unreadTotal}
+              </span>
+            );
+          }
+          return null;
+        })()}
       </button>
     </div>
   );

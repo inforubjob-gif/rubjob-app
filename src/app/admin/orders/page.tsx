@@ -198,11 +198,29 @@ export default function AdminOrdersPage() {
               <div className="flex items-center gap-2">
                {order.status === "at_shop" && (
                 <button
+                 onClick={() => handleUpdateOrder(order.id, { status: "washing" })}
+                 disabled={isUpdating === order.id}
+                 className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white text-[10px] font-black uppercase tracking-widest rounded-xl shadow-lg shadow-blue-500/20 transition-all active:scale-95"
+                >
+                 🧺 เริ่มซัก
+                </button>
+               )}
+               {order.status === "washing" && (
+                <button
                  onClick={() => handleUpdateOrder(order.id, { status: "ready_for_return" })}
                  disabled={isUpdating === order.id}
                  className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white text-[10px] font-black uppercase tracking-widest rounded-xl shadow-lg shadow-emerald-500/20 transition-all active:scale-95"
                 >
-                 {t('admin.orders.markReady')}
+                 ✅ ซักเสร็จ
+                </button>
+               )}
+               {order.status === "ready_for_return" && (
+                <button
+                 onClick={() => handleUpdateOrder(order.id, { status: "delivering_to_customer" })}
+                 disabled={isUpdating === order.id}
+                 className="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white text-[10px] font-black uppercase tracking-widest rounded-xl shadow-lg shadow-amber-500/20 transition-all active:scale-95"
+                >
+                 🏍️ เรียกส่งคืน
                 </button>
                )}
                {order.status === "pending" && (

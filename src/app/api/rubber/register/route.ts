@@ -6,7 +6,7 @@ export const runtime = "edge";
 export async function POST(req: Request) {
   try {
     const payload = await req.json() as any;
-    const { email, password, name, phone, vehicleType, licensePlate, idNumber, bankName, accountNumber, accountName, idCardUrl, licenseUrl } = payload;
+    const { email, password, name, phone, province, area, vehicleType, licensePlate, idNumber, bankName, accountNumber, accountName, idCardUrl, licenseUrl } = payload;
     const db = getRequestContext().env.DB;
     if (!db) return NextResponse.json({ error: "D1 not found" }, { status: 500 });
 
@@ -19,9 +19,9 @@ export async function POST(req: Request) {
 
     // 2. Insert with 'pending' status for admin verification
     await db.prepare(`
-      INSERT INTO rubber_users (id, email, password, name, phone, status, rubber_number, vehicleType, licensePlate, idNumber, bankName, accountNumber, accountName)
-      VALUES (?, ?, ?, ?, ?, 'pending', ?, ?, ?, ?, ?, ?, ?)
-    `).bind(id, email, password, name, phone || "", nextNumber, vehicleType || "bike", licensePlate || "", idNumber || "", bankName || "", accountNumber || "", accountName || "").run();
+      INSERT INTO rubber_users (id, email, password, name, phone, status, rubber_number, vehicleType, licensePlate, idNumber, bankName, accountNumber, accountName, address)
+      VALUES (?, ?, ?, ?, ?, 'pending', ?, ?, ?, ?, ?, ?, ?, ?)
+    `).bind(id, email, password, name, phone || "", nextNumber, vehicleType || "bike", licensePlate || "", idNumber || "", bankName || "", accountNumber || "", accountName || "", province ? `ย่าน/ตำบล: ${area || '-'}\nจังหวัด: ${province}` : "").run();
 
     // 3. Insert documents
     if (idCardUrl) {
@@ -32,8 +32,6 @@ export async function POST(req: Request) {
       const docId = `DOC-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
       await db.prepare(`INSERT INTO rubber_documents (id, rubberId, type, url, status) VALUES (?, ?, 'license', ?, 'pending')`).bind(docId, id, licenseUrl).run();
     }
-
-    return NextResponse.json({ success: true, id });
 
     return NextResponse.json({ success: true, id });
   } catch (error: any) {

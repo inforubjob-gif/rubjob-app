@@ -18,6 +18,7 @@ const DEFAULT_SETTINGS = [
   { key: "stripe_publishable_key", value: "", type: "string", description: "Stripe Publishable Key (pk_test_...)" },
   { key: "stripe_secret_key", value: "", type: "string", description: "Stripe Secret Key (sk_test_...)" },
   { key: "stripe_webhook_secret", value: "", type: "string", description: "Stripe Webhook Signing Secret (whsec_...)" },
+  { key: "open_regions", value: JSON.stringify([{ province: "ขอนแก่น", areas: ["กังสดาล"] }]), type: "json", description: "Configurable regions open for service" },
 ];
 
 /**

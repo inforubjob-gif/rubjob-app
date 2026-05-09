@@ -1,5 +1,15 @@
 import type { Service, TimeSlot } from "@/types";
 
+
+
+// ─── Open Provinces for Registration ───
+export const OPEN_PROVINCES = [
+  "กรุงเทพมหานคร",
+  "นนทบุรี",
+  "ปทุมธานี",
+  "สมุทรปราการ",
+];
+
 // ─── Business Logic Services ───
 // These are used for UI labels and icons, NOT as mock data.
 export const SERVICES: Service[] = [

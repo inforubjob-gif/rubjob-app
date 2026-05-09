@@ -658,6 +658,57 @@ function SettingsContent() {
             </div>
           )}
          </div>
+
+         {/* Service Regions UI */}
+         <div className="space-y-4 pt-8 border-t border-slate-50">
+            <h3 className="text-sm font-black text-slate-900">พื้นที่ให้บริการ (Service Regions)</h3>
+            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 -mt-2">กำหนดจังหวัดและย่านที่เปิดรับสมัครพาร์ทเนอร์</p>
+            
+            {(() => {
+               const regionsList = (() => { try { return JSON.parse(getSetting("open_regions") || "[]") } catch { return [] } })();
+               return (
+                 <div className="space-y-3">
+                   {regionsList.map((r: any, i: number) => (
+                     <div key={i} className="p-4 bg-slate-50 border border-slate-100 rounded-xl space-y-3 relative group">
+                        <button onClick={() => {
+                           const n = [...regionsList]; n.splice(i, 1);
+                           updateLocalSetting("open_regions", JSON.stringify(n));
+                        }} type="button" className="absolute top-4 right-4 w-8 h-8 rounded-lg bg-white shadow-sm flex items-center justify-center text-slate-300 hover:text-rose-500 hover:bg-rose-50 transition-all"><Icons.Trash size={14} /></button>
+                        
+                        <div className="space-y-1">
+                          <label className="text-[10px] font-black uppercase tracking-widest text-slate-500">จังหวัด</label>
+                          <input type="text" value={r.province} onChange={(e) => {
+                             const n = [...regionsList]; n[i].province = e.target.value; updateLocalSetting("open_regions", JSON.stringify(n));
+                          }} className="w-full md:w-1/2 px-3 py-2 rounded-lg border-2 border-slate-200 text-sm font-bold focus:border-primary outline-none transition-all" />
+                        </div>
+                        <div className="space-y-1">
+                          <label className="text-[10px] font-black uppercase tracking-widest text-slate-500">ย่าน/ตำบล (คั่นด้วยลูกน้ำ)</label>
+                          <input type="text" value={r.areas.join(", ")} onChange={(e) => {
+                             const n = [...regionsList]; n[i].areas = e.target.value.split(",").map(a => a.trim()); updateLocalSetting("open_regions", JSON.stringify(n));
+                          }} className="w-full px-3 py-2 rounded-lg border-2 border-slate-200 text-sm focus:border-primary outline-none transition-all" placeholder="กังสดาล, ในเมือง" />
+                        </div>
+                     </div>
+                   ))}
+                   <button type="button" onClick={() => {
+                      updateLocalSetting("open_regions", JSON.stringify([...regionsList, { province: "ขอนแก่น", areas: ["กังสดาล"] }]));
+                   }} className="w-full py-3 rounded-xl border-2 border-dashed border-slate-200 text-slate-400 hover:text-primary hover:border-primary/50 hover:bg-primary/5 text-xs font-black uppercase tracking-widest flex items-center justify-center gap-2 transition-all"><Icons.Plus size={16}/> เพิ่มพื้นที่ใหม่</button>
+                 </div>
+               );
+            })()}
+         </div>
+
+         {hasChanges && (
+            <div className="pt-6 border-t border-slate-50 animate-fade-in">
+              <button 
+               onClick={handleSaveSettings}
+               disabled={isSaving}
+               className="w-full bg-emerald-500 text-white py-4 rounded-xl font-black text-sm uppercase tracking-widest shadow-xl shadow-emerald-500/20 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+              >
+                {isSaving ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <Icons.Check size={18} />}
+                {isSaving ? "กำลังบันทึก..." : "บันทึกการเปลี่ยนแปลง (Save)"}
+              </button>
+            </div>
+         )}
         </div>
       </Card>
 
