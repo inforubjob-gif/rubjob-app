@@ -29,6 +29,29 @@ export default function PromptPayCheckout({ clientSecret, autoConfirm }: PromptP
 
   const [paymentAmount, setPaymentAmount] = useState<number | null>(null);
 
+  // Poll for payment success
+  useEffect(() => {
+    if (!qrCodeUrl || !stripe || !clientSecret) return;
+    
+    const intervalId = setInterval(async () => {
+      try {
+        const { paymentIntent, error } = await stripe.retrievePaymentIntent(clientSecret);
+        if (error) {
+          console.error("Poll error:", error);
+          return;
+        }
+        if (paymentIntent && paymentIntent.status === "succeeded") {
+          clearInterval(intervalId);
+          window.location.reload(); // Reload to show updated order status or success page
+        }
+      } catch (err) {
+        console.error("Failed to poll payment intent", err);
+      }
+    }, 3000); // Check every 3 seconds
+
+    return () => clearInterval(intervalId);
+  }, [qrCodeUrl, stripe, clientSecret]);
+
   useEffect(() => {
     if (autoConfirm && stripe && !hasAutoConfirmed.current && !isLoading && !qrCodeUrl) {
       hasAutoConfirmed.current = true;

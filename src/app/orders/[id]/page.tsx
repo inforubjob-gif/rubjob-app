@@ -221,7 +221,7 @@ export default function OrderDetailPage() {
         </Card>
 
         {/* Payment Required Section */}
-        {(order.paymentStatus === "pending" || order.status === "pending") && (
+        {(order.paymentStatus === "pending" || order.status === "pending") && order.status !== "cancelled" && (
           <Card className="p-0 overflow-hidden border-2 border-primary shadow-lg shadow-primary/10">
             <div className="bg-primary/10 p-4 border-b border-primary/20 flex items-center justify-between">
               <div className="flex items-center gap-2">
