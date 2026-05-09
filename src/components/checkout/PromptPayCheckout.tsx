@@ -137,10 +137,10 @@ export default function PromptPayCheckout({ clientSecret, autoConfirm }: PromptP
                 className="mb-6 flex items-center justify-center gap-2 px-6 py-3 bg-white border-2 border-slate-200 text-slate-700 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-slate-50 active:scale-95 transition-all shadow-sm w-full max-w-[250px]"
               >
                 <Icons.Download size={18} />
-                {t("orders.payment.saveQR") || "บันทึก QR Code"}
+                {t("orders.payment.saveQR")}
               </button>
 
-              <p className="text-sm font-bold text-slate-500 uppercase tracking-widest animate-pulse">Waiting for payment...</p>
+              <p className="text-sm font-bold text-slate-500 uppercase tracking-widest animate-pulse">{t("orders.payment.waitingForPayment")}</p>
             </div>
           ) : (
             <div className="w-full flex flex-col items-center justify-center space-y-4">
@@ -174,7 +174,7 @@ export default function PromptPayCheckout({ clientSecret, autoConfirm }: PromptP
       <div className="text-center">
         <div className="inline-flex items-center gap-2 px-4 py-2 bg-slate-100 rounded-full text-[10px] font-black text-slate-400 uppercase">
            <Icons.Shield size={12} />
-           100% Secure Payment by Stripe
+           {t("orders.payment.securePaymentByStripe")}
         </div>
       </div>
     </div>
