@@ -72,6 +72,32 @@ export default function PromptPayCheckout({ clientSecret, autoConfirm }: PromptP
     }
   };
 
+  const handleSaveQR = async () => {
+    if (!qrCodeUrl) return;
+    try {
+      const response = await fetch(qrCodeUrl);
+      const blob = await response.blob();
+      const blobUrl = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = blobUrl;
+      link.download = "rubjob-promptpay-qr.png";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(blobUrl);
+    } catch (err) {
+      console.error("Failed to download QR code", err);
+      // Fallback if CORS prevents fetch
+      const link = document.createElement("a");
+      link.href = qrCodeUrl;
+      link.download = "rubjob-promptpay-qr.png";
+      link.target = "_blank";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     doConfirm();
@@ -100,8 +126,17 @@ export default function PromptPayCheckout({ clientSecret, autoConfirm }: PromptP
       <div className="space-y-6">
         <div className="bg-white rounded-xl p-6 border border-slate-100 shadow-xl shadow-slate-200/50 flex flex-col items-center justify-center min-h-[300px]">
           {qrCodeUrl ? (
-            <div className="flex flex-col items-center animate-scale-in">
-              <img src={qrCodeUrl} alt="PromptPay QR Code" className="w-64 h-64 object-contain mb-4 border-4 border-slate-50 rounded-xl shadow-inner" />
+            <div className="flex flex-col items-center animate-scale-in w-full">
+              <img src={qrCodeUrl} alt="PromptPay QR Code" className="w-64 h-64 object-contain mb-6 border-4 border-slate-50 rounded-xl shadow-inner" />
+              
+              <button 
+                onClick={handleSaveQR}
+                className="mb-6 flex items-center justify-center gap-2 px-6 py-3 bg-white border-2 border-slate-200 text-slate-700 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-slate-50 active:scale-95 transition-all shadow-sm w-full max-w-[250px]"
+              >
+                <Icons.Download size={18} />
+                {t("orders.payment.saveQR") || "บันทึก QR Code"}
+              </button>
+
               <p className="text-sm font-bold text-slate-500 uppercase tracking-widest animate-pulse">Waiting for payment...</p>
             </div>
           ) : (

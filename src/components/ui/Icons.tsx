@@ -146,6 +146,7 @@ export const Icons = {
   Trash: (props: IconProps) => <MaterialIcon name="delete" {...props} />,
   Eye: (props: IconProps) => <MaterialIcon name="visibility" {...props} />,
   Refresh: (props: IconProps) => <MaterialIcon name="refresh" {...props} />,
+  Download: (props: IconProps) => <MaterialIcon name="download" {...props} />,
   Loading: ({ size = 24, className = "" }: { size?: number, className?: string }) => (
     <div 
       className={`animate-spin rounded-full border-2 border-slate-200 border-t-primary ${className}`} 
