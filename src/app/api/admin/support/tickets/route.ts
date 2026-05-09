@@ -49,7 +49,8 @@ export async function GET(req: Request) {
         r.pictureUrl as rubberPicture,
         s.name as storeName,
         (SELECT content FROM support_messages WHERE ticketId = t.id ORDER BY createdAt DESC LIMIT 1) as lastMessage,
-        (SELECT createdAt FROM support_messages WHERE ticketId = t.id ORDER BY createdAt DESC LIMIT 1) as lastMessageAt
+        (SELECT createdAt FROM support_messages WHERE ticketId = t.id ORDER BY createdAt DESC LIMIT 1) as lastMessageAt,
+        (SELECT senderType FROM support_messages WHERE ticketId = t.id ORDER BY createdAt DESC LIMIT 1) as lastMessageSenderType
       FROM support_tickets t
       LEFT JOIN users u ON t.userId = u.id AND (t.userType = 'customer' OR t.userType IS NULL OR t.userType = 'unknown' OR t.userType = 'both')
       LEFT JOIN rubber_users r ON (t.userId = r.id OR t.userId = r.lineUserId) AND (t.userType = 'rubber' OR t.userType = 'both')

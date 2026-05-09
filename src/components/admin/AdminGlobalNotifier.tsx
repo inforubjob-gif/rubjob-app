@@ -71,13 +71,13 @@ export default function AdminGlobalNotifier() {
       if (ticketsRes && ticketsRes.ok) {
         const data = await ticketsRes.json() as any;
         if (data.tickets) {
-          const unread = data.tickets.filter((t: any) => t.status === "active" && t.unreadCount > 0);
+          const unread = data.tickets.filter((t: any) => t.status === "open" && t.lastMessageSenderType && t.lastMessageSenderType !== "admin");
           if (unread.length > 0) {
             newAlerts.push({
               id: "unread_tickets",
               type: "info",
               title: "ข้อความช่วยเหลือใหม่",
-              desc: `มี ${unread.length} ข้อความที่ยังไม่ได้อ่าน`,
+              desc: `มี ${unread.length} แชทที่รอการตอบกลับ`,
               link: "/admin/support",
               icon: Icons.Message
             });
