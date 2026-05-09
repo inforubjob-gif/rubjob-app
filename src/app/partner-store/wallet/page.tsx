@@ -123,6 +123,9 @@ export default function StoreWalletPage() {
                <button className="w-14 h-14 rounded-xl bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/20 active:scale-95 transition-transform shadow-lg">
                   <Icons.Clock size={20} className="text-white" />
                </button>
+               <button onClick={() => router.push('/partner-store/profile/payout-method')} className="w-14 h-14 rounded-xl bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/20 active:scale-95 transition-transform shadow-lg">
+                  <Icons.Settings size={20} className="text-white" />
+               </button>
             </div>
           </div>
         </header>
