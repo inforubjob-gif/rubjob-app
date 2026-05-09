@@ -159,24 +159,36 @@ export default function PinLock({ type, userId, onVerified, children }: PinLockP
 
   return (
     <div className="fixed inset-0 bg-white z-[10000] flex flex-col">
-      {/* Top Section: Header + Dots */}
-      <div className="flex flex-col items-center pt-12 pb-6 px-6">
+      {/* Subtle brand gradient at top */}
+      <div className="absolute top-0 left-0 right-0 h-48 bg-gradient-to-b from-primary/5 to-transparent pointer-events-none" />
+
+      {/* Top Section: Header + Logo + Dots */}
+      <div className="relative flex flex-col items-center pt-10 pb-4 px-6">
         {/* Back Button */}
-        <div className="w-full flex items-start mb-6">
+        <div className="w-full flex items-start mb-4">
           <button
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
               router.back();
             }}
-            className="w-10 h-10 rounded-full flex items-center justify-center text-slate-400 active:bg-slate-100 transition-all"
+            className="w-10 h-10 rounded-xl flex items-center justify-center text-slate-400 active:bg-slate-100 transition-all"
           >
             <Icons.Back size={22} />
           </button>
         </div>
 
+        {/* App Logo */}
+        <div className="w-16 h-16 bg-white rounded-2xl shadow-lg shadow-primary/10 border border-primary/10 flex items-center justify-center mb-5 p-3">
+          <img 
+            src="/images/rubjob-complete_logo-color.png" 
+            alt="Rubjob" 
+            className="w-full h-full object-contain" 
+          />
+        </div>
+
         {/* Title */}
-        <h1 className="text-xl font-black text-slate-900 mb-2 text-center">
+        <h1 className="text-xl font-black text-slate-900 mb-1 text-center">
           {step === "enter" ? t(`${type}.wallet.pin.enterTitle`) : 
            step === "setup" ? t(`${type}.wallet.pin.setupTitle`) : 
            t(`${type}.wallet.pin.confirmPin`)}
@@ -185,22 +197,22 @@ export default function PinLock({ type, userId, onVerified, children }: PinLockP
           {t(`${type}.wallet.pin.instruction`)}
         </p>
 
-        {/* PIN Dots */}
-        <div className="flex gap-5 mb-4">
+        {/* PIN Dots — Brand CI color */}
+        <div className="flex gap-5 mb-3">
           {[...Array(6)].map((_, i) => (
             <div 
               key={i} 
               className={`w-4 h-4 rounded-full border-2 transition-all duration-200 ${
                 i < currentValue.length
-                  ? "bg-blue-500 border-blue-500 scale-110" 
-                  : "bg-transparent border-blue-300"
+                  ? "bg-primary border-primary scale-110 shadow-md shadow-primary/30" 
+                  : "bg-transparent border-primary/30"
               }`}
             />
           ))}
         </div>
 
         {/* Step Label */}
-        <p className="text-xs font-bold text-slate-400 mb-2">
+        <p className="text-[11px] font-bold text-primary/60">
           {step === "enter" ? t(`${type}.wallet.pin.enterTitle`) : 
            step === "setup" ? t(`${type}.wallet.pin.setupTitle`) : 
            t(`${type}.wallet.pin.confirmPin`)}
@@ -208,8 +220,8 @@ export default function PinLock({ type, userId, onVerified, children }: PinLockP
 
         {/* Error */}
         {error && (
-          <div className="mt-2 animate-shake">
-            <p className="text-xs font-bold text-rose-500 flex items-center gap-1.5">
+          <div className="mt-3 animate-shake">
+            <p className="text-xs font-bold text-white bg-rose-500 px-4 py-2 rounded-full shadow-lg shadow-rose-500/20 flex items-center gap-1.5">
               <Icons.AlertCircle size={14} />
               {error}
             </p>
@@ -220,14 +232,14 @@ export default function PinLock({ type, userId, onVerified, children }: PinLockP
       {/* Spacer pushes numpad to bottom */}
       <div className="flex-1" />
 
-      {/* Numpad — fixed to bottom, large banking-style buttons */}
-      <div className="w-full bg-slate-50 border-t border-slate-100">
+      {/* Numpad — large banking-style with brand CI */}
+      <div className="w-full bg-[#FAFAFA] border-t border-slate-100">
         <div className="max-w-md mx-auto grid grid-cols-3">
           {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
             <button
               key={num}
               onClick={() => handleNumberClick(num)}
-              className="h-[72px] flex items-center justify-center text-3xl font-bold text-slate-800 active:bg-slate-200 transition-colors border-b border-r border-slate-100 select-none"
+              className="h-[72px] flex items-center justify-center text-[28px] font-bold text-slate-700 active:bg-primary/10 active:text-primary transition-colors border-b border-r border-slate-100/80 select-none"
             >
               {num}
             </button>
@@ -241,25 +253,25 @@ export default function PinLock({ type, userId, onVerified, children }: PinLockP
                 setConfirmPin("");
               }
             }}
-            className="h-[72px] flex items-center justify-center text-slate-400 active:bg-slate-200 transition-colors border-b border-r border-slate-100 select-none"
+            className="h-[72px] flex items-center justify-center text-slate-400 active:bg-primary/10 transition-colors border-b border-r border-slate-100/80 select-none"
           >
             {step === "confirm" && <Icons.Back size={24} />}
           </button>
           <button
             onClick={() => handleNumberClick(0)}
-            className="h-[72px] flex items-center justify-center text-3xl font-bold text-slate-800 active:bg-slate-200 transition-colors border-b border-r border-slate-100 select-none"
+            className="h-[72px] flex items-center justify-center text-[28px] font-bold text-slate-700 active:bg-primary/10 active:text-primary transition-colors border-b border-r border-slate-100/80 select-none"
           >
             0
           </button>
           <button
             onClick={handleDelete}
-            className="h-[72px] flex items-center justify-center text-slate-500 active:bg-slate-200 transition-colors border-b border-slate-100 select-none"
+            className="h-[72px] flex items-center justify-center text-slate-400 active:bg-rose-50 active:text-rose-500 transition-colors border-b border-slate-100/80 select-none"
           >
             <Icons.Backspace size={28} />
           </button>
         </div>
         {/* Safe area padding for phones with home indicator */}
-        <div className="h-[env(safe-area-inset-bottom,0px)] bg-slate-50" />
+        <div className="h-[env(safe-area-inset-bottom,0px)] bg-[#FAFAFA]" />
       </div>
     </div>
   );
