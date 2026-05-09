@@ -25,6 +25,8 @@ export default function PromptPayCheckout({ clientSecret, autoConfirm }: PromptP
   const [isLoading, setIsLoading] = useState(false);
   const hasAutoConfirmed = useRef(false);
 
+  const [paymentAmount, setPaymentAmount] = useState<number | null>(null);
+
   useEffect(() => {
     if (autoConfirm && stripe && !hasAutoConfirmed.current && !isLoading && !qrCodeUrl) {
       hasAutoConfirmed.current = true;
@@ -55,6 +57,8 @@ export default function PromptPayCheckout({ clientSecret, autoConfirm }: PromptP
         paymentIntent.status === "requires_action" &&
         paymentIntent.next_action?.type === "promptpay_display_qr_code"
       ) {
+        setPaymentAmount(paymentIntent.amount / 100);
+
         const qrUrl = (paymentIntent.next_action as any).promptpay_display_qr_code.image_url_svg || 
                       (paymentIntent.next_action as any).promptpay_display_qr_code.image_url_png ||
                       (paymentIntent.next_action as any).promptpay_display_qr_code.hosted_instructions_url;
@@ -78,25 +82,81 @@ export default function PromptPayCheckout({ clientSecret, autoConfirm }: PromptP
   const handleSaveQR = async () => {
     if (!qrCodeUrl) return;
     try {
-      // Use our proxy API to avoid CORS issues and prevent Stripe from rendering the HTML page
+      // Use our proxy API to avoid CORS issues
       const proxyUrl = `/api/payment/proxy-image?url=${encodeURIComponent(qrCodeUrl)}`;
       const response = await fetch(proxyUrl);
-      
       if (!response.ok) throw new Error("Failed to fetch image via proxy");
       
       const blob = await response.blob();
-      const blobUrl = window.URL.createObjectURL(blob);
+      const qrBlobUrl = window.URL.createObjectURL(blob);
+
+      // Create a canvas to draw the custom beautiful QR image
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d");
+      if (!ctx) throw new Error("Canvas not supported");
+
+      // Set dimensions (Professional portrait ratio)
+      canvas.width = 600;
+      canvas.height = 850;
+
+      // Draw background (White with subtle rounding look via borders if needed, but standard is white)
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // Draw Header Banner (Rubjob Orange)
+      ctx.fillStyle = "#f97316";
+      ctx.fillRect(0, 0, canvas.width, 140);
+
+      // Draw "RUBJOB" text in banner
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "900 48px 'Helvetica Neue', Helvetica, Arial, sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText("RUBJOB", canvas.width / 2, 85);
+
+      // Load QR Image
+      const qrImg = new Image();
+      qrImg.crossOrigin = "anonymous";
+      await new Promise((resolve, reject) => {
+        qrImg.onload = resolve;
+        qrImg.onerror = reject;
+        qrImg.src = qrBlobUrl;
+      });
+
+      // Draw QR Code
+      const qrSize = 420;
+      const qrX = (canvas.width - qrSize) / 2;
+      const qrY = 190;
+      ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
+
+      // Draw "Scan to Pay" text
+      ctx.fillStyle = "#334155";
+      ctx.font = "bold 28px 'Helvetica Neue', Helvetica, Arial, sans-serif";
+      ctx.fillText("สแกนเพื่อชำระเงิน / Scan to Pay", canvas.width / 2, 660);
+
+      // Draw Amount
+      if (paymentAmount) {
+        ctx.fillStyle = "#f97316";
+        ctx.font = "900 64px 'Helvetica Neue', Helvetica, Arial, sans-serif";
+        ctx.fillText(`฿${paymentAmount.toLocaleString()}`, canvas.width / 2, 740);
+      }
+
+      // Draw Footer
+      ctx.fillStyle = "#94a3b8";
+      ctx.font = "16px 'Helvetica Neue', Helvetica, Arial, sans-serif";
+      ctx.fillText("ขอบคุณที่ใช้บริการ Rubjob", canvas.width / 2, 810);
+
+      const dataUrl = canvas.toDataURL("image/png");
       const link = document.createElement("a");
-      link.href = blobUrl;
-      link.download = "rubjob-promptpay-qr.png";
+      link.href = dataUrl;
+      link.download = `rubjob-qr-${paymentAmount || 'payment'}.png`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      
-      setTimeout(() => window.URL.revokeObjectURL(blobUrl), 1000);
+
+      window.URL.revokeObjectURL(qrBlobUrl);
     } catch (err) {
-      console.error("Failed to download QR code", err);
-      // Fallback: If proxy fails, try direct download without window.open
+      console.error("Failed to generate custom QR", err);
+      // Fallback
       const link = document.createElement("a");
       link.href = qrCodeUrl;
       link.download = "rubjob-promptpay-qr.png";
