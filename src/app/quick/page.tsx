@@ -266,12 +266,21 @@ export default function QuickBookPage() {
               </p>
             </div>
 
-            <button
-              onClick={handleConfirmQuickBook}
-              className="w-full bg-primary text-white py-4 rounded-xl font-black text-base uppercase shadow-lg shadow-primary/30 active:scale-95 transition-all"
-            >
-              ยืนยันจองด่วน
-            </button>
+            <div className="space-y-3">
+              <button
+                onClick={handleConfirmQuickBook}
+                className="w-full bg-primary text-white py-4 rounded-xl font-black text-base uppercase shadow-lg shadow-primary/30 active:scale-95 transition-all"
+              >
+                ยืนยันจองด่วน
+              </button>
+              
+              <button
+                onClick={() => router.push("/booking")}
+                className="w-full bg-white text-slate-500 border border-slate-200 py-3.5 rounded-xl font-bold text-sm uppercase active:scale-95 transition-all"
+              >
+                แก้ไขรายละเอียด (จองปกติ)
+              </button>
+            </div>
           </Card>
         </main>
       </div>
