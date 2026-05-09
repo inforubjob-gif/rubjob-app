@@ -272,7 +272,7 @@ export async function ensureSchema(db: D1Database) {
   if (!servicesCount || servicesCount.count === 0) {
     await db.prepare(`
       INSERT OR REPLACE INTO services (id, name, category, description, basePrice, unit, icon, estimatedDays, isActive) VALUES
-      ('wash_fold', 'Wash & Fold', 'laundry', 'Everyday laundry, washed and neatly folded', 59, 'piece', 'wash_fold', 2, 1),
+      ('wash_fold', 'Wash & Dry', 'laundry', 'Everyday laundry, washed and dried', 59, 'piece', 'wash_fold', 2, 1),
       ('dry_clean', 'Dry Clean', 'laundry', 'Premium care for delicate fabrics & suits', 129, 'piece', 'dry_clean', 3, 1),
       ('iron_only', 'Iron Only', 'laundry', 'Perfectly pressed, ready to wear', 39, 'piece', 'iron_only', 1, 1),
       ('wash_iron', 'Wash & Iron', 'laundry', 'Full service wash with professional pressing', 89, 'piece', 'wash_iron', 2, 1),

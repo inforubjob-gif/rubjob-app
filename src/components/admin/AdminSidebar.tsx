@@ -24,6 +24,8 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
     { label: t("admin.nav.stores"), href: "/stores", icon: <Icons.Office size={20} />, permission: "stores" },
     { label: t("admin.nav.rubbers"), href: "/rubbers", icon: <Icons.Car size={20} />, permission: "rubbers" },
     { label: t("admin.nav.providers"), href: "/providers", icon: <Icons.Stars size={20} />, permission: "stores" },
+    { label: "Reviews", href: "/reviews", icon: <Icons.Star size={20} />, permission: "support" },
+    { label: "Broadcast", href: "/broadcast", icon: <Icons.Bell size={20} />, permission: "support" },
     { label: t("admin.nav.coupons"), href: "/coupons", icon: <Icons.Ticket size={20} />, permission: "coupons" },
     { label: t("admin.nav.finance"), href: "/finance", icon: <Icons.Wallet size={20} />, permission: "finance" },
     { label: t("admin.nav.support"), href: "/support", icon: <Icons.Chat size={20} />, permission: "support" },

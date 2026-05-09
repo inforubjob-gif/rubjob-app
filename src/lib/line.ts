@@ -69,7 +69,7 @@ export const bookingConfirmationFlex = (orderId: string, serviceName: string, to
       contents: [
         {
           type: "text",
-          text: "การจองลุล่วง! 🎉",
+          text: "รับออเดอร์แล้ว! 📝",
           weight: "bold",
           size: "xl",
           color: "#000000",

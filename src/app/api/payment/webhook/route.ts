@@ -75,7 +75,13 @@ export async function POST(req: Request) {
 
           // Broadcast to Online Rubbers via LINE
           try {
-            const orderData = await db.prepare("SELECT deliveryFee FROM orders WHERE id = ?").bind(orderId).first() as any;
+            const orderData = await db.prepare(`
+              SELECT o.deliveryFee, o.userId, o.totalPrice, o.serviceId, s.name as serviceName, p.title as gigName
+              FROM orders o
+              LEFT JOIN services s ON o.serviceId = s.id
+              LEFT JOIN provider_services p ON o.serviceId = p.id
+              WHERE o.id = ?
+            `).bind(orderId).first() as any;
             if (orderData) {
               const deliveryFee = orderData.deliveryFee || 0;
               let customerToken = env.LINE_CHANNEL_ACCESS_TOKEN;
@@ -94,6 +100,17 @@ export async function POST(req: Request) {
               
               if (rubberToken) {
                 const { sendLinePush, rubberNewJobFlex } = await import("@/lib/line");
+                
+                // Notify Customer that payment is successful and order is confirmed
+                if (customerToken && orderData.userId) {
+                  const serviceName = orderData.serviceName || orderData.gigName || "Laundry Service";
+                  const { bookingConfirmationFlex } = await import("@/lib/line");
+                  sendLinePush(
+                    orderData.userId, 
+                    [bookingConfirmationFlex(orderId, serviceName, orderData.totalPrice || 0)],
+                    customerToken
+                  ).catch(err => console.error("Customer push error in webhook:", err));
+                }
                 
                 const rubbers = await db.prepare(`
                   SELECT lineUserId, preferences

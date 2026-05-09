@@ -312,7 +312,7 @@ export default function AdminOrderDetailPage() {
       <h2 className="text-xs font-black text-slate-900 uppercase tracking-widest mb-5">💰 รายละเอียดค่าบริการ</h2>
       <div className="space-y-3">
        <div className="flex justify-between text-sm font-bold border-b border-slate-50 pb-3">
-        <span className="text-slate-500">ค่าซัก ({order.serviceName || 'Wash & Fold'})</span>
+        <span className="text-slate-500">ค่าซัก ({order.serviceName || 'Wash & Dry'})</span>
         <span className="text-slate-900">฿{order.laundryFee || 0}</span>
        </div>
        <div className="flex justify-between text-sm font-bold border-b border-slate-50 pb-3">

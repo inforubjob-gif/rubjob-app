@@ -27,6 +27,8 @@ function PermissionGate({ children }: { children: React.ReactNode }) {
       "/admin/coupons": "coupons",
       "/admin/finance": "finance",
       "/admin/support": "support",
+      "/admin/reviews": "support",
+      "/admin/broadcast": "support",
       "/admin/settings": "settings",
     };
 

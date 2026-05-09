@@ -87,13 +87,15 @@ export async function POST(req: Request) {
 
     // Send LINE Notification (Async, don't block response)
     if (env.LINE_CHANNEL_ACCESS_TOKEN) {
-      // 1. Notify Customer (Messaging API - Professional Flex Message)
-      const { bookingConfirmationFlex } = await import("@/lib/line");
-      sendLinePush(
-        userId, 
-        [bookingConfirmationFlex(orderId, serviceName, totalPrice)],
-        env.LINE_CHANNEL_ACCESS_TOKEN
-      ).catch(err => console.error("LINE push error (customer):", err));
+      // 1. Notify Customer ONLY if payment is Cash
+      if (paymentMethod === 'cash') {
+        const { bookingConfirmationFlex } = await import("@/lib/line");
+        sendLinePush(
+          userId, 
+          [bookingConfirmationFlex(orderId, serviceName, totalPrice)],
+          env.LINE_CHANNEL_ACCESS_TOKEN
+        ).catch(err => console.error("LINE push error (customer):", err));
+      }
 
       // 2. Broadcast to Admin Group
       const userRecord = await db.prepare("SELECT displayName FROM users WHERE id = ?").bind(userId).first() as { displayName: string };

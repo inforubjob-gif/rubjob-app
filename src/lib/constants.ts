@@ -5,9 +5,9 @@ import type { Service, TimeSlot } from "@/types";
 export const SERVICES: Service[] = [
   {
     id: "wash_fold",
-    name: "Wash & Fold",
+    name: "Wash & Dry",
     category: "laundry",
-    description: "Everyday laundry, washed and neatly folded",
+    description: "Everyday laundry, washed and dried",
     basePrice: 129,
     unit: "piece",
     icon: "wash_fold",
