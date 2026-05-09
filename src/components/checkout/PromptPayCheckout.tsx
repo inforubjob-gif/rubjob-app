@@ -78,7 +78,12 @@ export default function PromptPayCheckout({ clientSecret, autoConfirm }: PromptP
   const handleSaveQR = async () => {
     if (!qrCodeUrl) return;
     try {
-      const response = await fetch(qrCodeUrl);
+      // Use our proxy API to avoid CORS issues and prevent Stripe from rendering the HTML page
+      const proxyUrl = `/api/payment/proxy-image?url=${encodeURIComponent(qrCodeUrl)}`;
+      const response = await fetch(proxyUrl);
+      
+      if (!response.ok) throw new Error("Failed to fetch image via proxy");
+      
       const blob = await response.blob();
       const blobUrl = window.URL.createObjectURL(blob);
       const link = document.createElement("a");
@@ -87,10 +92,11 @@ export default function PromptPayCheckout({ clientSecret, autoConfirm }: PromptP
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      window.URL.revokeObjectURL(blobUrl);
+      
+      setTimeout(() => window.URL.revokeObjectURL(blobUrl), 1000);
     } catch (err) {
       console.error("Failed to download QR code", err);
-      // Fallback if CORS prevents fetch
+      // Fallback: If proxy fails, try direct download without window.open
       const link = document.createElement("a");
       link.href = qrCodeUrl;
       link.download = "rubjob-promptpay-qr.png";
