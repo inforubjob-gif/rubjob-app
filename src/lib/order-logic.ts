@@ -42,14 +42,23 @@ export async function transitionOrderStatus(
   }
 
   // 3. Update Database (Including evidence and timestamps)
+  // 🤖 AUTO-CHAIN: When rubber drops off at store → auto-transition to "washing"
+  // Admin is not at the store, so once the driver confirms delivery with a photo,
+  // the system immediately marks it as washing.
+  let actualStatus = nextStatus;
+  if (nextStatus === "at_shop") {
+    actualStatus = "washing" as OrderStatus;
+  }
+
   let query = "UPDATE orders SET status = ?, updatedAt = CURRENT_TIMESTAMP";
-  const params: any[] = [nextStatus];
+  const params: any[] = [actualStatus];
 
   if (options?.evidenceUrl) {
     if (nextStatus === "picking_up") {
       query += ", pickupPhotoUrl = ?, evidenceBeforeUrl = ?";
       params.push(options.evidenceUrl, options.evidenceUrl);
     } else if (nextStatus === "at_shop") {
+      // Still save the dropoff photo and timestamp even though we auto-chain to washing
       query += ", dropoffShopPhotoUrl = ?, arrivedAtShopAt = CURRENT_TIMESTAMP";
       params.push(options.evidenceUrl);
     } else if (nextStatus === "completed") {
@@ -57,12 +66,11 @@ export async function transitionOrderStatus(
       params.push(options.evidenceUrl);
     }
   } else if (nextStatus === "at_shop") {
-    // Even if no photo, record the timestamp
     query += ", arrivedAtShopAt = CURRENT_TIMESTAMP";
   }
 
   // Auto-mark payment as paid when order is completed
-  if (nextStatus === "completed") {
+  if (actualStatus === "completed") {
     query += ", paymentStatus = CASE WHEN paymentStatus = 'pending' THEN 'paid' ELSE paymentStatus END";
   }
 
@@ -83,20 +91,19 @@ export async function transitionOrderStatus(
       completed: "งานสำเร็จเรียบร้อยแล้ว ขอบคุณที่ใช้บริการ!"
     };
 
-    switch (nextStatus) {
+    switch (actualStatus) {
       case "picking_up":
         if (options?.rubberName) {
           flexMessage = rubberAcceptedFlex(orderId, options.rubberName);
         }
         break;
-      case "at_shop":
       case "delivering_to_store":
         flexMessage = deliveringToStoreFlex(orderId);
         break;
       case "washing":
-        // Notify customer their clothes are being washed
-        const { washingOrderFlex: washFlex } = await import("./line");
-        flexMessage = washFlex(orderId);
+        // Notify customer their clothes are now being washed
+        // This fires both when admin manually triggers AND when auto-chained from at_shop
+        flexMessage = washingOrderFlex(orderId);
         break;
       case "ready_for_return":
       case "ready_for_pickup":
@@ -149,7 +156,7 @@ export async function transitionOrderStatus(
     }
   }
 
-  return { success: true, nextStatus };
+  return { success: true, nextStatus: actualStatus };
 }
 
 function tStatus(status: string) {
