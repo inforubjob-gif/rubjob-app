@@ -216,10 +216,14 @@ export default function BottomNav() {
                 )}
 
                 {/* Icon */}
-                <div className={`relative z-10 flex items-center justify-center w-8 h-8 rounded-xl transition-all duration-200 ${
+                <div className={`relative z-10 flex items-center justify-center transition-all duration-200 ${
+                  isBooking ? "w-auto h-auto" : "w-8 h-8 rounded-xl"
+                } ${
                   isActive && !isBooking
                     ? "text-white scale-105" 
-                    : "text-white/50 group-active:text-white/90 group-active:scale-95"
+                    : !isBooking 
+                      ? "text-white/50 group-active:text-white/90 group-active:scale-95" 
+                      : ""
                 }`}>
                   {tab.icon(isActive)}
                 </div>
