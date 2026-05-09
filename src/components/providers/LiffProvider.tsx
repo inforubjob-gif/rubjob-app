@@ -107,7 +107,8 @@ export default function LiffProvider({ children }: { children: ReactNode }) {
         const isInClient = liff.isInClient();
 
         if (!isLoggedIn) {
-          setCtx(prev => ({ ...prev, isReady: true, isInClient }));
+          // Auto-login: redirect to LINE login and return to the current page
+          liff.login({ redirectUri: window.location.href });
           return;
         }
 
