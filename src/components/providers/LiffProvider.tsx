@@ -101,7 +101,13 @@ export default function LiffProvider({ children }: { children: ReactNode }) {
           return;
         }
 
-        await liff.init({ liffId: LIFF_ID });
+        const host = window.location.hostname;
+        const isPortalSubdomain = /^(rubber|admin|store|provider)\./i.test(host);
+
+        await liff.init({ 
+          liffId: LIFF_ID,
+          withLoginOnExternalBrowser: !isPortalSubdomain
+        });
 
         const isLoggedIn = liff.isLoggedIn();
         const isInClient = liff.isInClient();

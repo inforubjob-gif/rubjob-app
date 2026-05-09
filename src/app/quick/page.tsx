@@ -16,13 +16,6 @@ export default function QuickBookPage() {
   const { profile, isReady, login, isLoggedIn } = useLiff();
   const { t, language } = useTranslation();
 
-  // Auto-login: if LIFF is ready but user is not logged in, trigger login automatically
-  useEffect(() => {
-    if (isReady && !isLoggedIn && !profile?.userId) {
-      login();
-    }
-  }, [isReady, isLoggedIn, profile?.userId, login]);
-
   const [recentOrder, setRecentOrder] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
@@ -31,7 +24,7 @@ export default function QuickBookPage() {
   // Payment state
   const [stripePromise, setStripePromise] = useState<Promise<Stripe | null> | null>(null);
   const [clientSecret, setClientSecret] = useState<string | null>(null);
-  const [paymentStatus, setPaymentStatus] = useState<"loading" | "creating" | "ready" | "error">("loading");
+  const [paymentStatus, setPaymentStatus] = useState<"idle" | "loading" | "creating" | "ready" | "error">("idle");
 
   // Prevent double-submit
   const hasSubmittedRef = useRef(false);
@@ -103,74 +96,69 @@ export default function QuickBookPage() {
     }
   };
 
-  // Auto-submit: once we have recentOrder + profile, create booking + payment immediately
-  useEffect(() => {
+  // Manual Submit: User must click "Confirm" to create booking + payment
+  const handleConfirmQuickBook = async () => {
     if (!recentOrder || !profile?.userId || hasSubmittedRef.current) return;
     hasSubmittedRef.current = true;
+    setPaymentStatus("creating");
 
-    async function autoSubmit() {
-      setPaymentStatus("creating");
+    try {
+      const { date, slotId } = getFirstAvailableSlot();
 
-      try {
-        const { date, slotId } = getFirstAvailableSlot();
+      const payload = {
+        userId: profile!.userId,
+        storeId: recentOrder.storeId,
+        providerId: recentOrder.providerId,
+        serviceId: recentOrder.serviceId,
+        items: recentOrder.items,
+        address: recentOrder.address,
+        paymentMethod: "promptpay",
+        laundryFee: recentOrder.laundryFee,
+        deliveryFee: recentOrder.deliveryFee,
+        distanceKm: recentOrder.distanceKm || 0,
+        totalPrice: recentOrder.totalPrice,
+        pickupDateTime: `${date} ${slotId}`,
+        scheduledDate: recentOrder.scheduledDate
+      };
 
-        const payload = {
-          userId: profile!.userId,
-          storeId: recentOrder.storeId,
-          providerId: recentOrder.providerId,
-          serviceId: recentOrder.serviceId,
-          items: recentOrder.items,
-          address: recentOrder.address,
-          paymentMethod: "promptpay",
-          laundryFee: recentOrder.laundryFee,
-          deliveryFee: recentOrder.deliveryFee,
-          distanceKm: recentOrder.distanceKm || 0,
-          totalPrice: recentOrder.totalPrice,
-          pickupDateTime: `${date} ${slotId}`,
-          scheduledDate: recentOrder.scheduledDate
-        };
+      // 1. Create Booking
+      const res = await fetch("/api/booking", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
 
-        // 1. Create Booking
-        const res = await fetch("/api/booking", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload)
-        });
+      const bookingData = await res.json();
+      if (!res.ok || !bookingData.success) throw new Error(bookingData.error || "Booking failed");
+      
+      const orderId = bookingData.orderId;
+      setActiveOrderId(orderId);
 
-        const bookingData = await res.json();
-        if (!res.ok || !bookingData.success) throw new Error(bookingData.error || "Booking failed");
-        
-        const orderId = bookingData.orderId;
-        setActiveOrderId(orderId);
+      // 2. Create Stripe Payment
+      const payRes = await fetch("/api/payment/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          orderId,
+          amount: Math.ceil(recentOrder.totalPrice),
+          paymentMethod: "promptpay"
+        })
+      });
 
-        // 2. Create Stripe Payment
-        const payRes = await fetch("/api/payment/checkout", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            orderId,
-            amount: Math.ceil(recentOrder.totalPrice),
-            paymentMethod: "promptpay"
-          })
-        });
-
-        const payData = await payRes.json() as any;
-        if (payRes.ok && payData.clientSecret) {
-          setClientSecret(payData.clientSecret);
-          setPaymentStatus("ready");
-        } else {
-          throw new Error("Payment initialization failed");
-        }
-
-      } catch (err: any) {
-        console.error(err);
-        setError(err.message || "เกิดข้อผิดพลาด");
-        setPaymentStatus("error");
+      const payData = await payRes.json() as any;
+      if (payRes.ok && payData.clientSecret) {
+        setClientSecret(payData.clientSecret);
+        setPaymentStatus("ready");
+      } else {
+        throw new Error("Payment initialization failed");
       }
-    }
 
-    autoSubmit();
-  }, [recentOrder, profile?.userId]);
+    } catch (err: any) {
+      console.error(err);
+      setError(err.message || "เกิดข้อผิดพลาด");
+      setPaymentStatus("error");
+    }
+  };
 
   const totalPrice = Math.ceil(recentOrder?.totalPrice || 0);
 
@@ -235,6 +223,57 @@ export default function QuickBookPage() {
             จองปกติ
           </button>
         </div>
+      </div>
+    );
+  }
+
+  // ─── Idle State — Show Summary ───
+  if (paymentStatus === "idle") {
+    return (
+      <div className="min-h-dvh bg-slate-50 flex flex-col">
+        {/* Header */}
+        <header className="bg-white px-5 pt-3 pb-4 border-b border-slate-200 flex items-center justify-between sticky top-0 z-40">
+          <button onClick={() => router.back()} className="active:scale-95 transition-transform">
+            <IconCircle variant="white" size="sm">
+              <Icons.Back size={18} />
+            </IconCircle>
+          </button>
+          <h1 className="text-lg font-bold text-slate-900">⚡ จองด่วน (Quick Book)</h1>
+          <div className="w-9 h-9" />
+        </header>
+
+        <main className="flex-1 px-5 py-6">
+          <Card className="p-5 space-y-4">
+            <div className="flex items-center gap-4">
+              <IconCircle variant="orange" size="md">
+                {getServiceIcon(recentOrder.serviceId, { size: 24 })}
+              </IconCircle>
+              <div>
+                <h2 className="font-black text-slate-800 text-lg">
+                  ใช้บริการแบบเดิม
+                </h2>
+                <p className="text-sm text-slate-500">บริการ: {recentOrder.serviceName || recentOrder.serviceId}</p>
+              </div>
+            </div>
+            
+            <div className="bg-slate-50 p-4 rounded-xl border border-slate-100">
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-sm text-slate-500 font-bold">ราคารวม (โดยประมาณ)</span>
+                <span className="text-xl font-black text-primary">฿{totalPrice}</span>
+              </div>
+              <p className="text-xs text-slate-400">
+                ระบบจะสร้างคำสั่งซักโดยอ้างอิงจากออเดอร์ล่าสุดของคุณ (ทั้งราคาและสถานที่รับส่ง) และชำระเงินผ่านระบบ PromptPay
+              </p>
+            </div>
+
+            <button
+              onClick={handleConfirmQuickBook}
+              className="w-full bg-primary text-white py-4 rounded-xl font-black text-base uppercase shadow-lg shadow-primary/30 active:scale-95 transition-all"
+            >
+              ยืนยันจองด่วน
+            </button>
+          </Card>
+        </main>
       </div>
     );
   }
