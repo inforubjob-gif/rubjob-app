@@ -193,36 +193,54 @@ export default function BottomNav() {
   const tabs = isProviderContext ? PROVIDER_TABS : isRubberContext ? RUBBER_TABS : (isStoreContext ? STORE_TABS : USER_TABS);
 
   return (
-    <nav className={`fixed bottom-0 left-0 right-0 z-50 bg-primary border-primary-dark/20 border-t shadow-[0_-8px_30px_rgba(255,159,28,0.25)] pb-[env(safe-area-inset-bottom,0px)]`}>
-      <div className={`flex items-center justify-around h-16 max-w-lg mx-auto px-2 text-white/70`}>
-        {tabs.map((tab) => {
-          const isActive = tab.href === "/"
-            ? pathname === "/"
-            : pathname.startsWith(tab.href);
-          
-          const isBooking = tab.href === "/booking";
+    <nav className="fixed bottom-0 left-0 right-0 z-50 pb-[env(safe-area-inset-bottom,0px)]">
+      {/* Gradient bar with subtle top glow */}
+      <div className="bg-gradient-to-t from-[#e88a00] to-primary border-t border-white/15 shadow-[0_-4px_24px_rgba(232,138,0,0.3)]">
+        <div className="flex items-center justify-around h-[68px] max-w-lg mx-auto px-1">
+          {tabs.map((tab) => {
+            const isActive = tab.href === "/"
+              ? pathname === "/"
+              : pathname.startsWith(tab.href);
+            
+            const isBooking = tab.href === "/booking";
 
-          return (
-            <Link
-              key={tab.href}
-              href={tab.href}
-              className={`relative flex flex-col items-center justify-center gap-1 flex-1 h-full transition-all duration-300 group ${
-                isActive 
-                  ? "text-white drop-shadow-md -translate-y-1" 
-                   : "text-white/60 hover:text-white hover:-translate-y-1"
-              }`}
-            >
-              <div className={`flex items-center justify-center p-2 rounded-xl transition-all duration-300 ${
-                isActive && !isBooking ? "bg-white text-primary scale-[1.15] shadow-lg shadow-black/10" : "group-hover:bg-white/10"
-              }`}>
-                {tab.icon(isActive)}
-              </div>
-              <span className={`text-[10px] font-black uppercase leading-tight transition-all duration-300 ${isActive ? "opacity-100 scale-105" : "opacity-60 group-hover:opacity-100"}`}>
-                {tab.label}
-              </span>
-            </Link>
-          );
-        })}
+            return (
+              <Link
+                key={tab.href}
+                href={tab.href}
+                className={`relative flex flex-col items-center justify-center flex-1 h-full transition-all duration-200 group select-none`}
+              >
+                {/* Active background pill */}
+                {isActive && !isBooking && (
+                  <div className="absolute inset-x-2 top-1.5 bottom-1.5 bg-white/20 rounded-2xl backdrop-blur-sm" />
+                )}
+
+                {/* Icon */}
+                <div className={`relative z-10 flex items-center justify-center w-8 h-8 rounded-xl transition-all duration-200 ${
+                  isActive && !isBooking
+                    ? "text-white scale-105" 
+                    : "text-white/50 group-active:text-white/90 group-active:scale-95"
+                }`}>
+                  {tab.icon(isActive)}
+                </div>
+
+                {/* Label */}
+                <span className={`relative z-10 text-[10px] font-extrabold uppercase leading-none mt-0.5 transition-all duration-200 ${
+                  isActive 
+                    ? "text-white" 
+                    : "text-white/40 group-active:text-white/80"
+                }`}>
+                  {tab.label}
+                </span>
+
+                {/* Active dot indicator */}
+                {isActive && !isBooking && (
+                  <div className="absolute -bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 bg-white rounded-full shadow-[0_0_6px_rgba(255,255,255,0.8)]" />
+                )}
+              </Link>
+            );
+          })}
+        </div>
       </div>
     </nav>
   );
