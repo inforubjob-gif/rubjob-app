@@ -56,54 +56,85 @@ export default function StatusTimeline({ currentStatus, orderType = "logistics" 
   
   const currentIdx = statusOrder.indexOf(currentStatus);
 
-  return (
-    <div className="space-y-8 py-4 px-1">
-      {steps.map((step, index) => {
-        // Map step key to index in statusOrder
-        const stepIdx = statusOrder.indexOf(step.key);
-        const isDone = stepIdx < currentIdx || (step.key === "completed" && currentStatus === "completed");
-        const isCurrent = step.key === currentStatus;
-        const isFuture = stepIdx > currentIdx && !isCurrent;
-        
-        return (
-          <div 
-            key={step.key} 
-            className={`flex items-center justify-between gap-6 transition-all duration-500 ${isFuture ? "opacity-30 grayscale" : "opacity-100"}`}
-          >
-            {/* Right: Icon (Moved to left for better timeline flow if desired, but keeping layout) */}
-            <div className={`relative shrink-0 transition-all duration-500 ${isCurrent ? "scale-110" : "scale-100"}`}>
-               <IconCircle 
-                  variant={isCurrent ? "orange" : isDone ? "black" : "slate"} 
-                  size="lg"
-                  className={isCurrent ? "ring-4 ring-primary/20 shadow-xl shadow-primary/20" : ""}
-               >
-                 {step.icon && <step.icon size={28} strokeWidth={2.5} />}
-               </IconCircle>
-              
-              {isDone && (
-                <div className="absolute -top-1 -right-1 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center text-white border-2 border-white shadow-sm animate-fade-in z-10">
-                  <Icons.Check size={12} strokeWidth={4} />
-                </div>
-              )}
-            </div>
+  // Determine which step is currently active in the UI
+  let activeStepIdx = 0;
+  let currentStepInfo = steps[0];
 
-            {/* Left: Text Info */}
-            <div className="flex-1 space-y-1">
-              <div className="flex items-center gap-2">
-                <h4 className={`text-sm font-black uppercase ${isCurrent ? "text-primary-dark" : "text-slate-700"}`}>
-                  {t(`orders.status.${step.key}`)}
-                </h4>
-                {isCurrent && !isDone && (
-                  <span className="flex h-2 w-2 rounded-full bg-primary animate-ping" />
-                )}
+  steps.forEach((step, index) => {
+    const stepIdx = statusOrder.indexOf(step.key);
+    if (currentIdx >= stepIdx) {
+      activeStepIdx = index;
+      currentStepInfo = step;
+    }
+  });
+
+  // If we are at a status not in the steps array (like 'pending'), show the first step as pending
+  if (currentIdx === 0) {
+    activeStepIdx = 0;
+    currentStepInfo = steps[0];
+  }
+
+  // Calculate progress percentage
+  const progressPercent = Math.max(0, (activeStepIdx / (steps.length - 1)) * 100);
+
+  return (
+    <div className="space-y-5 py-2">
+      {/* Horizontal Progress Bar */}
+      <div className="relative px-2">
+        <div className="absolute left-[10%] right-[10%] top-1/2 -translate-y-1/2 h-1 bg-slate-100 -z-10 rounded-full" />
+        <div 
+          className="absolute left-[10%] top-1/2 -translate-y-1/2 h-1 bg-primary -z-10 rounded-full transition-all duration-700 ease-in-out" 
+          style={{ width: `${progressPercent * 0.8}%` }} 
+        />
+        
+        <div className="flex items-center justify-between">
+          {steps.map((step, index) => {
+            const stepIdx = statusOrder.indexOf(step.key);
+            const isDone = stepIdx < currentIdx || (step.key === "completed" && currentStatus === "completed");
+            const isCurrent = index === activeStepIdx && currentStatus !== "completed";
+            
+            return (
+              <div key={step.key} className="relative bg-white z-10 px-1 transition-all duration-500">
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 transition-all duration-500 ${
+                  isDone ? "bg-primary border-primary text-white" : 
+                  isCurrent ? "bg-white border-primary text-primary shadow-md shadow-primary/20 scale-110" : 
+                  "bg-slate-50 border-slate-100 text-slate-300"
+                }`}>
+                  {isDone ? <Icons.Check size={14} strokeWidth={3} /> : step.icon && <step.icon size={14} strokeWidth={2.5} />}
+                </div>
               </div>
-              <p className="text-[10px] text-slate-400 font-bold uppercase leading-none">
-                {isDone ? t("common.done") : isCurrent ? t("common.processing") : t("common.pending")}
-              </p>
-            </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Current Step Card */}
+      <div className="bg-slate-50/80 p-4 rounded-2xl border border-slate-100 flex items-center gap-4 animate-fade-in">
+        <IconCircle 
+          variant={currentStatus === "completed" ? "black" : "orange"} 
+          size="md" 
+          className="shrink-0 shadow-sm"
+        >
+          {currentStepInfo.icon && <currentStepInfo.icon size={22} strokeWidth={2.5} />}
+        </IconCircle>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center justify-between gap-2">
+            <h4 className="text-sm font-black uppercase text-slate-900 truncate">
+              {t(`orders.status.${currentStepInfo.key}`)}
+            </h4>
+            {currentStatus !== "completed" && (
+              <span className="flex h-2 w-2 rounded-full bg-primary animate-ping shrink-0" />
+            )}
           </div>
-        );
-      })}
+          <p className="text-xs text-slate-500 mt-0.5 truncate">
+            {currentStatus === "completed" 
+              ? t("orders.status.completed") 
+              : currentIdx === 0 
+                ? t("common.pending") 
+                : t("common.processing")}
+          </p>
+        </div>
+      </div>
     </div>
   );
 }
