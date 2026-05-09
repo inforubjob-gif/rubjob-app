@@ -2,6 +2,7 @@ import { getRequestContext } from "@cloudflare/next-on-pages";
 import { NextResponse } from "next/server";
 import { getRubberSession } from "@/lib/auth-server";
 import { nanoid } from "nanoid";
+import { createNotification } from "@/lib/notify-server";
 
 export const runtime = "edge";
 
@@ -118,6 +119,18 @@ export async function POST(req: Request) {
       INSERT INTO payout_requests (id, requesterId, requesterType, amount, bankName, accountNumber, accountName, status)
       VALUES (?, ?, 'rubber', ?, ?, ?, ?, 'pending')
     `).bind(id, rubberId, amount, bankName || "N/A", accountNumber || "N/A", accountName || "N/A").run();
+
+    // Create withdrawal notification
+    try {
+      await createNotification(db, {
+        userId: rubberId,
+        userType: "rubber",
+        type: "withdrawal",
+        title: "🏧 คำขอถอนเงินสำเร็จ",
+        message: `ถอนเงิน ฿${amount} รอดำเนินการ จะโอนภายใน 24 ชั่วโมง`,
+        link: "/rubber/wallet"
+      });
+    } catch (e) { console.error("Notify withdrawal error:", e); }
 
     return NextResponse.json({ success: true, payoutId: id });
   } catch (error: any) {

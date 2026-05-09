@@ -9,6 +9,7 @@ import {
   deliveringToCustomerFlex,
   orderCompletedFlex 
 } from "./line";
+import { createNotification } from "./notify-server";
 
 /**
  * Handle Order Status Transitions and Notifications
@@ -145,6 +146,20 @@ export async function transitionOrderStatus(
         break;
       case "completed":
         flexMessage = orderCompletedFlex(orderId);
+        // Create earning notification for the rubber driver
+        if (order.rubberId) {
+          try {
+            const earning = (order.totalPrice || 0) * 0.85;
+            await createNotification(db, {
+              userId: order.rubberId,
+              userType: "rubber",
+              type: "earning",
+              title: "💰 รายได้เข้าแล้ว",
+              message: `งาน #${orderId.slice(-6)} เสร็จสิ้น — ได้รับ ฿${earning.toFixed(0)}`,
+              link: "/rubber/wallet"
+            });
+          } catch (e) { console.error("Notify earning error:", e); }
+        }
         break;
       default:
         // Generic Flex for Direct Service or other statuses

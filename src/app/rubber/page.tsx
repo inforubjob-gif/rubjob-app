@@ -33,6 +33,7 @@ export default function RubberDashboard() {
   const [availableJobs, setAvailableJobs] = useState<any[]>([]);
   const [activeJobs, setActiveJobs] = useState<any[]>([]);
   const [balance, setBalance] = useState(0);
+  const [unreadNotifCount, setUnreadNotifCount] = useState(0);
 
   const [verificationStatus, setVerificationStatus] = useState<"active" | "pending" | "unregistered" | "rejected">("pending");
 
@@ -44,6 +45,7 @@ export default function RubberDashboard() {
         const parsed = JSON.parse(localSession);
         setRubber(parsed);
         fetchRubberData(parsed.id);
+        fetchUnreadCount();
       } else {
         setIsLoading(false); 
         router.push("/rubber/login");
@@ -55,6 +57,20 @@ export default function RubberDashboard() {
       router.push("/rubber/login");
     }
   }, [router]);
+
+  // Poll notification count every 30 seconds
+  useEffect(() => {
+    const interval = setInterval(fetchUnreadCount, 30000);
+    return () => clearInterval(interval);
+  }, []);
+
+  async function fetchUnreadCount() {
+    try {
+      const res = await fetch("/api/notifications?limit=1&unreadOnly=true");
+      const data = await res.json() as any;
+      setUnreadNotifCount(data.unreadCount || 0);
+    } catch (e) {}
+  }
 
   async function fetchRubberData(rubberId: string) {
     if (!rubberId) return;
@@ -244,8 +260,16 @@ export default function RubberDashboard() {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <button className="w-9 h-9 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/20 shadow-md shadow-primary-dark/10 active:scale-90 transition-transform">
+            <button 
+              onClick={() => router.push("/rubber/notifications")}
+              className="relative w-9 h-9 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/20 shadow-md shadow-primary-dark/10 active:scale-90 transition-transform"
+            >
               <Icons.Bell size={18} className="text-white" />
+              {unreadNotifCount > 0 && (
+                <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] bg-rose-500 text-white text-[9px] font-black rounded-full flex items-center justify-center px-1 shadow-lg shadow-rose-500/40 animate-pulse">
+                  {unreadNotifCount > 99 ? "99+" : unreadNotifCount}
+                </span>
+              )}
             </button>
           </div>
         </div>

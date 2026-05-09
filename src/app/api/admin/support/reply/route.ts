@@ -1,6 +1,7 @@
 import { getRequestContext } from "@cloudflare/next-on-pages";
 import { NextResponse } from "next/server";
 import { getAdminSession } from "@/lib/auth-server";
+import { createNotification } from "@/lib/notify-server";
 
 export const runtime = "edge";
 
@@ -83,6 +84,23 @@ export async function POST(req: Request) {
     await db.prepare(`
       UPDATE support_tickets SET updatedAt = CURRENT_TIMESTAMP WHERE id = ?
     `).bind(ticketId).run();
+
+    // 6. Create in-app notification for the user
+    try {
+      const ticketFull = await db.prepare(`SELECT userId, userType, subject FROM support_tickets WHERE id = ?`).bind(ticketId).first() as any;
+      if (ticketFull?.userId) {
+        await createNotification(db, {
+          userId: ticketFull.userId,
+          userType: ticketFull.userType || "rubber",
+          type: "support_reply",
+          title: "💬 แอดมินตอบกลับแล้ว",
+          message: text.length > 80 ? text.slice(0, 80) + "..." : text,
+          link: "/rubber/support"
+        });
+      }
+    } catch (notifErr) {
+      console.error("Failed to create notification:", notifErr);
+    }
 
     return NextResponse.json({ success: true });
   } catch (error: any) {
