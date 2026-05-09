@@ -23,6 +23,7 @@ export default function PromptPayCheckout({ clientSecret, autoConfirm }: PromptP
   const [qrCodeUrl, setQrCodeUrl] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [generatedQrUrl, setGeneratedQrUrl] = useState<string | null>(null);
   const hasAutoConfirmed = useRef(false);
 
   const [paymentAmount, setPaymentAmount] = useState<number | null>(null);
@@ -145,18 +146,39 @@ export default function PromptPayCheckout({ clientSecret, autoConfirm }: PromptP
       ctx.font = "16px 'Helvetica Neue', Helvetica, Arial, sans-serif";
       ctx.fillText("ขอบคุณที่ใช้บริการ Rubjob", canvas.width / 2, 810);
 
-      const dataUrl = canvas.toDataURL("image/png");
-      const link = document.createElement("a");
-      link.href = dataUrl;
-      link.download = `rubjob-qr-${paymentAmount || 'payment'}.png`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      canvas.toBlob(async (canvasBlob) => {
+        if (!canvasBlob) return;
+        
+        const generatedDataUrl = URL.createObjectURL(canvasBlob);
+        setGeneratedQrUrl(generatedDataUrl);
+
+        try {
+          if (navigator.share && navigator.canShare) {
+            const file = new File([canvasBlob], `rubjob-qr-${paymentAmount || 'payment'}.png`, { type: 'image/png' });
+            if (navigator.canShare({ files: [file] })) {
+              await navigator.share({
+                files: [file],
+                title: 'QR Code สำหรับชำระเงิน',
+              });
+              return;
+            }
+          }
+        } catch (e) {
+          console.error("Web Share failed", e);
+        }
+
+        const link = document.createElement("a");
+        link.href = generatedDataUrl;
+        link.download = `rubjob-qr-${paymentAmount || 'payment'}.png`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+      }, "image/png");
 
       window.URL.revokeObjectURL(qrBlobUrl);
     } catch (err) {
       console.error("Failed to generate custom QR", err);
-      // Fallback
       const link = document.createElement("a");
       link.href = qrCodeUrl;
       link.download = "rubjob-promptpay-qr.png";
@@ -243,6 +265,30 @@ export default function PromptPayCheckout({ clientSecret, autoConfirm }: PromptP
            {t("orders.payment.securePaymentByStripe")}
         </div>
       </div>
+
+      {generatedQrUrl && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm animate-fade-in" onClick={() => setGeneratedQrUrl(null)}>
+          <div className="bg-white rounded-3xl p-5 w-full max-w-sm flex flex-col items-center animate-scale-in" onClick={e => e.stopPropagation()}>
+            <div className="w-12 h-12 bg-emerald-100 text-emerald-500 rounded-full flex items-center justify-center mb-3">
+              <Icons.Download size={24} />
+            </div>
+            <h3 className="text-lg font-black text-slate-800 mb-1">บันทึกรูปภาพสำเร็จ?</h3>
+            <p className="text-xs font-bold text-slate-500 mb-6 text-center leading-relaxed">
+              หากรูปภาพไม่ถูกบันทึกลงในอัลบั้มของคุณ<br/>
+              <span className="text-primary font-black">กรุณาแตะค้างที่รูปภาพด้านล่างเพื่อบันทึก (Save Image)</span>
+            </p>
+            
+            <img src={generatedQrUrl} alt="QR Code" className="w-full h-auto rounded-2xl shadow-xl border-4 border-slate-100" />
+            
+            <button 
+              onClick={() => setGeneratedQrUrl(null)}
+              className="mt-6 w-full py-3.5 bg-slate-100 hover:bg-slate-200 rounded-xl font-black text-slate-600 active:scale-95 transition-all text-sm uppercase"
+            >
+              ปิดหน้าต่างนี้ (Close)
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
