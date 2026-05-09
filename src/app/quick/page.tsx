@@ -23,7 +23,6 @@ export default function QuickBookPage() {
   useEffect(() => {
     if (!profile?.userId) {
       if (profile === null) {
-        // Not logged in or initialization failed
         setIsLoading(false);
       }
       return;
@@ -34,8 +33,14 @@ export default function QuickBookPage() {
         const res = await fetch(`/api/orders?userId=${profile?.userId}`);
         const data = await res.json();
         if (data.orders && data.orders.length > 0) {
-          // Find the most recent valid order (e.g. not rejected)
           const validOrder = data.orders.find((o: any) => o.status !== "rejected") || data.orders[0];
+          // Parse items/address if they're JSON strings
+          if (typeof validOrder.items === "string") {
+            try { validOrder.items = JSON.parse(validOrder.items); } catch {}
+          }
+          if (typeof validOrder.address === "string") {
+            try { validOrder.address = JSON.parse(validOrder.address); } catch {}
+          }
           setRecentOrder(validOrder);
         }
       } catch (err) {
@@ -59,13 +64,18 @@ export default function QuickBookPage() {
     });
 
     if (validSlots.length > 0) {
-      return { date: todayStr, slotId: validSlots[0].id };
+      return { date: todayStr, slotId: validSlots[0].id, slotLabel: validSlots[0].label };
     } else {
-      // If today is full, return tomorrow's first slot
       const tomorrow = new Date(now.getTime() + 86400000 - now.getTimezoneOffset() * 60000);
-      return { date: tomorrow.toISOString().slice(0, 10), slotId: TIME_SLOTS[0].id };
+      return { date: tomorrow.toISOString().slice(0, 10), slotId: TIME_SLOTS[0].id, slotLabel: TIME_SLOTS[0].label };
     }
   };
+
+  const nextSlot = getFirstAvailableSlot();
+  const locale = language === "th" ? "th-TH" : "en-US";
+  const pickupDateLabel = new Date(nextSlot.date + "T00:00:00").toLocaleDateString(locale, {
+    weekday: "long", day: "numeric", month: "long",
+  });
 
   const handleConfirm = async () => {
     if (!recentOrder || !profile?.userId) return;
@@ -74,7 +84,7 @@ export default function QuickBookPage() {
     setError("");
 
     try {
-      const { date, slotId } = getFirstAvailableSlot();
+      const { date, slotId } = nextSlot;
 
       const payload = {
         userId: profile.userId,
@@ -83,7 +93,7 @@ export default function QuickBookPage() {
         serviceId: recentOrder.serviceId,
         items: recentOrder.items,
         address: recentOrder.address,
-        paymentMethod: recentOrder.paymentMethod || "qr",
+        paymentMethod: recentOrder.paymentMethod || "promptpay",
         laundryFee: recentOrder.laundryFee,
         deliveryFee: recentOrder.deliveryFee,
         distanceKm: recentOrder.distanceKm || 0,
@@ -92,7 +102,6 @@ export default function QuickBookPage() {
         scheduledDate: recentOrder.scheduledDate
       };
 
-      // 1. Create Booking
       const res = await fetch("/api/booking", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -104,21 +113,28 @@ export default function QuickBookPage() {
       
       const orderId = bookingData.orderId;
       setActiveOrderId(orderId);
-
-      // 2. We show the payment step so they can scan the QR
       setStep("payment");
       setIsSubmitting(false);
 
     } catch (err: any) {
       console.error(err);
-      setError(err.message || t("common.toast.error"));
+      setError(err.message || "เกิดข้อผิดพลาด");
       setIsSubmitting(false);
+    }
+  };
+
+  // Navigate to full booking with pre-filled service
+  const handleEdit = () => {
+    if (recentOrder?.serviceId) {
+      router.push(`/booking?service=${recentOrder.serviceId}`);
+    } else {
+      router.push("/booking");
     }
   };
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50">
+      <div className="min-h-dvh flex flex-col items-center justify-center bg-slate-50">
         <div className="w-10 h-10 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
         <p className="mt-4 text-xs font-bold text-slate-400 uppercase tracking-widest">{t("common.loading")}</p>
       </div>
@@ -127,7 +143,7 @@ export default function QuickBookPage() {
 
   if (!recentOrder) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50 p-6 text-center">
+      <div className="min-h-dvh flex flex-col items-center justify-center bg-slate-50 p-6 text-center">
         <div className="w-20 h-20 bg-white rounded-[2rem] shadow-xl shadow-slate-200/50 flex items-center justify-center mb-6 text-slate-300">
           <Icons.Clock size={40} />
         </div>
@@ -145,86 +161,196 @@ export default function QuickBookPage() {
     );
   }
 
+  // Extract display info
+  const addressLabel = recentOrder.address?.label || recentOrder.address?.name || "ที่อยู่";
+  const addressDetail = recentOrder.address?.details || recentOrder.address?.detail || recentOrder.address?.address || "ไม่มีระบุ";
+  const addressNote = recentOrder.address?.note;
+  const laundryFee = recentOrder.laundryFee || 0;
+  const deliveryFee = recentOrder.deliveryFee || 0;
+  const totalPrice = Math.ceil(recentOrder.totalPrice || 0);
+  const distanceKm = recentOrder.distanceKm ? Number(recentOrder.distanceKm).toFixed(1) : null;
+  const isExpress = recentOrder.scheduledDate?.includes("ด่วน") || recentOrder.scheduledDate?.includes("Express");
+  const itemsList = Array.isArray(recentOrder.items) ? recentOrder.items : [];
+
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col">
+    <div className="min-h-dvh bg-slate-50 flex flex-col">
       {/* Header */}
-      <header className="bg-white px-5 pt-12 pb-4 border-b border-slate-200 flex items-center justify-between sticky top-0 z-40">
+      <header className="bg-white px-5 pt-3 pb-4 border-b border-slate-200 flex items-center justify-between sticky top-0 z-40">
         <button
           onClick={() => router.back()}
-          className="w-9 h-9 rounded-xl bg-slate-100 flex items-center justify-center text-slate-600 active:scale-95 transition-transform"
+          className="active:scale-95 transition-transform"
         >
-          <Icons.Back size={20} />
+          <IconCircle variant="white" size="sm">
+            <Icons.Back size={18} />
+          </IconCircle>
         </button>
-        <h1 className="text-lg font-bold text-slate-900 absolute left-1/2 -translate-x-1/2">
-          จองด่วน (Quick Book)
+        <h1 className="text-lg font-bold text-slate-900">
+          {step === "confirm" ? "⚡ จองด่วน" : "ชำระเงิน"}
         </h1>
-        <div className="w-9 h-9" />
+        {step === "confirm" ? (
+          <button
+            onClick={handleEdit}
+            className="text-xs font-black text-primary active:opacity-60 transition-opacity uppercase"
+          >
+            แก้ไข
+          </button>
+        ) : (
+          <div className="w-9 h-9" />
+        )}
       </header>
 
-      <main className="flex-1 p-5 pb-32 animate-fade-in">
+      <main className="flex-1 p-5 pb-40 animate-fade-in">
         {step === "confirm" ? (
           <>
-            <div className="mb-6">
-              <h2 className="text-sm font-black text-slate-500 uppercase tracking-widest mb-1">ทำรายการเดิมซ้ำ</h2>
-              <p className="text-slate-800 font-medium text-sm">
-                ระบบจะอิงข้อมูลจากออเดอร์ล่าสุดของคุณ และเลือกเวลาเข้ารับผ้าที่เร็วที่สุดของวันนี้
-              </p>
+            {/* Info Banner */}
+            <div className="bg-primary/5 border border-primary/10 rounded-2xl p-4 mb-5 flex items-start gap-3">
+              <div className="w-9 h-9 bg-primary/10 text-primary rounded-xl flex items-center justify-center shrink-0 mt-0.5">
+                <Icons.Bell size={18} strokeWidth={2.5} />
+              </div>
+              <div>
+                <p className="text-[13px] font-black text-primary-dark">ทำรายการเดิมซ้ำอีกครั้ง</p>
+                <p className="text-xs text-slate-500 font-medium mt-0.5 leading-relaxed">
+                  ระบบดึงข้อมูลจากออเดอร์ล่าสุดมาให้ คุณสามารถกด <span className="text-primary font-bold">"แก้ไข"</span> มุมขวาบนเพื่อปรับรายละเอียดได้
+                </p>
+              </div>
             </div>
 
-            <Card className="p-0 overflow-hidden mb-6 border-slate-200">
-              <div className="p-4 border-b border-slate-100 flex items-center gap-4 bg-white">
-                <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center text-primary shrink-0">
+            {/* Service Card */}
+            <Card className="p-0 overflow-hidden mb-4 border-slate-200">
+              <div className="p-4 flex items-center gap-4 bg-white border-b border-slate-100">
+                <IconCircle variant="orange" size="lg" className="shrink-0">
                   {getServiceIcon(recentOrder.serviceId, { size: 24 })}
+                </IconCircle>
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-black text-slate-900 text-[15px]">
+                    {t(`orders.services.${recentOrder.serviceId}`) || recentOrder.serviceId}
+                  </h3>
+                  <p className="text-xs text-slate-400 font-bold mt-0.5">ออเดอร์อ้างอิง: {recentOrder.id}</p>
                 </div>
-                <div>
-                  <h3 className="font-black text-slate-900 uppercase">{t(`orders.services.${recentOrder.serviceId}`) || recentOrder.serviceId}</h3>
-                  <p className="text-xs text-slate-500 font-medium">รูปแบบที่คุณใช้เป็นประจำ</p>
+                <div className={`px-2.5 py-1 rounded-lg text-[10px] font-black uppercase ${isExpress ? "bg-amber-100 text-amber-700" : "bg-slate-100 text-slate-500"}`}>
+                  {isExpress ? "⚡ ด่วน" : "มาตรฐาน"}
                 </div>
-              </div>
-              
-              <div className="p-4 space-y-4 bg-slate-50/50">
-                <div className="flex gap-3">
-                  <IconCircle variant="black" size="sm" className="shrink-0 mt-0.5">
-                    <Icons.FileText size={12} />
-                  </IconCircle>
-                  <div>
-                    <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">รายการที่เลือก</p>
-                    {recentOrder.items?.map((item: any, i: number) => (
-                      <p key={i} className="text-sm font-medium text-slate-900">• {item.name}</p>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="flex gap-3">
-                  <IconCircle variant="blue" size="sm" className="shrink-0 mt-0.5">
-                    <Icons.MapPin size={12} />
-                  </IconCircle>
-                  <div>
-                    <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">สถานที่รับ-ส่ง</p>
-                    <p className="text-sm font-medium text-slate-900">{recentOrder.address?.detail || recentOrder.address?.address || "ไม่มีระบุ"}</p>
-                  </div>
-                </div>
-
-                <div className="flex gap-3">
-                  <IconCircle variant="yellow" size="sm" className="shrink-0 mt-0.5">
-                    <Icons.Bell size={12} />
-                  </IconCircle>
-                  <div>
-                    <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">ความเร็วจัดส่ง</p>
-                    <p className="text-sm font-medium text-slate-900">{recentOrder.scheduledDate}</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="p-4 bg-white border-t border-slate-100 flex items-center justify-between">
-                <span className="font-black text-slate-600 uppercase">ยอดรวมสุทธิ</span>
-                <span className="text-xl font-black text-primary">฿{Math.ceil(recentOrder.totalPrice)}</span>
               </div>
             </Card>
 
+            {/* Details Section */}
+            <div className="space-y-3 mb-5">
+              {/* Items */}
+              <Card className="p-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <IconCircle variant="black" size="sm">
+                    <Icons.FileText size={12} strokeWidth={3} />
+                  </IconCircle>
+                  <span className="text-xs font-black text-slate-500 uppercase tracking-wider">รายการที่เลือก</span>
+                </div>
+                <div className="pl-9 space-y-1.5">
+                  {itemsList.length > 0 ? itemsList.map((item: any, i: number) => (
+                    <div key={i} className="flex items-center justify-between">
+                      <span className="text-sm font-medium text-slate-800">• {item.name}</span>
+                      {item.qty && item.qty > 1 && (
+                        <span className="text-xs font-bold text-slate-400">×{item.qty}</span>
+                      )}
+                    </div>
+                  )) : (
+                    <p className="text-sm text-slate-400">ไม่มีรายการ</p>
+                  )}
+                </div>
+              </Card>
+
+              {/* Address */}
+              <Card className="p-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <IconCircle variant="orange" size="sm">
+                    <Icons.MapPin size={12} strokeWidth={3} />
+                  </IconCircle>
+                  <span className="text-xs font-black text-slate-500 uppercase tracking-wider">สถานที่รับ-ส่งผ้า</span>
+                </div>
+                <div className="pl-9">
+                  <p className="text-sm font-bold text-slate-900">{addressLabel}</p>
+                  <p className="text-xs text-slate-500 mt-0.5 leading-relaxed">{addressDetail}</p>
+                  {addressNote && (
+                    <div className="flex items-center gap-1.5 mt-2 text-primary-dark">
+                      <Icons.FileText size={11} strokeWidth={3} />
+                      <p className="text-xs font-medium">{addressNote}</p>
+                    </div>
+                  )}
+                  {distanceKm && (
+                    <p className="text-[11px] text-slate-400 font-bold mt-1.5">📍 ระยะทาง {distanceKm} กม.</p>
+                  )}
+                </div>
+              </Card>
+
+              {/* Pickup Schedule */}
+              <Card className="p-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <IconCircle variant="yellow" size="sm">
+                    <Icons.Bell size={12} strokeWidth={3} />
+                  </IconCircle>
+                  <span className="text-xs font-black text-slate-500 uppercase tracking-wider">นัดรับผ้า (อัตโนมัติ)</span>
+                </div>
+                <div className="pl-9">
+                  <div className="flex items-center gap-2">
+                    <div className="bg-primary/10 text-primary-dark px-3 py-1.5 rounded-lg">
+                      <p className="text-xs font-black">{pickupDateLabel}</p>
+                    </div>
+                    <div className="bg-slate-100 text-slate-700 px-3 py-1.5 rounded-lg">
+                      <p className="text-xs font-black">{nextSlot.slotLabel}</p>
+                    </div>
+                  </div>
+                  <p className="text-[11px] text-slate-400 font-medium mt-2">
+                    * ระบบเลือกช่วงเวลาที่เร็วที่สุดให้อัตโนมัติ
+                  </p>
+                </div>
+              </Card>
+            </div>
+
+            {/* Price Breakdown */}
+            <Card className="p-0 overflow-hidden mb-5 border-slate-200">
+              <div className="px-4 pt-4 pb-2">
+                <div className="flex items-center gap-2 mb-3">
+                  <IconCircle variant="black" size="sm">
+                    <Icons.Payment size={12} strokeWidth={3} />
+                  </IconCircle>
+                  <span className="text-xs font-black text-slate-500 uppercase tracking-wider">สรุปยอดชำระ</span>
+                </div>
+                <div className="pl-9 space-y-2.5 text-sm">
+                  <div className="flex justify-between items-center">
+                    <span className="text-slate-600 font-medium">🧺 ค่าซักรีด</span>
+                    <span className="font-bold text-slate-800">฿{Math.ceil(laundryFee)}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-slate-600 font-medium">🛵 ค่าจัดส่ง (ไปกลับ)</span>
+                    <span className="font-bold text-slate-800">฿{Math.ceil(deliveryFee)}</span>
+                  </div>
+                  {isExpress && (
+                    <div className="flex justify-between items-center text-amber-600">
+                      <span className="font-medium">⚡ ค่าบริการด่วน</span>
+                      <span className="font-bold">+฿20</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+              <div className="px-4 py-4 bg-slate-50 border-t border-slate-100 flex items-end justify-between mt-2">
+                <div>
+                  <span className="block text-sm font-black text-slate-900">ยอดรวมสุทธิ</span>
+                  <span className="block text-[10px] text-slate-400 font-bold">รวมภาษีมูลค่าเพิ่มแล้ว</span>
+                </div>
+                <span className="text-3xl font-black text-primary-dark">฿{totalPrice}</span>
+              </div>
+            </Card>
+
+            {/* Edit CTA */}
+            <button
+              onClick={handleEdit}
+              className="w-full flex items-center justify-center gap-2 py-3 text-sm font-bold text-primary border-2 border-dashed border-primary/20 rounded-2xl bg-primary/5 hover:bg-primary/10 active:scale-[0.98] transition-all mb-4"
+            >
+              <Icons.Settings size={16} />
+              ต้องการแก้ไขรายละเอียด? → ไปหน้าจองปกติ
+            </button>
+
             {error && (
-              <div className="mb-6 p-4 bg-red-50 text-red-600 rounded-xl text-sm font-medium border border-red-100 flex items-start gap-2">
-                <Icons.Close size={18} className="shrink-0 mt-0.5" />
+              <div className="mb-4 p-4 bg-red-50 text-red-600 rounded-xl text-sm font-medium border border-red-100 flex items-start gap-2">
+                <Icons.AlertCircle size={18} className="shrink-0 mt-0.5" />
                 <p>{error}</p>
               </div>
             )}
@@ -234,7 +360,7 @@ export default function QuickBookPage() {
             <div className="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mb-6 shadow-xl shadow-green-100/50">
               <Icons.Check size={32} strokeWidth={3} />
             </div>
-            <h2 className="text-xl font-black text-slate-900 mb-2 uppercase tracking-tight">การจองด่วนสำเร็จ</h2>
+            <h2 className="text-xl font-black text-slate-900 mb-2 uppercase tracking-tight">การจองด่วนสำเร็จ!</h2>
             <p className="text-sm text-slate-500 mb-8 text-center max-w-[280px]">
               สแกน QR Code เพื่อชำระเงิน<br/><span className="text-rose-500 font-bold">*ต้องชำระเงินก่อนระบบถึงจะเริ่มดำเนินการ</span>
             </p>
@@ -249,7 +375,7 @@ export default function QuickBookPage() {
               
               <div className="bg-white p-4 rounded-xl shadow-inner border border-slate-100 relative overflow-hidden mb-6">
                 <img 
-                  src={`https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=00020101021129370016A000000677010111011300660000000005802TH5303764580215${Math.ceil(recentOrder.totalPrice)}.006304`}
+                  src={`https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=00020101021129370016A000000677010111011300660000000005802TH5303764580215${totalPrice}.006304`}
                   alt="PromptPay QR" 
                   className="w-48 h-48 object-contain"
                 />
@@ -258,7 +384,7 @@ export default function QuickBookPage() {
               <div className="text-center w-full">
                 <div className="flex items-baseline justify-center gap-1">
                   <span className="text-sm font-bold text-slate-500">ยอดชำระสุทธิ</span>
-                  <span className="text-3xl font-black text-slate-900">฿{Math.ceil(recentOrder.totalPrice)}</span>
+                  <span className="text-3xl font-black text-slate-900">฿{totalPrice}</span>
                 </div>
               </div>
             </Card>
@@ -267,7 +393,7 @@ export default function QuickBookPage() {
       </main>
 
       {/* Floating Action Button */}
-      <div className="fixed bottom-0 left-0 right-0 p-5 bg-gradient-to-t from-slate-50 via-slate-50 to-transparent z-40">
+      <div className="fixed bottom-20 left-0 right-0 p-5 z-40">
         {step === "confirm" ? (
           <button
             onClick={handleConfirm}
@@ -282,7 +408,7 @@ export default function QuickBookPage() {
             ) : (
               <>
                 <Icons.Check size={20} strokeWidth={3} />
-                ยืนยันการจองด่วน
+                ยืนยันการจองด่วน — ฿{totalPrice}
               </>
             )}
           </button>
@@ -291,7 +417,7 @@ export default function QuickBookPage() {
             onClick={() => router.push(`/orders/${activeOrderId}`)}
             className="w-full bg-slate-900 text-white py-4 rounded-2xl font-black text-sm uppercase tracking-wider shadow-lg flex items-center justify-center gap-2 active:scale-[0.98] transition-all"
           >
-            ไปหน้าออเดอร์ (เพื่อตรวจสอบสถานะ)
+            ไปหน้าออเดอร์ →
           </button>
         )}
       </div>
