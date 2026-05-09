@@ -12,6 +12,9 @@ import Button from "@/components/ui/Button";
 import { Icons, getServiceIcon, IconCircle } from "@/components/ui/Icons";
 import { useTranslation } from "@/components/providers/LanguageProvider";
 import { useLiff } from "@/components/providers/LiffProvider";
+import { loadStripe, type Stripe } from "@stripe/stripe-js";
+import { Elements } from "@stripe/react-stripe-js";
+import PromptPayCheckout from "@/components/checkout/PromptPayCheckout";
 
 const ITEM_KEY_MAP: Record<string, string> = {
   "T-shirt": "items.tshirt",
@@ -32,6 +35,8 @@ export default function OrderDetailPage() {
   const [rating, setRating] = useState(0);
   const [reviewText, setReviewText] = useState("");
   const [isSubmittingReview, setIsSubmittingReview] = useState(false);
+  const [stripePromise, setStripePromise] = useState<Promise<Stripe | null> | null>(null);
+  const [clientSecret, setClientSecret] = useState<string | null>(null);
 
   const handleSubmitReview = async () => {
     if (rating === 0) return;
@@ -62,6 +67,26 @@ export default function OrderDetailPage() {
         const data = (await res.json()) as any;
         if (data.order) {
           setOrder(data.order);
+          // If payment is pending, initialize Stripe and generate QR
+          if (data.order.paymentStatus === "pending" || data.order.status === "pending") {
+            fetch("/api/payment/config")
+              .then(r => r.json())
+              .then((res: any) => {
+                if (res.publishableKey) setStripePromise(loadStripe(res.publishableKey));
+              })
+              .catch(console.error);
+
+            fetch("/api/payment/checkout", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ orderId: data.order.id, amount: data.order.totalPrice })
+            })
+              .then(r => r.json())
+              .then((res: any) => {
+                if (res.clientSecret) setClientSecret(res.clientSecret);
+              })
+              .catch(console.error);
+          }
         }
       } catch (err) {
         console.error("Fetch order detail error:", err);
@@ -170,6 +195,31 @@ export default function OrderDetailPage() {
             )}
           </div>
         </Card>
+
+        {/* Payment Required Section */}
+        {(order.paymentStatus === "pending" || order.status === "pending") && (
+          <Card className="p-0 overflow-hidden border-2 border-primary shadow-lg shadow-primary/10">
+            <div className="bg-primary/10 p-4 border-b border-primary/20 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Icons.AlertCircle className="text-primary" size={20} />
+                <h3 className="font-black text-primary uppercase text-sm">รอการชำระเงิน</h3>
+              </div>
+              <span className="text-lg font-black text-primary-dark">฿{Math.ceil(order.totalPrice)}</span>
+            </div>
+            <div className="p-5 flex flex-col items-center">
+              {clientSecret && stripePromise ? (
+                <Elements stripe={stripePromise} options={{ clientSecret, appearance: { theme: 'stripe' } }}>
+                  <PromptPayCheckout clientSecret={clientSecret} autoConfirm />
+                </Elements>
+              ) : (
+                <div className="flex flex-col items-center gap-3 py-6">
+                  <div className="w-8 h-8 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
+                  <p className="text-xs font-bold text-slate-400">กำลังโหลด QR ชำระเงิน...</p>
+                </div>
+              )}
+            </div>
+          </Card>
+        )}
 
         {/* Status Timeline */}
         {order.status !== "cancelled" && (
@@ -302,7 +352,22 @@ export default function OrderDetailPage() {
               <p className="text-sm font-semibold text-foreground">{t("orders.needHelp")}</p>
               <p className="text-xs text-muted">{t("orders.contactSupport")}</p>
             </div>
-            <Button variant="outline" size="sm">
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={async () => {
+                try {
+                  const liff = (await import("@line/liff")).default;
+                  if (liff.isInClient()) {
+                    liff.closeWindow();
+                  } else {
+                    window.open("https://line.me/R/ti/p/@rubjob", "_blank");
+                  }
+                } catch (e) {
+                  window.open("https://line.me/R/ti/p/@rubjob", "_blank");
+                }
+              }}
+            >
               {t("common.chat")}
             </Button>
           </div>

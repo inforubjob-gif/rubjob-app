@@ -351,6 +351,8 @@ export const en = {
     deliveryOptions: "Delivery Options",
     hours: "Hours",
     dayTurnaround: "day",
+    laundryFee: "Laundry Fee",
+    deliveryFee: "Delivery Fee",
     fromPrice: "Starts from",
     addNew: "+ Add New",
     serviceTitle: "Select Service",

@@ -287,6 +287,8 @@ export const th = {
       deliveryOptions: "ตัวเลือกการส่งคืน",
       hours: "ชั่วโมง",
       dayTurnaround: "วัน",
+      laundryFee: "ค่าซักรีด",
+      deliveryFee: "ค่าบริการจัดส่ง",
       fromPrice: "เริ่มต้นที่",
       addNew: "+ เพิ่มใหม่",
       serviceTitle: "เลือกบริการ",
