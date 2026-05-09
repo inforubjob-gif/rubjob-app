@@ -30,7 +30,7 @@ export default function AdminOrdersPage() {
   try {
    const res = await fetch("/api/admin/orders");
    const data = await res.json() as any;
-   if (data.orders) setOrders(data.orders);
+   if (data.orders && Array.isArray(data.orders)) setOrders(data.orders);
   } catch (err) {
    console.error(err);
   } finally {
@@ -42,7 +42,7 @@ export default function AdminOrdersPage() {
   try {
    const res = await fetch("/api/admin/rubbers");
    const data = await res.json() as any;
-   if (data.rubbers) setRiders(data.rubbers);
+   if (data.rubbers && Array.isArray(data.rubbers)) setRiders(data.rubbers);
   } catch (err) {
    console.error(err);
   }
@@ -132,7 +132,7 @@ export default function AdminOrdersPage() {
            <tr key={order.id} className={`${rowClass} transition-colors group`}>
             <td className="px-4 py-6">
              <Link href={`/admin/orders/${order.id}`} className="flex flex-col hover:text-primary transition-colors">
-              <span className="font-mono text-[11px] font-bold text-slate-900 mb-1 hover:text-primary">#{order.id.slice(-6).toUpperCase()}</span>
+              <span className="font-mono text-[11px] font-bold text-slate-900 mb-1 hover:text-primary">#{String(order.id || "").slice(-6).toUpperCase()}</span>
               <span className="text-[10px] text-slate-400 font-bold">{new Date(order.createdAt).toLocaleTimeString()}</span>
               {sla !== "none" && (
                <div className={`mt-2 flex items-center gap-1.5 text-[9px] font-black uppercase tracking-widest ${sla === 'critical' ? 'text-rose-500' : 'text-amber-500'}`}>

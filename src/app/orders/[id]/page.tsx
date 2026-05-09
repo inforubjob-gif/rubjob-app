@@ -385,10 +385,10 @@ export default function OrderDetailPage() {
                   if (liff.isInClient()) {
                     liff.closeWindow();
                   } else {
-                    window.open("https://line.me/R/ti/p/@rubjob", "_blank");
+                    window.open("https://line.me/R/ti/p/@576juaqx", "_blank");
                   }
                 } catch (e) {
-                  window.open("https://line.me/R/ti/p/@rubjob", "_blank");
+                  window.open("https://line.me/R/ti/p/@576juaqx", "_blank");
                 }
               }}
             >
