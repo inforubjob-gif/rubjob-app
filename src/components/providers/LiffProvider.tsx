@@ -102,7 +102,8 @@ export default function LiffProvider({ children }: { children: ReactNode }) {
         }
 
         const host = window.location.hostname;
-        const isPortalSubdomain = /^(rubber|admin|store|provider)\./i.test(host);
+        const path = window.location.pathname;
+        const isPortalSubdomain = /^(rubber|admin|store|provider)\./i.test(host) || /^\/(rubber|admin|store|provider)(\/|$)/i.test(path);
 
         await liff.init({ 
           liffId: LIFF_ID,
@@ -116,7 +117,8 @@ export default function LiffProvider({ children }: { children: ReactNode }) {
           // Only auto-login via LINE on the Customer app portal
           // Rubber, Admin, Store, Provider portals use their own email/password login
           const host = window.location.hostname;
-          const isPortalSubdomain = /^(rubber|admin|store|provider)\./i.test(host);
+          const path = window.location.pathname;
+          const isPortalSubdomain = /^(rubber|admin|store|provider)\./i.test(host) || /^\/(rubber|admin|store|provider)(\/|$)/i.test(path);
           
           if (!isPortalSubdomain) {
             liff.login({ redirectUri: window.location.href });
