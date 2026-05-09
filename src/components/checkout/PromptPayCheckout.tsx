@@ -21,6 +21,9 @@ export default function PromptPayCheckout({ clientSecret, autoConfirm }: PromptP
   const { t } = useTranslation();
 
   const [qrCodeUrl, setQrCodeUrl] = useState<string | null>(null);
+  const [message, setMessage] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const hasAutoConfirmed = useRef(false);
 
   useEffect(() => {
     if (autoConfirm && stripe && !hasAutoConfirmed.current && !isLoading && !qrCodeUrl) {
