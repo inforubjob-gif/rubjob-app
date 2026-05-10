@@ -132,6 +132,26 @@ export default function LiffProvider({ children }: { children: ReactNode }) {
         const isLoggedIn = liff.isLoggedIn();
         const isInClient = liff.isInClient();
 
+        // 🔐 Check if user previously logged out intentionally
+        // LIFF in LINE's WebView will auto-re-authenticate on every open,
+        // so we use a flag to remember the user's logout intent.
+        const hasLoggedOut = localStorage.getItem("rubjob_logged_out");
+        if (hasLoggedOut && isLoggedIn) {
+          // User pressed logout before — honour their intent
+          liff.logout();
+          localStorage.removeItem("rubjob_logged_out");
+          setCtx(prev => ({
+            ...prev,
+            isReady: true,
+            isLoggedIn: false,
+            isInClient,
+            profile: null,
+            login: handleLogin,
+            logout: handleLogout,
+          }));
+          return;
+        }
+
         if (!isLoggedIn) {
           // Only auto-login via LINE on the Customer app portal
           // Rubber, Admin, Store, Provider portals and Landing page use their own auth flow or none
@@ -209,6 +229,8 @@ export default function LiffProvider({ children }: { children: ReactNode }) {
   const handleLogin = async () => {
     try {
       const liff = (await import("@line/liff")).default;
+      // Clear the logout flag — user is explicitly choosing to login
+      localStorage.removeItem("rubjob_logged_out");
       if (!liff.isLoggedIn()) {
         // Preserve current path so user returns to the same page after login
         const currentUrl = window.location.href;
@@ -222,6 +244,12 @@ export default function LiffProvider({ children }: { children: ReactNode }) {
   const handleLogout = async (redirectPath?: string) => {
     try {
       const liff = (await import("@line/liff")).default;
+      
+      // 🔐 Set the logout flag BEFORE clearing the token
+      // This ensures that even if LINE's WebView auto-re-authenticates,
+      // our init() will detect the flag and refuse to proceed.
+      localStorage.setItem("rubjob_logged_out", "true");
+      
       if (liff.isLoggedIn()) {
         liff.logout();
       }
@@ -238,6 +266,7 @@ export default function LiffProvider({ children }: { children: ReactNode }) {
       }
     } catch (err) {
       console.error("[RUBJOB] Logout error:", err);
+      localStorage.setItem("rubjob_logged_out", "true");
       window.location.href = redirectPath || "/";
     }
   };
