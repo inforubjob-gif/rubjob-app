@@ -608,10 +608,10 @@ function BookingFlow() {
           <div className="space-y-5 animate-fade-in">
             {/* Service Selection (Editable) */}
             <section>
-              <div className="flex items-center justify-between mb-2">
-                <h3 className="text-sm font-black text-foreground flex items-center gap-2 uppercase tracking-tight">
-                  <IconCircle variant="green" size="sm">
-                    <Icons.WashFold size={14} strokeWidth={3} />
+              <div className="flex items-center justify-between mb-1.5">
+                <h3 className="text-xs font-black text-foreground flex items-center gap-1.5 uppercase tracking-tight">
+                  <IconCircle variant="green" size="xs">
+                    <Icons.WashFold size={12} strokeWidth={3} />
                   </IconCircle> บริการที่เลือก
                 </h3>
               </div>
@@ -619,21 +619,19 @@ function BookingFlow() {
                 <Card
                   hoverable
                   onClick={() => setStep("service")}
-                  className="p-4 transition-all duration-300 border-2 border-slate-100 hover:border-primary/50 bg-white shadow-sm flex items-center justify-between group"
+                  className="p-3 transition-all duration-300 border border-slate-100 hover:border-primary/50 bg-white shadow-sm flex items-center justify-between group"
                 >
-                  <div className="flex items-start gap-3 flex-1">
-                    <IconCircle variant="orange" size="md">
-                      {getServiceIcon(service.id, { size: 20 })}
+                  <div className="flex items-center gap-2.5 flex-1">
+                    <IconCircle variant="orange" size="sm">
+                      {getServiceIcon(service.id, { size: 16 })}
                     </IconCircle>
-                    <div className="flex-1">
-                      <p className="text-sm font-black text-slate-800">{t(`orders.services.${service.id}`) || service.name}</p>
-                      <p className="text-[11px] text-slate-500 mt-1 line-clamp-1">{t(`serviceDesc.${service.id}`) || service.description}</p>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-black text-slate-800 leading-tight">{t(`orders.services.${service.id}`) || service.name}</p>
+                      <p className="text-[10px] text-slate-400 mt-0.5 line-clamp-1">{t(`serviceDesc.${service.id}`) || service.description}</p>
                     </div>
                   </div>
-                  <div className="pl-3 border-l border-slate-100 ml-3 shrink-0">
-                    <div className="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-primary/10 group-hover:text-primary transition-colors">
-                      <Icons.Edit size={16} />
-                    </div>
+                  <div className="w-7 h-7 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-primary/10 group-hover:text-primary transition-colors shrink-0 ml-2">
+                    <Icons.Edit size={14} />
                   </div>
                 </Card>
               )}
@@ -641,48 +639,46 @@ function BookingFlow() {
 
             {/* Address selection */}
             <section>
-              <div className="flex items-center justify-between mb-2">
-                <h3 className="text-sm font-black text-foreground flex items-center gap-2 uppercase tracking-tight">
-                  <IconCircle variant="orange" size="sm">
-                    <Icons.MapPin size={14} strokeWidth={3} />
+              <div className="flex items-center justify-between mb-1.5">
+                <h3 className="text-xs font-black text-foreground flex items-center gap-1.5 uppercase tracking-tight">
+                  <IconCircle variant="orange" size="xs">
+                    <Icons.MapPin size={12} strokeWidth={3} />
                   </IconCircle> {t("booking.pickupAddress")}
                 </h3>
                 <button 
                   onClick={() => router.push("/profile/addresses")}
-                  className="text-xs font-bold text-primary active:opacity-60 transition-opacity"
+                  className="text-[10px] font-bold text-primary active:opacity-60 transition-opacity"
                 >
                   {t("booking.addNew")}
                 </button>
               </div>
               <div className="space-y-2">
                 {dbAddresses.length === 0 && (
-                  <p className="text-center py-4 text-xs text-muted">{t("booking.noAddress")}</p>
+                  <p className="text-center py-3 text-xs text-muted">{t("booking.noAddress")}</p>
                 )}
                 {selectedAddress && (
                   <Card
                     hoverable
                     onClick={() => router.push("/profile/addresses?redirect=/booking")}
-                    className="p-4 transition-all duration-300 border-2 border-slate-100 hover:border-primary/50 bg-white shadow-sm flex items-center justify-between group"
+                    className="p-3 transition-all duration-300 border border-slate-100 hover:border-primary/50 bg-white shadow-sm flex items-center justify-between group"
                   >
-                    <div className="flex items-start gap-3 flex-1">
-                      <IconCircle variant="orange" size="md">
-                        {selectedAddress.label.toLowerCase().includes("home") || selectedAddress.label.toLowerCase().includes("บ้าน") ? <Icons.Home size={20} /> : <Icons.Office size={20} />}
+                    <div className="flex items-center gap-2.5 flex-1 min-w-0">
+                      <IconCircle variant="orange" size="sm">
+                        {selectedAddress.label.toLowerCase().includes("home") || selectedAddress.label.toLowerCase().includes("บ้าน") ? <Icons.Home size={16} /> : <Icons.Office size={16} />}
                       </IconCircle>
-                      <div className="flex-1">
-                        <p className="text-sm font-bold text-slate-800">{selectedAddress.label}</p>
-                        <p className="text-xs text-slate-500 mt-1 line-clamp-2">{selectedAddress.details}</p>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-bold text-slate-800 leading-tight">{selectedAddress.label}</p>
+                        <p className="text-[10px] text-slate-400 mt-0.5 line-clamp-1">{selectedAddress.details}</p>
                         {selectedAddress.note && (
-                          <div className="flex items-center gap-1 mt-1.5 text-primary-dark">
-                            <Icons.FileText size={12} strokeWidth={3} />
-                            <p className="text-xs">{selectedAddress.note}</p>
+                          <div className="flex items-center gap-1 mt-0.5 text-primary-dark">
+                            <Icons.FileText size={10} strokeWidth={3} />
+                            <p className="text-[10px] line-clamp-1">{selectedAddress.note}</p>
                           </div>
                         )}
                       </div>
                     </div>
-                    <div className="pl-3 border-l border-slate-100 ml-3 shrink-0">
-                      <div className="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-primary/10 group-hover:text-primary transition-colors">
-                        <Icons.Edit size={16} />
-                      </div>
+                    <div className="w-7 h-7 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-primary/10 group-hover:text-primary transition-colors shrink-0 ml-2">
+                      <Icons.Edit size={14} />
                     </div>
                   </Card>
                 )}

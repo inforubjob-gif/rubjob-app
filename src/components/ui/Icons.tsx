@@ -171,7 +171,7 @@ export function IconCircle({
 }: { 
   children: React.ReactNode; 
   variant?: "orange" | "yellow" | "green" | "white" | "black" | "slate" | "ghost"; 
-  size?: "sm" | "md" | "lg" | "xl";
+  size?: "xs" | "sm" | "md" | "lg" | "xl";
   className?: string;
 }) {
   const variants = {
@@ -185,6 +185,7 @@ export function IconCircle({
   };
 
   const sizes = {
+    xs: "w-7 h-7 rounded-lg text-sm",
     sm: "w-10 h-10 rounded-xl text-lg",
     md: "w-14 h-14 rounded-2xl text-2xl",
     lg: "w-16 h-16 rounded-[1.5rem] text-3xl",
