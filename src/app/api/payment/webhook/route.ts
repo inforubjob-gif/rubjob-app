@@ -67,6 +67,7 @@ export async function POST(req: Request) {
           await db.prepare(`
             UPDATE orders 
             SET paymentStatus = 'paid', 
+                status = 'searching_driver',
                 updatedAt = CURRENT_TIMESTAMP 
             WHERE id = ?
           `).bind(orderId).run();

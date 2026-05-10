@@ -34,10 +34,11 @@ export async function POST(req: Request) {
       return NextResponse.json({ success: true, message: "Already paid (skipped)" });
     }
 
-    // 2. Mark as paid — identical to what Stripe webhook does
+    // 2. Mark as paid AND change status to searching_driver — identical to what Stripe webhook should do
     await db.prepare(`
       UPDATE orders 
       SET paymentStatus = 'paid', 
+          status = 'searching_driver',
           updatedAt = CURRENT_TIMESTAMP 
       WHERE id = ?
     `).bind(orderId).run();
