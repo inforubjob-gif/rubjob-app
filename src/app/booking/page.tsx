@@ -536,7 +536,7 @@ function BookingFlow() {
       {/* Header */}
       {/* Header */}
       <header className={`bg-white px-5 border-b border-border sticky top-0 z-30 header-transition ${
-        isCollapsed ? "pt-10 pb-2" : "pt-4 pb-4"
+        isCollapsed ? "pt-2 pb-2 shadow-md" : "pt-4 pb-4"
       }`}>
         <div className="flex items-center gap-3">
             <button

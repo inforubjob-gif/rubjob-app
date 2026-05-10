@@ -99,7 +99,7 @@ export default function ProfilePage() {
 
         <div className="flex items-center gap-4 mt-10">
           {/* Avatar */}
-          <div className="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center text-white text-2xl font-bold ring-4 ring-white/30 shadow-lg">
+          <div className="w-16 h-16 rounded-full overflow-hidden bg-white/20 flex items-center justify-center text-white text-2xl font-bold ring-4 ring-white/30 shadow-lg">
             {profile?.pictureUrl ? (
               <img
                 src={profile.pictureUrl}

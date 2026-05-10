@@ -253,7 +253,7 @@ export default function RubberDashboard() {
 
       {/* Rubber Header */}
       <header className={`relative z-10 px-5 sticky top-0 header-transition ${
-        isCollapsed ? "pt-10 pb-2" : "pt-4 pb-4"
+        isCollapsed ? "pt-2 pb-2 bg-slate-900 shadow-md" : "pt-4 pb-4 bg-transparent"
       }`}>
         <div className={`flex items-center justify-between header-transition ${isCollapsed ? "mb-0" : "mb-6"}`}>
           <div className="flex items-center gap-3">

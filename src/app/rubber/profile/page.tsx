@@ -100,7 +100,7 @@ export default function RubberProfilePage() {
 
         <div className="flex items-center gap-5 mt-12">
           {/* Avatar */}
-          <div className="w-20 h-20 rounded-[2rem] bg-white/10 backdrop-blur-xl border-2 border-white/30 flex items-center justify-center text-white text-3xl font-bold shadow-2xl relative group">
+          <div className="w-20 h-20 rounded-[2rem] overflow-hidden bg-white/10 backdrop-blur-xl border-2 border-white/30 flex items-center justify-center text-white text-3xl font-bold shadow-2xl relative group">
             <img 
               src={!rubberSession?.pictureUrl ? `https://api.dicebear.com/7.x/avataaars/svg?seed=${rubberSession?.id || 'Rubjob'}` : (rubberSession.pictureUrl.startsWith('data:') || rubberSession.pictureUrl.startsWith('http')) ? rubberSession.pictureUrl : `/api/admin/documents/${rubberSession.pictureUrl}`} 
               alt="Avatar" 

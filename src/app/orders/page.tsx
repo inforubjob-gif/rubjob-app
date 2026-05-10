@@ -50,7 +50,7 @@ export default function OrdersPage() {
     <div className="flex flex-col min-h-dvh bg-slate-50">
       {/* Header */}
       <header className={`bg-white px-5 border-b border-slate-200 flex items-center justify-between sticky top-0 z-40 header-transition ${
-        isCollapsed ? "pt-10 pb-2" : "pt-4 pb-4"
+        isCollapsed ? "pt-2 pb-2 shadow-md" : "pt-4 pb-4"
       }`}>
         <button
           onClick={() => router.back()}

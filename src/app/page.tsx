@@ -86,7 +86,7 @@ export default function HomePage() {
 
       {/* ─── Collapsible Header ─── */}
       <header className={`relative z-10 px-5 sticky top-0 header-transition ${
-        isCollapsed ? "pt-10 pb-2" : "pt-4 pb-6"
+        isCollapsed ? "pt-2 pb-2 bg-primary shadow-md" : "pt-4 pb-6"
       }`}>
         <div className={`flex items-center justify-between header-transition ${isCollapsed ? "gap-3" : "gap-4"}`}>
           <div className="flex items-center gap-3 flex-1 min-w-0">
@@ -113,7 +113,7 @@ export default function HomePage() {
           </div>
           
           <Link href="/profile" className="relative group shrink-0">
-            <div className={`rounded-full bg-white/20 flex items-center justify-center text-white font-bold ring-4 ring-white/30 shadow-xl group-active:scale-90 transition-all header-transition ${
+            <div className={`rounded-full overflow-hidden bg-white/20 flex items-center justify-center text-white font-bold ring-4 ring-white/30 shadow-xl group-active:scale-90 transition-all header-transition ${
               isCollapsed ? "w-7 h-7 text-sm" : "w-10 h-10 text-lg"
             }`}>
               {profile?.pictureUrl ? (
