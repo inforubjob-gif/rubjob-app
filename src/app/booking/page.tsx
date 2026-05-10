@@ -688,23 +688,24 @@ function BookingFlow() {
             </section>
 
             <section>
-                <h3 className="text-sm font-black text-foreground mb-2 flex items-center gap-2 uppercase tracking-tight">
-                  <IconCircle variant="yellow" size="sm">
-                    <Icons.Bell size={14} strokeWidth={3} />
+                <h3 className="text-xs font-black text-foreground mb-1.5 flex items-center gap-1.5 uppercase tracking-tight">
+                  <IconCircle variant="yellow" size="xs">
+                    <Icons.Bell size={12} strokeWidth={3} />
                   </IconCircle> {t("booking.pickupSelectTime")}
                 </h3>
               
-              <div className="p-3 bg-slate-50/80 rounded-xl space-y-4 animate-fade-in border border-slate-100">
-                <div className="flex gap-2 overflow-x-auto hide-scrollbar pb-1">
+              <div className="p-2.5 bg-slate-50/80 rounded-xl space-y-2.5 animate-fade-in border border-slate-100">
+                {/* Compact date selector — inline pill style */}
+                <div className="flex items-center gap-2 overflow-x-auto hide-scrollbar">
                   {dates.map((d: { value: string; day: string; date: number; month: string }) => (
                     <button
                       key={d.value}
                       onClick={() => setPickupDate(d.value)}
-                      className={`flex flex-col items-center min-w-[60px] py-2 px-2 rounded-xl transition-all duration-300 ${pickupDate === d.value ? "bg-primary text-white shadow-md shadow-primary/20 scale-105" : "bg-white text-foreground hover:bg-slate-100 border border-border"}`}
+                      className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] font-bold whitespace-nowrap transition-all ${pickupDate === d.value ? "bg-primary text-white shadow-sm" : "bg-white text-slate-500 border border-slate-200 hover:bg-slate-100"}`}
                     >
-                      <span className="text-[10px] font-medium opacity-80">{d.day}</span>
-                      <span className="text-sm font-bold">{d.date}</span>
-                      <span className="text-[10px] opacity-80">{d.month}</span>
+                      <span>{d.day}</span>
+                      <span className="font-black">{d.date}</span>
+                      <span>{d.month}</span>
                     </button>
                   ))}
                 </div>
@@ -714,19 +715,17 @@ function BookingFlow() {
                   const allSlotsDisabled = TIME_SLOTS.every(s => isSlotPassed(s.startTime, pickupDate));
                   if (!allSlotsDisabled) return null;
                   return (
-                    <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-start gap-3 animate-fade-in">
-                      <div className="w-10 h-10 bg-amber-100 text-amber-600 rounded-xl flex items-center justify-center shrink-0 mt-0.5">
-                        <Icons.Bell size={20} strokeWidth={2.5} />
-                      </div>
+                    <div className="bg-amber-50 border border-amber-200 rounded-lg p-2.5 flex items-center gap-2 animate-fade-in">
+                      <Icons.Bell size={16} className="text-amber-500 shrink-0" />
                       <div>
-                        <p className="text-sm font-black text-amber-800">{t("booking.outsideHoursTitle")}</p>
-                        <p className="text-xs text-amber-600 font-bold mt-1 leading-relaxed">{t("booking.outsideHoursDesc")}</p>
+                        <p className="text-xs font-bold text-amber-700">{t("booking.outsideHoursTitle")}</p>
+                        <p className="text-[10px] text-amber-600 mt-0.5">{t("booking.outsideHoursDesc")}</p>
                       </div>
                     </div>
                   );
                 })()}
 
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-3 gap-1.5">
                   {TIME_SLOTS.map((slot) => {
                     const isDisabled = isSlotPassed(slot.startTime, pickupDate);
                     return (
@@ -734,15 +733,15 @@ function BookingFlow() {
                         key={slot.id}
                         disabled={isDisabled}
                         onClick={() => setPickupSlot(slot.id)}
-                        className={`py-3 px-2 rounded-xl text-center transition-all duration-300 ${
+                        className={`py-2 px-1 rounded-lg text-center transition-all ${
                           isDisabled 
-                            ? "bg-slate-50 text-slate-300 border border-transparent cursor-not-allowed opacity-50" 
+                            ? "bg-slate-50 text-slate-300 cursor-not-allowed opacity-40" 
                             : pickupSlot === slot.id 
-                              ? "bg-primary text-white shadow-md shadow-primary/20 scale-[1.02]" 
-                              : "bg-white text-foreground hover:bg-slate-100 border border-border"
+                              ? "bg-primary text-white shadow-sm" 
+                              : "bg-white text-foreground hover:bg-slate-100 border border-slate-200"
                         }`}
                       >
-                        <p className={`text-xs font-bold ${isDisabled ? "line-through decoration-slate-300/50" : ""}`}>
+                        <p className={`text-[10px] font-bold ${isDisabled ? "line-through" : ""}`}>
                           {t(`timeSlots.${slot.id}`) || slot.label}
                         </p>
                       </button>
@@ -868,15 +867,15 @@ function BookingFlow() {
 
             {/* Discount & Points */}
             <section className="animate-fade-in">
-              <div className="flex items-center justify-between mb-2 mt-6">
-                <h3 className="text-sm font-black text-foreground flex items-center gap-2 uppercase tracking-tight">
-                  <IconCircle variant="yellow" size="sm">
-                    <Icons.Ticket size={14} strokeWidth={3} />
+              <div className="flex items-center justify-between mb-1.5 mt-4">
+                <h3 className="text-xs font-black text-foreground flex items-center gap-1.5 uppercase tracking-tight">
+                  <IconCircle variant="yellow" size="xs">
+                    <Icons.Ticket size={12} strokeWidth={3} />
                   </IconCircle> {t("booking.discountsTitle")}
                 </h3>
               </div>
               
-              <Card className="p-4 mb-4">
+              <Card className="p-3">
                 <button 
                   onClick={async () => {
                     setIsCouponModalOpen(true);
@@ -891,26 +890,26 @@ function BookingFlow() {
                       setIsLoadingCoupons(false);
                     }
                   }}
-                  className="w-full mb-4 bg-primary/5 hover:bg-primary/10 border-2 border-dashed border-primary/20 rounded-xl p-3 flex items-center justify-between group transition-all"
+                  className="w-full mb-3 bg-primary/5 hover:bg-primary/10 border border-dashed border-primary/30 rounded-lg p-2.5 flex items-center justify-between group transition-all"
                 >
-                  <div className="flex items-center gap-3">
-                    <IconCircle variant="orange" size="md">
-                      <Icons.Ticket size={20} />
-                    </IconCircle>
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center text-primary shrink-0">
+                      <Icons.Ticket size={16} />
+                    </div>
                     <div className="text-left">
-                      <p className="text-[13px] font-black text-primary-dark uppercase leading-none">{t("booking.selectCoupon")}</p>
-                      <p className="text-[10px] text-primary/60 font-bold mt-1 uppercase leading-none">{t("booking.promoLabel")}</p>
+                      <p className="text-xs font-black text-primary-dark uppercase leading-none">{t("booking.selectCoupon")}</p>
+                      <p className="text-[9px] text-primary/50 font-bold mt-0.5 uppercase">{t("booking.promoLabel")}</p>
                     </div>
                   </div>
-                  <Icons.ChevronRight size={18} className="text-primary/40 group-hover:text-primary transition-colors" />
+                  <Icons.ChevronRight size={16} className="text-primary/40 group-hover:text-primary transition-colors" />
                 </button>
-                <div className="flex gap-2 mb-4">
+                <div className="flex gap-1.5 mb-3">
                   <input 
                     type="text" 
                     placeholder={t("booking.couponPlaceholder")} 
                     value={couponCode}
                     onChange={(e) => setCouponCode(e.target.value)}
-                    className="flex-1 bg-slate-100 border-none rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 font-bold uppercase"
+                    className="flex-1 bg-slate-100 border-none rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-primary/40 font-bold uppercase"
                   />
                   <Button 
                     onClick={async () => {
@@ -934,29 +933,29 @@ function BookingFlow() {
                       showToast(`❌ ${t("booking.couponErrorGeneric")}`, "error");
                     }
                     }}
-                    className="min-w-[80px] rounded-xl text-xs font-black shadow-md shadow-primary/20"
+                    className="min-w-[70px] rounded-lg text-[10px] font-black shadow-sm py-2"
                   >
                     {t("booking.applyCoupon")}
                   </Button>
                 </div>
                 
                 {appliedCoupon && (
-                  <div className="bg-emerald-50 text-emerald-600 text-[11px] font-bold px-3 py-2.5 rounded-xl flex items-center justify-between mb-4 border border-emerald-100 shadow-sm animate-in fade-in slide-in-from-top-2">
-                    <span className="flex items-center gap-1.5">{t("booking.couponApplied").replace("{code}", appliedCoupon.code)}</span>
-                    <button onClick={() => { setAppliedCoupon(null); setCouponCode(""); }} className="text-emerald-700 underline underline-offset-2">{t("common.remove")}</button>
+                  <div className="bg-emerald-50 text-emerald-600 text-[10px] font-bold px-2.5 py-2 rounded-lg flex items-center justify-between mb-3 border border-emerald-100 animate-in fade-in">
+                    <span className="flex items-center gap-1">{t("booking.couponApplied").replace("{code}", appliedCoupon.code)}</span>
+                    <button onClick={() => { setAppliedCoupon(null); setCouponCode(""); }} className="text-emerald-700 underline underline-offset-2 text-[10px]">{t("common.remove")}</button>
                   </div>
                 )}
 
-                <label className="flex items-center justify-between cursor-pointer border-t border-slate-100 pt-4" onClick={() => setUsePoints(!usePoints)}>
+                <label className="flex items-center justify-between cursor-pointer border-t border-slate-100 pt-3" onClick={() => setUsePoints(!usePoints)}>
                   <div className="flex flex-col">
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-bold text-foreground">{t("booking.usePoints")}</span>
-                      <span className="text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-md font-black">{availablePoints} Pts</span>
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-xs font-bold text-foreground">{t("booking.usePoints")}</span>
+                      <span className="text-[10px] bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded font-black">{availablePoints} Pts</span>
                     </div>
-                    <span className="text-xs text-muted mt-0.5">{t("booking.pointsDesc")}</span>
+                    <span className="text-[10px] text-muted mt-0.5">{t("booking.pointsDesc")}</span>
                   </div>
-                  <div className={`w-[42px] h-[24px] rounded-full p-[2px] transition-colors duration-300 flex items-center ${usePoints ? "bg-primary" : "bg-slate-200"}`}>
-                    <div className={`w-5 h-5 rounded-full bg-white transition-transform duration-300 shadow-sm ${usePoints ? "translate-x-[18px]" : "translate-x-0"}`} />
+                  <div className={`w-[38px] h-[22px] rounded-full p-[2px] transition-colors duration-300 flex items-center ${usePoints ? "bg-primary" : "bg-slate-200"}`}>
+                    <div className={`w-[18px] h-[18px] rounded-full bg-white transition-transform duration-300 shadow-sm ${usePoints ? "translate-x-[16px]" : "translate-x-0"}`} />
                   </div>
                 </label>
               </Card>
