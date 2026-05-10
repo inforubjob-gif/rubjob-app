@@ -245,6 +245,9 @@ export default function BottomNav() {
           })}
         </div>
       </div>
+      
+      {/* Overscroll Extension for LINE LIFF / iOS Safe Area gap */}
+      <div className="absolute top-full left-0 right-0 h-[100px] bg-[#e88a00]" />
     </nav>
   );
 }
