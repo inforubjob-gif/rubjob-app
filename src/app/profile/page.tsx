@@ -86,7 +86,7 @@ export default function ProfilePage() {
       <div className="absolute top-0 left-0 right-0 h-[350px] bg-gradient-to-b from-primary via-primary to-slate-50 z-0" />
 
       {/* Profile Header */}
-      <header className="relative z-10 px-5 pt-3 pb-12">
+      <header className="relative z-10 px-5 pt-12 pb-12">
         {/* Back button */}
         <button
           onClick={() => router.back()}

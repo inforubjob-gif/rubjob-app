@@ -532,7 +532,7 @@ function BookingFlow() {
   return (
     <div className="flex flex-col min-h-dvh">
       {/* Header */}
-      <header className="bg-white px-5 pt-3 pb-4 border-b border-border sticky top-0 z-30">
+      <header className="bg-white px-5 pt-12 pb-4 border-b border-border sticky top-0 z-30">
         <div className="flex items-center gap-3">
             <button
               onClick={() => {

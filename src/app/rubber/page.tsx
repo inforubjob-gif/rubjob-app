@@ -249,7 +249,7 @@ export default function RubberDashboard() {
       </div>
 
       {/* Rubber Header */}
-      <header className="relative z-10 px-5 pt-10 pb-4">
+      <header className="relative z-10 px-5 pt-12 pb-4">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
             <Icons.Logo variant="icon-white" size={48} />

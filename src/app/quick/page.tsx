@@ -232,14 +232,14 @@ export default function QuickBookPage() {
     return (
       <div className="min-h-dvh bg-slate-50 flex flex-col">
         {/* Header */}
-        <header className="bg-white px-5 pt-3 pb-4 border-b border-slate-200 flex items-center justify-between sticky top-0 z-40">
+        <header className="bg-white px-5 pt-12 pb-4 border-b border-slate-200 flex items-center justify-between sticky top-0 z-40">
           <button onClick={() => router.back()} className="active:scale-95 transition-transform">
             <IconCircle variant="white" size="sm">
               <Icons.Back size={18} />
             </IconCircle>
           </button>
-          <h1 className="text-lg font-bold text-slate-900">⚡ จองด่วน (Quick Book)</h1>
-          <div className="w-9 h-9" />
+          <h1 className="text-lg font-bold text-slate-900">⚡ จองด่วน</h1>
+          <img src="/images/rubjob-complete_logo-white.png" alt="RUBJOB" className="h-7 w-auto object-contain" />
         </header>
 
         <main className="flex-1 px-5 py-6">
@@ -291,14 +291,14 @@ export default function QuickBookPage() {
   return (
     <div className="min-h-dvh bg-slate-50 flex flex-col">
       {/* Header */}
-      <header className="bg-white px-5 pt-3 pb-4 border-b border-slate-200 flex items-center justify-between sticky top-0 z-40">
+      <header className="bg-white px-5 pt-12 pb-4 border-b border-slate-200 flex items-center justify-between sticky top-0 z-40">
         <button onClick={() => router.back()} className="active:scale-95 transition-transform">
           <IconCircle variant="white" size="sm">
             <Icons.Back size={18} />
           </IconCircle>
         </button>
         <h1 className="text-lg font-bold text-slate-900">⚡ จองด่วน</h1>
-        <div className="w-9 h-9" />
+        <img src="/images/rubjob-complete_logo-white.png" alt="RUBJOB" className="h-7 w-auto object-contain" />
       </header>
 
       <main className="flex-1 p-5 pb-40 animate-fade-in">

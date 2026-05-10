@@ -120,7 +120,7 @@ export default function StoreDashboard() {
       </div>
 
       {/* Store Header (Rubber Style) */}
-      <header className="relative z-10 px-6 pt-8 pb-10">
+      <header className="relative z-10 px-6 pt-12 pb-10">
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-4">
             <div className="relative group">

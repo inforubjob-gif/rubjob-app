@@ -159,7 +159,7 @@ export default function ProviderDashboard() {
     <div className="flex flex-col min-h-screen bg-slate-50 relative overflow-hidden">
       <div className="absolute top-0 left-0 right-0 h-[380px] bg-gradient-to-b from-primary via-primary-dark to-slate-50 z-0" />
 
-      <header className="relative z-10 px-5 pt-3 pb-6">
+      <header className="relative z-10 px-5 pt-12 pb-6">
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-4">
             <Icons.Logo variant="icon-white" size={56} />
