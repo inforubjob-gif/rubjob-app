@@ -98,7 +98,10 @@ export async function getEligibleRubbers(
 }
 
 /**
- * Broadcast a new job notification to geo-eligible rubbers only
+ * Broadcast a new job notification to geo-eligible rubbers only.
+ * Sends BOTH:
+ * 1. LINE Push Message (if rubber has linked LINE + token is valid)
+ * 2. In-App Notification (always, so rubber sees it in their notification center)
  */
 export async function broadcastToEligibleRubbers(
   db: D1Database,
@@ -127,21 +130,57 @@ export async function broadcastToEligibleRubbers(
     rubberToken = customerToken;
   }
 
-  if (!rubberToken) return;
-
   const { sendLinePush, rubberNewJobFlex } = await import("./line");
+  const { createNotification } = await import("./notify-server");
 
   // 15% commission + 15 THB Platform Fee
   const totalOrderEarn = deliveryFee - (deliveryFee * 0.15) - 15;
-  const legEarn = totalOrderEarn * 0.5;
+  const legEarn = Math.max(totalOrderEarn * 0.5, 0);
 
   const eligibleRubbers = await getEligibleRubbers(db, orderAddress);
+  
+  console.log(`📡 [DISPATCH] Order ${orderId}: Broadcasting to ${eligibleRubbers.length} eligible rubbers (status: ${status}, deliveryFee: ${deliveryFee}, legEarn: ${legEarn.toFixed(0)})`);
+
+  if (eligibleRubbers.length === 0) {
+    console.warn(`⚠️ [DISPATCH] Order ${orderId}: No eligible rubbers found! Check workStatus and address matching.`);
+  }
 
   for (const r of eligibleRubbers) {
-    await sendLinePush(
-      r.lineUserId,
-      [rubberNewJobFlex(orderId, status, legEarn)],
-      rubberToken
-    ).catch(() => {});
+    // 1. In-App Notification (always works, no external dependency)
+    try {
+      // Use the rubber's internal ID (not lineUserId) for the notification
+      // We need to look up the rubber's ID from their lineUserId
+      const rubberRecord = await db.prepare(
+        "SELECT id FROM rubber_users WHERE lineUserId = ?"
+      ).bind(r.lineUserId).first() as any;
+
+      const rubberInternalId = rubberRecord?.id || r.lineUserId;
+
+      await createNotification(db, {
+        userId: rubberInternalId,
+        userType: "rubber",
+        type: "order_update",
+        title: "💸 มีงานใหม่เข้า!",
+        message: `งาน #${orderId.slice(-6)} — รายได้ ฿${legEarn.toFixed(0)} กดรับงานด่วน!`,
+        link: "/rubber"
+      });
+      console.log(`  ✅ [DISPATCH] In-app notification sent to rubber ${rubberInternalId}`);
+    } catch (e) {
+      console.error(`  ❌ [DISPATCH] In-app notification failed for ${r.lineUserId}:`, e);
+    }
+
+    // 2. LINE Push Message (depends on valid token + rubber has added LINE OA)
+    if (rubberToken) {
+      await sendLinePush(
+        r.lineUserId,
+        [rubberNewJobFlex(orderId, status, legEarn)],
+        rubberToken
+      ).catch((err: any) => {
+        console.error(`  ❌ [DISPATCH] LINE push failed for ${r.lineUserId}:`, err?.message || err);
+      });
+    }
   }
+  
+  console.log(`📡 [DISPATCH] Order ${orderId}: Broadcast complete.`);
 }
+
