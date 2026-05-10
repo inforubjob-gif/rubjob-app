@@ -8,6 +8,7 @@ import Card from "@/components/ui/Card";
 import { Icons, IconCircle } from "@/components/ui/Icons";
 import { useTranslation } from "@/components/providers/LanguageProvider";
 import type { Language } from "@/lib/i18n";
+import { useScrollCollapse } from "@/hooks/useScrollCollapse";
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -23,6 +24,7 @@ export default function ProfilePage() {
   const [addresses, setAddresses] = useState<any[]>([]);
   const [phone, setPhone] = useState<string | null>(null);
   const [isDataLoading, setIsDataLoading] = useState(true);
+  const isCollapsed = useScrollCollapse(50);
 
   const MENU_ITEMS = [
     { icon: <Icons.MapPin size={20} />, label: t("profile.myAddress"), description: addresses.length > 0 ? `${addresses.length} ที่อยู่ที่บันทึกไว้` : t("profile.addressDesc"), href: "/profile/addresses" },
@@ -86,20 +88,22 @@ export default function ProfilePage() {
       <div className="absolute top-0 left-0 right-0 h-[350px] bg-gradient-to-b from-primary via-primary to-slate-50 z-0" />
 
       {/* Profile Header */}
-      <header className="relative z-10 px-5 pt-4 pb-6">
+      <header className={`relative z-50 px-5 sticky top-0 header-transition ${
+        isCollapsed ? "pt-2 pb-2 bg-primary shadow-md flex items-center gap-4" : "pt-4 pb-6 block"
+      }`}>
         {/* Back button */}
         <button
           onClick={() => router.back()}
-          className="absolute left-5 top-4 active:scale-95 transition-transform z-10"
+          className={`active:scale-95 transition-transform z-10 ${isCollapsed ? "relative" : "absolute left-5 top-4"}`}
         >
-          <IconCircle variant="white" size="sm">
-            <Icons.Back size={16} />
+          <IconCircle variant="white" size={isCollapsed ? "xs" : "sm"}>
+            <Icons.Back size={isCollapsed ? 14 : 16} />
           </IconCircle>
         </button>
 
-        <div className="flex items-center gap-4 mt-10">
+        <div className={`flex items-center gap-4 header-transition ${isCollapsed ? "mt-0 flex-1" : "mt-10"}`}>
           {/* Avatar */}
-          <div className="w-16 h-16 rounded-full overflow-hidden bg-white/20 flex items-center justify-center text-white text-2xl font-bold ring-4 ring-white/30 shadow-lg">
+          <div className={`rounded-full overflow-hidden bg-white/20 flex items-center justify-center text-white font-bold ring-4 ring-white/30 shadow-lg header-transition ${isCollapsed ? "w-8 h-8 text-sm" : "w-16 h-16 text-2xl"}`}>
             {profile?.pictureUrl ? (
               <img
                 src={profile.pictureUrl}
@@ -112,33 +116,36 @@ export default function ProfilePage() {
           </div>
           <div className="text-white flex-1 min-w-0">
             <div className="flex items-center gap-2 group cursor-pointer" onClick={() => router.push("/profile/edit")}>
-              <h1 className="text-3xl font-extrabold truncate">
+              <h1 className={`font-extrabold truncate header-transition ${isCollapsed ? "text-lg" : "text-3xl"}`}>
                 {isReady ? profile?.displayName ?? "Guest" : t("common.loading")}
               </h1>
-              <Icons.Edit size={14} className="text-white/50 group-hover:text-white transition-colors" />
+              {!isCollapsed && <Icons.Edit size={14} className="text-white/50 group-hover:text-white transition-colors" />}
             </div>
-            {phone ? (
-              <p className="text-sm text-white/90 font-bold mt-0.5 flex items-center gap-1.5">
-                <Icons.Phone size={10} strokeWidth={3} /> {phone}
-              </p>
-            ) : (
-              <button onClick={() => router.push("/profile/edit")} className="text-xs text-white/70 font-bold uppercase mt-1 border border-white/30 px-2.5 py-1 rounded-md hover:bg-white/10 transition-colors">
-                {t("profile.addPhone")}
-              </button>
-            )}
-            <div className="flex items-center gap-2 mt-1">
-              <span className="px-2.5 py-1 bg-white/20 backdrop-blur-md rounded-full text-xs font-bold uppercase">
-                {language === "th" ? `สมาชิก${tier}` : `${tier} ${t("tiers.member")}`}
-              </span>
-              <button className="w-6 h-6 bg-white/20 rounded-lg flex items-center justify-center text-white/70">
-                <Icons.Bell size={12} />
-              </button>
+            
+            <div className={`header-element-collapse ${isCollapsed ? "header-element-hidden" : "block"}`}>
+              {phone ? (
+                <p className="text-sm text-white/90 font-bold mt-0.5 flex items-center gap-1.5">
+                  <Icons.Phone size={10} strokeWidth={3} /> {phone}
+                </p>
+              ) : (
+                <button onClick={() => router.push("/profile/edit")} className="text-xs text-white/70 font-bold uppercase mt-1 border border-white/30 px-2.5 py-1 rounded-md hover:bg-white/10 transition-colors">
+                  {t("profile.addPhone")}
+                </button>
+              )}
+              <div className="flex items-center gap-2 mt-1">
+                <span className="px-2.5 py-1 bg-white/20 backdrop-blur-md rounded-full text-xs font-bold uppercase">
+                  {language === "th" ? `สมาชิก${tier}` : `${tier} ${t("tiers.member")}`}
+                </span>
+                <button className="w-6 h-6 bg-white/20 rounded-lg flex items-center justify-center text-white/70">
+                  <Icons.Bell size={12} />
+                </button>
+              </div>
             </div>
           </div>
         </div>
       </header>
 
-      <div className="relative z-10 flex-1 px-5 -mt-4 space-y-6 pb-24 animate-page-enter">
+      <div className={`relative z-10 flex-1 px-5 space-y-6 pb-24 animate-page-enter ${isCollapsed ? "pt-4" : "-mt-4"}`}>
 
 
         {/* Settings Menu */}

@@ -7,11 +7,13 @@ import Button from "@/components/ui/Button";
 import { Icons } from "@/components/ui/Icons";
 import { useTranslation } from "@/components/providers/LanguageProvider";
 import { useLiff } from "@/components/providers/LiffProvider";
+import { useScrollCollapse } from "@/hooks/useScrollCollapse";
 
 export default function PromotionsPage() {
   const router = useRouter();
   const { t } = useTranslation();
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
+  const isCollapsed = useScrollCollapse(50);
 
   const handleCopy = (code: string) => {
     navigator.clipboard.writeText(code);
@@ -123,14 +125,16 @@ export default function PromotionsPage() {
       {/* Background Gradient Layer */}
       <div className="absolute top-0 left-0 right-0 h-[450px] bg-gradient-to-b from-primary via-primary to-slate-50 z-0" />
 
-      <header className="relative z-10 px-6 pt-4 pb-6">
-        <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center text-white border border-white/20">
-                <Icons.Percent size={20} />
+      <header className={`relative z-50 px-6 sticky top-0 header-transition ${
+        isCollapsed ? "pt-2 pb-2 bg-primary shadow-md flex items-center justify-between" : "pt-4 pb-6 bg-transparent"
+      }`}>
+        <div className={`flex items-center gap-3 header-transition ${isCollapsed ? "mb-0" : "mb-4"}`}>
+            <div className={`rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center text-white border border-white/20 header-transition ${isCollapsed ? "w-8 h-8" : "w-10 h-10"}`}>
+                <Icons.Percent size={isCollapsed ? 16 : 20} />
             </div>
-            <h1 className="text-3xl font-black text-white drop-shadow-sm">{t("promotions.title")}</h1>
+            <h1 className={`font-black text-white drop-shadow-sm header-transition ${isCollapsed ? "text-xl" : "text-3xl"}`}>{t("promotions.title")}</h1>
         </div>
-        <p className="text-white/70 text-sm font-medium">{t("promotions.subtitle")}</p>
+        <p className={`text-white/70 font-medium header-element-collapse ${isCollapsed ? "text-[10px] header-element-hidden" : "text-sm"}`}>{t("promotions.subtitle")}</p>
       </header>
 
       <div className="relative z-10 px-5 space-y-7 pt-2 pb-24 animate-page-enter stagger">

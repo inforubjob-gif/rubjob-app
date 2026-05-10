@@ -85,7 +85,7 @@ export default function HomePage() {
       <div className="absolute top-0 left-0 right-0 h-[250px] bg-gradient-to-b from-primary via-primary/90 to-slate-50 z-0" />
 
       {/* ─── Collapsible Header ─── */}
-      <header className={`relative z-10 px-5 sticky top-0 header-transition ${
+      <header className={`relative z-50 px-5 sticky top-0 header-transition ${
         isCollapsed ? "pt-2 pb-2 bg-primary shadow-md" : "pt-4 pb-6"
       }`}>
         <div className={`flex items-center justify-between header-transition ${isCollapsed ? "gap-3" : "gap-4"}`}>
