@@ -239,8 +239,8 @@ export default function OrderDetailPage() {
           </div>
         </Card>
 
-        {/* Payment Required Section */}
-        {(order.paymentStatus === "pending" || order.status === "pending") && order.status !== "cancelled" && (
+        {/* Payment Required Section — Only show when payment is actually pending */}
+        {order.paymentStatus === "pending" && order.paymentMethod !== "cash" && order.status !== "cancelled" && (
           <Card className="p-0 overflow-hidden border-2 border-primary shadow-lg shadow-primary/10">
             <div className="bg-primary/10 p-4 border-b border-primary/20 flex items-center justify-between">
               <div className="flex items-center gap-2">
@@ -260,6 +260,21 @@ export default function OrderDetailPage() {
                   <p className="text-xs font-bold text-slate-400">กำลังโหลด QR ชำระเงิน...</p>
                 </div>
               )}
+            </div>
+          </Card>
+        )}
+
+        {/* Payment Confirmed Banner */}
+        {order.paymentStatus === "paid" && order.status === "pending" && (
+          <Card className="p-4 border-2 border-emerald-200 bg-emerald-50">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center shrink-0">
+                <Icons.Shield size={20} />
+              </div>
+              <div>
+                <h3 className="text-sm font-black text-emerald-800 uppercase">✅ ชำระเงินเรียบร้อย</h3>
+                <p className="text-xs text-emerald-600 font-bold mt-0.5">กำลังจัดหาพนักงานไปรับผ้าของคุณ...</p>
+              </div>
             </div>
           </Card>
         )}

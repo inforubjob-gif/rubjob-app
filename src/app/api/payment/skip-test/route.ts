@@ -103,6 +103,20 @@ export async function POST(req: Request) {
           orderData.deliveryFee || 0,
           "pending"
         );
+
+        // 5. Notify Admin that payment has been confirmed
+        try {
+          const { notifyAdminNewOrder } = await import("@/lib/support-notify");
+          const userRecord = await db.prepare("SELECT displayName FROM users WHERE id = ?").bind(orderData.userId).first() as any;
+          await notifyAdminNewOrder({
+            orderId,
+            customerName: `${userRecord?.displayName || "ลูกค้า"} ✅ ชำระแล้ว (Test)`,
+            serviceName,
+            totalPrice: orderData.totalPrice || 0
+          }, env);
+        } catch (e) {
+          console.error("Admin notification error:", e);
+        }
       } else {
         console.error(`🧪 [SKIP-TEST] Could not fetch order data for ${orderId}`);
       }
