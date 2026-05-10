@@ -55,6 +55,7 @@ body {
   color: var(--color-foreground);
   font-family: var(--font-sans), system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
   /* Safe-area for LINE in-app browser & notch devices */
   padding-bottom: env(safe-area-inset-bottom, 0px);
 }

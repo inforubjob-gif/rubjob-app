@@ -54,7 +54,7 @@ export default function RubberOrdersPage() {
   return (
     <div className="flex flex-col min-h-dvh bg-slate-50">
       {/* Header — Customer UI Style */}
-      <header className="bg-white px-5 pt-12 pb-4 border-b border-slate-200 flex items-center justify-between sticky top-0 z-40">
+      <header className="bg-white px-5 pt-4 pb-4 border-b border-slate-200 flex items-center justify-between sticky top-0 z-40">
         <button
           onClick={() => router.push("/rubber")}
           className="w-9 h-9 rounded-xl bg-slate-100 flex items-center justify-center text-slate-600 active:scale-95 transition-transform"

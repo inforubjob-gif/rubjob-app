@@ -22,7 +22,7 @@ export default function PricingPage() {
   return (
     <div className="flex flex-col min-h-dvh bg-gradient-to-br from-primary via-amber-400 to-primary-dark">
       {/* ─── Header ─── */}
-      <header className="px-5 pt-12 pb-6 text-center relative">
+      <header className="px-5 pt-4 pb-6 text-center relative">
         {/* Back button */}
         <button
           onClick={() => router.back()}

@@ -65,7 +65,7 @@ export default function StoreOrderDetailPage() {
 
   return (
     <div className="flex flex-col min-h-dvh bg-slate-50">
-      <header className="bg-white px-5 pt-12 pb-6 border-b border-slate-100 flex items-center justify-between sticky top-0 z-50">
+      <header className="bg-white px-5 pt-4 pb-6 border-b border-slate-100 flex items-center justify-between sticky top-0 z-50">
         <button onClick={() => router.back()} className="active:scale-90 transition-all">
           <IconCircle variant="white" size="sm">
             <Icons.Back size={18} />

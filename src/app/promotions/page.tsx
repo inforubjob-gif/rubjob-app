@@ -119,11 +119,11 @@ export default function PromotionsPage() {
   }));
 
   return (
-    <div className="flex flex-col min-h-dvh bg-slate-50 relative overflow-hidden">
+    <div className="flex flex-col min-h-dvh bg-slate-50 relative">
       {/* Background Gradient Layer */}
       <div className="absolute top-0 left-0 right-0 h-[450px] bg-gradient-to-b from-primary via-primary to-slate-50 z-0" />
 
-      <header className="relative z-10 px-6 pt-12 pb-8">
+      <header className="relative z-10 px-6 pt-4 pb-6">
         <div className="flex items-center gap-3 mb-4">
             <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center text-white border border-white/20">
                 <Icons.Percent size={20} />
@@ -137,7 +137,7 @@ export default function PromotionsPage() {
         {/* Membership Card (High Contrast Premium) */}
         <div className="relative group animate-slide-up -mt-2">
           <div className="absolute -inset-1 bg-gradient-to-r from-primary to-primary-dark rounded-xl blur opacity-20 group-hover:opacity-40 transition duration-1000"></div>
-          <div className="p-6 relative overflow-hidden shadow-2xl rounded-xl border border-white/20 bg-gradient-to-br from-[#ae8b5b] to-[#806642] backdrop-blur-xl">
+          <div className="p-6 relative shadow-2xl rounded-xl border border-white/20 bg-gradient-to-br from-[#ae8b5b] to-[#806642] backdrop-blur-xl">
             <div className="absolute top-[-20%] right-[-10%] w-48 h-48 bg-primary/20 rounded-full blur-3xl pointer-events-none" />
             
             <div className="relative z-10">
@@ -166,7 +166,7 @@ export default function PromotionsPage() {
                     {t("promotions.pointsToGo").replace("{points}", pointsToGo.toString())}
                   </span>
                 </div>
-                <div className="h-3 w-full bg-white/10 rounded-full overflow-hidden p-[2px] border border-white/5">
+                <div className="h-3 w-full bg-white/10 rounded-full p-[2px] border border-white/5">
                   <div 
                     className="h-full bg-gradient-to-r from-[#ffd33d] to-[#ff9f1c] rounded-full shadow-[0_0_15px_rgba(255,159,28,0.5)]" 
                     style={{ width: `${progress}%` }} 
@@ -199,7 +199,7 @@ export default function PromotionsPage() {
               </Card>
             )}
             {deals.map((deal, i) => (
-                <Card key={i} className="p-0 overflow-hidden relative group" hoverable>
+                <Card key={i} className="p-0 overflow-x-hidden relative group" hoverable>
                     <div className="flex">
                         <div className={`w-4 ${deal.color} self-stretch`} />
                         <div className="flex-1 p-6 relative">

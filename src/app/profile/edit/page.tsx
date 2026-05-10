@@ -82,12 +82,12 @@ export default function EditProfilePage() {
   };
 
   return (
-    <div className="flex flex-col min-h-dvh bg-slate-50 relative overflow-hidden text-slate-900">
+    <div className="flex flex-col min-h-dvh bg-slate-50 relative text-slate-900">
       {/* Background Gradient Layer */}
       <div className="absolute top-0 left-0 right-0 h-[300px] bg-gradient-to-b from-primary via-primary to-slate-50 z-0" />
 
       {/* Header */}
-      <header className="relative z-10 px-5 pt-12 pb-4 flex items-center gap-3">
+      <header className="relative z-10 px-5 pt-4 pb-4 flex items-center gap-3">
         <button
           onClick={() => router.back()}
           className="w-9 h-9 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center text-white active:scale-95 transition-transform"
@@ -101,7 +101,7 @@ export default function EditProfilePage() {
         {/* Profile Image Section */}
         <div className="flex flex-col items-center gap-4">
           <div className="relative group cursor-pointer" onClick={handlePhotoClick}>
-            <div className="w-28 h-28 rounded-xl bg-white p-1.5 shadow-2xl relative overflow-hidden transition-transform active:scale-95 ring-4 ring-white/30">
+            <div className="w-28 h-28 rounded-xl bg-white p-1.5 shadow-2xl relative transition-transform active:scale-95 ring-4 ring-white/30">
               {photoUrl ? (
                 <img src={photoUrl} alt="Profile" className="w-full h-full object-cover rounded-xl" />
               ) : (

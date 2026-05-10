@@ -158,7 +158,7 @@ export default function ManageAddressesPage() {
   if (isSelectingLocation) {
     return (
       <div className="flex flex-col min-h-dvh bg-white animate-in slide-in-from-bottom duration-300">
-         <header className="bg-white px-5 pt-12 pb-4 border-b border-slate-200 flex items-center justify-between sticky top-0 z-40">
+         <header className="bg-white px-5 pt-4 pb-4 border-b border-slate-200 flex items-center justify-between sticky top-0 z-40">
             <button
               onClick={() => setIsSelectingLocation(false)}
               className="active:scale-95 transition-transform"
@@ -214,7 +214,7 @@ export default function ManageAddressesPage() {
   return (
     <div className="flex flex-col min-h-dvh bg-slate-50">
       {/* Header — Premium Style */}
-      <header className="bg-white px-5 pt-12 pb-4 border-b border-slate-200 flex items-center justify-between sticky top-0 z-40">
+      <header className="bg-white px-5 pt-4 pb-4 border-b border-slate-200 flex items-center justify-between sticky top-0 z-40">
         <button
           onClick={() => router.back()}
           className="active:scale-95 transition-transform"

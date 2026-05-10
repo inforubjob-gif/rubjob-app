@@ -78,9 +78,9 @@ export default function RubberServiceAreaPage() {
   };
 
   return (
-    <div className="flex flex-col min-h-dvh bg-white overflow-hidden">
+    <div className="flex flex-col min-h-dvh bg-white">
       {/* Header */}
-      <header className="px-5 pt-12 pb-4 border-b border-slate-100 flex items-center justify-between sticky top-0 bg-white z-30">
+      <header className="px-5 pt-4 pb-4 border-b border-slate-100 flex items-center justify-between sticky top-0 bg-white z-30">
         <div className="flex items-center gap-3">
           <button
             onClick={() => router.back()}
@@ -128,7 +128,7 @@ export default function RubberServiceAreaPage() {
            <Card className="p-6 shadow-[0_20px_50px_rgba(0,0,0,0.15)] border-none bg-white/95 backdrop-blur-xl rounded-xl">
               <div className="flex gap-4">
                  <div className="w-14 h-14 bg-primary/10 rounded-xl flex items-center justify-center text-3xl shadow-inner shrink-0">📍</div>
-                 <div className="flex-1 overflow-hidden">
+                 <div className="flex-1">
                     <p className="text-sm font-black text-slate-900 uppercase mb-1">
                       {hasPinned ? t("rubber.serviceAreaPage.pinnedLocation") : t("rubber.serviceAreaPage.selectYourArea")}
                     </p>

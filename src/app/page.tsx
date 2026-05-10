@@ -80,13 +80,13 @@ export default function HomePage() {
   const isCollapsed = useScrollCollapse(50);
 
   return (
-    <div className="flex flex-col min-h-dvh bg-slate-50 relative overflow-hidden">
+    <div className="flex flex-col min-h-dvh bg-slate-50 relative">
       {/* Background Gradient Layer */}
       <div className="absolute top-0 left-0 right-0 h-[250px] bg-gradient-to-b from-primary via-primary/90 to-slate-50 z-0" />
 
       {/* ─── Collapsible Header ─── */}
       <header className={`relative z-10 px-5 sticky top-0 header-transition ${
-        isCollapsed ? "pt-10 pb-2" : "pt-12 pb-6"
+        isCollapsed ? "pt-10 pb-2" : "pt-4 pb-6"
       }`}>
         <div className={`flex items-center justify-between header-transition ${isCollapsed ? "gap-3" : "gap-4"}`}>
           <div className="flex items-center gap-3 flex-1 min-w-0">
@@ -113,7 +113,7 @@ export default function HomePage() {
           </div>
           
           <Link href="/profile" className="relative group shrink-0">
-            <div className={`rounded-full bg-white/20 flex items-center justify-center text-white font-bold overflow-hidden ring-4 ring-white/30 shadow-xl group-active:scale-90 transition-all header-transition ${
+            <div className={`rounded-full bg-white/20 flex items-center justify-center text-white font-bold ring-4 ring-white/30 shadow-xl group-active:scale-90 transition-all header-transition ${
               isCollapsed ? "w-7 h-7 text-sm" : "w-10 h-10 text-lg"
             }`}>
               {profile?.pictureUrl ? (
@@ -132,7 +132,7 @@ export default function HomePage() {
 
       <div className="relative z-10 px-5 space-y-7 pt-2 pb-24 animate-page-enter">
         {/* ─── Hero Ads ─── */}
-        <section className="relative w-full rounded-xl overflow-hidden shadow-2xl shadow-primary/20 group active:scale-[0.98] transition-all duration-500 bg-white border-4 border-white/50">
+        <section className="relative w-full rounded-xl shadow-2xl shadow-primary/20 group active:scale-[0.98] transition-all duration-500 bg-white border-4 border-white/50">
           <img 
             src="/images/ads/rubjobfull.png" 
             alt="Rubjob Promotion"

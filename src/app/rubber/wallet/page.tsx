@@ -124,7 +124,7 @@ export default function RubberWalletPage() {
   return (
     <PinLock type="rubber" onVerified={() => {}}>
       <div className="flex flex-col min-h-dvh bg-slate-50">
-        <header className="bg-primary text-white px-5 pt-12 pb-10 rounded-b-[3rem] shadow-xl relative overflow-hidden text-center">
+        <header className="bg-primary text-white px-5 pt-4 pb-6 rounded-b-[3rem] shadow-xl relative overflow-hidden text-center">
           <div className="absolute top-0 right-0 w-40 h-40 bg-white/20 rounded-full -mr-20 -mt-20 blur-3xl pointer-events-none" />
           <div className="relative z-10">
             <p className="text-[10px] font-black text-white/50 uppercase mb-2">{t("rubber.wallet.balance")}</p>

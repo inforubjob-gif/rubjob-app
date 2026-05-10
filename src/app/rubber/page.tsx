@@ -242,7 +242,7 @@ export default function RubberDashboard() {
   const isCollapsed = useScrollCollapse(50);
 
   return (
-    <div className="flex flex-col min-h-screen bg-slate-50 relative overflow-hidden">
+    <div className="flex flex-col min-h-screen bg-slate-50 relative">
       {/* Background Gradient Layer */}
       <div className="absolute top-0 left-0 right-0 h-[280px] bg-gradient-to-b from-primary via-primary to-slate-50 z-0" />
 
@@ -253,7 +253,7 @@ export default function RubberDashboard() {
 
       {/* Rubber Header */}
       <header className={`relative z-10 px-5 sticky top-0 header-transition ${
-        isCollapsed ? "pt-10 pb-2" : "pt-12 pb-4"
+        isCollapsed ? "pt-10 pb-2" : "pt-4 pb-4"
       }`}>
         <div className={`flex items-center justify-between header-transition ${isCollapsed ? "mb-0" : "mb-6"}`}>
           <div className="flex items-center gap-3">
@@ -516,7 +516,7 @@ export default function RubberDashboard() {
         {selectedJob && (
           <div className="w-full space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
              {/* Virtual Route Connection */}
-             <div className="relative h-24 bg-slate-50 rounded-xl border-2 border-slate-100/50 flex items-center justify-between px-10 overflow-hidden">
+             <div className="relative h-24 bg-slate-50 rounded-xl border-2 border-slate-100/50 flex items-center justify-between px-10 overflow-x-hidden">
                 <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(#000 1px, transparent 1px)', backgroundSize: '20px 20px' }} />
                 
                 <div className="relative z-10 flex flex-col items-center">

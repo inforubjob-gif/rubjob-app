@@ -110,7 +110,7 @@ export default function StoreDashboard() {
   };
 
   return (
-    <div className="flex flex-col min-h-dvh bg-slate-50 relative overflow-hidden pb-24">
+    <div className="flex flex-col min-h-dvh bg-slate-50 relative pb-24">
       {/* Background Gradient Layer */}
       <div className="absolute top-0 left-0 right-0 h-[420px] bg-gradient-to-b from-primary via-primary-dark to-slate-50 z-0" />
       
@@ -120,12 +120,12 @@ export default function StoreDashboard() {
       </div>
 
       {/* Store Header (Rubber Style) */}
-      <header className="relative z-10 px-6 pt-12 pb-10">
+      <header className="relative z-10 px-6 pt-4 pb-6">
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-4">
             <div className="relative group">
               <div className="absolute -inset-1 bg-white/20 rounded-2xl blur opacity-0 group-hover:opacity-100 transition duration-500"></div>
-              <div className="relative w-16 h-16 rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 flex items-center justify-center shadow-2xl overflow-hidden">
+              <div className="relative w-16 h-16 rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 flex items-center justify-center shadow-2xl">
                 <Icons.Logo variant="icon-white" size={40} />
               </div>
             </div>
@@ -177,14 +177,14 @@ export default function StoreDashboard() {
 
         {/* Stats Grid (Rubber Style) */}
         <div className="grid grid-cols-2 gap-4 text-center">
-          <div className="bg-white/10 backdrop-blur-md p-5 rounded-[2rem] border border-white/10 text-white relative overflow-hidden group">
+          <div className="bg-white/10 backdrop-blur-md p-5 rounded-[2rem] border border-white/10 text-white relative group">
             <p className="text-[10px] font-black text-white/50 uppercase tracking-[0.2em] mb-1">{t("store.navOrders")}</p>
             <div className="flex items-baseline justify-center gap-1">
               <p className="text-3xl font-black">{incomingOrders.length + washingOrders.length + readyOrders.length}</p>
             </div>
           </div>
           
-          <div className="bg-white/10 backdrop-blur-md p-5 rounded-[2rem] border border-white/10 text-white relative overflow-hidden group">
+          <div className="bg-white/10 backdrop-blur-md p-5 rounded-[2rem] border border-white/10 text-white relative overflow-x-hidden group">
             <p className="text-[10px] font-black text-white/50 uppercase tracking-[0.2em] mb-1">{t("store.wallet.availableBalance")}</p>
             <div className="flex items-baseline justify-center gap-1">
               <p className="text-3xl font-black">฿{Math.floor(balance).toLocaleString()}</p>
@@ -324,7 +324,7 @@ export default function StoreDashboard() {
         {/* Info Cards (Bottom) */}
         <div className="grid grid-cols-1 gap-4 pt-4">
           {!store?.lineUserId && (
-            <Card className="bg-gradient-to-br from-emerald-600 to-teal-500 border-none text-white p-6 rounded-[2.5rem] shadow-xl shadow-emerald-900/20 relative overflow-hidden group">
+            <Card className="bg-gradient-to-br from-emerald-600 to-teal-500 border-none text-white p-6 rounded-[2.5rem] shadow-xl shadow-emerald-900/20 relative overflow-x-hidden group">
               <div className="absolute -right-8 -bottom-8 w-32 h-32 bg-white/10 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700" />
               <div className="flex items-start gap-5 relative z-10">
                 <div className="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center shrink-0 backdrop-blur-md border border-white/20">
@@ -362,7 +362,7 @@ export default function StoreDashboard() {
             </Card>
           )}
 
-          <Card className="bg-slate-900 text-white p-6 rounded-[2.5rem] border border-white/5 relative overflow-hidden group">
+          <Card className="bg-slate-900 text-white p-6 rounded-[2.5rem] border border-white/5 relative overflow-x-hidden group">
             <div className="absolute -left-4 -top-4 w-24 h-24 bg-primary/10 rounded-full blur-xl group-hover:scale-150 transition-transform duration-700" />
             <div className="flex items-center gap-5 relative z-10">
               <div className="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center shrink-0 border border-primary/20 shadow-xl shadow-primary/5">

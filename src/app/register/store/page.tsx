@@ -86,7 +86,7 @@ export default function StoreRegisterPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white text-slate-900 pb-20 overflow-hidden relative">
+    <div className="min-h-screen bg-white text-slate-900 pb-20 relative">
       <nav className="relative z-10 p-6 flex items-center justify-between border-b border-slate-100 mb-8">
          <div className="flex items-center gap-2" onClick={() => router.push("/")}>
             <Icons.Logo size={32} />
@@ -133,7 +133,7 @@ export default function StoreRegisterPage() {
              
              <div className="space-y-2">
                 <label className="text-[10px] font-black text-slate-400 uppercase ml-1">Interactive Map Pin</label>
-                <div className="rounded-xl overflow-hidden border-2 border-slate-100 shadow-inner">
+                <div className="rounded-xl border-2 border-slate-100 shadow-inner">
                    <MapPicker 
                      lat={formData.lat} 
                      lng={formData.lng} 
@@ -238,7 +238,7 @@ export default function StoreRegisterPage() {
                      <label className="text-[10px] font-black text-slate-400 uppercase ml-1">{doc.label}</label>
                      <div 
                        onClick={() => document.getElementById(`file-${doc.id}`)?.click()}
-                       className={`relative aspect-[16/5] rounded-xl border-2 border-dashed transition-all cursor-pointer overflow-hidden flex flex-col items-center justify-center ${getDocPreview(doc.id) ? 'border-primary bg-primary/5' : 'border-slate-100 bg-slate-50'}`}
+                       className={`relative aspect-[16/5] rounded-xl border-2 border-dashed transition-all cursor-pointer flex flex-col items-center justify-center ${getDocPreview(doc.id) ? 'border-primary bg-primary/5' : 'border-slate-100 bg-slate-50'}`}
                      >
                         {getDocPreview(doc.id) ? (
                           <img src={getDocPreview(doc.id)} className="w-full h-full object-cover" />

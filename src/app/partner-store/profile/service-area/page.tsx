@@ -49,9 +49,9 @@ export default function ServiceAreaPage() {
   };
 
   return (
-    <div className="flex flex-col min-h-dvh bg-white overflow-hidden">
+    <div className="flex flex-col min-h-dvh bg-white">
       {/* Header */}
-      <header className="px-5 pt-12 pb-4 border-b border-slate-100 flex items-center justify-between sticky top-0 bg-white z-30">
+      <header className="px-5 pt-4 pb-4 border-b border-slate-100 flex items-center justify-between sticky top-0 bg-white z-30">
         <div className="flex items-center gap-3">
           <button
             onClick={() => router.back()}

@@ -10,7 +10,7 @@ export default function TOSPage() {
 
   return (
     <div className="flex flex-col min-h-dvh bg-white">
-      <header className="px-5 pt-12 pb-4 border-b border-slate-100 flex items-center gap-3 sticky top-0 bg-white z-10">
+      <header className="px-5 pt-4 pb-4 border-b border-slate-100 flex items-center gap-3 sticky top-0 bg-white z-10">
         <button
           onClick={() => router.back()}
           className="w-9 h-9 rounded-xl bg-slate-50 flex items-center justify-center text-slate-600 active:scale-95 transition-transform"

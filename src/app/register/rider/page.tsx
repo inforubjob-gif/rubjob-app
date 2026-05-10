@@ -77,7 +77,7 @@ export default function RubberRegisterPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white pb-20 overflow-hidden relative">
+    <div className="min-h-screen bg-slate-950 text-white pb-20 relative">
       {/* Abstract Background */}
       <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary/10 rounded-full blur-[120px] -mr-40 -mt-20 z-0" />
       <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-indigo-500/5 rounded-full blur-[100px] -ml-20 -mb-20 z-0" />
@@ -210,7 +210,7 @@ export default function RubberRegisterPage() {
                      <label className="text-[10px] font-black text-slate-500 uppercase ml-1">{doc.label}</label>
                      <div 
                        onClick={() => document.getElementById(`file-${doc.id}`)?.click()}
-                       className={`relative aspect-[16/6] rounded-xl border-2 border-dashed transition-all cursor-pointer overflow-hidden flex flex-col items-center justify-center ${getDocPreview(doc.id) ? 'border-primary bg-primary/5' : 'border-slate-800 bg-slate-900/50'}`}
+                       className={`relative aspect-[16/6] rounded-xl border-2 border-dashed transition-all cursor-pointer flex flex-col items-center justify-center ${getDocPreview(doc.id) ? 'border-primary bg-primary/5' : 'border-slate-800 bg-slate-900/50'}`}
                      >
                         {getDocPreview(doc.id) ? (
                           <img src={getDocPreview(doc.id)} className="w-full h-full object-cover opacity-50" />

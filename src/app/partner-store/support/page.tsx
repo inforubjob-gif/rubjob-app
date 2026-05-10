@@ -213,7 +213,7 @@ export default function StoreSupportPage() {
   return (
     <div className="flex flex-col min-h-dvh bg-slate-50">
       {/* Header */}
-      <header className="bg-primary text-white px-5 pt-12 pb-8 rounded-b-[2rem] shadow-xl relative overflow-hidden">
+      <header className="bg-primary text-white px-5 pt-4 pb-6 rounded-b-[2rem] shadow-xl relative overflow-hidden">
         <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-32 -mt-32 blur-3xl" />
         <div className="flex items-center gap-3 mb-4">
           <button

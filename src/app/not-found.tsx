@@ -9,7 +9,7 @@ export default function NotFound() {
   const { t } = useTranslation();
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-dvh bg-gradient-to-b from-white to-orange-50/30 px-6 text-center overflow-hidden">
+    <div className="flex flex-col items-center justify-center min-h-dvh bg-gradient-to-b from-white to-orange-50/30 px-6 text-center">
       {/* Decorative Orbs */}
       <div className="absolute top-0 right-0 w-96 h-96 bg-primary/5 rounded-full blur-[100px] -mr-48 -mt-48" />
       <div className="absolute bottom-0 left-0 w-96 h-96 bg-primary/10 rounded-full blur-[100px] -ml-48 -mb-48" />

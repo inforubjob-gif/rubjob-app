@@ -32,7 +32,7 @@ export default function ActivityPage() {
 
   return (
     <div className="flex flex-col min-h-dvh">
-      <header className="bg-white px-5 pt-12 pb-4 border-b border-border sticky top-0 z-30">
+      <header className="bg-white px-5 pt-4 pb-4 border-b border-border sticky top-0 z-30">
         <h1 className="text-2xl font-black text-foreground">{t("home.navOrders")}</h1>
         <p className="text-sm text-muted mt-0.5">{t("orders.noOrdersSub").replace("{tab}", "")}</p>
       </header>

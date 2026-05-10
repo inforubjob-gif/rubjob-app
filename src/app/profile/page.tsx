@@ -81,12 +81,12 @@ export default function ProfilePage() {
   ];
 
   return (
-    <div className="flex flex-col min-h-dvh bg-slate-50 relative overflow-hidden">
+    <div className="flex flex-col min-h-dvh bg-slate-50 relative">
       {/* Background Gradient Layer */}
       <div className="absolute top-0 left-0 right-0 h-[350px] bg-gradient-to-b from-primary via-primary to-slate-50 z-0" />
 
       {/* Profile Header */}
-      <header className="relative z-10 px-5 pt-12 pb-12">
+      <header className="relative z-10 px-5 pt-4 pb-6">
         {/* Back button */}
         <button
           onClick={() => router.back()}
@@ -99,7 +99,7 @@ export default function ProfilePage() {
 
         <div className="flex items-center gap-4 mt-10">
           {/* Avatar */}
-          <div className="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center text-white text-2xl font-bold overflow-hidden ring-4 ring-white/30 shadow-lg">
+          <div className="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center text-white text-2xl font-bold ring-4 ring-white/30 shadow-lg">
             {profile?.pictureUrl ? (
               <img
                 src={profile.pictureUrl}
@@ -144,7 +144,7 @@ export default function ProfilePage() {
         {/* Settings Menu */}
         <section>
           <h2 className="text-sm font-black text-slate-900 uppercase mb-3 px-1">{t("profile.accountSettings")}</h2>
-          <Card className="divide-y divide-slate-50 overflow-hidden shadow-xl">
+          <Card className="divide-y divide-slate-50 shadow-xl">
             {MENU_ITEMS.map((item) => {
               const content = (
                 <>

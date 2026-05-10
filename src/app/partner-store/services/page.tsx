@@ -58,10 +58,10 @@ export default function StoreServicesPage() {
   };
 
   return (
-    <div className="flex flex-col min-h-dvh bg-slate-50 relative overflow-hidden">
+    <div className="flex flex-col min-h-dvh bg-slate-50 relative">
       <div className="absolute top-0 left-0 right-0 h-[260px] bg-gradient-to-b from-primary/10 to-transparent z-0" />
       
-      <header className="relative z-10 px-5 pt-12 pb-6 border-b border-border bg-white/40 backdrop-blur-md sticky top-0">
+      <header className="relative z-10 px-5 pt-4 pb-6 border-b border-border bg-white/40 backdrop-blur-md sticky top-0">
         <div className="flex items-center gap-3">
           <button onClick={() => router.back()} className="w-9 h-9 rounded-xl bg-white flex items-center justify-center shadow-sm">
             <Icons.Back size={18} />

@@ -163,7 +163,7 @@ export default function LandingPage() {
   }, []);
 
   return (
-    <div className="min-h-dvh bg-[#fafbfd] text-slate-800 font-sans overflow-x-hidden relative">
+    <div className="min-h-dvh bg-[#fafbfd] text-slate-800 font-sans relative">
       {/* ─── Ambient Glowing Orbs (Light Theme Adaptation) ─── */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
         <div className="absolute top-[-10%] left-[-5%] w-[800px] h-[800px] rounded-full bg-primary/20 blur-[120px] mix-blend-multiply opacity-70 animate-pulse-gold" />

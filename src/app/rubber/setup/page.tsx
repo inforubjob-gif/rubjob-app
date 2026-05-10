@@ -69,11 +69,11 @@ export default function RubberSetupPage() {
   };
 
   return (
-    <div className="flex flex-col min-h-dvh bg-slate-50 relative overflow-hidden pb-12">
+    <div className="flex flex-col min-h-dvh bg-slate-50 relative pb-12">
       {/* Background Decor */}
       <div className="absolute top-0 left-0 right-0 h-[320px] bg-gradient-to-b from-primary to-transparent z-0" />
       
-      <header className="relative z-10 px-5 pt-12 pb-6 text-white">
+      <header className="relative z-10 px-5 pt-4 pb-6 text-white">
         <h1 className="text-3xl font-black uppercase">{t("rubber.setup.title")}</h1>
         <p className="text-xs font-bold uppercase mt-1 opacity-80">{t("rubber.setup.sub")}</p>
       </header>

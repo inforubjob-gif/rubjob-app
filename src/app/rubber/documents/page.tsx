@@ -77,7 +77,7 @@ export default function RubberDocumentsPage() {
 
   return (
     <div className="flex flex-col min-h-dvh bg-slate-50 pb-12">
-      <header className="px-5 pt-12 pb-6 border-b border-slate-100 bg-white sticky top-0 z-30">
+      <header className="px-5 pt-4 pb-6 border-b border-slate-100 bg-white sticky top-0 z-30">
         <div className="flex items-center gap-3">
           <button onClick={() => router.back()} className="w-9 h-9 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400">
             <Icons.Back size={18} />

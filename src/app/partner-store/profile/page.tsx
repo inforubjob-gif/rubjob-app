@@ -58,12 +58,12 @@ export default function StoreProfilePage() {
   };
 
   return (
-    <div className="flex flex-col min-h-dvh bg-slate-50 relative overflow-hidden">
+    <div className="flex flex-col min-h-dvh bg-slate-50 relative">
       {/* Background Gradient Layer */}
       <div className="absolute top-0 left-0 right-0 h-[380px] bg-gradient-to-b from-primary via-primary-dark to-slate-50 z-0" />
 
       {/* Profile Header */}
-      <header className="relative z-10 px-6 pt-12 pb-12">
+      <header className="relative z-10 px-6 pt-4 pb-6">
         {/* Back button */}
         <button
           onClick={() => router.back()}
@@ -76,7 +76,7 @@ export default function StoreProfilePage() {
 
         <div className="flex items-center gap-5 mt-12">
           {/* Avatar */}
-          <div className="w-20 h-20 rounded-[2rem] bg-white/10 backdrop-blur-xl border-2 border-white/30 flex items-center justify-center text-primary text-3xl font-bold overflow-hidden shadow-2xl relative">
+          <div className="w-20 h-20 rounded-[2rem] bg-white/10 backdrop-blur-xl border-2 border-white/30 flex items-center justify-center text-primary text-3xl font-bold shadow-2xl relative">
             <div className="w-full h-full bg-white flex items-center justify-center text-primary font-black text-3xl">
               {store?.name?.[0] || "S"}
             </div>
@@ -132,7 +132,7 @@ export default function StoreProfilePage() {
         {/* Store Settings Menu */}
         <section>
           <h2 className="text-[11px] font-black text-slate-900 uppercase tracking-[0.2em] mb-4 px-2">{t("store.profile.settings")}</h2>
-          <Card className="divide-y divide-slate-50 overflow-hidden shadow-2xl rounded-[2.5rem] bg-white border border-slate-100">
+          <Card className="divide-y divide-slate-50 shadow-2xl rounded-[2.5rem] bg-white border border-slate-100">
             <button
               onClick={() => setShowLanguageModal(true)}
               className="w-full flex items-center gap-5 px-6 py-3 hover:bg-slate-50 transition-colors text-left group"
@@ -196,7 +196,7 @@ export default function StoreProfilePage() {
         {/* Support Section */}
         <section>
           <h2 className="text-[11px] font-black text-slate-900 uppercase tracking-[0.2em] mb-4 px-2">{t("support.sectionTitle") || "ช่วยเหลือ"}</h2>
-          <Card className="overflow-hidden shadow-2xl rounded-[2.5rem] bg-white border border-slate-100">
+          <Card className="overflow-x-hidden shadow-2xl rounded-[2.5rem] bg-white border border-slate-100">
             <button
               onClick={() => router.push("/partner-store/support")}
               className="w-full flex items-center gap-5 px-6 py-3 hover:bg-slate-50 transition-colors text-left group"
