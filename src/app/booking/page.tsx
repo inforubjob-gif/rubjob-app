@@ -78,6 +78,7 @@ function BookingFlow() {
   const [pickupSlot, setPickupSlot] = useState("");
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSkippingPayment, setIsSkippingPayment] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
   const [dbServices, setDbServices] = useState<any[]>([]);
   const [dbStores, setDbStores] = useState<any[]>([]);
@@ -1150,6 +1151,50 @@ function BookingFlow() {
               <Icons.Shield size={14} className="text-green-600" />
               <span className="text-xs font-bold uppercase text-foreground">{t("orders.payment.secure")}</span>
             </div>
+
+            {/* 🧪 Skip Payment — Test Mode Only */}
+            {activeOrderId && (
+              <div className="mt-6 border-2 border-dashed border-amber-300 bg-amber-50 rounded-2xl p-4 space-y-3">
+                <div className="flex items-center gap-2">
+                  <span className="text-lg">🧪</span>
+                  <span className="text-xs font-black text-amber-700 uppercase tracking-widest">Test Mode</span>
+                </div>
+                <p className="text-xs text-amber-600 font-bold leading-relaxed">
+                  ข้ามการจ่ายเงินเพื่อทดสอบระบบ — ออเดอร์จะถูกตั้งสถานะเป็น "ชำระแล้ว" ทันที และแจ้งไรเดอร์อัตโนมัติ
+                </p>
+                <button
+                  onClick={async () => {
+                    setIsSkippingPayment(true);
+                    try {
+                      const res = await fetch("/api/payment/skip-test", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ orderId: activeOrderId })
+                      });
+                      const data = await res.json() as any;
+                      if (data.success) {
+                        showToast("✅ ข้ามการจ่ายเงินสำเร็จ! กำลังเปิดหน้าออเดอร์...", "success");
+                        setTimeout(() => router.push(`/orders/${activeOrderId}`), 1000);
+                      } else {
+                        showToast(`Error: ${data.error}`, "error");
+                      }
+                    } catch (err: any) {
+                      showToast(`Error: ${err.message}`, "error");
+                    } finally {
+                      setIsSkippingPayment(false);
+                    }
+                  }}
+                  disabled={isSkippingPayment}
+                  className="w-full py-3.5 bg-amber-500 hover:bg-amber-600 text-white text-sm font-black rounded-xl shadow-lg shadow-amber-500/20 transition-all active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2"
+                >
+                  {isSkippingPayment ? (
+                    <><Icons.Loading className="animate-spin" size={16} /> กำลังข้าม...</>
+                  ) : (
+                    <>⚡ ข้ามการจ่ายเงิน (ทดสอบ)</>
+                  )}
+                </button>
+              </div>
+            )}
           </div>
         )}
 
