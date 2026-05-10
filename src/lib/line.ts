@@ -287,7 +287,7 @@ export const rubberNewJobFlex = (orderId: string, type: string, earn: number): L
   orderStatusUpdateFlex(
     orderId, 
     "💸 มีงานใหม่เข้า!", 
-    `ประเภท: ${type === 'pending' ? 'รับผ้าจากลูกค้า' : 'ส่งผ้าคืนลูกค้า'}\nรายได้: ฿${earn}\nกดเข้าแอปเพื่อรับงานด่วน!`, 
+    `ประเภท: ${type === 'ready_for_pickup' ? 'ส่งผ้าคืนลูกค้า' : 'รับผ้าจากลูกค้า'}\nรายได้: ฿${earn}\nกดเข้าแอปเพื่อรับงานด่วน!`, 
     "#f59e0b"
   );
 

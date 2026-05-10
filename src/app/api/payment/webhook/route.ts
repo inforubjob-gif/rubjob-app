@@ -123,7 +123,7 @@ export async function POST(req: Request) {
                 db, env, orderId,
                 orderData.address,
                 orderData.deliveryFee || 0,
-                'pending'
+                'paid'
               );
             }
           } catch (e) {

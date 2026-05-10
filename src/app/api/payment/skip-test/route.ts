@@ -101,19 +101,30 @@ export async function POST(req: Request) {
           db, env, orderId,
           orderData.address,
           orderData.deliveryFee || 0,
-          "pending"
+          "paid"  // ← Was "pending" — this fixes the rubber notification showing wrong status
         );
 
-        // 5. Notify Admin that payment has been confirmed
+        // 5. Notify Admin LINE group — PAYMENT CONFIRMED (not "new order")
         try {
-          const { notifyAdminNewOrder } = await import("@/lib/support-notify");
-          const userRecord = await db.prepare("SELECT displayName FROM users WHERE id = ?").bind(orderData.userId).first() as any;
-          await notifyAdminNewOrder({
-            orderId,
-            customerName: `${userRecord?.displayName || "ลูกค้า"} ✅ ชำระแล้ว (Test)`,
-            serviceName,
-            totalPrice: orderData.totalPrice || 0
-          }, env);
+          const groupId = env.LINE_ADMIN_GROUP_ID;
+          const accessToken = env.LINE_CHANNEL_ACCESS_TOKEN_HELP || env.LINE_CHANNEL_ACCESS_TOKEN;
+          if (groupId && accessToken) {
+            await fetch("https://api.line.me/v2/bot/message/push", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${accessToken}`,
+              },
+              body: JSON.stringify({
+                to: groupId,
+                messages: [{
+                  type: "text",
+                  text: `✅ ยืนยันชำระเงินแล้ว (Test)\nรหัส: ${orderId}\nบริการ: ${serviceName}\nราคา: ฿${orderData.totalPrice}\n\nสถานะ: จ่ายแล้ว → กำลังจัดหาไรเดอร์`
+                }]
+              })
+            });
+            console.log(`🧪 [SKIP-TEST] Admin payment confirmation sent`);
+          }
         } catch (e) {
           console.error("Admin notification error:", e);
         }
