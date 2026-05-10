@@ -192,9 +192,9 @@ export default function BottomNav() {
   const tabs = isProviderContext ? PROVIDER_TABS : isRubberContext ? RUBBER_TABS : (isStoreContext ? STORE_TABS : USER_TABS);
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 pb-[env(safe-area-inset-bottom,0px)]">
+    <nav className="fixed bottom-0 left-0 right-0 z-50">
       {/* Gradient bar with subtle top glow */}
-      <div className="bg-gradient-to-t from-[#e88a00] to-primary border-t border-white/15 shadow-[0_-4px_24px_rgba(232,138,0,0.3)]">
+      <div className="bg-gradient-to-t from-[#e88a00] to-primary border-t border-white/15 shadow-[0_-4px_24px_rgba(232,138,0,0.3)] pb-[env(safe-area-inset-bottom,0px)]">
         <div className="flex items-center justify-around h-[68px] max-w-lg mx-auto px-1">
           {tabs.map((tab) => {
             const isActive = tab.href === "/"
