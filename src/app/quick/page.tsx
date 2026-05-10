@@ -239,7 +239,7 @@ export default function QuickBookPage() {
             </IconCircle>
           </button>
           <h1 className="text-lg font-bold text-slate-900">⚡ จองด่วน</h1>
-          <img src="/images/rubjob-complete_logo-white.png" alt="RUBJOB" className="h-7 w-auto object-contain" />
+          <img src="/images/rubjob-complete_logo-color.png" alt="RUBJOB" className="h-7 w-auto object-contain" />
         </header>
 
         <main className="flex-1 px-5 py-6">
@@ -298,7 +298,7 @@ export default function QuickBookPage() {
           </IconCircle>
         </button>
         <h1 className="text-lg font-bold text-slate-900">⚡ จองด่วน</h1>
-        <img src="/images/rubjob-complete_logo-white.png" alt="RUBJOB" className="h-7 w-auto object-contain" />
+        <img src="/images/rubjob-complete_logo-color.png" alt="RUBJOB" className="h-7 w-auto object-contain" />
       </header>
 
       <main className="flex-1 p-5 pb-40 animate-page-enter">
