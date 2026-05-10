@@ -148,7 +148,7 @@ export default function RubberWalletPage() {
           </div>
         </header>
 
-        <div className="flex-1 px-5 py-8 space-y-6 pb-24 animate-fade-in">
+        <div className="flex-1 px-5 py-8 space-y-6 pb-24 animate-page-enter">
           <section className="animate-in fade-in slide-in-from-bottom-4 duration-700 delay-150">
             <h2 className="text-[11px] font-black text-slate-900 uppercase tracking-[0.2em] mb-4 px-2">{t("rubber.wallet.earningsInsight") || "Earnings Insight"}</h2>
             <Card className="p-6 bg-white border border-slate-100 shadow-2xl rounded-[2.5rem]">
@@ -341,7 +341,7 @@ export default function RubberWalletPage() {
                </div>
             </div>
           ) : (
-            <div className="flex flex-col items-center text-center animate-fade-in">
+            <div className="flex flex-col items-center text-center animate-page-enter">
                <div className="w-20 h-20 bg-emerald-50 text-emerald-500 rounded-xl flex items-center justify-center mb-6 shadow-lg shadow-emerald-500/10 scale-110">
                   <Icons.CheckCircle size={40} />
                </div>

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useScrollCollapse } from "@/hooks/useScrollCollapse";
 import Card from "@/components/ui/Card";
 import Badge, { statusToBadgeVariant } from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
@@ -238,6 +239,8 @@ export default function RubberDashboard() {
     }
   };
 
+  const isCollapsed = useScrollCollapse(50);
+
   return (
     <div className="flex flex-col min-h-screen bg-slate-50 relative overflow-hidden">
       {/* Background Gradient Layer */}
@@ -249,24 +252,32 @@ export default function RubberDashboard() {
       </div>
 
       {/* Rubber Header */}
-      <header className="relative z-10 px-5 pt-12 pb-4">
-        <div className="flex items-center justify-between mb-6">
+      <header className={`relative z-10 px-5 sticky top-0 header-transition ${
+        isCollapsed ? "pt-10 pb-2" : "pt-12 pb-4"
+      }`}>
+        <div className={`flex items-center justify-between header-transition ${isCollapsed ? "mb-0" : "mb-6"}`}>
           <div className="flex items-center gap-3">
-            <Icons.Logo variant="icon-white" size={48} />
+            <Icons.Logo variant="icon-white" size={isCollapsed ? 28 : 48} />
             <div className="min-w-0">
-              <p className="text-[10px] text-white font-black uppercase leading-tight mb-1 flex items-center gap-1.5">
+              <p className={`text-white font-black uppercase leading-tight flex items-center gap-1.5 header-element-collapse ${
+                isCollapsed ? "text-[8px] mb-0 header-element-hidden" : "text-[10px] mb-1"
+              }`}>
                 <span className="w-1.5 h-1.5 rounded-full bg-white/50 animate-pulse" />
                 {t("rubber.hero")}
               </p>
-              <h1 className="text-xl font-black text-white truncate drop-shadow-md leading-none">{rubber?.name || t("common.guest")}</h1>
+              <h1 className={`font-black text-white truncate drop-shadow-md leading-none header-transition ${
+                isCollapsed ? "text-sm" : "text-xl"
+              }`}>{rubber?.name || t("common.guest")}</h1>
             </div>
           </div>
           <div className="flex items-center gap-2">
             <button 
               onClick={() => router.push("/rubber/notifications")}
-              className="relative w-9 h-9 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/20 shadow-md shadow-primary-dark/10 active:scale-90 transition-transform"
+              className={`relative rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/20 shadow-md shadow-primary-dark/10 active:scale-90 transition-transform header-transition ${
+                isCollapsed ? "w-7 h-7" : "w-9 h-9"
+              }`}
             >
-              <Icons.Bell size={18} className="text-white" />
+              <Icons.Bell size={isCollapsed ? 14 : 18} className="text-white" />
               {unreadNotifCount > 0 && (
                 <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] bg-rose-500 text-white text-[9px] font-black rounded-full flex items-center justify-center px-1 shadow-lg shadow-rose-500/40 animate-pulse">
                   {unreadNotifCount > 99 ? "99+" : unreadNotifCount}
@@ -276,30 +287,33 @@ export default function RubberDashboard() {
           </div>
         </div>
 
-        {/* Work Status Toggle (Dashboard Version) */}
-        <Card className="mb-6 bg-white/10 backdrop-blur-xl border border-white/20 shadow-lg shadow-primary-dark/20 rounded-xl p-3 text-white">
-           <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2.5">
-                  <div className={`w-9 h-9 rounded-lg flex items-center justify-center transition-all shadow-sm ${workStatus ? 'bg-emerald-400/20 text-emerald-300' : 'bg-white/10 text-white/60'}`}>
-                      <Icons.Shield size={18} />
-                  </div>
-                  <div>
-                      <p className="text-[9px] font-black text-white/50 uppercase leading-none mb-0.5">{t("rubber.profile.workStatus")}</p>
-                      <p className="text-sm font-black uppercase leading-none">
-                        {workStatus ? t("rubber.profile.receivingJobs") : t("rubber.profile.notReceiving")}
-                      </p>
-                  </div>
-              </div>
-              <button 
-                onClick={() => setIsStatusModalOpen(true)}
-                className={`w-11 h-6 rounded-full p-0.5 transition-all duration-300 ${workStatus ? 'bg-white shadow-md shadow-white/20' : 'bg-white/20'}`}
-              >
-                <div className={`w-5 h-5 rounded-full shadow-sm transition-all duration-300 ${workStatus ? 'bg-primary transform translate-x-5' : 'bg-white'}`} />
-              </button>
-           </div>
-        </Card>
+        {/* Work Status Toggle — hides on scroll */}
+        <div className={`header-element-collapse ${isCollapsed ? "header-element-hidden" : ""}`}>
+          <Card className="mb-6 bg-white/10 backdrop-blur-xl border border-white/20 shadow-lg shadow-primary-dark/20 rounded-xl p-3 text-white">
+             <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2.5">
+                    <div className={`w-9 h-9 rounded-lg flex items-center justify-center transition-all shadow-sm ${workStatus ? 'bg-emerald-400/20 text-emerald-300' : 'bg-white/10 text-white/60'}`}>
+                        <Icons.Shield size={18} />
+                    </div>
+                    <div>
+                        <p className="text-[9px] font-black text-white/50 uppercase leading-none mb-0.5">{t("rubber.profile.workStatus")}</p>
+                        <p className="text-sm font-black uppercase leading-none">
+                          {workStatus ? t("rubber.profile.receivingJobs") : t("rubber.profile.notReceiving")}
+                        </p>
+                    </div>
+                </div>
+                <button 
+                  onClick={() => setIsStatusModalOpen(true)}
+                  className={`w-11 h-6 rounded-full p-0.5 transition-all duration-300 ${workStatus ? 'bg-white shadow-md shadow-white/20' : 'bg-white/20'}`}
+                >
+                  <div className={`w-5 h-5 rounded-full shadow-sm transition-all duration-300 ${workStatus ? 'bg-primary transform translate-x-5' : 'bg-white'}`} />
+                </button>
+             </div>
+          </Card>
+        </div>
 
-        <div className="grid grid-cols-2 gap-4 text-center">
+        {/* Stats Grid — hides on scroll */}
+        <div className={`grid grid-cols-2 gap-4 text-center header-element-collapse ${isCollapsed ? "header-element-hidden" : ""}`}>
           <div className="bg-white/80 backdrop-blur-md p-4 rounded-xl border border-white shadow-sm">
             <p className="text-xs font-black text-slate-500 uppercase">{t("rubber.tasksToday")}</p>
             <p className="text-2xl font-black mt-1 text-slate-800">{activeJobs.length}</p>
@@ -315,7 +329,7 @@ export default function RubberDashboard() {
         {/* Dashboard Mascot Accent moved here or handled via background */}
       </header>
 
-      <div className="relative z-10 px-5 space-y-7 pt-2 animate-fade-in">
+      <div className="relative z-10 px-5 space-y-7 pt-2 animate-page-enter">
         {/* Tabs */}
         <div className="bg-slate-100 p-1.5 rounded-xl flex shadow-inner border border-slate-200/50">
           <button
@@ -337,7 +351,7 @@ export default function RubberDashboard() {
         </div>
       </div>
 
-      <div className="flex-1 px-5 pt-6 space-y-7 pb-24 animate-fade-in">
+      <div className="flex-1 px-5 pt-6 space-y-7 pb-24 animate-page-enter">
         {isLoading ? (
           <div className="space-y-4">
              {[1, 2, 3].map((i) => (
@@ -351,7 +365,7 @@ export default function RubberDashboard() {
              ))}
           </div>
         ) : verificationStatus !== "active" ? (
-          <div className="flex flex-col items-center justify-center py-10 px-6 text-center animate-fade-in relative z-10 min-h-[50vh]">
+          <div className="flex flex-col items-center justify-center py-10 px-6 text-center animate-page-enter relative z-10 min-h-[50vh]">
              {verificationStatus === "unregistered" ? (
                <>
                  <div className="w-24 h-24 bg-white/20 backdrop-blur-xl rounded-xl flex items-center justify-center text-white border border-white/30 shadow-2xl mb-8 relative">

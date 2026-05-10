@@ -138,7 +138,7 @@ export default function ProfilePage() {
         </div>
       </header>
 
-      <div className="relative z-10 flex-1 px-5 -mt-4 space-y-6 pb-24 animate-fade-in">
+      <div className="relative z-10 flex-1 px-5 -mt-4 space-y-6 pb-24 animate-page-enter">
 
 
         {/* Settings Menu */}
@@ -209,7 +209,7 @@ export default function ProfilePage() {
 
       {/* Language Modal (Dropdown Style) */}
       {showLanguageModal && (
-        <div className="fixed inset-0 z-[110] flex items-end sm:items-center justify-center animate-fade-in">
+        <div className="fixed inset-0 z-[110] flex items-end sm:items-center justify-center animate-page-enter">
           <div className="absolute inset-0 bg-slate-950/60 backdrop-blur-sm" onClick={() => setShowLanguageModal(false)} />
           <div className="bg-white w-full max-w-lg rounded-t-[2.5rem] sm:rounded-xl p-8 pb-12 relative z-10 animate-slide-up shadow-2xl">
             <div className="w-12 h-1.5 bg-slate-100 rounded-full mx-auto mb-8 sm:hidden" />

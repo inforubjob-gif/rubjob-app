@@ -37,7 +37,7 @@ export default function ActivityPage() {
         <p className="text-sm text-muted mt-0.5">{t("orders.noOrdersSub").replace("{tab}", "")}</p>
       </header>
 
-      <div className="flex-1 px-5 py-4 space-y-3 animate-fade-in stagger">
+      <div className="flex-1 px-5 py-4 space-y-3 animate-page-enter stagger">
         {activities.map((order) => {
           const time = new Date(order.updatedAt);
           return (

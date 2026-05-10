@@ -301,7 +301,7 @@ export default function QuickBookPage() {
         <img src="/images/rubjob-complete_logo-white.png" alt="RUBJOB" className="h-7 w-auto object-contain" />
       </header>
 
-      <main className="flex-1 p-5 pb-40 animate-fade-in">
+      <main className="flex-1 p-5 pb-40 animate-page-enter">
         {/* Success Banner */}
         <div className="bg-green-50 border border-green-200 rounded-2xl p-4 flex items-center gap-3 mb-5">
           <div className="w-10 h-10 bg-green-100 text-green-600 rounded-xl flex items-center justify-center shrink-0">

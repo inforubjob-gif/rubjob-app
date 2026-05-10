@@ -10,6 +10,7 @@ import { useTranslation } from "@/components/providers/LanguageProvider";
 
 import { useEffect, useState } from "react";
 import Button from "@/components/ui/Button";
+import { useScrollCollapse } from "@/hooks/useScrollCollapse";
 
 export default function HomePage() {
   const { profile, isReady } = useLiff();
@@ -76,24 +77,30 @@ export default function HomePage() {
   const otherServices = services.filter(s => s.category !== "laundry");
   const activeOrders = orders.filter((o) => o.status !== "completed" && o.status !== "cancelled");
 
+  const isCollapsed = useScrollCollapse(50);
+
   return (
     <div className="flex flex-col min-h-dvh bg-slate-50 relative overflow-hidden">
       {/* Background Gradient Layer */}
       <div className="absolute top-0 left-0 right-0 h-[250px] bg-gradient-to-b from-primary via-primary/90 to-slate-50 z-0" />
 
-      {/* ─── Header ─── */}
-      <header className="relative z-10 px-5 pt-12 pb-6">
-        <div className="flex items-center justify-between gap-4">
+      {/* ─── Collapsible Header ─── */}
+      <header className={`relative z-10 px-5 sticky top-0 header-transition ${
+        isCollapsed ? "pt-10 pb-2" : "pt-12 pb-6"
+      }`}>
+        <div className={`flex items-center justify-between header-transition ${isCollapsed ? "gap-3" : "gap-4"}`}>
           <div className="flex items-center gap-3 flex-1 min-w-0">
             <Link href="/" className="shrink-0">
                <img
                  src="/images/rubjob-complete_logo-white.png"
                  alt="RUBJOB"
-                 className="h-10 w-auto object-contain"
+                 className={`w-auto object-contain header-transition ${isCollapsed ? "h-6" : "h-10"}`}
                />
             </Link>
             
-            <Link href="/profile/addresses" className="flex-1 bg-white/20 backdrop-blur-md rounded-full px-4 py-2 flex items-center gap-2 border border-white/10 active:scale-95 transition-all truncate">
+            <Link href="/profile/addresses" className={`flex-1 bg-white/20 backdrop-blur-md rounded-full flex items-center gap-2 border border-white/10 active:scale-95 transition-all truncate header-element-collapse ${
+              isCollapsed ? "px-3 py-1 header-element-hidden" : "px-4 py-2"
+            }`}>
                <Icons.MapPin size={16} className="text-white shrink-0" />
                <div className="flex flex-col min-w-0">
                   <span className="text-[10px] font-black text-white/60 uppercase leading-none mb-0.5">{t("profile.myAddress")}</span>
@@ -106,7 +113,9 @@ export default function HomePage() {
           </div>
           
           <Link href="/profile" className="relative group shrink-0">
-            <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-white text-lg font-bold overflow-hidden ring-4 ring-white/30 shadow-xl group-active:scale-90 transition-all">
+            <div className={`rounded-full bg-white/20 flex items-center justify-center text-white font-bold overflow-hidden ring-4 ring-white/30 shadow-xl group-active:scale-90 transition-all header-transition ${
+              isCollapsed ? "w-7 h-7 text-sm" : "w-10 h-10 text-lg"
+            }`}>
               {profile?.pictureUrl ? (
                 <img
                   src={profile.pictureUrl}
@@ -121,7 +130,7 @@ export default function HomePage() {
         </div>
       </header>
 
-      <div className="relative z-10 px-5 space-y-7 pt-2 pb-24 animate-fade-in">
+      <div className="relative z-10 px-5 space-y-7 pt-2 pb-24 animate-page-enter">
         {/* ─── Hero Ads ─── */}
         <section className="relative w-full rounded-xl overflow-hidden shadow-2xl shadow-primary/20 group active:scale-[0.98] transition-all duration-500 bg-white border-4 border-white/50">
           <img 

@@ -130,7 +130,7 @@ export default function StoreWalletPage() {
           </div>
         </header>
 
-        <div className="flex-1 px-5 py-8 space-y-6 pb-24 animate-fade-in">
+        <div className="flex-1 px-5 py-8 space-y-6 pb-24 animate-page-enter">
           <section id="history-section">
             <h2 className="text-xs font-black text-slate-400 uppercase mb-4 px-1">{t("store.wallet.history")}</h2>
             <div className="space-y-3">
@@ -234,7 +234,7 @@ export default function StoreWalletPage() {
                </div>
             </div>
           ) : (
-            <div className="flex flex-col items-center text-center animate-fade-in">
+            <div className="flex flex-col items-center text-center animate-page-enter">
                <div className="w-20 h-20 bg-emerald-50 text-emerald-500 rounded-xl flex items-center justify-center mb-6 shadow-lg shadow-emerald-500/10 scale-110">
                   <Icons.CheckCircle size={40} />
                </div>

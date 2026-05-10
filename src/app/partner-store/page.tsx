@@ -194,7 +194,7 @@ export default function StoreDashboard() {
       </header>
 
       {/* Main Content Area */}
-      <main className="relative z-10 px-6 space-y-8 animate-fade-in">
+      <main className="relative z-10 px-6 space-y-8 animate-page-enter">
         
         {/* Tab System (Rubber Style) */}
         <div className="space-y-6">

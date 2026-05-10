@@ -103,6 +103,30 @@ body {
 .animate-float { animation: float 4s ease-in-out infinite; }
 .animate-float-delayed { animation: float 4s ease-in-out infinite 2s; }
 
+/* ─── Page Transitions ─── */
+@keyframes page-enter {
+  from { opacity: 0; transform: translateY(12px) scale(0.99); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.animate-page-enter { animation: page-enter 0.35s cubic-bezier(0.22, 1, 0.36, 1) both; }
+
+/* ─── Collapsible Header ─── */
+.header-transition {
+  transition: padding 0.25s ease, font-size 0.25s ease, height 0.25s ease, gap 0.25s ease, opacity 0.2s ease;
+}
+.header-element-collapse {
+  transition: opacity 0.2s ease, max-height 0.25s ease, margin 0.2s ease, transform 0.25s ease;
+  overflow: hidden;
+}
+.header-element-hidden {
+  opacity: 0;
+  max-height: 0 !important;
+  margin: 0 !important;
+  transform: translateY(-8px);
+  pointer-events: none;
+}
+
 .active-scale:active { transform: scale(0.95); transition: transform 0.1s; }
 
 /* Stagger children */

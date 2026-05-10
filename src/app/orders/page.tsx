@@ -8,6 +8,7 @@ import Badge, { statusToBadgeVariant } from "@/components/ui/Badge";
 import { Icons, getServiceIcon } from "@/components/ui/Icons";
 import { useTranslation } from "@/components/providers/LanguageProvider";
 import { useLiff } from "@/components/providers/LiffProvider";
+import { useScrollCollapse } from "@/hooks/useScrollCollapse";
  
 type TabFilter = "active" | "completed";
  
@@ -43,20 +44,28 @@ export default function OrdersPage() {
     return o.status === "completed" || o.status === "cancelled" || o.status === "rejected";
   });
  
+  const isCollapsed = useScrollCollapse(40);
+
   return (
     <div className="flex flex-col min-h-dvh bg-slate-50">
-      {/* Header — Styled like Notifications reference */}
-      <header className="bg-white px-5 pt-12 pb-4 border-b border-slate-200 flex items-center justify-between sticky top-0 z-40">
+      {/* Header */}
+      <header className={`bg-white px-5 border-b border-slate-200 flex items-center justify-between sticky top-0 z-40 header-transition ${
+        isCollapsed ? "pt-10 pb-2" : "pt-12 pb-4"
+      }`}>
         <button
           onClick={() => router.back()}
-          className="w-9 h-9 rounded-xl bg-slate-100 flex items-center justify-center text-slate-600 active:scale-95 transition-transform"
+          className={`rounded-xl bg-slate-100 flex items-center justify-center text-slate-600 active:scale-95 transition-transform header-transition ${
+            isCollapsed ? "w-7 h-7" : "w-9 h-9"
+          }`}
         >
-          <Icons.Back size={20} />
+          <Icons.Back size={isCollapsed ? 16 : 20} />
         </button>
-        <h1 className="text-lg font-bold text-slate-900 absolute left-1/2 -translate-x-1/2">
+        <h1 className={`font-bold text-slate-900 absolute left-1/2 -translate-x-1/2 header-transition ${
+          isCollapsed ? "text-sm" : "text-lg"
+        }`}>
           {t("orders.myOrders")}
         </h1>
-        <div className="w-9 h-9" /> {/* Spacer for centering */}
+        <div className={`header-transition ${isCollapsed ? "w-7 h-7" : "w-9 h-9"}`} />
       </header>
  
       {/* Tabs — Minimalist Pill Style */}
@@ -80,7 +89,7 @@ export default function OrdersPage() {
         </div>
       </div>
  
-      <main className="flex-1 p-5 space-y-6 pb-28 animate-fade-in stagger">
+      <main className="flex-1 p-5 space-y-6 pb-28 animate-page-enter stagger">
         {isLoading ? (
           <div className="flex flex-col items-center justify-center py-20 gap-4">
             <div className="w-10 h-10 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />

@@ -28,6 +28,7 @@ function getDistanceKm(lat1: number, lon1: number, lat2: number, lon2: number) {
 import { useTranslation } from "@/components/providers/LanguageProvider";
 import { useLiff } from "@/components/providers/LiffProvider";
 import { useToast } from "@/components/providers/ToastProvider";
+import { useScrollCollapse } from "@/hooks/useScrollCollapse";
 
 const ITEM_KEY_MAP: Record<string, string> = {
   "T-shirt": "items.tshirt",
@@ -78,6 +79,7 @@ function BookingFlow() {
   const [pickupSlot, setPickupSlot] = useState("");
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const isCollapsed = useScrollCollapse(40);
   const [isSkippingPayment, setIsSkippingPayment] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
   const [dbServices, setDbServices] = useState<any[]>([]);
@@ -508,7 +510,7 @@ function BookingFlow() {
   // 4. Handle platform closed state
   if (isLoaded && systemSettings.is_open === "false") {
     return (
-      <div className="flex flex-col items-center justify-center min-h-dvh px-10 text-center animate-fade-in bg-slate-50">
+      <div className="flex flex-col items-center justify-center min-h-dvh px-10 text-center animate-page-enter bg-slate-50">
         <div className="w-24 h-24 bg-white rounded-xl shadow-xl flex items-center justify-center mb-8 border border-slate-100">
            <Icons.Settings size={48} className="text-slate-300 animate-spin-slow" />
         </div>
@@ -532,7 +534,10 @@ function BookingFlow() {
   return (
     <div className="flex flex-col min-h-dvh">
       {/* Header */}
-      <header className="bg-white px-5 pt-12 pb-4 border-b border-border sticky top-0 z-30">
+      {/* Header */}
+      <header className={`bg-white px-5 border-b border-border sticky top-0 z-30 header-transition ${
+        isCollapsed ? "pt-10 pb-2" : "pt-12 pb-4"
+      }`}>
         <div className="flex items-center gap-3">
             <button
               onClick={() => {
@@ -542,19 +547,19 @@ function BookingFlow() {
               }}
               className="active:scale-95 transition-transform"
             >
-              <IconCircle variant="white" size="sm">
-                <Icons.Back size={18} />
+              <IconCircle variant="white" size={isCollapsed ? "xs" : "sm"}>
+                <Icons.Back size={isCollapsed ? 14 : 18} />
               </IconCircle>
             </button>
-          <h1 className="text-lg font-bold text-foreground">
+          <h1 className={`font-bold text-foreground header-transition ${isCollapsed ? "text-sm" : "text-lg"}`}>
             {step === "service" ? t("booking.serviceTitle") : 
             step === "details" ? t("booking.pickupTitle") : 
              t("orders.payment.title")}
           </h1>
         </div>
 
-        {/* Progress bar — 3 steps now */}
-        <div className="flex gap-2 mt-4">
+        {/* Progress bar — hides on scroll */}
+        <div className={`flex gap-2 header-element-collapse ${isCollapsed ? "mt-0 header-element-hidden" : "mt-4"}`}>
           {(["service", "details", "payment"] as BookingStep[]).map((s, i) => (
             <div
               key={s}
@@ -566,7 +571,7 @@ function BookingFlow() {
         </div>
       </header>
 
-      <div className="flex-1 px-5 py-5 pb-56 space-y-4 animate-fade-in relative">
+      <div className="flex-1 px-5 py-5 pb-56 space-y-4 animate-page-enter relative">
 
         {/* ─── Step: Service ─── */}
         {step === "service" && (
@@ -605,7 +610,7 @@ function BookingFlow() {
 
         {/* ─── Step: Details ─── */}
         {step === "details" && (
-          <div className="space-y-5 animate-fade-in">
+          <div className="space-y-5 animate-page-enter">
             {/* Service Selection (Editable) */}
             <section>
               <div className="flex items-center justify-between mb-1.5">
@@ -694,7 +699,7 @@ function BookingFlow() {
                   </IconCircle> {t("booking.pickupSelectTime")}
                 </h3>
               
-              <div className="p-2.5 bg-slate-50/80 rounded-xl space-y-2.5 animate-fade-in border border-slate-100">
+              <div className="p-2.5 bg-slate-50/80 rounded-xl space-y-2.5 animate-page-enter border border-slate-100">
                 {/* Compact date selector — inline pill style */}
                 <div className="flex items-center gap-2 overflow-x-auto hide-scrollbar">
                   {dates.map((d: { value: string; day: string; date: number; month: string }) => (
@@ -715,7 +720,7 @@ function BookingFlow() {
                   const allSlotsDisabled = TIME_SLOTS.every(s => isSlotPassed(s.startTime, pickupDate));
                   if (!allSlotsDisabled) return null;
                   return (
-                    <div className="bg-amber-50 border border-amber-200 rounded-lg p-2.5 flex items-center gap-2 animate-fade-in">
+                    <div className="bg-amber-50 border border-amber-200 rounded-lg p-2.5 flex items-center gap-2 animate-page-enter">
                       <Icons.Bell size={16} className="text-amber-500 shrink-0" />
                       <div>
                         <p className="text-xs font-bold text-amber-700">{t("booking.outsideHoursTitle")}</p>
@@ -866,7 +871,7 @@ function BookingFlow() {
             )}
 
             {/* Discount & Points */}
-            <section className="animate-fade-in">
+            <section className="animate-page-enter">
               <div className="flex items-center justify-between mb-1.5 mt-4">
                 <h3 className="text-xs font-black text-foreground flex items-center gap-1.5 uppercase tracking-tight">
                   <IconCircle variant="yellow" size="xs">
@@ -1055,7 +1060,7 @@ function BookingFlow() {
 
         {/* ─── Step: Payment & Summary ─── */}
         {step === "payment" && (
-          <div className="space-y-6 animate-fade-in">
+          <div className="space-y-6 animate-page-enter">
             {/* Order Summary */}
             <section className="space-y-3">
               <h3 className="text-sm font-bold text-foreground flex items-center gap-2">

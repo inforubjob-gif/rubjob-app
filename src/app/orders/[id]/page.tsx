@@ -216,7 +216,7 @@ export default function OrderDetailPage() {
         </div>
       </header>
 
-      <div className="flex-1 px-5 py-5 space-y-5 animate-fade-in">
+      <div className="flex-1 px-5 py-5 space-y-5 animate-page-enter">
         {/* Service Info */}
         <Card className="p-4">
           <div className="flex items-center gap-4 mb-3">
@@ -316,7 +316,7 @@ export default function OrderDetailPage() {
                 </div>
 
                 {rating > 0 && (
-                  <div className="w-full space-y-4 animate-fade-in">
+                  <div className="w-full space-y-4 animate-page-enter">
                      <textarea 
                         className="w-full bg-white border border-slate-200 rounded-2xl p-4 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all placeholder:text-slate-300 font-medium"
                         placeholder={t("orders.review.placeholder") || "เล่าประสบการณ์การใช้งานที่นี่..."}

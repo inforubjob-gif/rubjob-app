@@ -133,7 +133,7 @@ export default function PromotionsPage() {
         <p className="text-white/70 text-sm font-medium">{t("promotions.subtitle")}</p>
       </header>
 
-      <div className="relative z-10 px-5 space-y-7 pt-2 pb-24 animate-fade-in stagger">
+      <div className="relative z-10 px-5 space-y-7 pt-2 pb-24 animate-page-enter stagger">
         {/* Membership Card (High Contrast Premium) */}
         <div className="relative group animate-slide-up -mt-2">
           <div className="absolute -inset-1 bg-gradient-to-r from-primary to-primary-dark rounded-xl blur opacity-20 group-hover:opacity-40 transition duration-1000"></div>

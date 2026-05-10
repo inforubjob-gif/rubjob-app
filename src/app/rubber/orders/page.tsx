@@ -88,7 +88,7 @@ export default function RubberOrdersPage() {
         </div>
       </div>
 
-      <main className="flex-1 p-5 space-y-6 pb-28 animate-fade-in stagger">
+      <main className="flex-1 p-5 space-y-6 pb-28 animate-page-enter stagger">
         {isLoading ? (
           <div className="space-y-4">
             {[1, 2, 3].map((i) => (
