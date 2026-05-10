@@ -44,7 +44,7 @@ export async function POST(req: Request) {
 
     console.log(`🧪 [TEST] Order ${orderId} marked as PAID (skipped payment)`);
 
-    // 3. Send customer confirmation (same as webhook)
+    // 3. Send customer confirmation + rubber broadcast
     try {
       const orderData = await db.prepare(`
         SELECT o.deliveryFee, o.userId, o.totalPrice, o.serviceId, o.address,
@@ -56,6 +56,25 @@ export async function POST(req: Request) {
       `).bind(orderId).first() as any;
 
       if (orderData) {
+        const serviceName = orderData.serviceName || orderData.gigName || "Laundry Service";
+        
+        // 3a. In-App Notification for Customer (always works)
+        try {
+          const { createNotification } = await import("@/lib/notify-server");
+          await createNotification(db, {
+            userId: orderData.userId,
+            userType: "customer",
+            type: "order_update",
+            title: "✅ ชำระเงินสำเร็จ",
+            message: `งาน #${orderId.slice(-6)} — ${serviceName} ฿${orderData.totalPrice} ได้รับการยืนยันแล้ว กำลังจัดหาไรเดอร์...`,
+            link: `/orders/${orderId}`
+          });
+          console.log(`🧪 [SKIP-TEST] Customer in-app notification sent to ${orderData.userId}`);
+        } catch (e) {
+          console.error("Customer in-app notification error:", e);
+        }
+
+        // 3b. LINE Push to Customer (may fail if token not set)
         let customerToken = env.LINE_CHANNEL_ACCESS_TOKEN;
         if (!customerToken) {
           const setting = await db.prepare(
@@ -65,16 +84,18 @@ export async function POST(req: Request) {
         }
 
         if (customerToken && orderData.userId) {
-          const serviceName = orderData.serviceName || orderData.gigName || "Laundry Service";
           const { sendLinePush, bookingConfirmationFlex } = await import("@/lib/line");
           sendLinePush(
             orderData.userId,
             [bookingConfirmationFlex(orderId, serviceName, orderData.totalPrice || 0)],
             customerToken
-          ).catch(err => console.error("Customer push error (skip-test):", err));
+          ).catch(err => console.error("🧪 [SKIP-TEST] Customer LINE push error:", err));
+        } else {
+          console.warn("🧪 [SKIP-TEST] No LINE token — customer LINE push skipped");
         }
 
-        // 4. Geo-Filtered Broadcast to rubbers
+        // 4. Geo-Filtered Broadcast to rubbers (LINE + In-App)
+        console.log(`🧪 [SKIP-TEST] Starting rubber broadcast for order ${orderId}...`);
         const { broadcastToEligibleRubbers } = await import("@/lib/dispatch");
         await broadcastToEligibleRubbers(
           db, env, orderId,
@@ -82,6 +103,8 @@ export async function POST(req: Request) {
           orderData.deliveryFee || 0,
           "pending"
         );
+      } else {
+        console.error(`🧪 [SKIP-TEST] Could not fetch order data for ${orderId}`);
       }
     } catch (e) {
       console.error("Skip-test broadcast error:", e);

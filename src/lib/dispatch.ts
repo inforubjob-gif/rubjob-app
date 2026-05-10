@@ -56,16 +56,17 @@ function parseRubberAddress(address: string | null): { province: string | null; 
 export async function getEligibleRubbers(
   db: D1Database,
   orderAddress: any
-): Promise<{ lineUserId: string; preferences: string }[]> {
+): Promise<{ id: string; lineUserId: string | null; preferences: string }[]> {
   const { province: orderProvince } = parseOrderAddress(orderAddress);
   
+  // Select ALL rubbers — not just those with lineUserId
+  // Rubbers registered via web (phone+password) may not have linked LINE yet
   const { results: allRubbers } = await db.prepare(`
-    SELECT lineUserId, preferences, address
+    SELECT id, lineUserId, preferences, address
     FROM rubber_users
-    WHERE lineUserId IS NOT NULL
   `).all() as any;
 
-  const eligible: { lineUserId: string; preferences: string }[] = [];
+  const eligible: { id: string; lineUserId: string | null; preferences: string }[] = [];
 
   for (const r of (allRubbers || [])) {
     try {
@@ -86,7 +87,8 @@ export async function getEligibleRubbers(
       }
       
       eligible.push({
-        lineUserId: r.lineUserId,
+        id: r.id,
+        lineUserId: r.lineUserId || null,
         preferences: r.preferences || "{}",
       });
     } catch (e) {
@@ -146,31 +148,23 @@ export async function broadcastToEligibleRubbers(
   }
 
   for (const r of eligibleRubbers) {
-    // 1. In-App Notification (always works, no external dependency)
+    // 1. In-App Notification (always works — uses rubber's primary ID)
     try {
-      // Use the rubber's internal ID (not lineUserId) for the notification
-      // We need to look up the rubber's ID from their lineUserId
-      const rubberRecord = await db.prepare(
-        "SELECT id FROM rubber_users WHERE lineUserId = ?"
-      ).bind(r.lineUserId).first() as any;
-
-      const rubberInternalId = rubberRecord?.id || r.lineUserId;
-
       await createNotification(db, {
-        userId: rubberInternalId,
+        userId: r.id,
         userType: "rubber",
         type: "order_update",
         title: "💸 มีงานใหม่เข้า!",
         message: `งาน #${orderId.slice(-6)} — รายได้ ฿${legEarn.toFixed(0)} กดรับงานด่วน!`,
         link: "/rubber"
       });
-      console.log(`  ✅ [DISPATCH] In-app notification sent to rubber ${rubberInternalId}`);
+      console.log(`  ✅ [DISPATCH] In-app notification → rubber ${r.id}`);
     } catch (e) {
-      console.error(`  ❌ [DISPATCH] In-app notification failed for ${r.lineUserId}:`, e);
+      console.error(`  ❌ [DISPATCH] In-app notification failed for ${r.id}:`, e);
     }
 
-    // 2. LINE Push Message (depends on valid token + rubber has added LINE OA)
-    if (rubberToken) {
+    // 2. LINE Push Message (only if rubber has linked LINE + token exists)
+    if (rubberToken && r.lineUserId) {
       await sendLinePush(
         r.lineUserId,
         [rubberNewJobFlex(orderId, status, legEarn)],

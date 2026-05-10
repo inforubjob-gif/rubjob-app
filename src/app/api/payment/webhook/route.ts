@@ -84,7 +84,24 @@ export async function POST(req: Request) {
               WHERE o.id = ?
             `).bind(orderId).first() as any;
             if (orderData) {
-              // Notify Customer that payment is successful
+              const serviceName = orderData.serviceName || orderData.gigName || "Laundry Service";
+
+              // In-App Notification for Customer (always works)
+              try {
+                const { createNotification } = await import("@/lib/notify-server");
+                await createNotification(db, {
+                  userId: orderData.userId,
+                  userType: "customer",
+                  type: "order_update",
+                  title: "✅ ชำระเงินสำเร็จ",
+                  message: `งาน #${orderId.slice(-6)} — ${serviceName} ฿${orderData.totalPrice} ได้รับการยืนยันแล้ว`,
+                  link: `/orders/${orderId}`
+                });
+              } catch (e) {
+                console.error("Customer in-app notification error:", e);
+              }
+
+              // LINE Push to Customer
               let customerToken = env.LINE_CHANNEL_ACCESS_TOKEN;
               if (!customerToken) {
                 const setting = await db.prepare("SELECT value FROM system_settings WHERE key = 'line_channel_access_token_regular'").first() as any;
@@ -92,7 +109,6 @@ export async function POST(req: Request) {
               }
               
               if (customerToken && orderData.userId) {
-                const serviceName = orderData.serviceName || orderData.gigName || "Laundry Service";
                 const { sendLinePush, bookingConfirmationFlex } = await import("@/lib/line");
                 sendLinePush(
                   orderData.userId, 
@@ -101,7 +117,7 @@ export async function POST(req: Request) {
                 ).catch(err => console.error("Customer push error in webhook:", err));
               }
 
-              // Geo-Filtered Broadcast to matching rubbers only
+              // Geo-Filtered Broadcast to matching rubbers only (LINE + In-App)
               const { broadcastToEligibleRubbers } = await import("@/lib/dispatch");
               await broadcastToEligibleRubbers(
                 db, env, orderId,
