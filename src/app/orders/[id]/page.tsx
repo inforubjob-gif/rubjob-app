@@ -119,6 +119,25 @@ export default function OrderDetailPage() {
       }
     }
     fetchOrder();
+
+    // 🔄 Auto-poll: Refresh order status every 10s so customer sees updates
+    // (e.g. after skip-payment, driver acceptance, washing, etc.)
+    const interval = setInterval(async () => {
+      if (!id) return;
+      try {
+        const res = await fetch(`/api/orders/${id}`);
+        const data = (await res.json()) as any;
+        if (data.order) {
+          setOrder(data.order);
+          // Stop polling if order is terminal
+          if (data.order.status === "completed" || data.order.status === "cancelled") {
+            clearInterval(interval);
+          }
+        }
+      } catch (e) {}
+    }, 10000);
+
+    return () => clearInterval(interval);
   }, [id]);
 
   const sendToLine = async () => {
