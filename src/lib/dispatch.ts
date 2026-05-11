@@ -113,24 +113,33 @@ export async function broadcastToEligibleRubbers(
   deliveryFee: number,
   status: string = 'pending'
 ) {
-  // Get LINE tokens
+  // Get LINE tokens — Priority: dedicated rubber token → env customer token → DB customer token
   let rubberToken = env.LINE_CHANNEL_ACCESS_TOKEN_RUBBER;
   if (!rubberToken) {
-    const setting = await db.prepare(
-      "SELECT value FROM system_settings WHERE key = 'line_channel_access_token_rubber'"
-    ).first() as any;
-    if (setting?.value) rubberToken = setting.value;
+    try {
+      const setting = await db.prepare(
+        "SELECT value FROM system_settings WHERE key = 'line_channel_access_token_rubber'"
+      ).first() as any;
+      if (setting?.value) rubberToken = setting.value;
+    } catch (e) {
+      console.error("[DISPATCH] Failed to read rubber token from DB:", e);
+    }
   }
   if (!rubberToken) {
-    let customerToken = env.LINE_CHANNEL_ACCESS_TOKEN;
-    if (!customerToken) {
-      const setting = await db.prepare(
-        "SELECT value FROM system_settings WHERE key = 'line_channel_access_token_regular'"
-      ).first() as any;
-      if (setting?.value) customerToken = setting.value;
+    // Fallback: use customer channel token (env first, then DB)
+    rubberToken = env.LINE_CHANNEL_ACCESS_TOKEN;
+    if (!rubberToken) {
+      try {
+        const setting = await db.prepare(
+          "SELECT value FROM system_settings WHERE key = 'line_channel_access_token_regular'"
+        ).first() as any;
+        if (setting?.value) rubberToken = setting.value;
+      } catch (e) {
+        console.error("[DISPATCH] Failed to read customer token from DB:", e);
+      }
     }
-    rubberToken = customerToken;
   }
+  console.log(`📡 [DISPATCH] Token status: rubberToken=${rubberToken ? `SET(${rubberToken.length}chars)` : 'MISSING'}`);
 
   const { sendLinePush, rubberNewJobFlex } = await import("./line");
   const { createNotification } = await import("./notify-server");

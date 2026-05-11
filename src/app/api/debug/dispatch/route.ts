@@ -71,36 +71,38 @@ export async function GET(req: Request) {
       report.checks.eligibleCount = eligible.length;
     }
 
-    // 4. Check LINE tokens
+    // 4. Check LINE tokens (mirrors dispatch.ts logic)
     const tokenChecks: any = {};
     
-    // Rubber channel token
-    let rubberToken = env.LINE_CHANNEL_ACCESS_TOKEN_RUBBER;
-    tokenChecks.envRubberToken = rubberToken ? `SET (${rubberToken.length} chars)` : "NOT_SET";
+    // Step 1: Dedicated rubber token from env
+    let resolvedRubberToken = env.LINE_CHANNEL_ACCESS_TOKEN_RUBBER;
+    tokenChecks.step1_envRubberToken = resolvedRubberToken ? `SET (${resolvedRubberToken.length} chars)` : "NOT_SET";
     
-    if (!rubberToken) {
+    // Step 2: Dedicated rubber token from DB
+    if (!resolvedRubberToken) {
       const setting = await db.prepare(
         "SELECT value FROM system_settings WHERE key = 'line_channel_access_token_rubber'"
       ).first() as any;
-      tokenChecks.dbRubberToken = setting?.value ? `SET (${setting.value.length} chars)` : "NOT_SET";
-      if (setting?.value) rubberToken = setting.value;
+      tokenChecks.step2_dbRubberToken = setting?.value ? `SET (${setting.value.length} chars)` : "NOT_SET";
+      if (setting?.value) resolvedRubberToken = setting.value;
     }
 
-    // Customer channel token 
-    let customerToken = env.LINE_CHANNEL_ACCESS_TOKEN;
-    tokenChecks.envCustomerToken = customerToken ? `SET (${customerToken.length} chars)` : "NOT_SET";
+    // Step 3: Fallback to customer env token
+    if (!resolvedRubberToken) {
+      resolvedRubberToken = env.LINE_CHANNEL_ACCESS_TOKEN;
+      tokenChecks.step3_envCustomerTokenFallback = resolvedRubberToken ? `USING THIS (${resolvedRubberToken.length} chars)` : "NOT_SET";
+    }
     
-    if (!customerToken) {
+    // Step 4: Fallback to customer DB token
+    if (!resolvedRubberToken) {
       const setting = await db.prepare(
         "SELECT value FROM system_settings WHERE key = 'line_channel_access_token_regular'"
       ).first() as any;
-      tokenChecks.dbCustomerToken = setting?.value ? `SET (${setting.value.length} chars)` : "NOT_SET";
-      if (setting?.value) customerToken = setting.value;
+      tokenChecks.step4_dbCustomerTokenFallback = setting?.value ? `USING THIS (${setting.value.length} chars)` : "NOT_SET";
+      if (setting?.value) resolvedRubberToken = setting.value;
     }
 
-    // Fallback: rubber token uses customer token
-    tokenChecks.finalRubberToken = rubberToken ? `AVAILABLE (${rubberToken.length} chars)` : "MISSING";
-    tokenChecks.finalCustomerToken = customerToken ? `AVAILABLE (${customerToken.length} chars)` : "MISSING";
+    tokenChecks.finalRubberToken = resolvedRubberToken ? `AVAILABLE (${resolvedRubberToken.length} chars)` : "MISSING — NO TOKEN FOUND ANYWHERE";
     
     // Admin group
     tokenChecks.adminGroupId = env.LINE_ADMIN_GROUP_ID ? `SET (${env.LINE_ADMIN_GROUP_ID})` : "NOT_SET";
