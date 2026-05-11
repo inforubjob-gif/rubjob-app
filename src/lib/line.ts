@@ -283,13 +283,106 @@ export const deliveringToCustomerFlex = (orderId: string): LineFlexMessage =>
 /**
  * Flex Message for New Job Available (For Rubbers)
  */
-export const rubberNewJobFlex = (orderId: string, type: string, earn: number): LineFlexMessage => 
-  orderStatusUpdateFlex(
-    orderId, 
-    "💸 มีงานใหม่เข้า!", 
-    `ประเภท: ${type === 'ready_for_pickup' ? 'ส่งผ้าคืนลูกค้า' : 'รับผ้าจากลูกค้า'}\nรายได้: ฿${earn}\nกดเข้าแอปเพื่อรับงานด่วน!`, 
-    "#f59e0b"
-  );
+export const rubberNewJobFlex = (orderId: string, type: string, earn: number): LineFlexMessage => ({
+  type: "flex",
+  altText: `💸 มีงานใหม่เข้า! รายได้ ฿${earn.toFixed(0)}`,
+  contents: {
+    type: "bubble",
+    hero: {
+      type: "image",
+      url: "https://app.rubjob-all.com/images/mascot-riding.png",
+      size: "full",
+      aspectRatio: "20:13",
+      aspectMode: "fit",
+      backgroundColor: "#FFF7ED"
+    },
+    body: {
+      type: "box",
+      layout: "vertical",
+      spacing: "md",
+      contents: [
+        {
+          type: "text",
+          text: "💸 มีงานใหม่เข้า!",
+          weight: "bold",
+          size: "xl",
+          color: "#f59e0b",
+        },
+        {
+          type: "text",
+          text: `ประเภท: ${type === 'ready_for_pickup' ? 'ส่งผ้าคืนลูกค้า' : 'รับผ้าจากลูกค้า'}`,
+          size: "sm",
+          color: "#4b5563",
+          wrap: true,
+        },
+        {
+          type: "separator",
+          margin: "md",
+        },
+        {
+          type: "box",
+          layout: "baseline",
+          spacing: "sm",
+          margin: "md",
+          contents: [
+            {
+              type: "text",
+              text: "ออเดอร์",
+              color: "#aaaaaa",
+              size: "xs",
+              flex: 2,
+            },
+            {
+              type: "text",
+              text: orderId,
+              color: "#666666",
+              size: "xs",
+              flex: 5,
+            },
+          ],
+        },
+        {
+          type: "box",
+          layout: "baseline",
+          spacing: "sm",
+          contents: [
+            {
+              type: "text",
+              text: "รายได้",
+              color: "#aaaaaa",
+              size: "xs",
+              flex: 2,
+            },
+            {
+              type: "text",
+              text: `฿${earn.toFixed(0)}`,
+              color: "#f59e0b",
+              size: "lg",
+              weight: "bold",
+              flex: 5,
+            },
+          ],
+        },
+      ],
+    },
+    footer: {
+      type: "box",
+      layout: "vertical",
+      contents: [
+        {
+          type: "button",
+          style: "primary",
+          color: "#f59e0b",
+          action: {
+            type: "uri",
+            label: "🚀 รับงานเลย!",
+            uri: `https://rubber.rubjob-all.com`,
+          },
+        },
+      ],
+    },
+  },
+});
 
 /**
  * Flex Message for New Order Received (For Stores)
