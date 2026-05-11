@@ -126,19 +126,49 @@ export async function transitionOrderStatus(
         break;
       case "completed":
         flexMessage = orderCompletedFlex(orderId);
-        // Create earning notification for the rubber driver
-        if (order.rubberId) {
-          try {
-            const earning = (order.totalPrice || 0) * 0.85;
+        
+        // 💰 Earnings Notification for Rubber Drivers
+        try {
+          const rubberToken = env.LINE_CHANNEL_ACCESS_TOKEN_RUBBER;
+          const deliveryFee = order.deliveryFee || 0;
+          const totalRubberPayout = deliveryFee - (deliveryFee * 0.15) - 15;
+          const splitEarning = totalRubberPayout * 0.5; // 50% for pickup, 50% for delivery
+
+          const notifyRubber = async (driverId: string, role: string) => {
+            if (!driverId) return;
+            const rInfo = await db.prepare("SELECT id, lineUserId FROM rubber_users WHERE id = ?").bind(driverId).first() as any;
+            if (!rInfo) return;
+            
+            // 1. In-App Notification
             await createNotification(db, {
-              userId: order.rubberId,
+              userId: rInfo.id,
               userType: "rubber",
               type: "earning",
               title: "💰 รายได้เข้าแล้ว",
-              message: `งาน #${orderId.slice(-6)} เสร็จสิ้น — ได้รับ ฿${earning.toFixed(0)}`,
+              message: `งาน #${orderId.slice(-6)} (${role}) เสร็จสิ้น — ได้รับ ฿${splitEarning.toFixed(0)}`,
               link: "/rubber/wallet"
-            });
-          } catch (e) { console.error("Notify earning error:", e); }
+            }).catch(() => {});
+
+            // 2. LINE Push Notification
+            if (rubberToken && rInfo.lineUserId) {
+              await sendLinePush(
+                rInfo.lineUserId,
+                [{
+                  type: "text",
+                  text: `💰 รายได้เข้าแล้ว!\n\nงาน #${orderId.slice(-6)} เสร็จสมบูรณ์\nคุณได้รับรายได้ (ส่วนของ${role}) จำนวน ฿${splitEarning.toFixed(0)}\n\nตรวจสอบกระเป๋าเงินของคุณได้ในแอปเลยครับ!`
+                }],
+                rubberToken
+              ).catch(e => console.error(`Failed to notify earning to rubber ${rInfo.lineUserId}:`, e));
+            }
+          };
+
+          // Notify both drivers (or the same driver twice if they did both legs)
+          if (order.pickupDriverId) await notifyRubber(order.pickupDriverId, "รับผ้า");
+          if (order.deliveryDriverId && order.deliveryDriverId !== order.pickupDriverId) {
+            await notifyRubber(order.deliveryDriverId, "ส่งผ้าคืน");
+          }
+        } catch (e) { 
+          console.error("Notify earning error:", e); 
         }
         break;
       default:
@@ -152,29 +182,6 @@ export async function transitionOrderStatus(
     if (flexMessage) {
       await sendLinePush(order.customerLineId, [flexMessage], accessToken)
         .catch(err => console.error("Failed to send status update notification:", err));
-    }
-  }
-
-  // 5. Notify Rubber
-  const rubberToken = env.LINE_CHANNEL_ACCESS_TOKEN_RUBBER;
-  if (rubberToken) {
-    const rubberId = (actualStatus === "ready_for_pickup" || actualStatus === "delivering_to_customer" || actualStatus === "completed") 
-      ? order.deliveryDriverId 
-      : order.pickupDriverId;
-    
-    if (rubberId) {
-      const msgs = {
-        picking_up: "คุณได้รับงานเรียบร้อย กรุณาไปรับผ้าที่ลูกค้า",
-        delivering_to_store: "คุณรับผ้าเรียบร้อยแล้ว กำลังนำส่งไปที่ร้านซัก",
-        at_shop: "คุณได้ส่งผ้าถึงร้านซักเรียบร้อยแล้ว (กำลังซัก)",
-        ready_for_pickup: "ผ้าซักเสร็จแล้ว กรุณาไปรับที่ร้านซักเพื่อนำส่งลูกค้า",
-        delivering_to_customer: "รับผ้าจากร้านซักแล้ว กำลังนำส่งคืนลูกค้า",
-        completed: "ลูกค้ารับผ้าเรียบร้อย งานเสร็จสมบูรณ์ ขอบคุณครับ!"
-      } as Record<string, string>;
-
-      const msgTxt = msgs[actualStatus] || `สถานะงานอัปเดตเป็น: ${actualStatus}`;
-      await sendLinePush(rubberId, [{ type: "text", text: `🚚 อัปเดตงาน: ${orderId}\n\n${msgTxt}` }], rubberToken)
-        .catch(e => console.error("Failed to notify rubber:", e));
     }
   }
 
