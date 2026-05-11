@@ -17,6 +17,9 @@ export async function GET() {
     let addressObj = {};
     try { addressObj = JSON.parse(order.address); } catch(e) {}
     
+    const { getEligibleRubbers } = await import("@/lib/dispatch");
+    const eligibleRubbers = await getEligibleRubbers(db, addressObj);
+
     await broadcastToEligibleRubbers(
       db, env, order.id,
       addressObj,
@@ -24,7 +27,7 @@ export async function GET() {
       order.status
     );
 
-    return NextResponse.json({ success: true, orderId: order.id });
+    return NextResponse.json({ success: true, orderId: order.id, eligibleRubbers });
   } catch (error: any) {
     return NextResponse.json({ error: error.message, stack: error.stack }, { status: 500 });
   }
