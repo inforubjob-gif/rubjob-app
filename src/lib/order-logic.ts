@@ -129,7 +129,12 @@ export async function transitionOrderStatus(
         
         // 💰 Earnings Notification for Rubber Drivers
         try {
-          const rubberToken = env.LINE_CHANNEL_ACCESS_TOKEN_RUBBER;
+          let rubberToken = env.LINE_CHANNEL_ACCESS_TOKEN_RUBBER;
+          if (!rubberToken) {
+            const setting = await db.prepare("SELECT value FROM system_settings WHERE key = 'line_token_rubber'").first() as any;
+            if (setting?.value) rubberToken = setting.value;
+          }
+          
           const deliveryFee = order.deliveryFee || 0;
           const totalRubberPayout = deliveryFee - (deliveryFee * 0.15) - 15;
           const splitEarning = totalRubberPayout * 0.5; // 50% for pickup, 50% for delivery
@@ -158,7 +163,14 @@ export async function transitionOrderStatus(
                   text: `💰 รายได้เข้าแล้ว!\n\nงาน #${orderId.slice(-6)} เสร็จสมบูรณ์\nคุณได้รับรายได้ (ส่วนของ${role}) จำนวน ฿${splitEarning.toFixed(0)}\n\nตรวจสอบกระเป๋าเงินของคุณได้ในแอปเลยครับ!`
                 }],
                 rubberToken
-              ).catch(e => console.error(`Failed to notify earning to rubber ${rInfo.lineUserId}:`, e));
+              ).then(async (res) => {
+                 try { await db.prepare("INSERT INTO webhook_logs (id, channel, payload, error) VALUES (?, ?, ?, ?)").bind(`EARN-${orderId}-${driverId}`, 'earn_success', JSON.stringify(res), null).run(); } catch(e){}
+              }).catch(async (e) => {
+                 console.error(`Failed to notify earning to rubber ${rInfo.lineUserId}:`, e);
+                 try { await db.prepare("INSERT INTO webhook_logs (id, channel, payload, error) VALUES (?, ?, ?, ?)").bind(`EARN-${orderId}-${driverId}`, 'earn_fail', rInfo.lineUserId, e?.message || e).run(); } catch(err){}
+              });
+            } else {
+              try { await db.prepare("INSERT INTO webhook_logs (id, channel, payload, error) VALUES (?, ?, ?, ?)").bind(`EARN-${orderId}-${driverId}`, 'earn_skip', JSON.stringify({ token: !!rubberToken, lineUserId: rInfo.lineUserId }), null).run(); } catch(e){}
             }
           };
 
