@@ -54,7 +54,7 @@ export async function transitionOrderStatus(
   const params: any[] = [actualStatus];
 
   if (options?.evidenceUrl) {
-    if (nextStatus === "picking_up") {
+    if (nextStatus === "delivering_to_store") {
       query += ", pickupPhotoUrl = ?, evidenceBeforeUrl = ?";
       params.push(options.evidenceUrl, options.evidenceUrl);
     } else if (nextStatus === "at_shop") {

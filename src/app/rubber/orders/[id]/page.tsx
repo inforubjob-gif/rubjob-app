@@ -85,8 +85,8 @@ export default function RubberOrderDetailPage() {
 
   // Define steps that require photo
   const photoSteps: Record<string, string> = {
-    "picking_up": "pickupUser",
-    "at_shop": "deliveryStore",
+    "picking_up": "pickupUser", // Driver is at customer, taking photo to start delivering_to_store
+    "delivering_to_store": "deliveryStore", // Driver is at store, taking photo to drop off
     "ready_for_return": "pickupStore",
     "delivering_to_customer": "deliveryUser",
   };
@@ -107,7 +107,7 @@ export default function RubberOrderDetailPage() {
     const activePhoto = photoOverride || photo;
     
     // Skill.md Section 11: Mandatory photos for pickup and shop drop-off
-    const needsPhoto = status === "picking_up" || status === "at_shop";
+    const needsPhoto = status === "picking_up" || status === "delivering_to_store" || status === "delivering_to_customer";
     
     if (needsPhoto && !activePhoto) {
       // Automatically trigger camera if photo is missing
@@ -142,7 +142,8 @@ export default function RubberOrderDetailPage() {
 
   const getNextStatus = (currentStatus: string) => {
     switch(currentStatus) {
-        case "picking_up": return "at_shop";
+        case "picking_up": return "delivering_to_store";
+        case "delivering_to_store": return "at_shop";
         case "at_shop": return "at_shop"; // Wait for Admin to change to ready_for_return
         case "ready_for_return": return "delivering_to_customer";
         case "delivering_to_customer": return "completed";
@@ -412,6 +413,7 @@ export default function RubberOrderDetailPage() {
                 className="bg-primary text-white hover:bg-primary-dark shadow-2xl shadow-primary/30 py-6 text-base font-black rounded-xl uppercase"
              >
                 {status === "picking_up" ? t("rubber.orderDetail.btnPickup") : 
+                 status === "delivering_to_store" ? t("rubber.orderDetail.btnHandover") : 
                  status === "at_shop" ? t("rubber.orderDetail.btnHandover") : 
                  status === "ready_for_return" ? t("staff.receiveFromDriver") : 
                  status === "delivering_to_customer" ? t("rubber.orderDetail.btnFinish") : t("rubber.orderDetail.btnUpdateTask")}
