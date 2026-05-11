@@ -87,7 +87,7 @@ export default function RubberOrderDetailPage() {
   const photoSteps: Record<string, string> = {
     "picking_up": "pickupUser", // Driver is at customer, taking photo to start delivering_to_store
     "delivering_to_store": "deliveryStore", // Driver is at store, taking photo to drop off
-    "ready_for_return": "pickupStore",
+    "ready_for_pickup": "pickupStore",
     "delivering_to_customer": "deliveryUser",
   };
 
@@ -144,8 +144,8 @@ export default function RubberOrderDetailPage() {
     switch(currentStatus) {
         case "picking_up": return "delivering_to_store";
         case "delivering_to_store": return "at_shop";
-        case "at_shop": return "at_shop"; // Wait for Admin to change to ready_for_return
-        case "ready_for_return": return "delivering_to_customer";
+        case "at_shop": return "at_shop"; // Wait for Admin to change to ready_for_pickup
+        case "ready_for_pickup": return "delivering_to_customer";
         case "delivering_to_customer": return "completed";
         default: return currentStatus;
     }
@@ -342,7 +342,7 @@ export default function RubberOrderDetailPage() {
              </div>
           </Card>
 
-          {(status === "ready_for_return" || status === "delivering_to_customer") && (
+          {(status === "ready_for_pickup" || status === "delivering_to_customer") && (
             <Card className="p-6 border-none shadow-xl shadow-primary/5 rounded-[2rem] bg-slate-900 text-white relative overflow-hidden group">
                <div className="absolute top-0 right-0 w-32 h-32 bg-primary/20 rounded-full blur-3xl -mr-16 -mt-16" />
                <div className="relative z-10">
@@ -415,7 +415,7 @@ export default function RubberOrderDetailPage() {
                 {status === "picking_up" ? t("rubber.orderDetail.btnPickup") : 
                  status === "delivering_to_store" ? t("rubber.orderDetail.btnHandover") : 
                  status === "at_shop" ? t("rubber.orderDetail.btnHandover") : 
-                 status === "ready_for_return" ? t("staff.receiveFromDriver") : 
+                 status === "ready_for_pickup" ? t("staff.receiveFromDriver") : 
                  status === "delivering_to_customer" ? t("rubber.orderDetail.btnFinish") : t("rubber.orderDetail.btnUpdateTask")}
              </Button>
            )}

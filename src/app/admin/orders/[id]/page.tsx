@@ -18,7 +18,7 @@ const STATUS_FLOW = [
  { key: "delivering_to_store", label: "กำลังส่งร้านซัก", icon: "🚚" },
  { key: "at_shop", label: "อยู่ที่ร้านซัก", icon: "🏪" },
  { key: "washing", label: "กำลังซัก", icon: "🧺" },
- { key: "ready_for_return", label: "ซักเสร็จ รอส่งคืน", icon: "✅" },
+ { key: "ready_for_pickup", label: "ซักเสร็จ รอส่งคืน", icon: "✅" },
  { key: "delivering_to_customer", label: "กำลังส่งคืนลูกค้า", icon: "📦" },
  { key: "completed", label: "สำเร็จ", icon: "🎉" },
 ];
@@ -260,7 +260,7 @@ export default function AdminOrderDetailPage() {
           {/* Ready for return - Admin marks when store is done */}
           {(order.status === "washing" || order.status === "at_shop") && (
            <button
-            onClick={() => setConfirmModal({ key: "ready_for_return", label: "ซักเสร็จ พร้อมส่งคืน", icon: "✅" })}
+            onClick={() => setConfirmModal({ key: "ready_for_pickup", label: "ซักเสร็จ พร้อมส่งคืน", icon: "✅" })}
             disabled={isUpdating}
             className="w-full py-5 bg-emerald-500 hover:bg-emerald-400 text-white text-lg font-black rounded-2xl shadow-xl shadow-emerald-500/30 transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-3"
            >
@@ -270,17 +270,13 @@ export default function AdminOrderDetailPage() {
            </button>
           )}
 
-          {/* Dispatch return rider */}
-          {order.status === "ready_for_return" && (
-           <button
-            onClick={() => setConfirmModal({ key: "delivering_to_customer", label: "กำลังส่งคืนลูกค้า (เรียกไรเดอร์)", icon: "🏍️" })}
-            disabled={isUpdating}
-            className="w-full py-5 bg-amber-500 hover:bg-amber-400 text-white text-lg font-black rounded-2xl shadow-xl shadow-amber-500/30 transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-3"
-           >
-            <span className="text-2xl">🏍️</span>
-            <span>เรียกไรเดอร์ไปรับผ้าที่ร้านซัก</span>
-            <Icons.ChevronRight size={20} />
-           </button>
+          {/* Wait for return rider */}
+          {order.status === "ready_for_pickup" && (
+           <div className="w-full py-4 bg-amber-500/10 border border-amber-500/20 rounded-xl text-center">
+            <p className="text-xs font-bold text-amber-500 uppercase tracking-wide">
+             🏍️ เรียกไรเดอร์ให้แล้ว... รอไรเดอร์กดรับงาน
+            </p>
+           </div>
           )}
 
           {/* Complete */}

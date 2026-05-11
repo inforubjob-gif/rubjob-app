@@ -105,7 +105,6 @@ export async function transitionOrderStatus(
         // This fires both when admin manually triggers AND when auto-chained from at_shop
         flexMessage = washingOrderFlex(orderId);
         break;
-      case "ready_for_return":
       case "ready_for_pickup":
         flexMessage = readyForDeliveryFlex(orderId);
         
@@ -119,7 +118,7 @@ export async function transitionOrderStatus(
             nextStatus
           );
         } catch (e) {
-          console.error("Failed to broadcast ready_for_return to rubbers:", e);
+          console.error("Failed to broadcast ready_for_pickup to rubbers:", e);
         }
         break;
       case "delivering_to_customer":
@@ -165,7 +164,7 @@ function tStatus(status: string) {
     in_progress: "กำลังดำเนินการ",
     at_shop: "ถึงร้านแล้ว",
     washing: "กำลังซัก",
-    ready_for_return: "ซักเสร็จพร้อมส่ง",
+    ready_for_pickup: "ซักเสร็จพร้อมส่ง",
     completed: "สำเร็จ"
   };
   return map[status] || status;

@@ -36,7 +36,7 @@ export type OrderStatus =
   | "pending"
   | "picking_up"
   | "at_shop"
-  | "ready_for_return"
+  | "ready_for_pickup"
   | "delivering_to_store"
   | "washing"
   | "ready_for_pickup"

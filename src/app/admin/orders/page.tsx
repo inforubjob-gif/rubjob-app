@@ -207,14 +207,14 @@ export default function AdminOrdersPage() {
                )}
                {order.status === "washing" && (
                 <button
-                 onClick={() => handleUpdateOrder(order.id, { status: "ready_for_return" })}
+                 onClick={() => handleUpdateOrder(order.id, { status: "ready_for_pickup" })}
                  disabled={isUpdating === order.id}
                  className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white text-[10px] font-black uppercase tracking-widest rounded-xl shadow-lg shadow-emerald-500/20 transition-all active:scale-95"
                 >
                  ✅ ซักเสร็จ
                 </button>
                )}
-               {order.status === "ready_for_return" && (
+               {order.status === "ready_for_pickup" && (
                 <button
                  onClick={() => handleUpdateOrder(order.id, { status: "delivering_to_customer" })}
                  disabled={isUpdating === order.id}
