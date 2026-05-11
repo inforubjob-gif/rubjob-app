@@ -519,11 +519,14 @@ export default function RubberDashboard() {
              <div className="relative h-24 bg-slate-50 rounded-xl border-2 border-slate-100/50 flex items-center justify-between px-10 overflow-x-hidden">
                 <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(#000 1px, transparent 1px)', backgroundSize: '20px 20px' }} />
                 
+                {/* Left Side (Pickup) */}
                 <div className="relative z-10 flex flex-col items-center">
-                   <div className="w-10 h-10 bg-black rounded-xl border-4 border-white shadow-xl flex items-center justify-center text-white">
-                      <Icons.Logo size={20} variant="icon" />
+                   <div className={`w-10 h-10 rounded-xl border-4 border-white shadow-xl flex items-center justify-center text-white ${(selectedJob.status === 'pending' || selectedJob.status === 'searching_driver') ? 'bg-primary' : 'bg-black'}`}>
+                      {(selectedJob.status === 'pending' || selectedJob.status === 'searching_driver') ? <Icons.User size={20} /> : <Icons.Logo size={20} variant="icon" />}
                    </div>
-                   <p className="text-xs font-black mt-2 uppercaseer opacity-50">{t("common.store")}</p>
+                   <p className="text-xs font-black mt-2 uppercaseer opacity-50">
+                     {(selectedJob.status === 'pending' || selectedJob.status === 'searching_driver') ? t("common.user") : t("common.store")}
+                   </p>
                 </div>
 
                 <div className="flex-1 px-4 relative">
@@ -535,11 +538,14 @@ export default function RubberDashboard() {
                    </div>
                 </div>
 
+                {/* Right Side (Delivery) */}
                 <div className="relative z-10 flex flex-col items-center">
-                   <div className="w-10 h-10 bg-primary rounded-xl border-4 border-white shadow-xl flex items-center justify-center text-white">
-                      <Icons.MapPin size={20} strokeWidth={3} />
+                   <div className={`w-10 h-10 rounded-xl border-4 border-white shadow-xl flex items-center justify-center text-white ${(selectedJob.status === 'pending' || selectedJob.status === 'searching_driver') ? 'bg-black' : 'bg-primary'}`}>
+                      {(selectedJob.status === 'pending' || selectedJob.status === 'searching_driver') ? <Icons.Logo size={20} variant="icon" /> : <Icons.MapPin size={20} strokeWidth={3} />}
                    </div>
-                   <p className="text-xs font-black mt-2 uppercaseer opacity-50">{t("common.user")}</p>
+                   <p className="text-xs font-black mt-2 uppercaseer opacity-50">
+                     {(selectedJob.status === 'pending' || selectedJob.status === 'searching_driver') ? t("common.store") : t("common.user")}
+                   </p>
                 </div>
              </div>
 
