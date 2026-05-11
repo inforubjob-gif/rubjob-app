@@ -48,9 +48,10 @@ export default function AdminDashboard() {
       connection: data.connection || "CONNECTED"
      });
     }
-   } catch (err) {
+   } catch (err: any) {
     console.error("Failed to fetch admin stats:", err);
     setErrorCount(prev => prev + 1);
+    setApiError(err.message || "Network Error or Invalid Response");
    } finally {
     setIsLoading(false);
    }
