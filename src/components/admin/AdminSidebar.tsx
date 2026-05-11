@@ -29,7 +29,6 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
     { label: t("admin.nav.coupons"), href: "/admin/coupons", icon: <Icons.Ticket size={20} />, permission: "coupons" },
     { label: t("admin.nav.finance"), href: "/admin/finance", icon: <Icons.Wallet size={20} />, permission: "finance" },
     { label: t("admin.nav.support"), href: "/admin/support", icon: <Icons.Chat size={20} />, permission: "support" },
-    { label: "พนักงานและสิทธิ์", href: "/admin/settings?tab=admins", icon: <Icons.Shield size={20} />, permission: "settings" },
     { label: "ตั้งค่าระบบ", href: "/admin/settings", icon: <Icons.Settings size={20} />, permission: "settings" },
   ].filter(item => hasPermission(item.permission));
 
