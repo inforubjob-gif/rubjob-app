@@ -35,6 +35,7 @@ export default function RubberOrderDetailPage() {
   const [isUpdating, setIsUpdating] = useState(false);
   const [isIssueModalOpen, setIsIssueModalOpen] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [updateError, setUpdateError] = useState<string | null>(null);
   const [rubberCoords, setRubberCoords] = useState<{lat: number, lng: number} | null>(null);
 
   useEffect(() => {
@@ -125,6 +126,7 @@ export default function RubberOrderDetailPage() {
     }
 
     setIsUpdating(true);
+    setUpdateError(null);
     try {
       const res = await fetch(`/api/rubber/orders/${id}/status`, {
         method: "POST",
@@ -134,7 +136,7 @@ export default function RubberOrderDetailPage() {
       
       if (!res.ok) {
         const errData = await res.json().catch(() => ({}));
-        throw new Error(errData.error || "Failed to update status");
+        throw new Error(errData.error || `Server Error: ${res.status}`);
       }
 
       setStatus(nextStatus);
@@ -153,8 +155,9 @@ export default function RubberOrderDetailPage() {
           router.push("/rubber");
         }, 2000);
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error("Update rubber status failed:", err);
+      setUpdateError(err.message || "ไม่สามารถอัปเดตสถานะได้ กรุณาลองใหม่");
     } finally {
       setIsUpdating(false);
     }
@@ -469,6 +472,18 @@ export default function RubberOrderDetailPage() {
 
         {/* Action Button */}
         <div className="fixed bottom-0 left-0 right-0 p-5 bg-white/80 backdrop-blur-2xl border-t border-slate-100/50 z-40">
+           {updateError && (
+             <div className="mb-3 p-3 bg-rose-50 border border-rose-200 rounded-xl flex items-center gap-3 animate-fade-in">
+               <div className="w-2 h-2 rounded-full bg-rose-500 animate-pulse shrink-0" />
+               <p className="text-xs font-bold text-rose-600 flex-1">{updateError}</p>
+               <button 
+                 onClick={() => { setUpdateError(null); handleUpdateStatus(getNextStatus(status)); }}
+                 className="text-[10px] font-black text-primary bg-primary/10 px-3 py-1.5 rounded-lg uppercase shrink-0"
+               >
+                 ลองใหม่
+               </button>
+             </div>
+           )}
            {status === "washing" ? (
              <div className="text-center p-4 bg-slate-50 rounded-xl border-2 border-dashed border-slate-200">
                 <p className="text-xs font-black text-slate-400 uppercase">{t("store.processing")}</p>
