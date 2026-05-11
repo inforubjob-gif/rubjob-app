@@ -54,10 +54,12 @@ export async function POST(req: Request) {
     if (serviceId === 'duvet_washing') {
       try {
         await db.prepare(`
-          INSERT OR IGNORE INTO services (id, name, category, description, basePrice, unit, icon, estimatedDays, isActive, gpPercent)
-          VALUES ('duvet_washing', 'ซักผ้านวม', 'laundry', 'บริการซักผ้านวม', 199, 'piece', 'duvet_washing', 2, 1, 15)
+          INSERT OR IGNORE INTO services (id, name, category, description, basePrice, unit, icon, estimatedDays, isActive)
+          VALUES ('duvet_washing', 'ซักผ้านวม', 'laundry', 'บริการซักผ้านวม', 199, 'piece', 'duvet_washing', 2, 1)
         `).run();
-      } catch(e) {}
+      } catch(e) {
+        console.error("Self-heal duvet_washing failed:", e);
+      }
     }
 
     // Insert Order

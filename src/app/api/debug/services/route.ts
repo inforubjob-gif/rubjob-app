@@ -13,8 +13,8 @@ export async function GET() {
     
     if (!exists) {
       await db.prepare(`
-        INSERT INTO services (id, name, category, description, basePrice, unit, icon, estimatedDays, isActive, gpPercent)
-        VALUES ('duvet_washing', 'ซักผ้านวม', 'laundry', 'บริการซักผ้านวมโดยเฉพาะ รองรับสูงสุด 28kg', 199, 'piece', 'duvet_washing', 2, 1, 15)
+        INSERT INTO services (id, name, category, description, basePrice, unit, icon, estimatedDays, isActive)
+        VALUES ('duvet_washing', 'ซักผ้านวม', 'laundry', 'บริการซักผ้านวมโดยเฉพาะ รองรับสูงสุด 28kg', 199, 'piece', 'duvet_washing', 2, 1)
       `).run();
       return NextResponse.json({ success: true, message: "Inserted duvet_washing" });
     }
