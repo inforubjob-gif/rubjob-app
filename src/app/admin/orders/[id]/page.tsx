@@ -345,7 +345,7 @@ export default function AdminOrderDetailPage() {
         {[
          { label: "รับผ้าจากลูกค้า (Pickup)", url: order?.serviceDetails ? (() => { try { const d = JSON.parse(order.serviceDetails); return d?.proofPhotos?.delivering_to_store || d?.proofPhotos?.picking_up || order.evidenceBeforeUrl; } catch { return order.evidenceBeforeUrl; } })() : order?.evidenceBeforeUrl },
          { label: "ส่งที่ร้านซัก (Dropoff)", url: order?.serviceDetails ? (() => { try { const d = JSON.parse(order.serviceDetails); return d?.proofPhotos?.at_shop || order.dropoffShopPhotoUrl; } catch { return order.dropoffShopPhotoUrl; } })() : order?.dropoffShopPhotoUrl },
-         { label: "เริ่มซัก (Before Wash)", url: order.evidenceBeforeUrl },
+         { label: "เริ่มซัก (Before Wash)", url: order?.serviceDetails ? (() => { try { const d = JSON.parse(order.serviceDetails); return d?.proofPhotos?.washing || order.evidenceBeforeUrl; } catch { return order.evidenceBeforeUrl; } })() : order?.evidenceBeforeUrl },
          { label: "หลังบริการ (After)", url: order?.serviceDetails ? (() => { try { const d = JSON.parse(order.serviceDetails); return d?.proofPhotos?.completed || order.evidenceAfterUrl; } catch { return order.evidenceAfterUrl; } })() : order?.evidenceAfterUrl },
         ].map((photo) => (
         <div key={photo.label} className="space-y-2">

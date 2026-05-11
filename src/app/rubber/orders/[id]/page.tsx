@@ -126,11 +126,17 @@ export default function RubberOrderDetailPage() {
 
     setIsUpdating(true);
     try {
-      await fetch(`/api/rubber/orders/${id}/status`, {
+      const res = await fetch(`/api/rubber/orders/${id}/status`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status: nextStatus, photo: activePhoto }),
       });
+      
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.error || "Failed to update status");
+      }
+
       setStatus(nextStatus);
       setPhoto(null);
       setAutoSubmitAfterPhoto(false);
