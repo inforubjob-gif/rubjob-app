@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { Icons } from "./Icons";
 
 interface ModalProps {
@@ -11,6 +12,11 @@ interface ModalProps {
 }
 
 export default function Modal({ isOpen, onClose, title, children }: ModalProps) {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = "hidden";
@@ -22,9 +28,9 @@ export default function Modal({ isOpen, onClose, title, children }: ModalProps) 
     };
   }, [isOpen]);
 
-  if (!isOpen) return null;
+  if (!isOpen || !mounted) return null;
 
-  return (
+  return createPortal(
     <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center animate-fade-in p-0 sm:p-6">
       <div 
         className="absolute inset-0 bg-slate-950/50 backdrop-blur-sm" 
@@ -47,6 +53,7 @@ export default function Modal({ isOpen, onClose, title, children }: ModalProps) 
           <Icons.Close size={18} />
         </button>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
