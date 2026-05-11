@@ -120,17 +120,19 @@ export async function broadcastToEligibleRubbers(
   // Get Rubber LINE OA token — MUST be separate from Customer OA
   // Priority: env variable → DB setting (admin dashboard)
   // ⚠️ Do NOT fallback to customer token — they are separate LINE OAs!
-  let rubberToken = env.LINE_CHANNEL_ACCESS_TOKEN_RUBBER;
+  let rubberToken = null;
+  try {
+    // Check DB with key 'line_token_rubber' (matches admin settings)
+    const setting = await db.prepare(
+      "SELECT value FROM system_settings WHERE key = 'line_token_rubber'"
+    ).first() as any;
+    if (setting?.value) rubberToken = setting.value;
+  } catch (e) {
+    console.error("[DISPATCH] Failed to read rubber token from DB:", e);
+  }
+  
   if (!rubberToken) {
-    try {
-      // Check DB with key 'line_token_rubber' (matches admin settings)
-      const setting = await db.prepare(
-        "SELECT value FROM system_settings WHERE key = 'line_token_rubber'"
-      ).first() as any;
-      if (setting?.value) rubberToken = setting.value;
-    } catch (e) {
-      console.error("[DISPATCH] Failed to read rubber token from DB:", e);
-    }
+    rubberToken = env.LINE_CHANNEL_ACCESS_TOKEN_RUBBER;
   }
   if (!rubberToken) {
     console.warn("⚠️ [DISPATCH] Rubber LINE OA token is NOT configured! Rubber LINE push will be SKIPPED. Set 'LINE_CHANNEL_ACCESS_TOKEN_RUBBER' in env or 'line_token_rubber' in Admin Settings.");

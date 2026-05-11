@@ -105,19 +105,21 @@ export async function POST(req: Request) {
     ).run();
 
     // 🤖 Automation: Notify Store and Available Rubbers via LINE
-    const env = getRequestContext().env;
-    let customerToken = env.LINE_CHANNEL_ACCESS_TOKEN;
-    let rubberToken = env.LINE_CHANNEL_ACCESS_TOKEN_RUBBER;
+    // Priority 1: DB (Admin Settings UI)
+    // Priority 2: Cloudflare ENV
+    let customerToken = null;
+    let rubberToken = null;
+    
+    try {
+      const regularSetting = await db.prepare("SELECT value FROM system_settings WHERE key = 'line_token_regular'").first() as any;
+      if (regularSetting?.value) customerToken = regularSetting.value;
+      
+      const rubberSetting = await db.prepare("SELECT value FROM system_settings WHERE key = 'line_token_rubber'").first() as any;
+      if (rubberSetting?.value) rubberToken = rubberSetting.value;
+    } catch (e) {}
 
-    // Fallback to database settings if env vars are not set
-    if (!customerToken) {
-      const setting = await db.prepare("SELECT value FROM system_settings WHERE key = 'line_token_regular'").first() as any;
-      if (setting?.value) customerToken = setting.value;
-    }
-    if (!rubberToken) {
-      const setting = await db.prepare("SELECT value FROM system_settings WHERE key = 'line_token_rubber'").first() as any;
-      if (setting?.value) rubberToken = setting.value;
-    }
+    if (!customerToken) customerToken = env.LINE_CHANNEL_ACCESS_TOKEN;
+    if (!rubberToken) rubberToken = env.LINE_CHANNEL_ACCESS_TOKEN_RUBBER;
 
     // ⚠️ Do NOT fallback rubber token to customer token — they are separate LINE OAs!
     
