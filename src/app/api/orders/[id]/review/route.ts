@@ -13,25 +13,45 @@ export async function POST(
 ) {
   try {
     const { id } = await params;
-    const { rating, reviewText } = await req.json() as any;
+    const { storeRating, storeReview, driverRating, driverReview } = await req.json() as any;
 
-    if (!rating || rating < 1 || rating > 5) {
-      return NextResponse.json({ error: "Invalid rating" }, { status: 400 });
+    if (!storeRating && !driverRating) {
+      return NextResponse.json({ error: "No ratings provided" }, { status: 400 });
     }
 
     const db = getRequestContext().env.DB;
 
-    // Self-healing: Ensure new columns exist
-    try { await db.prepare("ALTER TABLE orders ADD COLUMN rating INTEGER").run(); } catch (e) {}
-    try { await db.prepare("ALTER TABLE orders ADD COLUMN review_text TEXT").run(); } catch (e) {}
+    // We no longer need the fallback ALTER TABLEs because we added them in db-init.ts.
+    let updateFields = [];
+    const paramsArray: any[] = [];
+    
+    // Calculate average rating for backward compatibility
+    let totalScore = 0;
+    let totalCount = 0;
+    
+    if (storeRating) {
+       updateFields.push("storeRating = ?", "storeReview = ?");
+       paramsArray.push(storeRating, storeReview || null);
+       totalScore += Number(storeRating);
+       totalCount++;
+    }
+    if (driverRating) {
+       updateFields.push("driverRating = ?", "driverReview = ?");
+       paramsArray.push(driverRating, driverReview || null);
+       totalScore += Number(driverRating);
+       totalCount++;
+    }
+    
+    const avgRating = totalCount > 0 ? Math.round(totalScore / totalCount) : null;
+    const combinedReviewText = `[Store: ${storeReview || '-'}] [Driver: ${driverReview || '-'}]`;
 
-    // Update order with rating and review
-    const result = await db
-      .prepare(
-        "UPDATE orders SET rating = ?, review_text = ? WHERE id = ? AND status = 'completed'"
-      )
-      .bind(rating, reviewText, id)
-      .run();
+    updateFields.push("rating = ?", "review_text = ?");
+    paramsArray.push(avgRating, combinedReviewText);
+    
+    const query = `UPDATE orders SET ${updateFields.join(", ")} WHERE id = ? AND status = 'completed'`;
+    paramsArray.push(id);
+
+    const result = await db.prepare(query).bind(...paramsArray).run();
 
     if (result.meta.changes === 0) {
       return NextResponse.json(
@@ -40,29 +60,63 @@ export async function POST(
       )
     }
 
+    // ─── Fetch Order Info for Notifications ───
+    const orderData = await db.prepare(`
+      SELECT o.userId, u.displayName as customerName, o.storeId, o.deliveryDriverId,
+             st.ownerId as storeOwnerId
+      FROM orders o 
+      LEFT JOIN users u ON o.userId = u.id 
+      LEFT JOIN stores st ON o.storeId = st.id
+      WHERE o.id = ?
+    `).bind(id).first() as any;
+    
+    // ─── Notify Driver via internal notification (and possibly LINE) ───
+    if (driverRating && orderData?.deliveryDriverId) {
+      try {
+        await db.prepare(`
+          INSERT INTO support_tickets (id, userId, userType, status, subject, updatedAt)
+          VALUES (?, ?, 'driver', 'open', 'รีวิวจากลูกค้า', CURRENT_TIMESTAMP)
+        `).bind(`REV-DRV-${id.slice(-6)}`, orderData.deliveryDriverId).run();
+        
+        await db.prepare(`
+          INSERT INTO support_messages (id, ticketId, content, senderType, createdAt)
+          VALUES (?, ?, ?, 'system', CURRENT_TIMESTAMP)
+        `).bind(`MSG-DRV-${id.slice(-6)}`, `REV-DRV-${id.slice(-6)}`, `ลูกค้าให้คะแนนคุณ ${driverRating} ดาว: ${driverReview || 'ไม่มีคอมเมนต์'}`).run();
+      } catch (e) {
+        console.error("Failed to notify driver", e);
+      }
+    }
+
+    // ─── Notify Store via internal notification ───
+    if (storeRating && orderData?.storeOwnerId) {
+      try {
+        await db.prepare(`
+          INSERT INTO support_tickets (id, userId, userType, status, subject, updatedAt)
+          VALUES (?, ?, 'partner', 'open', 'รีวิวจากลูกค้า', CURRENT_TIMESTAMP)
+        `).bind(`REV-STR-${id.slice(-6)}`, orderData.storeOwnerId).run();
+        
+        await db.prepare(`
+          INSERT INTO support_messages (id, ticketId, content, senderType, createdAt)
+          VALUES (?, ?, ?, 'system', CURRENT_TIMESTAMP)
+        `).bind(`MSG-STR-${id.slice(-6)}`, `REV-STR-${id.slice(-6)}`, `ลูกค้ารีวิวร้านซักของคุณ ${storeRating} ดาว: ${storeReview || 'ไม่มีคอมเมนต์'}`).run();
+      } catch (e) {
+        console.error("Failed to notify store", e);
+      }
+    }
+
     // ─── Escalation Logic (Integrated with existing Support Chat) ───
-    if (rating <= 3 || (reviewText && reviewText.trim().length > 0)) {
-      // Get customer info
-      const orderData = await db.prepare(`
-        SELECT o.userId, u.displayName as customerName 
-        FROM orders o 
-        LEFT JOIN users u ON o.userId = u.id 
-        WHERE o.id = ?
-      `).bind(id).first() as any;
-      
+    if (avgRating !== null && avgRating <= 3 || (combinedReviewText && combinedReviewText.trim().length > 0)) {
       if (orderData?.userId) {
         const ticketId = `SUP-REV-${id.slice(-6).toUpperCase()}`;
         const messageId = `MSG-${Math.random().toString(36).substring(2, 10).toUpperCase()}`;
-        const content = `[Review ${rating} Stars] ${reviewText || "No comment"}`;
+        const content = `[Review ${avgRating} Stars] ${combinedReviewText || "No comment"}`;
 
-        // 1. Create or Update Support Ticket
         await db.prepare(`
           INSERT INTO support_tickets (id, userId, userType, status, updatedAt)
           VALUES (?, ?, 'customer', 'open', CURRENT_TIMESTAMP)
           ON CONFLICT(id) DO UPDATE SET status = 'open', updatedAt = CURRENT_TIMESTAMP
         `).bind(ticketId, orderData.userId).run();
 
-        // 2. Insert the review as the first message
         await db.prepare(`
           INSERT INTO support_messages (id, ticketId, content, senderType, createdAt)
           VALUES (?, ?, ?, 'user', CURRENT_TIMESTAMP)

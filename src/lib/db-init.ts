@@ -138,6 +138,10 @@ export async function ensureSchema(db: D1Database) {
       serviceDetails TEXT,
       rating INTEGER,
       review_text TEXT,
+      storeRating INTEGER,
+      storeReview TEXT,
+      driverRating INTEGER,
+      driverReview TEXT,
       createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
       updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (userId) REFERENCES users(id),
@@ -257,6 +261,10 @@ export async function ensureSchema(db: D1Database) {
      "ALTER TABLE orders ADD COLUMN dropoffShopPhotoUrl TEXT",
      "ALTER TABLE orders ADD COLUMN arrivedAtShopAt DATETIME",
      "ALTER TABLE orders ADD COLUMN lastNotifiedAt DATETIME",
+     "ALTER TABLE orders ADD COLUMN storeRating INTEGER",
+     "ALTER TABLE orders ADD COLUMN storeReview TEXT",
+     "ALTER TABLE orders ADD COLUMN driverRating INTEGER",
+     "ALTER TABLE orders ADD COLUMN driverReview TEXT",
   ];
 
   for (const migration of migrations) {

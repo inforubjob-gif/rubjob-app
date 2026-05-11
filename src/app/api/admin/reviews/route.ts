@@ -17,6 +17,10 @@ export async function GET(req: Request) {
         o.id as orderId, 
         o.rating, 
         o.review_text as reviewText, 
+        o.storeRating,
+        o.storeReview,
+        o.driverRating,
+        o.driverReview,
         o.createdAt,
         u.displayName as customerName,
         u.pictureUrl as customerAvatar,
@@ -27,12 +31,11 @@ export async function GET(req: Request) {
       FROM orders o
       JOIN users u ON o.userId = u.id
       LEFT JOIN stores s ON o.storeId = s.id
-      LEFT JOIN rubber_users r ON o.pickupDriverId = r.id OR o.deliveryDriverId = r.id
+      LEFT JOIN rubber_users r ON o.deliveryDriverId = r.id
       LEFT JOIN specialist_profiles sp ON o.providerId = sp.id
       LEFT JOIN users p ON sp.id = p.id
       LEFT JOIN services srv ON o.serviceId = srv.id
-      WHERE o.rating IS NOT NULL OR o.review_text IS NOT NULL
-      GROUP BY o.id
+      WHERE o.rating IS NOT NULL OR o.review_text IS NOT NULL OR o.storeRating IS NOT NULL OR o.driverRating IS NOT NULL
       ORDER BY o.createdAt DESC
     `).all();
 

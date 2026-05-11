@@ -32,8 +32,10 @@ export default function OrderDetailPage() {
   const { t } = useTranslation();
   const [order, setOrder] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [rating, setRating] = useState(0);
-  const [reviewText, setReviewText] = useState("");
+  const [storeRating, setStoreRating] = useState(0);
+  const [storeReview, setStoreReview] = useState("");
+  const [driverRating, setDriverRating] = useState(0);
+  const [driverReview, setDriverReview] = useState("");
   const [isSubmittingReview, setIsSubmittingReview] = useState(false);
   const [stripePromise, setStripePromise] = useState<Promise<Stripe | null> | null>(null);
   const [clientSecret, setClientSecret] = useState<string | null>(null);
@@ -63,18 +65,18 @@ export default function OrderDetailPage() {
   };
 
   const handleSubmitReview = async () => {
-    if (rating === 0) return;
+    if (storeRating === 0 && driverRating === 0) return;
     setIsSubmittingReview(true);
     try {
       const res = await fetch(`/api/orders/${id}/review`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ rating, reviewText }),
+        body: JSON.stringify({ storeRating, storeReview, driverRating, driverReview }),
       });
       if (res.ok) {
         alert("ขอบคุณสำหรับรีวิวครับ!");
         // Update local state to hide review box
-        setOrder({ ...order, rating, reviewText });
+        setOrder({ ...order, storeRating, driverRating });
       }
     } catch (err) {
       console.error("Failed to submit review:", err);
@@ -290,7 +292,7 @@ export default function OrderDetailPage() {
         )}
 
         {/* Review Section (New) */}
-         {order.status === "completed" && !order.rating && (
+         {order.status === "completed" && !order.rating && !order.storeRating && !order.driverRating && (
           <Card className="p-8 border border-slate-100 bg-white">
              <div className="flex flex-col items-center text-center">
                 <div className="w-14 h-14 bg-primary/10 rounded-full flex items-center justify-center text-primary mb-4">
@@ -299,31 +301,62 @@ export default function OrderDetailPage() {
                 <h3 className="text-lg font-black text-foreground mb-1">{t("orders.review.title")}</h3>
                 <p className="text-xs text-muted mb-8">{t("orders.review.subtitle")}</p>
                 
-                <div className="flex gap-2 mb-8">
-                   {[1, 2, 3, 4, 5].map((star) => (
-                      <button 
-                        key={star}
-                        onClick={() => setRating(star)}
-                        className={`transition-all duration-200 ${rating >= star ? "text-primary scale-110" : "text-slate-200 hover:text-slate-300"}`}
-                      >
-                         <Icons.Star 
-                           size={36} 
-                           fill={rating >= star} 
-                           strokeWidth={rating >= star ? 0 : 2}
-                         />
-                      </button>
-                   ))}
-                </div>
+                {/* Store Review Section */}
+                {order.storeId && (
+                  <div className="w-full mb-6 border border-slate-100 rounded-2xl p-5 bg-slate-50/50">
+                     <p className="text-xs font-bold text-slate-500 mb-3 uppercase tracking-wider">🏪 รีวิวความสะอาดและบริการร้านซัก</p>
+                     <div className="flex justify-center gap-2 mb-4">
+                        {[1, 2, 3, 4, 5].map((star) => (
+                           <button 
+                             key={`store-${star}`}
+                             onClick={() => setStoreRating(star)}
+                             className={`transition-all duration-200 ${storeRating >= star ? "text-primary scale-110" : "text-slate-200 hover:text-slate-300"}`}
+                           >
+                              <Icons.Star size={32} fill={storeRating >= star} strokeWidth={storeRating >= star ? 0 : 2}/>
+                           </button>
+                        ))}
+                     </div>
+                     {storeRating > 0 && (
+                        <textarea 
+                           className="w-full bg-white border border-slate-200 rounded-xl p-3 text-sm focus:border-primary outline-none transition-all placeholder:text-slate-300 font-medium"
+                           placeholder="เล่าความประทับใจเกี่ยวกับร้านซักผ้า..."
+                           rows={2}
+                           value={storeReview}
+                           onChange={(e) => setStoreReview(e.target.value)}
+                        />
+                     )}
+                  </div>
+                )}
 
-                {rating > 0 && (
-                  <div className="w-full space-y-4 animate-page-enter">
-                     <textarea 
-                        className="w-full bg-white border border-slate-200 rounded-2xl p-4 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all placeholder:text-slate-300 font-medium"
-                        placeholder={t("orders.review.placeholder") || "เล่าประสบการณ์การใช้งานที่นี่..."}
-                        rows={3}
-                        value={reviewText}
-                        onChange={(e) => setReviewText(e.target.value)}
-                     />
+                {/* Driver Review Section */}
+                {(order.pickupDriverId || order.deliveryDriverId) && (
+                  <div className="w-full mb-6 border border-slate-100 rounded-2xl p-5 bg-slate-50/50">
+                     <p className="text-xs font-bold text-slate-500 mb-3 uppercase tracking-wider">🏍️ รีวิวการให้บริการของไรเดอร์</p>
+                     <div className="flex justify-center gap-2 mb-4">
+                        {[1, 2, 3, 4, 5].map((star) => (
+                           <button 
+                             key={`driver-${star}`}
+                             onClick={() => setDriverRating(star)}
+                             className={`transition-all duration-200 ${driverRating >= star ? "text-primary scale-110" : "text-slate-200 hover:text-slate-300"}`}
+                           >
+                              <Icons.Star size={32} fill={driverRating >= star} strokeWidth={driverRating >= star ? 0 : 2}/>
+                           </button>
+                        ))}
+                     </div>
+                     {driverRating > 0 && (
+                        <textarea 
+                           className="w-full bg-white border border-slate-200 rounded-xl p-3 text-sm focus:border-primary outline-none transition-all placeholder:text-slate-300 font-medium"
+                           placeholder="เล่าความประทับใจเกี่ยวกับไรเดอร์..."
+                           rows={2}
+                           value={driverReview}
+                           onChange={(e) => setDriverReview(e.target.value)}
+                        />
+                     )}
+                  </div>
+                )}
+
+                {(storeRating > 0 || driverRating > 0) && (
+                  <div className="w-full space-y-4 animate-page-enter mt-4">
                      <Button 
                         onClick={handleSubmitReview}
                         disabled={isSubmittingReview}

@@ -9,6 +9,10 @@ interface Review {
   orderId: string;
   rating: number;
   reviewText: string;
+  storeRating?: number;
+  storeReview?: string;
+  driverRating?: number;
+  driverReview?: string;
   createdAt: string;
   customerName: string;
   customerAvatar: string;
@@ -125,17 +129,51 @@ export default function ReviewsPage() {
                          review.rubberName ? `Rubber: ${review.rubberName}` : "General"}
                       </div>
                     </td>
-                    <td className="py-4 px-6 whitespace-nowrap">
-                      <div className="flex text-yellow-400">
-                        {Array.from({ length: 5 }).map((_, i) => (
-                          <span key={i} className={i < (review.rating || 0) ? "text-yellow-400" : "text-slate-200"}>
-                            ★
-                          </span>
-                        ))}
-                      </div>
+                    <td className="py-4 px-6 whitespace-nowrap space-y-2">
+                      {review.storeRating && (
+                        <div className="flex items-center gap-2">
+                          <span className="text-[10px] font-bold text-slate-400 w-10">STORE</span>
+                          <div className="flex text-yellow-400 text-xs">
+                            {Array.from({ length: 5 }).map((_, i) => (
+                              <span key={`s-${i}`} className={i < review.storeRating! ? "text-yellow-400" : "text-slate-200"}>★</span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                      {review.driverRating && (
+                        <div className="flex items-center gap-2">
+                          <span className="text-[10px] font-bold text-slate-400 w-10">DRIVER</span>
+                          <div className="flex text-yellow-400 text-xs">
+                            {Array.from({ length: 5 }).map((_, i) => (
+                              <span key={`d-${i}`} className={i < review.driverRating! ? "text-yellow-400" : "text-slate-200"}>★</span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                      {!review.storeRating && !review.driverRating && (
+                        <div className="flex text-yellow-400 text-sm">
+                          {Array.from({ length: 5 }).map((_, i) => (
+                            <span key={i} className={i < (review.rating || 0) ? "text-yellow-400" : "text-slate-200"}>★</span>
+                          ))}
+                        </div>
+                      )}
                     </td>
-                    <td className="py-4 px-6 text-sm text-slate-600">
-                      {review.reviewText || <span className="italic text-slate-400">No text provided</span>}
+                    <td className="py-4 px-6 text-sm text-slate-600 space-y-2">
+                      {review.storeReview && (
+                        <div className="text-xs bg-slate-50 p-2 rounded-lg border border-slate-100">
+                          <span className="font-bold text-slate-400 block mb-0.5 text-[9px]">STORE REVIEW:</span>
+                          {review.storeReview}
+                        </div>
+                      )}
+                      {review.driverReview && (
+                        <div className="text-xs bg-slate-50 p-2 rounded-lg border border-slate-100">
+                          <span className="font-bold text-slate-400 block mb-0.5 text-[9px]">DRIVER REVIEW:</span>
+                          {review.driverReview}
+                        </div>
+                      )}
+                      {!review.storeReview && !review.driverReview && (
+                        <div>{review.reviewText || <span className="italic text-slate-400">No text provided</span>}</div>
+                      )}
                     </td>
                     <td className="py-4 px-6 text-right">
                       <button
