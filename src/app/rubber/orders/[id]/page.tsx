@@ -115,8 +115,8 @@ export default function RubberOrderDetailPage() {
   const handleUpdateStatus = async (nextStatus: string, photoOverride?: string) => {
     const activePhoto = photoOverride || photo;
     
-    // Skill.md Section 11: Mandatory photos for pickup and shop drop-off
-    const needsPhoto = status === "picking_up" || status === "delivering_to_store" || status === "delivering_to_customer";
+    // Mandatory photos for all 4 steps
+    const needsPhoto = status === "picking_up" || status === "delivering_to_store" || status === "ready_for_pickup" || status === "delivering_to_customer";
     
     if (needsPhoto && !activePhoto) {
       // Automatically trigger camera if photo is missing
@@ -143,17 +143,10 @@ export default function RubberOrderDetailPage() {
       setPhoto(null);
       setAutoSubmitAfterPhoto(false);
       
-      // Show success overlay for intermediate transitions to guide the driver
-      if (nextStatus === "delivering_to_store" || nextStatus === "delivering_to_customer") {
+      // Show overlay for all transitions
+      if (nextStatus === "delivering_to_store" || nextStatus === "delivering_to_customer" || nextStatus === "at_shop" || nextStatus === "completed") {
         setShowSuccess(true);
         window.scrollTo({ top: 0, behavior: 'smooth' });
-      }
-
-      // Auto-redirection for states that end the current rubber leg
-      if (nextStatus === "at_shop" || nextStatus === "completed") {
-        setTimeout(() => {
-          router.push("/rubber");
-        }, 2000);
       }
     } catch (err: any) {
       console.error("Update rubber status failed:", err);
@@ -207,9 +200,42 @@ export default function RubberOrderDetailPage() {
   }
 
   if (showSuccess) {
+    // Determine if this is a "job done" overlay or a "navigate next" overlay
+    const isJobDone = status === "washing" || status === "completed";
     const isToStore = status === "delivering_to_store";
     const destName = isToStore ? order?.storeName || t("admin.nav.stores") : order?.userName || t("admin.nav.users");
-    const destLabel = isToStore ? t("rubber.orderDetail.deliverTo") || "นำส่งที่ร้านซัก" : t("rubber.orderDetail.deliverTo") || "นำส่งที่ลูกค้า";
+    const destLabel = isToStore ? "นำส่งที่ร้านซัก" : "นำส่งที่ลูกค้า";
+
+    if (isJobDone) {
+      // Job Done overlay — shown after dropping off at store or completing delivery
+      const isLeg1 = status === "washing"; // auto-chained from at_shop
+      return (
+        <div className="flex flex-col min-h-dvh bg-emerald-600 text-white justify-center px-6 animate-fade-in text-center relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -mr-20 -mt-20" />
+          <div className="absolute bottom-0 left-0 w-48 h-48 bg-black/10 rounded-full blur-2xl -ml-20 -mb-20" />
+          
+          <div className="w-28 h-28 bg-white text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-2xl shadow-black/20">
+            <Icons.Check size={56} strokeWidth={3} />
+          </div>
+          
+          <h2 className="text-3xl font-black mb-2 tracking-tight">
+            {isLeg1 ? "ส่งผ้าเรียบร้อย!" : "🎉 จบงานเรียบร้อย!"}
+          </h2>
+          <p className="text-white/80 font-bold mb-8 text-sm">
+            {isLeg1 ? "ผ้าถึงร้านซักแล้ว ระบบจะแจ้งเตือนเมื่อมีงานรับผ้ากลับ" : "ส่งผ้าคืนลูกค้าสำเร็จ ขอบคุณที่ให้บริการ!"}
+          </p>
+          
+          <button 
+            onClick={() => router.push("/rubber")}
+            className="w-full bg-white text-emerald-600 hover:bg-slate-50 py-4 text-base font-black rounded-xl uppercase shadow-xl transition-all active:scale-95 flex justify-center items-center gap-2 mb-4"
+          >
+            <Icons.Home size={20} /> กลับหน้าหลัก
+          </button>
+        </div>
+      );
+    }
+
+    // Navigation overlay — shown for delivering_to_store or delivering_to_customer
     return (
       <div className="flex flex-col min-h-dvh bg-primary text-white justify-center px-6 animate-fade-in text-center relative overflow-hidden">
         <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -mr-20 -mt-20" />
