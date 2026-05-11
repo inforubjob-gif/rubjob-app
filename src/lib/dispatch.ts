@@ -113,12 +113,15 @@ export async function broadcastToEligibleRubbers(
   deliveryFee: number,
   status: string = 'pending'
 ) {
-  // Get LINE tokens — Priority: dedicated rubber token → env customer token → DB customer token
+  // Get Rubber LINE OA token — MUST be separate from Customer OA
+  // Priority: env variable → DB setting (admin dashboard)
+  // ⚠️ Do NOT fallback to customer token — they are separate LINE OAs!
   let rubberToken = env.LINE_CHANNEL_ACCESS_TOKEN_RUBBER;
   if (!rubberToken) {
     try {
+      // Check DB with key 'line_token_rubber' (matches admin settings)
       const setting = await db.prepare(
-        "SELECT value FROM system_settings WHERE key = 'line_channel_access_token_rubber'"
+        "SELECT value FROM system_settings WHERE key = 'line_token_rubber'"
       ).first() as any;
       if (setting?.value) rubberToken = setting.value;
     } catch (e) {
@@ -126,20 +129,10 @@ export async function broadcastToEligibleRubbers(
     }
   }
   if (!rubberToken) {
-    // Fallback: use customer channel token (env first, then DB)
-    rubberToken = env.LINE_CHANNEL_ACCESS_TOKEN;
-    if (!rubberToken) {
-      try {
-        const setting = await db.prepare(
-          "SELECT value FROM system_settings WHERE key = 'line_channel_access_token_regular'"
-        ).first() as any;
-        if (setting?.value) rubberToken = setting.value;
-      } catch (e) {
-        console.error("[DISPATCH] Failed to read customer token from DB:", e);
-      }
-    }
+    console.warn("⚠️ [DISPATCH] Rubber LINE OA token is NOT configured! Rubber LINE push will be SKIPPED. Set 'LINE_CHANNEL_ACCESS_TOKEN_RUBBER' in env or 'line_token_rubber' in Admin Settings.");
+  } else {
+    console.log(`📡 [DISPATCH] Rubber token: SET (${rubberToken.length} chars)`);
   }
-  console.log(`📡 [DISPATCH] Token status: rubberToken=${rubberToken ? `SET(${rubberToken.length}chars)` : 'MISSING'}`);
 
   const { sendLinePush, rubberNewJobFlex } = await import("./line");
   const { createNotification } = await import("./notify-server");

@@ -23,13 +23,13 @@ export async function POST(req: Request) {
 
     let accessToken = env.LINE_CHANNEL_ACCESS_TOKEN;
     if (!accessToken) {
-      const setting = await db.prepare("SELECT value FROM system_settings WHERE key = 'line_channel_access_token_regular'").first() as any;
+      const setting = await db.prepare("SELECT value FROM system_settings WHERE key = 'line_token_regular'").first() as any;
       if (setting?.value) accessToken = setting.value;
     }
 
     let rubberToken = env.LINE_CHANNEL_ACCESS_TOKEN_RUBBER;
     if (!rubberToken) {
-      const setting = await db.prepare("SELECT value FROM system_settings WHERE key = 'line_channel_access_token_rubber'").first() as any;
+      const setting = await db.prepare("SELECT value FROM system_settings WHERE key = 'line_token_rubber'").first() as any;
       if (setting?.value) rubberToken = setting.value;
     }
 
@@ -45,7 +45,7 @@ export async function POST(req: Request) {
       const table = target === "rubbers" ? "rubber_users" : "stores";
       const res = await db.prepare(`SELECT lineUserId FROM ${table} WHERE lineUserId IS NOT NULL`).all();
       users = res.results;
-      activeToken = rubberToken || accessToken;
+      activeToken = rubberToken; // Use dedicated Rubber OA token (do NOT fallback to customer)
     } else {
       return NextResponse.json({ error: "Invalid target" }, { status: 400 });
     }

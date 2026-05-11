@@ -111,16 +111,15 @@ export async function POST(req: Request) {
 
     // Fallback to database settings if env vars are not set
     if (!customerToken) {
-      const setting = await db.prepare("SELECT value FROM system_settings WHERE key = 'line_channel_access_token_regular'").first() as any;
+      const setting = await db.prepare("SELECT value FROM system_settings WHERE key = 'line_token_regular'").first() as any;
       if (setting?.value) customerToken = setting.value;
     }
     if (!rubberToken) {
-      const setting = await db.prepare("SELECT value FROM system_settings WHERE key = 'line_channel_access_token_rubber'").first() as any;
+      const setting = await db.prepare("SELECT value FROM system_settings WHERE key = 'line_token_rubber'").first() as any;
       if (setting?.value) rubberToken = setting.value;
     }
 
-    // Ultimate fallback for rubber token is customer token (though not recommended for different OAs)
-    rubberToken = rubberToken || customerToken;
+    // ⚠️ Do NOT fallback rubber token to customer token — they are separate LINE OAs!
     
     if (rubberToken) {
       const { 

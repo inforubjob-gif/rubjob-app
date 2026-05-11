@@ -75,11 +75,11 @@ export async function POST(req: Request) {
           console.error("Customer in-app notification error:", e);
         }
 
-        // 3b. LINE Push to Customer (may fail if token not set)
+        // 3b. LINE Push to Customer via Customer OA
         let customerToken = env.LINE_CHANNEL_ACCESS_TOKEN;
         if (!customerToken) {
           const setting = await db.prepare(
-            "SELECT value FROM system_settings WHERE key = 'line_channel_access_token_regular'"
+            "SELECT value FROM system_settings WHERE key = 'line_token_regular'"
           ).first() as any;
           if (setting?.value) customerToken = setting.value;
         }
