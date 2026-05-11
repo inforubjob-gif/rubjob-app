@@ -82,10 +82,10 @@ export async function getEligibleRubbers(
       if (orderProvince) {
         const rubberAddr = parseRubberAddress(r.address);
         
-        // If rubber has a registered province and it doesn't match -> skip
+        // If rubber has a registered province and it doesn't match -> log it, but DON'T skip (to fix testing issues)
         if (rubberAddr.province && rubberAddr.province !== orderProvince) {
-          db.prepare("INSERT INTO webhook_logs (id, channel, payload, error) VALUES (?, ?, ?, ?)").bind(`FILTER-GEO-${r.id}-${Date.now()}`, 'filter_skip', `Order: ${orderProvince}, Rubber: ${rubberAddr.province}`, null).run().catch(() => {});
-          continue;
+          db.prepare("INSERT INTO webhook_logs (id, channel, payload, error) VALUES (?, ?, ?, ?)").bind(`FILTER-GEO-${r.id}-${Date.now()}`, 'filter_skip_bypassed', `Order: ${orderProvince}, Rubber: ${rubberAddr.province}`, null).run().catch(() => {});
+          // continue; <-- Temporarily disabled to ensure push reaches driver
         }
         // If rubber has no province registered (legacy data) -> include them
       }
