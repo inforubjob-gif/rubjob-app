@@ -861,6 +861,12 @@ export const en = {
     },
   },
   rubber: {
+    flow: {
+      pickupLeg: "Pickup Leg",
+      deliveryLeg: "Delivery Leg",
+      customerToStore: "Customer to Store",
+      storeToCustomer: "Store to Customer",
+    },
     hero: "Rubber",
     tasksToday: "Today's Deliveries",
     earnings: "Earnings",

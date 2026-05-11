@@ -761,6 +761,12 @@ export const th = {
       }
     },
     rubber: {
+      flow: {
+        pickupLeg: "เที่ยวรับผ้า",
+        deliveryLeg: "เที่ยวส่งผ้าคืน",
+        customerToStore: "รับจากลูกค้าไปส่งร้าน",
+        storeToCustomer: "รับจากร้านไปส่งลูกค้า",
+      },
       hero: "รับเบอร์",
       tasksToday: "รับงานวันนี้",
       earnings: "รายได้สะสม",
