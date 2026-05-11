@@ -33,5 +33,14 @@ export async function GET() {
     results.push({ key: "line_token_regular", action: "SYNCED from ENV", prefix: customerToken.substring(0, 10) });
   }
 
+  // Sync Help/Support token
+  const helpToken = (env as any).LINE_CHANNEL_ACCESS_TOKEN_HELP;
+  if (helpToken) {
+    await db.prepare(
+      "INSERT OR REPLACE INTO system_settings (key, value) VALUES ('line_token_help', ?)"
+    ).bind(helpToken).run();
+    results.push({ key: "line_token_help", action: "SYNCED from ENV", prefix: helpToken.substring(0, 10) });
+  }
+
   return NextResponse.json({ success: true, synced: results });
 }

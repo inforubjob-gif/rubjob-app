@@ -881,6 +881,30 @@ function SettingsContent() {
             />
            </div>
          </div>
+
+         <div className="space-y-4 pt-6 border-t border-slate-50">
+           <h3 className="text-xs font-black text-green-600 uppercase tracking-widest">LINE สำหรับช่วยเหลือ (Support/Help)</h3>
+           <div className="space-y-2">
+            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Channel Secret</label>
+            <input 
+             type="password" 
+             className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-6 py-4 text-sm text-slate-900 font-black focus:border-green-500 transition-all outline-none"
+             placeholder="ใส่ Channel Secret"
+             value={getSetting("line_secret_help")}
+             onChange={(e) => updateLocalSetting("line_secret_help", e.target.value)}
+            />
+           </div>
+           <div className="space-y-2">
+            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Channel Access Token</label>
+            <input 
+             type="password" 
+             className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-6 py-4 text-sm text-slate-900 font-black focus:border-green-500 transition-all outline-none"
+             placeholder="ใส่ Access Token"
+             value={getSetting("line_token_help")}
+             onChange={(e) => updateLocalSetting("line_token_help", e.target.value)}
+            />
+           </div>
+         </div>
         </div>
       </Card>
      </div>
