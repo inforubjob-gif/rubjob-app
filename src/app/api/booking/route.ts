@@ -121,9 +121,18 @@ export async function POST(req: Request) {
         totalPrice
       }, env).catch(err => console.error("Admin push error:", err));
 
-      // 3. Broadcast to Rubbers Group (Now using In-App Polling & Web Push - 100% Free)
-      // Since LINE Notify is discontinued, we rely on our built-in real-time update system
-      // Rubbers who are "Online" will get a Sound Alert and In-App notification within 15s.
+      // 3. Broadcast to Rubbers — send LINE Flex Message to eligible rubbers
+      try {
+        const { broadcastToEligibleRubbers } = await import("@/lib/dispatch");
+        await broadcastToEligibleRubbers(
+          db, env, orderId,
+          body.address,
+          deliveryFee,
+          "pending"
+        );
+      } catch (err) {
+        console.error("Rubber broadcast error:", err);
+      }
     }
 
     return NextResponse.json({ 
