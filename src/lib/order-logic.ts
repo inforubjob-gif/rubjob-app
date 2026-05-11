@@ -156,21 +156,21 @@ export async function transitionOrderStatus(
 
             // 2. LINE Push Notification
             if (rubberToken && rInfo.lineUserId) {
-              await sendLinePush(
-                rInfo.lineUserId,
-                [{
-                  type: "text",
-                  text: `💰 รายได้เข้าแล้ว!\n\nงาน #${orderId.slice(-6)} เสร็จสมบูรณ์\nคุณได้รับรายได้ (ส่วนของ${role}) จำนวน ฿${splitEarning.toFixed(0)}\n\nตรวจสอบกระเป๋าเงินของคุณได้ในแอปเลยครับ!`
-                }],
-                rubberToken
-              ).then(async (res) => {
-                 try { await db.prepare("INSERT INTO webhook_logs (id, channel, payload, error) VALUES (?, ?, ?, ?)").bind(`EARN-${orderId}-${driverId}`, 'earn_success', JSON.stringify(res), null).run(); } catch(e){}
-              }).catch(async (e) => {
-                 console.error(`Failed to notify earning to rubber ${rInfo.lineUserId}:`, e);
-                 try { await db.prepare("INSERT INTO webhook_logs (id, channel, payload, error) VALUES (?, ?, ?, ?)").bind(`EARN-${orderId}-${driverId}`, 'earn_fail', rInfo.lineUserId, e?.message || e).run(); } catch(err){}
-              });
-            } else {
-              try { await db.prepare("INSERT INTO webhook_logs (id, channel, payload, error) VALUES (?, ?, ?, ?)").bind(`EARN-${orderId}-${driverId}`, 'earn_skip', JSON.stringify({ token: !!rubberToken, lineUserId: rInfo.lineUserId }), null).run(); } catch(e){}
+              try {
+                const res = await sendLinePush(
+                  rInfo.lineUserId,
+                  [{
+                    type: "text",
+                    text: `💰 รายได้เข้าแล้ว!\n\nงาน #${orderId.slice(-6)} เสร็จสมบูรณ์\nคุณได้รับรายได้ (ส่วนของ${role}) จำนวน ฿${splitEarning.toFixed(0)}\n\nตรวจสอบกระเป๋าเงินของคุณได้ในแอปเลยครับ!`
+                  }],
+                  rubberToken
+                );
+                console.log(`  ✅ [EARN] LINE push → ${rInfo.lineUserId}`, JSON.stringify(res));
+                db.prepare("INSERT INTO webhook_logs (id, channel, payload, error) VALUES (?, ?, ?, ?)").bind(`EARN-${orderId}-${driverId}-${Date.now()}`, 'earn_success', JSON.stringify(res), null).run().catch(() => {});
+              } catch (e: any) {
+                console.error(`Failed to notify earning to rubber ${rInfo.lineUserId}:`, e);
+                db.prepare("INSERT INTO webhook_logs (id, channel, payload, error) VALUES (?, ?, ?, ?)").bind(`EARN-${orderId}-${driverId}-${Date.now()}`, 'earn_fail', rInfo.lineUserId || '', e?.message || String(e)).run().catch(() => {});
+              }
             }
           };
 
