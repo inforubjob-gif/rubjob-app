@@ -1,12 +1,12 @@
 import { getRequestContext } from "@cloudflare/next-on-pages";
 import { NextResponse } from "next/server";
-import { requireAdmin } from "@/lib/auth-server";
+import { getAdminSession } from "@/lib/auth-server";
 
 export const runtime = "edge";
 
 export async function DELETE(req: Request, { params }: { params: { orderId: string } }) {
   try {
-    const admin = await requireAdmin(req);
+    const admin = await getAdminSession();
     if (!admin) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const db = getRequestContext().env.DB;

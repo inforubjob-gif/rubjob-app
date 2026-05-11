@@ -1,14 +1,15 @@
 import { getRequestContext } from "@cloudflare/next-on-pages";
 import { NextResponse } from "next/server";
-import { requireAdmin } from "@/lib/auth-server";
-import { sendLinePush } from "@/lib/line";
+import { getAdminSession } from "@/lib/auth-server";
 
 export const runtime = "edge";
 
 export async function POST(req: Request) {
   try {
-    const admin = await requireAdmin(req);
-    if (!admin) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const admin = await getAdminSession();
+    if (!admin) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
 
     const body = await req.json() as { message: string, target: string };
     const { message, target } = body;
