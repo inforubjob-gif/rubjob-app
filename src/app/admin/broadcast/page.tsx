@@ -13,11 +13,12 @@ export default function BroadcastPage() {
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!message.trim()) {
-      showToast("Please enter a message to broadcast", "error");
+      showToast("กรุณาพิมพ์ข้อความที่ต้องการส่ง", "error");
       return;
     }
 
-    if (!confirm(`Are you sure you want to broadcast this message to ${target.replace("_", " ")}?`)) {
+    const targetLabel = target === "all_users" ? "ลูกค้าทั้งหมด" : target === "rubbers" ? "Rubber ทั้งหมด" : "ร้านค้าทั้งหมด";
+    if (!confirm(`คุณต้องการส่งข้อความนี้ไปยัง "${targetLabel}" ใช่หรือไม่?`)) {
       return;
     }
 
@@ -30,9 +31,9 @@ export default function BroadcastPage() {
       });
       
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to broadcast");
+      if (!res.ok) throw new Error(data.error || "ส่งข้อความไม่สำเร็จ");
       
-      showToast(`Broadcast sent successfully! (Sent: ${data.sent}, Failed: ${data.failed})`, "success");
+      showToast(`ส่งข้อความสำเร็จ! (ส่งได้: ${data.sent}, ล้มเหลว: ${data.failed})`, "success");
       setMessage("");
     } catch (err: any) {
       showToast(err.message, "error");
@@ -48,22 +49,22 @@ export default function BroadcastPage() {
           <div className="p-2.5 bg-blue-500/10 text-blue-600 rounded-xl">
             <Icons.Bell size={24} />
           </div>
-          Broadcast Center
+          ศูนย์ประกาศข่าวสาร
         </h1>
         <p className="text-slate-500 mt-2 text-sm font-medium">
-          Send announcements, promotions, or alerts to users via LINE Push Notification.
+          ส่งประกาศ โปรโมชั่น หรือการแจ้งเตือนไปยังผู้ใช้งานผ่าน LINE Push Notification
         </p>
       </div>
 
       <div className="bg-white rounded-3xl border border-slate-100 shadow-xl shadow-slate-200/40 p-8">
         <form onSubmit={handleSend} className="space-y-6">
           <div className="space-y-3">
-            <label className="text-sm font-bold text-slate-700">Select Target Audience</label>
+            <label className="text-sm font-bold text-slate-700">เลือกกลุ่มเป้าหมาย</label>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {[
-                { id: "all_users", label: "All Customers", icon: <Icons.Users size={20} /> },
-                { id: "rubbers", label: "All Rubbers (Drivers)", icon: <Icons.Car size={20} /> },
-                { id: "stores", label: "All Store Owners", icon: <Icons.Store size={20} /> }
+                { id: "all_users", label: "ลูกค้าทั้งหมด", icon: <Icons.Users size={20} /> },
+                { id: "rubbers", label: "Rubber ทั้งหมด", icon: <Icons.Car size={20} /> },
+                { id: "stores", label: "ร้านค้าทั้งหมด", icon: <Icons.Store size={20} /> }
               ].map(t => (
                 <label 
                   key={t.id}
@@ -89,16 +90,16 @@ export default function BroadcastPage() {
           </div>
 
           <div className="space-y-3">
-            <label className="text-sm font-bold text-slate-700">Message Content</label>
+            <label className="text-sm font-bold text-slate-700">เนื้อหาข้อความ</label>
             <textarea
               value={message}
               onChange={(e) => setMessage(e.target.value)}
-              placeholder="Type your message here... You can use emojis 😊"
+              placeholder="พิมพ์ข้อความที่ต้องการส่งที่นี่... สามารถใช้อีโมจิได้ 😊"
               className="w-full h-40 p-4 border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary resize-none text-slate-700"
               required
             />
             <p className="text-xs text-slate-400 font-medium">
-              Note: Messages will be sent as standard text messages via LINE Official Account. Ensure your LINE Messaging API limit allows mass sending.
+              หมายเหตุ: ข้อความจะถูกส่งเป็นข้อความมาตรฐานผ่าน LINE Official Account กรุณาตรวจสอบโควต้าการส่งข้อความ LINE Messaging API ของคุณ
             </p>
           </div>
 
@@ -111,12 +112,12 @@ export default function BroadcastPage() {
               {loading ? (
                 <>
                   <Icons.Loading size={20} />
-                  Sending Broadcast...
+                  กำลังส่งข้อความ...
                 </>
               ) : (
                 <>
                   <Icons.Bell size={20} />
-                  Send Broadcast
+                  ส่งข้อความประกาศ
                 </>
               )}
             </button>
