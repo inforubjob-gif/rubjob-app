@@ -459,7 +459,7 @@ export default function RubberOrderDetailPage() {
                   </p>
                   <div className="grid grid-cols-2 gap-3">
                      <div className="space-y-2">
-                        <p className="text-[9px] font-black text-primary uppercase">{t("rubber.orderDetail.photoFromCustomer") || "รูปตอนรับจากลูกค้า"}</p>
+                        <p className="text-[9px] font-black text-primary uppercase">รูปตอนรับจากลูกค้า</p>
                         <div className="aspect-square rounded-xl bg-slate-800 overflow-hidden border border-white/10">
                            {order?.serviceDetails && (() => { try { const d = JSON.parse(order.serviceDetails); return d?.proofPhotos?.delivering_to_store || d?.proofPhotos?.picking_up || order.evidenceBeforeUrl; } catch { return order.evidenceBeforeUrl; } })() ? (
                              <img src={(() => { try { const d = JSON.parse(order.serviceDetails); return d?.proofPhotos?.delivering_to_store || d?.proofPhotos?.picking_up || order.evidenceBeforeUrl; } catch { return order.evidenceBeforeUrl; } })()} className="w-full h-full object-cover" alt="Pickup" />
@@ -469,7 +469,7 @@ export default function RubberOrderDetailPage() {
                         </div>
                      </div>
                      <div className="space-y-2">
-                        <p className="text-[9px] font-black text-primary uppercase">{t("rubber.orderDetail.photoAtStore") || "รูปตอนส่งที่ร้าน"}</p>
+                        <p className="text-[9px] font-black text-primary uppercase">รูปตอนส่งที่ร้าน</p>
                         <div className="aspect-square rounded-xl bg-slate-800 overflow-hidden border border-white/10">
                            {order?.serviceDetails && (() => { try { const d = JSON.parse(order.serviceDetails); return d?.proofPhotos?.at_shop || order.dropoffShopPhotoUrl; } catch { return order.dropoffShopPhotoUrl; } })() ? (
                              <img src={(() => { try { const d = JSON.parse(order.serviceDetails); return d?.proofPhotos?.at_shop || order.dropoffShopPhotoUrl; } catch { return order.dropoffShopPhotoUrl; } })()} className="w-full h-full object-cover" alt="At Shop" />
@@ -526,11 +526,11 @@ export default function RubberOrderDetailPage() {
                 isLoading={isUpdating}
                 className="bg-primary text-white hover:bg-primary-dark shadow-2xl shadow-primary/30 py-6 text-base font-black rounded-xl uppercase"
              >
-                {status === "picking_up" ? t("rubber.orderDetail.btnPickup") : 
-                 status === "delivering_to_store" ? t("rubber.orderDetail.btnHandover") : 
-                 status === "at_shop" ? t("rubber.orderDetail.btnHandover") : 
-                 status === "ready_for_pickup" ? t("staff.receiveFromDriver") : 
-                 status === "delivering_to_customer" ? t("rubber.orderDetail.btnFinish") : t("rubber.orderDetail.btnUpdateTask")}
+                {status === "picking_up" ? "ยืนยันการรับผ้า" : 
+                 status === "delivering_to_store" ? "ส่งผ้าที่ร้านซัก" : 
+                 status === "at_shop" ? "ส่งผ้าที่ร้านซัก" : 
+                 status === "ready_for_pickup" ? "รับผ้าจากร้าน" : 
+                 status === "delivering_to_customer" ? "ส่งผ้าคืนลูกค้า" : "อัปเดตสถานะ"}
              </Button>
            )}
         </div>
