@@ -696,7 +696,7 @@ function AvailableDeliveries({ t, router, jobs, onAccept, onViewDetails }: { t: 
                   {(job.status === 'pending' || job.status === 'searching_driver') ? t("rubber.flow.customerToStore") : t("rubber.flow.storeToCustomer")}
                 </h3>
                  <div className="flex items-center gap-3 text-[11px] text-slate-500 font-medium">
-                   <span className="flex items-center gap-1"><Icons.MapPin size={12} className="text-primary" /> {job.distanceKm || "0.5"} {t("rubber.nearby")}</span>
+                   <span className="flex items-center gap-1"><Icons.MapPin size={12} className="text-primary" /> {Number(job.distanceKm || 0.5).toFixed(1)} {t("rubber.nearby")}</span>
                    <span className="flex items-center gap-1"><Icons.ArrowRight size={12} className="text-primary" /> {t("rubber.earnAmount")} ฿{job.rubberEarn}</span>
                  </div>
               </div>
