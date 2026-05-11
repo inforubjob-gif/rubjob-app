@@ -56,3 +56,23 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: err.message || "Internal Server Error" }, { status: 500 });
   }
 }
+
+export async function PATCH(req: Request) {
+  try {
+    const rubberId = await getRubberSession();
+    if (!rubberId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+    const payload = await req.json() as any;
+    const db = getRequestContext().env.DB;
+    if (!db) return NextResponse.json({ error: "DB not found" }, { status: 500 });
+
+    if (payload.action === 'unlink_line') {
+      await db.prepare("UPDATE rubber_users SET lineUserId = NULL WHERE id = ?").bind(rubberId).run();
+      return NextResponse.json({ success: true });
+    }
+
+    return NextResponse.json({ error: "Invalid action" }, { status: 400 });
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+}

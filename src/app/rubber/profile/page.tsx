@@ -239,7 +239,7 @@ export default function RubberProfilePage() {
                       </p>
                   </div>
                </div>
-               {!rubberData?.lineUserId && (
+               {!rubberData?.lineUserId ? (
                  <button 
                     onClick={async () => {
                       try {
@@ -257,6 +257,30 @@ export default function RubberProfilePage() {
                     className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase transition-all bg-primary text-white shadow-lg shadow-primary/20`}
                  >
                     Connect
+                 </button>
+               ) : (
+                 <button 
+                    onClick={async () => {
+                      if (!confirm("คุณต้องการยกเลิกการเชื่อมต่อ LINE ใช่หรือไม่?")) return;
+                      try {
+                        if (!rubberSession?.id) return;
+                        // Call an API to remove lineUserId. 
+                        // Let's use the preferences API or create a quick inline fetch to remove it.
+                        await fetch(`/api/rubber/me`, {
+                          method: 'PATCH',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({ rubberId: rubberSession.id, action: 'unlink_line' })
+                        });
+                        alert("ยกเลิกการเชื่อมต่อ LINE สำเร็จ กรุณารีเฟรชหน้าเว็บ");
+                        window.location.reload();
+                      } catch (e) {
+                        console.error("LINE unlink error:", e);
+                        alert("ไม่สามารถยกเลิกการเชื่อมต่อได้");
+                      }
+                    }}
+                    className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase transition-all bg-red-500 text-white shadow-lg shadow-red-500/20`}
+                 >
+                    Disconnect
                  </button>
                )}
              </div>
