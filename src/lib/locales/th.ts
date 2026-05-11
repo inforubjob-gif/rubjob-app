@@ -433,6 +433,8 @@ export const th = {
       itemCount: "รายการ",
       orderNotFound: "ไม่พบออเดอร์",
       orderNotFoundSub: "ออเดอร์นี้อาจถูกลบไปแล้ว",
+      orderNo: "เลขที่ออเดอร์",
+      reportIssue: "แจ้งปัญหา",
       needHelp: "ต้องการความช่วยเหลือ?",
       contactSupport: "ติดต่อฝ่ายช่วยเหลือผ่าน LINE",
       lineOnly: "ฟีเจอร์นี้ใช้ได้เฉพาะในแอป LINE เท่านั้น",
@@ -856,6 +858,9 @@ export const th = {
         pickupStore: "ถ่ายรูปขณะรับผ้าคืนจากร้าน",
         deliveryUser: "ถ่ายรูปขณะส่งผ้าให้ลูกค้า",
       },
+      visualIdentification: "ดูรูปเพื่อระบุตะกร้าผ้า",
+      photoGuide: "ใช้รูปเหล่านี้เพื่อระบุตะกร้า/ถุงผ้าที่ถูกต้องที่ร้านซัก",
+      availableRequests: "จุดหมายถัดไป",
       profile: {
         workStatus: "สถานะการทำงาน",
         receivingJobs: "กำลังรับงาน",
@@ -1005,6 +1010,8 @@ export const th = {
       }
     },
     staff: {
+      receiveFromDriver: "รับผ้าจากคนขับ",
+      processing: "ร้านกำลังดำเนินการ",
       wallet: {
         availableBalance: "ยอดเงินคงเหลือ",
         withdraw: "ถอนเงิน",
