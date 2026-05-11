@@ -50,6 +50,16 @@ export async function POST(req: Request) {
       await db.prepare("ALTER TABLE orders ADD COLUMN providerId TEXT").run();
     } catch(e) {}
 
+    // Self-healing: ensure duvet_washing exists in services
+    if (serviceId === 'duvet_washing') {
+      try {
+        await db.prepare(`
+          INSERT OR IGNORE INTO services (id, name, category, description, basePrice, unit, icon, estimatedDays, isActive, gpPercent)
+          VALUES ('duvet_washing', 'ซักผ้านวม', 'laundry', 'บริการซักผ้านวม', 199, 'piece', 'duvet_washing', 2, 1, 15)
+        `).run();
+      } catch(e) {}
+    }
+
     // Insert Order
     await db.prepare(`
       INSERT INTO orders (
