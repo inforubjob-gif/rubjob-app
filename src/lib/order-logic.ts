@@ -155,6 +155,29 @@ export async function transitionOrderStatus(
     }
   }
 
+  // 5. Notify Rubber
+  const rubberToken = env.LINE_CHANNEL_ACCESS_TOKEN_RUBBER;
+  if (rubberToken) {
+    const rubberId = (actualStatus === "ready_for_pickup" || actualStatus === "delivering_to_customer" || actualStatus === "completed") 
+      ? order.deliveryDriverId 
+      : order.pickupDriverId;
+    
+    if (rubberId) {
+      const msgs = {
+        picking_up: "คุณได้รับงานเรียบร้อย กรุณาไปรับผ้าที่ลูกค้า",
+        delivering_to_store: "คุณรับผ้าเรียบร้อยแล้ว กำลังนำส่งไปที่ร้านซัก",
+        at_shop: "คุณได้ส่งผ้าถึงร้านซักเรียบร้อยแล้ว (กำลังซัก)",
+        ready_for_pickup: "ผ้าซักเสร็จแล้ว กรุณาไปรับที่ร้านซักเพื่อนำส่งลูกค้า",
+        delivering_to_customer: "รับผ้าจากร้านซักแล้ว กำลังนำส่งคืนลูกค้า",
+        completed: "ลูกค้ารับผ้าเรียบร้อย งานเสร็จสมบูรณ์ ขอบคุณครับ!"
+      } as Record<string, string>;
+
+      const msgTxt = msgs[actualStatus] || `สถานะงานอัปเดตเป็น: ${actualStatus}`;
+      await sendLinePush(rubberId, [{ type: "text", text: `🚚 อัปเดตงาน: ${orderId}\n\n${msgTxt}` }], rubberToken)
+        .catch(e => console.error("Failed to notify rubber:", e));
+    }
+  }
+
   return { success: true, nextStatus: actualStatus };
 }
 

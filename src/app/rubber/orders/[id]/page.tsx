@@ -34,6 +34,7 @@ export default function RubberOrderDetailPage() {
   const [photo, setPhoto] = useState<string | null>(null);
   const [isUpdating, setIsUpdating] = useState(false);
   const [isIssueModalOpen, setIsIssueModalOpen] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
   const [rubberCoords, setRubberCoords] = useState<{lat: number, lng: number} | null>(null);
 
   useEffect(() => {
@@ -127,6 +128,12 @@ export default function RubberOrderDetailPage() {
       setPhoto(null);
       setAutoSubmitAfterPhoto(false);
       
+      // Show success overlay for intermediate transitions to guide the driver
+      if (nextStatus === "delivering_to_store" || nextStatus === "delivering_to_customer") {
+        setShowSuccess(true);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+
       // Auto-redirection for states that end the current rubber leg
       if (nextStatus === "at_shop" || nextStatus === "completed") {
         setTimeout(() => {
@@ -179,6 +186,46 @@ export default function RubberOrderDetailPage() {
         <Button onClick={() => router.push("/rubber")} className="w-full">
           กลับหน้าหลัก
         </Button>
+      </div>
+    );
+  }
+
+  if (showSuccess) {
+    const isToStore = status === "delivering_to_store";
+    const destName = isToStore ? order?.storeName || t("admin.nav.stores") : order?.userName || t("admin.nav.users");
+    const destLabel = isToStore ? t("rubber.orderDetail.deliverTo") || "นำส่งที่ร้านซัก" : t("rubber.orderDetail.deliverTo") || "นำส่งที่ลูกค้า";
+    return (
+      <div className="flex flex-col min-h-dvh bg-primary text-white justify-center px-6 animate-fade-in text-center relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -mr-20 -mt-20" />
+        
+        <div className="w-24 h-24 bg-white text-primary rounded-full flex items-center justify-center mx-auto mb-6 shadow-2xl shadow-black/20 animate-bounce">
+          <Icons.Check size={48} strokeWidth={3} />
+        </div>
+        
+        <h2 className="text-3xl font-black mb-2 tracking-tight">บันทึกรูปภาพสำเร็จ!</h2>
+        <p className="text-white/80 font-bold mb-8 text-sm">อัปเดตสถานะงานเรียบร้อยแล้ว</p>
+        
+        <div className="bg-white/10 backdrop-blur-md rounded-[2rem] p-6 mb-8 border border-white/20">
+          <p className="text-[10px] font-black text-white/50 uppercase tracking-widest mb-1">{destLabel}</p>
+          <p className="text-xl font-black mb-4">{destName}</p>
+          
+          <button 
+            onClick={() => {
+              window.open(`https://www.google.com/maps/dir/?api=1&destination=${activeDest.pos.lat},${activeDest.pos.lng}`, "_blank");
+              setShowSuccess(false);
+            }}
+            className="w-full bg-white text-primary hover:bg-slate-50 py-4 text-base font-black rounded-xl uppercase shadow-xl transition-all active:scale-95 flex justify-center items-center gap-2"
+          >
+            <Icons.MapPin size={20} /> นำทางไปที่ใหม่
+          </button>
+        </div>
+        
+        <button 
+          onClick={() => setShowSuccess(false)}
+          className="text-white/60 text-xs font-bold uppercase underline underline-offset-4 hover:text-white transition-colors"
+        >
+          กลับไปดูรายละเอียดงาน
+        </button>
       </div>
     );
   }

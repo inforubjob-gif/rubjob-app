@@ -47,7 +47,8 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
       db, 
       id, 
       status, 
-      getRequestContext().env
+      getRequestContext().env,
+      { evidenceUrl: photo }
     );
 
     return NextResponse.json(result);
