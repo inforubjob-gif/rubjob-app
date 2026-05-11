@@ -53,7 +53,7 @@ export async function GET(req: Request) {
       FROM orders o
       JOIN services s ON o.serviceId = s.id
       JOIN stores st ON o.storeId = st.id
-      WHERE (o.status = 'pending' AND o.pickupDriverId IS NULL AND (o.paymentMethod = 'cash' OR o.paymentStatus = 'paid'))
+      WHERE (o.status IN ('pending', 'searching_driver') AND o.pickupDriverId IS NULL AND (o.paymentMethod = 'cash' OR o.paymentStatus = 'paid'))
          OR (o.status = 'ready_for_pickup' AND o.deliveryDriverId IS NULL)
     `).all();
 
@@ -122,10 +122,10 @@ export async function PUT(req: Request) {
     let assignmentResult;
     let nextStatus: any = null;
 
-    if (order.status === 'pending' && !order.pickupDriverId) {
+    if ((order.status === 'pending' || order.status === 'searching_driver') && !order.pickupDriverId) {
       // Leg 1: Pickup
       assignmentResult = await db.prepare(`
-        UPDATE orders SET pickupDriverId = ? WHERE id = ? AND status = 'pending' AND pickupDriverId IS NULL
+        UPDATE orders SET pickupDriverId = ? WHERE id = ? AND status IN ('pending', 'searching_driver') AND pickupDriverId IS NULL
       `).bind(rubberId, orderId).run();
       nextStatus = "picking_up";
     } else if (order.status === 'ready_for_pickup' && !order.deliveryDriverId) {
