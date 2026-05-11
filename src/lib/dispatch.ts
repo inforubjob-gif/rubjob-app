@@ -72,8 +72,8 @@ export async function getEligibleRubbers(
     try {
       const prefs = JSON.parse(r.preferences || "{}");
       
-      // Must be online
-      if (prefs.workStatus !== true) continue;
+      // Must be online (default to true if undefined)
+      if (prefs.workStatus === false) continue;
       
       // Geo-filter: check province match
       if (orderProvince) {
