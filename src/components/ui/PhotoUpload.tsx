@@ -37,11 +37,16 @@ const PhotoUpload = forwardRef<PhotoUploadHandle, PhotoUploadProps>(({ onPhotoCa
           let width = img.width;
           let height = img.height;
           
-          // Resize if too large
-          const MAX_WIDTH = 1000;
+          // Resize aggressively to keep base64 small (4 photos must fit in 1 DB field)
+          const MAX_WIDTH = 600;
+          const MAX_HEIGHT = 600;
           if (width > MAX_WIDTH) {
             height *= MAX_WIDTH / width;
             width = MAX_WIDTH;
+          }
+          if (height > MAX_HEIGHT) {
+            width *= MAX_HEIGHT / height;
+            height = MAX_HEIGHT;
           }
           
           canvas.width = width;
@@ -49,8 +54,8 @@ const PhotoUpload = forwardRef<PhotoUploadHandle, PhotoUploadProps>(({ onPhotoCa
           const ctx = canvas.getContext("2d");
           ctx?.drawImage(img, 0, 0, width, height);
           
-          // Output as compressed base64
-          const compressedBase64 = canvas.toDataURL("image/jpeg", 0.7);
+          // Output as heavily compressed base64 (quality 0.4)
+          const compressedBase64 = canvas.toDataURL("image/jpeg", 0.4);
           setPreview(compressedBase64);
           onPhotoCapture(compressedBase64);
         };
