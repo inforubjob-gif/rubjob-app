@@ -73,7 +73,10 @@ export async function getEligibleRubbers(
       const prefs = JSON.parse(r.preferences || "{}");
       
       // Must be online (default to true if undefined)
-      if (prefs.workStatus === false) continue;
+      if (prefs.workStatus === false) {
+         try { await db.prepare("INSERT INTO webhook_logs (id, channel, payload, error) VALUES (?, ?, ?, ?)").bind(`FILTER-WORK-${r.id}-${Date.now()}`, 'filter_skip', 'workStatus is false', null).run(); } catch(e){}
+         continue;
+      }
       
       // Geo-filter: check province match
       if (orderProvince) {
@@ -81,6 +84,7 @@ export async function getEligibleRubbers(
         
         // If rubber has a registered province and it doesn't match -> skip
         if (rubberAddr.province && rubberAddr.province !== orderProvince) {
+          try { await db.prepare("INSERT INTO webhook_logs (id, channel, payload, error) VALUES (?, ?, ?, ?)").bind(`FILTER-GEO-${r.id}-${Date.now()}`, 'filter_skip', `Order: ${orderProvince}, Rubber: ${rubberAddr.province}`, null).run(); } catch(e){}
           continue;
         }
         // If rubber has no province registered (legacy data) -> include them
@@ -171,12 +175,18 @@ export async function broadcastToEligibleRubbers(
         r.lineUserId,
         [rubberNewJobFlex(orderId, status, legEarn)],
         rubberToken
-      ).catch((err: any) => {
+      ).then(async (res) => {
+        try { await db.prepare("INSERT INTO webhook_logs (id, channel, payload, error) VALUES (?, ?, ?, ?)").bind(`DISPATCH-${orderId}-${r.id}`, 'dispatch_success', JSON.stringify(res), null).run(); } catch(e){}
+      }).catch(async (err: any) => {
         console.error(`  ❌ [DISPATCH] LINE push failed for ${r.lineUserId}:`, err?.message || err);
+        try { await db.prepare("INSERT INTO webhook_logs (id, channel, payload, error) VALUES (?, ?, ?, ?)").bind(`DISPATCH-${orderId}-${r.id}`, 'dispatch_fail', r.lineUserId, err?.message || err).run(); } catch(e){}
       });
+    } else {
+      try { await db.prepare("INSERT INTO webhook_logs (id, channel, payload, error) VALUES (?, ?, ?, ?)").bind(`DISPATCH-${orderId}-${r.id}`, 'dispatch_skip_line', JSON.stringify({ token: !!rubberToken, lineUserId: r.lineUserId }), null).run(); } catch(e){}
     }
   }
   
+  try { await db.prepare("INSERT INTO webhook_logs (id, channel, payload, error) VALUES (?, ?, ?, ?)").bind(`DISPATCH-END-${orderId}`, 'dispatch_summary', `Found ${eligibleRubbers.length} eligible rubbers`, null).run(); } catch(e){}
   console.log(`📡 [DISPATCH] Order ${orderId}: Broadcast complete.`);
 }
 
