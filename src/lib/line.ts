@@ -13,29 +13,24 @@ export async function sendLinePush(userId: string, messages: LineMessage[], acce
     return null;
   }
 
-  try {
-    const response = await fetch("https://api.line.me/v2/bot/message/push", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${accessToken}`,
-      },
-      body: JSON.stringify({
-        to: userId,
-        messages,
-      }),
-    });
+  const response = await fetch("https://api.line.me/v2/bot/message/push", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${accessToken}`,
+    },
+    body: JSON.stringify({
+      to: userId,
+      messages,
+    }),
+  });
 
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(`LINE API error: ${JSON.stringify(error)}`);
-    }
-
-    return await response.json() as LinePushResponse;
-  } catch (error) {
-    console.error("Failed to send LINE push notification:", error);
-    return null;
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(`LINE API error: ${JSON.stringify(error)}`);
   }
+
+  return await response.json() as LinePushResponse;
 }
 
 /**
