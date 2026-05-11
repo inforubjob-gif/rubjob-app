@@ -265,6 +265,17 @@ export async function ensureSchema(db: D1Database) {
      "ALTER TABLE orders ADD COLUMN storeReview TEXT",
      "ALTER TABLE orders ADD COLUMN driverRating INTEGER",
      "ALTER TABLE orders ADD COLUMN driverReview TEXT",
+     "ALTER TABLE orders ADD COLUMN evidenceBeforeUrl TEXT",
+     "ALTER TABLE orders ADD COLUMN evidenceAfterUrl TEXT",
+     "ALTER TABLE orders ADD COLUMN serviceDetails TEXT",
+     "ALTER TABLE orders ADD COLUMN cancellationFee REAL DEFAULT 0",
+     "ALTER TABLE orders ADD COLUMN surgeMultiplier REAL DEFAULT 1.0",
+     "ALTER TABLE orders ADD COLUMN staffNote TEXT",
+     "ALTER TABLE orders ADD COLUMN rating INTEGER",
+     "ALTER TABLE orders ADD COLUMN review_text TEXT",
+     "ALTER TABLE orders ADD COLUMN providerId TEXT",
+     "ALTER TABLE orders ADD COLUMN paymentStatus TEXT DEFAULT 'pending'",
+     "ALTER TABLE orders ADD COLUMN orderType TEXT DEFAULT 'logistics'",
   ];
 
   for (const migration of migrations) {
