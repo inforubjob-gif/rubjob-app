@@ -51,7 +51,21 @@ export async function POST(req: Request) {
       metadata: { orderId },
     });
 
-    // 2. Update Order in D1 with PaymentIntent ID
+    // 2. Self-healing: Fix any empty strings in foreign key columns to avoid SQLITE_CONSTRAINT during UPDATE
+    try {
+      await db.prepare(`
+        UPDATE orders 
+        SET storeId = NULLIF(storeId, ''),
+            pickupDriverId = NULLIF(pickupDriverId, ''),
+            deliveryDriverId = NULLIF(deliveryDriverId, ''),
+            providerId = NULLIF(providerId, '')
+        WHERE id = ? AND (storeId = '' OR pickupDriverId = '' OR deliveryDriverId = '' OR providerId = '')
+      `).bind(orderId).run();
+    } catch (e) {
+      console.warn("Auto-healing foreign keys failed", e);
+    }
+
+    // 3. Update Order in D1 with PaymentIntent ID
     await db.prepare(`
       UPDATE orders 
       SET paymentStatus = 'pending', 

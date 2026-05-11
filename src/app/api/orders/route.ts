@@ -93,7 +93,7 @@ export async function POST(req: Request) {
     `).bind(
       orderId, 
       userId, 
-      storeId, 
+      storeId || null, 
       serviceId, 
       laundryFee || 0, 
       deliveryFee || 0, 
