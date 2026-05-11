@@ -573,7 +573,7 @@ export default function RubberDashboard() {
                     <div className="flex-1">
                        <p className="text-[10px] font-black text-slate-300 uppercase mb-1">{t("rubber.delivery")}</p>
                        <p className="text-xs font-black text-slate-900 leading-relaxed">{selectedJob.customerName || selectedJob.customer || t("rubber.unknownCustomer")}</p>
-                       <p className="text-xs text-slate-400 font-bold mt-1">{selectedJob.address || t("rubber.orderDetail.noAddress")}</p>
+                       <p className="text-xs text-slate-400 font-bold mt-1">{typeof selectedJob.address === 'string' ? selectedJob.address : (selectedJob.address?.details || selectedJob.address?.label || t("rubber.orderDetail.noAddress"))}</p>
                     </div>
                  </div>
                </div>
