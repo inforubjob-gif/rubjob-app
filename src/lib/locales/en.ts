@@ -502,9 +502,11 @@ export const en = {
     confirmCancel: "Are you sure you want to cancel this order?",
     cancelSuccess: "Order cancelled successfully",
     status: {
+      searching_driver: "Finding Driver",
       picking_up: "Picking Up",
       delivering_to_store: "Sending to Store",
       washing: "Store Processing",
+      ready_for_pickup: "Ready for Delivery",
       delivering_to_customer: "Returning to You",
       completed: "Completed",
       cancelled: "Cancelled",

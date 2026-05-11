@@ -440,9 +440,11 @@ export const th = {
       confirmCancel: "คุณแน่ใจหรือไม่ที่จะยกเลิกออเดอร์นี้?",
       cancelSuccess: "ยกเลิกออเดอร์สำเร็จ",
       status: {
+        searching_driver: "กำลังหาคนขับ",
         picking_up: "กำลังเข้าไปรับผ้า",
         delivering_to_store: "กำลังนำส่งร้านซัก",
         washing: "ร้านกำลังซัก",
+        ready_for_pickup: "ซักเสร็จแล้ว รอจัดส่งคืน",
         delivering_to_customer: "กำลังนำผ้าส่งคืน",
         completed: "สำเร็จ",
         cancelled: "ยกเลิกแล้ว",
