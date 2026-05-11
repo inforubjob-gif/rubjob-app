@@ -336,18 +336,18 @@ export default function AdminOrderDetailPage() {
       </Card>
      )}
 
-     {/* ── Evidence Photos ── */}
-     <Card className="p-6">
-      <h2 className="text-xs font-black text-slate-900 uppercase tracking-widest mb-5 flex items-center gap-2">
-       <Icons.Shield className="text-primary" size={16} /> หลักฐานรูปภาพ (Evidence Photos)
-      </h2>
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-       {[
-        { label: "รับผ้า (Pickup)", url: order.pickupPhotoUrl },
-        { label: "ส่งร้านซัก (Dropoff)", url: order.dropoffShopPhotoUrl },
-        { label: "ก่อนบริการ (Before)", url: order.evidenceBeforeUrl },
-        { label: "หลังบริการ (After)", url: order.evidenceAfterUrl },
-       ].map((photo) => (
+      {/* ── Evidence Photos ── */}
+      <Card className="p-6">
+       <h2 className="text-xs font-black text-slate-900 uppercase tracking-widest mb-5 flex items-center gap-2">
+        <Icons.Shield className="text-primary" size={16} /> หลักฐานรูปภาพ (Evidence Photos)
+       </h2>
+       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        {[
+         { label: "รับผ้าจากลูกค้า (Pickup)", url: order?.serviceDetails ? (() => { try { const d = JSON.parse(order.serviceDetails); return d?.proofPhotos?.delivering_to_store || d?.proofPhotos?.picking_up || order.evidenceBeforeUrl; } catch { return order.evidenceBeforeUrl; } })() : order?.evidenceBeforeUrl },
+         { label: "ส่งที่ร้านซัก (Dropoff)", url: order?.serviceDetails ? (() => { try { const d = JSON.parse(order.serviceDetails); return d?.proofPhotos?.at_shop || order.dropoffShopPhotoUrl; } catch { return order.dropoffShopPhotoUrl; } })() : order?.dropoffShopPhotoUrl },
+         { label: "เริ่มซัก (Before Wash)", url: order.evidenceBeforeUrl },
+         { label: "หลังบริการ (After)", url: order?.serviceDetails ? (() => { try { const d = JSON.parse(order.serviceDetails); return d?.proofPhotos?.completed || order.evidenceAfterUrl; } catch { return order.evidenceAfterUrl; } })() : order?.evidenceAfterUrl },
+        ].map((photo) => (
         <div key={photo.label} className="space-y-2">
          <p className="text-[9px] font-black text-slate-400 uppercase">{photo.label}</p>
          <div className="aspect-square bg-slate-50 rounded-xl overflow-hidden border-2 border-slate-100 flex items-center justify-center group relative cursor-pointer"

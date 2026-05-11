@@ -6,7 +6,7 @@ export const runtime = "edge";
 export async function GET() {
   try {
     const db = getRequestContext().env.DB as any;
-    const logs = await db.prepare("SELECT * FROM webhook_logs WHERE channel = 'dispatch_fail' ORDER BY createdAt DESC LIMIT 5").all();
+    const logs = await db.prepare("SELECT * FROM webhook_logs ORDER BY createdAt DESC LIMIT 20").all();
     return NextResponse.json({ logs: logs.results });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });

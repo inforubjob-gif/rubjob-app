@@ -426,8 +426,8 @@ export default function RubberOrderDetailPage() {
                      <div className="space-y-2">
                         <p className="text-[9px] font-black text-primary uppercase">{t("rubber.orderDetail.photoFromCustomer") || "รูปตอนรับจากลูกค้า"}</p>
                         <div className="aspect-square rounded-xl bg-slate-800 overflow-hidden border border-white/10">
-                           {order?.pickupPhotoUrl ? (
-                             <img src={order.pickupPhotoUrl} className="w-full h-full object-cover" alt="Pickup" />
+                           {order?.serviceDetails && (() => { try { const d = JSON.parse(order.serviceDetails); return d?.proofPhotos?.delivering_to_store || d?.proofPhotos?.picking_up || order.evidenceBeforeUrl; } catch { return order.evidenceBeforeUrl; } })() ? (
+                             <img src={(() => { try { const d = JSON.parse(order.serviceDetails); return d?.proofPhotos?.delivering_to_store || d?.proofPhotos?.picking_up || order.evidenceBeforeUrl; } catch { return order.evidenceBeforeUrl; } })()} className="w-full h-full object-cover" alt="Pickup" />
                            ) : (
                              <div className="w-full h-full flex items-center justify-center text-slate-600 italic text-[9px]">No photo</div>
                            )}
@@ -436,8 +436,8 @@ export default function RubberOrderDetailPage() {
                      <div className="space-y-2">
                         <p className="text-[9px] font-black text-primary uppercase">{t("rubber.orderDetail.photoAtStore") || "รูปตอนส่งที่ร้าน"}</p>
                         <div className="aspect-square rounded-xl bg-slate-800 overflow-hidden border border-white/10">
-                           {order?.dropoffShopPhotoUrl ? (
-                             <img src={order.dropoffShopPhotoUrl} className="w-full h-full object-cover" alt="At Shop" />
+                           {order?.serviceDetails && (() => { try { const d = JSON.parse(order.serviceDetails); return d?.proofPhotos?.at_shop || order.dropoffShopPhotoUrl; } catch { return order.dropoffShopPhotoUrl; } })() ? (
+                             <img src={(() => { try { const d = JSON.parse(order.serviceDetails); return d?.proofPhotos?.at_shop || order.dropoffShopPhotoUrl; } catch { return order.dropoffShopPhotoUrl; } })()} className="w-full h-full object-cover" alt="At Shop" />
                            ) : (
                              <div className="w-full h-full flex items-center justify-center text-slate-600 italic text-[9px]">No photo</div>
                            )}
