@@ -79,10 +79,10 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
                  onClick={() => {
                    if (window.innerWidth < 768) onClose();
                  }}
-                 className={`flex items-center gap-4 md:gap-0 xl:gap-4 px-4 md:px-0 xl:px-4 py-3.5 md:py-4 xl:py-3.5 md:justify-center xl:justify-start rounded-xl text-sm font-bold transition-all group ${
+                 className={`flex items-center gap-4 md:gap-0 xl:gap-4 px-4 md:px-0 xl:px-4 py-3.5 md:py-4 xl:py-3.5 md:justify-center xl:justify-start rounded-xl text-sm font-bold transition-all duration-200 group cursor-pointer ${
                    isActive 
-                     ? 'bg-primary text-white shadow-lg shadow-primary/20' 
-                     : 'text-slate-400 hover:bg-white/5 hover:text-white'
+                     ? 'bg-primary text-white shadow-lg shadow-primary/20 hover:bg-primary-dark hover:shadow-xl hover:shadow-primary/30 active:scale-[0.97]' 
+                     : 'text-slate-400 hover:bg-white/10 hover:text-white hover:translate-x-1 active:scale-[0.97]'
                  }`}
                >
                  <span className={`${isActive ? "text-white" : "text-slate-500"} group-hover:scale-110 transition-transform`}>{item.icon}</span>
