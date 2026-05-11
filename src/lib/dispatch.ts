@@ -180,11 +180,11 @@ export async function broadcastToEligibleRubbers(
           rubberToken
         );
         console.log(`  ✅ [DISPATCH] LINE push → ${r.lineUserId}`, JSON.stringify(res));
-        // Fire-and-forget log — DO NOT await (D1 timeouts break the flow)
-        db.prepare("INSERT INTO webhook_logs (id, channel, payload, error) VALUES (?, ?, ?, ?)").bind(`DISPATCH-${orderId}-${r.id}-${Date.now()}`, 'dispatch_success', JSON.stringify(res), null).run().catch(() => {});
+        // Await so Edge worker doesn't kill it
+        await db.prepare("INSERT INTO webhook_logs (id, channel, payload, error) VALUES (?, ?, ?, ?)").bind(`DISPATCH-${orderId}-${r.id}-${Date.now()}`, 'dispatch_success', JSON.stringify(res), null).run().catch(() => {});
       } catch (err: any) {
         console.error(`  ❌ [DISPATCH] LINE push failed for ${r.lineUserId}:`, err?.message || err);
-        db.prepare("INSERT INTO webhook_logs (id, channel, payload, error) VALUES (?, ?, ?, ?)").bind(`DISPATCH-${orderId}-${r.id}-${Date.now()}`, 'dispatch_fail', r.lineUserId || '', err?.message || String(err)).run().catch(() => {});
+        await db.prepare("INSERT INTO webhook_logs (id, channel, payload, error) VALUES (?, ?, ?, ?)").bind(`DISPATCH-${orderId}-${r.id}-${Date.now()}`, 'dispatch_fail', r.lineUserId || '', err?.message || String(err)).run().catch(() => {});
       }
     } else {
       console.warn(`  ⚠️ [DISPATCH] LINE push skipped for ${r.id}: token=${!!rubberToken}, lineUserId=${r.lineUserId}`);
