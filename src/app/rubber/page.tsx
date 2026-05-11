@@ -565,15 +565,28 @@ export default function RubberDashboard() {
                     <Icons.Navigation size={18} className="text-primary shrink-0 mt-0.5" />
                     <div className="flex-1">
                        <p className="text-[10px] font-black text-slate-300 uppercase mb-1">{t("rubber.pickup")}</p>
-                       <p className="text-xs font-bold text-slate-700 leading-relaxed">{selectedJob.storeName || selectedJob.store || t("rubber.unknownStore")}</p>
+                       <p className="text-xs font-bold text-slate-700 leading-relaxed">
+                         {(selectedJob.status === 'pending' || selectedJob.status === 'searching_driver') 
+                           ? (selectedJob.customerName || selectedJob.customer || t("rubber.unknownCustomer"))
+                           : (selectedJob.storeName || selectedJob.store || t("rubber.unknownStore"))}
+                       </p>
+                       {(selectedJob.status === 'pending' || selectedJob.status === 'searching_driver') && (
+                         <p className="text-xs text-slate-400 font-bold mt-1">{typeof selectedJob.address === 'string' ? selectedJob.address : (selectedJob.address?.details || selectedJob.address?.label || t("rubber.orderDetail.noAddress"))}</p>
+                       )}
                     </div>
                   </div>
                  <div className="flex gap-4">
                     <Icons.MapPin size={18} className="text-primary shrink-0 mt-0.5" />
                     <div className="flex-1">
                        <p className="text-[10px] font-black text-slate-300 uppercase mb-1">{t("rubber.delivery")}</p>
-                       <p className="text-xs font-black text-slate-900 leading-relaxed">{selectedJob.customerName || selectedJob.customer || t("rubber.unknownCustomer")}</p>
-                       <p className="text-xs text-slate-400 font-bold mt-1">{typeof selectedJob.address === 'string' ? selectedJob.address : (selectedJob.address?.details || selectedJob.address?.label || t("rubber.orderDetail.noAddress"))}</p>
+                       <p className="text-xs font-black text-slate-900 leading-relaxed">
+                         {(selectedJob.status === 'pending' || selectedJob.status === 'searching_driver')
+                           ? (selectedJob.storeName || selectedJob.store || t("rubber.unknownStore"))
+                           : (selectedJob.customerName || selectedJob.customer || t("rubber.unknownCustomer"))}
+                       </p>
+                       {!(selectedJob.status === 'pending' || selectedJob.status === 'searching_driver') && (
+                         <p className="text-xs text-slate-400 font-bold mt-1">{typeof selectedJob.address === 'string' ? selectedJob.address : (selectedJob.address?.details || selectedJob.address?.label || t("rubber.orderDetail.noAddress"))}</p>
+                       )}
                     </div>
                  </div>
                </div>
@@ -668,13 +681,13 @@ function AvailableDeliveries({ t, router, jobs, onAccept, onViewDetails }: { t: 
               </IconCircle>
               <div className="flex-1">
                 <div className="flex items-center gap-1.5 mb-1">
-                  <span className={`text-[11px] font-black px-1.5 py-0.5 rounded-lg uppercase ${job.status === 'pending' ? 'bg-blue-100 text-blue-700' : 'bg-orange-100 text-orange-700'}`}>
-                    {job.status === 'pending' ? t("rubber.flow.pickupLeg") : t("rubber.flow.deliveryLeg")}
+                  <span className={`text-[11px] font-black px-1.5 py-0.5 rounded-lg uppercase ${(job.status === 'pending' || job.status === 'searching_driver') ? 'bg-blue-100 text-blue-700' : 'bg-orange-100 text-orange-700'}`}>
+                    {(job.status === 'pending' || job.status === 'searching_driver') ? t("rubber.flow.pickupLeg") : t("rubber.flow.deliveryLeg")}
                   </span>
                   <span className="text-xs font-black text-slate-400 uppercase">{job.id}</span>
                 </div>
                 <h3 className="font-bold text-slate-900 mb-1 leading-tight">
-                  {job.status === 'pending' ? t("rubber.flow.customerToStore") : t("rubber.flow.storeToCustomer")}
+                  {(job.status === 'pending' || job.status === 'searching_driver') ? t("rubber.flow.customerToStore") : t("rubber.flow.storeToCustomer")}
                 </h3>
                  <div className="flex items-center gap-3 text-[11px] text-slate-500 font-medium">
                    <span className="flex items-center gap-1"><Icons.MapPin size={12} className="text-primary" /> {job.distanceKm || "0.5"} {t("rubber.nearby")}</span>
