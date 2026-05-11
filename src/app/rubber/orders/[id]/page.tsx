@@ -78,10 +78,17 @@ export default function RubberOrderDetailPage() {
     fetchOrder();
   }, [id]);
 
+  const parsedAddress = (() => {
+    try {
+      if (!order?.address) return null;
+      if (typeof order.address === 'string') return JSON.parse(order.address);
+      return order.address;
+    } catch { return null; }
+  })();
   const storePos = { lat: order?.storeLat || 13.7563, lng: order?.storeLng || 100.5018 };
   const userPos = { 
-    lat: order?.address?.lat || order?.lat || 13.7563, 
-    lng: order?.address?.lng || order?.lng || 100.5018 
+    lat: parsedAddress?.lat || order?.lat || 13.7563, 
+    lng: parsedAddress?.lng || order?.lng || 100.5018 
   };
 
   // Define steps that require photo
@@ -304,7 +311,7 @@ export default function RubberOrderDetailPage() {
                 <div>
                    <p className="text-[10px] font-black text-white/60 uppercase tracking-widest mb-1">{t("rubber.earnAmountLabel")}</p>
                    <h2 className="text-4xl font-black italic">
-                     ฿{(['picking_up', 'delivering_to_store'].includes(status) ? order?.rubberPickupEarn : order?.rubberDeliveryEarn || order?.rubberEarn * 0.5)?.toFixed(0)}
+                     ฿{((['picking_up', 'delivering_to_store'].includes(status) ? (order?.rubberPickupEarn || 0) : (order?.rubberDeliveryEarn || (order?.rubberEarn || 0) * 0.5)) || 0).toFixed(0)}
                    </h2>
                 </div>
                 <div className="w-14 h-14 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center border border-white/30">
@@ -364,7 +371,7 @@ export default function RubberOrderDetailPage() {
                    <div className="flex-1">
                       <p className="text-[10px] font-black text-slate-300 uppercase mb-1">{t("rubber.orderDetail.deliverTo")}</p>
                       <p className="text-xs font-black text-slate-900 leading-relaxed mb-1">
-                        {typeof order?.address === 'string' ? order.address : (order?.address?.details || t("rubber.orderDetail.noAddress"))}
+                        {typeof order?.address === 'string' ? (() => { try { const a = JSON.parse(order.address); return a?.details || order.address; } catch { return order.address; } })() : (order?.address?.details || parsedAddress?.details || t("rubber.orderDetail.noAddress"))}
                       </p>
                       {/* Note for Driver */}
                       {order?.address?.note && (
