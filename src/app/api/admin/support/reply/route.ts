@@ -34,15 +34,17 @@ export async function POST(req: Request) {
 
     // 2. Send Push Message to LINE if it's a LINE channel (skip for in_app)
     if (ticket.channel.includes('line')) {
-      const channelKeyToken = `line_token_${ticket.channel.replace('_line', '')}`;
+      // Normalize support/help channels to use the same token keys
+      const normalizedChannel = ticket.channel === 'support_line' ? 'help_line' : ticket.channel;
+      const channelKeyToken = `line_token_${normalizedChannel.replace('_line', '')}`;
       const result = await db.prepare(`SELECT value FROM system_settings WHERE key = ?`).bind(channelKeyToken).first() as { value: string };
       
       // Select token: Priority 1: D1 Database, Priority 2: Environment Variables
       let channelToken = result?.value;
       
       if (!channelToken) {
-        if (ticket.channel === 'help_line') {
-          channelToken = env.LINE_CHANNEL_ACCESS_TOKEN_HELP || env.LINE_CHANNEL_ACCESS_TOKEN;
+        if (ticket.channel === 'help_line' || ticket.channel === 'support_line') {
+          channelToken = env.LINE_CHANNEL_ACCESS_TOKEN_SUPPORT || env.LINE_CHANNEL_ACCESS_TOKEN_HELP || env.LINE_CHANNEL_ACCESS_TOKEN;
         } else if (ticket.channel === 'rubber_line') {
           channelToken = env.LINE_CHANNEL_ACCESS_TOKEN_RUBBER || env.LINE_CHANNEL_ACCESS_TOKEN;
         } else if (ticket.channel === 'regular_line') {

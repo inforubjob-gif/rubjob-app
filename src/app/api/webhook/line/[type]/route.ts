@@ -32,7 +32,9 @@ export async function POST(req: Request, { params }: { params: Promise<{ type: s
       `).run();
     } catch(e) {}
 
-    const channelType = (await params).type; // 'regular' or 'help'
+    let channelType = (await params).type; // 'regular' or 'help'
+    if (channelType === 'support') channelType = 'help'; // Normalize support to help
+    
     const bodyText = await req.text();
     
     // Log the incoming request
