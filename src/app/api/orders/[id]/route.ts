@@ -29,7 +29,7 @@ export async function GET(
       FROM orders o
       JOIN services s ON o.serviceId = s.id
       JOIN users u_customer ON o.userId = u_customer.id
-      JOIN stores st ON o.storeId = st.id
+      LEFT JOIN stores st ON o.storeId = st.id
       LEFT JOIN users u_pickup ON o.pickupDriverId = u_pickup.id
       LEFT JOIN rubber_users r_pickup ON o.pickupDriverId = r_pickup.id
       LEFT JOIN users u_delivery ON o.deliveryDriverId = u_delivery.id

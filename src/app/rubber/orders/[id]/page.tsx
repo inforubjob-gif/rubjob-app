@@ -170,6 +170,19 @@ export default function RubberOrderDetailPage() {
     );
   }
 
+  if (!order) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-dvh bg-slate-50 px-5 text-center">
+        <Icons.AlertCircle size={48} className="text-red-500 mb-4 opacity-50" />
+        <h2 className="text-xl font-bold text-slate-800 mb-2">เกิดข้อผิดพลาด</h2>
+        <p className="text-sm text-slate-500 mb-6">ไม่พบข้อมูลออเดอร์นี้ หรือออเดอร์อาจถูกยกเลิกไปแล้ว</p>
+        <Button onClick={() => router.push("/rubber")} className="w-full">
+          กลับหน้าหลัก
+        </Button>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col min-h-dvh bg-slate-50 pb-24">
       {/* Header */}
