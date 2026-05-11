@@ -42,11 +42,10 @@ export async function POST(req: Request) {
       const res = await db.prepare("SELECT id as lineUserId FROM users WHERE id IS NOT NULL").all();
       users = res.results;
       activeToken = accessToken;
-    } else if (target === "rubbers" || target === "stores") {
-      const table = target === "rubbers" ? "rubber_users" : "stores";
-      const res = await db.prepare(`SELECT lineUserId FROM ${table} WHERE lineUserId IS NOT NULL`).all();
+    } else if (target === "rubbers") {
+      const res = await db.prepare("SELECT lineUserId FROM rubber_users WHERE lineUserId IS NOT NULL").all();
       users = res.results;
-      activeToken = rubberToken; // Use dedicated Rubber OA token (do NOT fallback to customer)
+      activeToken = rubberToken || accessToken; // Fallback to customer token if rubber token not set
     } else {
       return NextResponse.json({ error: "Invalid target" }, { status: 400 });
     }

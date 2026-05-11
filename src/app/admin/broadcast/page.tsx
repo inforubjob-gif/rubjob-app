@@ -63,8 +63,7 @@ export default function BroadcastPage() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {[
                 { id: "all_users", label: "ลูกค้าทั้งหมด", icon: <Icons.Users size={20} /> },
-                { id: "rubbers", label: "Rubber ทั้งหมด", icon: <Icons.Car size={20} /> },
-                { id: "stores", label: "ร้านค้าทั้งหมด", icon: <Icons.Store size={20} /> }
+                { id: "rubbers", label: "Rubber ทั้งหมด", icon: <Icons.Car size={20} /> }
               ].map(t => (
                 <label 
                   key={t.id}
