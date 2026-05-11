@@ -67,9 +67,10 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
         
         <nav className="flex-1 px-5 md:px-2 xl:px-5 py-6 space-y-1.5 overflow-y-auto no-scrollbar">
           {NAV_ITEMS.map((item) => {
+             const basePath = item.href.split('?')[0];
              const isActive = item.href === "/admin" 
                ? (pathname === "/admin")
-               : (pathname === item.href || pathname.startsWith(item.href.split('?')[0] + "/"));
+               : (pathname === basePath || pathname.startsWith(basePath + "/"));
              
              return (
                <Link 
@@ -79,13 +80,16 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
                  onClick={() => {
                    if (window.innerWidth < 768) onClose();
                  }}
-                 className={`flex items-center gap-4 md:gap-0 xl:gap-4 px-4 md:px-0 xl:px-4 py-3.5 md:py-4 xl:py-3.5 md:justify-center xl:justify-start rounded-xl text-sm font-bold transition-all duration-200 group cursor-pointer ${
+                 className={`relative flex items-center gap-4 md:gap-0 xl:gap-4 px-4 md:px-0 xl:px-4 py-3.5 md:py-4 xl:py-3.5 md:justify-center xl:justify-start rounded-xl text-sm font-bold transition-all duration-200 group cursor-pointer ${
                    isActive 
-                     ? 'bg-primary text-white shadow-lg shadow-primary/20 hover:bg-primary-dark hover:shadow-xl hover:shadow-primary/30 active:scale-[0.97]' 
-                     : 'text-slate-400 hover:bg-white/10 hover:text-white hover:translate-x-1 active:scale-[0.97]'
+                     ? 'bg-primary text-white shadow-lg shadow-primary/20 hover:brightness-110 active:scale-[0.97]' 
+                     : 'text-slate-400 hover:bg-white/10 hover:text-white active:scale-[0.97]'
                  }`}
                >
-                 <span className={`${isActive ? "text-white" : "text-slate-500"} group-hover:scale-110 transition-transform`}>{item.icon}</span>
+                 {isActive && (
+                   <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-white rounded-r-full md:hidden xl:block" />
+                 )}
+                 <span className={`${isActive ? "text-white" : "text-slate-500 group-hover:text-white"} group-hover:scale-110 transition-all`}>{item.icon}</span>
                  <span className="block md:hidden xl:block whitespace-nowrap">{item.label}</span>
                </Link>
              );
