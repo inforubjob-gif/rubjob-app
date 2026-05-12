@@ -29,19 +29,6 @@ export async function GET(req: Request) {
     `).bind(email).first() as any;
 
     if (!admin) {
-      // Fallback for Master Admin if not in DB
-      const masterEmail = process.env.ADMIN_EMAIL || "admin@rubjob.com";
-      if (email === masterEmail) {
-        return NextResponse.json({
-          admin: {
-            name: "Master Admin",
-            email: masterEmail,
-            role: "super_admin",
-            permissions: null,
-            avatarUrl: null
-          }
-        });
-      }
       return NextResponse.json({ error: "Admin not found" }, { status: 404 });
     }
 
