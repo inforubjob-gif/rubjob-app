@@ -49,10 +49,12 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
   }
 
   const logout = async () => {
-    // Note: We don't have a logout API yet that clears the cookie, 
-    // but we can clear localStorage as a fallback.
+    try {
+      await fetch("/api/admin/logout", { method: "POST" });
+    } catch (e) {
+      console.error("Logout API error:", e);
+    }
     localStorage.removeItem("rubjob_admin_session");
-    // Ideally call an API to clear the cookie
     setAdmin(null);
     router.push("/admin");
     window.location.reload();
