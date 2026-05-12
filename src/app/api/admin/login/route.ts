@@ -40,20 +40,7 @@ export async function POST(req: Request) {
       console.warn("D1 access failed or context missing, using fallback:", dbErr);
     }
 
-    // 2. Fallback to Environment Variables
-    if (!adminData) {
-      const validEmail = process.env.ADMIN_EMAIL || "admin@rubjob.com";
-      const validPassword = process.env.ADMIN_PASSWORD || "admin123";
-
-      if (email === validEmail && password === validPassword) {
-        adminData = {
-          name: "Master Admin",
-          role: "super_admin",
-          permissions: null,
-          avatarUrl: null
-        };
-      }
-    }
+    // Fallback removed for security — admin must exist in admin_users table
 
     if (adminData) {
       // Set HTTP-only cookie

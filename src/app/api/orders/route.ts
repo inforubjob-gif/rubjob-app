@@ -30,13 +30,8 @@ export async function GET(req: Request) {
     `;
     
     let rawResults;
-    if (userId === "all") {
-      const { results } = await db.prepare(`${query} ORDER BY o.createdAt DESC`).all();
-      rawResults = results;
-    } else {
-      const { results } = await db.prepare(`${query} WHERE o.userId = ? ORDER BY o.createdAt DESC`).bind(userId).all();
-      rawResults = results;
-    }
+    const { results } = await db.prepare(`${query} WHERE o.userId = ? ORDER BY o.createdAt DESC`).bind(userId).all();
+    rawResults = results;
 
     // Parse JSON strings back to objects
     const orders = (rawResults || []).map((row: any) => ({

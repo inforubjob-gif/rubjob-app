@@ -1,5 +1,6 @@
 import { getRequestContext } from "@cloudflare/next-on-pages";
 import { NextResponse } from "next/server";
+import { getAdminSession } from "@/lib/auth-server";
 
 export const runtime = "edge";
 
@@ -9,6 +10,8 @@ export const runtime = "edge";
  * Body: { key: string, value: string }
  */
 export async function POST(req: Request) {
+  const session = await getAdminSession();
+  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   try {
     const { key, value } = (await req.json()) as { key: string; value: string };
     
