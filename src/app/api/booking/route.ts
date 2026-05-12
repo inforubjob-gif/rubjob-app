@@ -17,6 +17,10 @@ export async function POST(req: Request) {
     
     // 1. Validate Inputs
     validateRequired(body.userId, "userId");
+    // LINE User IDs start with 'U' and are 33 characters
+    if (typeof body.userId !== "string" || !body.userId.startsWith("U") || body.userId.length !== 33) {
+      return NextResponse.json({ error: "Invalid userId format" }, { status: 400 });
+    }
     if (!body.storeId && !body.providerId) {
       return NextResponse.json({ error: "Either storeId or providerId is required" }, { status: 400 });
     }

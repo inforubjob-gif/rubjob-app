@@ -1,5 +1,6 @@
 import { getRequestContext } from "@cloudflare/next-on-pages";
 import { NextResponse } from "next/server";
+import { hashPassword } from "@/lib/password";
 
 export const runtime = "edge";
 
@@ -17,11 +18,14 @@ export async function POST(req: Request) {
     const nextNumber = (lastRubber?.rubber_number || 0) + 1;
     const id = `RDR-${Math.random().toString(36).substr(2, 6).toUpperCase()}`;
 
-    // 2. Insert with 'pending' status for admin verification
+    // 2. Hash password before storing
+    const hashedPassword = await hashPassword(password);
+
+    // 3. Insert with 'pending' status for admin verification
     await db.prepare(`
       INSERT INTO rubber_users (id, email, password, name, phone, status, rubber_number, vehicleType, licensePlate, idNumber, bankName, accountNumber, accountName, address)
       VALUES (?, ?, ?, ?, ?, 'pending', ?, ?, ?, ?, ?, ?, ?, ?)
-    `).bind(id, email, password, name, phone || "", nextNumber, vehicleType || "bike", licensePlate || "", idNumber || "", bankName || "", accountNumber || "", accountName || "", province ? `ย่าน/ตำบล: ${area || '-'}\nจังหวัด: ${province}` : "").run();
+    `).bind(id, email, hashedPassword, name, phone || "", nextNumber, vehicleType || "bike", licensePlate || "", idNumber || "", bankName || "", accountNumber || "", accountName || "", province ? `ย่าน/ตำบล: ${area || '-'}\nจังหวัด: ${province}` : "").run();
 
     // 3. Insert documents
     if (idCardUrl) {

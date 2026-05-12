@@ -1,6 +1,7 @@
 import { getRequestContext } from "@cloudflare/next-on-pages";
 import { NextResponse } from "next/server";
 import { getAdminSession } from "@/lib/auth-server";
+import { hashPassword } from "@/lib/password";
 
 export const runtime = "edge";
 
@@ -42,12 +43,13 @@ export async function POST(req: Request) {
     if (!db) return NextResponse.json({ error: "D1 not found" }, { status: 500 });
 
     const id = crypto.randomUUID();
+    const hashedPassword = await hashPassword(password);
 
     await db.prepare(`
       INSERT INTO admin_users (id, email, password, name, role, permissions, avatarUrl)
       VALUES (?, ?, ?, ?, ?, ?, ?)
     `).bind(
-      id, email, password, name || email.split('@')[0], role || 'admin', 
+      id, email, hashedPassword, name || email.split('@')[0], role || 'admin', 
       permissions ? JSON.stringify(permissions) : null,
       avatarUrl || null
     ).run();
@@ -71,6 +73,8 @@ export async function PUT(req: Request) {
     const db = getRequestContext().env.DB;
     if (!db) return NextResponse.json({ error: "D1 not found" }, { status: 500 });
 
+    const hashedPw = password ? await hashPassword(password) : null;
+
     await db.prepare(`
       UPDATE admin_users 
       SET email = COALESCE(?, email),
@@ -81,7 +85,7 @@ export async function PUT(req: Request) {
           avatarUrl = COALESCE(?, avatarUrl)
       WHERE id = ?
     `).bind(
-      email || null, password || null, name || null, role || null, 
+      email || null, hashedPw, name || null, role || null, 
       permissions ? JSON.stringify(permissions) : null,
       avatarUrl || null, id
     ).run();

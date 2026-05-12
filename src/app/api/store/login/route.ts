@@ -1,12 +1,13 @@
 import { getRequestContext } from "@cloudflare/next-on-pages";
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
+import { verifyPassword, isBcryptHash, hashPassword } from "@/lib/password";
 
 export const runtime = "edge";
 
 export async function POST(req: Request) {
   try {
-    const { email, password } = await req.json() as any;
+    const { email, password } = await req.json() as { email: string; password: string };
 
     if (!email || !password) {
       return NextResponse.json({ success: false, error: "Please provide email and password" }, { status: 400 });
@@ -19,37 +20,53 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Database not found" }, { status: 500 });
     }
 
-    // Verify store credentials
-    const store = await db.prepare(`
-      SELECT id, name, email FROM stores WHERE email = ? AND password = ? AND isActive = 1
-    `).bind(email, password).first() as any;
+    // Fetch by email only — verify password in application layer
+    const store = await db.prepare(
+      "SELECT id, name, email, password FROM stores WHERE email = ? AND isActive = 1"
+    ).bind(email).first() as Record<string, unknown> | null;
 
-    if (store) {
-      // Set HTTP-only cookie for store session
-      const cookieStore = await cookies();
-      const hostname = req.headers.get("host") || "";
-      const rootDomain = ["rubjob-all.com", "rubjob.com", "rubjob-app.pages.dev", "lvh.me"].find(d => hostname.endsWith(d));
+    if (store && typeof store.password === "string") {
+      let passwordValid = false;
 
-      cookieStore.set("store_token", store.id, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-        path: "/",
-        domain: rootDomain ? `.${rootDomain}` : undefined,
-        maxAge: 60 * 60 * 24 * 7 // 1 week
-      });
-
-      return NextResponse.json({ 
-        success: true, 
-        store: {
-          id: store.id,
-          name: store.name,
-          email: store.email
+      if (isBcryptHash(store.password)) {
+        passwordValid = await verifyPassword(password, store.password);
+      } else {
+        // Lazy migration: plaintext → bcrypt
+        passwordValid = store.password === password;
+        if (passwordValid) {
+          const hashed = await hashPassword(password);
+          await db.prepare("UPDATE stores SET password = ? WHERE id = ?")
+            .bind(hashed, store.id).run();
+          console.log(`🔒 [AUTH] Auto-migrated store ${email} password to bcrypt`);
         }
-      });
-    } else {
-      return NextResponse.json({ success: false, error: "อีเมลหรือรหัสผ่านไม่ถูกต้อง" }, { status: 401 });
+      }
+
+      if (passwordValid) {
+        const cookieStore = await cookies();
+        const hostname = req.headers.get("host") || "";
+        const rootDomain = ["rubjob-all.com", "rubjob.com", "rubjob-app.pages.dev", "lvh.me"].find(d => hostname.endsWith(d));
+
+        cookieStore.set("store_token", String(store.id), {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production",
+          sameSite: "lax",
+          path: "/",
+          domain: rootDomain ? `.${rootDomain}` : undefined,
+          maxAge: 60 * 60 * 24 * 7 // 1 week
+        });
+
+        return NextResponse.json({ 
+          success: true, 
+          store: {
+            id: store.id,
+            name: store.name,
+            email: store.email
+          }
+        });
+      }
     }
+
+    return NextResponse.json({ success: false, error: "อีเมลหรือรหัสผ่านไม่ถูกต้อง" }, { status: 401 });
   } catch (err) {
     console.error("Store login error:", err);
     return NextResponse.json({ success: false, error: "Internal Server Error" }, { status: 500 });

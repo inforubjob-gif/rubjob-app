@@ -1,49 +1,63 @@
 import { getRequestContext } from "@cloudflare/next-on-pages";
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
+import { verifyPassword, isBcryptHash, hashPassword } from "@/lib/password";
 
 export const runtime = "edge";
 
 export async function POST(req: Request) {
   try {
-    const { email, password } = await req.json() as any as { email: string; password: string };
+    const { email, password } = await req.json() as { email: string; password: string };
 
     if (!email || !password) {
       return NextResponse.json({ success: false, error: "Please provide email and password" }, { status: 400 });
     }
 
-    let adminData: any = null;
+    let adminData: Record<string, unknown> | null = null;
 
-    // 1. Try D1 Database (Safe check for local dev)
     try {
       const context = getRequestContext();
       const db = context?.env?.DB;
       
       if (db) {
         // Self-healing: Ensure columns exist
-        try {
-          await db.prepare("ALTER TABLE admin_users ADD COLUMN permissions TEXT").run();
-        } catch (e) {}
-        try {
-          await db.prepare("ALTER TABLE admin_users ADD COLUMN avatarUrl TEXT").run();
-        } catch (e) {}
+        try { await db.prepare("ALTER TABLE admin_users ADD COLUMN permissions TEXT").run(); } catch (e) {}
+        try { await db.prepare("ALTER TABLE admin_users ADD COLUMN avatarUrl TEXT").run(); } catch (e) {}
 
-        const admin = await db.prepare(`
-          SELECT * FROM admin_users WHERE email = ? AND password = ?
-        `).bind(email, password).first();
+        // Fetch admin by email only — verify password in application layer
+        const admin = await db.prepare(
+          "SELECT * FROM admin_users WHERE email = ?"
+        ).bind(email).first() as Record<string, unknown> | null;
 
-        if (admin) {
-          adminData = admin;
+        if (admin && typeof admin.password === "string") {
+          let passwordValid = false;
+
+          if (isBcryptHash(admin.password)) {
+            // Already hashed — use bcrypt compare
+            passwordValid = await verifyPassword(password, admin.password);
+          } else {
+            // Legacy plaintext — compare directly, then auto-hash (lazy migration)
+            passwordValid = admin.password === password;
+            if (passwordValid) {
+              const hashed = await hashPassword(password);
+              await db.prepare("UPDATE admin_users SET password = ? WHERE id = ?")
+                .bind(hashed, admin.id).run();
+              console.log(`🔒 [AUTH] Auto-migrated admin ${email} password to bcrypt`);
+            }
+          }
+
+          if (passwordValid) {
+            adminData = admin;
+          }
         }
       }
     } catch (dbErr) {
-      console.warn("D1 access failed or context missing, using fallback:", dbErr);
+      console.warn("D1 access failed:", dbErr);
     }
 
     // Fallback removed for security — admin must exist in admin_users table
 
     if (adminData) {
-      // Set HTTP-only cookie
       const cookieStore = await cookies();
       const hostname = req.headers.get("host") || "";
       const rootDomain = ["rubjob-all.com", "rubjob.com", "rubjob-app.pages.dev", "lvh.me"].find(d => hostname.endsWith(d));
@@ -60,7 +74,7 @@ export async function POST(req: Request) {
         success: true, 
         name: adminData.name,
         role: adminData.role,
-        permissions: adminData.permissions ? JSON.parse(adminData.permissions) : null,
+        permissions: typeof adminData.permissions === "string" ? JSON.parse(adminData.permissions) : null,
         avatarUrl: adminData.avatarUrl
       });
     } else {
