@@ -62,9 +62,26 @@ export async function GET(req: Request) {
     const displayTotalStores = storesCount;
 
     // Calculations
-    const storeEarnings = (totalLaundry * gpStore) / 100;
-    const rubberEarnings = (totalDelivery * gpRubber) / 100;
-    const totalPlatformEarnings = storeEarnings + rubberEarnings;
+    const storeGP = (totalLaundry * gpStore) / 100;
+    const rubberGP = (totalDelivery * gpRubber) / 100;
+
+    // Count completed orders with drivers to calculate ฿15 platform fee per order
+    let platformFeeTotal = 0;
+    try {
+      const feeResult = await db.prepare(`
+        SELECT COUNT(*) as cnt FROM orders 
+        WHERE status = 'completed' AND (pickupDriverId IS NOT NULL OR deliveryDriverId IS NOT NULL)
+      `).first() as any;
+      platformFeeTotal = (feeResult?.cnt || 0) * 15;
+    } catch (e) {
+      console.warn("Platform fee count failed:", e);
+    }
+
+    const totalPlatformEarnings = storeGP + rubberGP + platformFeeTotal;
+
+    // What each party actually receives (for breakdown display)
+    const storeNetEarnings = totalLaundry - storeGP;          // laundryFee × 90%
+    const rubberNetEarnings = totalDelivery - rubberGP - platformFeeTotal; // deliveryFee - 15% GP - ฿15/order
 
     // 2. Full Table Inventory (Count rows in every table - batched for efficiency)
     const inventory: Record<string, number> = {};
@@ -136,6 +153,16 @@ export async function GET(req: Request) {
       orders: ordersCount,
       revenue: grossRevenue,
       earnings: totalPlatformEarnings,
+      // Revenue breakdown
+      revenueBreakdown: {
+        totalLaundry,
+        totalDelivery,
+        storeGP,
+        rubberGP,
+        platformFee: platformFeeTotal,
+        storeNetEarnings,
+        rubberNetEarnings,
+      },
       gpStore,
       gpRubber,
       totalRubbers,

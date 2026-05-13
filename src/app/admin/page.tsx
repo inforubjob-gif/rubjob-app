@@ -17,6 +17,7 @@ export default function AdminDashboard() {
   inventory: {} as Record<string, number>,
   connection: "WAITING",
   rubberWalletBalance: 0, storeWalletBalance: 0,
+  revenueBreakdown: { totalLaundry: 0, totalDelivery: 0, storeGP: 0, rubberGP: 0, platformFee: 0, storeNetEarnings: 0, rubberNetEarnings: 0 },
  });
  const [isLoading, setIsLoading] = useState(true);
  const [errorCount, setErrorCount] = useState(0);
@@ -58,6 +59,7 @@ export default function AdminDashboard() {
       connection: data.connection || "CONNECTED",
       rubberWalletBalance: data.rubberWalletBalance || 0,
       storeWalletBalance: data.storeWalletBalance || 0,
+      revenueBreakdown: data.revenueBreakdown || { totalLaundry: 0, totalDelivery: 0, storeGP: 0, rubberGP: 0, platformFee: 0, storeNetEarnings: 0, rubberNetEarnings: 0 },
      });
     }
    } catch (err: unknown) {
@@ -264,13 +266,47 @@ export default function AdminDashboard() {
         </div>
       </Card>
 
-       {/* Quick Insights Placeholder */}
-       <Card className="col-span-1 md:col-span-2 lg:col-span-3 p-8 bg-slate-50/50 border border-slate-100 border-dashed rounded-xl flex flex-col items-center justify-center text-center group hover:bg-white hover:border-solid hover:shadow-card transition-all duration-500">
-         <div className="w-16 h-16 bg-white rounded-xl shadow-sm text-slate-200 flex items-center justify-center mb-6 group-hover:text-primary group-hover:scale-110 transition-all">
-          <Icons.Finance size={32} />
+       {/* Revenue Breakdown Card */}
+       <Card className="col-span-1 md:col-span-2 lg:col-span-3 p-7 bg-white border border-slate-100 shadow-card rounded-xl">
+         <div className="flex items-center gap-3 mb-6">
+          <div className="w-10 h-10 rounded-xl bg-slate-900 text-white flex items-center justify-center shadow-sm">
+           <Icons.Finance size={20} />
+          </div>
+          <div>
+           <h3 className="text-sm font-black text-slate-900">สรุปรายได้</h3>
+           <p className="text-[10px] font-bold text-slate-400">รายละเอียดการแบ่งรายได้จากออเดอร์ที่สำเร็จ</p>
+          </div>
          </div>
-         <h3 className="text-xl font-black text-slate-900 mb-2">{t("admin.dashboard.analytics")}</h3>
-         <p className="text-slate-400 text-sm font-medium max-w-sm mx-auto tracking-tight">{t("admin.dashboard.analyticsSub")}</p>
+         <div className="space-y-3">
+          <div className="flex items-center justify-between py-3 border-b border-slate-50">
+           <div className="flex items-center gap-2">
+            <div className="w-2 h-2 rounded-full bg-slate-900" />
+            <span className="text-xs font-bold text-slate-500">รายได้รวม (Gross Revenue)</span>
+           </div>
+           <span className="text-sm font-black text-slate-900 tabular-nums">฿{Number(stats.revenue).toLocaleString()}</span>
+          </div>
+          <div className="flex items-center justify-between py-2">
+           <div className="flex items-center gap-2">
+            <div className="w-2 h-2 rounded-full bg-violet-500" />
+            <span className="text-xs font-bold text-slate-500">ร้านซักได้รับ (หลังหัก GP {stats.gpStore}%)</span>
+           </div>
+           <span className="text-sm font-black text-violet-600 tabular-nums">฿{Number(stats.revenueBreakdown.storeNetEarnings).toLocaleString()}</span>
+          </div>
+          <div className="flex items-center justify-between py-2">
+           <div className="flex items-center gap-2">
+            <div className="w-2 h-2 rounded-full bg-emerald-500" />
+            <span className="text-xs font-bold text-slate-500">Rubber ได้รับ (หลังหัก GP {stats.gpRubber}% + ฿15)</span>
+           </div>
+           <span className="text-sm font-black text-emerald-600 tabular-nums">฿{Number(stats.revenueBreakdown.rubberNetEarnings).toLocaleString()}</span>
+          </div>
+          <div className="flex items-center justify-between py-3 border-t border-dashed border-slate-200 bg-primary/5 -mx-7 px-7 rounded-b-xl mt-2">
+           <div className="flex items-center gap-2">
+            <div className="w-2 h-2 rounded-full bg-primary" />
+            <span className="text-xs font-black text-primary">แพลตฟอร์มได้รับ (GP + ค่าบริการ ฿15/ออเดอร์)</span>
+           </div>
+           <span className="text-sm font-black text-primary tabular-nums">฿{Number(stats.earnings).toLocaleString()}</span>
+          </div>
+         </div>
        </Card>
       
       {/* Quick Actions Card */}
