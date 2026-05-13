@@ -150,6 +150,7 @@ export default function StoresAdminPage() {
          <th className="px-4 py-5 text-center">{t('admin.stores.list.table.services')}</th>
          <th className="px-4 py-5">{t('admin.stores.list.table.delivery')}</th>
          <th className="px-4 py-5">{t('admin.stores.list.table.status')}</th>
+         <th className="px-4 py-5 text-right">กระเป๋าเงิน</th>
          <th className="px-4 py-5 text-right">{t('admin.stores.list.table.actions')}</th>
         </tr>
        </thead>
@@ -207,6 +208,16 @@ export default function StoresAdminPage() {
               store.status === 'pending' ? t('admin.rubbers.form.pendingReview') : 
               t('admin.rubbers.form.rejected')}
             </Badge>
+          </td>
+          <td className="px-4 py-6 text-right">
+            <div className="flex flex-col items-end">
+             <span className="text-sm font-black text-slate-900 tabular-nums">
+              <span className="text-slate-300 text-xs">฿</span>{Number(store.walletBalance || 0).toLocaleString()}
+             </span>
+             {Number(store.walletBalance || 0) > 0 && (
+              <span className="text-[9px] font-bold text-violet-500 mt-0.5">คงเหลือ</span>
+             )}
+            </div>
           </td>
           <td className="px-4 py-6 text-right">
             <div className="flex justify-end gap-2 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-all">

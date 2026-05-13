@@ -28,15 +28,41 @@ export async function GET(req: Request) {
       SELECT * FROM rubber_documents
     `).all();
 
+    // Fetch wallet data for all rubbers in batch
+    const { results: rubberEarnings } = await db.prepare(`
+      SELECT pickupDriverId as id, SUM(deliveryFee - (deliveryFee * 0.15) - 15) * 0.5 as earned
+      FROM orders WHERE status = 'completed' AND pickupDriverId IS NOT NULL
+      GROUP BY pickupDriverId
+    `).all();
+    const { results: rubberEarnings2 } = await db.prepare(`
+      SELECT deliveryDriverId as id, SUM(deliveryFee - (deliveryFee * 0.15) - 15) * 0.5 as earned
+      FROM orders WHERE status = 'completed' AND deliveryDriverId IS NOT NULL
+      GROUP BY deliveryDriverId
+    `).all();
+    const { results: rubberWithdrawals } = await db.prepare(`
+      SELECT requesterId as id, SUM(amount) as withdrawn
+      FROM payout_requests WHERE requesterType = 'rubber' AND status != 'rejected'
+      GROUP BY requesterId
+    `).all();
+
+    const earningsMap: Record<string, number> = {};
+    (rubberEarnings as any[]).forEach((r: any) => { earningsMap[r.id] = (earningsMap[r.id] || 0) + (r.earned || 0); });
+    (rubberEarnings2 as any[]).forEach((r: any) => { earningsMap[r.id] = (earningsMap[r.id] || 0) + (r.earned || 0); });
+    const withdrawnMap: Record<string, number> = {};
+    (rubberWithdrawals as any[]).forEach((r: any) => { withdrawnMap[r.id] = r.withdrawn || 0; });
+
     const rubbersWithDocs = rubbers.map((r: any) => {
       let workStatus = false;
       try {
         const prefs = r.preferences ? JSON.parse(r.preferences) : {};
         workStatus = !!prefs.workStatus;
       } catch (e) {}
+      const totalEarned = earningsMap[r.id] || 0;
+      const totalWithdrawn = withdrawnMap[r.id] || 0;
       return {
         ...r,
         workStatus,
+        walletBalance: Math.max(0, totalEarned - totalWithdrawn),
         displayId: r.rubber_number ? `RD-${String(r.rubber_number).padStart(4, '0')}` : r.id,
         documents: docs.filter((d: any) => d.rubberId === r.id)
       };

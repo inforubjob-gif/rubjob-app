@@ -148,6 +148,7 @@ export default function RubberManagementAdminPage() {
          <th className="px-4 py-5">{t('admin.rubbers.list.table.contact')}</th>
          <th className="px-4 py-5">สถานะรับงาน</th>
          <th className="px-4 py-5">{t('admin.rubbers.list.table.status')}</th>
+         <th className="px-4 py-5 text-right">กระเป๋าเงิน</th>
          <th className="px-4 py-5 text-right">{t('admin.rubbers.list.table.actions')}</th>
         </tr>
        </thead>
@@ -234,6 +235,16 @@ export default function RubberManagementAdminPage() {
               rubber.status === 'pending' ? t('admin.rubbers.form.pendingReview') : 
               t('admin.rubbers.form.rejected')}
             </Badge>
+           </td>
+           <td className="px-4 py-6 text-right">
+            <div className="flex flex-col items-end">
+             <span className="text-sm font-black text-slate-900 tabular-nums">
+              <span className="text-slate-300 text-xs">฿</span>{Number(rubber.walletBalance || 0).toLocaleString()}
+             </span>
+             {Number(rubber.walletBalance || 0) > 0 && (
+              <span className="text-[9px] font-bold text-emerald-500 mt-0.5">คงเหลือ</span>
+             )}
+            </div>
            </td>
           <td className="px-4 py-6 text-right">
             <div className="flex justify-end gap-2 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-all">

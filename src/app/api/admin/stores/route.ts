@@ -35,8 +35,26 @@ export async function GET(req: Request) {
       SELECT * FROM store_documents
     `).all();
 
+    // Fetch wallet data for all stores in batch
+    const { results: storeEarningsData } = await db.prepare(`
+      SELECT storeId as id, SUM(laundryFee * 0.90) as earned
+      FROM orders WHERE status = 'completed' AND storeId IS NOT NULL
+      GROUP BY storeId
+    `).all();
+    const { results: storeWithdrawalsData } = await db.prepare(`
+      SELECT requesterId as id, SUM(amount) as withdrawn
+      FROM payout_requests WHERE requesterType = 'store' AND status != 'rejected'
+      GROUP BY requesterId
+    `).all();
+
+    const storeEarningsMap: Record<string, number> = {};
+    (storeEarningsData as any[]).forEach((r: any) => { storeEarningsMap[r.id] = r.earned || 0; });
+    const storeWithdrawnMap: Record<string, number> = {};
+    (storeWithdrawalsData as any[]).forEach((r: any) => { storeWithdrawnMap[r.id] = r.withdrawn || 0; });
+
     const storesWithServices = stores.map((s: any) => ({
       ...s,
+      walletBalance: Math.max(0, (storeEarningsMap[s.id] || 0) - (storeWithdrawnMap[s.id] || 0)),
       services: storeServices
         .filter((ss: any) => ss.storeId === s.id)
         .map((ss: any) => ({ serviceId: ss.serviceId, price: ss.price })),

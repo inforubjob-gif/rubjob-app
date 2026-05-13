@@ -264,42 +264,14 @@ export default function AdminDashboard() {
         </div>
       </Card>
 
-       {/* Wallet Balances */}
-       <Link href="/admin/finance" className="block group">
-        <Card className="p-7 bg-white border border-slate-100 shadow-card hover:shadow-card-hover hover:-translate-y-1 transition-all duration-300 relative overflow-hidden">
-         <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-50/50 rounded-full blur-3xl -mr-12 -mt-12 group-hover:bg-emerald-100/50 transition-colors" />
-         <div className="w-14 h-14 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-6 shadow-inner group-hover:scale-110 transition-transform">
-           <Icons.Wallet size={28} />
+       {/* Quick Insights Placeholder */}
+       <Card className="col-span-1 md:col-span-2 lg:col-span-3 p-8 bg-slate-50/50 border border-slate-100 border-dashed rounded-xl flex flex-col items-center justify-center text-center group hover:bg-white hover:border-solid hover:shadow-card transition-all duration-500">
+         <div className="w-16 h-16 bg-white rounded-xl shadow-sm text-slate-200 flex items-center justify-center mb-6 group-hover:text-primary group-hover:scale-110 transition-all">
+          <Icons.Finance size={32} />
          </div>
-         <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.15em] mb-2">กระเป๋าเงิน Rubber</p>
-         <h2 className="text-3xl font-black text-slate-900 leading-none tracking-tighter">
-          <span className="text-sm font-black text-slate-300 mr-1.5">฿</span>
-          {Number(stats.rubberWalletBalance).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
-         </h2>
-         <div className="mt-4 flex items-center gap-1.5 font-bold text-[10px] text-emerald-500">
-          <span className="w-1 h-1 bg-emerald-400 rounded-full" />
-          ยอดคงเหลือรวมทุกคน
-         </div>
-        </Card>
-       </Link>
-
-       <Link href="/admin/finance" className="block group">
-        <Card className="p-7 bg-white border border-slate-100 shadow-card hover:shadow-card-hover hover:-translate-y-1 transition-all duration-300 relative overflow-hidden">
-         <div className="absolute top-0 right-0 w-24 h-24 bg-violet-50/50 rounded-full blur-3xl -mr-12 -mt-12 group-hover:bg-violet-100/50 transition-colors" />
-         <div className="w-14 h-14 rounded-xl bg-violet-50 text-violet-600 flex items-center justify-center mb-6 shadow-inner group-hover:scale-110 transition-transform">
-           <Icons.Office size={28} />
-         </div>
-         <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.15em] mb-2">กระเป๋าเงินร้านซัก</p>
-         <h2 className="text-3xl font-black text-slate-900 leading-none tracking-tighter">
-          <span className="text-sm font-black text-slate-300 mr-1.5">฿</span>
-          {Number(stats.storeWalletBalance).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
-         </h2>
-         <div className="mt-4 flex items-center gap-1.5 font-bold text-[10px] text-violet-500">
-          <span className="w-1 h-1 bg-violet-400 rounded-full" />
-          ยอดคงเหลือรวมทุกร้าน
-         </div>
-        </Card>
-       </Link>
+         <h3 className="text-xl font-black text-slate-900 mb-2">{t("admin.dashboard.analytics")}</h3>
+         <p className="text-slate-400 text-sm font-medium max-w-sm mx-auto tracking-tight">{t("admin.dashboard.analyticsSub")}</p>
+       </Card>
       
       {/* Quick Actions Card */}
       <Card className="col-span-1 md:col-span-2 lg:col-span-3 xl:col-span-2 p-8 bg-white border border-slate-100 shadow-card rounded-xl">
