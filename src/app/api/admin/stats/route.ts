@@ -137,11 +137,11 @@ export async function GET(req: Request) {
           SELECT COALESCE(SUM(amount), 0) as total
           FROM payout_requests WHERE requesterType = 'rubber' AND status != 'rejected'
         `),
-        // Total store earnings: laundryFee × 90% from completed orders
+        // Total store earnings: laundryFee × (100 - gpStore)% from completed orders
         db.prepare(`
-          SELECT COALESCE(SUM(laundryFee * 0.90), 0) as total
+          SELECT COALESCE(SUM(laundryFee * ?), 0) as total
           FROM orders WHERE status = 'completed' AND storeId IS NOT NULL
-        `),
+        `).bind((100 - gpStore) / 100),
         // Total store withdrawals (excluding rejected)
         db.prepare(`
           SELECT COALESCE(SUM(amount), 0) as total

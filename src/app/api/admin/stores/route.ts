@@ -35,12 +35,16 @@ export async function GET(req: Request) {
       SELECT * FROM store_documents
     `).all();
 
+    const { results: settings } = await db.prepare("SELECT value FROM system_settings WHERE key = 'gp_store_percent'").all();
+    const gpStoreRaw = settings?.[0]?.value;
+    const gpStoreFraction = gpStoreRaw !== undefined ? (100 - Number(gpStoreRaw)) / 100 : 0.90;
+
     // Fetch wallet data for all stores in batch
     const { results: storeEarningsData } = await db.prepare(`
-      SELECT storeId as id, SUM(laundryFee * 0.90) as earned
+      SELECT storeId as id, SUM(laundryFee * ?) as earned
       FROM orders WHERE status = 'completed' AND storeId IS NOT NULL
       GROUP BY storeId
-    `).all();
+    `).bind(gpStoreFraction).all();
     const { results: storeWithdrawalsData } = await db.prepare(`
       SELECT requesterId as id, SUM(amount) as withdrawn
       FROM payout_requests WHERE requesterType = 'store' AND status != 'rejected'
