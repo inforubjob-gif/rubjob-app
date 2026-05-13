@@ -87,6 +87,45 @@ export async function GET(req: Request) {
       console.warn("Batch inventory count failed, skipping:", err);
     }
 
+    // 3. Wallet Balances (Aggregate for all rubbers and stores)
+    let rubberWalletBalance = 0;
+    let storeWalletBalance = 0;
+
+    try {
+      const walletStats = await db.batch([
+        // Total rubber earnings: deliveryFee from completed orders (after 15% GP + ฿15 platform fee)
+        db.prepare(`
+          SELECT COALESCE(SUM(deliveryFee - (deliveryFee * 0.15) - 15), 0) as total
+          FROM orders WHERE status = 'completed' AND (pickupDriverId IS NOT NULL OR deliveryDriverId IS NOT NULL)
+        `),
+        // Total rubber withdrawals (excluding rejected)
+        db.prepare(`
+          SELECT COALESCE(SUM(amount), 0) as total
+          FROM payout_requests WHERE requesterType = 'rubber' AND status != 'rejected'
+        `),
+        // Total store earnings: laundryFee × 90% from completed orders
+        db.prepare(`
+          SELECT COALESCE(SUM(laundryFee * 0.90), 0) as total
+          FROM orders WHERE status = 'completed' AND storeId IS NOT NULL
+        `),
+        // Total store withdrawals (excluding rejected)
+        db.prepare(`
+          SELECT COALESCE(SUM(amount), 0) as total
+          FROM payout_requests WHERE requesterType = 'store' AND status != 'rejected'
+        `),
+      ]);
+
+      const rubberEarned = walletStats[0].results?.[0]?.total || 0;
+      const rubberWithdrawn = walletStats[1].results?.[0]?.total || 0;
+      rubberWalletBalance = Math.max(0, Number(rubberEarned) - Number(rubberWithdrawn));
+
+      const storeEarned = walletStats[2].results?.[0]?.total || 0;
+      const storeWithdrawn = walletStats[3].results?.[0]?.total || 0;
+      storeWalletBalance = Math.max(0, Number(storeEarned) - Number(storeWithdrawn));
+    } catch (e) {
+      console.warn("Wallet stats failed:", e);
+    }
+
     return NextResponse.json({ 
       users: usersCount,
       rawUsers: rawUsersCount,
@@ -101,7 +140,9 @@ export async function GET(req: Request) {
       gpRubber,
       totalRubbers,
       activeRubbers,
-      inventory: inventory
+      inventory: inventory,
+      rubberWalletBalance,
+      storeWalletBalance,
     });
   } catch (error: unknown) {
     return NextResponse.json({ error: safeError(error) }, { status: 500 });
