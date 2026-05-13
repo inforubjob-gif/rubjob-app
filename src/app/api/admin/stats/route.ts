@@ -151,6 +151,7 @@ export async function GET(req: Request) {
           SELECT s.name, COUNT(o.id) as count 
           FROM orders o 
           JOIN services s ON o.serviceId = s.id 
+          WHERE o.status != 'cancelled'
           GROUP BY s.id 
           ORDER BY count DESC 
           LIMIT 5
@@ -158,7 +159,7 @@ export async function GET(req: Request) {
         db.prepare(`
           SELECT address, COUNT(id) as count 
           FROM orders 
-          WHERE address IS NOT NULL AND address != ''
+          WHERE address IS NOT NULL AND address != '' AND status != 'cancelled'
           GROUP BY address 
           ORDER BY count DESC 
           LIMIT 5
