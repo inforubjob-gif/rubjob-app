@@ -225,8 +225,8 @@ export default function AdminDashboard() {
          </div>
          <p className="text-[10px] font-black text-white/50 uppercase tracking-widest">{t("admin.dashboard.platformEarnings")}</p>
         </div>
-        <h2 className="text-4xl font-black tracking-tighter mb-1">
-         <span className="text-lg text-white/40 mr-1">฿</span>{Number(stats.earnings).toLocaleString()}
+        <h2 className="text-4xl font-black tracking-tighter mb-1 text-primary">
+         <span className="text-lg text-primary/60 mr-1">฿</span>{Number(stats.earnings).toLocaleString()}
         </h2>
         <p className="text-[10px] font-bold text-white/30 uppercase tracking-widest">{t("admin.dashboard.netCommission")}</p>
         
@@ -242,7 +242,7 @@ export default function AdminDashboard() {
          </div>
          <div className="flex justify-between text-[10px]">
           <span className="text-white/40">ค่าบริการ (฿15/ออเดอร์)</span>
-          <span className="font-black text-primary">฿{Number(bd.platformFee).toLocaleString()}</span>
+          <span className="font-black text-white/70">฿{Number(bd.platformFee).toLocaleString()}</span>
          </div>
         </div>
        </div>
