@@ -25,6 +25,15 @@ export default function AdminDashboard() {
   async function fetchStats() {
    try {
     const res = await fetch("/api/admin/stats", { cache: "no-store" });
+
+    // Guard: if server returns HTML instead of JSON (e.g. error page, login redirect)
+    const contentType = res.headers.get("content-type") || "";
+    if (!contentType.includes("application/json")) {
+      setErrorCount(prev => prev + 1);
+      setApiError(`Server Error: ${res.status} (ระบบตอบกลับผิดรูปแบบ)`);
+      return;
+    }
+
     const data = await res.json() as any;
 
     if (!res.ok || data.error) {
