@@ -18,12 +18,6 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: "Database not connected" }, { status: 500 });
     }
 
-    // Ensure schema exists
-    const { ensureSchema } = await import("@/lib/db-init");
-    await ensureSchema(db);
-
-    // Self-healing: ensure lineUserId column exists
-
     const rubber = await db.prepare(`
       SELECT r.id, r.name, r.email, r.status, r.pictureUrl, r.phone, r.lineUserId, r.vehicleType, r.bankName, r.accountNumber, u.displayName as lineDisplayName
       FROM rubber_users r

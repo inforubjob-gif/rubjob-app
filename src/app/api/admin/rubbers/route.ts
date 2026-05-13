@@ -13,9 +13,6 @@ export async function GET(req: Request) {
     const db = getRequestContext().env.DB;
     if (!db) return NextResponse.json({ error: "D1 not found" }, { status: 500 });
 
-    // Self-healing: Ensure required columns and tables exist
-    await ensureSchema(db);
-
     const { results: rubbers } = await db.prepare(`
       SELECT r.*, u.displayName as lineDisplayName 
       FROM rubber_users r

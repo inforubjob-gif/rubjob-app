@@ -19,10 +19,10 @@ export default function RubberManagementAdminPage() {
  const [isLoading, setIsLoading] = useState(true);
  const [lastRefresh, setLastRefresh] = useState<Date | null>(null);
 
- // Initial fetch + auto-polling every 10 seconds for real-time work status
+ // Initial fetch + auto-polling every 60 seconds for real-time work status
  useEffect(() => {
   fetchRubbers();
-  const interval = setInterval(() => fetchRubbers(true), 10000);
+  const interval = setInterval(() => fetchRubbers(true), 60000);
   return () => clearInterval(interval);
  }, []);
 
@@ -97,7 +97,7 @@ export default function RubberManagementAdminPage() {
      {lastRefresh && (
       <div className="flex items-center gap-2 mt-2">
        <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
-       <span className="text-[10px] font-bold text-slate-400">อัพเดทอัตโนมัติทุก 10 วินาที • {lastRefresh.toLocaleTimeString('th-TH')}</span>
+       <span className="text-[10px] font-bold text-slate-400">อัพเดทอัตโนมัติทุก 60 วินาที • {lastRefresh.toLocaleTimeString('th-TH')}</span>
        <button onClick={() => fetchRubbers(true)} className="text-[10px] font-black text-primary hover:underline ml-1">รีเฟรชตอนนี้</button>
       </div>
      )}
