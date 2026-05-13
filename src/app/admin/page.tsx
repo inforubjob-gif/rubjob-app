@@ -50,6 +50,8 @@ export default function AdminDashboard() {
   connection: "WAITING",
   rubberWalletBalance: 0, storeWalletBalance: 0,
   revenueBreakdown: { totalLaundry: 0, totalDelivery: 0, storeGP: 0, rubberGP: 0, platformFee: 0, storeNetEarnings: 0, rubberNetEarnings: 0 },
+  topServices: [] as any[],
+  topLocations: [] as any[],
  });
  const [isLoading, setIsLoading] = useState(true);
  const [errorCount, setErrorCount] = useState(0);
@@ -92,6 +94,8 @@ export default function AdminDashboard() {
       rubberWalletBalance: data.rubberWalletBalance || 0,
       storeWalletBalance: data.storeWalletBalance || 0,
       revenueBreakdown: data.revenueBreakdown || { totalLaundry: 0, totalDelivery: 0, storeGP: 0, rubberGP: 0, platformFee: 0, storeNetEarnings: 0, rubberNetEarnings: 0 },
+      topServices: data.topServices || [],
+      topLocations: data.topLocations || [],
      });
     }
    } catch (err: unknown) {
@@ -316,7 +320,70 @@ export default function AdminDashboard() {
       </Card>
      </section>
 
-     {/* ═══════════ SECTION 3: Quick Actions ═══════════ */}
+     {/* ═══════════ SECTION 3: Top Insights ═══════════ */}
+     <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {/* Top Services */}
+      <Card className="p-6 bg-white border border-slate-100 shadow-sm rounded-xl">
+       <div className="flex items-center gap-3 mb-5">
+        <div className="w-8 h-8 rounded-lg bg-pink-50 text-pink-500 flex items-center justify-center">
+         <Icons.Star size={16} />
+        </div>
+        <div>
+         <h3 className="text-sm font-black text-slate-900">บริการยอดฮิต</h3>
+         <p className="text-[10px] font-bold text-slate-400">บริการที่ลูกค้านิยมสั่งมากที่สุด</p>
+        </div>
+       </div>
+       <div className="space-y-3">
+        {stats.topServices.length > 0 ? stats.topServices.map((svc, i) => (
+         <div key={i} className="flex items-center justify-between group">
+          <div className="flex items-center gap-3">
+           <div className="w-5 h-5 rounded flex items-center justify-center text-[10px] font-black bg-slate-50 text-slate-400 group-hover:bg-pink-50 group-hover:text-pink-500 transition-colors">
+            {i + 1}
+           </div>
+           <span className="text-xs font-bold text-slate-700">{svc.name}</span>
+          </div>
+          <div className="text-[10px] font-black bg-slate-50 px-2 py-1 rounded-md text-slate-500">
+           {svc.count} <span className="font-bold text-slate-400 font-mono">ครั้ง</span>
+          </div>
+         </div>
+        )) : (
+         <div className="text-center py-4 text-xs font-bold text-slate-400">ยังไม่มีข้อมูล</div>
+        )}
+       </div>
+      </Card>
+
+      {/* Top Locations */}
+      <Card className="p-6 bg-white border border-slate-100 shadow-sm rounded-xl">
+       <div className="flex items-center gap-3 mb-5">
+        <div className="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-500 flex items-center justify-center">
+         <Icons.MapPin size={16} />
+        </div>
+        <div>
+         <h3 className="text-sm font-black text-slate-900">ย่านยอดฮิต</h3>
+         <p className="text-[10px] font-bold text-slate-400">บริเวณที่ลูกค้าเรียกใช้บริการบ่อยที่สุด</p>
+        </div>
+       </div>
+       <div className="space-y-3">
+        {stats.topLocations.length > 0 ? stats.topLocations.map((loc, i) => (
+         <div key={i} className="flex items-center justify-between group">
+          <div className="flex items-center gap-3 overflow-hidden">
+           <div className="w-5 h-5 shrink-0 rounded flex items-center justify-center text-[10px] font-black bg-slate-50 text-slate-400 group-hover:bg-indigo-50 group-hover:text-indigo-500 transition-colors">
+            {i + 1}
+           </div>
+           <span className="text-xs font-bold text-slate-700 truncate" title={loc.name}>{loc.name}</span>
+          </div>
+          <div className="text-[10px] shrink-0 font-black bg-slate-50 px-2 py-1 rounded-md text-slate-500 ml-2">
+           {loc.count} <span className="font-bold text-slate-400 font-mono">ครั้ง</span>
+          </div>
+         </div>
+        )) : (
+         <div className="text-center py-4 text-xs font-bold text-slate-400">ยังไม่มีข้อมูล</div>
+        )}
+       </div>
+      </Card>
+     </section>
+
+     {/* ═══════════ SECTION 4: Quick Actions ═══════════ */}
      <section>
       <Card className="p-6 bg-white border border-slate-100 shadow-sm rounded-xl">
        <h3 className="text-sm font-black text-slate-900 mb-5 flex items-center gap-2">

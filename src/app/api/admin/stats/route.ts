@@ -142,6 +142,41 @@ export async function GET(req: Request) {
     } catch (e) {
       console.warn("Wallet stats failed:", e);
     }
+    // 4. Top Insights
+    let topServices: any[] = [];
+    let topLocations: any[] = [];
+    try {
+      const insights = await db.batch([
+        db.prepare(`
+          SELECT s.name, COUNT(o.id) as count 
+          FROM orders o 
+          JOIN services s ON o.serviceId = s.id 
+          GROUP BY s.id 
+          ORDER BY count DESC 
+          LIMIT 5
+        `),
+        db.prepare(`
+          SELECT address, COUNT(id) as count 
+          FROM orders 
+          WHERE address IS NOT NULL AND address != ''
+          GROUP BY address 
+          ORDER BY count DESC 
+          LIMIT 5
+        `)
+      ]);
+      topServices = insights[0].results || [];
+      
+      // Post-process addresses to extract districts or just use short versions
+      const rawLocations = insights[1].results || [];
+      topLocations = rawLocations.map((loc: any) => {
+         // Naive extraction: try to get the part after "เขต" or "อำเภอ" if it exists, otherwise just truncate
+         let shortName = loc.address;
+         if (shortName.length > 30) shortName = shortName.substring(0, 30) + '...';
+         return { name: shortName, count: loc.count };
+      });
+    } catch (e) {
+      console.warn("Top insights failed:", e);
+    }
 
     return NextResponse.json({ 
       users: usersCount,
@@ -170,6 +205,8 @@ export async function GET(req: Request) {
       inventory: inventory,
       rubberWalletBalance,
       storeWalletBalance,
+      topServices,
+      topLocations,
     });
   } catch (error: unknown) {
     return NextResponse.json({ error: safeError(error) }, { status: 500 });
