@@ -1,3 +1,4 @@
+import { safeError } from "@/lib/api-utils";
 import { getRequestContext } from "@cloudflare/next-on-pages";
 import { NextResponse } from "next/server";
 import { validateRequired, validatePhone } from "@/lib/validation";
@@ -62,8 +63,8 @@ export async function POST(req: Request) {
       storeId: storeId,
       ownerId: ownerId
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Public Store Registration error:", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: safeError(error) }, { status: 500 });
   }
 }

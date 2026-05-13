@@ -1,3 +1,4 @@
+import { safeError } from "@/lib/api-utils";
 import { getRequestContext } from "@cloudflare/next-on-pages";
 import { NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
@@ -22,48 +23,10 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "D1 Database binding 'DB' not found" }, { status: 500 });
     }
 
-    // 1. Ensure table exists (Self-healing)
-    await db.prepare(`
-      CREATE TABLE IF NOT EXISTS addresses (
-        id TEXT PRIMARY KEY,
-        userId TEXT NOT NULL,
-        label TEXT NOT NULL,
-        details TEXT,
-        note TEXT,
-        lat REAL,
-        lng REAL,
-        isDefault INTEGER DEFAULT 0
-      )
-    `).run();
+    // Self-healing: tables moved to db-init.ts
 
-    // Ensure users table exists (Self-healing)
-    await db.prepare(`
-      CREATE TABLE IF NOT EXISTS users (
-        id TEXT PRIMARY KEY,
-        displayName TEXT,
-        pictureUrl TEXT,
-        phone TEXT,
-        role TEXT DEFAULT 'user',
-        assignedStoreId TEXT,
-        points INTEGER DEFAULT 0,
-        preferences TEXT,
-        walletPin TEXT,
-        createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
-      )
-    `).run();
 
-    try {
-      await db.prepare(`ALTER TABLE users ADD COLUMN walletPin TEXT`).run();
-    } catch (e) {
-      // Column might already exist
-    }
-
-    // Migrations: Add orderId to support_tickets
-    try {
-      await db.prepare(`ALTER TABLE support_tickets ADD COLUMN orderId TEXT`).run();
-    } catch (e) {
-      // Column might already exist
-    }
+    // Self-healing columns moved to db-init.ts
 
     // Upsert User (include phone if provided)
     if (phone) {
@@ -89,8 +52,8 @@ export async function POST(req: Request) {
     const user = await db.prepare(`SELECT phone FROM users WHERE id = ?`).bind(id).first();
 
     return NextResponse.json({ success: true, phone: user?.phone || null });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Sync user error:", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: safeError(error) }, { status: 500 });
   }
 }

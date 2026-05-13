@@ -234,6 +234,81 @@ export async function ensureSchema(db: D1Database) {
       description TEXT,
       updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP
     );
+
+    CREATE TABLE IF NOT EXISTS login_attempts (
+      id TEXT PRIMARY KEY,
+      ip_key TEXT NOT NULL,
+      created_at DATETIME NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS provider_users (
+      id TEXT PRIMARY KEY,
+      email TEXT UNIQUE NOT NULL,
+      password TEXT NOT NULL,
+      name TEXT NOT NULL DEFAULT '',
+      phone TEXT DEFAULT '',
+      pictureUrl TEXT DEFAULT '',
+      lineUserId TEXT,
+      skills TEXT DEFAULT '[]',
+      pricing TEXT DEFAULT '{}',
+      pricingUnit TEXT DEFAULT '{}',
+      bio TEXT DEFAULT '',
+      lineId TEXT DEFAULT '',
+      status TEXT DEFAULT 'pending',
+      createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+      updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+
+    CREATE TABLE IF NOT EXISTS provider_services (
+      id TEXT PRIMARY KEY,
+      providerId TEXT NOT NULL,
+      title TEXT NOT NULL,
+      description TEXT,
+      price REAL,
+      unit TEXT,
+      icon TEXT DEFAULT 'Stars',
+      packages TEXT DEFAULT '[]',
+      isActive INTEGER DEFAULT 1,
+      createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (providerId) REFERENCES provider_users(id) ON DELETE CASCADE
+    );
+
+    CREATE TABLE IF NOT EXISTS provider_wallet (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      providerId TEXT NOT NULL,
+      orderId TEXT,
+      amount REAL NOT NULL DEFAULT 0,
+      type TEXT DEFAULT 'job_completion',
+      status TEXT DEFAULT 'completed',
+      createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+
+    CREATE TABLE IF NOT EXISTS notifications (
+      id TEXT PRIMARY KEY,
+      userId TEXT NOT NULL,
+      userType TEXT DEFAULT 'rubber',
+      type TEXT NOT NULL,
+      title TEXT NOT NULL,
+      message TEXT NOT NULL,
+      link TEXT,
+      isRead INTEGER DEFAULT 0,
+      createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+
+    CREATE TABLE IF NOT EXISTS webhook_logs (
+      id TEXT PRIMARY KEY,
+      channel TEXT,
+      payload TEXT,
+      error TEXT,
+      createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+
+    CREATE TABLE IF NOT EXISTS link_tokens (
+      token TEXT PRIMARY KEY,
+      accountId TEXT NOT NULL,
+      used INTEGER DEFAULT 0,
+      createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
   `;
 
   // Execute standard tables
@@ -252,11 +327,16 @@ export async function ensureSchema(db: D1Database) {
 
   // Ensure mandatory columns exist (for tables that might already exist but are missing columns)
   const migrations = [
+     // --- rubber_users ---
      "ALTER TABLE rubber_users ADD COLUMN rubber_number INTEGER",
      "ALTER TABLE rubber_users ADD COLUMN pictureUrl TEXT",
      "ALTER TABLE rubber_users ADD COLUMN bankName TEXT",
      "ALTER TABLE rubber_users ADD COLUMN accountNumber TEXT",
      "ALTER TABLE rubber_users ADD COLUMN accountName TEXT",
+     "ALTER TABLE rubber_users ADD COLUMN lineUserId TEXT",
+     "ALTER TABLE rubber_users ADD COLUMN preferences TEXT",
+
+     // --- orders ---
      "ALTER TABLE orders ADD COLUMN pickupPhotoUrl TEXT",
      "ALTER TABLE orders ADD COLUMN dropoffShopPhotoUrl TEXT",
      "ALTER TABLE orders ADD COLUMN arrivedAtShopAt DATETIME",
@@ -276,6 +356,57 @@ export async function ensureSchema(db: D1Database) {
      "ALTER TABLE orders ADD COLUMN providerId TEXT",
      "ALTER TABLE orders ADD COLUMN paymentStatus TEXT DEFAULT 'pending'",
      "ALTER TABLE orders ADD COLUMN orderType TEXT DEFAULT 'logistics'",
+     "ALTER TABLE orders ADD COLUMN adminNotifiedDelay INTEGER DEFAULT 0",
+
+     // --- admin_users ---
+     "ALTER TABLE admin_users ADD COLUMN permissions TEXT",
+     "ALTER TABLE admin_users ADD COLUMN avatarUrl TEXT",
+
+     // --- stores ---
+     "ALTER TABLE stores ADD COLUMN email TEXT",
+     "ALTER TABLE stores ADD COLUMN password TEXT",
+     "ALTER TABLE stores ADD COLUMN lineUserId TEXT",
+     "ALTER TABLE stores ADD COLUMN status TEXT DEFAULT 'active'",
+     "ALTER TABLE stores ADD COLUMN preferences TEXT",
+
+     // --- coupons ---
+     "ALTER TABLE coupons ADD COLUMN title TEXT",
+     "ALTER TABLE coupons ADD COLUMN description TEXT",
+     "ALTER TABLE coupons ADD COLUMN isVisible INTEGER DEFAULT 1",
+     "ALTER TABLE coupons ADD COLUMN maxDiscount REAL",
+     "ALTER TABLE coupons ADD COLUMN eligibleRoles TEXT DEFAULT 'all'",
+
+     // --- support_tickets ---
+     "ALTER TABLE support_tickets ADD COLUMN userType TEXT DEFAULT 'customer'",
+     "ALTER TABLE support_tickets ADD COLUMN senderName TEXT",
+     "ALTER TABLE support_tickets ADD COLUMN orderId TEXT",
+
+     // --- addresses ---
+     "ALTER TABLE addresses ADD COLUMN note TEXT",
+     "ALTER TABLE addresses ADD COLUMN lat REAL",
+     "ALTER TABLE addresses ADD COLUMN lng REAL",
+
+     // --- users ---
+     "ALTER TABLE users ADD COLUMN walletPin TEXT",
+     "ALTER TABLE users ADD COLUMN preferences TEXT",
+
+     // --- provider_users (schema drift fix) ---
+     "ALTER TABLE provider_users ADD COLUMN name TEXT DEFAULT ''",
+     "ALTER TABLE provider_users ADD COLUMN phone TEXT DEFAULT ''",
+     "ALTER TABLE provider_users ADD COLUMN pictureUrl TEXT DEFAULT ''",
+     "ALTER TABLE provider_users ADD COLUMN lineUserId TEXT",
+     "ALTER TABLE provider_users ADD COLUMN skills TEXT DEFAULT '[]'",
+     "ALTER TABLE provider_users ADD COLUMN pricing TEXT DEFAULT '{}'",
+     "ALTER TABLE provider_users ADD COLUMN pricingUnit TEXT DEFAULT '{}'",
+     "ALTER TABLE provider_users ADD COLUMN bio TEXT DEFAULT ''",
+     "ALTER TABLE provider_users ADD COLUMN lineId TEXT DEFAULT ''",
+     "ALTER TABLE provider_users ADD COLUMN updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP",
+
+     // --- provider_services (schema drift fix) ---
+     "ALTER TABLE provider_services ADD COLUMN price REAL",
+     "ALTER TABLE provider_services ADD COLUMN unit TEXT",
+     "ALTER TABLE provider_services ADD COLUMN icon TEXT DEFAULT 'Stars'",
+     "ALTER TABLE provider_services ADD COLUMN packages TEXT DEFAULT '[]'",
   ];
 
   for (const migration of migrations) {

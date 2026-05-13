@@ -1,3 +1,4 @@
+import { safeError } from "@/lib/api-utils";
 import { getRequestContext } from "@cloudflare/next-on-pages";
 import { NextResponse } from "next/server";
 import { getRubberSession } from "@/lib/auth-server";
@@ -116,8 +117,8 @@ export async function GET(req: Request) {
       transactions: transactions.slice(0, 20)
     });
 
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error: unknown) {
+    return NextResponse.json({ error: safeError(error) }, { status: 500 });
   }
 }
 
@@ -153,7 +154,7 @@ export async function POST(req: Request) {
     } catch (e) { console.error("Notify withdrawal error:", e); }
 
     return NextResponse.json({ success: true, payoutId: id });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error: unknown) {
+    return NextResponse.json({ error: safeError(error) }, { status: 500 });
   }
 }

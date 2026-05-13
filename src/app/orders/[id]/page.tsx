@@ -12,6 +12,7 @@ import Button from "@/components/ui/Button";
 import { Icons, getServiceIcon, IconCircle } from "@/components/ui/Icons";
 import { useTranslation } from "@/components/providers/LanguageProvider";
 import { useLiff } from "@/components/providers/LiffProvider";
+import { useToast } from "@/components/providers/ToastProvider";
 import { loadStripe, type Stripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
 import PromptPayCheckout from "@/components/checkout/PromptPayCheckout";
@@ -30,6 +31,7 @@ export default function OrderDetailPage() {
   const router = useRouter();
   const { profile } = useLiff();
   const { t } = useTranslation();
+  const { showToast } = useToast();
   const [order, setOrder] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [storeRating, setStoreRating] = useState(0);
@@ -52,13 +54,13 @@ export default function OrderDetailPage() {
       });
       const data = await res.json() as any;
       if (!res.ok) {
-        alert(data.error || "Failed to cancel order");
+        showToast(data.error || "Failed to cancel order", "error");
         return;
       }
-      alert(t("orders.cancelSuccess") || "ยกเลิกออเดอร์สำเร็จ");
+      showToast(t("orders.cancelSuccess") || "ยกเลิกออเดอร์สำเร็จ", "success");
       window.location.reload();
     } catch (e) {
-      alert("Error cancelling order");
+      showToast("Error cancelling order", "error");
     } finally {
       setIsCancelling(false);
     }
@@ -74,7 +76,7 @@ export default function OrderDetailPage() {
         body: JSON.stringify({ storeRating, storeReview, driverRating, driverReview }),
       });
       if (res.ok) {
-        alert("ขอบคุณสำหรับรีวิวครับ!");
+        showToast(t("orders.review.thankYou"), "success");
         // Update local state to hide review box
         setOrder({ ...order, storeRating, driverRating });
       }
@@ -157,9 +159,9 @@ export default function OrderDetailPage() {
             text: `🧺 RUBJOB Update\n${msg}\n\nView details: ${window.location.href}`,
           },
         ]);
-        alert(t("orders.notifications.statusSent"));
+        showToast(t("orders.notifications.statusSent"), "success");
       } else {
-        alert(t("orders.lineOnly"));
+        showToast(t("orders.lineOnly"), "warning");
       }
     } catch (err) {
       console.error("Failed to send message:", err);

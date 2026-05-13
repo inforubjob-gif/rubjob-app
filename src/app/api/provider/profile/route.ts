@@ -1,3 +1,4 @@
+import { safeError } from "@/lib/api-utils";
 import { getRequestContext } from "@cloudflare/next-on-pages";
 import { NextResponse } from "next/server";
 
@@ -31,7 +32,7 @@ export async function PUT(req: Request) {
     `).bind(lineId, name, bio, email).run();
 
     return NextResponse.json({ success: true });
-  } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 });
+  } catch (err: unknown) {
+    return NextResponse.json({ error: safeError(err) }, { status: 500 });
   }
 }

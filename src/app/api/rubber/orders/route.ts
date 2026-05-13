@@ -2,6 +2,7 @@ import { getRequestContext } from "@cloudflare/next-on-pages";
 import { NextResponse } from "next/server";
 import { getRubberSession } from "@/lib/auth-server";
 import { transitionOrderStatus } from "@/lib/order-logic";
+import { safeError } from "@/lib/api-utils";
 
 export const runtime = "edge";
 
@@ -26,12 +27,7 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: "D1 Database binding 'DB' not found" }, { status: 500 });
     }
 
-    // Self-healing: Ensure required columns exist
-    try { await db.prepare("ALTER TABLE rubber_users ADD COLUMN rubber_number INTEGER").run(); } catch(e) {}
-    try { await db.prepare("ALTER TABLE rubber_users ADD COLUMN bankName TEXT").run(); } catch(e) {}
-    try { await db.prepare("ALTER TABLE rubber_users ADD COLUMN accountNumber TEXT").run(); } catch(e) {}
-    try { await db.prepare("ALTER TABLE rubber_users ADD COLUMN accountName TEXT").run(); } catch(e) {}
-    try { await db.prepare("ALTER TABLE rubber_users ADD COLUMN lineUserId TEXT").run(); } catch(e) {}
+    // Self-healing columns moved to db-init.ts (Phase 3.2)
 
     const calculateRubberEarn = (deliveryFee: number, status: string) => {
       // 15% commission + 15 THB Platform Fee
@@ -83,9 +79,9 @@ export async function GET(req: Request) {
         items: JSON.parse(r.items || "[]")
       }))
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Fetch rubber orders error:", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: safeError(error) }, { status: 500 });
   }
 }
 
@@ -152,8 +148,8 @@ export async function PUT(req: Request) {
     } else {
       return NextResponse.json({ success: false, error: "งานนี้ถูกรับไปแล้ว" }, { status: 409 });
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Accept job error:", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: safeError(error) }, { status: 500 });
   }
 }

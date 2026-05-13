@@ -376,6 +376,22 @@ export const th = {
         bagSize: "ขนาดสัมภาระ",
         extraService: "บริการเสริม",
       },
+      connectingLine: "กำลังเชื่อมต่อระบบ LINE...",
+      selectedService: "บริการที่เลือก",
+      bagMaxSize: "ขนาดใหญ่สุด (28kg)",
+      bagMaxDesc: "รองรับผ้านวมขนาดใหญ่",
+      bagPieces: {
+        "9kg": "~25-30 ชิ้น",
+        "14kg": "~40-50 ชิ้น",
+        "18kg": "~60-70 ชิ้น",
+        "28kg": "~80-100 ชิ้น",
+      },
+      detergentTitle: "น้ำยาซักผ้า / ปรับผ้านุ่ม",
+      detergentLabel: "รับน้ำยาของร้าน",
+      detergentPrice: "+฿20 (เกรดพรีเมียม)",
+      expressLabel: "ค่าบริการด่วนพิเศษ (Express)",
+      detergentFeeLabel: "ค่าน้ำยาซักผ้า/ปรับผ้านุ่ม",
+      genericError: "เกิดข้อผิดพลาด",
     },
     items: {
       tshirt: "เสื้อยืด",
@@ -881,6 +897,11 @@ export const th = {
         stopWorkConfirm: "ต้องการหยุดรับงานใช่หรือไม่?",
         startWorkDesc: "เมื่อเริ่มรับงาน คุณจะเริ่มได้รับแจ้งเตือนออเดอร์ใหม่ทันที",
         stopWorkDesc: "เมื่อหยุดรับงาน คุณจะไม่เห็นออเดอร์ใหม่ๆ จนกว่าจะเปิดสถานะอีกครั้ง",
+        line: {
+          connectError: "ไม่สามารถเชื่อมต่อ LINE ได้ กรุณาลองใหม่อีกครั้ง",
+          disconnectSuccess: "ยกเลิกการเชื่อมต่อ LINE สำเร็จ กรุณารีเฟรชหน้าเว็บ",
+          disconnectError: "ไม่สามารถยกเลิกการเชื่อมต่อได้",
+        },
       },
       payoutMethodPage: {
         title: "ช่องทางการรับเงิน",
@@ -1041,6 +1062,13 @@ export const th = {
         loginButton: "เข้าสู่ระบบ (Login)",
         backOffice: "ระบบหลังบ้าน",
         authorizedOnly: "สำหรับผู้ที่ได้รับอนุญาตเท่านั้น",
+      },
+      broadcast: {
+        title: "ศูนย์ประกาศข่าวสาร",
+        emptyMessage: "กรุณาพิมพ์ข้อความที่ต้องการส่ง",
+        sendSuccess: "ส่งข้อความสำเร็จ! (ส่งได้: {sent}, ล้มเหลว: {failed})",
+        updateSuccess: "อัพเดทสำเร็จ",
+        genericError: "เกิดข้อผิดพลาด",
       },
       common: {
         adminBadge: "ผู้ดูแลระบบ",
@@ -1310,6 +1338,9 @@ export const th = {
         selectSub: "เลือกรายชื่อลูกค้าจากทางซ้ายเพื่อเริ่มต้นการช่วยเหลือระดับโลก",
         you: "คุณ",
         openingTicket: "กำลังเปิดตั๋วปัญหา...",
+        replyViaLineOA: "ตอบกลับใน LINE OA (ฟรี)",
+        quotaWarning: "⚡ ประหยัดโควต้า",
+        quotaWarningDesc: "การกดส่งข้อความในระบบนี้จะหักโควต้า LINE OA (Push API) ทุกข้อความ หากต้องการตอบฟรี กดปุ่ม \"ตอบกลับใน LINE OA\" เพื่อไปพิมพ์ตอบในแอป LINE OA โดยตรง",
       },
       investor: {
         costs: {

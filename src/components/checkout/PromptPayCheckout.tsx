@@ -97,8 +97,8 @@ export default function PromptPayCheckout({ clientSecret, autoConfirm }: PromptP
       } else if (paymentIntent && paymentIntent.status === "succeeded") {
         window.location.href = "/success";
       }
-    } catch (err: any) {
-      setMessage(err?.message || "An unexpected error occurred while confirming payment.");
+    } catch (err: unknown) {
+      setMessage((err instanceof Error) ? err.message : "An unexpected error occurred while confirming payment.");
     } finally {
       setIsLoading(false);
     }

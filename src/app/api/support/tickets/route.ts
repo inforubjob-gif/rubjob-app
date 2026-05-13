@@ -31,8 +31,6 @@ export async function GET(req: Request) {
   if (!db) return NextResponse.json({ error: "DB not found" }, { status: 500 });
 
   // Self-healing: ensure columns exist
-  try { await db.prepare("ALTER TABLE support_tickets ADD COLUMN userType TEXT DEFAULT 'customer'").run(); } catch (e) {}
-  try { await db.prepare("ALTER TABLE support_tickets ADD COLUMN orderId TEXT").run(); } catch (e) {}
 
   const { searchParams } = new URL(req.url);
   const ticketId = searchParams.get("id");
@@ -80,8 +78,6 @@ export async function POST(req: Request) {
   if (!db) return NextResponse.json({ error: "DB not found" }, { status: 500 });
 
   // Self-healing
-  try { await db.prepare("ALTER TABLE support_tickets ADD COLUMN userType TEXT DEFAULT 'customer'").run(); } catch (e) {}
-  try { await db.prepare("ALTER TABLE support_tickets ADD COLUMN orderId TEXT").run(); } catch (e) {}
 
   // Ensure userId exists in users table (FK constraint)
   // Rubber/Store IDs live in separate tables but FK references users(id)

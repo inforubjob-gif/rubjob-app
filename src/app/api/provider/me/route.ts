@@ -1,3 +1,4 @@
+import { safeError } from "@/lib/api-utils";
 import { getRequestContext } from "@cloudflare/next-on-pages";
 import { NextResponse } from "next/server";
 import { getProviderSession } from "@/lib/auth-server";
@@ -41,8 +42,8 @@ export async function GET() {
         status: provider.status,
       }
     });
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error("Provider /me error:", err);
-    return NextResponse.json({ error: err.message }, { status: 500 });
+    return NextResponse.json({ error: safeError(err) }, { status: 500 });
   }
 }

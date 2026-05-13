@@ -1,3 +1,4 @@
+import { safeError } from "@/lib/api-utils";
 import { getRequestContext } from "@cloudflare/next-on-pages";
 import { NextResponse } from "next/server";
 import { hashPassword } from "@/lib/password";
@@ -38,10 +39,10 @@ export async function POST(req: Request) {
     }
 
     return NextResponse.json({ success: true, id });
-  } catch (error: any) {
-    if (error.message.includes("UNIQUE constraint failed")) {
+  } catch (error: unknown) {
+    if (((error instanceof Error) ? safeError(error) : "").includes("UNIQUE constraint failed")) {
       return NextResponse.json({ error: "Email already exists" }, { status: 400 });
     }
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: safeError(error) }, { status: 500 });
   }
 }

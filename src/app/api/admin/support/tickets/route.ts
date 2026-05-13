@@ -1,3 +1,4 @@
+import { safeError } from "@/lib/api-utils";
 import { getRequestContext } from "@cloudflare/next-on-pages";
 import { NextResponse } from "next/server";
 import { getAdminSession } from "@/lib/auth-server";
@@ -20,8 +21,6 @@ export async function GET(req: Request) {
     if (!db) return NextResponse.json({ error: "D1 not found" }, { status: 500 });
 
     // Self-healing: ensure columns exist
-    try { await db.prepare("ALTER TABLE support_tickets ADD COLUMN userType TEXT DEFAULT 'customer'").run(); } catch (e) {}
-    try { await db.prepare("ALTER TABLE support_tickets ADD COLUMN senderName TEXT").run(); } catch (e) {}
 
     if (id) {
       // Fetch messages for a specific ticket
@@ -88,9 +87,9 @@ export async function GET(req: Request) {
         unknown: countResult?.unknownCount || 0,
       }
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Admin tickets fetch error:", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: safeError(error) }, { status: 500 });
   }
 }
 
@@ -109,7 +108,7 @@ export async function PATCH(req: Request) {
     `).bind(status, id).run();
 
     return NextResponse.json({ success: true });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error: unknown) {
+    return NextResponse.json({ error: safeError(error) }, { status: 500 });
   }
 }

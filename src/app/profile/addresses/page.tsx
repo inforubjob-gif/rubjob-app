@@ -7,6 +7,7 @@ import type { Address } from "@/types";
 import { useTranslation } from "@/components/providers/LanguageProvider";
 import { Icons, IconCircle } from "@/components/ui/Icons";
 import { useLiff } from "@/components/providers/LiffProvider";
+import { useToast } from "@/components/providers/ToastProvider";
 import dynamic from "next/dynamic";
  
 const MapPicker = dynamic(() => import("@/components/ui/MapPicker"), {
@@ -19,6 +20,7 @@ export default function ManageAddressesPage() {
   const { t } = useTranslation();
   const [addresses, setAddresses] = useState<Address[]>([]);
   const { profile } = useLiff();
+  const { showToast } = useToast();
   const [isSaving, setIsSaving] = useState(false);
   
   // Fetch real addresses
@@ -74,7 +76,7 @@ export default function ManageAddressesPage() {
            router.back();
         }, 300);
       } else {
-        alert(data.error || "Failed to select address");
+        showToast(data.error || "Failed to select address", "error");
       }
     } catch (err) {
       console.error("Select address error:", err);
@@ -95,7 +97,7 @@ export default function ManageAddressesPage() {
   const handleAddAddress = async () => {
     if (!profile?.userId) return;
     if (!newLabel || !newAddress) {
-      alert(t("profile.addressRequired"));
+      showToast(t("profile.addressRequired"), "warning");
       return;
     }
  
@@ -140,11 +142,11 @@ export default function ManageAddressesPage() {
         setNewNote("");
         setLocation(null);
       } else {
-        alert(data.error || "Failed to save address");
+        showToast(data.error || "Failed to save address", "error");
       }
     } catch (err) {
       console.error("Save address error:", err);
-      alert("Failed to connect to server");
+      showToast("Failed to connect to server", "error");
     } finally {
       setIsSaving(false);
     }

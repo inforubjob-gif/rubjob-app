@@ -1,3 +1,4 @@
+import { safeError } from "@/lib/api-utils";
 import { NextResponse } from "next/server";
 import { getRequestContext } from "@cloudflare/next-on-pages";
 import { getAdminSession } from "@/lib/auth-server";
@@ -25,7 +26,6 @@ export async function PATCH(
     const db = getRequestContext().env.DB;
 
     // Self-healing: ensure staffNote column exists
-    try { await db.prepare("ALTER TABLE orders ADD COLUMN staffNote TEXT").run(); } catch (e) {}
 
     // Build dynamic update query for field assignments
     const fields: string[] = [];
@@ -57,8 +57,8 @@ export async function PATCH(
     }
 
     return NextResponse.json({ success: true });
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error("Admin order update error:", err);
-    return NextResponse.json({ error: err.message }, { status: 500 });
+    return NextResponse.json({ error: safeError(err) }, { status: 500 });
   }
 }

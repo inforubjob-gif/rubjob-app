@@ -1,3 +1,4 @@
+import { safeError } from "@/lib/api-utils";
 import { getRequestContext } from "@cloudflare/next-on-pages";
 import { NextResponse } from "next/server";
 import { getAdminSession } from "@/lib/auth-server";
@@ -58,8 +59,8 @@ export async function GET(req: Request) {
       totalRubbers = extended[0].results?.[0]?.total || 0;
       activeRubbers = extended[1].results?.[0]?.total || 0;
       activeStores = extended[2].results?.[0]?.total || 0;
-    } catch (e: any) {
-      console.warn("Extended stats failed:", e.message);
+    } catch (e: unknown) {
+      console.warn("Extended stats failed:", e instanceof Error ? e.message : String(e));
     }
 
     const displayTotalStores = storesCount;
@@ -106,7 +107,7 @@ export async function GET(req: Request) {
       activeRubbers,
       inventory: inventory
     });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error: unknown) {
+    return NextResponse.json({ error: safeError(error) }, { status: 500 });
   }
 }

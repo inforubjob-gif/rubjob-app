@@ -1,3 +1,4 @@
+import { safeError } from "@/lib/api-utils";
 import { getRequestContext } from "@cloudflare/next-on-pages";
 import { NextResponse } from "next/server";
 import { getAdminSession } from "@/lib/auth-server";
@@ -11,44 +12,9 @@ export async function GET(req: Request) {
     const db = getRequestContext().env.DB;
     if (!db) return NextResponse.json({ error: "D1 not found" }, { status: 500 });
 
-    // Self-healing: Ensure new columns and tables exist
-    try {
-      await db.prepare(`
-        CREATE TABLE IF NOT EXISTS store_services (
-          storeId TEXT NOT NULL,
-          serviceId TEXT NOT NULL,
-          price REAL,
-          PRIMARY KEY (storeId, serviceId),
-          FOREIGN KEY (storeId) REFERENCES stores(id) ON DELETE CASCADE,
-          FOREIGN KEY (serviceId) REFERENCES services(id) ON DELETE CASCADE
-        )
-      `).run();
-    } catch (e) {}
+    // Self-healing: tables moved to db-init.ts
 
-    try {
-      await db.prepare(`
-        CREATE TABLE IF NOT EXISTS store_documents (
-          id TEXT PRIMARY KEY,
-          storeId TEXT NOT NULL,
-          type TEXT NOT NULL,
-          url TEXT NOT NULL,
-          status TEXT DEFAULT 'pending',
-          notes TEXT,
-          createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
-          FOREIGN KEY (storeId) REFERENCES stores(id) ON DELETE CASCADE
-        )
-      `).run();
-    } catch (e) {}
 
-    try { await db.prepare("ALTER TABLE stores ADD COLUMN status TEXT DEFAULT 'active'").run(); } catch(e) {}
-    try { await db.prepare("ALTER TABLE stores ADD COLUMN bankName TEXT").run(); } catch(e) {}
-    try { await db.prepare("ALTER TABLE stores ADD COLUMN accountNumber TEXT").run(); } catch(e) {}
-    try { await db.prepare("ALTER TABLE stores ADD COLUMN accountName TEXT").run(); } catch(e) {}
-    try { await db.prepare("ALTER TABLE stores ADD COLUMN email TEXT").run(); } catch(e) {}
-    try { await db.prepare("ALTER TABLE stores ADD COLUMN password TEXT").run(); } catch(e) {}
-    try { await db.prepare("ALTER TABLE stores ADD COLUMN preferences TEXT").run(); } catch(e) {}
-    try { await db.prepare("ALTER TABLE stores ADD COLUMN lineUserId TEXT").run(); } catch(e) {}
-    
 
     const { results: stores } = await db.prepare(`
       SELECT s.*, u.displayName as ownerName, COUNT(o.id) as orderCount
@@ -78,8 +44,8 @@ export async function GET(req: Request) {
     }));
 
     return NextResponse.json({ stores: storesWithServices });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error: unknown) {
+    return NextResponse.json({ error: safeError(error) }, { status: 500 });
   }
 }
 
@@ -104,9 +70,9 @@ export async function POST(req: Request) {
           INSERT INTO users (id, displayName, role)
           VALUES (?, ?, 'store_admin')
         `).bind(finalOwnerId, `Owner of ${name}`).run();
-      } catch (e: any) {
+      } catch (e: unknown) {
         console.error("Auto-owner creation failed:", e);
-        return NextResponse.json({ error: "Could not auto-generate owner: " + e.message }, { status: 500 });
+        return NextResponse.json({ error: "Could not auto-generate owner: " + safeError(e) }, { status: 500 });
       }
     }
 
@@ -129,8 +95,8 @@ export async function POST(req: Request) {
     }
 
     return NextResponse.json({ success: true, id, ownerId: finalOwnerId });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error: unknown) {
+    return NextResponse.json({ error: safeError(error) }, { status: 500 });
   }
 }
 
@@ -190,8 +156,8 @@ export async function PUT(req: Request) {
     }
 
     return NextResponse.json({ success: true });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error: unknown) {
+    return NextResponse.json({ error: safeError(error) }, { status: 500 });
   }
 }
 
@@ -208,7 +174,7 @@ export async function DELETE(req: Request) {
     await db.prepare(`DELETE FROM stores WHERE id = ?`).bind(id).run();
 
     return NextResponse.json({ success: true });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error: unknown) {
+    return NextResponse.json({ error: safeError(error) }, { status: 500 });
   }
 }

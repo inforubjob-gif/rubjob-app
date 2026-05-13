@@ -1,6 +1,7 @@
 import { getRequestContext } from "@cloudflare/next-on-pages";
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
+import { safeError } from "@/lib/api-utils";
 
 export const runtime = "edge";
 
@@ -22,6 +23,21 @@ export async function POST(req: Request) {
 
     if (!db) {
       return NextResponse.json({ error: "Missing DB Connection" }, { status: 500 });
+    }
+
+    // 🛡️ Phase 2.1: Validate amount against actual order in DB
+    const order = await db.prepare(
+      "SELECT totalPrice, paymentStatus FROM orders WHERE id = ?"
+    ).bind(orderId).first() as { totalPrice: number; paymentStatus: string } | null;
+
+    if (!order) {
+      return NextResponse.json({ error: "Order not found" }, { status: 404 });
+    }
+    if (order.paymentStatus === "paid") {
+      return NextResponse.json({ error: "Already paid" }, { status: 400 });
+    }
+    if (Math.round(order.totalPrice * 100) !== Math.round(amount * 100)) {
+      return NextResponse.json({ error: "Amount mismatch" }, { status: 400 });
     }
 
     // Try Env first, then DB
@@ -80,8 +96,8 @@ export async function POST(req: Request) {
       paymentIntentId: paymentIntent.id
     });
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Stripe Checkout error:", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: safeError(error) }, { status: 500 });
   }
 }

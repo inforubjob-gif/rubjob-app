@@ -1,3 +1,4 @@
+import { safeError } from "@/lib/api-utils";
 import { getRequestContext } from "@cloudflare/next-on-pages";
 import { NextResponse } from "next/server";
 
@@ -16,31 +17,9 @@ export async function GET(req: Request) {
     const db = getRequestContext().env.DB;
     if (!db) return NextResponse.json({ error: "D1 not found" }, { status: 500 });
 
-    await db.exec(`
-      CREATE TABLE IF NOT EXISTS provider_users (
-        id TEXT PRIMARY KEY,
-        email TEXT UNIQUE NOT NULL,
-        password TEXT NOT NULL,
-        name TEXT,
-        phone TEXT,
-        status TEXT DEFAULT 'pending',
-        pictureUrl TEXT,
-        bio TEXT,
-        createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
-        updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP
-      );
-      CREATE TABLE IF NOT EXISTS provider_services (
-        id TEXT PRIMARY KEY,
-        providerId TEXT NOT NULL,
-        title TEXT NOT NULL,
-        description TEXT,
-        price REAL NOT NULL,
-        unit TEXT NOT NULL,
-        isActive INTEGER DEFAULT 1,
-        createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (providerId) REFERENCES provider_users(id) ON DELETE CASCADE
-      );
-    `);
+    // Self-healing: tables moved to db-init.ts
+
+
 
     const { results: providers } = await db.prepare(`
       SELECT id, email, name, status, pictureUrl, bio, createdAt,
@@ -50,9 +29,9 @@ export async function GET(req: Request) {
     `).all();
 
     return NextResponse.json({ providers });
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error("Admin providers GET error:", err);
-    return NextResponse.json({ error: err.message }, { status: 500 });
+    return NextResponse.json({ error: safeError(err) }, { status: 500 });
   }
 }
 
@@ -73,8 +52,8 @@ export async function PUT(req: Request) {
     `).bind(status, id).run();
 
     return NextResponse.json({ success: true, status });
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error("Admin providers PUT error:", err);
-    return NextResponse.json({ error: err.message }, { status: 500 });
+    return NextResponse.json({ error: safeError(err) }, { status: 500 });
   }
 }

@@ -411,7 +411,25 @@ export default function SupportCenterPage() {
       </div>
 
       {/* Input Area */}
-      <div className="p-4 md:p-6 border-t border-slate-100 bg-white">
+      <div className="p-4 md:p-6 border-t border-slate-100 bg-white space-y-3">
+        {/* Quota Warning Banner — only for LINE channels */}
+        {selectedTicket?.channel?.includes('line') && (
+          <div className="flex items-start gap-3 p-3 bg-amber-50 border border-amber-100 rounded-xl">
+            <span className="text-amber-500 shrink-0 mt-0.5">⚡</span>
+            <div className="flex-1 min-w-0">
+              <p className="text-[10px] font-black text-amber-700 uppercase tracking-wider">{t('admin.support.quotaWarning')}</p>
+              <p className="text-[10px] text-amber-600 font-medium leading-relaxed mt-0.5">{t('admin.support.quotaWarningDesc')}</p>
+            </div>
+            <a
+              href="https://chat.line.biz/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="shrink-0 bg-[#00B900] text-white text-[10px] font-black uppercase px-4 py-2.5 rounded-xl hover:bg-[#009900] active:scale-95 transition-all flex items-center gap-1.5 shadow-md shadow-green-200 whitespace-nowrap"
+            >
+              <Icons.Line size={14} /> {t('admin.support.replyViaLineOA')}
+            </a>
+          </div>
+        )}
         <div className="bg-slate-50 rounded-xl p-2 pl-4 md:pl-6 flex items-center gap-3 border border-slate-100 ring-4 ring-slate-50/50">
          <input 
           type="text"

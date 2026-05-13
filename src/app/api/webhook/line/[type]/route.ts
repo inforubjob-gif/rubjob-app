@@ -1,3 +1,4 @@
+import { safeError } from "@/lib/api-utils";
 import { getRequestContext } from "@cloudflare/next-on-pages";
 import { NextResponse } from "next/server";
 
@@ -19,18 +20,8 @@ export async function POST(req: Request, { params }: { params: Promise<{ type: s
     const db = getRequestContext().env.DB as any;
     if (!db) return NextResponse.json({ error: "D1 not found" }, { status: 500 });
     
-    // Create webhook_logs for debugging
-    try {
-      await db.prepare(`
-        CREATE TABLE IF NOT EXISTS webhook_logs (
-          id TEXT PRIMARY KEY,
-          channel TEXT,
-          payload TEXT,
-          error TEXT,
-          createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
-        )
-      `).run();
-    } catch(e) {}
+    // Self-healing: webhook_logs table moved to db-init.ts
+
 
     let channelType = (await params).type; // 'regular' or 'help'
     if (channelType === 'support') channelType = 'help'; // Normalize support to help
@@ -85,14 +76,44 @@ export async function POST(req: Request, { params }: { params: Promise<{ type: s
     }
 
     // Self-healing: ensure columns exist
-    try { await db.prepare("ALTER TABLE support_tickets ADD COLUMN userType TEXT DEFAULT 'customer'").run(); } catch (e) {}
-    try { await db.prepare("ALTER TABLE support_tickets ADD COLUMN senderName TEXT").run(); } catch (e) {}
-    try { await db.prepare("ALTER TABLE rubber_users ADD COLUMN lineUserId TEXT").run(); } catch (e) {}
-    try { await db.prepare("ALTER TABLE stores ADD COLUMN lineUserId TEXT").run(); } catch (e) {}
+
+    // Fetch channel token once for use in auto-reply
+    const tokenResult = await db.prepare(`SELECT value FROM system_settings WHERE key = ?`).bind(channelKeyToken).first() as { value: string } | null;
+    let channelAccessToken = tokenResult?.value;
+    if (!channelAccessToken) {
+      const envKey = `LINE_CHANNEL_ACCESS_TOKEN_${channelType.toUpperCase()}`;
+      channelAccessToken = (getRequestContext().env as any)[envKey] || (getRequestContext().env as any).LINE_CHANNEL_ACCESS_TOKEN;
+    }
 
     const events = body.events || [];
 
     for (const event of events) {
+      // ── Auto-Reply with Reply Token (FREE — does not consume push quota) ──
+      // Reply Token expires in ~60 seconds, so we must use it immediately.
+      if (!isManual && event.replyToken && event.type === "message") {
+        try {
+          if (channelAccessToken) {
+            await fetch("https://api.line.me/v2/bot/message/reply", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${channelAccessToken}`,
+              },
+              body: JSON.stringify({
+                replyToken: event.replyToken,
+                messages: [{
+                  type: "text",
+                  text: "ขอบคุณที่ติดต่อเข้ามาครับ 🙏 แอดมินได้รับเรื่องของคุณแล้ว จะรีบตอบกลับโดยเร็วที่สุดครับ"
+                }],
+              }),
+            });
+          }
+        } catch (replyErr) {
+          // Non-critical: if auto-reply fails (token expired, etc.), continue processing
+          console.warn("Auto-reply failed (non-critical):", replyErr);
+        }
+      }
+
       if (isManual || (event.type === "message" && ["text", "image", "sticker"].includes(event.message.type))) {
         const userId = isManual ? body.userId : event.source.userId;
         let text = "";
@@ -191,15 +212,15 @@ export async function POST(req: Request, { params }: { params: Promise<{ type: s
     }
 
     return NextResponse.json({ success: true });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("LINE Webhook error:", error);
     try {
       const db = getRequestContext().env.DB as any;
       if (db) {
-        await db.prepare(`UPDATE webhook_logs SET error = ? WHERE id = (SELECT id FROM webhook_logs ORDER BY createdAt DESC LIMIT 1)`).bind(error.stack || error.message).run();
+        await db.prepare(`UPDATE webhook_logs SET error = ? WHERE id = (SELECT id FROM webhook_logs ORDER BY createdAt DESC LIMIT 1)`).bind(error instanceof Error ? error.stack : safeError(error)).run();
       }
     } catch(e) {}
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: safeError(error) }, { status: 500 });
   }
 }
 

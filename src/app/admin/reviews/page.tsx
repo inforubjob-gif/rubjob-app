@@ -33,8 +33,8 @@ export default function ReviewsPage() {
       if (!res.ok) throw new Error("Failed to fetch reviews");
       const data = await res.json();
       setReviews(data.reviews || []);
-    } catch (err: any) {
-      showToast(err.message, "error");
+    } catch (err: unknown) {
+      showToast((err instanceof Error) ? err.message : "เกิดข้อผิดพลาด", "error");
     } finally {
       setLoading(false);
     }
@@ -53,8 +53,8 @@ export default function ReviewsPage() {
       if (!res.ok) throw new Error("Failed to delete review");
       showToast("Review deleted successfully", "success");
       setReviews(reviews.filter(r => r.orderId !== orderId));
-    } catch (err: any) {
-      showToast(err.message, "error");
+    } catch (err: unknown) {
+      showToast((err instanceof Error) ? err.message : "เกิดข้อผิดพลาด", "error");
     }
   };
 

@@ -1,3 +1,4 @@
+import { safeError } from "@/lib/api-utils";
 import { getRequestContext } from "@cloudflare/next-on-pages";
 import { NextResponse } from "next/server";
 
@@ -13,24 +14,8 @@ export async function GET() {
     const db = getRequestContext().env.DB;
     if (!db) return NextResponse.json({ error: "D1 not found" }, { status: 500 });
 
-    // Ensure table exists
-    await db.prepare(`
-      CREATE TABLE IF NOT EXISTS provider_users (
-        id TEXT PRIMARY KEY,
-        email TEXT UNIQUE NOT NULL,
-        password TEXT NOT NULL,
-        name TEXT NOT NULL DEFAULT '',
-        phone TEXT DEFAULT '',
-        pictureUrl TEXT DEFAULT '',
-        lineUserId TEXT,
-        skills TEXT DEFAULT '[]',
-        pricing TEXT DEFAULT '{}',
-        pricingUnit TEXT DEFAULT '{}',
-        bio TEXT DEFAULT '',
-        status TEXT DEFAULT 'pending',
-        createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
-      )
-    `).run();
+    // Self-healing: provider_users table moved to db-init.ts
+
 
     // Insert test provider
     await db.prepare(`
@@ -57,8 +42,8 @@ export async function GET() {
         password: "12345678"
       }
     });
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error("Seed error:", err);
-    return NextResponse.json({ error: err.message }, { status: 500 });
+    return NextResponse.json({ error: safeError(err) }, { status: 500 });
   }
 }

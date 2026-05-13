@@ -1,3 +1,4 @@
+import { safeError } from "@/lib/api-utils";
 import { getRequestContext } from "@cloudflare/next-on-pages";
 import { NextResponse } from "next/server";
 
@@ -48,8 +49,8 @@ export async function GET(request: Request) {
       checked: delayedOrders.length,
       notified: updatedCount 
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Cron SLA check error:", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: safeError(error) }, { status: 500 });
   }
 }

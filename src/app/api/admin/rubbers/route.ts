@@ -1,3 +1,4 @@
+import { safeError } from "@/lib/api-utils";
 import { getRequestContext } from "@cloudflare/next-on-pages";
 import { NextResponse } from "next/server";
 import { getAdminSession } from "@/lib/auth-server";
@@ -42,8 +43,8 @@ export async function GET(req: Request) {
     });
 
     return NextResponse.json({ rubbers: rubbersWithDocs });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error: unknown) {
+    return NextResponse.json({ error: safeError(error) }, { status: 500 });
   }
 }
 
@@ -76,11 +77,11 @@ export async function POST(req: Request) {
     ).run();
 
     return NextResponse.json({ success: true, id, displayId });
-  } catch (error: any) {
-    if (error.message.includes("UNIQUE constraint failed")) {
+  } catch (error: unknown) {
+    if (((error instanceof Error) ? safeError(error) : "").includes("UNIQUE constraint failed")) {
       return NextResponse.json({ error: "Email already exists" }, { status: 400 });
     }
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: safeError(error) }, { status: 500 });
   }
 }
 
@@ -134,8 +135,8 @@ export async function PUT(req: Request) {
     }
 
     return NextResponse.json({ success: true });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error: unknown) {
+    return NextResponse.json({ error: safeError(error) }, { status: 500 });
   }
 }
 
@@ -152,7 +153,7 @@ export async function DELETE(req: Request) {
     await db.prepare(`DELETE FROM rubber_users WHERE id = ?`).bind(id).run();
 
     return NextResponse.json({ success: true });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error: unknown) {
+    return NextResponse.json({ error: safeError(error) }, { status: 500 });
   }
 }

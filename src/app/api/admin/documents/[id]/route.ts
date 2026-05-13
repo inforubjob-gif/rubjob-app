@@ -1,3 +1,4 @@
+import { safeError } from "@/lib/api-utils";
 import { getRequestContext } from "@cloudflare/next-on-pages";
 import { NextResponse } from "next/server";
 import { getAdminSession, getRubberSession } from "@/lib/auth-server";
@@ -51,7 +52,7 @@ export async function GET(
 
     // 4. Handle external URLs (fallback)
     return NextResponse.redirect(doc.url);
-  } catch (error: any) {
-    return new Response(error.message, { status: 500 });
+  } catch (error: unknown) {
+    return new Response(safeError(error), { status: 500 });
   }
 }

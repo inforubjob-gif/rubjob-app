@@ -1,3 +1,4 @@
+import { safeError } from "@/lib/api-utils";
 import { getRequestContext } from "@cloudflare/next-on-pages";
 import { NextResponse } from "next/server";
 import { getAdminSession, getRubberSession, getStoreSession } from "@/lib/auth-server";
@@ -56,8 +57,8 @@ export async function POST(req: Request) {
     const url = `/api/admin/files/${filename}`;
 
     return NextResponse.json({ success: true, url });
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error("Public Upload error:", err);
-    return NextResponse.json({ error: err.message }, { status: 500 });
+    return NextResponse.json({ error: safeError(err) }, { status: 500 });
   }
 }

@@ -1,3 +1,4 @@
+import { safeError } from "@/lib/api-utils";
 import { getRequestContext } from "@cloudflare/next-on-pages";
 import { NextResponse } from "next/server";
 
@@ -74,9 +75,9 @@ export async function GET(
     order.rubberDeliveryEarn = totalRubberPayout * 0.5;
 
     return NextResponse.json({ order });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Fetch order detail error:", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: safeError(error) }, { status: 500 });
   }
 }
 
@@ -148,9 +149,9 @@ export async function PATCH(
     }
 
     return NextResponse.json({ success: true, message: "Order cancelled successfully" });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Update order error:", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: safeError(error) }, { status: 500 });
   }
 }
 

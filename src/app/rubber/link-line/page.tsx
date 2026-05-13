@@ -64,10 +64,10 @@ function LinkLineContent() {
           setStatus("error");
           setError(data.error || "เชื่อมต่อไม่สำเร็จ");
         }
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error("Linking error:", err);
         setStatus("error");
-        setError(err.message || "เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง");
+        setError(((err instanceof Error) ? err.message : "") || "เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง");
       }
     }
 

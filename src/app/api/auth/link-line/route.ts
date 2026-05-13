@@ -1,3 +1,4 @@
+import { safeError } from "@/lib/api-utils";
 import { getRequestContext } from "@cloudflare/next-on-pages";
 import { NextResponse } from "next/server";
 
@@ -19,8 +20,6 @@ export async function POST(req: Request) {
     if (!db) return NextResponse.json({ error: "Database not found" }, { status: 500 });
 
     // Self-healing: ensure lineUserId column exists
-    try { await db.prepare("ALTER TABLE rubber_users ADD COLUMN lineUserId TEXT").run(); } catch (e) {}
-    try { await db.prepare("ALTER TABLE stores ADD COLUMN lineUserId TEXT").run(); } catch (e) {}
 
     // 1. Validate the linking token (Nonce)
     // We expect a token that was generated in the previous session
@@ -64,9 +63,9 @@ export async function POST(req: Request) {
     await db.prepare(`UPDATE link_tokens SET used = 1 WHERE token = ?`).bind(token).run();
 
     return NextResponse.json({ success: true, message: "Account linked successfully" });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Link LINE error:", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: safeError(error) }, { status: 500 });
   }
 }
 
@@ -94,19 +93,8 @@ export async function GET(req: Request) {
 
     if (!accountId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     
-    // Self-healing: Ensure lineUserId columns + link_tokens table exist
-    try { await db.prepare("ALTER TABLE rubber_users ADD COLUMN lineUserId TEXT").run(); } catch (e) {}
-    try { await db.prepare("ALTER TABLE stores ADD COLUMN lineUserId TEXT").run(); } catch (e) {}
-    try {
-      await db.prepare(`
-        CREATE TABLE IF NOT EXISTS link_tokens (
-          token TEXT PRIMARY KEY,
-          accountId TEXT NOT NULL,
-          used INTEGER DEFAULT 0,
-          createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
-        )
-      `).run();
-    } catch (e) {}
+    // Self-healing: link_tokens table moved to db-init.ts
+
 
     const token = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
     
@@ -115,7 +103,7 @@ export async function GET(req: Request) {
     `).bind(token, accountId).run();
 
     return NextResponse.json({ token, accountId });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error: unknown) {
+    return NextResponse.json({ error: safeError(error) }, { status: 500 });
   }
 }

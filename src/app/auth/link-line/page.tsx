@@ -62,10 +62,10 @@ function LinkLineContent() {
           setStatus("error");
           setError(data.error || "Failed to link account");
         }
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error("Linking error:", err);
         setStatus("error");
-        setError(err.message || "An unexpected error occurred");
+        setError(((err instanceof Error) ? err.message : "") || "An unexpected error occurred");
       }
     }
 

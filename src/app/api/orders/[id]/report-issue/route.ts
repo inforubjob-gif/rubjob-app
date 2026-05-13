@@ -1,3 +1,4 @@
+import { safeError } from "@/lib/api-utils";
 import { getRequestContext } from "@cloudflare/next-on-pages";
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
@@ -61,8 +62,8 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     `).bind(msgId, ticketId, identity.type, identity.id, fullContent).run();
 
     return NextResponse.json({ success: true, ticketId });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Report issue error:", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: safeError(error) }, { status: 500 });
   }
 }

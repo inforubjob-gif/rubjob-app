@@ -1,6 +1,7 @@
 import { getRequestContext } from "@cloudflare/next-on-pages";
 import { NextResponse } from "next/server";
 import { getAdminSession } from "@/lib/auth-server";
+import { safeError } from "@/lib/api-utils";
 
 export const runtime = "edge";
 
@@ -12,19 +13,7 @@ export async function GET(req: Request) {
     const db = getRequestContext().env.DB;
     if (!db) return NextResponse.json({ error: "DB not found" }, { status: 500 });
 
-    // Self-heal: ensure review columns exist
-    const cols = [
-      "ALTER TABLE orders ADD COLUMN rating INTEGER",
-      "ALTER TABLE orders ADD COLUMN review_text TEXT",
-      "ALTER TABLE orders ADD COLUMN storeRating INTEGER",
-      "ALTER TABLE orders ADD COLUMN storeReview TEXT",
-      "ALTER TABLE orders ADD COLUMN driverRating INTEGER",
-      "ALTER TABLE orders ADD COLUMN driverReview TEXT",
-      "ALTER TABLE orders ADD COLUMN providerId TEXT",
-    ];
-    for (const col of cols) {
-      try { await db.prepare(col).run(); } catch (_) {}
-    }
+    // Self-healing columns moved to db-init.ts (Phase 3.2)
 
     const { results } = await db.prepare(`
       SELECT 
@@ -51,8 +40,8 @@ export async function GET(req: Request) {
     `).all();
 
     return NextResponse.json({ reviews: results });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Fetch reviews error:", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: safeError(error) }, { status: 500 });
   }
 }

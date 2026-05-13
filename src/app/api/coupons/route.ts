@@ -1,3 +1,4 @@
+import { safeError } from "@/lib/api-utils";
 import { getRequestContext } from "@cloudflare/next-on-pages";
 import { NextResponse } from "next/server";
 
@@ -14,7 +15,6 @@ export async function GET(req: Request) {
     if (!db) return NextResponse.json({ error: "D1 not found" }, { status: 500 });
 
     // Self-healing
-    try { await db.prepare("ALTER TABLE coupons ADD COLUMN eligibleRoles TEXT DEFAULT 'all'").run(); } catch (e) {}
 
     const { searchParams } = new URL(req.url);
     const role = searchParams.get("role"); // rubber | store | customer
@@ -36,7 +36,7 @@ export async function GET(req: Request) {
     }
 
     return NextResponse.json({ coupons: filtered });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error: unknown) {
+    return NextResponse.json({ error: safeError(error) }, { status: 500 });
   }
 }

@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useLiff } from "@/components/providers/LiffProvider";
 import { useTranslation } from "@/components/providers/LanguageProvider";
+import { useToast } from "@/components/providers/ToastProvider";
 import { Icons } from "@/components/ui/Icons";
 import Card from "@/components/ui/Card";
 
@@ -11,6 +12,7 @@ export default function EditProfilePage() {
   const router = useRouter();
   const { profile, isReady } = useLiff();
   const { t } = useTranslation();
+  const { showToast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
   
   const [name, setName] = useState("");
@@ -40,13 +42,13 @@ export default function EditProfilePage() {
       setIsVerified(true);
       setIsVerifying(false);
     } else {
-      alert(t("profile.invalidOtp"));
+      showToast(t("profile.invalidOtp"), "error");
     }
   };
 
   const handleSave = async () => {
     if (!isVerified) {
-      alert(t("profile.verifyPhoneFirst"));
+      showToast(t("profile.verifyPhoneFirst"), "warning");
       return;
     }
     setIsLoading(true);

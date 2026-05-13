@@ -5,6 +5,8 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Icons } from "@/components/ui/Icons";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
+import { useToast } from "@/components/providers/ToastProvider";
+import { useTranslation } from "@/components/providers/LanguageProvider";
 
 type PackageData = {
   type: "basic" | "standard" | "premium";
@@ -32,6 +34,8 @@ const GIG_CATEGORIES = [
 export default function GigBuilderPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { showToast } = useToast();
+  const { t } = useTranslation();
   const editId = searchParams.get("edit");
   const [provider, setProvider] = useState<any>(null);
 
@@ -106,8 +110,8 @@ export default function GigBuilderPage() {
 
   const handleSaveGig = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!title.trim()) return alert("กรุณาตั้งชื่องาน");
-    if (!packages[0].price) return alert("กรุณาตั้งราคาแพ็คเกจเริ่มต้น");
+    if (!title.trim()) { showToast(t("provider.gig.validationTitle"), "warning"); return; }
+    if (!packages[0].price) { showToast(t("provider.gig.validationPrice"), "warning"); return; }
 
     setIsSubmitting(true);
     try {
@@ -126,13 +130,13 @@ export default function GigBuilderPage() {
 
       const data = await res.json() as any;
       if (res.ok && data.success) {
-        alert("บันทึกบริการสำเร็จ!");
+        showToast(t("provider.gig.saveSuccess"), "success");
         router.push("/partner-service/services");
       } else {
-        alert(data.error || "เกิดข้อผิดพลาด");
+        showToast(data.error || t("provider.dashboard.genericError"), "error");
       }
     } catch (err) {
-      alert("เชื่อมต่อขัดข้อง");
+      showToast(t("provider.gig.connectionError"), "error");
     } finally {
       setIsSubmitting(false);
     }

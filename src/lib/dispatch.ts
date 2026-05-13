@@ -82,10 +82,10 @@ export async function getEligibleRubbers(
       if (orderProvince) {
         const rubberAddr = parseRubberAddress(r.address);
         
-        // If rubber has a registered province and it doesn't match -> log it, but DON'T skip (to fix testing issues)
+        // 🛡️ Phase 2.3: Re-enabled geo-filter — rubber must be in same province as order
         if (rubberAddr.province && rubberAddr.province !== orderProvince) {
-          db.prepare("INSERT INTO webhook_logs (id, channel, payload, error) VALUES (?, ?, ?, ?)").bind(`FILTER-GEO-${r.id}-${Date.now()}`, 'filter_skip_bypassed', `Order: ${orderProvince}, Rubber: ${rubberAddr.province}`, null).run().catch(() => {});
-          // continue; <-- Temporarily disabled to ensure push reaches driver
+          db.prepare("INSERT INTO webhook_logs (id, channel, payload, error) VALUES (?, ?, ?, ?)").bind(`FILTER-GEO-${r.id}-${Date.now()}`, 'filter_skip', `Order: ${orderProvince}, Rubber: ${rubberAddr.province}`, null).run().catch(() => {});
+          continue;
         }
         // If rubber has no province registered (legacy data) -> include them
       }
@@ -137,7 +137,7 @@ export async function broadcastToEligibleRubbers(
   if (!rubberToken) {
     console.warn("⚠️ [DISPATCH] Rubber LINE OA token is NOT configured! Rubber LINE push will be SKIPPED. Set 'LINE_CHANNEL_ACCESS_TOKEN_RUBBER' in env or 'line_token_rubber' in Admin Settings.");
   } else {
-    console.log(`📡 [DISPATCH] Rubber token: SET (${rubberToken.length} chars)`);
+    console.log(`📡 [DISPATCH] Rubber token: SET`);
   }
 
   const { sendLinePush, rubberNewJobFlex } = await import("./line");
@@ -182,9 +182,10 @@ export async function broadcastToEligibleRubbers(
         console.log(`  ✅ [DISPATCH] LINE push → ${r.lineUserId}`, JSON.stringify(res));
         // Await so Edge worker doesn't kill it
         await db.prepare("INSERT INTO webhook_logs (id, channel, payload, error) VALUES (?, ?, ?, ?)").bind(`DISPATCH-${orderId}-${r.id}-${Date.now()}`, 'dispatch_success', JSON.stringify(res), null).run().catch(() => {});
-      } catch (err: any) {
-        console.error(`  ❌ [DISPATCH] LINE push failed for ${r.lineUserId}:`, err?.message || err);
-        await db.prepare("INSERT INTO webhook_logs (id, channel, payload, error) VALUES (?, ?, ?, ?)").bind(`DISPATCH-${orderId}-${r.id}-${Date.now()}`, 'dispatch_fail', r.lineUserId || '', err?.message || String(err)).run().catch(() => {});
+      } catch (err: unknown) {
+        const errMsg = (err instanceof Error) ? err.message : String(err);
+        console.error(`  ❌ [DISPATCH] LINE push failed for ${r.lineUserId}:`, errMsg);
+        await db.prepare("INSERT INTO webhook_logs (id, channel, payload, error) VALUES (?, ?, ?, ?)").bind(`DISPATCH-${orderId}-${r.id}-${Date.now()}`, 'dispatch_fail', r.lineUserId || '', errMsg).run().catch(() => {});
       }
     } else {
       console.warn(`  ⚠️ [DISPATCH] LINE push skipped for ${r.id}: token=${!!rubberToken}, lineUserId=${r.lineUserId}`);

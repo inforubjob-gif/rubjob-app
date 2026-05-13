@@ -6,12 +6,14 @@ import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import { Icons, IconCircle } from "@/components/ui/Icons";
 import { useTranslation } from "@/components/providers/LanguageProvider";
+import { useToast } from "@/components/providers/ToastProvider";
 
 import Modal from "@/components/ui/Modal";
 
 export default function RubberProfilePage() {
   const router = useRouter();
   const { language, setLanguage, t } = useTranslation();
+  const { showToast } = useToast();
   const [workStatus, setWorkStatus] = useState(true);
   const [showLanguageModal, setShowLanguageModal] = useState(false);
   const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
@@ -251,7 +253,7 @@ export default function RubberProfilePage() {
                         window.location.href = `https://liff.line.me/${liffId}/link-line?type=rubber&id=${data.accountId}&token=${data.token}`;
                       } catch (e) {
                         console.error("LINE link error:", e);
-                        alert("ไม่สามารถเชื่อมต่อ LINE ได้ กรุณาลองใหม่อีกครั้ง");
+                        showToast(t("rubber.profile.line.connectError"), "error");
                       }
                     }}
                     className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase transition-all bg-primary text-white shadow-lg shadow-primary/20`}
@@ -271,11 +273,11 @@ export default function RubberProfilePage() {
                           headers: { 'Content-Type': 'application/json' },
                           body: JSON.stringify({ rubberId: rubberSession.id, action: 'unlink_line' })
                         });
-                        alert("ยกเลิกการเชื่อมต่อ LINE สำเร็จ กรุณารีเฟรชหน้าเว็บ");
+                        showToast(t("rubber.profile.line.disconnectSuccess"), "success");
                         window.location.reload();
                       } catch (e) {
                         console.error("LINE unlink error:", e);
-                        alert("ไม่สามารถยกเลิกการเชื่อมต่อได้");
+                        showToast(t("rubber.profile.line.disconnectError"), "error");
                       }
                     }}
                     className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase transition-all bg-red-500 text-white shadow-lg shadow-red-500/20`}

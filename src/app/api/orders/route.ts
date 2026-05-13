@@ -1,5 +1,6 @@
 import { getRequestContext } from "@cloudflare/next-on-pages";
 import { NextResponse } from "next/server";
+import { safeError } from "@/lib/api-utils";
 
 export const runtime = "edge";
 
@@ -41,108 +42,10 @@ export async function GET(req: Request) {
     }));
 
     return NextResponse.json({ orders });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Fetch orders error:", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: safeError(error) }, { status: 500 });
   }
 }
 
-/**
- * POST /api/orders
- * Creates a new order
- */
-export async function POST(req: Request) {
-  try {
-    const body = await req.json() as any;
-    const { 
-      userId, 
-      storeId, 
-      serviceId, 
-      items, 
-      address, 
-      totalPrice, 
-      deliveryFee, 
-      laundryFee,
-      paymentMethod,
-      scheduledDate
-    } = body;
 
-    if (!userId || !serviceId || !totalPrice) {
-      return NextResponse.json({ error: "Missing required order fields" }, { status: 400 });
-    }
-
-    const db = getRequestContext().env.DB;
-    if (!db) {
-      return NextResponse.json({ error: "D1 Database binding 'DB' not found" }, { status: 500 });
-    }
-
-    const orderId = `RJ-${Math.random().toString(36).substring(2, 10).toUpperCase()}`;
-
-    const result = await db.prepare(`
-      INSERT INTO orders (
-        id, userId, storeId, serviceId, status, 
-        laundryFee, deliveryFee, totalPrice, 
-        paymentMethod, paymentStatus, items, address, 
-        scheduledDate, createdAt, updatedAt
-      ) VALUES (?, ?, ?, ?, 'pending', ?, ?, ?, ?, 'pending', ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-    `).bind(
-      orderId, 
-      userId, 
-      storeId || null, 
-      serviceId, 
-      laundryFee || 0, 
-      deliveryFee || 0, 
-      totalPrice, 
-      paymentMethod || 'cash', 
-      JSON.stringify(items || []), 
-      JSON.stringify(address || {}), 
-      scheduledDate || null
-    ).run();
-
-    // 🤖 Automation: Notify Store and Available Rubbers via LINE
-    // Priority 1: DB (Admin Settings UI)
-    // Priority 2: Cloudflare ENV
-    let customerToken = null;
-    let rubberToken = null;
-    
-    try {
-      const regularSetting = await db.prepare("SELECT value FROM system_settings WHERE key = 'line_token_regular'").first() as any;
-      if (regularSetting?.value) customerToken = regularSetting.value;
-      
-      const rubberSetting = await db.prepare("SELECT value FROM system_settings WHERE key = 'line_token_rubber'").first() as any;
-      if (rubberSetting?.value) rubberToken = rubberSetting.value;
-    } catch (e) {}
-
-    if (!customerToken) customerToken = env.LINE_CHANNEL_ACCESS_TOKEN;
-    if (!rubberToken) rubberToken = env.LINE_CHANNEL_ACCESS_TOKEN_RUBBER;
-
-    // ⚠️ Do NOT fallback rubber token to customer token — they are separate LINE OAs!
-    
-    if (rubberToken) {
-      const { 
-        sendLinePush, 
-        rubberNewJobFlex, 
-        storeOrderAlertFlex 
-      } = await import("@/lib/line");
-
-      // 1. Notify Store Owner (Using Rubber Bot)
-      const storeData = await db.prepare("SELECT lineUserId FROM stores WHERE id = ?").bind(storeId).first() as any;
-      if (storeData?.lineUserId) {
-        await sendLinePush(storeData.lineUserId, [storeOrderAlertFlex(orderId)], rubberToken).catch(() => {});
-      }
-
-      // 2. Broadcast to Online Rubbers (Geo-Filtered by Province)
-      // ONLY broadcast immediately if payment method is cash.
-      // If PromptPay/Card, we broadcast from the Stripe Webhook after payment succeeds.
-      if (paymentMethod === 'cash') {
-        const { broadcastToEligibleRubbers } = await import("@/lib/dispatch");
-        await broadcastToEligibleRubbers(db, env, orderId, address, deliveryFee || 0, 'pending');
-      }
-    }
-
-    return NextResponse.json({ success: true, orderId });
-  } catch (error: any) {
-    console.error("Create order error:", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
-  }
-}

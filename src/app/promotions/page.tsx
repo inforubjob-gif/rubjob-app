@@ -8,10 +8,12 @@ import { Icons } from "@/components/ui/Icons";
 import { useTranslation } from "@/components/providers/LanguageProvider";
 import { useLiff } from "@/components/providers/LiffProvider";
 import { useScrollCollapse } from "@/hooks/useScrollCollapse";
+import { useToast } from "@/components/providers/ToastProvider";
 
 export default function PromotionsPage() {
   const router = useRouter();
   const { t } = useTranslation();
+  const { showToast } = useToast();
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
   const isCollapsed = useScrollCollapse(50);
 
@@ -71,7 +73,7 @@ export default function PromotionsPage() {
     e.stopPropagation();
     try {
       if (!process.env.NEXT_PUBLIC_LIFF_ID) {
-        alert(t("promotions.inviteSuccess"));
+        showToast(t("promotions.inviteSuccess"), "success");
         return;
       }
 
@@ -101,12 +103,12 @@ export default function PromotionsPage() {
               }
             }
           ]);
-          if (result) alert(t("promotions.inviteSuccess"));
-        } else alert(t("promotions.shareNotAvailable"));
-      } else alert(t("promotions.mustLogin"));
+          if (result) showToast(t("promotions.inviteSuccess"), "success");
+        } else showToast(t("promotions.shareNotAvailable"), "warning");
+      } else showToast(t("promotions.mustLogin"), "warning");
     } catch (err) {
       console.error(err);
-      alert(t("promotions.inviteError"));
+      showToast(t("promotions.inviteError"), "error");
     }
   };
 

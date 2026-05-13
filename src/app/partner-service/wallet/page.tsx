@@ -5,9 +5,13 @@ import { useRouter } from "next/navigation";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import { Icons } from "@/components/ui/Icons";
+import { useToast } from "@/components/providers/ToastProvider";
+import { useTranslation } from "@/components/providers/LanguageProvider";
 
 export default function ProviderWalletPage() {
   const router = useRouter();
+  const { showToast } = useToast();
+  const { t } = useTranslation();
   const [balance, setBalance] = useState(0);
   const [transactions, setTransactions] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -35,7 +39,7 @@ export default function ProviderWalletPage() {
   const handleWithdraw = async () => {
     const amt = parseFloat(withdrawAmount);
     if (!amt || amt < 300) {
-      alert("ยอดถอนขั้นต่ำ 300 บาท");
+      showToast(t("provider.wallet.minWithdraw"), "warning");
       return;
     }
     try {
@@ -46,15 +50,15 @@ export default function ProviderWalletPage() {
       });
       const data = await res.json() as any;
       if (res.ok && data.success) {
-        alert("ส่งคำขอถอนเงินแล้ว จะโอนภายใน 24 ชม.");
+        showToast(t("provider.wallet.withdrawSuccess"), "success");
         setShowWithdraw(false);
         setWithdrawAmount("");
         fetchWallet();
       } else {
-        alert(data.error || "เกิดข้อผิดพลาด");
+        showToast(data.error || "เกิดข้อผิดพลาด", "error");
       }
     } catch (err) {
-      alert("เกิดข้อผิดพลาดในการเชื่อมต่อ");
+      showToast(t("provider.wallet.connectionError"), "error");
     }
   };
 

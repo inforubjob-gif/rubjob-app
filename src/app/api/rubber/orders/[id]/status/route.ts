@@ -2,6 +2,7 @@ import { getRequestContext } from "@cloudflare/next-on-pages";
 import { NextResponse } from "next/server";
 import { getRubberSession } from "@/lib/auth-server";
 import { transitionOrderStatus } from "@/lib/order-logic";
+import { safeError } from "@/lib/api-utils";
 
 export const runtime = "edge";
 
@@ -20,19 +21,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
 
     if (!status) return NextResponse.json({ error: "Status required" }, { status: 400 });
 
-    // Self-heal: ensure required columns exist (prevents SQLITE_ERROR on older tables)
-    const cols = [
-      "ALTER TABLE orders ADD COLUMN evidenceBeforeUrl TEXT",
-      "ALTER TABLE orders ADD COLUMN evidenceAfterUrl TEXT",
-      "ALTER TABLE orders ADD COLUMN pickupPhotoUrl TEXT",
-      "ALTER TABLE orders ADD COLUMN dropoffShopPhotoUrl TEXT",
-      "ALTER TABLE orders ADD COLUMN serviceDetails TEXT",
-      "ALTER TABLE orders ADD COLUMN arrivedAtShopAt DATETIME",
-      "ALTER TABLE orders ADD COLUMN paymentStatus TEXT DEFAULT 'pending'",
-    ];
-    for (const col of cols) {
-      try { await db.prepare(col).run(); } catch (_) {}
-    }
+    // Self-healing columns moved to db-init.ts (Phase 3.2)
 
     // 1. Fetch current order to get serviceDetails
     const order = await db.prepare("SELECT serviceDetails, userId FROM orders WHERE id = ?").bind(id).first() as any;
@@ -66,8 +55,8 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     );
 
     return NextResponse.json(result);
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Rubber status update error:", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: safeError(error) }, { status: 500 });
   }
 }

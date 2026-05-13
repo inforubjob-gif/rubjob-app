@@ -5,9 +5,11 @@ import Card from "@/components/ui/Card";
 import { Icons } from "@/components/ui/Icons";
 import Modal from "@/components/ui/Modal";
 import { useTranslation } from "@/components/providers/LanguageProvider";
+import { useToast } from "@/components/providers/ToastProvider";
 
 export default function UsersAdminPage() {
  const { t } = useTranslation();
+ const { showToast } = useToast();
  const [users, setUsers] = useState<any[]>([]);
  const [filteredUsers, setFilteredUsers] = useState<any[]>([]);
  const [search, setSearch] = useState("");
@@ -85,7 +87,7 @@ export default function UsersAdminPage() {
     setIsModalOpen(false);
     setSelectedUser(null);
    } else {
-    alert(t("admin.users.deleteError"));
+    showToast(t("admin.users.deleteError"), "error");
    }
   } catch (err) {
    console.error("Failed to delete user", err);

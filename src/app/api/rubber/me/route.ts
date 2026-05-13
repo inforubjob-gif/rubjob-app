@@ -1,3 +1,4 @@
+import { safeError } from "@/lib/api-utils";
 import { getRequestContext } from "@cloudflare/next-on-pages";
 import { NextResponse } from "next/server";
 import { getRubberSession } from "@/lib/auth-server";
@@ -22,7 +23,6 @@ export async function GET(req: Request) {
     await ensureSchema(db);
 
     // Self-healing: ensure lineUserId column exists
-    try { await db.prepare("ALTER TABLE rubber_users ADD COLUMN lineUserId TEXT").run(); } catch(e) {}
 
     const rubber = await db.prepare(`
       SELECT r.id, r.name, r.email, r.status, r.pictureUrl, r.phone, r.lineUserId, r.vehicleType, r.bankName, r.accountNumber, u.displayName as lineDisplayName
@@ -51,9 +51,9 @@ export async function GET(req: Request) {
     } else {
       return NextResponse.json({ error: "Rubber not found" }, { status: 404 });
     }
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error("Fetch rubber profile error:", err);
-    return NextResponse.json({ error: err.message || "Internal Server Error" }, { status: 500 });
+    return NextResponse.json({ error: safeError(err) }, { status: 500 });
   }
 }
 
@@ -72,7 +72,7 @@ export async function PATCH(req: Request) {
     }
 
     return NextResponse.json({ error: "Invalid action" }, { status: 400 });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error: unknown) {
+    return NextResponse.json({ error: safeError(error) }, { status: 500 });
   }
 }

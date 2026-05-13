@@ -109,13 +109,13 @@ export default function AdminOrderDetailPage() {
     body: JSON.stringify(updates),
    });
    if (res.ok) {
-    showToast("อัพเดทสำเร็จ", "success");
+    showToast(t("admin.broadcast.updateSuccess"), "success");
     fetchOrder();
    } else {
     const err = await res.json() as any;
-    showToast(err.error || "เกิดข้อผิดพลาด", "error");
+    showToast(err.error || t("admin.broadcast.genericError"), "error");
    }
-  } catch { showToast("เกิดข้อผิดพลาด", "error"); }
+  } catch { showToast(t("admin.broadcast.genericError"), "error"); }
   finally { setIsUpdating(false); }
  }
 

@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import { Icons } from "@/components/ui/Icons";
+import { useToast } from "@/components/providers/ToastProvider";
+import { useTranslation } from "@/components/providers/LanguageProvider";
 
 const SKILL_LABELS: Record<string, string> = {
   gecko_catcher: "จับตุ๊กแก 🦎",
@@ -17,6 +19,8 @@ const SKILL_LABELS: Record<string, string> = {
 
 export default function ProviderProfilePage() {
   const router = useRouter();
+  const { showToast } = useToast();
+  const { t } = useTranslation();
   const [provider, setProvider] = useState<any>(null);
   const [gigs, setGigs] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -171,7 +175,7 @@ export default function ProviderProfilePage() {
                    });
                    if (res.ok) {
                      localStorage.setItem("rubjob_provider_session", JSON.stringify(provider));
-                     alert("บันทึก LINE ID สำเร็จ!");
+                     showToast(t("provider.profile.lineIdSaved"), "success");
                    }
                 } catch (e) {
                    console.error(e);

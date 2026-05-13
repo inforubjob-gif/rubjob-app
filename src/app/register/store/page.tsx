@@ -6,6 +6,7 @@ import dynamic from "next/dynamic";
 import { Icons } from "@/components/ui/Icons";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
+import { useToast } from "@/components/providers/ToastProvider";
 
 const MapPicker = dynamic(() => import("@/components/ui/MapPicker"), { 
   ssr: false,
@@ -14,6 +15,7 @@ const MapPicker = dynamic(() => import("@/components/ui/MapPicker"), {
 
 export default function StoreRegisterPage() {
   const router = useRouter();
+  const { showToast } = useToast();
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   
@@ -55,9 +57,9 @@ export default function StoreRegisterPage() {
         setStep(4); // Success step
       } else {
         const err = await res.json() as any;
-        alert(err.error || "Failed to submit store details");
+        showToast(err.error || "Failed to submit store details", "error");
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err);
     } finally {
       setIsSubmitting(false);

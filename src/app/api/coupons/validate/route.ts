@@ -1,3 +1,4 @@
+import { safeError } from "@/lib/api-utils";
 import { getRequestContext } from "@cloudflare/next-on-pages";
 import { NextResponse } from "next/server";
 
@@ -23,7 +24,6 @@ export async function POST(req: Request) {
     if (!db) return NextResponse.json({ error: "D1 not found" }, { status: 500 });
 
     // Self-healing
-    try { await db.prepare("ALTER TABLE coupons ADD COLUMN eligibleRoles TEXT DEFAULT 'all'").run(); } catch (e) {}
 
     const coupon = await db.prepare(`
       SELECT * FROM coupons 
@@ -93,8 +93,8 @@ export async function POST(req: Request) {
       } 
     });
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Coupon validation error:", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: safeError(error) }, { status: 500 });
   }
 }

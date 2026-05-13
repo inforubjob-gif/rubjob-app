@@ -5,9 +5,11 @@ import { useRouter } from "next/navigation";
 import { Icons } from "@/components/ui/Icons";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
+import { useToast } from "@/components/providers/ToastProvider";
 
 export default function RubberRegisterPage() {
   const router = useRouter();
+  const { showToast } = useToast();
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   
@@ -46,9 +48,9 @@ export default function RubberRegisterPage() {
         setStep(4); // Success step
       } else {
         const err = await res.json() as any;
-        alert(err.error || "Something went wrong");
+        showToast(err.error || "Something went wrong", "error");
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err);
     } finally {
       setIsSubmitting(false);

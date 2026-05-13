@@ -1,3 +1,4 @@
+import { safeError } from "@/lib/api-utils";
 import { getRequestContext } from "@cloudflare/next-on-pages";
 import { NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
@@ -49,10 +50,7 @@ export async function POST(req: Request) {
 
     const orderId = `RJ-${nanoid(8).toUpperCase()}`;
 
-    // Self-healing: ensure providerId column exists
-    try {
-      await db.prepare("ALTER TABLE orders ADD COLUMN providerId TEXT").run();
-    } catch(e) {}
+    // Self-healing columns moved to db-init.ts
 
     // Self-healing: ensure duvet_washing exists in services
     if (serviceId === 'duvet_washing') {
@@ -144,8 +142,8 @@ export async function POST(req: Request) {
       orderId,
       message: "Booking submitted successfully" 
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Booking error:", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: safeError(error) }, { status: 500 });
   }
 }

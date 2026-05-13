@@ -3,27 +3,8 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 
 export const runtime = "edge";
+// Self-healing: notifications table moved to db-init.ts
 
-/**
- * Self-healing: ensure notifications table exists
- */
-async function ensureNotificationsTable(db: any) {
-  try {
-    await db.prepare(`
-      CREATE TABLE IF NOT EXISTS notifications (
-        id TEXT PRIMARY KEY,
-        userId TEXT NOT NULL,
-        userType TEXT DEFAULT 'rubber',
-        type TEXT NOT NULL,
-        title TEXT NOT NULL,
-        message TEXT NOT NULL,
-        link TEXT,
-        isRead INTEGER DEFAULT 0,
-        createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
-      )
-    `).run();
-  } catch (e) {}
-}
 
 /**
  * Resolve identity from cookies
@@ -48,7 +29,6 @@ export async function GET(req: Request) {
   const db = getRequestContext().env.DB;
   if (!db) return NextResponse.json({ error: "DB not found" }, { status: 500 });
 
-  await ensureNotificationsTable(db);
 
   const { searchParams } = new URL(req.url);
   const limit = parseInt(searchParams.get("limit") || "30");
@@ -83,7 +63,6 @@ export async function POST(req: Request) {
   const db = getRequestContext().env.DB;
   if (!db) return NextResponse.json({ error: "DB not found" }, { status: 500 });
 
-  await ensureNotificationsTable(db);
 
   const body = await req.json() as any;
 

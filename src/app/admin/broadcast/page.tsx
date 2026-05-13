@@ -3,17 +3,19 @@
 import { useState } from "react";
 import { Icons } from "@/components/ui/Icons";
 import { useToast } from "@/components/providers/ToastProvider";
+import { useTranslation } from "@/components/providers/LanguageProvider";
 
 export default function BroadcastPage() {
   const [message, setMessage] = useState("");
   const [target, setTarget] = useState("all_users");
   const [loading, setLoading] = useState(false);
   const { showToast } = useToast();
+  const { t } = useTranslation();
 
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!message.trim()) {
-      showToast("กรุณาพิมพ์ข้อความที่ต้องการส่ง", "error");
+      showToast(t("admin.broadcast.emptyMessage"), "error");
       return;
     }
 
@@ -33,10 +35,10 @@ export default function BroadcastPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "ส่งข้อความไม่สำเร็จ");
       
-      showToast(`ส่งข้อความสำเร็จ! (ส่งได้: ${data.sent}, ล้มเหลว: ${data.failed})`, "success");
+      showToast(t("admin.broadcast.sendSuccess").replace("{sent}", data.sent).replace("{failed}", data.failed), "success");
       setMessage("");
-    } catch (err: any) {
-      showToast(err.message, "error");
+    } catch (err: unknown) {
+      showToast((err instanceof Error) ? err.message : t("admin.broadcast.genericError"), "error");
     } finally {
       setLoading(false);
     }

@@ -1,3 +1,4 @@
+import { safeError } from "@/lib/api-utils";
 import { getRequestContext } from "@cloudflare/next-on-pages";
 import { NextResponse } from "next/server";
 import { getAdminSession } from "@/lib/auth-server";
@@ -12,11 +13,6 @@ export async function GET(req: Request) {
     if (!db) return NextResponse.json({ error: "D1 not found" }, { status: 500 });
 
     // Self-healing: ensure all columns exist
-    try { await db.prepare("ALTER TABLE coupons ADD COLUMN title TEXT").run(); } catch (e) {}
-    try { await db.prepare("ALTER TABLE coupons ADD COLUMN description TEXT").run(); } catch (e) {}
-    try { await db.prepare("ALTER TABLE coupons ADD COLUMN isVisible INTEGER DEFAULT 1").run(); } catch (e) {}
-    try { await db.prepare("ALTER TABLE coupons ADD COLUMN maxDiscount REAL").run(); } catch (e) {}
-    try { await db.prepare("ALTER TABLE coupons ADD COLUMN eligibleRoles TEXT DEFAULT 'all'").run(); } catch (e) {}
 
     const { results } = await db.prepare(`
       SELECT * FROM coupons
@@ -24,8 +20,8 @@ export async function GET(req: Request) {
     `).all();
 
     return NextResponse.json({ coupons: results });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error: unknown) {
+    return NextResponse.json({ error: safeError(error) }, { status: 500 });
   }
 }
 
@@ -38,11 +34,6 @@ export async function POST(req: Request) {
     if (!db) return NextResponse.json({ error: "D1 not found" }, { status: 500 });
 
     // Self-healing
-    try { await db.prepare("ALTER TABLE coupons ADD COLUMN title TEXT").run(); } catch (e) {}
-    try { await db.prepare("ALTER TABLE coupons ADD COLUMN description TEXT").run(); } catch (e) {}
-    try { await db.prepare("ALTER TABLE coupons ADD COLUMN isVisible INTEGER DEFAULT 1").run(); } catch (e) {}
-    try { await db.prepare("ALTER TABLE coupons ADD COLUMN maxDiscount REAL").run(); } catch (e) {}
-    try { await db.prepare("ALTER TABLE coupons ADD COLUMN eligibleRoles TEXT DEFAULT 'all'").run(); } catch (e) {}
 
     if (!code || !type || !value) return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
 
@@ -56,11 +47,11 @@ export async function POST(req: Request) {
     ).run();
 
     return NextResponse.json({ success: true, id });
-  } catch (error: any) {
-    if (error.message.includes("UNIQUE constraint failed")) {
+  } catch (error: unknown) {
+    if (((error instanceof Error) ? safeError(error) : "").includes("UNIQUE constraint failed")) {
       return NextResponse.json({ error: "Coupon code already exists" }, { status: 400 });
     }
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: safeError(error) }, { status: 500 });
   }
 }
 
@@ -73,11 +64,6 @@ export async function PUT(req: Request) {
     if (!db) return NextResponse.json({ error: "D1 not found" }, { status: 500 });
 
     // Self-healing
-    try { await db.prepare("ALTER TABLE coupons ADD COLUMN title TEXT").run(); } catch (e) {}
-    try { await db.prepare("ALTER TABLE coupons ADD COLUMN description TEXT").run(); } catch (e) {}
-    try { await db.prepare("ALTER TABLE coupons ADD COLUMN isVisible INTEGER DEFAULT 1").run(); } catch (e) {}
-    try { await db.prepare("ALTER TABLE coupons ADD COLUMN maxDiscount REAL").run(); } catch (e) {}
-    try { await db.prepare("ALTER TABLE coupons ADD COLUMN eligibleRoles TEXT DEFAULT 'all'").run(); } catch (e) {}
 
     if (!id) return NextResponse.json({ error: "Missing ID" }, { status: 400 });
 
@@ -128,11 +114,11 @@ export async function PUT(req: Request) {
     }
 
     return NextResponse.json({ success: true });
-  } catch (error: any) {
-    if (error.message.includes("UNIQUE constraint failed")) {
+  } catch (error: unknown) {
+    if (((error instanceof Error) ? safeError(error) : "").includes("UNIQUE constraint failed")) {
       return NextResponse.json({ error: "Coupon code already exists" }, { status: 400 });
     }
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: safeError(error) }, { status: 500 });
   }
 }
 
@@ -147,7 +133,7 @@ export async function DELETE(req: Request) {
     await db.prepare(`DELETE FROM coupons WHERE id = ?`).bind(id).run();
 
     return NextResponse.json({ success: true });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error: unknown) {
+    return NextResponse.json({ error: safeError(error) }, { status: 500 });
   }
 }

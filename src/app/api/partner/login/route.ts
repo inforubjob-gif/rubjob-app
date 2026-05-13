@@ -2,6 +2,7 @@ import { getRequestContext } from "@cloudflare/next-on-pages";
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { verifyPassword, isBcryptHash, hashPassword } from "@/lib/password";
+import { checkRateLimit, recordLoginAttempt } from "@/lib/rate-limit";
 
 export const runtime = "edge";
 
@@ -18,6 +19,12 @@ export async function POST(req: Request) {
     
     if (!db) {
       return NextResponse.json({ error: "Database not connected" }, { status: 500 });
+    }
+
+    // 🛡️ Phase 3.4: Rate limiting — 5 attempts per 15 minutes
+    const allowed = await checkRateLimit(db, email);
+    if (!allowed) {
+      return NextResponse.json({ success: false, error: "พยายามเข้าสู่ระบบมากเกินไป กรุณารอ 15 นาที" }, { status: 429 });
     }
 
     // 1. Try to login as Store (partner-store)
@@ -57,16 +64,8 @@ export async function POST(req: Request) {
     }
 
     // 2. Try to login as Provider (partner-service)
-    try {
-      await db.prepare(`
-        CREATE TABLE IF NOT EXISTS provider_users (
-          id TEXT PRIMARY KEY,
-          email TEXT UNIQUE NOT NULL,
-          password TEXT NOT NULL,
-          status TEXT DEFAULT 'pending'
-        )
-      `).run();
-    } catch (e) {}
+    // Self-healing: provider_users table moved to db-init.ts
+
 
     const provider = await db.prepare(
       "SELECT id, email, name, status, password FROM provider_users WHERE email = ?"
@@ -107,7 +106,8 @@ export async function POST(req: Request) {
       }
     }
 
-    // Neither Store nor Provider found
+    // Neither Store nor Provider found — record failed attempt
+    await recordLoginAttempt(db, email);
     return NextResponse.json({ success: false, error: "อีเมลหรือรหัสผ่านไม่ถูกต้อง" }, { status: 401 });
   } catch (err: unknown) {
     console.error("Partner unified login error:", err);

@@ -1,3 +1,4 @@
+import { safeError } from "@/lib/api-utils";
 import { getRequestContext } from "@cloudflare/next-on-pages";
 import { NextResponse } from "next/server";
 import { getAdminSession } from "@/lib/auth-server";
@@ -32,16 +33,8 @@ export async function GET() {
     const db = getRequestContext().env.DB;
     if (!db) return NextResponse.json({ error: "D1 not found" }, { status: 500 });
 
-    // 1. Ensure table exists (Self-healing)
-    await db.prepare(`
-      CREATE TABLE IF NOT EXISTS system_settings (
-        key TEXT PRIMARY KEY,
-        value TEXT,
-        type TEXT,
-        description TEXT,
-        updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP
-      )
-    `).run();
+    // Self-healing: system_settings table moved to db-init.ts
+
 
     // 2. Fetch existing
     const { results: existing } = await db.prepare(`SELECT * FROM system_settings`).all();
@@ -66,9 +59,9 @@ export async function GET() {
     }
 
     return NextResponse.json({ settings: finalResults });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Fetch settings error:", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: safeError(error) }, { status: 500 });
   }
 }
 
@@ -96,8 +89,8 @@ export async function PATCH(req: Request) {
     }
 
     return NextResponse.json({ success: true });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Update settings error:", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: safeError(error) }, { status: 500 });
   }
 }

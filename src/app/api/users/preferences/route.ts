@@ -1,3 +1,4 @@
+import { safeError } from "@/lib/api-utils";
 import { getRequestContext } from "@cloudflare/next-on-pages";
 import { NextResponse } from "next/server";
 
@@ -24,10 +25,7 @@ export async function GET(req: Request) {
     // Determine table based on ID prefix
     const tableName = userId.startsWith("RDR-") ? "rubber_users" : "users";
     
-    // Check if column exists (self-healing)
-    try {
-      await db.prepare(`ALTER TABLE ${tableName} ADD COLUMN preferences TEXT`).run();
-    } catch (e) {}
+    // Self-healing columns moved to db-init.ts
 
     const user = await db.prepare(`SELECT preferences FROM ${tableName} WHERE id = ?`).bind(userId).first() as any;
     
@@ -45,9 +43,9 @@ export async function GET(req: Request) {
     }
 
     return NextResponse.json({ preferences });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("GET preferences error:", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: safeError(error) }, { status: 500 });
   }
 }
 
@@ -91,21 +89,14 @@ export async function POST(req: Request) {
       await db.prepare(`UPDATE ${tableName} SET preferences = ? WHERE id = ?`)
         .bind(JSON.stringify(newPrefs), userId)
         .run();
-    } catch (err: any) {
-      // If error indicates column doesn't exist, try to add it
-      if (err.message && err.message.includes("no column")) {
-         await db.prepare(`ALTER TABLE ${tableName} ADD COLUMN preferences TEXT;`).run();
-         await db.prepare(`UPDATE ${tableName} SET preferences = ? WHERE id = ?`)
-           .bind(JSON.stringify(newPrefs), userId)
-           .run();
-      } else {
-         throw err;
-      }
+    } catch (err: unknown) {
+      // Column should exist via db-init.ts; re-throw if it's a different error
+      throw err;
     }
 
     return NextResponse.json({ success: true, preferences: newPrefs });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("POST preferences error:", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: safeError(error) }, { status: 500 });
   }
 }

@@ -21,7 +21,6 @@ export async function GET(req: Request) {
     }
 
     // Self-healing: ensure lineUserId column exists
-    try { await db.prepare("ALTER TABLE stores ADD COLUMN lineUserId TEXT").run(); } catch(e) {}
 
     const store = await db.prepare(`
       SELECT s.id, s.name, s.email, s.lineUserId, u.displayName as lineDisplayName 

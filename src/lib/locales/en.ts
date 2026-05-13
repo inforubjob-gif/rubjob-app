@@ -440,6 +440,22 @@ export const en = {
       bagSize: "Bag Size",
       extraService: "Extra Service",
     },
+    connectingLine: "Connecting to LINE...",
+    selectedService: "Selected Service",
+    bagMaxSize: "Max Size (28kg)",
+    bagMaxDesc: "For large duvets",
+    bagPieces: {
+      "9kg": "~25-30 pcs",
+      "14kg": "~40-50 pcs",
+      "18kg": "~60-70 pcs",
+      "28kg": "~80-100 pcs",
+    },
+    detergentTitle: "Detergent / Fabric Softener",
+    detergentLabel: "Use shop's detergent",
+    detergentPrice: "+฿20 (Premium Grade)",
+    expressLabel: "Express Surcharge",
+    detergentFeeLabel: "Detergent / Softener Fee",
+    genericError: "An error occurred",
   },
   items: {
     tshirt: "T-Shirt",
@@ -976,6 +992,11 @@ export const en = {
       stopWorkConfirm: "Are you sure you want to pause receiving orders?",
       startWorkDesc: "Once you start, you will receive real-time notifications for new orders.",
       stopWorkDesc: "Once paused, you won't see new orders until you toggle your status back on.",
+      line: {
+        connectError: "Failed to connect LINE. Please try again.",
+        disconnectSuccess: "LINE disconnected. Please refresh the page.",
+        disconnectError: "Failed to disconnect LINE.",
+      },
     },
     payoutMethodPage: {
       title: "Payout Method",
@@ -1109,6 +1130,13 @@ export const en = {
       loginButton: "Login",
       backOffice: "Back Office",
       authorizedOnly: "AUTHORIZED PERSONNEL ONLY",
+    },
+    broadcast: {
+      title: "Broadcast Center",
+      emptyMessage: "Please type a message to send",
+      sendSuccess: "Message sent! (Sent: {sent}, Failed: {failed})",
+      updateSuccess: "Updated successfully",
+      genericError: "An error occurred",
     },
     common: {
       adminBadge: "Staff",
@@ -1428,6 +1456,9 @@ export const en = {
       selectSub: "Select a customer from the left to start world-class support",
       you: "You",
       openingTicket: "Opening support ticket...",
+      replyViaLineOA: "Reply in LINE OA (Free)",
+      quotaWarning: "⚡ Save Quota",
+      quotaWarningDesc: "Sending messages here consumes LINE OA push quota. To reply for free, click \"Reply in LINE OA\" to respond directly in the LINE OA app.",
     },
     investor: {
       costs: {

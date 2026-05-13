@@ -1,3 +1,4 @@
+import { safeError } from "@/lib/api-utils";
 import { getRequestContext } from "@cloudflare/next-on-pages";
 import { NextResponse } from "next/server";
 
@@ -28,9 +29,9 @@ export async function GET(req: Request) {
     `).bind(userId).all();
 
     return NextResponse.json({ addresses: results });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Fetch addresses error:", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: safeError(error) }, { status: 500 });
   }
 }
 
@@ -54,32 +55,10 @@ export async function POST(req: Request) {
 
     const id = `ADDR-${Date.now()}`;
     
-    // 1. Ensure table exists (Self-healing)
-    await db.prepare(`
-      CREATE TABLE IF NOT EXISTS addresses (
-        id TEXT PRIMARY KEY,
-        userId TEXT NOT NULL,
-        label TEXT NOT NULL,
-        details TEXT,
-        note TEXT,
-        lat REAL,
-        lng REAL,
-        isDefault INTEGER DEFAULT 0
-      )
-    `).run();
+    // Self-healing: addresses table moved to db-init.ts
 
-    // 2. Migration Guard: Add missing columns if they don't exist (Self-healing for existing tables)
-    try {
-      await db.prepare(`ALTER TABLE addresses ADD COLUMN note TEXT`).run();
-    } catch (e) { /* Column might already exist */ }
-    
-    try {
-      await db.prepare(`ALTER TABLE addresses ADD COLUMN lat REAL`).run();
-    } catch (e) { /* Column might already exist */ }
-    
-    try {
-      await db.prepare(`ALTER TABLE addresses ADD COLUMN lng REAL`).run();
-    } catch (e) { /* Column might already exist */ }
+
+    // Self-healing columns moved to db-init.ts
 
     // 3. If isDefault is true, unset other defaults first
     if (isDefault) {
@@ -92,9 +71,9 @@ export async function POST(req: Request) {
     `).bind(id, userId, label, details, note, lat, lng, isDefault ? 1 : 0).run();
 
     return NextResponse.json({ success: true, id });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Create address error:", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: safeError(error) }, { status: 500 });
   }
 }
 
@@ -123,9 +102,9 @@ export async function PUT(req: Request) {
     `).bind(label, details, note, lat, lng, id).run();
 
     return NextResponse.json({ success: true });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Update address error:", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: safeError(error) }, { status: 500 });
   }
 }
 
@@ -155,8 +134,8 @@ export async function PATCH(req: Request) {
     }
 
     return NextResponse.json({ success: true });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Patch address error:", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: safeError(error) }, { status: 500 });
   }
 }

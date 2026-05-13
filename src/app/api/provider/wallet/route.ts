@@ -1,3 +1,4 @@
+import { safeError } from "@/lib/api-utils";
 import { getRequestContext } from "@cloudflare/next-on-pages";
 import { NextResponse } from "next/server";
 import { getProviderSession } from "@/lib/auth-server";
@@ -20,20 +21,8 @@ export async function GET(req: Request) {
     const db = getRequestContext().env.DB;
     if (!db) return NextResponse.json({ error: "D1 not found" }, { status: 500 });
 
-    // Self-healing: ensure table exists
-    try {
-      await db.prepare(`
-        CREATE TABLE IF NOT EXISTS provider_wallet (
-          id INTEGER PRIMARY KEY AUTOINCREMENT,
-          providerId TEXT NOT NULL,
-          orderId TEXT,
-          amount REAL NOT NULL DEFAULT 0,
-          type TEXT DEFAULT 'job_completion',
-          status TEXT DEFAULT 'completed',
-          createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
-        )
-      `).run();
-    } catch (e) {}
+    // Self-healing: provider_wallet table moved to db-init.ts
+
 
     // Calculate Earnings (sum of totalPrice from completed orders)
     const earningsRes = await db.prepare(`
@@ -92,9 +81,9 @@ export async function GET(req: Request) {
       balance: Math.max(0, balance),
       transactions: transactions.slice(0, 15)
     });
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error("Provider wallet GET error:", err);
-    return NextResponse.json({ error: err.message }, { status: 500 });
+    return NextResponse.json({ error: safeError(err) }, { status: 500 });
   }
 }
 
@@ -152,8 +141,8 @@ export async function POST(req: Request) {
     ).run();
 
     return NextResponse.json({ success: true });
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error("Provider wallet POST error:", err);
-    return NextResponse.json({ error: err.message }, { status: 500 });
+    return NextResponse.json({ error: safeError(err) }, { status: 500 });
   }
 }

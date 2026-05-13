@@ -148,9 +148,9 @@ export default function RubberOrderDetailPage() {
         setShowSuccess(true);
         window.scrollTo({ top: 0, behavior: 'smooth' });
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Update rubber status failed:", err);
-      setUpdateError(err.message || "ไม่สามารถอัปเดตสถานะได้ กรุณาลองใหม่");
+      setUpdateError(((err instanceof Error) ? err.message : "") || "ไม่สามารถอัปเดตสถานะได้ กรุณาลองใหม่");
     } finally {
       setIsUpdating(false);
     }

@@ -1,3 +1,4 @@
+import { safeError } from "@/lib/api-utils";
 import { getRequestContext } from "@cloudflare/next-on-pages";
 import { NextResponse } from "next/server";
 
@@ -19,30 +20,17 @@ export async function GET(req: Request) {
     const db = getRequestContext().env.DB;
     if (!db) return NextResponse.json({ error: "D1 not found" }, { status: 500 });
     
-    // Self-healing: ensure table exists
-    try {
-      await db.prepare(`
-        CREATE TABLE IF NOT EXISTS provider_services (
-          id TEXT PRIMARY KEY,
-          providerId TEXT NOT NULL,
-          title TEXT NOT NULL,
-          description TEXT,
-          icon TEXT DEFAULT 'Stars',
-          packages TEXT DEFAULT '[]',
-          isActive BOOLEAN DEFAULT 1,
-          createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
-        )
-      `).run();
-    } catch (e) {}
+    // Self-healing: provider_services table moved to db-init.ts
+
 
     const { results } = await db.prepare(`
       SELECT * FROM provider_services WHERE providerId = ? ORDER BY createdAt DESC
     `).bind(providerId).all();
 
     return NextResponse.json({ services: results });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Fetch provider services error:", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: safeError(error) }, { status: 500 });
   }
 }
 
@@ -61,21 +49,8 @@ export async function POST(req: Request) {
     const db = getRequestContext().env.DB;
     if (!db) return NextResponse.json({ error: "D1 not found" }, { status: 500 });
     
-    // Self-healing: ensure table exists
-    try {
-      await db.prepare(`
-        CREATE TABLE IF NOT EXISTS provider_services (
-          id TEXT PRIMARY KEY,
-          providerId TEXT NOT NULL,
-          title TEXT NOT NULL,
-          description TEXT,
-          icon TEXT DEFAULT 'Stars',
-          packages TEXT DEFAULT '[]',
-          isActive BOOLEAN DEFAULT 1,
-          createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
-        )
-      `).run();
-    } catch (e) {}
+    // Self-healing: provider_services table moved to db-init.ts
+
 
     const gigId = id || `gig_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
     const packagesJson = typeof packages === 'string' ? packages : JSON.stringify(packages);
@@ -112,8 +87,8 @@ export async function POST(req: Request) {
     }
 
     return NextResponse.json({ success: true, id: gigId });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Save gig error:", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: safeError(error) }, { status: 500 });
   }
 }

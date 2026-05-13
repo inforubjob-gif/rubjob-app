@@ -1,3 +1,4 @@
+import { safeError } from "@/lib/api-utils";
 import { getRequestContext } from "@cloudflare/next-on-pages";
 import { NextResponse } from "next/server";
 import { getAdminSession } from "@/lib/auth-server";
@@ -61,8 +62,8 @@ export async function GET(req: Request) {
       }
     });
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Support image proxy error:", error);
-    return new Response(error.message, { status: 500 });
+    return new Response(safeError(error), { status: 500 });
   }
 }

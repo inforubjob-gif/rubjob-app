@@ -1,3 +1,4 @@
+import { safeError } from "@/lib/api-utils";
 import { getRequestContext } from "@cloudflare/next-on-pages";
 import { NextResponse } from "next/server";
 import { notifyAdminDelayedOrder } from "@/lib/support-notify";
@@ -13,12 +14,7 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: "DB not found" }, { status: 500 });
     }
 
-    // Ensure the column exists for tracking if we've notified already
-    try {
-      await db.prepare("ALTER TABLE orders ADD COLUMN adminNotifiedDelay INTEGER DEFAULT 0").run();
-    } catch (e) {
-      // Ignore if it already exists
-    }
+    // Self-healing columns moved to db-init.ts
 
     // Find orders that are in "washing" status for more than 3 hours
     // and haven't been notified yet.
@@ -51,8 +47,8 @@ export async function GET(req: Request) {
     }
 
     return NextResponse.json({ success: true, notifiedCount });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Cron check-delayed error:", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: safeError(error) }, { status: 500 });
   }
 }

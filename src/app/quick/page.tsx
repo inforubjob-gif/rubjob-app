@@ -153,9 +153,9 @@ export default function QuickBookPage() {
         throw new Error("Payment initialization failed");
       }
 
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err);
-      setError(err.message || "เกิดข้อผิดพลาด");
+      setError(((err instanceof Error) ? err.message : "") || "เกิดข้อผิดพลาด");
       setPaymentStatus("error");
     }
   };

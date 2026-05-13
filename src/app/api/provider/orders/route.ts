@@ -1,3 +1,4 @@
+import { safeError } from "@/lib/api-utils";
 import { getRequestContext } from "@cloudflare/next-on-pages";
 import { NextResponse } from "next/server";
 import { getProviderSession } from "@/lib/auth-server";
@@ -76,9 +77,9 @@ export async function GET(req: Request) {
       available: available,
       active: activeRes.results || [],
     });
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error("Provider orders GET error:", err);
-    return NextResponse.json({ error: err.message }, { status: 500 });
+    return NextResponse.json({ error: safeError(err) }, { status: 500 });
   }
 }
 
@@ -139,8 +140,8 @@ export async function PUT(req: Request) {
     }
 
     return NextResponse.json({ error: "Invalid action" }, { status: 400 });
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error("Provider orders PUT error:", err);
-    return NextResponse.json({ error: err.message }, { status: 500 });
+    return NextResponse.json({ error: safeError(err) }, { status: 500 });
   }
 }

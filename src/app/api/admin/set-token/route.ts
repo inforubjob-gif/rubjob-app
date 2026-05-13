@@ -1,3 +1,4 @@
+import { safeError } from "@/lib/api-utils";
 import { getRequestContext } from "@cloudflare/next-on-pages";
 import { NextResponse } from "next/server";
 import { getAdminSession } from "@/lib/auth-server";
@@ -27,16 +28,8 @@ export async function POST(req: Request) {
     const db = getRequestContext().env.DB;
     if (!db) return NextResponse.json({ error: "DB not found" }, { status: 500 });
 
-    // Ensure table exists
-    await db.prepare(`
-      CREATE TABLE IF NOT EXISTS system_settings (
-        key TEXT PRIMARY KEY,
-        value TEXT,
-        type TEXT,
-        description TEXT,
-        updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP
-      )
-    `).run();
+    // Self-healing: system_settings table moved to db-init.ts
+
 
     // Upsert the value
     await db.prepare(`
@@ -55,7 +48,7 @@ export async function POST(req: Request) {
       message: `Token '${key}' saved successfully`,
       verification: check 
     });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error: unknown) {
+    return NextResponse.json({ error: safeError(error) }, { status: 500 });
   }
 }

@@ -1,3 +1,4 @@
+import { safeError } from "@/lib/api-utils";
 import { getRequestContext } from "@cloudflare/next-on-pages";
 import { NextResponse } from "next/server";
 
@@ -29,9 +30,9 @@ export async function GET(req: Request) {
 
     const settings = JSON.parse((user.preferences as string) || "{}");
     return NextResponse.json({ settings });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Fetch settings error:", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: safeError(error) }, { status: 500 });
   }
 }
 
@@ -67,8 +68,8 @@ export async function POST(req: Request) {
       .run();
 
     return NextResponse.json({ success: true, settings: newPrefs });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Update settings error:", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: safeError(error) }, { status: 500 });
   }
 }

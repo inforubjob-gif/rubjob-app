@@ -2,6 +2,7 @@ import { getRequestContext } from "@cloudflare/next-on-pages";
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { verifyPassword, isBcryptHash, hashPassword } from "@/lib/password";
+import { checkRateLimit, recordLoginAttempt } from "@/lib/rate-limit";
 
 export const runtime = "edge";
 
@@ -16,6 +17,12 @@ export async function POST(req: Request) {
     const db = getRequestContext().env.DB;
     if (!db) {
       return NextResponse.json({ success: false, error: "Database not connected" }, { status: 500 });
+    }
+
+    // 🛡️ Phase 3.4: Rate limiting — 5 attempts per 15 minutes
+    const allowed = await checkRateLimit(db, email);
+    if (!allowed) {
+      return NextResponse.json({ success: false, error: "พยายามเข้าสู่ระบบมากเกินไป กรุณารอ 15 นาที" }, { status: 429 });
     }
 
     // Fetch by email only — verify password in application layer
@@ -69,6 +76,8 @@ export async function POST(req: Request) {
       }
     }
 
+    // Record failed login attempt for rate limiting
+    await recordLoginAttempt(db, email);
     return NextResponse.json({ success: false, error: "อีเมลหรือรหัสผ่านไม่ถูกต้อง" }, { status: 401 });
   } catch (err: unknown) {
     console.error("Rubber login error:", err);

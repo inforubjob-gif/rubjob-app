@@ -188,9 +188,9 @@ function BookingFlow() {
             }
           }
         }
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error("Failed to fetch booking data:", err);
-        setDataError(err.message || "Failed to load booking data");
+        setDataError(err instanceof Error ? err.message : "Failed to load booking data");
       } finally {
         setIsDataLoading(false);
       }
@@ -433,9 +433,10 @@ function BookingFlow() {
         // If payment fails to init, still have the order. Redirect to order page.
         router.push(`/orders/${orderId}`);
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error(error);
-      showToast(`${t("common.error")}: ${error.message}`, "error");
+      const msg = error instanceof Error ? error.message : t("booking.genericError");
+      showToast(`${t("common.error")}: ${msg}`, "error");
     } finally {
       setIsSubmitting(false);
     }
@@ -456,7 +457,7 @@ function BookingFlow() {
     return (
       <div className="flex flex-col items-center justify-center min-h-dvh bg-slate-50 gap-4">
         <div className="w-12 h-12 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
-        <p className="text-sm font-black text-slate-400 uppercase tracking-widest">กำลังเชื่อมต่อระบบ LINE...</p>
+        <p className="text-sm font-black text-slate-400 uppercase tracking-widest">{t("booking.connectingLine")}</p>
       </div>
     );
   }
@@ -617,7 +618,7 @@ function BookingFlow() {
                 <h3 className="text-xs font-black text-foreground flex items-center gap-1.5 uppercase tracking-tight">
                   <IconCircle variant="green" size="xs">
                     <Icons.WashFold size={12} strokeWidth={3} />
-                  </IconCircle> บริการที่เลือก
+                  </IconCircle> {t("booking.selectedService")}
                 </h3>
               </div>
               {service && (
@@ -799,9 +800,9 @@ function BookingFlow() {
                 {selectedService === "duvet_washing" ? (
                   <div className="grid grid-cols-1 mb-4">
                     <label className="flex flex-col items-center justify-center p-4 rounded-xl border-2 border-primary bg-primary/5 shadow-md shadow-primary/10">
-                      <span className="text-sm font-black text-foreground">ขนาดใหญ่สุด (28kg)</span>
+                      <span className="text-sm font-black text-foreground">{t("booking.bagMaxSize")}</span>
                       <span className="text-[10px] text-muted font-bold mt-1">
-                        รองรับผ้านวมขนาดใหญ่
+                        {t("booking.bagMaxDesc")}
                       </span>
                     </label>
                   </div>
@@ -811,10 +812,7 @@ function BookingFlow() {
                       <label key={size} className={`flex flex-col items-center justify-center p-3.5 rounded-xl border-2 cursor-pointer transition-all ${bagSize === size ? "border-primary bg-primary/5 shadow-md shadow-primary/10" : "border-slate-100 bg-white hover:bg-slate-50"}`} onClick={() => setBagSize(size)}>
                         <span className="text-sm font-black text-foreground">{size}</span>
                         <span className="text-[10px] text-muted font-bold">
-                          {size === "9kg" ? "~25-30 ชิ้น" : 
-                           size === "14kg" ? "~40-50 ชิ้น" : 
-                           size === "18kg" ? "~60-70 ชิ้น" : 
-                           "~80-100 ชิ้น"}
+                          {({ "9kg": t("booking.bagPieces.9kg"), "14kg": t("booking.bagPieces.14kg"), "18kg": t("booking.bagPieces.18kg"), "28kg": t("booking.bagPieces.28kg") } as const)[size]}
                         </span>
                         {size === "28kg" && <span className="text-[10px] text-primary-dark font-black mt-1">+฿20</span>}
                       </label>
@@ -854,13 +852,13 @@ function BookingFlow() {
                   <IconCircle variant="black" size="sm">
                     <Icons.Shield size={14} strokeWidth={3} />
                   </IconCircle>
-                  น้ำยาซักผ้า / ปรับผ้านุ่ม
+                  {t("booking.detergentTitle")}
                 </h3>
                 <Card className="p-4 mb-4">
                   <label className="flex items-center justify-between cursor-pointer" onClick={() => setNeedsDetergent(!needsDetergent)}>
                     <div className="flex flex-col">
-                      <span className="text-sm font-bold text-foreground">รับน้ำยาของร้าน</span>
-                      <span className="text-xs text-primary-dark font-medium">+฿20 (เกรดพรีเมียม)</span>
+                      <span className="text-sm font-bold text-foreground">{t("booking.detergentLabel")}</span>
+                      <span className="text-xs text-primary-dark font-medium">{t("booking.detergentPrice")}</span>
                     </div>
                     <div className={`w-[42px] h-[24px] rounded-full p-[2px] transition-colors duration-300 flex items-center ${needsDetergent ? "bg-primary" : "bg-slate-200"}`}>
                       <div className={`w-5 h-5 rounded-full bg-white transition-transform duration-300 shadow-sm ${needsDetergent ? "translate-x-[18px]" : "translate-x-0"}`} />
@@ -987,13 +985,13 @@ function BookingFlow() {
                       </div>
                       {deliverySpeed === "express" && (
                         <div className="flex items-center justify-between text-primary-dark">
-                          <span>ค่าบริการด่วนพิเศษ (Express)</span>
+                          <span>{t("booking.expressLabel")}</span>
                           <span className="font-bold">+฿20</span>
                         </div>
                       )}
                       {needsDetergent && (
                         <div className="flex items-center justify-between text-primary-dark">
-                          <span>ค่าน้ำยาซักผ้า/ปรับผ้านุ่ม</span>
+                          <span>{t("booking.detergentFeeLabel")}</span>
                           <span className="font-bold">+฿20</span>
                         </div>
                       )}

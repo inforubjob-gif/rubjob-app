@@ -1,3 +1,4 @@
+import { safeError } from "@/lib/api-utils";
 import { getRequestContext } from "@cloudflare/next-on-pages";
 import { NextResponse } from "next/server";
 import { getRubberSession, getStoreSession } from "@/lib/auth-server";
@@ -15,17 +16,7 @@ async function hashPin(pin: string) {
   return hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
 }
 
-/**
- * Self-healing: ensure walletPin column exists on the target table.
- * Called before any PIN read/write operation.
- */
-async function ensureWalletPinColumn(db: any, tableName: string) {
-  try {
-    await db.prepare(`ALTER TABLE ${tableName} ADD COLUMN walletPin TEXT`).run();
-  } catch (e) {
-    // Column already exists — ignore
-  }
-}
+// Self-healing walletPin column moved to db-init.ts
 
 /**
  * Resolve the userId and tableName for PIN operations
@@ -77,8 +68,7 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Self-healing: ensure column exists before reading
-    await ensureWalletPinColumn(db, tableName);
+    // walletPin column ensured by db-init.ts
 
     const user = await db.prepare(`SELECT walletPin FROM ${tableName} WHERE id = ?`).bind(userId).first() as any;
     
@@ -86,9 +76,9 @@ export async function GET(req: Request) {
       success: true, 
       hasPin: !!user?.walletPin 
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("PIN check error:", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: safeError(error) }, { status: 500 });
   }
 }
 
@@ -110,8 +100,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Self-healing: ensure column exists before any operation
-    await ensureWalletPinColumn(db, tableName);
+    // walletPin column ensured by db-init.ts
 
     if (action === "setup") {
       if (!pin || pin.length !== 6) return NextResponse.json({ error: "Invalid PIN format" }, { status: 400 });
@@ -156,15 +145,15 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: "Missing userId" }, { status: 400 });
       }
 
-      await ensureWalletPinColumn(db, targetTable);
+      // walletPin column ensured by db-init.ts
       await db.prepare(`UPDATE ${targetTable} SET walletPin = NULL WHERE id = ?`).bind(targetUserId).run();
 
       return NextResponse.json({ success: true, message: "PIN has been reset" });
     }
 
     return NextResponse.json({ error: "Invalid action" }, { status: 400 });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("PIN operation error:", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: safeError(error) }, { status: 500 });
   }
 }

@@ -2,6 +2,7 @@ import { getRequestContext } from "@cloudflare/next-on-pages";
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { verifyPassword, isBcryptHash, hashPassword } from "@/lib/password";
+import { checkRateLimit, recordLoginAttempt } from "@/lib/rate-limit";
 
 export const runtime = "edge";
 
@@ -20,9 +21,13 @@ export async function POST(req: Request) {
       const db = context?.env?.DB;
       
       if (db) {
-        // Self-healing: Ensure columns exist
-        try { await db.prepare("ALTER TABLE admin_users ADD COLUMN permissions TEXT").run(); } catch (e) {}
-        try { await db.prepare("ALTER TABLE admin_users ADD COLUMN avatarUrl TEXT").run(); } catch (e) {}
+        // 🛡️ Phase 3.4: Rate limiting — 5 attempts per 15 minutes
+        const allowed = await checkRateLimit(db, email);
+        if (!allowed) {
+          return NextResponse.json({ success: false, error: "พยายามเข้าสู่ระบบมากเกินไป กรุณารอ 15 นาที" }, { status: 429 });
+        }
+
+        // Self-healing columns moved to db-init.ts (Phase 3.2)
 
         // Fetch admin by email only — verify password in application layer
         const admin = await db.prepare(
@@ -78,6 +83,11 @@ export async function POST(req: Request) {
         avatarUrl: adminData.avatarUrl
       });
     } else {
+      // Record failed login attempt for rate limiting
+      try {
+        const db = getRequestContext()?.env?.DB;
+        if (db) await recordLoginAttempt(db, email);
+      } catch {}
       return NextResponse.json({ success: false, error: "อีเมลหรือรหัสผ่านไม่ถูกต้อง" }, { status: 401 });
     }
   } catch (err) {

@@ -1,3 +1,4 @@
+import { safeError } from "@/lib/api-utils";
 import { getRequestContext } from "@cloudflare/next-on-pages";
 import { NextResponse } from "next/server";
 import { getAdminSession } from "@/lib/auth-server";
@@ -12,13 +13,7 @@ export async function GET(req: Request) {
     const db = getRequestContext().env.DB;
     if (!db) return NextResponse.json({ error: "D1 not found" }, { status: 500 });
 
-    // Self-healing: Ensure columns exist
-    try {
-      await db.prepare("ALTER TABLE admin_users ADD COLUMN permissions TEXT").run();
-    } catch (e) {}
-    try {
-      await db.prepare("ALTER TABLE admin_users ADD COLUMN avatarUrl TEXT").run();
-    } catch (e) {}
+    // Self-healing columns moved to db-init.ts
 
     const { results } = await db.prepare(`
       SELECT id, email, name, role, permissions, avatarUrl, createdAt
@@ -27,8 +22,8 @@ export async function GET(req: Request) {
     `).all();
 
     return NextResponse.json({ admins: results });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error: unknown) {
+    return NextResponse.json({ error: safeError(error) }, { status: 500 });
   }
 }
 
@@ -55,11 +50,11 @@ export async function POST(req: Request) {
     ).run();
 
     return NextResponse.json({ success: true, id });
-  } catch (error: any) {
-    if (error.message.includes("UNIQUE constraint failed")) {
+  } catch (error: unknown) {
+    if (((error instanceof Error) ? safeError(error) : "").includes("UNIQUE constraint failed")) {
       return NextResponse.json({ error: "Email already exists" }, { status: 400 });
     }
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: safeError(error) }, { status: 500 });
   }
 }
 
@@ -91,8 +86,8 @@ export async function PUT(req: Request) {
     ).run();
 
     return NextResponse.json({ success: true });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error: unknown) {
+    return NextResponse.json({ error: safeError(error) }, { status: 500 });
   }
 }
 
@@ -110,7 +105,7 @@ export async function DELETE(req: Request) {
     await db.prepare(`DELETE FROM admin_users WHERE id = ?`).bind(id).run();
 
     return NextResponse.json({ success: true });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error: unknown) {
+    return NextResponse.json({ error: safeError(error) }, { status: 500 });
   }
 }

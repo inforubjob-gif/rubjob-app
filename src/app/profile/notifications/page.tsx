@@ -6,11 +6,13 @@ import Card from "@/components/ui/Card";
 import { useTranslation } from "@/components/providers/LanguageProvider";
 import { Icons } from "@/components/ui/Icons";
 import { useLiff } from "@/components/providers/LiffProvider";
+import { useToast } from "@/components/providers/ToastProvider";
 
 export default function NotificationsPage() {
   const router = useRouter();
   const { t } = useTranslation();
   const { profile } = useLiff();
+  const { showToast } = useToast();
   const [settings, setSettings] = useState({
     orderStatus: true,
     promotions: false,
@@ -62,7 +64,7 @@ export default function NotificationsPage() {
       console.error("Failed to save settings:", err);
       // Revert on failure
       setSettings(prev => ({ ...prev, [key]: !newValue }));
-      alert("Failed to save settings");
+      showToast("Failed to save settings", "error");
     }
   };
 

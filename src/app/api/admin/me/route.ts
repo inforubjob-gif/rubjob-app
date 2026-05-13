@@ -1,3 +1,4 @@
+import { safeError } from "@/lib/api-utils";
 import { getRequestContext } from "@cloudflare/next-on-pages";
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
@@ -16,13 +17,7 @@ export async function GET(req: Request) {
     const db = getRequestContext().env.DB;
     if (!db) return NextResponse.json({ error: "D1 not found" }, { status: 500 });
 
-    // Self-healing: Ensure columns exist
-    try {
-      await db.prepare("ALTER TABLE admin_users ADD COLUMN permissions TEXT").run();
-    } catch (e) {}
-    try {
-      await db.prepare("ALTER TABLE admin_users ADD COLUMN avatarUrl TEXT").run();
-    } catch (e) {}
+    // Self-healing columns moved to db-init.ts
 
     const admin = await db.prepare(`
       SELECT id, email, name, role, permissions, avatarUrl FROM admin_users WHERE email = ?
@@ -38,7 +33,7 @@ export async function GET(req: Request) {
         permissions: admin.permissions ? JSON.parse(admin.permissions) : null
       }
     });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error: unknown) {
+    return NextResponse.json({ error: safeError(error) }, { status: 500 });
   }
 }
