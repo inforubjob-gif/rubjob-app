@@ -92,18 +92,18 @@ export async function GET(req: Request) {
     }
 
     // Calculate Payment Gateway Fee (Stripe/Omise)
-    // Credit cards ~3.65% + 10 THB, PromptPay ~1.65%. We approximate based on paymentMethod.
+    // Credit cards ~3.65% + ฿10, PromptPay ~1.65%, cash = 0
     let paymentGatewayFee = 0;
     try {
       const pgStats = await db.prepare(`
-        SELECT SUM(
+        SELECT COALESCE(SUM(
           CASE 
             WHEN paymentMethod LIKE '%card%' THEN (totalPrice * 0.0365) + 10 
             WHEN paymentMethod LIKE '%promptpay%' THEN (totalPrice * 0.0165)
-            WHEN paymentMethod = 'cash' THEN 0
-            ELSE (totalPrice * 0.03) -- 3% fallback for unknown digital methods
+            WHEN paymentMethod = 'cash' OR paymentMethod = 'wallet' THEN 0
+            ELSE (totalPrice * 0.03)
           END
-        ) as fee 
+        ), 0) as fee 
         FROM orders WHERE status = 'completed'
       `).first() as any;
       paymentGatewayFee = pgStats?.fee || 0;
