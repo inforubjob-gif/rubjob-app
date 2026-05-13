@@ -20,6 +20,8 @@ export default function QuickBookPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
   const [activeOrderId, setActiveOrderId] = useState<string | null>(null);
+  const [favServices, setFavServices] = useState<any[]>([]);
+  const [favIds, setFavIds] = useState<string[]>([]);
   
   // Payment state
   const [stripePromise, setStripePromise] = useState<Promise<Stripe | null> | null>(null);
@@ -76,6 +78,23 @@ export default function QuickBookPage() {
     }
     fetchRecentOrder();
   }, [profile?.userId]);
+
+  // Load favorites and service data
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("rubjob_fav_services");
+      if (saved) {
+        const ids = JSON.parse(saved) as string[];
+        setFavIds(ids);
+        // Fetch services to get names
+        fetch("/api/services").then(r => r.json()).then((data: any) => {
+          if (data.services) {
+            setFavServices(data.services.filter((s: any) => ids.includes(s.id)));
+          }
+        }).catch(() => {});
+      }
+    } catch {}
+  }, []);
 
   const getFirstAvailableSlot = () => {
     const now = new Date();
@@ -179,16 +198,16 @@ export default function QuickBookPage() {
     );
   }
 
-  // ─── No Recent Order ───
-  if (!recentOrder) {
+  // ─── No Recent Order AND No Favorites ───
+  if (!recentOrder && favServices.length === 0) {
     return (
       <div className="min-h-dvh flex flex-col items-center justify-center bg-slate-50 p-6 text-center">
         <div className="w-20 h-20 bg-white rounded-[2rem] shadow-xl shadow-slate-200/50 flex items-center justify-center mb-6 text-slate-300">
           <Icons.Clock size={40} />
         </div>
         <h1 className="text-xl font-black text-slate-900 uppercase tracking-tight mb-2">ไม่พบประวัติการใช้งาน</h1>
-        <p className="text-sm text-slate-500 mb-8 max-w-[250px]">
-          คุณต้องทำการจองบริการผ่านระบบปกติอย่างน้อย 1 ครั้ง เพื่อใช้งานระบบจองด่วน
+        <p className="text-sm text-slate-500 mb-3 max-w-[280px]">
+          คุณต้องทำการจองบริการอย่างน้อย 1 ครั้ง หรือกดดาว ⭐ ที่บริการโปรดเพื่อใช้งานระบบจองด่วน
         </p>
         <button
           onClick={() => router.push("/booking")}
@@ -244,43 +263,83 @@ export default function QuickBookPage() {
 
         <main className="flex-1 px-5 py-6">
           <Card className="p-5 space-y-4">
-            <div className="flex items-center gap-4">
-              <IconCircle variant="orange" size="md">
-                {getServiceIcon(recentOrder.serviceId, { size: 24 })}
-              </IconCircle>
-              <div>
-                <h2 className="font-black text-slate-800 text-lg">
-                  ใช้บริการแบบเดิม
-                </h2>
-                <p className="text-sm text-slate-500">บริการ: {recentOrder.serviceName || recentOrder.serviceId}</p>
+            {/* Favorite Services Quick Access */}
+            {favServices.length > 0 && (
+              <div className="space-y-3">
+                <div className="flex items-center gap-2">
+                  <Icons.Star size={14} className="text-amber-500" />
+                  <h3 className="text-xs font-black text-slate-500 uppercase tracking-wider">บริการโปรด</h3>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  {favServices.map(fav => (
+                    <button
+                      key={fav.id}
+                      onClick={() => router.push(`/booking?service=${fav.id}`)}
+                      className="flex items-center gap-2 p-3 bg-amber-50 border border-amber-200 rounded-xl text-left hover:bg-amber-100 active:scale-95 transition-all"
+                    >
+                      <IconCircle variant="orange" size="xs">
+                        {getServiceIcon(fav.id, { size: 14 })}
+                      </IconCircle>
+                      <span className="text-xs font-black text-slate-700 truncate">{t(`orders.services.${fav.id}`) || fav.name}</span>
+                    </button>
+                  ))}
+                </div>
               </div>
-            </div>
-            
-            <div className="bg-slate-50 p-4 rounded-xl border border-slate-100">
-              <div className="flex justify-between items-center mb-2">
-                <span className="text-sm text-slate-500 font-bold">ราคารวม (โดยประมาณ)</span>
-                <span className="text-xl font-black text-primary">฿{totalPrice}</span>
-              </div>
-              <p className="text-xs text-slate-400">
-                ระบบจะสร้างคำสั่งซักโดยอ้างอิงจากออเดอร์ล่าสุดของคุณ (ทั้งราคาและสถานที่รับส่ง) และชำระเงินผ่านระบบ PromptPay
-              </p>
-            </div>
+            )}
 
-            <div className="space-y-3">
-              <button
-                onClick={handleConfirmQuickBook}
-                className="w-full bg-primary text-white py-4 rounded-xl font-black text-base uppercase shadow-lg shadow-primary/30 active:scale-95 transition-all"
-              >
-                ยืนยันจองด่วน
-              </button>
-              
+            {/* Recent Order Quick Re-book */}
+            {recentOrder && (
+              <>
+                {favServices.length > 0 && <div className="border-t border-slate-100 pt-4" />}
+                <div className="flex items-center gap-4">
+                  <IconCircle variant="orange" size="md">
+                    {getServiceIcon(recentOrder.serviceId, { size: 24 })}
+                  </IconCircle>
+                  <div>
+                    <h2 className="font-black text-slate-800 text-lg">
+                      ใช้บริการแบบเดิม
+                    </h2>
+                    <p className="text-sm text-slate-500">บริการ: {t(`orders.services.${recentOrder.serviceId}`) || recentOrder.serviceName || recentOrder.serviceId}</p>
+                  </div>
+                </div>
+                
+                <div className="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-sm text-slate-500 font-bold">ราคารวม (โดยประมาณ)</span>
+                    <span className="text-xl font-black text-primary">฿{totalPrice}</span>
+                  </div>
+                  <p className="text-xs text-slate-400">
+                    ระบบจะสร้างคำสั่งซักโดยอ้างอิงจากออเดอร์ล่าสุดของคุณ (ทั้งราคาและสถานที่รับส่ง) และชำระเงินผ่านระบบ PromptPay
+                  </p>
+                </div>
+
+                <div className="space-y-3">
+                  <button
+                    onClick={handleConfirmQuickBook}
+                    className="w-full bg-primary text-white py-4 rounded-xl font-black text-base uppercase shadow-lg shadow-primary/30 active:scale-95 transition-all"
+                  >
+                    ยืนยันจองด่วน
+                  </button>
+                  
+                  <button
+                    onClick={() => router.push("/booking")}
+                    className="w-full bg-white text-slate-500 border border-slate-200 py-3.5 rounded-xl font-bold text-sm uppercase active:scale-95 transition-all"
+                  >
+                    แก้ไขรายละเอียด (จองปกติ)
+                  </button>
+                </div>
+              </>
+            )}
+
+            {/* If only favorites, no recent order */}
+            {!recentOrder && favServices.length > 0 && (
               <button
                 onClick={() => router.push("/booking")}
-                className="w-full bg-white text-slate-500 border border-slate-200 py-3.5 rounded-xl font-bold text-sm uppercase active:scale-95 transition-all"
+                className="w-full bg-white text-slate-500 border border-slate-200 py-3.5 rounded-xl font-bold text-sm uppercase active:scale-95 transition-all mt-2"
               >
-                แก้ไขรายละเอียด (จองปกติ)
+                หรือจองแบบปกติ
               </button>
-            </div>
+            )}
           </Card>
         </main>
       </div>

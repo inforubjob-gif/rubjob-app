@@ -62,6 +62,24 @@ function BookingFlow() {
   const [selectedStore, setSelectedStore] = useState<Store | null>(null);
   const [selectedService, setSelectedService] = useState<ServiceType | null>(validInitService);
   const [selectedAddress, setSelectedAddress] = useState<Address | null>(null);
+
+  // Favorites system
+  const [favorites, setFavorites] = useState<string[]>([]);
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("rubjob_fav_services");
+      if (saved) setFavorites(JSON.parse(saved));
+    } catch {}
+  }, []);
+  const toggleFavorite = (svcId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setFavorites(prev => {
+      const next = prev.includes(svcId) ? prev.filter(id => id !== svcId) : [...prev, svcId];
+      localStorage.setItem("rubjob_fav_services", JSON.stringify(next));
+      showToast(next.includes(svcId) ? "⭐ บันทึกเป็นรายการโปรดแล้ว" : "ลบออกจากรายการโปรดแล้ว", "success");
+      return next;
+    });
+  };
   type DeliverySpeed = "standard" | "express";
   const [deliverySpeed, setDeliverySpeed] = useState<DeliverySpeed>("standard");
   const [deliveryDate, setDeliveryDate] = useState("");
@@ -576,8 +594,20 @@ function BookingFlow() {
 
         {/* ─── Step: Service ─── */}
         {step === "service" && (
-          <div className="space-y-4 stagger">
-            {dbServices.map((svc) => (
+          <div className="space-y-3 stagger">
+            {/* Favorites hint */}
+            {favorites.length === 0 && dbServices.length > 0 && (
+              <div className="flex items-center gap-2 px-3 py-2 bg-amber-50 border border-amber-100 rounded-xl">
+                <Icons.Star size={14} className="text-amber-400" />
+                <p className="text-[10px] font-bold text-amber-600">กดดาว ⭐ เพื่อบันทึกบริการโปรด สำหรับจองด่วนครั้งถัดไป</p>
+              </div>
+            )}
+            {/* Sort: favorites first */}
+            {[...dbServices].sort((a, b) => {
+              const aFav = favorites.includes(a.id) ? -1 : 0;
+              const bFav = favorites.includes(b.id) ? -1 : 0;
+              return aFav - bFav;
+            }).map((svc) => (
                 <Card
                   key={svc.id}
                   hoverable
@@ -586,24 +616,36 @@ function BookingFlow() {
                     if (svc.id === "duvet_washing") setBagSize("28kg");
                     setStep("details");
                   }}
-                  className={`p-5 flex items-center gap-4 transition-all duration-300 border-2 ${
+                  className={`p-4 flex items-center gap-3 transition-all duration-300 border-2 ${
                     selectedService === svc.id
                       ? "bg-primary/5 border-primary shadow-xl shadow-primary/20 scale-[1.02] ring-4 ring-primary/10"
-                      : "border-slate-100 hover:border-slate-200"
+                      : favorites.includes(svc.id)
+                        ? "border-amber-200 bg-amber-50/30"
+                        : "border-slate-100 hover:border-slate-200"
                   }`}
                 >
-                <IconCircle variant={selectedService === svc.id ? "orange" : "white"} size="lg" className="shrink-0">
-                  {getServiceIcon(svc.id, { size: 28 })}
+                <IconCircle variant={selectedService === svc.id ? "orange" : "white"} size="md" className="shrink-0">
+                  {getServiceIcon(svc.id, { size: 22 })}
                 </IconCircle>
                 <div className="flex-1 min-w-0">
-                  <h3 className="text-base font-black text-foreground">{t(`orders.services.${svc.id}`) || svc.name}</h3>
-                  <p className="text-xs text-muted mt-1 leading-relaxed opacity-90">{t(`serviceDesc.${svc.id}`) || svc.description}</p>
-                </div>
-                {selectedService === svc.id && (
-                  <div className="w-7 h-7 bg-primary shadow-md shadow-primary/40 rounded-full flex items-center justify-center text-white text-sm shrink-0">
-                    ✓
+                  <div className="flex items-center gap-1.5">
+                    <h3 className="text-sm font-black text-foreground">{t(`orders.services.${svc.id}`) || svc.name}</h3>
+                    {favorites.includes(svc.id) && (
+                      <span className="text-[8px] font-black bg-amber-100 text-amber-600 px-1.5 py-0.5 rounded-full uppercase leading-none">โปรด</span>
+                    )}
                   </div>
-                )}
+                  <p className="text-[11px] text-muted mt-0.5 leading-relaxed opacity-90 line-clamp-1">{t(`serviceDesc.${svc.id}`) || svc.description}</p>
+                </div>
+                <button
+                  onClick={(e) => toggleFavorite(svc.id, e)}
+                  className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 transition-all active:scale-90 ${
+                    favorites.includes(svc.id)
+                      ? "bg-amber-100 text-amber-500"
+                      : "bg-slate-50 text-slate-300 hover:text-amber-400 hover:bg-amber-50"
+                  }`}
+                >
+                  <Icons.Star size={16} />
+                </button>
               </Card>
             ))}
           </div>
