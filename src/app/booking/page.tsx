@@ -614,30 +614,20 @@ function BookingFlow() {
           <div className="space-y-5 animate-page-enter">
             {/* Service Selection (Editable) */}
             <section>
-              <div className="flex items-center justify-between mb-1.5">
-                <h3 className="text-xs font-black text-foreground flex items-center gap-1.5 uppercase tracking-tight">
-                  <IconCircle variant="green" size="xs">
-                    <Icons.WashFold size={12} strokeWidth={3} />
-                  </IconCircle> {t("booking.selectedService")}
-                </h3>
-              </div>
               {service && (
                 <Card
                   hoverable
                   onClick={() => setStep("service")}
-                  className="p-3 transition-all duration-300 border border-slate-100 hover:border-primary/50 bg-white shadow-sm flex items-center justify-between group"
+                  className="p-2.5 transition-all duration-300 border border-slate-100 hover:border-primary/50 bg-white shadow-sm flex items-center justify-between group"
                 >
-                  <div className="flex items-center gap-2.5 flex-1">
-                    <IconCircle variant="orange" size="sm">
-                      {getServiceIcon(service.id, { size: 16 })}
+                  <div className="flex items-center gap-2 flex-1 min-w-0">
+                    <IconCircle variant="orange" size="xs">
+                      {getServiceIcon(service.id, { size: 12 })}
                     </IconCircle>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-black text-slate-800 leading-tight">{t(`orders.services.${service.id}`) || service.name}</p>
-                      <p className="text-[10px] text-slate-400 mt-0.5 line-clamp-1">{t(`serviceDesc.${service.id}`) || service.description}</p>
-                    </div>
+                    <p className="text-xs font-black text-slate-800 truncate">{t(`orders.services.${service.id}`) || service.name}</p>
                   </div>
-                  <div className="w-7 h-7 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-primary/10 group-hover:text-primary transition-colors shrink-0 ml-2">
-                    <Icons.Edit size={14} />
+                  <div className="w-6 h-6 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-primary/10 group-hover:text-primary transition-colors shrink-0 ml-2">
+                    <Icons.Edit size={12} />
                   </div>
                 </Card>
               )}
@@ -645,11 +635,9 @@ function BookingFlow() {
 
             {/* Address selection */}
             <section>
-              <div className="flex items-center justify-between mb-1.5">
-                <h3 className="text-xs font-black text-foreground flex items-center gap-1.5 uppercase tracking-tight">
-                  <IconCircle variant="orange" size="xs">
-                    <Icons.MapPin size={12} strokeWidth={3} />
-                  </IconCircle> {t("booking.pickupAddress")}
+              <div className="flex items-center justify-between mb-1">
+                <h3 className="text-[10px] font-black text-slate-400 flex items-center gap-1 uppercase tracking-tight">
+                  <Icons.MapPin size={10} strokeWidth={3} className="text-primary" /> {t("booking.pickupAddress")}
                 </h3>
                 <button 
                   onClick={() => router.push("/profile/addresses")}
@@ -658,63 +646,37 @@ function BookingFlow() {
                   {t("booking.addNew")}
                 </button>
               </div>
-              <div className="space-y-2">
-                {dbAddresses.length === 0 && (
-                  <p className="text-center py-3 text-xs text-muted">{t("booking.noAddress")}</p>
-                )}
-                {selectedAddress && (
-                  <Card
-                    hoverable
-                    onClick={() => router.push("/profile/addresses?redirect=/booking")}
-                    className="p-3 transition-all duration-300 border border-slate-100 hover:border-primary/50 bg-white shadow-sm flex items-center justify-between group"
-                  >
-                    <div className="flex items-center gap-2.5 flex-1 min-w-0">
-                      <IconCircle variant="orange" size="sm">
-                        {selectedAddress.label.toLowerCase().includes("home") || selectedAddress.label.toLowerCase().includes("บ้าน") ? <Icons.Home size={16} /> : <Icons.Office size={16} />}
-                      </IconCircle>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-bold text-slate-800 leading-tight">{selectedAddress.label}</p>
-                        <p className="text-[10px] text-slate-400 mt-0.5 line-clamp-1">{selectedAddress.details}</p>
-                        {selectedAddress.note && (
-                          <div className="flex items-center gap-1 mt-0.5 text-primary-dark">
-                            <Icons.FileText size={10} strokeWidth={3} />
-                            <p className="text-[10px] line-clamp-1">{selectedAddress.note}</p>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                    <div className="w-7 h-7 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-primary/10 group-hover:text-primary transition-colors shrink-0 ml-2">
-                      <Icons.Edit size={14} />
-                    </div>
-                  </Card>
-                )}
-              </div>
-
+              {dbAddresses.length === 0 && (
+                <p className="text-center py-3 text-xs text-muted">{t("booking.noAddress")}</p>
+              )}
+              {selectedAddress && (
+                <Card
+                  hoverable
+                  onClick={() => router.push("/profile/addresses?redirect=/booking")}
+                  className="p-2.5 transition-all duration-300 border border-slate-100 hover:border-primary/50 bg-white shadow-sm flex items-center justify-between group"
+                >
+                  <div className="flex items-center gap-2 flex-1 min-w-0">
+                    <IconCircle variant="orange" size="xs">
+                      {selectedAddress.label.toLowerCase().includes("home") || selectedAddress.label.toLowerCase().includes("บ้าน") ? <Icons.Home size={12} /> : <Icons.Office size={12} />}
+                    </IconCircle>
+                    <p className="text-xs font-bold text-slate-800 truncate">{selectedAddress.label}{selectedAddress.details ? ` — ${selectedAddress.details}` : ''}</p>
+                  </div>
+                  <div className="w-6 h-6 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-primary/10 group-hover:text-primary transition-colors shrink-0 ml-2">
+                    <Icons.Edit size={12} />
+                  </div>
+                </Card>
+              )}
               {/* Auto-assigned store is hidden from the user per requirements */}
             </section>
 
             <section>
                 <h3 className="text-xs font-black text-foreground mb-1.5 flex items-center gap-1.5 uppercase tracking-tight">
-                  <IconCircle variant="yellow" size="xs">
+                  <IconCircle variant="orange" size="xs">
                     <Icons.Bell size={12} strokeWidth={3} />
                   </IconCircle> {t("booking.pickupSelectTime")}
                 </h3>
               
               <div className="p-2.5 bg-slate-50/80 rounded-xl space-y-2.5 animate-page-enter border border-slate-100">
-                {/* Compact date selector — inline pill style */}
-                <div className="flex items-center gap-2 overflow-x-auto hide-scrollbar">
-                  {dates.map((d: { value: string; day: string; date: number; month: string }) => (
-                    <button
-                      key={d.value}
-                      onClick={() => setPickupDate(d.value)}
-                      className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] font-bold whitespace-nowrap transition-all ${pickupDate === d.value ? "bg-primary text-white shadow-sm" : "bg-white text-slate-500 border border-slate-200 hover:bg-slate-100"}`}
-                    >
-                      <span>{d.day}</span>
-                      <span className="font-black">{d.date}</span>
-                      <span>{d.month}</span>
-                    </button>
-                  ))}
-                </div>
 
                 {/* Outside business hours banner */}
                 {(() => {
