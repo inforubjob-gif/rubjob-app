@@ -49,7 +49,7 @@ export default function AdminDashboard() {
   inventory: {} as Record<string, number>,
   connection: "WAITING",
   rubberWalletBalance: 0, storeWalletBalance: 0,
-  revenueBreakdown: { totalLaundry: 0, totalDelivery: 0, storeGP: 0, rubberGP: 0, platformFee: 0, storeNetEarnings: 0, rubberNetEarnings: 0, unassignedDeliveryFee: 0 },
+  revenueBreakdown: { totalLaundry: 0, totalDelivery: 0, storeGP: 0, rubberGP: 0, platformFee: 0, storeNetEarnings: 0, rubberNetEarnings: 0, unassignedDeliveryFee: 0, paymentGatewayFee: 0 },
   topServices: [] as any[],
   topLocations: [] as any[],
  });
@@ -93,7 +93,7 @@ export default function AdminDashboard() {
       connection: data.connection || "CONNECTED",
       rubberWalletBalance: data.rubberWalletBalance || 0,
       storeWalletBalance: data.storeWalletBalance || 0,
-      revenueBreakdown: data.revenueBreakdown || { totalLaundry: 0, totalDelivery: 0, storeGP: 0, rubberGP: 0, platformFee: 0, storeNetEarnings: 0, rubberNetEarnings: 0, unassignedDeliveryFee: 0 },
+      revenueBreakdown: data.revenueBreakdown || { totalLaundry: 0, totalDelivery: 0, storeGP: 0, rubberGP: 0, platformFee: 0, storeNetEarnings: 0, rubberNetEarnings: 0, unassignedDeliveryFee: 0, paymentGatewayFee: 0 },
       topServices: data.topServices || [],
       topLocations: data.topLocations || [],
      });
@@ -248,6 +248,12 @@ export default function AdminDashboard() {
           <div className="flex justify-between text-[10px]">
            <span className="text-white/40">ค่าส่งส่วนเกิน (ไม่มีคนขับ)</span>
            <span className="font-black text-primary">฿{Number(bd.unassignedDeliveryFee).toLocaleString()}</span>
+          </div>
+         )}
+         {Number(bd.paymentGatewayFee) > 0 && (
+          <div className="flex justify-between text-[10px] pt-1 mt-1 border-t border-white/5">
+           <span className="text-red-400/80">หักค่าธรรมเนียม Payment API</span>
+           <span className="font-black text-red-400/90">- ฿{Number(bd.paymentGatewayFee).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
           </div>
          )}
         </div>

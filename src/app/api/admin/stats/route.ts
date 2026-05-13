@@ -91,12 +91,32 @@ export async function GET(req: Request) {
       console.warn("True rubber earnings calc failed", e);
     }
 
+    // Calculate Payment Gateway Fee (Stripe/Omise)
+    // Credit cards ~3.65% + 10 THB, PromptPay ~1.65%. We approximate based on paymentMethod.
+    let paymentGatewayFee = 0;
+    try {
+      const pgStats = await db.prepare(`
+        SELECT SUM(
+          CASE 
+            WHEN paymentMethod LIKE '%card%' THEN (totalPrice * 0.0365) + 10 
+            WHEN paymentMethod LIKE '%promptpay%' THEN (totalPrice * 0.0165)
+            WHEN paymentMethod = 'cash' THEN 0
+            ELSE (totalPrice * 0.03) -- 3% fallback for unknown digital methods
+          END
+        ) as fee 
+        FROM orders WHERE status = 'completed'
+      `).first() as any;
+      paymentGatewayFee = pgStats?.fee || 0;
+    } catch (e) {
+      console.warn("Payment gateway fee calc failed", e);
+    }
+
     // Unassigned delivery fees (where neither pickup nor delivery driver was assigned, or only one was assigned)
     // The platform absorbs this remaining fee as pure profit.
     const unassignedDeliveryFee = totalDelivery - (rubberNetEarnings + rubberGP + platformFeeTotal);
 
-    // Total platform earnings = Store GP + Rubber GP + Flat Platform Fee + Unassigned Delivery Fees
-    const totalPlatformEarnings = storeGP + rubberGP + platformFeeTotal + unassignedDeliveryFee;
+    // Total platform earnings = Store GP + Rubber GP + Flat Platform Fee + Unassigned Delivery Fees - Payment API Fees
+    const totalPlatformEarnings = storeGP + rubberGP + platformFeeTotal + unassignedDeliveryFee - paymentGatewayFee;
 
     // 2. Full Table Inventory (Count rows in every table - batched for efficiency)
     const inventory: Record<string, number> = {};
@@ -216,6 +236,7 @@ export async function GET(req: Request) {
         storeNetEarnings,
         rubberNetEarnings,
         unassignedDeliveryFee,
+        paymentGatewayFee,
       },
       gpStore,
       gpRubber,
