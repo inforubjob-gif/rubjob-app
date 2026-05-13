@@ -67,9 +67,12 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
         <nav className="flex-1 px-5 md:px-2 xl:px-5 py-6 space-y-1.5 overflow-y-auto no-scrollbar">
           {NAV_ITEMS.map((item) => {
              const basePath = item.href.split('?')[0];
+             // Normalize pathname: subdomain rewrite strips /admin prefix
+             // e.g. admin.rubjob.com/users → pathname is "/users" but href is "/admin/users"
+             const normalizedPath = pathname.startsWith("/admin") ? pathname : `/admin${pathname === "/" ? "" : pathname}`;
              const isActive = item.href === "/admin" 
-               ? (pathname === "/admin")
-               : (pathname === basePath || pathname.startsWith(basePath + "/"));
+               ? (normalizedPath === "/admin" || pathname === "/")
+               : (normalizedPath === basePath || normalizedPath.startsWith(basePath + "/"));
              
              return (
                <Link 
