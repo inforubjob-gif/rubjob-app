@@ -77,43 +77,9 @@ export async function POST(req: Request, { params }: { params: Promise<{ type: s
 
     // Self-healing: ensure columns exist
 
-    // Fetch channel token once for use in auto-reply
-    const tokenResult = await db.prepare(`SELECT value FROM system_settings WHERE key = ?`).bind(channelKeyToken).first() as { value: string } | null;
-    let channelAccessToken = tokenResult?.value;
-    if (!channelAccessToken) {
-      const envKey = `LINE_CHANNEL_ACCESS_TOKEN_${channelType.toUpperCase()}`;
-      channelAccessToken = (getRequestContext().env as any)[envKey] || (getRequestContext().env as any).LINE_CHANNEL_ACCESS_TOKEN;
-    }
-
     const events = body.events || [];
 
     for (const event of events) {
-      // ── Auto-Reply with Reply Token (FREE — does not consume push quota) ──
-      // Reply Token expires in ~60 seconds, so we must use it immediately.
-      if (!isManual && event.replyToken && event.type === "message") {
-        try {
-          if (channelAccessToken) {
-            await fetch("https://api.line.me/v2/bot/message/reply", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${channelAccessToken}`,
-              },
-              body: JSON.stringify({
-                replyToken: event.replyToken,
-                messages: [{
-                  type: "text",
-                  text: "ขอบคุณที่ติดต่อเข้ามาครับ 🙏 แอดมินได้รับเรื่องของคุณแล้ว จะรีบตอบกลับโดยเร็วที่สุดครับ"
-                }],
-              }),
-            });
-          }
-        } catch (replyErr) {
-          // Non-critical: if auto-reply fails (token expired, etc.), continue processing
-          console.warn("Auto-reply failed (non-critical):", replyErr);
-        }
-      }
-
       if (isManual || (event.type === "message" && ["text", "image", "sticker"].includes(event.message.type))) {
         const userId = isManual ? body.userId : event.source.userId;
         let text = "";
