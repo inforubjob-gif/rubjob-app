@@ -214,7 +214,7 @@ export default function AdminDashboard() {
      </section>
 
      {/* ═══════════ SECTION 2: Revenue Overview ═══════════ */}
-     <section className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+     <section className="grid grid-cols-1 lg:grid-cols-2 gap-4">
       {/* Platform Earnings — Hero */}
       <Card className="lg:col-span-1 p-6 bg-gradient-to-br from-slate-900 to-slate-800 text-white shadow-2xl shadow-slate-900/20 relative overflow-hidden">
        <div className="absolute top-0 right-0 w-40 h-40 bg-primary/20 rounded-full blur-3xl -mr-20 -mt-20" />
@@ -257,29 +257,6 @@ export default function AdminDashboard() {
           </div>
          )}
         </div>
-       </div>
-      </Card>
-
-      {/* Revenue Split Chart */}
-      <Card className="lg:col-span-1 p-6 bg-white border border-slate-100 shadow-sm flex flex-col items-center justify-center">
-       <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">สัดส่วนรายได้</p>
-       <DonutChart size={140} segments={[
-        { value: Number(bd.storeNetEarnings), color: "#8b5cf6", label: "ร้านซัก" },
-        { value: Number(bd.rubberNetEarnings), color: "#10b981", label: "Rubber" },
-        { value: Number(stats.earnings), color: "#FF9F1C", label: "แพลตฟอร์ม" },
-       ]} />
-       <div className="flex flex-wrap justify-center gap-4 mt-4">
-        {[
-         { color: "#8b5cf6", label: "ร้านซัก", value: bd.storeNetEarnings },
-         { color: "#10b981", label: "Rubber", value: bd.rubberNetEarnings },
-         { color: "#FF9F1C", label: "แพลตฟอร์ม", value: stats.earnings },
-        ].map(l => (
-         <div key={l.label} className="flex items-center gap-1.5">
-          <div className="w-2 h-2 rounded-full" style={{ backgroundColor: l.color }} />
-          <span className="text-[10px] font-bold text-slate-500">{l.label}</span>
-          <span className="text-[10px] font-black text-slate-700">฿{Number(l.value).toLocaleString()}</span>
-         </div>
-        ))}
        </div>
       </Card>
 
