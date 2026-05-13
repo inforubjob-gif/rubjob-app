@@ -63,25 +63,40 @@ export async function GET(req: Request) {
 
     // Calculations
     const storeGP = (totalLaundry * gpStore) / 100;
-    const rubberGP = (totalDelivery * gpRubber) / 100;
+    const storeNetEarnings = totalLaundry - storeGP;
 
-    // Count completed orders with drivers to calculate ฿15 platform fee per order
+    // Accurately calculate Rubber Net Earnings, GP, and Platform Fees by looking ONLY at assigned legs
+    // This perfectly matches the logic in /api/admin/rubbers (each leg = 50% of the delivery pot)
+    let rubberNetEarnings = 0;
+    let rubberGP = 0;
     let platformFeeTotal = 0;
     try {
-      const feeResult = await db.prepare(`
-        SELECT COUNT(*) as cnt FROM orders 
-        WHERE status = 'completed' AND (pickupDriverId IS NOT NULL OR deliveryDriverId IS NOT NULL)
-      `).first() as any;
-      platformFeeTotal = (feeResult?.cnt || 0) * 15;
+      const rubberStats = await db.prepare(`
+        SELECT 
+          COALESCE(SUM(CASE WHEN pickupDriverId IS NOT NULL THEN (deliveryFee - (deliveryFee * ?/100) - 15) * 0.5 ELSE 0 END), 0) +
+          COALESCE(SUM(CASE WHEN deliveryDriverId IS NOT NULL THEN (deliveryFee - (deliveryFee * ?/100) - 15) * 0.5 ELSE 0 END), 0) as netEarnings,
+          
+          COALESCE(SUM(CASE WHEN pickupDriverId IS NOT NULL THEN (deliveryFee * ?/100) * 0.5 ELSE 0 END), 0) +
+          COALESCE(SUM(CASE WHEN deliveryDriverId IS NOT NULL THEN (deliveryFee * ?/100) * 0.5 ELSE 0 END), 0) as gp,
+          
+          COALESCE(SUM(CASE WHEN pickupDriverId IS NOT NULL THEN 7.5 ELSE 0 END), 0) +
+          COALESCE(SUM(CASE WHEN deliveryDriverId IS NOT NULL THEN 7.5 ELSE 0 END), 0) as platformFee
+        FROM orders WHERE status = 'completed'
+      `).bind(gpRubber, gpRubber, gpRubber, gpRubber).first() as any;
+      
+      rubberNetEarnings = rubberStats?.netEarnings || 0;
+      rubberGP = rubberStats?.gp || 0;
+      platformFeeTotal = rubberStats?.platformFee || 0;
     } catch (e) {
-      console.warn("Platform fee count failed:", e);
+      console.warn("True rubber earnings calc failed", e);
     }
 
-    const totalPlatformEarnings = storeGP + rubberGP + platformFeeTotal;
+    // Unassigned delivery fees (where neither pickup nor delivery driver was assigned, or only one was assigned)
+    // The platform absorbs this remaining fee as pure profit.
+    const unassignedDeliveryFee = totalDelivery - (rubberNetEarnings + rubberGP + platformFeeTotal);
 
-    // What each party actually receives (for breakdown display)
-    const storeNetEarnings = totalLaundry - storeGP;          // laundryFee × 90%
-    const rubberNetEarnings = totalDelivery - rubberGP - platformFeeTotal; // deliveryFee - 15% GP - ฿15/order
+    // Total platform earnings = Store GP + Rubber GP + Flat Platform Fee + Unassigned Delivery Fees
+    const totalPlatformEarnings = storeGP + rubberGP + platformFeeTotal + unassignedDeliveryFee;
 
     // 2. Full Table Inventory (Count rows in every table - batched for efficiency)
     const inventory: Record<string, number> = {};
@@ -110,11 +125,13 @@ export async function GET(req: Request) {
 
     try {
       const walletStats = await db.batch([
-        // Total rubber earnings: deliveryFee from completed orders (after 15% GP + ฿15 platform fee)
+        // Total rubber earnings: deliveryFee from completed orders, matching exact leg logic
         db.prepare(`
-          SELECT COALESCE(SUM(deliveryFee - (deliveryFee * 0.15) - 15), 0) as total
-          FROM orders WHERE status = 'completed' AND (pickupDriverId IS NOT NULL OR deliveryDriverId IS NOT NULL)
-        `),
+          SELECT 
+            COALESCE(SUM(CASE WHEN pickupDriverId IS NOT NULL THEN (deliveryFee - (deliveryFee * ?/100) - 15) * 0.5 ELSE 0 END), 0) +
+            COALESCE(SUM(CASE WHEN deliveryDriverId IS NOT NULL THEN (deliveryFee - (deliveryFee * ?/100) - 15) * 0.5 ELSE 0 END), 0) as total
+          FROM orders WHERE status = 'completed'
+        `).bind(gpRubber, gpRubber),
         // Total rubber withdrawals (excluding rejected)
         db.prepare(`
           SELECT COALESCE(SUM(amount), 0) as total
@@ -198,6 +215,7 @@ export async function GET(req: Request) {
         platformFee: platformFeeTotal,
         storeNetEarnings,
         rubberNetEarnings,
+        unassignedDeliveryFee,
       },
       gpStore,
       gpRubber,

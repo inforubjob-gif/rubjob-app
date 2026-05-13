@@ -25,17 +25,21 @@ export async function GET(req: Request) {
       SELECT * FROM rubber_documents
     `).all();
 
+    const { results: settings } = await db.prepare("SELECT value FROM system_settings WHERE key = 'gp_rubber_percent'").all();
+    const gpRubberRaw = settings?.[0]?.value;
+    const gpRubberFraction = gpRubberRaw !== undefined ? Number(gpRubberRaw) / 100 : 0.15;
+
     // Fetch wallet data for all rubbers in batch
     const { results: rubberEarnings } = await db.prepare(`
-      SELECT pickupDriverId as id, SUM(deliveryFee - (deliveryFee * 0.15) - 15) * 0.5 as earned
+      SELECT pickupDriverId as id, SUM(deliveryFee - (deliveryFee * ?) - 15) * 0.5 as earned
       FROM orders WHERE status = 'completed' AND pickupDriverId IS NOT NULL
       GROUP BY pickupDriverId
-    `).all();
+    `).bind(gpRubberFraction).all();
     const { results: rubberEarnings2 } = await db.prepare(`
-      SELECT deliveryDriverId as id, SUM(deliveryFee - (deliveryFee * 0.15) - 15) * 0.5 as earned
+      SELECT deliveryDriverId as id, SUM(deliveryFee - (deliveryFee * ?) - 15) * 0.5 as earned
       FROM orders WHERE status = 'completed' AND deliveryDriverId IS NOT NULL
       GROUP BY deliveryDriverId
-    `).all();
+    `).bind(gpRubberFraction).all();
     const { results: rubberWithdrawals } = await db.prepare(`
       SELECT requesterId as id, SUM(amount) as withdrawn
       FROM payout_requests WHERE requesterType = 'rubber' AND status != 'rejected'
