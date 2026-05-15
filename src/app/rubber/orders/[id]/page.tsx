@@ -201,14 +201,14 @@ export default function RubberOrderDetailPage() {
 
   if (showSuccess) {
     // Determine if this is a "job done" overlay or a "navigate next" overlay
-    const isJobDone = status === "washing" || status === "completed";
+    const isJobDone = status === "washing" || status === "completed" || status === "at_shop";
     const isToStore = status === "delivering_to_store";
     const destName = isToStore ? order?.storeName || t("admin.nav.stores") : order?.userName || t("admin.nav.users");
     const destLabel = isToStore ? "นำส่งที่ร้านซัก" : "นำส่งที่ลูกค้า";
 
     if (isJobDone) {
       // Job Done overlay — shown after dropping off at store or completing delivery
-      const isLeg1 = status === "washing"; // auto-chained from at_shop
+      const isLeg1 = status === "washing" || status === "at_shop"; // auto-chained from at_shop
       return (
         <div className="flex flex-col min-h-dvh bg-emerald-600 text-white justify-center px-6 animate-fade-in text-center relative overflow-hidden">
           <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -mr-20 -mt-20" />

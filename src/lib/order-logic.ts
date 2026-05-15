@@ -91,6 +91,54 @@ export async function transitionOrderStatus(
       completed: "งานสำเร็จเรียบร้อยแล้ว ขอบคุณที่ใช้บริการ!"
     };
 
+    // Helper to notify rubber earning
+    const notifyRubberEarning = async (driverId: string, role: string) => {
+      try {
+        let rubberToken = env.LINE_CHANNEL_ACCESS_TOKEN_RUBBER;
+        if (!rubberToken) {
+          const setting = await db.prepare("SELECT value FROM system_settings WHERE key = 'line_token_rubber'").first() as any;
+          if (setting?.value) rubberToken = setting.value;
+        }
+        
+        const deliveryFee = order.deliveryFee || 0;
+        const totalRubberPayout = deliveryFee - (deliveryFee * 0.15) - 15;
+        const splitEarning = totalRubberPayout * 0.5; // 50% for pickup, 50% for delivery
+
+        if (!driverId) return;
+        const rInfo = await db.prepare("SELECT id, lineUserId FROM rubber_users WHERE id = ?").bind(driverId).first() as any;
+        if (!rInfo) return;
+        
+        // 1. In-App Notification
+        await createNotification(db, {
+          userId: rInfo.id,
+          userType: "rubber",
+          type: "earning",
+          title: "💰 รายได้เข้าแล้ว",
+          message: `งาน #\${orderId.slice(-6)} (\${role}) เสร็จสิ้น — ได้รับ ฿\${splitEarning.toFixed(0)}`,
+          link: "/rubber/wallet"
+        }).catch(() => {});
+
+        // 2. LINE Push Notification (Flex Message — matches "มีงานใหม่เข้า" style)
+        if (rubberToken && rInfo.lineUserId) {
+          try {
+            const { rubberEarningFlex } = await import("./line");
+            const res = await sendLinePush(
+              rInfo.lineUserId,
+              [rubberEarningFlex(orderId, role, splitEarning)],
+              rubberToken
+            );
+            console.log(`  ✅ [EARN] LINE push → \${rInfo.lineUserId}`, JSON.stringify(res));
+            db.prepare("INSERT INTO webhook_logs (id, channel, payload, error) VALUES (?, ?, ?, ?)").bind(`EARN-\${orderId}-\${driverId}-\${Date.now()}`, 'earn_success', JSON.stringify(res), null).run().catch(() => {});
+          } catch (e: any) {
+            console.error(`Failed to notify earning to rubber \${rInfo.lineUserId}:`, e);
+            db.prepare("INSERT INTO webhook_logs (id, channel, payload, error) VALUES (?, ?, ?, ?)").bind(`EARN-\${orderId}-\${driverId}-\${Date.now()}`, 'earn_fail', rInfo.lineUserId || '', e?.message || String(e)).run().catch(() => {});
+          }
+        }
+      } catch (e) {
+        console.error("Notify earning error:", e);
+      }
+    };
+
     switch (actualStatus) {
       case "picking_up":
         if (options?.rubberName) {
@@ -104,6 +152,11 @@ export async function transitionOrderStatus(
         // Notify customer their clothes are now being washed
         // This fires both when admin manually triggers AND when auto-chained from at_shop
         flexMessage = washingOrderFlex(orderId);
+        
+        // 💰 Earnings Notification for Pickup Driver (Leg 1)
+        if (order.pickupDriverId) {
+          await notifyRubberEarning(order.pickupDriverId, "รับผ้า");
+        }
         break;
       case "ready_for_pickup":
         flexMessage = readyForDeliveryFlex(orderId);
@@ -127,58 +180,9 @@ export async function transitionOrderStatus(
       case "completed":
         flexMessage = orderCompletedFlex(orderId);
         
-        // 💰 Earnings Notification for Rubber Drivers
-        try {
-          let rubberToken = env.LINE_CHANNEL_ACCESS_TOKEN_RUBBER;
-          if (!rubberToken) {
-            const setting = await db.prepare("SELECT value FROM system_settings WHERE key = 'line_token_rubber'").first() as any;
-            if (setting?.value) rubberToken = setting.value;
-          }
-          
-          const deliveryFee = order.deliveryFee || 0;
-          const totalRubberPayout = deliveryFee - (deliveryFee * 0.15) - 15;
-          const splitEarning = totalRubberPayout * 0.5; // 50% for pickup, 50% for delivery
-
-          const notifyRubber = async (driverId: string, role: string) => {
-            if (!driverId) return;
-            const rInfo = await db.prepare("SELECT id, lineUserId FROM rubber_users WHERE id = ?").bind(driverId).first() as any;
-            if (!rInfo) return;
-            
-            // 1. In-App Notification
-            await createNotification(db, {
-              userId: rInfo.id,
-              userType: "rubber",
-              type: "earning",
-              title: "💰 รายได้เข้าแล้ว",
-              message: `งาน #${orderId.slice(-6)} (${role}) เสร็จสิ้น — ได้รับ ฿${splitEarning.toFixed(0)}`,
-              link: "/rubber/wallet"
-            }).catch(() => {});
-
-            // 2. LINE Push Notification (Flex Message — matches "มีงานใหม่เข้า" style)
-            if (rubberToken && rInfo.lineUserId) {
-              try {
-                const { rubberEarningFlex } = await import("./line");
-                const res = await sendLinePush(
-                  rInfo.lineUserId,
-                  [rubberEarningFlex(orderId, role, splitEarning)],
-                  rubberToken
-                );
-                console.log(`  ✅ [EARN] LINE push → ${rInfo.lineUserId}`, JSON.stringify(res));
-                db.prepare("INSERT INTO webhook_logs (id, channel, payload, error) VALUES (?, ?, ?, ?)").bind(`EARN-${orderId}-${driverId}-${Date.now()}`, 'earn_success', JSON.stringify(res), null).run().catch(() => {});
-              } catch (e: any) {
-                console.error(`Failed to notify earning to rubber ${rInfo.lineUserId}:`, e);
-                db.prepare("INSERT INTO webhook_logs (id, channel, payload, error) VALUES (?, ?, ?, ?)").bind(`EARN-${orderId}-${driverId}-${Date.now()}`, 'earn_fail', rInfo.lineUserId || '', e?.message || String(e)).run().catch(() => {});
-              }
-            }
-          };
-
-          // Notify both drivers (or the same driver twice if they did both legs)
-          if (order.pickupDriverId) await notifyRubber(order.pickupDriverId, "รับผ้า");
-          if (order.deliveryDriverId && order.deliveryDriverId !== order.pickupDriverId) {
-            await notifyRubber(order.deliveryDriverId, "ส่งผ้าคืน");
-          }
-        } catch (e) { 
-          console.error("Notify earning error:", e); 
+        // 💰 Earnings Notification for Delivery Driver (Leg 2)
+        if (order.deliveryDriverId) {
+          await notifyRubberEarning(order.deliveryDriverId, "ส่งผ้าคืน");
         }
         break;
       default:
