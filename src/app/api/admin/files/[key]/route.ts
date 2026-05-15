@@ -8,19 +8,22 @@ export async function GET(
   req: Request,
   { params }: { params: Promise<{ key: string }> }
 ) {
-  // Security Upgrade: Check for any valid platform session
-  const [admin, rubber, store] = await Promise.all([
-    getAdminSession(),
-    getRubberSession(),
-    getStoreSession()
-  ]);
+  const { key } = await params;
 
-  if (!admin && !rubber && !store) {
-    return new Response("Unauthorized: No valid session found", { status: 401 });
+  // Security Upgrade: Check for any valid platform session, unless it's a public file
+  if (!key.startsWith("public-")) {
+    const [admin, rubber, store] = await Promise.all([
+      getAdminSession(),
+      getRubberSession(),
+      getStoreSession()
+    ]);
+
+    if (!admin && !rubber && !store) {
+      return new Response("Unauthorized: No valid session found", { status: 401 });
+    }
   }
 
   try {
-    const { key } = await params;
     const { env } = getRequestContext();
     const bucket = env.UPLOADS as any; // R2Bucket
 

@@ -6,16 +6,8 @@ import { getAdminSession, getRubberSession, getStoreSession } from "@/lib/auth-s
 export const runtime = "edge";
 
 export async function POST(req: Request) {
-  // Security Upgrade: Only authenticated users can upload
-  const [admin, rubber, store] = await Promise.all([
-    getAdminSession(),
-    getRubberSession(),
-    getStoreSession()
-  ]);
-
-  if (!admin && !rubber && !store) {
-    return NextResponse.json({ error: "Unauthorized: No valid session found" }, { status: 401 });
-  }
+  // Public upload endpoint for registration forms
+  // No session check required for initial upload
 
   try {
     const formData = await req.formData();
@@ -44,7 +36,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "File too large. Maximum size is 5MB." }, { status: 400 });
     }
 
-    const filename = `public/${crypto.randomUUID()}-${file.name.replace(/[^a-zA-Z0-9.-]/g, "_")}`;
+    const filename = `public-${crypto.randomUUID()}-${file.name.replace(/[^a-zA-Z0-9.-]/g, "_")}`;
     const contentType = file.type;
     const arrayBuffer = await file.arrayBuffer();
 

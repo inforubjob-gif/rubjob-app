@@ -145,7 +145,22 @@ export default function PartnerRegisterPage() {
 
         {/* Form Card */}
         <Card className="bg-white/90 backdrop-blur-3xl border border-slate-100 shadow-[0_50px_100px_-20px_rgba(0,0,0,0.08)] rounded-[56px] p-8 md:p-16 overflow-hidden">
-          <form onSubmit={handleSubmit} className="space-y-10">
+          {showSuccessModal ? (
+             <div className="text-center py-10 animate-in fade-in zoom-in duration-500">
+               <div className="w-24 h-24 bg-emerald-50 text-emerald-500 rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-xl shadow-emerald-500/10 scale-110">
+                 <Icons.Check size={48} strokeWidth={2.5} />
+               </div>
+               <h2 className="text-3xl font-black text-slate-900 mb-4 uppercase tracking-tight">การสมัครเสร็จสมบูรณ์</h2>
+               <p className="text-slate-500 font-bold mb-10 max-w-sm mx-auto leading-relaxed">
+                 กรุณารอผลการสมัคร<br/>
+                 หากผ่านการพิจารณาทีมงานจะติดต่อกลับไปในภายหลัง
+               </p>
+               <button onClick={() => router.push('/')} className="px-10 py-5 bg-slate-900 text-white rounded-2xl font-black uppercase text-sm hover:bg-slate-800 transition-all active:scale-95 shadow-xl shadow-slate-900/20">
+                 กลับสู่หน้าหลัก
+               </button>
+             </div>
+          ) : (
+            <form onSubmit={handleSubmit} className="space-y-10">
             
             {step === 1 && (
               <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500">
@@ -397,19 +412,9 @@ export default function PartnerRegisterPage() {
               </Button>
             </div>
           </form>
+          )}
         </Card>
       </div>
-
-      <ConfirmModal 
-        isOpen={showSuccessModal}
-        onClose={() => {
-          setShowSuccessModal(false);
-          router.push("/");
-        }}
-        title={t("register.partner.submitSuccess")}
-        message={t("register.partner.submitSuccess")}
-        type="success"
-      />
     </div>
   );
 }
