@@ -438,7 +438,7 @@ export const orderCompletedFlex = (orderId: string): LineFlexMessage => ({
           action: {
             type: "uri",
             label: "ให้คะแนนบริการ",
-            uri: `https://liff.line.me/${process.env.NEXT_PUBLIC_LIFF_ID}/activity`,
+            uri: `https://liff.line.me/${process.env.NEXT_PUBLIC_LIFF_ID}/orders/${orderId}`,
           },
         },
       ],
