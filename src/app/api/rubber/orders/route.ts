@@ -59,9 +59,21 @@ export async function GET(req: Request) {
       SELECT o.*, s.name as serviceName, st.name as storeName, st.address as storeAddress
       FROM orders o
       JOIN services s ON o.serviceId = s.id
-      JOIN stores st ON o.storeId = st.id
-      WHERE (o.pickupDriverId = ? AND o.status IN ('picking_up', 'delivering_to_store'))
+      LEFT JOIN stores st ON o.storeId = st.id
+      WHERE (o.pickupDriverId = ? AND o.status IN ('picking_up', 'delivering_to_store', 'at_shop', 'washing'))
          OR (o.deliveryDriverId = ? AND o.status IN ('ready_for_pickup', 'delivering_to_customer'))
+    `).bind(rubberId, rubberId).all();
+
+    // 3. Completed Jobs: rubber was assigned and order is closed
+    const completedJobs = await db.prepare(`
+      SELECT o.*, s.name as serviceName, st.name as storeName, st.address as storeAddress
+      FROM orders o
+      JOIN services s ON o.serviceId = s.id
+      LEFT JOIN stores st ON o.storeId = st.id
+      WHERE (o.pickupDriverId = ? OR o.deliveryDriverId = ?) 
+        AND o.status IN ('completed', 'cancelled')
+      ORDER BY o.updatedAt DESC
+      LIMIT 50
     `).bind(rubberId, rubberId).all();
 
     return NextResponse.json({ 
@@ -74,6 +86,12 @@ export async function GET(req: Request) {
         items: JSON.parse(r.items || "[]")
       })),
       active: activeJobs.results.map((r: any) => ({
+        ...r,
+        rubberEarn: calculateRubberEarn(r.deliveryFee || 0, r.status),
+        address: JSON.parse(r.address || "{}"),
+        items: JSON.parse(r.items || "[]")
+      })),
+      completed: completedJobs.results.map((r: any) => ({
         ...r,
         rubberEarn: calculateRubberEarn(r.deliveryFee || 0, r.status),
         address: JSON.parse(r.address || "{}"),
