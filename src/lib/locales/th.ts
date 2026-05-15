@@ -283,6 +283,8 @@ export const th = {
     booking: {
       pickupTitle: "รายละเอียดการรับผ้า",
       pickupAddress: "ที่อยู่รับผ้า",
+      noteForDriver: "โน้ตถึงคนขับ",
+      notePlaceholder: "เช่น ฝากผ้าไว้หน้าบ้าน, กดกริ่งชั้น 3",
       pickupDate: "วันที่รับผ้า",
       deliveryOptions: "ตัวเลือกการส่งคืน",
       hours: "ชั่วโมง",
@@ -932,6 +934,7 @@ export const th = {
         noAddress: "ไม่ได้ระบุที่อยู่",
         waitingStore: "รอคำยืนยันจากร้านค้า...",
         workCompleted: "งานเสร็จสมบูรณ์",
+        customerNote: "โน้ตจากลูกค้า",
         btnPickup: "ยืนยันการรับผ้า",
         btnHandover: "ส่งผ้าให้ที่ร้าน",
         btnPickupStore: "รับผ้าจากที่ร้าน",

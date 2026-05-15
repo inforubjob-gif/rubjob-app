@@ -7,11 +7,13 @@ export const runtime = "edge";
 
 export async function GET(req: Request) {
   try {
-    const rubberId = await getRubberSession();
+    const session = await getRubberSession();
 
-    if (!rubberId) {
+    if (!session) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
+
+    const rubberId = session.id;
 
     const db = getRequestContext().env.DB;
     if (!db) {
@@ -53,8 +55,9 @@ export async function GET(req: Request) {
 
 export async function PATCH(req: Request) {
   try {
-    const rubberId = await getRubberSession();
-    if (!rubberId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const session = await getRubberSession();
+    if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const rubberId = session.id;
 
     const payload = await req.json() as any;
     const db = getRequestContext().env.DB;

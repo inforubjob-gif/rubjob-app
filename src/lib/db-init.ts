@@ -135,6 +135,7 @@ export async function ensureSchema(db: D1Database) {
       cancellationFee REAL DEFAULT 0,
       surgeMultiplier REAL DEFAULT 1.0,
       staffNote TEXT,
+      customerNote TEXT,
       serviceDetails TEXT,
       rating INTEGER,
       review_text TEXT,
@@ -357,6 +358,7 @@ export async function ensureSchema(db: D1Database) {
      "ALTER TABLE orders ADD COLUMN paymentStatus TEXT DEFAULT 'pending'",
      "ALTER TABLE orders ADD COLUMN orderType TEXT DEFAULT 'logistics'",
      "ALTER TABLE orders ADD COLUMN adminNotifiedDelay INTEGER DEFAULT 0",
+     "ALTER TABLE orders ADD COLUMN customerNote TEXT",
 
      // --- admin_users ---
      "ALTER TABLE admin_users ADD COLUMN permissions TEXT",

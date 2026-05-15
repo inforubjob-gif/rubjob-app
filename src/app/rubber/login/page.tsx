@@ -12,10 +12,23 @@ export default function RubberLoginPage() {
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    // If already logged in, redirect to dashboard
+    // Validate server-side session before redirecting
+    // This prevents infinite loops when localStorage has stale data but cookie is expired
+    async function checkExistingSession() {
+      try {
+        const res = await fetch("/api/rubber/me");
+        if (res.ok) {
+          router.replace("/rubber");
+        }
+        // If not ok (401), stay on login page — don't redirect back
+      } catch {
+        // Network error — stay on login page
+      }
+    }
+    
     const rubberSession = localStorage.getItem("rubjob_rubber_session");
     if (rubberSession) {
-      router.replace("/rubber");
+      checkExistingSession();
     }
   }, [router]);
 

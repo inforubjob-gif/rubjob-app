@@ -598,6 +598,17 @@ export default function RubberDashboard() {
                </div>
              </div>
 
+             {/* Customer Note */}
+             {selectedJob.customerNote && (
+               <div className="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-xl flex items-start gap-2.5">
+                  <Icons.FileText size={16} className="text-amber-500 shrink-0 mt-0.5" />
+                  <div>
+                     <p className="text-[9px] font-black text-amber-500 uppercase tracking-widest mb-0.5">{t("rubber.orderDetail.customerNote") || "โน้ตจากลูกค้า"}</p>
+                     <p className="text-xs font-bold text-amber-800">{selectedJob.customerNote}</p>
+                  </div>
+               </div>
+             )}
+
              <div className="grid grid-cols-2 gap-4 mt-8 pt-4 border-t border-slate-100">
                 <Button 
                    variant="secondary" 

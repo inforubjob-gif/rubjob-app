@@ -86,6 +86,7 @@ function BookingFlow() {
   const [deliverySlot, setDeliverySlot] = useState("");
   const [selectedPayment, setSelectedPayment] = useState("promptpay");
   const [tempPhone, setTempPhone] = useState("");
+  const [customerNote, setCustomerNote] = useState("");
   
   // Weight & Size based selection instead of per-piece items
   const [bagSize, setBagSize] = useState<"9kg" | "14kg" | "18kg" | "28kg">("9kg");
@@ -416,7 +417,8 @@ function BookingFlow() {
         distanceKm,
         totalPrice,
         pickupDateTime: `${pickupDate} ${pickupSlot}`,
-        scheduledDate: deliverySpeed === "express" ? t("booking.speed.expressShort") : t("booking.speed.standardShort")
+        scheduledDate: deliverySpeed === "express" ? t("booking.speed.expressShort") : t("booking.speed.standardShort"),
+        customerNote: customerNote.trim() || undefined,
       };
 
       // 1. Create Booking
@@ -709,6 +711,26 @@ function BookingFlow() {
                 </Card>
               )}
               {/* Auto-assigned store is hidden from the user per requirements */}
+            </section>
+
+            {/* Customer Note for Driver */}
+            <section>
+              <h3 className="text-[10px] font-black text-slate-400 flex items-center gap-1 uppercase tracking-tight mb-1">
+                <Icons.Edit size={10} strokeWidth={3} className="text-primary" /> {t("booking.noteForDriver") || "โน้ตถึงคนขับ"}
+              </h3>
+              <div className="relative">
+                <input
+                  type="text"
+                  value={customerNote}
+                  onChange={(e) => setCustomerNote(e.target.value.slice(0, 100))}
+                  placeholder={t("booking.notePlaceholder") || "เช่น ฝากผ้าไว้หน้าบ้าน, กดกริ่งชั้น 3"}
+                  className="w-full px-3 py-2.5 rounded-xl border border-slate-200 bg-white text-xs font-bold text-slate-800 placeholder:text-slate-300 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all"
+                  maxLength={100}
+                />
+                {customerNote && (
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[9px] font-bold text-slate-300">{customerNote.length}/100</span>
+                )}
+              </div>
             </section>
 
             <section>

@@ -347,6 +347,8 @@ export const en = {
   booking: {
     pickupTitle: "Pickup Details",
     pickupAddress: "Pickup Address",
+    noteForDriver: "Note for Driver",
+    notePlaceholder: "e.g. Leave clothes at front door, ring bell 3rd floor",
     pickupDate: "Pickup Date",
     deliveryOptions: "Delivery Options",
     hours: "Hours",
@@ -1027,6 +1029,7 @@ export const en = {
       noAddress: "No Address Provided",
       waitingStore: "Waiting for store confirmation...",
       workCompleted: "Work Completed",
+      customerNote: "Note from Customer",
       btnPickup: "Confirm Pickup",
       btnHandover: "Deliver to Store",
       btnPickupStore: "Pickup from Store",

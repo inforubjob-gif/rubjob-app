@@ -85,9 +85,11 @@ export async function GET(req: Request) {
     if (!accountId) {
       const { getRubberSession, getStoreSession } = await import("@/lib/auth-server");
       if (type === "rubber") {
-        accountId = await getRubberSession();
+        const session = await getRubberSession();
+        accountId = session?.id || null;
       } else if (type === "store") {
-        accountId = await getStoreSession();
+        const session = await getStoreSession();
+        accountId = session?.id || null;
       }
     }
 

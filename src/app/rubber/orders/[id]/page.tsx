@@ -418,9 +418,24 @@ export default function RubberOrderDetailPage() {
                    </div>
                 </div>
              </div>
-          </Card>
+           </Card>
 
-          {/* Items & Price Breakdown */}
+           {/* Customer Note — prominent alert for driver */}
+           {order?.customerNote && (
+             <Card className="p-4 border-2 border-amber-200 shadow-lg shadow-amber-500/10 rounded-[2rem] bg-amber-50 relative overflow-hidden">
+                <div className="flex items-start gap-3">
+                   <div className="w-10 h-10 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center shrink-0 mt-0.5">
+                      <Icons.FileText size={20} strokeWidth={2.5} />
+                   </div>
+                   <div className="flex-1 min-w-0">
+                      <p className="text-[10px] font-black text-amber-500 uppercase tracking-widest mb-1">{t("rubber.orderDetail.customerNote") || "โน้ตจากลูกค้า"}</p>
+                      <p className="text-sm font-black text-amber-900 leading-relaxed">{order.customerNote}</p>
+                   </div>
+                </div>
+             </Card>
+           )}
+
+           {/* Items & Price Breakdown */}
           <Card className="p-6 border-none shadow-xl shadow-primary/5 rounded-[2rem] bg-white">
              <div className="flex items-center justify-between mb-4">
                 <h3 className="text-sm font-black text-slate-900 uppercase tracking-wider">{t("orders.items")}</h3>

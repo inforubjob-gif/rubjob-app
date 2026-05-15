@@ -25,10 +25,12 @@ async function resolveUser(type: string, db: any, bodyUserId?: string): Promise<
   let userId: string | null = null;
 
   if (type === "rubber") {
-    userId = await getRubberSession();
+    const session = await getRubberSession();
+    userId = session?.id || null;
     return { userId, tableName: "rubber_users" };
   } else if (type === "store") {
-    userId = await getStoreSession();
+    const session = await getStoreSession();
+    userId = session?.id || null;
     return { userId, tableName: "stores" };
   } else if (type === "customer") {
     userId = bodyUserId || null;
@@ -56,9 +58,11 @@ export async function GET(req: Request) {
     let userId: string | null = null;
 
     if (type === "rubber") {
-      userId = await getRubberSession();
+      const session = await getRubberSession();
+      userId = session?.id || null;
     } else if (type === "store") {
-      userId = await getStoreSession();
+      const session = await getStoreSession();
+      userId = session?.id || null;
     } else if (type === "customer") {
       userId = searchParams.get("userId");
     }

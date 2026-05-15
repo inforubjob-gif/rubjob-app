@@ -5,6 +5,9 @@ import { getAdminSession } from "@/lib/auth-server";
 
 export const runtime = "edge";
 
+// Keys that contain secrets — only visible to authenticated admins
+const SENSITIVE_KEY_PREFIXES = ["stripe_", "line_token_", "line_secret_"];
+
 const DEFAULT_SETTINGS = [
   { key: "is_open", value: "true", type: "boolean", description: "Whether the platform is currently accepting new orders." },
   { key: "radius_km", value: "5", type: "number", description: "Default service radius for stores in kilometers." },
@@ -27,14 +30,18 @@ const DEFAULT_SETTINGS = [
 /**
  * GET /api/admin/settings
  * Fetches all system settings, creating and seeding the table if necessary.
+ * 🛡️ Non-admin callers receive filtered results (sensitive keys redacted).
  */
 export async function GET() {
   try {
     const db = getRequestContext().env.DB;
     if (!db) return NextResponse.json({ error: "D1 not found" }, { status: 500 });
 
-    // Self-healing: system_settings table moved to db-init.ts
+    // Check if caller is an admin (don't block — just determine access level)
+    const adminSession = await getAdminSession();
+    const isAdmin = !!adminSession;
 
+    // Self-healing: system_settings table moved to db-init.ts
 
     // 2. Fetch existing
     const { results: existing } = await db.prepare(`SELECT * FROM system_settings`).all();
@@ -58,6 +65,13 @@ export async function GET() {
       finalResults = results;
     }
 
+    // 🛡️ Filter sensitive keys for non-admin callers
+    if (!isAdmin) {
+      finalResults = (finalResults as any[]).filter((s: any) =>
+        !SENSITIVE_KEY_PREFIXES.some(prefix => s.key?.startsWith(prefix))
+      );
+    }
+
     return NextResponse.json({ settings: finalResults });
   } catch (error: unknown) {
     console.error("Fetch settings error:", error);
@@ -71,6 +85,12 @@ export async function GET() {
  */
 export async function PATCH(req: Request) {
   try {
+    // 🛡️ Require admin authentication
+    const session = await getAdminSession();
+    if (!session) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const { updates } = (await req.json() as any) as { updates: { key: string; value: string }[] };
     if (!updates || !Array.isArray(updates)) {
       return NextResponse.json({ error: "Invalid updates format" }, { status: 400 });

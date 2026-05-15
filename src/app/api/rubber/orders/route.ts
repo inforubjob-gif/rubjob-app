@@ -42,14 +42,15 @@ export async function GET(req: Request) {
     const verificationStatus = rubberProfile?.status || "unregistered";
 
     // 1. Available Jobs: 
-    // - Must be pending and have no pickup driver AND either (payment is cash OR payment is paid)
+    // - Must have paymentStatus = 'paid' (confirmed via payment webhook)
+    // - AND status = 'searching_driver' AND no pickup driver assigned
     // - OR must be ready_for_pickup and have no delivery driver
     const availableJobs = await db.prepare(`
       SELECT o.*, s.name as serviceName, st.name as storeName, st.address as storeAddress, st.lat as storeLat, st.lng as storeLng
       FROM orders o
       JOIN services s ON o.serviceId = s.id
       JOIN stores st ON o.storeId = st.id
-      WHERE (o.status IN ('pending', 'searching_driver') AND o.pickupDriverId IS NULL AND (o.paymentMethod = 'cash' OR o.paymentStatus = 'paid'))
+      WHERE (o.status IN ('pending', 'searching_driver') AND o.pickupDriverId IS NULL AND o.paymentStatus = 'paid')
          OR (o.status = 'ready_for_pickup' AND o.deliveryDriverId IS NULL)
     `).all();
 

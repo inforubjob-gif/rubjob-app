@@ -154,15 +154,13 @@ export async function transitionOrderStatus(
               link: "/rubber/wallet"
             }).catch(() => {});
 
-            // 2. LINE Push Notification
+            // 2. LINE Push Notification (Flex Message — matches "มีงานใหม่เข้า" style)
             if (rubberToken && rInfo.lineUserId) {
               try {
+                const { rubberEarningFlex } = await import("./line");
                 const res = await sendLinePush(
                   rInfo.lineUserId,
-                  [{
-                    type: "text",
-                    text: `💰 รายได้เข้าแล้ว!\n\nงาน #${orderId.slice(-6)} เสร็จสมบูรณ์\nคุณได้รับรายได้ (ส่วนของ${role}) จำนวน ฿${splitEarning.toFixed(0)}\n\nตรวจสอบกระเป๋าเงินของคุณได้ในแอปเลยครับ!`
-                  }],
+                  [rubberEarningFlex(orderId, role, splitEarning)],
                   rubberToken
                 );
                 console.log(`  ✅ [EARN] LINE push → ${rInfo.lineUserId}`, JSON.stringify(res));

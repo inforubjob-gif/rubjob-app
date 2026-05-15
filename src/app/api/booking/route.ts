@@ -3,7 +3,6 @@ import { getRequestContext } from "@cloudflare/next-on-pages";
 import { NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 import { nanoid } from "nanoid";
-import { sendLinePush, bookingConfirmationFlex } from "@/lib/line";
 import { validateRequired, validateNumber, tryParseJSON } from "@/lib/validation";
 
 export const runtime = "edge";
@@ -38,7 +37,7 @@ export async function POST(req: Request) {
     const address = tryParseJSON(body.address, "address");
     
     const { 
-      userId, storeId, providerId, serviceId, paymentMethod, scheduledDate 
+      userId, storeId, providerId, serviceId, paymentMethod, scheduledDate, customerNote 
     } = body;
 
     // Access D1 from Cloudflare context
@@ -69,9 +68,9 @@ export async function POST(req: Request) {
       INSERT INTO orders (
         id, userId, storeId, providerId, serviceId, status, 
         laundryFee, deliveryFee, distanceKm, totalPrice, 
-        paymentMethod, items, address, scheduledDate
+        paymentMethod, items, address, scheduledDate, customerNote
       )
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `).bind(
       orderId,
       userId,
@@ -86,7 +85,8 @@ export async function POST(req: Request) {
       paymentMethod,
       JSON.stringify(items),
       JSON.stringify(address),
-      scheduledDate
+      scheduledDate,
+      customerNote || null
     ).run();
 
     // Fetch service info for notification (check both standard services and gigs)
@@ -101,17 +101,11 @@ export async function POST(req: Request) {
 
     // Send LINE Notification (Async, don't block response)
     if (env.LINE_CHANNEL_ACCESS_TOKEN) {
-      // 1. Notify Customer ONLY if payment is Cash
-      if (paymentMethod === 'cash') {
-        const { bookingConfirmationFlex } = await import("@/lib/line");
-        sendLinePush(
-          userId, 
-          [bookingConfirmationFlex(orderId, serviceName, totalPrice)],
-          env.LINE_CHANNEL_ACCESS_TOKEN
-        ).catch(err => console.error("LINE push error (customer):", err));
-      }
+      // NOTE: Customer confirmation + Driver broadcast happens AFTER payment
+      // is confirmed via /api/payment/webhook (payment_intent.succeeded).
+      // No cash payment exists — all orders require online payment first.
 
-      // 2. Broadcast to Admin Group
+      // Broadcast to Admin Group (admin sees all bookings regardless of payment)
       const userRecord = await db.prepare("SELECT displayName FROM users WHERE id = ?").bind(userId).first() as { displayName: string };
       const customerName = userRecord?.displayName || "ลูกค้าทั่วไป";
       
@@ -122,19 +116,6 @@ export async function POST(req: Request) {
         serviceName,
         totalPrice
       }, env).catch(err => console.error("Admin push error:", err));
-
-      // 3. Broadcast to Rubbers — send LINE Flex Message to eligible rubbers
-      try {
-        const { broadcastToEligibleRubbers } = await import("@/lib/dispatch");
-        await broadcastToEligibleRubbers(
-          db, env, orderId,
-          body.address,
-          deliveryFee,
-          "pending"
-        );
-      } catch (err) {
-        console.error("Rubber broadcast error:", err);
-      }
     }
 
     return NextResponse.json({ 
