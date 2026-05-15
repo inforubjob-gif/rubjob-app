@@ -42,6 +42,7 @@ export default function AdminOrderDetailPage() {
  const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
  const [staffNote, setStaffNote] = useState("");
  const [confirmModal, setConfirmModal] = useState<{ key: string; label: string; icon: string } | null>(null);
+ const [isSkippingPayment, setIsSkippingPayment] = useState(false);
  const [elapsedTime, setElapsedTime] = useState("00:00:00");
  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -333,6 +334,43 @@ export default function AdminOrderDetailPage() {
           ❌ ยกเลิกงาน
          </button>
         </div>
+
+       {/* Skip Payment — Testing Tool */}
+       {order.paymentStatus !== 'paid' && (
+        <button
+         onClick={async () => {
+          setIsSkippingPayment(true);
+          try {
+           const res = await fetch(`/api/admin/orders/${id}`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ paymentStatus: "paid" }),
+           });
+           if (res.ok) {
+            showToast("✅ ข้ามการจ่ายเงินสำเร็จ — Broadcast งานให้คนขับแล้ว", "success");
+            fetchOrder();
+           } else {
+            const err = await res.json() as any;
+            showToast(err.error || "เกิดข้อผิดพลาด", "error");
+           }
+          } catch { showToast("เกิดข้อผิดพลาดในการเชื่อมต่อ", "error"); }
+          finally { setIsSkippingPayment(false); }
+         }}
+         disabled={isSkippingPayment}
+         className="mt-4 w-full py-3.5 bg-amber-500 hover:bg-amber-400 text-white text-xs font-black uppercase rounded-xl shadow-lg shadow-amber-500/20 transition-all active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2 border border-amber-600/20"
+        >
+         {isSkippingPayment ? (
+          <>
+           <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+           กำลังดำเนินการ...
+          </>
+         ) : (
+          <>
+           🧪 ข้ามการจ่ายเงิน (Testing)
+          </>
+         )}
+        </button>
+       )}
       </Card>
      )}
 
