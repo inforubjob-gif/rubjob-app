@@ -17,7 +17,7 @@ export async function GET(req: Request) {
       db.prepare("SELECT COUNT(*) as total FROM users WHERE role IS NULL OR role = 'user'"),
       db.prepare("SELECT COUNT(*) as total FROM stores"),
       db.prepare("SELECT COUNT(*) as total FROM orders WHERE status != 'cancelled'"),
-      db.prepare("SELECT SUM(totalPrice) as revenue, SUM(laundryFee) as totalLaundry, SUM(deliveryFee) as totalDelivery FROM orders WHERE status = 'completed'"),
+      db.prepare("SELECT SUM(totalPrice) as revenue, SUM(laundryFee) as totalLaundry, SUM(deliveryFee) as totalDelivery FROM orders WHERE status = 'completed' AND status != 'cancelled'"),
       db.prepare("SELECT key, value FROM system_settings WHERE key IN ('gp_store_percent', 'gp_rubber_percent')"),
       db.prepare("SELECT COUNT(*) as total FROM users"), // Raw Unfiltered Count
       db.prepare("SELECT name FROM sqlite_master WHERE type='table'"), // Diagnostic
@@ -81,7 +81,7 @@ export async function GET(req: Request) {
           
           COALESCE(SUM(CASE WHEN pickupDriverId IS NOT NULL THEN 7.5 ELSE 0 END), 0) +
           COALESCE(SUM(CASE WHEN deliveryDriverId IS NOT NULL THEN 7.5 ELSE 0 END), 0) as platformFee
-        FROM orders WHERE status = 'completed'
+        FROM orders WHERE status = 'completed' AND status != 'cancelled'
       `).bind(gpRubber, gpRubber, gpRubber, gpRubber).first() as any;
       
       rubberNetEarnings = rubberStats?.netEarnings || 0;
@@ -104,7 +104,7 @@ export async function GET(req: Request) {
             ELSE (totalPrice * 0.03)
           END
         ), 0) as fee 
-        FROM orders WHERE status = 'completed'
+        FROM orders WHERE status = 'completed' AND status != 'cancelled'
       `).first() as any;
       paymentGatewayFee = pgStats?.fee || 0;
     } catch (e) {
@@ -150,7 +150,7 @@ export async function GET(req: Request) {
           SELECT 
             COALESCE(SUM(CASE WHEN pickupDriverId IS NOT NULL THEN (deliveryFee - (deliveryFee * ?/100) - 15) * 0.5 ELSE 0 END), 0) +
             COALESCE(SUM(CASE WHEN deliveryDriverId IS NOT NULL THEN (deliveryFee - (deliveryFee * ?/100) - 15) * 0.5 ELSE 0 END), 0) as total
-          FROM orders WHERE status = 'completed'
+          FROM orders WHERE status = 'completed' AND status != 'cancelled'
         `).bind(gpRubber, gpRubber),
         // Total rubber withdrawals (excluding rejected)
         db.prepare(`
@@ -160,7 +160,7 @@ export async function GET(req: Request) {
         // Total store earnings: laundryFee × (100 - gpStore)% from completed orders
         db.prepare(`
           SELECT COALESCE(SUM(laundryFee * ?), 0) as total
-          FROM orders WHERE status = 'completed' AND storeId IS NOT NULL
+          FROM orders WHERE status = 'completed' AND status != 'cancelled' AND storeId IS NOT NULL
         `).bind((100 - gpStore) / 100),
         // Total store withdrawals (excluding rejected)
         db.prepare(`
