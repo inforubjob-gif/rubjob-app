@@ -42,6 +42,8 @@ export default function AdminOrderDetailPage() {
  const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
  const [staffNote, setStaffNote] = useState("");
  const [confirmModal, setConfirmModal] = useState<{ key: string; label: string; icon: string } | null>(null);
+ const [changeModal, setChangeModal] = useState<{ type: 'store' | 'pickup' | 'delivery' } | null>(null);
+ const [changeModalValue, setChangeModalValue] = useState("");
  const [isSkippingPayment, setIsSkippingPayment] = useState(false);
  const [elapsedTime, setElapsedTime] = useState("00:00:00");
  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -441,7 +443,10 @@ export default function AdminOrderDetailPage() {
 
      {/* Store Info */}
      <Card className="p-5 border-2 border-primary/10">
-      <h3 className="text-[10px] font-black text-primary uppercase tracking-widest mb-4">🏪 ร้านซักที่รับงาน</h3>
+      <div className="flex items-center justify-between mb-4">
+       <h3 className="text-[10px] font-black text-primary uppercase tracking-widest">🏪 ร้านซักที่รับงาน</h3>
+       <button onClick={() => { setChangeModal({ type: 'store' }); setChangeModalValue(order.storeId || ""); }} className="text-[10px] font-black bg-primary/10 text-primary px-3 py-1.5 rounded-lg hover:bg-primary/20 transition-colors uppercase">เปลี่ยนร้าน (ฉุกเฉิน)</button>
+      </div>
       {order.storeName ? (
        <>
         <div className="flex items-center gap-3 mb-4">
@@ -476,7 +481,10 @@ export default function AdminOrderDetailPage() {
 
      {/* Pickup Rider Info */}
      <Card className="p-5">
-      <h3 className="text-[10px] font-black text-emerald-600 uppercase tracking-widest mb-4">🏍️ ไรเดอร์รับผ้า</h3>
+      <div className="flex items-center justify-between mb-4">
+       <h3 className="text-[10px] font-black text-emerald-600 uppercase tracking-widest">🏍️ ไรเดอร์รับผ้า</h3>
+       <button onClick={() => { setChangeModal({ type: 'pickup' }); setChangeModalValue(order.pickupDriverId || ""); }} className="text-[10px] font-black bg-emerald-50 text-emerald-600 px-3 py-1.5 rounded-lg hover:bg-emerald-100 transition-colors uppercase">เปลี่ยน (ฉุกเฉิน)</button>
+      </div>
       {order.pickupRiderName ? (
        <>
         <div className="flex items-center gap-3 mb-3">
@@ -499,7 +507,10 @@ export default function AdminOrderDetailPage() {
 
      {/* Delivery Rider Info */}
      <Card className="p-5">
-      <h3 className="text-[10px] font-black text-blue-600 uppercase tracking-widest mb-4">📦 ไรเดอร์ส่งคืน</h3>
+      <div className="flex items-center justify-between mb-4">
+       <h3 className="text-[10px] font-black text-blue-600 uppercase tracking-widest">📦 ไรเดอร์ส่งคืน</h3>
+       <button onClick={() => { setChangeModal({ type: 'delivery' }); setChangeModalValue(order.deliveryDriverId || ""); }} className="text-[10px] font-black bg-blue-50 text-blue-600 px-3 py-1.5 rounded-lg hover:bg-blue-100 transition-colors uppercase">เปลี่ยน (ฉุกเฉิน)</button>
+      </div>
       {order.deliveryRiderName ? (
        <>
         <div className="flex items-center gap-3 mb-3">
@@ -583,6 +594,51 @@ export default function AdminOrderDetailPage() {
        }`}
       >
        {isUpdating ? 'กำลังอัปเดต...' : 'ยืนยัน'}
+      </button>
+     </div>
+    </div>
+   </Modal>
+
+   {/* ── Emergency Change Modal ── */}
+   <Modal isOpen={!!changeModal} onClose={() => setChangeModal(null)} title={changeModal?.type === 'store' ? "เปลี่ยนร้านซัก (ฉุกเฉิน)" : "เปลี่ยนไรเดอร์ (ฉุกเฉิน)"}>
+    <div className="p-6 space-y-6">
+     <div>
+      <label className="text-[10px] font-black text-slate-400 uppercase block mb-2">เลือกคนใหม่</label>
+      <GlobalSelect
+       value={changeModalValue}
+       onChange={setChangeModalValue}
+       options={changeModal?.type === 'store' ? [
+        { label: "-- ยกเลิกการระบุร้าน --", value: "" },
+        ...stores.map(s => ({ label: `\${s.name} \${s.phone ? `(\${s.phone})` : ''}`, value: s.id }))
+       ] : [
+        { label: "-- ยกเลิกการระบุคนขับ --", value: "" },
+        ...riders.filter(r => r.status === 'active').map(r => ({ label: `\${r.name} \${r.phone ? `(\${r.phone})` : ''}`, value: r.id }))
+       ]}
+       disabled={isUpdating}
+      />
+     </div>
+     <div className="grid grid-cols-2 gap-3">
+      <button
+       onClick={() => setChangeModal(null)}
+       className="py-4 bg-slate-100 text-slate-600 font-black text-sm rounded-xl hover:bg-slate-200 transition-all active:scale-95"
+      >
+       ยกเลิก
+      </button>
+      <button
+       onClick={async () => {
+        if (!changeModal) return;
+        const updates: any = {};
+        if (changeModal.type === 'store') updates.storeId = changeModalValue;
+        if (changeModal.type === 'pickup') updates.pickupDriverId = changeModalValue;
+        if (changeModal.type === 'delivery') updates.deliveryDriverId = changeModalValue;
+        
+        await handleUpdate(updates);
+        setChangeModal(null);
+       }}
+       disabled={isUpdating}
+       className="py-4 bg-primary text-white font-black text-sm rounded-xl transition-all hover:bg-primary-dark active:scale-95 disabled:opacity-50"
+      >
+       {isUpdating ? 'กำลังอัปเดต...' : 'บันทึกการเปลี่ยนแปลง'}
       </button>
      </div>
     </div>
