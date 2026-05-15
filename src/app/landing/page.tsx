@@ -13,7 +13,7 @@ function getPortalUrl(subdomain: string): string {
   const protocol = window.location.protocol;
 
   // Known root domains
-  const roots = ["rubjob-all.com", "rubjob.com", "rubjob-app.pages.dev", "lvh.me", "localhost"];
+  const roots = ["rubjob-all.com", "rubjob-app.pages.dev", "lvh.me", "localhost"];
   for (const root of roots) {
     if (host.includes(root)) {
       const port = host.includes(":") ? `:${host.split(":")[1]}` : "";

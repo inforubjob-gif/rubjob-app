@@ -28,6 +28,6 @@ export default async function robots(): Promise<MetadataRoute.Robots> {
       userAgent: "*",
       allow: "/",
     },
-    sitemap: "https://rubjob.com/sitemap.xml",
+    sitemap: "https://rubjob-all.com/sitemap.xml",
   };
 }

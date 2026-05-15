@@ -65,7 +65,7 @@ export async function POST(req: Request) {
     if (adminData) {
       const cookieStore = await cookies();
       const hostname = req.headers.get("host") || "";
-      const rootDomain = ["rubjob-all.com", "rubjob.com", "rubjob-app.pages.dev", "lvh.me"].find(d => hostname.endsWith(d));
+      const rootDomain = ["rubjob-all.com", "rubjob-app.pages.dev", "lvh.me"].find(d => hostname.endsWith(d));
 
       cookieStore.set("admin_token", email, {
         httpOnly: true,

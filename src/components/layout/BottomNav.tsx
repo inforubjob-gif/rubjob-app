@@ -36,7 +36,6 @@ export default function BottomNav() {
       !hostname.startsWith("rubber.") &&
       !hostname.startsWith("store.") &&
       (hostname.includes("rubjob-all.com") ||
-       hostname.includes("rubjob.com") ||
        hostname === "localhost" ||
        hostname === "lvh.me") &&
       pathname === "/"

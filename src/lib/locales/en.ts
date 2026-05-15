@@ -1673,7 +1673,7 @@ export const en = {
       lastUpdated: "Last Updated: {date}",
       businessDetails: "Business Details",
       address: "Address: [BUSINESS_ADDRESS]",
-      email: "Email: support@rubjob.com",
+      email: "Email: support@rubjob-all.com",
     },
     landingContact: {
       title: "Contact Us",

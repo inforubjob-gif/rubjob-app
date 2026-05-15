@@ -2,7 +2,7 @@ import { MetadataRoute } from "next";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   // Update domain to match the production domain
-  const domain = "https://rubjob.com";
+  const domain = "https://rubjob-all.com";
 
   return [
     {

@@ -11,7 +11,7 @@ export async function POST(req: Request) {
   try {
     const cookieStore = await cookies();
     const hostname = req.headers.get("host") || "";
-    const rootDomain = ["rubjob-all.com", "rubjob.com", "rubjob-app.pages.dev", "lvh.me"].find(d => hostname.endsWith(d));
+    const rootDomain = ["rubjob-all.com", "rubjob-app.pages.dev", "lvh.me"].find(d => hostname.endsWith(d));
 
     // Clear without domain (matches cookies set without explicit domain)
     cookieStore.set("admin_token", "", {

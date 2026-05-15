@@ -35,7 +35,6 @@ export default function AppWrapper({ children }: { children: React.ReactNode }) 
      !window.location.hostname.startsWith("rubber.") &&
      !window.location.hostname.startsWith("store.") &&
      (window.location.hostname.includes("rubjob-all.com") ||
-      window.location.hostname.includes("rubjob.com") ||
       window.location.hostname === "localhost" ||
       window.location.hostname === "lvh.me") &&
      window.location.pathname === "/")

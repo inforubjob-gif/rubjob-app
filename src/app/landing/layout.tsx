@@ -20,7 +20,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "RUBJOB — เรื่องยุ่งยาก เรารับจบให้",
     description: "ไม่ต้องคิด ไม่ต้องกังวล บริการซักอบรีดที่เหมือนมีคนจัดการชีวิตแทนคุณ รวดเร็ว สะอาด และตรวจสอบสถานะได้ตลอดเวลา",
-    url: "https://rubjob.com",
+    url: "https://rubjob-all.com",
     siteName: "RUBJOB",
     images: [
       {

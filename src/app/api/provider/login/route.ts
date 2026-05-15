@@ -56,7 +56,7 @@ export async function POST(req: Request) {
 
         const cookieStore = await cookies();
         const hostname = req.headers.get("host") || "";
-        const rootDomain = ["rubjob-all.com", "rubjob.com", "rubjob-app.pages.dev", "lvh.me"].find(d => hostname.endsWith(d));
+        const rootDomain = ["rubjob-all.com", "rubjob-app.pages.dev", "lvh.me"].find(d => hostname.endsWith(d));
 
         cookieStore.set("provider_token", String(provider.id), {
           httpOnly: true,

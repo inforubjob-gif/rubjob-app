@@ -20,9 +20,7 @@ export const config = {
  * Supported root domains for subdomain extraction.
  * Order matters — first match wins.
  */
-const ROOT_DOMAINS = [
-  "rubjob-all.com",
-  "rubjob.com",
+const ROOT_DOMAINS = ["rubjob-all.com",
   "rubjob-app.pages.dev",
   "lvh.me", // Local development with subdomains
   "localhost", // Local development root

@@ -1696,7 +1696,7 @@ export const th = {
       lastUpdated: "อัปเดตล่าสุดเมื่อ: {date}",
       businessDetails: "ข้อมูลธุรกิจ",
       address: "ที่อยู่: กรุงเทพมหานคร, ประเทศไทย",
-      email: "อีเมล: support@rubjob.com",
+      email: "อีเมล: support@rubjob-all.com",
     },
     landingContact: {
       title: "ติดต่อเรา",
