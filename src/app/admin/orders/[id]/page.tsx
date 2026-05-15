@@ -198,47 +198,7 @@ export default function AdminOrderDetailPage() {
         <Icons.Settings size={14} /> ศูนย์บัญชาการ (Command Center)
        </h2>
 
-       {/* Assign Riders */}
-       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-        <div>
-         <label className="text-[10px] font-black text-white/40 uppercase block mb-2">🏍️ ไรเดอร์รับผ้า (Pickup)</label>
-         <GlobalSelect
-          value={order.pickupDriverId || ""}
-          onChange={(val) => handleUpdate({ pickupDriverId: val })}
-          options={[
-           { label: "-- ยังไม่ระบุ --", value: "" },
-           ...riders.filter(r => r.status === 'active').map(r => ({ label: `${r.name} ${r.phone ? `(${r.phone})` : ''}`, value: r.id }))
-          ]}
-          disabled={isUpdating}
-         />
-        </div>
-        <div>
-         <label className="text-[10px] font-black text-white/40 uppercase block mb-2">📦 ไรเดอร์ส่งคืน (Delivery)</label>
-         <GlobalSelect
-          value={order.deliveryDriverId || ""}
-          onChange={(val) => handleUpdate({ deliveryDriverId: val })}
-          options={[
-           { label: "-- ยังไม่ระบุ --", value: "" },
-           ...riders.filter(r => r.status === 'active').map(r => ({ label: `${r.name} ${r.phone ? `(${r.phone})` : ''}`, value: r.id }))
-          ]}
-          disabled={isUpdating}
-         />
-        </div>
-       </div>
 
-       {/* Assign Store */}
-       <div className="mb-6">
-        <label className="text-[10px] font-black text-white/40 uppercase block mb-2">🏪 ร้านซักที่รับงาน</label>
-        <GlobalSelect
-         value={order.storeId || ""}
-         onChange={(val) => handleUpdate({ storeId: val })}
-         options={[
-          { label: "-- ยังไม่ระบุร้าน --", value: "" },
-          ...stores.map(s => ({ label: `${s.name} ${s.phone ? `(${s.phone})` : ''}`, value: s.id }))
-         ]}
-         disabled={isUpdating}
-        />
-       </div>
 
         {/* Status Transition Buttons - Full Admin Control Tower */}
         <div>
