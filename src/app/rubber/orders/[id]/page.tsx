@@ -37,6 +37,7 @@ export default function RubberOrderDetailPage() {
   const [showSuccess, setShowSuccess] = useState(false);
   const [updateError, setUpdateError] = useState<string | null>(null);
   const [rubberCoords, setRubberCoords] = useState<{lat: number, lng: number} | null>(null);
+  const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
 
   useEffect(() => {
     if (typeof window !== "undefined" && navigator.geolocation) {
@@ -476,21 +477,43 @@ export default function RubberOrderDetailPage() {
                      <div className="space-y-2">
                         <p className="text-[9px] font-black text-primary uppercase">รูปตอนรับจากลูกค้า</p>
                         <div className="aspect-square rounded-xl bg-slate-800 overflow-hidden border border-white/10">
-                           {order?.serviceDetails && (() => { try { const d = JSON.parse(order.serviceDetails); return d?.proofPhotos?.delivering_to_store || d?.proofPhotos?.picking_up || order.evidenceBeforeUrl; } catch { return order.evidenceBeforeUrl; } })() ? (
-                             <img src={(() => { try { const d = JSON.parse(order.serviceDetails); return d?.proofPhotos?.delivering_to_store || d?.proofPhotos?.picking_up || order.evidenceBeforeUrl; } catch { return order.evidenceBeforeUrl; } })()} className="w-full h-full object-cover" alt="Pickup" />
-                           ) : (
-                             <div className="w-full h-full flex items-center justify-center text-slate-600 italic text-[9px]">No photo</div>
-                           )}
+                           {(() => {
+                             try {
+                               const d = order?.serviceDetails ? JSON.parse(order.serviceDetails) : null;
+                               const src = d?.proofPhotos?.delivering_to_store || d?.proofPhotos?.picking_up || order?.evidenceBeforeUrl;
+                               return src ? (
+                                 <img 
+                                   src={src} 
+                                   className="w-full h-full object-cover cursor-pointer hover:opacity-80 transition-opacity" 
+                                   alt="Pickup" 
+                                   onClick={() => setSelectedPhoto(src)}
+                                 />
+                               ) : (
+                                 <div className="w-full h-full flex items-center justify-center text-slate-600 italic text-[9px]">No photo</div>
+                               );
+                             } catch { return <div className="w-full h-full flex items-center justify-center text-slate-600 italic text-[9px]">No photo</div>; }
+                           })()}
                         </div>
                      </div>
                      <div className="space-y-2">
                         <p className="text-[9px] font-black text-primary uppercase">รูปตอนส่งที่ร้าน</p>
                         <div className="aspect-square rounded-xl bg-slate-800 overflow-hidden border border-white/10">
-                           {order?.serviceDetails && (() => { try { const d = JSON.parse(order.serviceDetails); return d?.proofPhotos?.at_shop || order.dropoffShopPhotoUrl; } catch { return order.dropoffShopPhotoUrl; } })() ? (
-                             <img src={(() => { try { const d = JSON.parse(order.serviceDetails); return d?.proofPhotos?.at_shop || order.dropoffShopPhotoUrl; } catch { return order.dropoffShopPhotoUrl; } })()} className="w-full h-full object-cover" alt="At Shop" />
-                           ) : (
-                             <div className="w-full h-full flex items-center justify-center text-slate-600 italic text-[9px]">No photo</div>
-                           )}
+                           {(() => {
+                             try {
+                               const d = order?.serviceDetails ? JSON.parse(order.serviceDetails) : null;
+                               const src = d?.proofPhotos?.at_shop || order?.dropoffShopPhotoUrl;
+                               return src ? (
+                                 <img 
+                                   src={src} 
+                                   className="w-full h-full object-cover cursor-pointer hover:opacity-80 transition-opacity" 
+                                   alt="At Shop" 
+                                   onClick={() => setSelectedPhoto(src)}
+                                 />
+                               ) : (
+                                 <div className="w-full h-full flex items-center justify-center text-slate-600 italic text-[9px]">No photo</div>
+                               );
+                             } catch { return <div className="w-full h-full flex items-center justify-center text-slate-600 italic text-[9px]">No photo</div>; }
+                           })()}
                         </div>
                      </div>
                   </div>
@@ -550,6 +573,15 @@ export default function RubberOrderDetailPage() {
            )}
         </div>
       </div>
+      {/* Full-Screen Photo Modal */}
+      <Modal isOpen={!!selectedPhoto} onClose={() => setSelectedPhoto(null)} title="ดูรูปภาพ">
+        <div className="p-4 bg-slate-50 flex items-center justify-center min-h-[400px]">
+          {selectedPhoto && (
+            <img src={selectedPhoto} className="max-w-full max-h-[70vh] rounded-xl shadow-2xl border-4 border-white" alt="Evidence" />
+          )}
+        </div>
+      </Modal>
+
     </div>
   );
 }
