@@ -37,6 +37,15 @@ export async function GET(req: Request) {
       return totalEarn * 0.5;
     };
 
+    const safeParse = (str: string | null | undefined, fallback: any) => {
+      try {
+        if (!str) return fallback;
+        return JSON.parse(str);
+      } catch (err) {
+        return fallback;
+      }
+    };
+
     // 0. Fetch Rubber Profile status and pictureUrl
     const rubberProfile = await db.prepare("SELECT status, pictureUrl FROM rubber_users WHERE id = ?").bind(rubberId).first() as any;
     const verificationStatus = rubberProfile?.status || "unregistered";
@@ -82,20 +91,20 @@ export async function GET(req: Request) {
       available: availableJobs.results.map((r: any) => ({
         ...r,
         rubberEarn: calculateRubberEarn(r.deliveryFee || 0, r.status),
-        address: JSON.parse(r.address || "{}"),
-        items: JSON.parse(r.items || "[]")
+        address: safeParse(r.address, {}),
+        items: safeParse(r.items, [])
       })),
       active: activeJobs.results.map((r: any) => ({
         ...r,
         rubberEarn: calculateRubberEarn(r.deliveryFee || 0, r.status),
-        address: JSON.parse(r.address || "{}"),
-        items: JSON.parse(r.items || "[]")
+        address: safeParse(r.address, {}),
+        items: safeParse(r.items, [])
       })),
       completed: completedJobs.results.map((r: any) => ({
         ...r,
         rubberEarn: calculateRubberEarn(r.deliveryFee || 0, r.status),
-        address: JSON.parse(r.address || "{}"),
-        items: JSON.parse(r.items || "[]")
+        address: safeParse(r.address, {}),
+        items: safeParse(r.items, [])
       }))
     });
   } catch (error: unknown) {
