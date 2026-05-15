@@ -57,7 +57,10 @@ export default function AdminOrderDetailPage() {
   if (timerRef.current) clearInterval(timerRef.current);
   if (!order?.updatedAt && !order?.createdAt) return;
   
-  const startTime = new Date(order.updatedAt || order.createdAt).getTime();
+  const timeStr = order.updatedAt || order.createdAt;
+  // SQLite timestamps are UTC but lack the 'Z' suffix. Append 'Z' to prevent timezone offset bugs.
+  const safeTimeStr = timeStr.includes('Z') ? timeStr : timeStr.replace(' ', 'T') + 'Z';
+  const startTime = new Date(safeTimeStr).getTime();
   
   function tick() {
    const now = Date.now();
@@ -122,10 +125,15 @@ export default function AdminOrderDetailPage() {
   finally { setIsUpdating(false); }
  }
 
- function parseAddress(addr: any) {
-  try { return typeof addr === 'string' ? JSON.parse(addr)?.label : addr?.label; }
-  catch { return addr || 'ไม่ระบุ'; }
- }
+  function parseAddress(addr: any) {
+   try { return typeof addr === 'string' ? JSON.parse(addr)?.label : addr?.label; }
+   catch { return addr || 'ไม่ระบุ'; }
+  }
+
+  function parseUTCDate(dateStr: string) {
+   if (!dateStr) return new Date();
+   return new Date(dateStr.includes('Z') ? dateStr : dateStr.replace(' ', 'T') + 'Z');
+  }
 
  if (isLoading) return <div className="flex justify-center py-40"><div className="w-10 h-10 border-4 border-primary/20 border-t-primary rounded-full animate-spin" /></div>;
  if (!order) return <div className="text-center py-40 font-bold text-slate-400 uppercase">Order not found</div>;
@@ -539,8 +547,8 @@ export default function AdminOrderDetailPage() {
        <div className="flex justify-between"><span className="text-slate-400 font-bold">ประเภท</span><span className="font-black text-slate-700">{order.orderType || 'logistics'}</span></div>
        <div className="flex justify-between"><span className="text-slate-400 font-bold">การชำระเงิน</span><span className="font-black text-slate-700">{order.paymentMethod || '-'}</span></div>
        <div className="flex justify-between"><span className="text-slate-400 font-bold">สถานะชำระ</span><Badge variant={order.paymentStatus === 'paid' ? 'success' : 'warning'} className="text-[9px]">{order.paymentStatus || 'pending'}</Badge></div>
-       <div className="flex justify-between"><span className="text-slate-400 font-bold">สร้างเมื่อ</span><span className="font-bold text-slate-600">{order.createdAt ? new Date(order.createdAt).toLocaleString('th-TH') : '-'}</span></div>
-       <div className="flex justify-between"><span className="text-slate-400 font-bold">อัพเดทล่าสุด</span><span className="font-bold text-slate-600">{order.updatedAt ? new Date(order.updatedAt).toLocaleString('th-TH') : '-'}</span></div>
+       <div className="flex justify-between"><span className="text-slate-400 font-bold">สร้างเมื่อ</span><span className="font-bold text-slate-600">{order.createdAt ? parseUTCDate(order.createdAt).toLocaleString('th-TH') : '-'}</span></div>
+       <div className="flex justify-between"><span className="text-slate-400 font-bold">อัพเดทล่าสุด</span><span className="font-bold text-slate-600">{order.updatedAt ? parseUTCDate(order.updatedAt).toLocaleString('th-TH') : '-'}</span></div>
       </div>
      </Card>
     </div>

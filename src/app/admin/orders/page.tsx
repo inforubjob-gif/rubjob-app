@@ -69,9 +69,14 @@ export default function AdminOrdersPage() {
   }
  }
 
+ function parseUTCDate(dateStr: string) {
+  if (!dateStr) return new Date();
+  return new Date(dateStr.includes('Z') ? dateStr : dateStr.replace(' ', 'T') + 'Z');
+ }
+
  function getOrderSLA(order: any) {
   if (order.status !== "at_shop" || !order.arrivedAtShopAt) return "none";
-  const arrived = new Date(order.arrivedAtShopAt).getTime();
+  const arrived = parseUTCDate(order.arrivedAtShopAt).getTime();
   const now = Date.now();
   const diffHours = (now - arrived) / (1000 * 60 * 60);
 
@@ -133,7 +138,7 @@ export default function AdminOrdersPage() {
             <td className="px-4 py-6">
              <Link href={`/admin/orders/${order.id}`} className="flex flex-col hover:text-primary transition-colors">
               <span className="font-mono text-[11px] font-bold text-slate-900 mb-1 hover:text-primary">#{String(order.id || "").slice(-6).toUpperCase()}</span>
-              <span className="text-[10px] text-slate-400 font-bold">{new Date(order.createdAt).toLocaleTimeString()}</span>
+              <span className="text-[10px] text-slate-400 font-bold">{parseUTCDate(order.createdAt).toLocaleTimeString()}</span>
               {sla !== "none" && (
                <div className={`mt-2 flex items-center gap-1.5 text-[9px] font-black uppercase tracking-widest ${sla === 'critical' ? 'text-rose-500' : 'text-amber-500'}`}>
                 <Icons.AlertCircle size={10} />
