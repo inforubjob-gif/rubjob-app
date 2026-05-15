@@ -114,7 +114,7 @@ export async function transitionOrderStatus(
           userType: "rubber",
           type: "earning",
           title: "💰 รายได้เข้าแล้ว",
-          message: `งาน #\${orderId.slice(-6)} (\${role}) เสร็จสิ้น — ได้รับ ฿\${splitEarning.toFixed(0)}`,
+          message: `งาน #${orderId.slice(-6)} (${role}) เสร็จสิ้น — ได้รับ ฿${splitEarning.toFixed(0)}`,
           link: "/rubber/wallet"
         }).catch(() => {});
 
@@ -127,11 +127,11 @@ export async function transitionOrderStatus(
               [rubberEarningFlex(orderId, role, splitEarning)],
               rubberToken
             );
-            console.log(`  ✅ [EARN] LINE push → \${rInfo.lineUserId}`, JSON.stringify(res));
-            db.prepare("INSERT INTO webhook_logs (id, channel, payload, error) VALUES (?, ?, ?, ?)").bind(`EARN-\${orderId}-\${driverId}-\${Date.now()}`, 'earn_success', JSON.stringify(res), null).run().catch(() => {});
+            console.log(`  ✅ [EARN] LINE push → ${rInfo.lineUserId}`, JSON.stringify(res));
+            db.prepare("INSERT INTO webhook_logs (id, channel, payload, error) VALUES (?, ?, ?, ?)").bind(`EARN-${orderId}-${driverId}-${Date.now()}`, 'earn_success', JSON.stringify(res), null).run().catch(() => {});
           } catch (e: any) {
-            console.error(`Failed to notify earning to rubber \${rInfo.lineUserId}:`, e);
-            db.prepare("INSERT INTO webhook_logs (id, channel, payload, error) VALUES (?, ?, ?, ?)").bind(`EARN-\${orderId}-\${driverId}-\${Date.now()}`, 'earn_fail', rInfo.lineUserId || '', e?.message || String(e)).run().catch(() => {});
+            console.error(`Failed to notify earning to rubber ${rInfo.lineUserId}:`, e);
+            db.prepare("INSERT INTO webhook_logs (id, channel, payload, error) VALUES (?, ?, ?, ?)").bind(`EARN-${orderId}-${driverId}-${Date.now()}`, 'earn_fail', rInfo.lineUserId || '', e?.message || String(e)).run().catch(() => {});
           }
         }
       } catch (e) {

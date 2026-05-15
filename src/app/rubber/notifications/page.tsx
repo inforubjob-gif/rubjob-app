@@ -85,7 +85,8 @@ export default function RubberNotificationsPage() {
   };
 
   const timeAgo = (dateStr: string) => {
-    const diff = Date.now() - new Date(dateStr).getTime();
+    const safeDateStr = dateStr.includes('Z') ? dateStr : dateStr.replace(' ', 'T') + 'Z';
+    const diff = Date.now() - new Date(safeDateStr).getTime();
     const mins = Math.floor(diff / 60000);
     if (mins < 1) return "เมื่อสักครู่";
     if (mins < 60) return `${mins} นาทีที่แล้ว`;
