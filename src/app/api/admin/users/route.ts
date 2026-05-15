@@ -66,19 +66,17 @@ export async function DELETE(req: Request) {
     const db = getRequestContext().env.DB;
     if (!db) return NextResponse.json({ error: "D1 not found" }, { status: 500 });
 
-    // Forcefully delete all related records to prevent foreign key constraint errors
-    await db.batch([
-      db.prepare(`DELETE FROM support_messages WHERE ticketId IN (SELECT id FROM support_tickets WHERE userId = ?)`).bind(id),
-      db.prepare(`DELETE FROM support_tickets WHERE userId = ?`).bind(id),
-      db.prepare(`DELETE FROM notifications WHERE userId = ?`).bind(id),
-      db.prepare(`DELETE FROM addresses WHERE userId = ?`).bind(id),
-      db.prepare(`DELETE FROM store_services WHERE storeId IN (SELECT id FROM stores WHERE ownerId = ?)`).bind(id),
-      db.prepare(`DELETE FROM store_documents WHERE storeId IN (SELECT id FROM stores WHERE ownerId = ?)`).bind(id),
-      db.prepare(`DELETE FROM stores WHERE ownerId = ?`).bind(id),
-      db.prepare(`DELETE FROM orders WHERE userId = ?`).bind(id),
-      db.prepare(`DELETE FROM specialist_profiles WHERE id = ?`).bind(id),
-      db.prepare(`DELETE FROM users WHERE id = ?`).bind(id)
-    ]);
+    // Soft delete / anonymize the user to preserve history (orders, chat, etc.)
+    await db.prepare(`
+      UPDATE users 
+      SET displayName = 'Unknown User', 
+          pictureUrl = NULL, 
+          phone = NULL, 
+          walletPin = NULL, 
+          preferences = NULL,
+          role = 'deleted'
+      WHERE id = ?
+    `).bind(id).run();
 
     return NextResponse.json({ success: true });
   } catch (error: unknown) {
