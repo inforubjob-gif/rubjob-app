@@ -66,7 +66,19 @@ export async function DELETE(req: Request) {
     const db = getRequestContext().env.DB;
     if (!db) return NextResponse.json({ error: "D1 not found" }, { status: 500 });
 
-    await db.prepare(`DELETE FROM users WHERE id = ?`).bind(id).run();
+    // Forcefully delete all related records to prevent foreign key constraint errors
+    await db.batch([
+      db.prepare(`DELETE FROM support_messages WHERE ticketId IN (SELECT id FROM support_tickets WHERE userId = ?)`).bind(id),
+      db.prepare(`DELETE FROM support_tickets WHERE userId = ?`).bind(id),
+      db.prepare(`DELETE FROM notifications WHERE userId = ?`).bind(id),
+      db.prepare(`DELETE FROM addresses WHERE userId = ?`).bind(id),
+      db.prepare(`DELETE FROM store_services WHERE storeId IN (SELECT id FROM stores WHERE ownerId = ?)`).bind(id),
+      db.prepare(`DELETE FROM store_documents WHERE storeId IN (SELECT id FROM stores WHERE ownerId = ?)`).bind(id),
+      db.prepare(`DELETE FROM stores WHERE ownerId = ?`).bind(id),
+      db.prepare(`DELETE FROM orders WHERE userId = ?`).bind(id),
+      db.prepare(`DELETE FROM specialist_profiles WHERE id = ?`).bind(id),
+      db.prepare(`DELETE FROM users WHERE id = ?`).bind(id)
+    ]);
 
     return NextResponse.json({ success: true });
   } catch (error: unknown) {
