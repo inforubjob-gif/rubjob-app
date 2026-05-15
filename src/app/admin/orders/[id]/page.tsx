@@ -609,10 +609,10 @@ export default function AdminOrderDetailPage() {
        onChange={setChangeModalValue}
        options={changeModal?.type === 'store' ? [
         { label: "-- ยกเลิกการระบุร้าน --", value: "" },
-        ...stores.map(s => ({ label: `\${s.name} \${s.phone ? `(\${s.phone})` : ''}`, value: s.id }))
+        ...stores.map(s => ({ label: s.name + (s.phone ? " (" + s.phone + ")" : ""), value: s.id }))
        ] : [
         { label: "-- ยกเลิกการระบุคนขับ --", value: "" },
-        ...riders.filter(r => r.status === 'active').map(r => ({ label: `\${r.name} \${r.phone ? `(\${r.phone})` : ''}`, value: r.id }))
+        ...riders.filter(r => r.status === 'active').map(r => ({ label: r.name + (r.phone ? " (" + r.phone + ")" : ""), value: r.id }))
        ]}
        disabled={isUpdating}
       />

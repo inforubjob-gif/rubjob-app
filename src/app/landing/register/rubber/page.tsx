@@ -422,6 +422,7 @@ export default function RubberRegisterPage() {
           <div className="flex items-center justify-center gap-8 pt-8 opacity-30 grayscale">
             <Icons.Logo size={80} />
           </div>
+          </div>
         )}
       </div>
     </div>
