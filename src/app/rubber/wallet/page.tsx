@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import Badge from "@/components/ui/Badge";
@@ -12,6 +13,7 @@ import GlobalInput from "@/components/ui/GlobalInput";
 import ConfirmModal from "@/components/ui/ConfirmModal";
 
 export default function RubberWalletPage() {
+  const router = useRouter();
   const { t, language } = useTranslation();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [amount, setAmount] = useState("");
