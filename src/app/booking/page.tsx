@@ -370,20 +370,20 @@ function BookingFlow() {
 
   const isTooFar = distanceKm > 10;
 
-  async function handleConfirm() {
+  async function handleConfirm(): Promise<boolean> {
     if (isTooFar) {
       showToast(t("booking.errors.tooFar") || "ขออภัย ระยะทางไกลเกิน 10 กม. ไม่สามารถให้บริการได้", "error");
-      return;
+      return false;
     }
     if (isBelowMinOrder) {
       showToast(t("booking.errors.minOrder").replace("{amount}", minOrderAmount.toString()), "error");
-      return;
+      return false;
     }
 
     if (activeOrderId && paymentQR) {
       // If we already have a QR and ID, just redirect to orders (user might have scanned already)
       router.push(`/orders/${activeOrderId}`);
-      return;
+      return false;
     }
 
     setIsSubmitting(true);
@@ -391,12 +391,12 @@ function BookingFlow() {
       if (!profile?.userId) {
         showToast(t("booking.loginRequired"), "error");
         setIsSubmitting(false);
-        return;
+        return false;
       }
       if ((!selectedStore?.id && !service?.isDynamicGig) || !selectedService) {
         showToast(t("booking.selectServiceStore"), "error");
         setIsSubmitting(false);
-        return;
+        return false;
       }
       
       const userId = profile.userId;
@@ -448,15 +448,17 @@ function BookingFlow() {
       const payData = await payRes.json() as any;
       if (payRes.ok && payData.clientSecret) {
         setPaymentQR(payData.clientSecret);
-        // Step remains 'payment' but now shows the real QR
+        return true;
       } else {
-        // If payment fails to init, still have the order. Redirect to order page.
-        router.push(`/orders/${orderId}`);
+        // Show specific error from payment API
+        showToast(`${t("common.error")}: ${payData.error || 'Payment init failed'}`, "error");
+        return false;
       }
     } catch (error: unknown) {
       console.error(error);
       const msg = error instanceof Error ? error.message : t("booking.genericError");
       showToast(`${t("common.error")}: ${msg}`, "error");
+      return false;
     } finally {
       setIsSubmitting(false);
     }
@@ -1264,8 +1266,8 @@ function BookingFlow() {
                   }
                 }
                 // Auto-create order and proceed to payment
-                handleConfirm();
-                setStep("payment");
+                const success = await handleConfirm();
+                if (success) setStep("payment");
               }}
               disabled={isTooFar || isSubmitting}
               className={(isTooFar || isSubmitting) ? "bg-slate-300 text-slate-500 shadow-none border-transparent cursor-not-allowed" : ""}
