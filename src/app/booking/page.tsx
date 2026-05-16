@@ -911,7 +911,8 @@ function BookingFlow() {
                 </h3>
               </div>
               
-              <Card className="p-3">
+              <Card className="p-4 space-y-4">
+                {/* Coupon Selector Button — Premium */}
                 <button 
                   onClick={async () => {
                     setIsCouponModalOpen(true);
@@ -926,27 +927,44 @@ function BookingFlow() {
                       setIsLoadingCoupons(false);
                     }
                   }}
-                  className="w-full mb-3 bg-primary/5 hover:bg-primary/10 border border-dashed border-primary/30 rounded-lg p-2.5 flex items-center justify-between group transition-all"
+                  className="w-full bg-gradient-to-r from-primary/10 via-amber-50 to-primary/5 hover:from-primary/15 hover:via-amber-100 hover:to-primary/10 border-2 border-dashed border-primary/30 hover:border-primary/50 rounded-2xl p-4 flex items-center justify-between group transition-all duration-300 active:scale-[0.98]"
                 >
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center text-primary shrink-0">
-                      <Icons.Ticket size={16} />
+                  <div className="flex items-center gap-3.5">
+                    <div className="w-12 h-12 bg-primary/15 rounded-xl flex items-center justify-center text-primary shrink-0 group-hover:bg-primary/20 transition-colors shadow-sm">
+                      <Icons.Ticket size={22} />
                     </div>
                     <div className="text-left">
-                      <p className="text-xs font-black text-primary-dark uppercase leading-none">{t("booking.selectCoupon")}</p>
-                      <p className="text-[9px] text-primary/50 font-bold mt-0.5 uppercase">{t("booking.promoLabel")}</p>
+                      <p className="text-sm font-black text-primary-dark leading-tight">{t("booking.selectCoupon")}</p>
+                      <p className="text-[10px] text-primary/60 font-bold mt-0.5">{t("booking.tapToViewCoupons")}</p>
                     </div>
                   </div>
-                  <Icons.ChevronRight size={16} className="text-primary/40 group-hover:text-primary transition-colors" />
+                  <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-sm border border-primary/10 group-hover:shadow-md transition-all">
+                    <Icons.ChevronRight size={16} className="text-primary group-hover:translate-x-0.5 transition-transform" />
+                  </div>
                 </button>
-                <div className="flex gap-1.5 mb-3">
-                  <input 
-                    type="text" 
-                    placeholder={t("booking.couponPlaceholder")} 
-                    value={couponCode}
-                    onChange={(e) => setCouponCode(e.target.value)}
-                    className="flex-1 bg-slate-100 border-none rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-primary/40 font-bold uppercase"
-                  />
+
+                {/* Applied Coupon Banner */}
+                {appliedCoupon && (
+                  <div className="bg-emerald-50 text-emerald-700 text-xs font-bold px-4 py-3 rounded-xl flex items-center justify-between border border-emerald-200 animate-in fade-in shadow-sm">
+                    <span className="flex items-center gap-2">
+                      <span className="text-base">🎉</span>
+                      {t("booking.couponApplied").replace("{code}", appliedCoupon.code)}
+                    </span>
+                    <button onClick={() => { setAppliedCoupon(null); setCouponCode(""); }} className="text-emerald-800 bg-emerald-100 px-2.5 py-1 rounded-lg text-[10px] font-black uppercase hover:bg-emerald-200 transition-colors">{t("common.remove")}</button>
+                  </div>
+                )}
+
+                {/* Manual Coupon Input */}
+                <div className="flex gap-2">
+                  <div className="flex-1 relative">
+                    <input 
+                      type="text" 
+                      placeholder={t("booking.couponPlaceholder")} 
+                      value={couponCode}
+                      onChange={(e) => setCouponCode(e.target.value)}
+                      className="w-full bg-slate-50 border-2 border-slate-100 focus:border-primary/40 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-0 font-bold uppercase placeholder:normal-case placeholder:font-medium placeholder:text-slate-300 transition-colors"
+                    />
+                  </div>
                   <Button 
                     onClick={async () => {
                       if (!couponCode) return;
@@ -969,29 +987,31 @@ function BookingFlow() {
                       showToast(`❌ ${t("booking.couponErrorGeneric")}`, "error");
                     }
                     }}
-                    className="min-w-[70px] rounded-lg text-[10px] font-black shadow-sm py-2"
+                    className="min-w-[80px] rounded-xl text-xs font-black shadow-md shadow-primary/20 py-3 px-5"
                   >
                     {t("booking.applyCoupon")}
                   </Button>
                 </div>
-                
-                {appliedCoupon && (
-                  <div className="bg-emerald-50 text-emerald-600 text-[10px] font-bold px-2.5 py-2 rounded-lg flex items-center justify-between mb-3 border border-emerald-100 animate-in fade-in">
-                    <span className="flex items-center gap-1">{t("booking.couponApplied").replace("{code}", appliedCoupon.code)}</span>
-                    <button onClick={() => { setAppliedCoupon(null); setCouponCode(""); }} className="text-emerald-700 underline underline-offset-2 text-[10px]">{t("common.remove")}</button>
-                  </div>
-                )}
 
-                <label className="flex items-center justify-between cursor-pointer border-t border-slate-100 pt-3" onClick={() => setUsePoints(!usePoints)}>
-                  <div className="flex flex-col">
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-xs font-bold text-foreground">{t("booking.usePoints")}</span>
-                      <span className="text-[10px] bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded font-black">{availablePoints} Pts</span>
+                {/* Divider */}
+                <div className="border-t border-slate-100" />
+
+                {/* Points Toggle */}
+                <label className="flex items-center justify-between cursor-pointer group" onClick={() => setUsePoints(!usePoints)}>
+                  <div className="flex items-center gap-3">
+                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-colors ${usePoints ? "bg-amber-100" : "bg-slate-100"}`}>
+                      <span className="text-lg">⭐</span>
                     </div>
-                    <span className="text-[10px] text-muted mt-0.5">{t("booking.pointsDesc")}</span>
+                    <div className="flex flex-col">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-bold text-foreground">{t("booking.usePoints")}</span>
+                        <span className="text-[10px] bg-gradient-to-r from-amber-100 to-amber-50 text-amber-700 px-2.5 py-1 rounded-lg font-black border border-amber-200/50 shadow-sm">{availablePoints} Pts</span>
+                      </div>
+                      <span className="text-[10px] text-muted mt-0.5 font-medium">{t("booking.pointsDesc")}</span>
+                    </div>
                   </div>
-                  <div className={`w-[38px] h-[22px] rounded-full p-[2px] transition-colors duration-300 flex items-center ${usePoints ? "bg-primary" : "bg-slate-200"}`}>
-                    <div className={`w-[18px] h-[18px] rounded-full bg-white transition-transform duration-300 shadow-sm ${usePoints ? "translate-x-[16px]" : "translate-x-0"}`} />
+                  <div className={`w-[44px] h-[26px] rounded-full p-[3px] transition-all duration-300 flex items-center shadow-inner ${usePoints ? "bg-primary" : "bg-slate-200"}`}>
+                    <div className={`w-[20px] h-[20px] rounded-full bg-white transition-transform duration-300 shadow-md ${usePoints ? "translate-x-[18px]" : "translate-x-0"}`} />
                   </div>
                 </label>
               </Card>

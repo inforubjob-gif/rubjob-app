@@ -324,6 +324,7 @@ export const th = {
       loginRequiredTitle: "เข้าสู่ระบบเพื่อจองงาน",
       loginRequiredDesc: "กรุณาเข้าสู่ระบบผ่าน LINE เพื่อเริ่มขั้นตอนการสั่งบริการซักอบรีด",
       selectCoupon: "เลือกใช้คูปองส่วนลด",
+      tapToViewCoupons: "แตะเพื่อดูคูปองที่ใช้ได้",
       noCoupons: "ขณะนี้ยังไม่มีคูปองที่ใช้งานได้",
       minSpend: "ขั้นต่ำ",
       expires: "หมดอายุ",

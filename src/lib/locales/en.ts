@@ -370,6 +370,7 @@ export const en = {
     pointsDesc: "Use 500 points for ฿50 discount",
     noAddress: "No saved addresses. Please add one in profile.",
     selectCoupon: "Select from available coupons",
+    tapToViewCoupons: "Tap to view available coupons",
     noCoupons: "No coupons available at the moment",
     loginRequired: "Please login first to confirm your booking.",
     selectServiceStore: "Please select a service and store to process your booking.",
