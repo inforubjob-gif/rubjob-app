@@ -83,7 +83,7 @@ function SettingsContent() {
  const handleAddAdmin = async (e: React.FormEvent) => {
   e.preventDefault();
   if (!newAdmin.name || !newAdmin.email || !newAdmin.password) {
-   setError(t("admin.users.deleteError") || "Missing fields"); // Fallback check
+   setError(t("admin.settings.missingFields") || "กรุณากรอกชื่อ อีเมล และรหัสผ่านให้ครบ");
    return;
   }
 
@@ -95,13 +95,13 @@ function SettingsContent() {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(newAdmin)
    });
+   const data = await res.json() as any;
    if (res.ok) {
     setSuccess(t("admin.settings.profileSuccess"));
     setNewAdmin({ name: "", email: "", password: "", role: "admin", permissions: ["dashboard", "orders", "users"] });
     fetchAdmins();
     setTimeout(() => setSuccess(""), 3000);
    } else {
-    const data = await res.json() as any;
     setError(data.error || t("common.error"));
    }
   } catch (err) {

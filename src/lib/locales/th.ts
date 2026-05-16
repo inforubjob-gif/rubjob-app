@@ -1244,6 +1244,7 @@ export const th = {
         fixedRate: "อัตราคงที่",
         refId: "รหัสอ้างอิง",
         fleetId: "รหัสรับเบอร์",
+        missingFields: "กรุณากรอกชื่อ อีเมล และรหัสผ่านให้ครบ",
       },
       finance: {
         title: "บัญชีและการเงิน",

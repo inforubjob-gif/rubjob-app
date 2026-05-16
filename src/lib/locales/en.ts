@@ -1364,6 +1364,7 @@ export const en = {
       fixedRate: "Fixed Rate",
       refId: "Ref ID",
       fleetId: "Fleet ID",
+      missingFields: "Please fill in name, email, and password",
     },
     finance: {
       title: "Finance & Accounts",
