@@ -12,6 +12,7 @@ import { useTranslation } from "@/components/providers/LanguageProvider";
 import PhotoUpload from "@/components/ui/PhotoUpload";
 import dynamic from "next/dynamic";
 import OrderIssueModal from "@/components/orders/OrderIssueModal";
+import Modal from "@/components/ui/Modal";
 
 const RubberMap = dynamic(() => import("@/components/rubber/RubberMap"), { 
   ssr: false,
