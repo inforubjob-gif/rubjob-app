@@ -225,28 +225,47 @@ export default function StoreForm({ initialData, isEdit }: StoreFormProps) {
                       lng={parseFloat(formData.lng)} 
                       onChange={(lat, lng) => setFormData({...formData, lat: lat.toFixed(6), lng: lng.toFixed(6)})}
                     />
-                    <div className="grid grid-cols-2 gap-4 mt-4">
+                    <div className="mt-4">
                        <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
-                          <label className="text-[10px] font-black text-slate-400 uppercase block mb-1.5">Latitude</label>
+                          <label className="text-[10px] font-black text-slate-400 uppercase block mb-1.5">Google Maps Coordinates</label>
                           <input 
-                            type="number"
-                            step="any"
-                            value={formData.lat}
-                            onChange={e => setFormData({...formData, lat: e.target.value})}
-                            placeholder="13.7563"
-                            className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm font-mono font-black text-slate-700 focus:outline-none focus:border-primary/50 transition-all"
+                            type="text"
+                            value={formData.lat && formData.lng ? `${formData.lat}, ${formData.lng}` : ''}
+                            onChange={e => {
+                              const val = e.target.value.trim();
+                              // Parse "lat, lng" or "lat,lng" format
+                              const parts = val.split(',').map(s => s.trim());
+                              if (parts.length === 2) {
+                                const lat = parseFloat(parts[0]);
+                                const lng = parseFloat(parts[1]);
+                                if (!isNaN(lat) && !isNaN(lng)) {
+                                  setFormData({...formData, lat: lat.toFixed(6), lng: lng.toFixed(6)});
+                                  return;
+                                }
+                              }
+                              // If single value or incomplete, store raw for editing
+                              setFormData({...formData, lat: val, lng: ''});
+                            }}
+                            onPaste={e => {
+                              e.preventDefault();
+                              const pasted = e.clipboardData.getData('text').trim();
+                              const parts = pasted.split(',').map(s => s.trim());
+                              if (parts.length === 2) {
+                                const lat = parseFloat(parts[0]);
+                                const lng = parseFloat(parts[1]);
+                                if (!isNaN(lat) && !isNaN(lng)) {
+                                  setFormData({...formData, lat: lat.toFixed(6), lng: lng.toFixed(6)});
+                                }
+                              }
+                            }}
+                            placeholder="วาง lat, lng จาก Google Maps เช่น 16.46347, 102.82743"
+                            className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2.5 text-sm font-mono font-black text-slate-700 focus:outline-none focus:border-primary/50 transition-all placeholder:font-medium placeholder:text-slate-300 placeholder:text-xs"
                           />
-                       </div>
-                       <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
-                          <label className="text-[10px] font-black text-slate-400 uppercase block mb-1.5">Longitude</label>
-                          <input 
-                            type="number"
-                            step="any"
-                            value={formData.lng}
-                            onChange={e => setFormData({...formData, lng: e.target.value})}
-                            placeholder="100.5018"
-                            className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm font-mono font-black text-slate-700 focus:outline-none focus:border-primary/50 transition-all"
-                          />
+                          {formData.lat && formData.lng && (
+                            <p className="text-[10px] font-bold text-emerald-600 mt-2 flex items-center gap-1">
+                              ✓ Lat: {formData.lat} / Lng: {formData.lng}
+                            </p>
+                          )}
                        </div>
                     </div>
                  </div>

@@ -171,24 +171,90 @@ export async function broadcastToEligibleRubbers(
       console.error(`  ❌ [DISPATCH] In-app notification failed for ${r.id}:`, e);
     }
 
-    // 2. LINE Push Message (only if rubber has linked LINE + token exists)
-    if (rubberToken && r.lineUserId) {
+    // 2. Check if rubber has Web Push subscription (PWA installed)
+    let hasPushSubscription = false;
+    try {
+      const pushSub = await db.prepare(
+        `SELECT id FROM push_subscriptions WHERE userId = ? AND userType = 'rubber' LIMIT 1`
+      ).bind(r.id).first();
+      hasPushSubscription = !!pushSub;
+    } catch (e) {
+      // Table might not exist yet, fall through to LINE
+    }
+
+    if (hasPushSubscription) {
+      // 3a. Web Push (PWA installed — skip LINE to save quota)
       try {
-        const res = await sendLinePush(
-          r.lineUserId,
-          [rubberNewJobFlex(orderId, status, legEarn)],
-          rubberToken
-        );
-        console.log(`  ✅ [DISPATCH] LINE push → ${r.lineUserId}`, JSON.stringify(res));
-        // Await so Edge worker doesn't kill it
-        await db.prepare("INSERT INTO webhook_logs (id, channel, payload, error) VALUES (?, ?, ?, ?)").bind(`DISPATCH-${orderId}-${r.id}-${Date.now()}`, 'dispatch_success', JSON.stringify(res), null).run().catch(() => {});
-      } catch (err: unknown) {
-        const errMsg = (err instanceof Error) ? err.message : String(err);
-        console.error(`  ❌ [DISPATCH] LINE push failed for ${r.lineUserId}:`, errMsg);
-        await db.prepare("INSERT INTO webhook_logs (id, channel, payload, error) VALUES (?, ?, ?, ?)").bind(`DISPATCH-${orderId}-${r.id}-${Date.now()}`, 'dispatch_fail', r.lineUserId || '', errMsg).run().catch(() => {});
+        const pushSubs = await db.prepare(
+          `SELECT endpoint FROM push_subscriptions WHERE userId = ? AND userType = 'rubber'`
+        ).bind(r.id).all();
+        
+        const pushPayload = JSON.stringify({
+          title: "💸 งานใหม่เข้า!",
+          body: `งาน #${orderId.slice(-6)} — รายได้ ฿${legEarn.toFixed(0)} กดรับงานด่วน!`,
+          url: "/rubber"
+        });
+
+        let anyPushSucceeded = false;
+
+        for (const sub of (pushSubs.results || [])) {
+          try {
+            const pushRes = await fetch(sub.endpoint as string, {
+              method: "POST",
+              headers: { "Content-Type": "application/json", "TTL": "86400" },
+              body: pushPayload,
+            });
+
+            if (pushRes.ok || pushRes.status === 201) {
+              anyPushSucceeded = true;
+            } else if (pushRes.status === 404 || pushRes.status === 410) {
+              // 410 Gone = unsubscribed / app uninstalled
+              // 404 = endpoint no longer exists
+              console.log(`  🗑️ [DISPATCH] Push endpoint expired (${pushRes.status}), cleaning up: ${r.id}`);
+              await db.prepare(`DELETE FROM push_subscriptions WHERE endpoint = ?`).bind(sub.endpoint).run().catch(() => {});
+            } else {
+              console.warn(`  ⚠️ [DISPATCH] Push returned ${pushRes.status} for ${r.id}`);
+            }
+          } catch {
+            // Network error — endpoint unreachable, clean up
+            console.log(`  🗑️ [DISPATCH] Push endpoint unreachable, cleaning up: ${r.id}`);
+            await db.prepare(`DELETE FROM push_subscriptions WHERE endpoint = ?`).bind(sub.endpoint).run().catch(() => {});
+          }
+        }
+
+        if (anyPushSucceeded) {
+          console.log(`  ✅ [DISPATCH] Web Push → rubber ${r.id} (LINE skipped — PWA active)`);
+          await db.prepare("INSERT INTO webhook_logs (id, channel, payload, error) VALUES (?, ?, ?, ?)").bind(`DISPATCH-PUSH-${orderId}-${r.id}-${Date.now()}`, 'dispatch_webpush', 'PWA active', null).run().catch(() => {});
+        } else {
+          // All push subscriptions failed — fall back to LINE
+          console.warn(`  ⚠️ [DISPATCH] All push endpoints failed for ${r.id}, falling back to LINE`);
+          hasPushSubscription = false;
+        }
+      } catch (pushErr) {
+        console.error(`  ❌ [DISPATCH] Web Push failed for ${r.id}, falling back to LINE:`, pushErr);
+        hasPushSubscription = false; // Fall through to LINE below
       }
-    } else {
-      console.warn(`  ⚠️ [DISPATCH] LINE push skipped for ${r.id}: token=${!!rubberToken}, lineUserId=${r.lineUserId}`);
+    }
+    
+    if (!hasPushSubscription) {
+      // 3b. LINE Push Message (no PWA — only if rubber has linked LINE + token exists)
+      if (rubberToken && r.lineUserId) {
+        try {
+          const res = await sendLinePush(
+            r.lineUserId,
+            [rubberNewJobFlex(orderId, status, legEarn)],
+            rubberToken
+          );
+          console.log(`  ✅ [DISPATCH] LINE push → ${r.lineUserId}`);
+          await db.prepare("INSERT INTO webhook_logs (id, channel, payload, error) VALUES (?, ?, ?, ?)").bind(`DISPATCH-${orderId}-${r.id}-${Date.now()}`, 'dispatch_success', JSON.stringify(res), null).run().catch(() => {});
+        } catch (err: unknown) {
+          const errMsg = (err instanceof Error) ? err.message : String(err);
+          console.error(`  ❌ [DISPATCH] LINE push failed for ${r.lineUserId}:`, errMsg);
+          await db.prepare("INSERT INTO webhook_logs (id, channel, payload, error) VALUES (?, ?, ?, ?)").bind(`DISPATCH-${orderId}-${r.id}-${Date.now()}`, 'dispatch_fail', r.lineUserId || '', errMsg).run().catch(() => {});
+        }
+      } else {
+        console.warn(`  ⚠️ [DISPATCH] No notification channel for ${r.id}: pushSub=${hasPushSubscription}, token=${!!rubberToken}, lineUserId=${r.lineUserId}`);
+      }
     }
   }
   

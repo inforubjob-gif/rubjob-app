@@ -127,6 +127,8 @@ export async function POST(req: Request) {
                 orderData.deliveryFee || 0,
                 'paid'
               );
+              // Web Push is now handled inside broadcastToEligibleRubbers (dispatch.ts)
+              // It checks per-user: PWA installed → Web Push only, no PWA → LINE only
             }
           } catch (e) {
             console.error("Failed to broadcast to rubbers from webhook:", e);

@@ -14,6 +14,18 @@ import Skeleton from "@/components/ui/Skeleton";
 import ConfirmModal from "@/components/ui/ConfirmModal";
 
 export default function RubberDashboard() {
+  // Helper: Convert VAPID key from base64 to Uint8Array
+  function urlBase64ToUint8Array(base64String: string) {
+    const padding = '='.repeat((4 - base64String.length % 4) % 4);
+    const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+    const rawData = window.atob(base64);
+    const outputArray = new Uint8Array(rawData.length);
+    for (let i = 0; i < rawData.length; ++i) {
+      outputArray[i] = rawData.charCodeAt(i);
+    }
+    return outputArray;
+  }
+
   const { t } = useTranslation();
   const router = useRouter();
   
@@ -65,6 +77,55 @@ export default function RubberDashboard() {
     const interval = setInterval(fetchUnreadCount, 30000);
     return () => clearInterval(interval);
   }, []);
+
+  // 🔔 Web Push Subscription — auto-subscribe when rubber is logged in
+  useEffect(() => {
+    if (!rubber?.id) return;
+    
+    async function subscribeToPush() {
+      try {
+        // Check if service worker and push are supported
+        if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
+        
+        // Request notification permission
+        const permission = await Notification.requestPermission();
+        if (permission !== 'granted') return;
+        
+        // Register service worker
+        const registration = await navigator.serviceWorker.register('/sw.js');
+        await navigator.serviceWorker.ready;
+
+        // Check for existing subscription
+        let subscription = await registration.pushManager.getSubscription();
+        
+        if (!subscription) {
+          // Create new subscription
+          const vapidKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
+          if (!vapidKey) return;
+          
+          subscription = await registration.pushManager.subscribe({
+            userVisibleOnly: true,
+            applicationServerKey: urlBase64ToUint8Array(vapidKey),
+          });
+        }
+
+        // Send subscription to backend
+        await fetch('/api/push/subscribe', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userId: rubber.id,
+            userType: 'rubber',
+            subscription: subscription.toJSON(),
+          }),
+        });
+      } catch (err) {
+        console.error('Push subscription failed:', err);
+      }
+    }
+
+    subscribeToPush();
+  }, [rubber?.id]);
 
   async function fetchUnreadCount() {
     try {
@@ -222,20 +283,57 @@ export default function RubberDashboard() {
   }, []);
 
   const handleInstallClick = async () => {
-    if (!deferredPrompt) {
-      // Fallback for iOS/Safari or when prompt not available
+    // Check if running inside LINE LIFF or any in-app browser
+    const ua = navigator.userAgent;
+    const isLIFF = ua.includes('LIFF') || ua.includes('Line/') || ua.includes('LINE/');
+    const isIOS = /iPad|iPhone|iPod/.test(ua);
+    const isAndroid = /Android/.test(ua);
+
+    if (deferredPrompt) {
+      // Chrome/Edge on Android — native install prompt
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      if (outcome === "accepted") setDeferredPrompt(null);
+      return;
+    }
+
+    if (isLIFF) {
+      // Inside LINE — open in external browser
+      const rubberUrl = `https://rubber.rubjob-all.com`;
+      try {
+        const liff = (window as any).liff;
+        if (liff?.openWindow) {
+          liff.openWindow({ url: rubberUrl, external: true });
+          return;
+        }
+      } catch {}
+      // Fallback: window.open
+      window.open(rubberUrl, '_blank');
+      return;
+    }
+
+    // Not in LIFF, no deferredPrompt — show manual instructions
+    if (isIOS) {
+      setAlertConfig({
+        isOpen: true,
+        title: "ติดตั้งแอปบน iPhone",
+        message: "กดปุ่ม 'แชร์' (ไอคอนสี่เหลี่ยมมีลูกศร) ด้านล่างของ Safari แล้วเลือก 'เพิ่มลงในหน้าจอโฮม'",
+        type: "warning"
+      });
+    } else if (isAndroid) {
+      setAlertConfig({
+        isOpen: true,
+        title: "ติดตั้งแอปบน Android",
+        message: "กดเมนู ⋮ มุมขวาบนของ Chrome แล้วเลือก 'เพิ่มลงในหน้าจอหลัก' หรือ 'ติดตั้งแอป'",
+        type: "warning"
+      });
+    } else {
       setAlertConfig({
         isOpen: true,
         title: "ติดตั้งแอป",
-        message: "สำหรับ iPhone ให้กดปุ่ม 'แชร์' ด้านล่าง แล้วเลือก 'เพิ่มลงในหน้าจอโฮม' ครับ",
+        message: "เปิดเว็บไซต์นี้ใน Safari หรือ Chrome แล้วเลือก 'เพิ่มลงในหน้าจอโฮม' จากเมนูเบราว์เซอร์ครับ",
         type: "warning"
       });
-      return;
-    }
-    deferredPrompt.prompt();
-    const { outcome } = await deferredPrompt.userChoice;
-    if (outcome === "accepted") {
-      setDeferredPrompt(null);
     }
   };
 
@@ -420,6 +518,45 @@ export default function RubberDashboard() {
                </>
              )}
           </div>
+        ) : !workStatus ? (
+          /* ☕ Break Mode — prominent full-screen message */
+          <div className="flex flex-col items-center justify-center py-16 px-6 text-center animate-page-enter min-h-[45vh]">
+            {/* Large break icon */}
+            <div className="relative mb-8">
+              <div className="w-28 h-28 bg-slate-100 rounded-3xl flex items-center justify-center border-2 border-slate-200 shadow-inner">
+                <Icons.Clock size={56} className="text-slate-300" />
+              </div>
+              {/* Pulsing "paused" indicator */}
+              <div className="absolute -top-2 -right-2 w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center border-4 border-white shadow-lg">
+                <div className="w-3 h-1.5 bg-white rounded-sm" />
+              </div>
+            </div>
+
+            <h2 className="text-2xl font-black text-slate-900 uppercase leading-tight">
+              คุณกำลังพักเบรคอยู่
+            </h2>
+            <p className="text-sm text-slate-400 font-bold mt-3 leading-relaxed max-w-[260px]">
+              คุณจะไม่ได้รับงานใหม่จนกว่าจะเปิดสถานะรับงานอีกครั้ง พักผ่อนให้เต็มที่ครับ
+            </p>
+
+            {/* Visual pulse ring */}
+            <div className="mt-8 relative flex items-center justify-center">
+              <div className="absolute w-16 h-16 rounded-full bg-orange-500/10 animate-ping" />
+              <div className="absolute w-12 h-12 rounded-full bg-orange-500/20 animate-pulse" />
+              <div className="w-8 h-8 rounded-full bg-orange-500/30 flex items-center justify-center relative z-10">
+                <div className="w-3 h-3 rounded-full bg-orange-500" />
+              </div>
+            </div>
+
+            {/* Resume button */}
+            <Button
+              onClick={() => setIsStatusModalOpen(true)}
+              className="mt-10 bg-emerald-500 hover:bg-emerald-600 text-white px-10 py-5 rounded-xl font-black uppercase shadow-xl shadow-emerald-500/20 active:scale-95 transition-all text-sm"
+            >
+              <Icons.Shield size={18} className="mr-2 inline" />
+              เปิดรับงานอีกครั้ง
+            </Button>
+          </div>
         ) : (
           <>
             {activeTab === "available" ? (
@@ -492,14 +629,10 @@ export default function RubberDashboard() {
               <div className="flex-1">
                 <div className="flex items-center justify-between">
                   <h3 className="font-black text-sm uppercase leading-tight">ติดตั้งแอปบนหน้าจอ</h3>
-                  {deferredPrompt && (
-                    <span className="text-[8px] bg-primary px-2 py-0.5 rounded-full animate-pulse">แนะนำ</span>
-                  )}
+                  <span className="text-[8px] bg-primary px-2 py-0.5 rounded-full animate-pulse">แนะนำ</span>
                 </div>
                 <p className="text-[10px] text-white/60 font-bold mt-1 leading-relaxed">
-                  {deferredPrompt 
-                    ? "กดที่นี่เพื่อติดตั้งแอป Rubjob ลงบนเครื่องของคุณได้ทันทีครับ" 
-                    : "กดที่ปุ่ม 'แชร์' ด้านล่าง แล้วเลือก 'เพิ่มลงในหน้าจอโฮม' เพื่อการใช้งานที่สะดวกเหมือนแอปจริงครับ"}
+                  กดที่นี่เพื่อเปิดในเบราว์เซอร์และเพิ่มไอคอนแอปลงหน้าจอมือถือ ใช้งานสะดวกเหมือนแอปจริง
                 </p>
               </div>
             </div>
