@@ -36,7 +36,7 @@ export default function Modal({ isOpen, onClose, title, children }: ModalProps) 
         className="absolute inset-0 bg-slate-950/50 backdrop-blur-sm" 
         onClick={onClose}
       />
-      <div className="bg-white w-full max-w-lg rounded-t-[1.75rem] sm:rounded-2xl p-6 pb-[calc(1.5rem+env(safe-area-inset-bottom,0px))] sm:pb-8 relative z-10 animate-slide-up shadow-2xl flex flex-col items-center">
+      <div className="bg-white w-full max-w-lg rounded-t-[1.75rem] sm:rounded-2xl p-6 pb-[calc(1.5rem+env(safe-area-inset-bottom,0px))] sm:pb-8 relative z-10 animate-slide-up shadow-2xl flex flex-col max-h-[85dvh] overflow-y-auto">
         {/* Drag handle for mobile */}
         <div className="w-10 h-1 bg-slate-200 rounded-full mx-auto mb-6 sm:hidden" />
         

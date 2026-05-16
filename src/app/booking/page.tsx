@@ -947,7 +947,7 @@ function BookingFlow() {
                 {appliedCoupon && (
                   <div className="bg-emerald-50 text-emerald-700 text-xs font-bold px-4 py-3 rounded-xl flex items-center justify-between border border-emerald-200 animate-in fade-in shadow-sm">
                     <span className="flex items-center gap-2">
-                      <span className="text-base">🎉</span>
+                      <Icons.Check size={16} strokeWidth={3} />
                       {t("booking.couponApplied").replace("{code}", appliedCoupon.code)}
                     </span>
                     <button onClick={() => { setAppliedCoupon(null); setCouponCode(""); }} className="text-emerald-800 bg-emerald-100 px-2.5 py-1 rounded-lg text-[10px] font-black uppercase hover:bg-emerald-200 transition-colors">{t("common.remove")}</button>
@@ -999,8 +999,8 @@ function BookingFlow() {
                 {/* Points Toggle */}
                 <label className="flex items-center justify-between cursor-pointer group" onClick={() => setUsePoints(!usePoints)}>
                   <div className="flex items-center gap-3">
-                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-colors ${usePoints ? "bg-amber-100" : "bg-slate-100"}`}>
-                      <span className="text-lg">⭐</span>
+                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-colors ${usePoints ? "bg-amber-100 text-amber-600" : "bg-slate-100 text-slate-400"}`}>
+                      <Icons.Guarantee size={20} />
                     </div>
                     <div className="flex flex-col">
                       <div className="flex items-center gap-2">
@@ -1028,7 +1028,7 @@ function BookingFlow() {
                   {/* Service Section */}
                   <div>
                     <div className="flex items-center gap-1.5 mb-2 text-primary-dark font-bold">
-                      <span className="text-sm leading-none pt-0.5">🧺</span>
+                      <Icons.Tasks size={14} strokeWidth={2.5} />
                       <span>{t("booking.summary.package")} {formatKg(bagSize)}</span>
                     </div>
                     <div className="space-y-2 pl-5">
@@ -1060,7 +1060,7 @@ function BookingFlow() {
                   {/* Rubber Section */}
                   <div className="pt-3 border-t border-dashed border-slate-200">
                     <div className="flex items-center gap-1.5 mb-2 text-blue-600 font-bold">
-                      <span className="text-sm leading-none pt-0.5">🛵</span>
+                      <Icons.Truck size={14} strokeWidth={2.5} />
                       <span>{t("booking.summary.rubberSection")}</span>
                     </div>
                     <div className="space-y-2 pl-5">
@@ -1226,7 +1226,7 @@ function BookingFlow() {
           </Button>
         )}
         {step === "details" && (
-          <div className="space-y-2">
+          <div className="space-y-3">
             {!profile?.phone && (
               <div className="bg-amber-50 border border-amber-100 p-3 rounded-xl">
                 <p className="text-xs font-bold text-amber-700 mb-2">{t("booking.identifyPhone")}</p>
@@ -1245,55 +1245,57 @@ function BookingFlow() {
                 {t("booking.errors.tooFar") || "ขออภัย ระยะทางไกลเกิน 10 กม. ไม่สามารถให้บริการได้"}
               </div>
             )}
-            <div className="flex items-center gap-3">
-              <div className="flex-1 min-w-0">
-                <div className="flex items-baseline gap-1.5">
+            <div className="bg-white rounded-2xl shadow-xl shadow-slate-200/50 border border-slate-100 p-4">
+              <div className="flex items-center justify-between">
+                <div className="flex flex-col">
                   <span className="text-[10px] font-bold text-muted uppercase">{t("booking.summary.total")}</span>
-                  {(couponDiscount > 0 || pointsDiscount > 0) && <span className="text-[10px] text-slate-400 line-through font-bold">฿{subTotal}</span>}
-                  <span className={`text-xl font-black leading-none ${isTooFar ? "text-slate-400" : "text-primary-dark"}`}>฿{totalPrice}</span>
+                  <div className="flex items-center gap-2 mt-0.5">
+                    {(couponDiscount > 0 || pointsDiscount > 0) && <span className="text-xs text-slate-400 line-through font-bold">฿{subTotal}</span>}
+                    <span className={`text-2xl font-black leading-none ${isTooFar ? "text-slate-400" : "text-primary-dark"}`}>฿{totalPrice}</span>
+                  </div>
+                  <span className="text-[9px] text-muted font-medium mt-0.5">{t("booking.summary.taxIncluded")}</span>
                 </div>
-                <span className="text-[9px] text-muted font-medium">{t("booking.summary.taxIncluded")}</span>
-              </div>
-              <Button
-                size="lg"
-                onClick={async () => {
-                  if (!selectedAddress) {
-                    showToast(t("booking.errors.noAddress"), "error");
-                    return;
-                  }
-                  if (!pickupDate || !pickupSlot) {
-                    showToast(t("booking.errors.noDateTime"), "error");
-                    return;
-                  }
-                  if (!profile?.phone && !tempPhone) {
-                    showToast(t("booking.errors.noPhone"), "error");
-                    return;
-                  }
-                  if (tempPhone && !profile?.phone) {
-                    try {
-                      await fetch("/api/user/sync", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({
-                          id: profile?.userId,
-                          displayName: profile?.displayName,
-                          pictureUrl: profile?.pictureUrl,
-                          phone: tempPhone
-                        })
-                      });
-                      profile!.phone = tempPhone; 
-                    } catch (e) {
-                      console.error("Phone sync failed", e);
+                <Button
+                  size="lg"
+                  onClick={async () => {
+                    if (!selectedAddress) {
+                      showToast(t("booking.errors.noAddress"), "error");
+                      return;
                     }
-                  }
-                  const success = await handleConfirm();
-                  if (success) setStep("payment");
-                }}
-                disabled={isTooFar || isSubmitting}
-                className={`flex-1 ${(isTooFar || isSubmitting) ? "bg-slate-300 text-slate-500 shadow-none border-transparent cursor-not-allowed" : ""}`}
-              >
-                {isSubmitting ? t("common.loading") : isTooFar ? t("booking.errors.tooFar") : t("common.confirm")}
-              </Button>
+                    if (!pickupDate || !pickupSlot) {
+                      showToast(t("booking.errors.noDateTime"), "error");
+                      return;
+                    }
+                    if (!profile?.phone && !tempPhone) {
+                      showToast(t("booking.errors.noPhone"), "error");
+                      return;
+                    }
+                    if (tempPhone && !profile?.phone) {
+                      try {
+                        await fetch("/api/user/sync", {
+                          method: "POST",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({
+                            id: profile?.userId,
+                            displayName: profile?.displayName,
+                            pictureUrl: profile?.pictureUrl,
+                            phone: tempPhone
+                          })
+                        });
+                        profile!.phone = tempPhone; 
+                      } catch (e) {
+                        console.error("Phone sync failed", e);
+                      }
+                    }
+                    const success = await handleConfirm();
+                    if (success) setStep("payment");
+                  }}
+                  disabled={isTooFar || isSubmitting}
+                  className={`min-w-[120px] py-4 text-base ${(isTooFar || isSubmitting) ? "bg-slate-300 text-slate-500 shadow-none border-transparent cursor-not-allowed" : ""}`}
+                >
+                  {isSubmitting ? t("common.loading") : isTooFar ? t("booking.errors.tooFar") : t("common.confirm")}
+                </Button>
+              </div>
             </div>
           </div>
         )}
