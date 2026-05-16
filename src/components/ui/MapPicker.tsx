@@ -43,10 +43,16 @@ function LocationMarker({ lat, lng, onChange }: MapPickerProps) {
 
 function MapUpdater({ lat, lng }: { lat: number, lng: number }) {
   const map = useMap();
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   useEffect(() => {
     if (lat !== 0 && lng !== 0) {
-      map.setView([lat, lng], 15);
+      // Debounce to avoid rapid panning while typing coordinates
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+      timeoutRef.current = setTimeout(() => {
+        map.flyTo([lat, lng], Math.max(map.getZoom(), 13), { duration: 0.5 });
+      }, 400);
     }
+    return () => { if (timeoutRef.current) clearTimeout(timeoutRef.current); };
   }, [lat, lng, map]);
   return null;
 }

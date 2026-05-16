@@ -11,8 +11,8 @@ import { useStoreAuth } from "@/components/providers/StoreProvider";
 import { useEffect } from "react";
 
 const VEHICLES = [
-  { id: "motorcycle", name: "Motorcycle", icon: <Icons.Bike size={24} />, desc: "Fast & Agile (Up to 10kg)" },
-  { id: "car", name: "Small Car", icon: <Icons.Truck size={24} />, desc: "Standard (Up to 30kg)" },
+  { id: "motorcycle", name: "Motorcycle", icon: <Icons.Bike size={24} />, desc: "Fast & Agile (Up to 10 kg.)" },
+  { id: "car", name: "Small Car", icon: <Icons.Truck size={24} />, desc: "Standard (Up to 30 kg.)" },
   { id: "van", name: "Van / Pickup", icon: <Icons.Truck size={24} />, desc: "Large (Unlimited)" }
 ];
 

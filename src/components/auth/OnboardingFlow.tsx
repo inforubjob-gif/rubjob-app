@@ -182,6 +182,20 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
               </p>
             </Card>
 
+            <Card className="p-4 shadow-sm border-blue-100 bg-blue-50/50 ring-1 ring-blue-100">
+              <div className="flex items-start gap-3">
+                <div className="w-9 h-9 bg-blue-100 rounded-xl flex items-center justify-center text-blue-600 shrink-0 mt-0.5">
+                  <Icons.MapPin size={18} />
+                </div>
+                <div className="flex-1">
+                  <h4 className="text-xs font-black text-blue-800 mb-1">{t("onboarding.gpsTitle")}</h4>
+                  <p className="text-[11px] text-blue-600 font-medium leading-relaxed">
+                    {t("onboarding.gpsDesc")}
+                  </p>
+                </div>
+              </div>
+            </Card>
+
             <Button
               fullWidth
               size="lg"

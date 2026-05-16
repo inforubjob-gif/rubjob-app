@@ -7,6 +7,7 @@ export interface PriceDetails {
   distanceKm: number;
   isExpress: boolean;
   needsDetergent: boolean;
+  withFolding: boolean;
 }
 
 export interface PricingResult {
@@ -25,8 +26,9 @@ export function calculateOrderPrice(details: {
   distanceKm: number;
   isExpress: boolean;
   needsDetergent: boolean;
+  withFolding: boolean;
 }): PricingResult {
-  const { weightKg, distanceKm, isExpress, needsDetergent } = details;
+  const { weightKg, distanceKm, isExpress, needsDetergent, withFolding } = details;
 
   // Distance limit handled in UI for better UX
   // if (distanceKm > 10) {
@@ -38,7 +40,7 @@ export function calculateOrderPrice(details: {
   if (weightKg <= 9) laundryCost = 120;
   else if (weightKg <= 14) laundryCost = 140;
   else if (weightKg <= 18) laundryCost = 170;
-  else laundryCost = 210; // Up to 28kg
+  else laundryCost = 210; // Up to 28 kg.
 
   const laundryPlatformGP = laundryCost * 0.10;
 
@@ -57,7 +59,8 @@ export function calculateOrderPrice(details: {
   // 3. Add-ons
   let addonsTotal = 0;
   if (isExpress) addonsTotal += 20;
-  if (needsDetergent) addonsTotal += 20;
+  if (needsDetergent) addonsTotal += 15;
+  if (withFolding) addonsTotal += 10;
 
   // 4. Totals
   const finalLaundry = Math.ceil(laundryCost);

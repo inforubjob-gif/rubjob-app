@@ -23,8 +23,8 @@ export async function GET(req: Request) {
       ORDER BY category ASC, name ASC
     `).all();
 
-    // The user requested to keep only 4 services. We will remove 'iron_only' to make room for 'duvet_washing'
-    results = results.filter((r: any) => r.id !== "iron_only");
+    // Keep only: wash_fold (ซักอบ) and duvet_washing (ซักผ้านวม)
+    results = results.filter((r: any) => r.id === "wash_fold" || r.id === "duvet_washing");
 
     // Fallback: Inject duvet washing if it doesn't exist in D1 yet
     const hasDuvet = results.some((r: any) => r.id === "duvet_washing");

@@ -58,6 +58,9 @@ function BookingFlow() {
   const { profile, login, isReady } = useLiff();
   const { t, language } = useTranslation();
   const { showToast } = useToast();
+
+  // Format "9kg" → "9 kg." for display
+  const formatKg = (val: string) => val.replace(/(\d+)kg/, '$1 kg.');
   const [step, setStep] = useState<BookingStep>(validInitService ? "details" : "service");
   const [selectedStore, setSelectedStore] = useState<Store | null>(null);
   const [selectedService, setSelectedService] = useState<ServiceType | null>(validInitService);
@@ -345,7 +348,8 @@ function BookingFlow() {
       weightKg: parseInt(bagSize) || 9,
       distanceKm: distanceKm || 0,
       isExpress: deliverySpeed === "express",
-      needsDetergent: needsDetergent
+      needsDetergent: needsDetergent,
+      withFolding: withFolding
     });
   } catch (err) {
     console.error("Pricing error:", err);
@@ -357,9 +361,9 @@ function BookingFlow() {
 
   // Add-on components for display
   const bagSizeExtra = 0; // Legacy, now integrated into laundryFee
-  const foldingFee = 0; // User requested no folding fee
+  const foldingFee = withFolding ? 10 : 0;
 
-  const subTotal = pricing.customerTotal + foldingFee;
+  const subTotal = pricing.customerTotal;
   const totalDiscount = couponDiscount + pointsDiscount;
   const totalPrice = Math.ceil(Math.max(subTotal - totalDiscount, 0));
 
@@ -408,7 +412,7 @@ function BookingFlow() {
         items: pkgDataRaw 
           ? [{ name: `${service?.name || selectedService} - ${pkgDataRaw.name}`, qty: 1 }] 
           : service?.category === "laundry" 
-            ? [{ name: `${t("booking.bag")} ${bagSize}`, qty: 1 }] 
+            ? [{ name: `${t("booking.bag")} ${formatKg(bagSize)}`, qty: 1 }] 
             : [{ name: service?.name || selectedService, qty: 1 }],
         address: selectedAddress,
         paymentMethod: selectedPayment,
@@ -759,7 +763,7 @@ function BookingFlow() {
                   );
                 })()}
 
-                <div className="grid grid-cols-3 gap-1.5">
+                <div className="grid grid-cols-2 gap-2">
                   {TIME_SLOTS.map((slot) => {
                     const isDisabled = isSlotPassed(slot.startTime, pickupDate);
                     return (
@@ -767,15 +771,15 @@ function BookingFlow() {
                         key={slot.id}
                         disabled={isDisabled}
                         onClick={() => setPickupSlot(slot.id)}
-                        className={`py-2 px-1 rounded-lg text-center transition-all ${
+                        className={`py-3.5 px-3 rounded-xl text-center transition-all ${
                           isDisabled 
                             ? "bg-slate-50 text-slate-300 cursor-not-allowed opacity-40" 
                             : pickupSlot === slot.id 
-                              ? "bg-primary text-white shadow-sm" 
+                              ? "bg-primary text-white shadow-md shadow-primary/20" 
                               : "bg-white text-foreground hover:bg-slate-100 border border-slate-200"
                         }`}
                       >
-                        <p className={`text-[10px] font-bold ${isDisabled ? "line-through" : ""}`}>
+                        <p className={`text-xs font-black ${isDisabled ? "line-through" : ""}`}>
                           {t(`timeSlots.${slot.id}`) || slot.label}
                         </p>
                       </button>
@@ -838,7 +842,7 @@ function BookingFlow() {
                   <div className="grid grid-cols-2 gap-2 mb-4">
                     {(["9kg", "14kg", "18kg", "28kg"] as const).map((size) => (
                       <label key={size} className={`flex flex-col items-center justify-center p-3.5 rounded-xl border-2 cursor-pointer transition-all ${bagSize === size ? "border-primary bg-primary/5 shadow-md shadow-primary/10" : "border-slate-100 bg-white hover:bg-slate-50"}`} onClick={() => setBagSize(size)}>
-                        <span className="text-sm font-black text-foreground">{size}</span>
+                        <span className="text-sm font-black text-foreground">{formatKg(size)}</span>
                         <span className="text-[10px] text-muted font-bold">
                           {({ "9kg": t("booking.bagPieces.9kg"), "14kg": t("booking.bagPieces.14kg"), "18kg": t("booking.bagPieces.18kg"), "28kg": t("booking.bagPieces.28kg") } as const)[size]}
                         </span>
@@ -869,6 +873,7 @@ function BookingFlow() {
                   <label className="flex items-center justify-between p-4 cursor-pointer hover:bg-slate-50 transition-colors" onClick={() => setWithFolding(true)}>
                     <div className="flex flex-col">
                       <span className="text-sm font-bold text-foreground">{t("booking.options.withFolding")}</span>
+                      <span className="text-xs text-primary-dark font-medium">+฿10</span>
                     </div>
                     <div className={`w-5 h-5 rounded-full flex items-center justify-center transition-colors ${withFolding ? "bg-primary text-white shadow-md shadow-primary/30" : "border-2 border-slate-200"}`}>
                       {withFolding && <span className="text-xs font-bold leading-none flex items-center justify-center pt-0.5">✓</span>}
@@ -1004,11 +1009,11 @@ function BookingFlow() {
                   <div>
                     <div className="flex items-center gap-1.5 mb-2 text-primary-dark font-bold">
                       <span className="text-sm leading-none pt-0.5">🧺</span>
-                      <span>{t("booking.summary.package")} {bagSize}</span>
+                      <span>{t("booking.summary.package")} {formatKg(bagSize)}</span>
                     </div>
                     <div className="space-y-2 pl-5">
                       <div className="flex items-center justify-between">
-                        <span>{t("booking.summary.package")} {bagSize}</span>
+                        <span>{t("booking.summary.package")} {formatKg(bagSize)}</span>
                         <span className="font-bold text-slate-800">฿{laundryFee}</span>
                       </div>
                       {deliverySpeed === "express" && (
@@ -1020,7 +1025,13 @@ function BookingFlow() {
                       {needsDetergent && (
                         <div className="flex items-center justify-between text-primary-dark">
                           <span>{t("booking.detergentFeeLabel")}</span>
-                          <span className="font-bold">+฿20</span>
+                          <span className="font-bold">+฿15</span>
+                        </div>
+                      )}
+                      {withFolding && (
+                        <div className="flex items-center justify-between text-primary-dark">
+                          <span>{t("booking.options.withFoldingShort")}</span>
+                          <span className="font-bold">+฿10</span>
                         </div>
                       )}
                     </div>
@@ -1059,26 +1070,6 @@ function BookingFlow() {
                   )}
                 </div>
                 
-                {/* Total */}
-                <div className="flex flex-col border-t border-slate-200 pt-4 bg-slate-50/50 -mx-5 -mb-5 px-5 pb-5 rounded-b-2xl">
-                  {isTooFar && (
-                    <div className="bg-red-50 text-red-600 text-[11px] font-bold p-2 rounded-lg mb-3 flex items-center gap-2 border border-red-100">
-                      <Icons.AlertCircle size={14} />
-                      {t("booking.errors.tooFar") || "ขออภัย ระยะทางไกลเกิน 10 กม. ไม่สามารถให้บริการได้"}
-                    </div>
-                  )}
-                  
-                  <div className="flex items-end justify-between">
-                    <div>
-                      <span className="block text-sm font-black text-foreground">{t("booking.summary.total")}</span>
-                      <span className="block text-[10px] text-muted font-bold mt-0.5">{t("booking.summary.taxIncluded")}</span>
-                    </div>
-                    <div className="flex flex-col items-end">
-                      {(couponDiscount > 0 || pointsDiscount > 0) && <span className="text-[11px] text-slate-400 line-through font-bold">฿{subTotal}</span>}
-                      <span className={`text-3xl font-black leading-none ${isTooFar ? "text-slate-400" : "text-primary-dark"}`}>฿{totalPrice}</span>
-                    </div>
-                  </div>
-                </div>
               </Card>
             </section>
           </div>
@@ -1099,7 +1090,6 @@ function BookingFlow() {
                   </div>
                   <div>
                     <h3 className="text-sm font-bold text-foreground">{t(`orders.services.${service?.id}`) || service?.name}</h3>
-                    <p className="text-xs text-muted">~{service?.estimatedDays} {t("booking.dayTurnaround")}</p>
                   </div>
                 </div>
 
@@ -1114,7 +1104,7 @@ function BookingFlow() {
                   {selectedStore && (
                     <Row icon={<Icons.Home size={12} />} label={t("common.store")} value={`${selectedStore.name} (${distanceKm.toFixed(1)} ${t("booking.km")})`} />
                   )}
-                  <Row icon={<Icons.FileText size={11} />} label={t("booking.confirm.bagSize")} value={`${bagSize} ${bagSizeExtra > 0 ? `(+฿${bagSizeExtra})` : ""}`} />
+                  <Row icon={<Icons.FileText size={11} />} label={t("booking.confirm.bagSize")} value={`${formatKg(bagSize)} ${bagSizeExtra > 0 ? `(+฿${bagSizeExtra})` : ""}`} />
                   <Row icon={<Icons.Tasks size={11} />} label={t("booking.confirm.extraService")} value={withFolding ? t("booking.options.withFoldingShort") : t("booking.options.noFoldingShort")} />
                 </div>
               </Card>
@@ -1216,7 +1206,7 @@ function BookingFlow() {
           </Button>
         )}
         {step === "details" && (
-          <div className="space-y-3">
+          <div className="space-y-2">
             {!profile?.phone && (
               <div className="bg-amber-50 border border-amber-100 p-3 rounded-xl">
                 <p className="text-xs font-bold text-amber-700 mb-2">{t("booking.identifyPhone")}</p>
@@ -1229,51 +1219,62 @@ function BookingFlow() {
                 />
               </div>
             )}
-            <Button
-              fullWidth
-              size="lg"
-              onClick={async () => {
-                // Validation checks
-                if (!selectedAddress) {
-                  showToast(t("booking.errors.noAddress"), "error");
-                  return;
-                }
-                if (!pickupDate || !pickupSlot) {
-                  showToast(t("booking.errors.noDateTime"), "error");
-                  return;
-                }
-                if (!profile?.phone && !tempPhone) {
-                  showToast(t("booking.errors.noPhone"), "error");
-                  return;
-                }
-
-                // If phone was provided in the temp input, sync it to user profile
-                if (tempPhone && !profile?.phone) {
-                  try {
-                    await fetch("/api/user/sync", {
-                      method: "POST",
-                      headers: { "Content-Type": "application/json" },
-                      body: JSON.stringify({
-                        id: profile?.userId,
-                        displayName: profile?.displayName,
-                        pictureUrl: profile?.pictureUrl,
-                        phone: tempPhone
-                      })
-                    });
-                    profile!.phone = tempPhone; 
-                  } catch (e) {
-                    console.error("Phone sync failed", e);
+            {isTooFar && (
+              <div className="bg-red-50 text-red-600 text-[11px] font-bold p-2 rounded-lg flex items-center gap-2 border border-red-100">
+                <Icons.AlertCircle size={14} />
+                {t("booking.errors.tooFar") || "ขออภัย ระยะทางไกลเกิน 10 กม. ไม่สามารถให้บริการได้"}
+              </div>
+            )}
+            <div className="flex items-center gap-3">
+              <div className="flex-1 min-w-0">
+                <div className="flex items-baseline gap-1.5">
+                  <span className="text-[10px] font-bold text-muted uppercase">{t("booking.summary.total")}</span>
+                  {(couponDiscount > 0 || pointsDiscount > 0) && <span className="text-[10px] text-slate-400 line-through font-bold">฿{subTotal}</span>}
+                  <span className={`text-xl font-black leading-none ${isTooFar ? "text-slate-400" : "text-primary-dark"}`}>฿{totalPrice}</span>
+                </div>
+                <span className="text-[9px] text-muted font-medium">{t("booking.summary.taxIncluded")}</span>
+              </div>
+              <Button
+                size="lg"
+                onClick={async () => {
+                  if (!selectedAddress) {
+                    showToast(t("booking.errors.noAddress"), "error");
+                    return;
                   }
-                }
-                // Auto-create order and proceed to payment
-                const success = await handleConfirm();
-                if (success) setStep("payment");
-              }}
-              disabled={isTooFar || isSubmitting}
-              className={(isTooFar || isSubmitting) ? "bg-slate-300 text-slate-500 shadow-none border-transparent cursor-not-allowed" : ""}
-            >
-              {isSubmitting ? t("common.loading") : isTooFar ? t("booking.errors.tooFar") : t("common.confirm")}
-            </Button>
+                  if (!pickupDate || !pickupSlot) {
+                    showToast(t("booking.errors.noDateTime"), "error");
+                    return;
+                  }
+                  if (!profile?.phone && !tempPhone) {
+                    showToast(t("booking.errors.noPhone"), "error");
+                    return;
+                  }
+                  if (tempPhone && !profile?.phone) {
+                    try {
+                      await fetch("/api/user/sync", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                          id: profile?.userId,
+                          displayName: profile?.displayName,
+                          pictureUrl: profile?.pictureUrl,
+                          phone: tempPhone
+                        })
+                      });
+                      profile!.phone = tempPhone; 
+                    } catch (e) {
+                      console.error("Phone sync failed", e);
+                    }
+                  }
+                  const success = await handleConfirm();
+                  if (success) setStep("payment");
+                }}
+                disabled={isTooFar || isSubmitting}
+                className={`flex-1 ${(isTooFar || isSubmitting) ? "bg-slate-300 text-slate-500 shadow-none border-transparent cursor-not-allowed" : ""}`}
+              >
+                {isSubmitting ? t("common.loading") : isTooFar ? t("booking.errors.tooFar") : t("common.confirm")}
+              </Button>
+            </div>
           </div>
         )}
         {step === "payment" && (
@@ -1318,7 +1319,7 @@ function BookingFlow() {
                   key={cpn.id}
                   onClick={async () => {
                      setCouponCode(cpn.code);
-                     setIsCouponModalOpen(false);
+                   setIsCouponModalOpen(false);
                      try {
                         const res = await fetch("/api/coupons/validate", {
                            method: "POST",
@@ -1336,43 +1337,48 @@ function BookingFlow() {
                         showToast(`❌ ${t("booking.couponErrorGeneric")}`, "error");
                      }
                   }}
-                  className="w-full relative group transition-transform active:scale-[0.98]"
+                  className="w-full relative group transition-transform active:scale-[0.97]"
                >
-                  {/* Ticket Container */}
-                  <div className="bg-white border-2 border-slate-100 rounded-2xl flex overflow-hidden shadow-sm group-hover:border-primary/30 transition-colors">
-                    {/* Left side: Discount Amount */}
-                    <div className="w-24 bg-primary/10 flex flex-col items-center justify-center border-r-2 border-dashed border-slate-100 relative">
-                      {/* Punch holes */}
-                      <div className="absolute top-0 right-0 translate-x-1/2 -translate-y-1/2 w-4 h-4 bg-white border-2 border-slate-100 rounded-full" />
-                      <div className="absolute bottom-0 right-0 translate-x-1/2 translate-y-1/2 w-4 h-4 bg-white border-2 border-slate-100 rounded-full" />
+                  {/* Premium Ticket Container */}
+                  <div className="bg-white rounded-2xl overflow-hidden shadow-md shadow-primary/5 border border-slate-100 group-hover:shadow-lg group-hover:shadow-primary/10 group-hover:border-primary/20 transition-all duration-300">
+                    {/* Top: Gradient discount banner */}
+                    <div className="bg-gradient-to-r from-primary/15 via-amber-50 to-primary/10 px-5 py-5 flex items-center justify-between relative">
+                      {/* Decorative circles */}
+                      <div className="absolute -bottom-3 left-6 w-6 h-6 bg-white rounded-full border border-slate-100" />
+                      <div className="absolute -bottom-3 right-6 w-6 h-6 bg-white rounded-full border border-slate-100" />
                       
-                      <span className="text-xs font-black text-primary uppercase leading-none mb-1">{t("booking.off")}</span>
-                      <span className="text-2xl font-black text-primary-dark">
-                        {cpn.type === 'percentage' ? `${cpn.value}%` : `฿${cpn.value}`}
-                      </span>
+                      <div className="flex items-center gap-4">
+                        <div className="w-16 h-16 bg-white/80 backdrop-blur rounded-2xl flex flex-col items-center justify-center shadow-sm border border-white">
+                          <span className="text-[9px] font-black text-primary uppercase leading-none">{t("booking.off")}</span>
+                          <span className="text-2xl font-black text-primary-dark leading-none mt-0.5">
+                            {cpn.type === 'percentage' ? `${cpn.value}%` : `฿${cpn.value}`}
+                          </span>
+                        </div>
+                        <div className="text-left">
+                          <h4 className="text-base font-black text-slate-900 leading-tight">{cpn.title || cpn.code}</h4>
+                          <p className="text-xs font-bold text-slate-500 mt-1 line-clamp-2 leading-relaxed">{cpn.description || t("promotions.subtitle")}</p>
+                        </div>
+                      </div>
+                      <span className="text-[10px] font-black font-mono bg-white/80 backdrop-blur text-primary-dark px-2.5 py-1.5 rounded-lg uppercase shadow-sm border border-white shrink-0">{cpn.code}</span>
                     </div>
 
-                    {/* Right side: Details */}
-                    <div className="flex-1 p-4 text-left flex flex-col justify-between min-h-[100px]">
-                      <div>
-                        <div className="flex items-center justify-between mb-1">
-                          <h4 className="text-sm font-black text-slate-800 leading-tight">{cpn.title || cpn.code}</h4>
-                          <span className="text-[10px] font-black font-mono bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded uppercase">{cpn.code}</span>
-                        </div>
-                        <p className="text-[11px] font-bold text-slate-500 line-clamp-2">{cpn.description || t("promotions.subtitle")}</p>
-                      </div>
-
-                      <div className="flex items-center justify-between mt-3">
+                    {/* Bottom: Details + CTA */}
+                    <div className="px-5 py-4 flex items-center justify-between border-t border-dashed border-slate-100">
+                      <div className="flex items-center gap-5">
                         <div className="flex flex-col">
-                          <span className="text-[11px] font-black text-slate-400 uppercase leading-none">{t("booking.minSpend")}</span>
-                          <span className="text-[11px] font-black text-slate-600">฿{cpn.minOrder || 0}</span>
+                          <span className="text-[9px] font-black text-slate-300 uppercase tracking-wider">{t("booking.minSpend")}</span>
+                          <span className="text-sm font-black text-slate-700">฿{cpn.minOrder || 0}</span>
                         </div>
-                        <div className="flex flex-col items-end">
-                          <span className="text-[11px] font-black text-slate-400 uppercase leading-none">{t("booking.expires")}</span>
-                          <span className="text-[10px] font-bold text-amber-600">
+                        <div className="w-px h-8 bg-slate-100" />
+                        <div className="flex flex-col">
+                          <span className="text-[9px] font-black text-slate-300 uppercase tracking-wider">{t("booking.expires")}</span>
+                          <span className="text-sm font-black text-amber-600">
                             {cpn.expiryDate ? new Date(cpn.expiryDate).toLocaleDateString("th-TH", { day: 'numeric', month: 'short', year: '2-digit' }) : "∞"}
                           </span>
                         </div>
+                      </div>
+                      <div className="bg-primary text-white text-xs font-black px-4 py-2.5 rounded-xl shadow-md shadow-primary/20 group-hover:shadow-lg group-hover:shadow-primary/30 transition-all uppercase tracking-wider">
+                        {t("common.useNow")}
                       </div>
                     </div>
                   </div>

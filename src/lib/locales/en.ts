@@ -400,11 +400,11 @@ export const en = {
     viewMyOrders: "View My Orders",
     speed: {
       standardTitle: "Standard Delivery",
-      standardDesc: "Delivery within 24 hours (Round trip ฿{halfFee}/leg, total ฿{fee})",
-      standardShort: "Standard (24h)",
+      standardDesc: "Delivery within 7-12 hours (Round trip ฿{halfFee}/leg, total ฿{fee})",
+      standardShort: "Standard (7-12h)",
       expressTitle: "Express Delivery ⚡",
-      expressDesc: "Delivery within 6 hours (Round trip ฿{halfFee}/leg, total ฿{fee})",
-      expressShort: "Express (6h)",
+      expressDesc: "Delivery within 4-6 hours (Round trip ฿{halfFee}/leg, total ฿{fee})",
+      expressShort: "Express (4-6h)",
     },
     distanceNote: "* Delivery fee includes extra distance ({distance} km)",
     bagSizeTitle: "Bag Size",
@@ -444,7 +444,7 @@ export const en = {
     },
     connectingLine: "Connecting to LINE...",
     selectedService: "Selected Service",
-    bagMaxSize: "Max Size (28kg)",
+    bagMaxSize: "Max Size (28 kg.)",
     bagMaxDesc: "For large duvets",
     bagPieces: {
       "9kg": "~25-30 pcs",
@@ -454,7 +454,7 @@ export const en = {
     },
     detergentTitle: "Detergent / Fabric Softener",
     detergentLabel: "Use shop's detergent",
-    detergentPrice: "+฿20 (Premium Grade)",
+    detergentPrice: "+฿15 (Premium Grade)",
     expressLabel: "Express Surcharge",
     detergentFeeLabel: "Detergent / Softener Fee",
     genericError: "An error occurred",
@@ -472,16 +472,8 @@ export const en = {
     topper: "Topper",
   },
   timeSlots: {
-    morning: "Morning",
-    midday: "Midday",
-    afternoon: "Afternoon",
-    evening: "Evening",
-    night: "Night",
-    late_night: "Late Night",
-    midnight: "Midnight",
-    am1: "1 AM",
-    am3: "3 AM",
-    am5: "5 AM",
+    morning: "Morning (09:00 - 12:00)",
+    afternoon: "Afternoon (14:00 - 17:00)",
   },
   addresses: {
     home: "Home",
@@ -619,7 +611,7 @@ export const en = {
     flashSaleDesc: "Applicable to all dry cleaning items this weekend only.",
     deals: {
       songkranTitle: "Songkran Clean Promo",
-      songkranDesc: "20% Discount for Wash & Dry. Min 5kg.",
+      songkranDesc: "20% Discount for Wash & Dry. Min 5 kg.",
       songkranExpires: "3 days left",
       newUserTitle: "New Users Only",
       newUserDesc: "Get ฿50 off your first booking. No minimum.",
@@ -1072,11 +1064,11 @@ export const en = {
       verificationDesc: "Changing your vehicle type may require a new document review. Our team will contact you if needed.",
       motorcycle: {
         name: "Motorcycle",
-        desc: "Fast & Agile (Up to 10kg)"
+        desc: "Fast & Agile (Up to 10 kg.)"
       },
       smallCar: {
         name: "Small Car",
-        desc: "Standard (Up to 30kg)"
+        desc: "Standard (Up to 30 kg.)"
       },
       vanPickup: {
         name: "Van / Pickup",
@@ -1798,6 +1790,8 @@ export const en = {
       pinLabel: "Pin Location",
       pinSet: "📍 Pinned ({lat}, {lng})",
       pinPrompt: "Tap the map to pin your location",
+      gpsTitle: "📍 Next Step: Allow GPS Access",
+      gpsDesc: "We'll ask for your location to pin your pickup & delivery address on the map, so our driver can navigate to your home accurately.",
     },
     register: {
       partner: {

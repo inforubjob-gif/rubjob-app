@@ -226,13 +226,27 @@ export default function StoreForm({ initialData, isEdit }: StoreFormProps) {
                       onChange={(lat, lng) => setFormData({...formData, lat: lat.toFixed(6), lng: lng.toFixed(6)})}
                     />
                     <div className="grid grid-cols-2 gap-4 mt-4">
-                       <div className="p-4 bg-slate-50 rounded-xl border border-slate-100 flex items-center justify-between">
-                          <span className="text-[10px] font-black text-slate-400 uppercase">Latitude</span>
-                          <span className="text-sm font-mono font-black text-slate-700">{formData.lat}</span>
+                       <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
+                          <label className="text-[10px] font-black text-slate-400 uppercase block mb-1.5">Latitude</label>
+                          <input 
+                            type="number"
+                            step="any"
+                            value={formData.lat}
+                            onChange={e => setFormData({...formData, lat: e.target.value})}
+                            placeholder="13.7563"
+                            className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm font-mono font-black text-slate-700 focus:outline-none focus:border-primary/50 transition-all"
+                          />
                        </div>
-                       <div className="p-4 bg-slate-50 rounded-xl border border-slate-100 flex items-center justify-between">
-                          <span className="text-[10px] font-black text-slate-400 uppercase">Longitude</span>
-                          <span className="text-sm font-mono font-black text-slate-700">{formData.lng}</span>
+                       <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
+                          <label className="text-[10px] font-black text-slate-400 uppercase block mb-1.5">Longitude</label>
+                          <input 
+                            type="number"
+                            step="any"
+                            value={formData.lng}
+                            onChange={e => setFormData({...formData, lng: e.target.value})}
+                            placeholder="100.5018"
+                            className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm font-mono font-black text-slate-700 focus:outline-none focus:border-primary/50 transition-all"
+                          />
                        </div>
                     </div>
                  </div>
@@ -269,7 +283,7 @@ export default function StoreForm({ initialData, isEdit }: StoreFormProps) {
                </div>
                
                <div className="space-y-6">
-                  {['business_license', 'owner_id', 'storefront'].map(docType => {
+                  {['business_license'].map(docType => {
                      const doc = formData.documents.find((d: any) => d.type === docType) || { status: 'none', url: '', notes: '' };
                      return (
                         <div key={docType} className="p-6 rounded-xl border-2 border-slate-50 bg-slate-50/20 space-y-4">
@@ -400,33 +414,6 @@ export default function StoreForm({ initialData, isEdit }: StoreFormProps) {
                       onChange={e => setFormData({...formData, serviceRadiusKm: e.target.value})}
                       className="w-full accent-white h-1.5 bg-white/20 rounded-lg appearance-none cursor-pointer"
                     />
-                 </div>
-                 
-                 <div className="grid grid-cols-1 gap-6">
-                    <div>
-                       <label className="text-[10px] uppercase font-black text-white/50 tracking-widest block mb-2">{t('admin.stores.form.baseFee')}</label>
-                       <div className="relative">
-                          <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30 font-black">฿</span>
-                          <input 
-                            type="number"
-                            value={formData.baseDeliveryFee}
-                            onChange={e => setFormData({...formData, baseDeliveryFee: e.target.value})}
-                            className="w-full bg-white/10 border-2 border-white/10 rounded-xl px-10 py-4 text-sm font-bold focus:outline-none focus:border-white/30 transition-all"
-                          />
-                       </div>
-                    </div>
-                    <div>
-                       <label className="text-[10px] uppercase font-black text-white/50 tracking-widest block mb-2">{t('admin.stores.form.extraFee')}</label>
-                       <div className="relative">
-                          <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30 font-black">฿</span>
-                          <input 
-                            type="number"
-                            value={formData.extraFeePerKm}
-                            onChange={e => setFormData({...formData, extraFeePerKm: e.target.value})}
-                            className="w-full bg-white/10 border-2 border-white/10 rounded-xl px-10 py-4 text-sm font-bold focus:outline-none focus:border-white/30 transition-all"
-                          />
-                       </div>
-                    </div>
                  </div>
               </div>
            </Card>

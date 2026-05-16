@@ -12,49 +12,208 @@ export async function GET(req: Request) {
     const db = getRequestContext().env.DB;
     if (!db) return NextResponse.json({ error: "D1 not found" }, { status: 500 });
 
-    // Single batch for ALL core stats — minimizes CPU time
-    const results = await db.batch([
+    // ─── BATCH 1: Core + Extended Stats (single round-trip) ───
+    const coreStats = await db.batch([
+      // [0] Users count (filtered)
       db.prepare("SELECT COUNT(*) as total FROM users WHERE role IS NULL OR role = 'user'"),
+      // [1] Total stores
       db.prepare("SELECT COUNT(*) as total FROM stores"),
+      // [2] Orders count
       db.prepare("SELECT COUNT(*) as total FROM orders WHERE status != 'cancelled'"),
-      db.prepare("SELECT SUM(totalPrice) as revenue, SUM(laundryFee) as totalLaundry, SUM(deliveryFee) as totalDelivery FROM orders WHERE status = 'completed'"),
+      // [3] Revenue aggregates
+      db.prepare("SELECT SUM(totalPrice) as revenue, SUM(laundryFee) as totalLaundry, SUM(deliveryFee) as totalDelivery FROM orders WHERE status = 'completed' AND status != 'cancelled'"),
+      // [4] GP settings
       db.prepare("SELECT key, value FROM system_settings WHERE key IN ('gp_store_percent', 'gp_rubber_percent')"),
+      // [5] Raw users count
+      db.prepare("SELECT COUNT(*) as total FROM users"),
+      // [6] Table names (for inventory)
+      db.prepare("SELECT name FROM sqlite_master WHERE type='table'"),
+      // [7] Total rubbers
       db.prepare("SELECT COUNT(*) as total FROM rubber_users"),
+      // [8] Active rubbers
       db.prepare("SELECT COUNT(*) as total FROM rubber_users WHERE status = 'active'"),
+      // [9] Active stores
       db.prepare("SELECT COUNT(*) as total FROM stores WHERE status = 'active'"),
     ]);
 
-    const usersCount = results[0].results?.[0]?.total || 0;
-    const storesCount = results[1].results?.[0]?.total || 0;
-    const ordersCount = results[2].results?.[0]?.total || 0;
-    const totalRubbers = results[5].results?.[0]?.total || 0;
-    const activeRubbers = results[6].results?.[0]?.total || 0;
-    const activeStores = results[7].results?.[0]?.total || 0;
+    const usersCount = coreStats[0].results?.[0]?.total || 0;
+    const storesCount = coreStats[1].results?.[0]?.total || 0;
+    const ordersCount = coreStats[2].results?.[0]?.total || 0;
+    const rawUsersCount = coreStats[5].results?.[0]?.total || 0;
+    const tableNames = (coreStats[6].results || []).map((r: any) => r.name);
+    const totalRubbers = coreStats[7].results?.[0]?.total || 0;
+    const activeRubbers = coreStats[8].results?.[0]?.total || 0;
+    const activeStores = coreStats[9].results?.[0]?.total || 0;
 
-    const revResult = results[3].results?.[0] || {};
+    const revResult = coreStats[3].results?.[0] || {} as any;
     const grossRevenue = revResult.revenue || 0;
     const totalLaundry = revResult.totalLaundry || 0;
     const totalDelivery = revResult.totalDelivery || 0;
 
-    const settings = (results[4].results || []) as { key: string, value: string }[];
-    const gpStore = Number(settings.find(s => s.key === 'gp_store_percent')?.value ?? 10);
-    const gpRubber = Number(settings.find(s => s.key === 'gp_rubber_percent')?.value ?? 15);
+    const settings = (coreStats[4].results || []) as { key: string, value: string }[];
+    const gpStoreRaw = settings.find(s => s.key === 'gp_store_percent')?.value;
+    const gpRubberRaw = settings.find(s => s.key === 'gp_rubber_percent')?.value;
+    const gpStore = gpStoreRaw !== undefined ? Number(gpStoreRaw) : 10;
+    const gpRubber = gpRubberRaw !== undefined ? Number(gpRubberRaw) : 15;
 
-    // Calculations (in-memory, no extra queries)
+    const displayTotalStores = storesCount;
+
+    // Calculations
     const storeGP = (totalLaundry * gpStore) / 100;
     const storeNetEarnings = totalLaundry - storeGP;
-    const rubberGP = (totalDelivery * gpRubber) / 100;
-    const platformFeeTotal = 0; // Simplified
-    const rubberNetEarnings = totalDelivery - rubberGP;
-    const totalPlatformEarnings = storeGP + rubberGP;
+
+    // ─── BATCH 2: Financial Deep-Dive (rubber earnings, payment fees, wallets, insights) ───
+    let rubberNetEarnings = 0;
+    let rubberGP = 0;
+    let platformFeeTotal = 0;
+    let paymentGatewayFee = 0;
+    let rubberWalletBalance = 0;
+    let storeWalletBalance = 0;
+    let topServices: any[] = [];
+    let topLocations: any[] = [];
+
+    try {
+      const financialBatch = await db.batch([
+        // [0] Rubber earnings breakdown (net, GP, platform fee)
+        db.prepare(`
+          SELECT 
+            COALESCE(SUM(CASE WHEN pickupDriverId IS NOT NULL THEN (deliveryFee - (deliveryFee * ?/100) - 15) * 0.5 ELSE 0 END), 0) +
+            COALESCE(SUM(CASE WHEN deliveryDriverId IS NOT NULL THEN (deliveryFee - (deliveryFee * ?/100) - 15) * 0.5 ELSE 0 END), 0) as netEarnings,
+            
+            COALESCE(SUM(CASE WHEN pickupDriverId IS NOT NULL THEN (deliveryFee * ?/100) * 0.5 ELSE 0 END), 0) +
+            COALESCE(SUM(CASE WHEN deliveryDriverId IS NOT NULL THEN (deliveryFee * ?/100) * 0.5 ELSE 0 END), 0) as gp,
+            
+            COALESCE(SUM(CASE WHEN pickupDriverId IS NOT NULL THEN 7.5 ELSE 0 END), 0) +
+            COALESCE(SUM(CASE WHEN deliveryDriverId IS NOT NULL THEN 7.5 ELSE 0 END), 0) as platformFee
+          FROM orders WHERE status = 'completed' AND status != 'cancelled'
+        `).bind(gpRubber, gpRubber, gpRubber, gpRubber),
+
+        // [1] Payment gateway fee estimation
+        db.prepare(`
+          SELECT COALESCE(SUM(
+            CASE 
+              WHEN paymentMethod LIKE '%card%' THEN (totalPrice * 0.0365) + 10 
+              WHEN paymentMethod LIKE '%promptpay%' THEN (totalPrice * 0.0165)
+              WHEN paymentMethod = 'cash' OR paymentMethod = 'wallet' THEN 0
+              ELSE (totalPrice * 0.03)
+            END
+          ), 0) as fee 
+          FROM orders WHERE status = 'completed' AND status != 'cancelled'
+        `),
+
+        // [2] Rubber total earnings (for wallet)
+        db.prepare(`
+          SELECT 
+            COALESCE(SUM(CASE WHEN pickupDriverId IS NOT NULL THEN (deliveryFee - (deliveryFee * ?/100) - 15) * 0.5 ELSE 0 END), 0) +
+            COALESCE(SUM(CASE WHEN deliveryDriverId IS NOT NULL THEN (deliveryFee - (deliveryFee * ?/100) - 15) * 0.5 ELSE 0 END), 0) as total
+          FROM orders WHERE status = 'completed' AND status != 'cancelled'
+        `).bind(gpRubber, gpRubber),
+
+        // [3] Rubber withdrawals
+        db.prepare(`
+          SELECT COALESCE(SUM(amount), 0) as total
+          FROM payout_requests WHERE requesterType = 'rubber' AND status != 'rejected'
+        `),
+
+        // [4] Store earnings (for wallet)
+        db.prepare(`
+          SELECT COALESCE(SUM(laundryFee * ?), 0) as total
+          FROM orders WHERE status = 'completed' AND status != 'cancelled' AND storeId IS NOT NULL
+        `).bind((100 - gpStore) / 100),
+
+        // [5] Store withdrawals
+        db.prepare(`
+          SELECT COALESCE(SUM(amount), 0) as total
+          FROM payout_requests WHERE requesterType = 'store' AND status != 'rejected'
+        `),
+
+        // [6] Top services
+        db.prepare(`
+          SELECT s.name, COUNT(o.id) as count 
+          FROM orders o 
+          JOIN services s ON o.serviceId = s.id 
+          WHERE o.status != 'cancelled'
+          GROUP BY s.id 
+          ORDER BY count DESC 
+          LIMIT 5
+        `),
+
+        // [7] Top locations
+        db.prepare(`
+          SELECT address, COUNT(id) as count 
+          FROM orders 
+          WHERE address IS NOT NULL AND address != '' AND status != 'cancelled'
+          GROUP BY address 
+          ORDER BY count DESC 
+          LIMIT 5
+        `),
+      ]);
+
+      // Rubber earnings breakdown
+      const rubberStats = financialBatch[0].results?.[0] as any;
+      rubberNetEarnings = rubberStats?.netEarnings || 0;
+      rubberGP = rubberStats?.gp || 0;
+      platformFeeTotal = rubberStats?.platformFee || 0;
+
+      // Payment gateway fee
+      paymentGatewayFee = (financialBatch[1].results?.[0] as any)?.fee || 0;
+
+      // Wallet balances
+      const rubberEarned = (financialBatch[2].results?.[0] as any)?.total || 0;
+      const rubberWithdrawn = (financialBatch[3].results?.[0] as any)?.total || 0;
+      rubberWalletBalance = Math.max(0, Number(rubberEarned) - Number(rubberWithdrawn));
+
+      const storeEarned = (financialBatch[4].results?.[0] as any)?.total || 0;
+      const storeWithdrawn = (financialBatch[5].results?.[0] as any)?.total || 0;
+      storeWalletBalance = Math.max(0, Number(storeEarned) - Number(storeWithdrawn));
+
+      // Top insights
+      topServices = financialBatch[6].results || [];
+
+      const rawLocations = financialBatch[7].results || [];
+      topLocations = rawLocations.map((loc: any) => {
+        let shortName = loc.address;
+        if (shortName.length > 30) shortName = shortName.substring(0, 30) + '...';
+        return { name: shortName, count: loc.count };
+      });
+    } catch (e) {
+      console.warn("Financial batch failed (non-fatal):", e);
+    }
+
+    // Derived calculations
+    const unassignedDeliveryFee = totalDelivery - (rubberNetEarnings + rubberGP + platformFeeTotal);
+    const totalPlatformEarnings = storeGP + rubberGP + platformFeeTotal + unassignedDeliveryFee - paymentGatewayFee;
+
+    // ─── BATCH 3: Table Inventory (dynamic count per table) ───
+    const inventory: Record<string, number> = {};
+    const tableNamesList = tableNames.filter((n: string) => !n.startsWith('_'));
+
+    try {
+      const countQueries = tableNamesList.map((name: string) => 
+        db.prepare(`SELECT '${name}' as tbl, COUNT(*) as count FROM "${name}"`)
+      );
+      if (countQueries.length > 0) {
+        const batchResults = await db.batch(countQueries);
+        batchResults.forEach((result: any) => {
+          const row = result.results?.[0];
+          if (row) inventory[row.tbl] = row.count || 0;
+        });
+      }
+    } catch (err) {
+      console.warn("Batch inventory count failed, skipping:", err);
+    }
 
     return NextResponse.json({ 
       users: usersCount,
-      stores: storesCount,
-      activeStores,
+      rawUsers: rawUsersCount,
+      tables: tableNamesList,
+      connection: "D1_CONNECTED",
+      stores: displayTotalStores,
+      activeStores: activeStores,
       orders: ordersCount,
       revenue: grossRevenue,
       earnings: totalPlatformEarnings,
+      // Revenue breakdown
       revenueBreakdown: {
         totalLaundry,
         totalDelivery,
@@ -63,18 +222,18 @@ export async function GET(req: Request) {
         platformFee: platformFeeTotal,
         storeNetEarnings,
         rubberNetEarnings,
-        unassignedDeliveryFee: 0,
-        paymentGatewayFee: 0,
+        unassignedDeliveryFee,
+        paymentGatewayFee,
       },
       gpStore,
       gpRubber,
       totalRubbers,
       activeRubbers,
-      rubberWalletBalance: 0,
-      storeWalletBalance: 0,
-      topServices: [],
-      topLocations: [],
-      connection: "D1_CONNECTED",
+      inventory: inventory,
+      rubberWalletBalance,
+      storeWalletBalance,
+      topServices,
+      topLocations,
     });
   } catch (error: unknown) {
     return NextResponse.json({ error: safeError(error) }, { status: 500 });

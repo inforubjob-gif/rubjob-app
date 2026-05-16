@@ -229,7 +229,6 @@ export default function OrderDetailPage() {
             </IconCircle>
             <div>
               <h2 className="text-base font-bold text-foreground">{t(`orders.services.${serviceId}`) || order.serviceName}</h2>
-              <p className="text-xs text-muted">~{order.estimatedDays || 2} {t("booking.dayTurnaround")}</p>
             </div>
           </div>
 
@@ -240,6 +239,29 @@ export default function OrderDetailPage() {
             {order.deliveryDate && (
               <InfoRow label={t("orders.info.delivered")} value={order.deliveryDate} />
             )}
+          </div>
+        </Card>
+
+        {/* Billing Summary — show before QR payment */}
+        <Card className="p-4">
+          <h3 className="text-sm font-bold text-foreground mb-3 flex items-center gap-2">
+            <Icons.FileText size={18} className="text-primary" /> {t("booking.summaryTitle")}
+          </h3>
+          <div className="space-y-2">
+            <div className="space-y-2">
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-muted">{t("booking.laundryFee")}</span>
+                <span className="font-semibold text-foreground">฿{Math.ceil(order.laundryFee)}</span>
+              </div>
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-muted">{t("booking.deliveryFee")}</span>
+                <span className="font-semibold text-foreground">฿{Math.ceil(order.deliveryFee)}</span>
+              </div>
+            </div>
+            <div className="border-t border-border pt-2 flex items-center justify-between">
+              <span className="text-sm font-bold text-foreground">{t("orders.total")}</span>
+              <span className="text-lg font-bold text-primary-dark">฿{Math.ceil(order.totalPrice)}</span>
+            </div>
           </div>
         </Card>
 
@@ -398,42 +420,7 @@ export default function OrderDetailPage() {
           </Card>
         )}
 
-        {/* Items Breakdown */}
-        <Card className="p-4">
-          <h3 className="text-sm font-bold text-foreground mb-3 flex items-center gap-2">
-            <Icons.FileText size={18} className="text-primary" /> {t("orders.items")}
-          </h3>
-          <div className="space-y-2">
-            {items.map((item: any, i: number) => {
-              const qty = parseFloat(item.quantity) || 1;
-              const price = parseFloat(item.pricePerUnit) || 0;
-              return (
-                <div key={i} className="flex items-center justify-between text-sm">
-                  <span className="text-muted">
-                    {t(ITEM_KEY_MAP[item.name] || "") || item.name} × {item.quantity}
-                  </span>
-                  <span className="font-semibold text-foreground">
-                    ฿{qty * price}
-                  </span>
-                </div>
-              );
-            })}
-            <div className="border-t border-dashed border-border pt-2 space-y-2">
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-muted">{t("booking.laundryFee") || "Laundry Fee"}</span>
-                <span className="font-semibold text-foreground">฿{Math.ceil(order.laundryFee)}</span>
-              </div>
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-muted">{t("booking.deliveryFee") || "Delivery Fee"}</span>
-                <span className="font-semibold text-foreground">฿{Math.ceil(order.deliveryFee)}</span>
-              </div>
-            </div>
-            <div className="border-t border-border pt-2 flex items-center justify-between">
-              <span className="text-sm font-bold text-foreground">{t("orders.total")}</span>
-              <span className="text-lg font-bold text-primary-dark">฿{Math.ceil(order.totalPrice)}</span>
-            </div>
-          </div>
-        </Card>
+
 
         {/* Support */}
         <Card className="p-4 bg-surface-alt">

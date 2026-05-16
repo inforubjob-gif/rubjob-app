@@ -260,7 +260,7 @@ export default function RubberOrderDetailPage() {
             }}
             className="w-full bg-white text-primary hover:bg-slate-50 py-4 text-base font-black rounded-xl uppercase shadow-xl transition-all active:scale-95 flex justify-center items-center gap-2"
           >
-            <Icons.MapPin size={20} /> นำทางไปที่ใหม่
+            <Icons.MapPin size={20} /> {isToStore ? "นำทางไปที่ร้านซัก" : "นำทางไปที่บ้านลูกค้า"}
           </button>
         </div>
         
