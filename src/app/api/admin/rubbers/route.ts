@@ -2,7 +2,7 @@ import { safeError } from "@/lib/api-utils";
 import { getRequestContext } from "@cloudflare/next-on-pages";
 import { NextResponse } from "next/server";
 import { getAdminSession } from "@/lib/auth-server";
-import { ensureSchema } from "@/lib/db-init";
+
 
 export const runtime = "edge";
 
@@ -84,8 +84,7 @@ export async function POST(req: Request) {
     const db = getRequestContext().env.DB;
     if (!db) return NextResponse.json({ error: "D1 not found" }, { status: 500 });
 
-    // Self-healing: Ensure required columns exist
-    await ensureSchema(db);
+
 
     if (!email || !password || !name) return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
 
