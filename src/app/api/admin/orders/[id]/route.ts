@@ -22,7 +22,7 @@ export async function PATCH(
   try {
     const { id } = await params;
     const body = await request.json();
-    const { status, pickupDriverId, deliveryDriverId, storeId, staffNote, paymentStatus } = body;
+    const { status, pickupDriverId, deliveryDriverId, storeId, staffNote, paymentStatus, refundBankName, refundAccountNumber, refundAccountName } = body;
     const env = getRequestContext().env;
     const db = env.DB;
 
@@ -72,6 +72,31 @@ export async function PATCH(
 
     // Handle status transition (with LINE notifications)
     if (status) {
+      if (status === 'cancelled') {
+        // Fetch order to check if it was paid
+        const order = await db.prepare("SELECT userId, paymentStatus, totalPrice FROM orders WHERE id = ?").bind(id).first() as any;
+        if (order && order.paymentStatus === 'paid') {
+          const { nanoid } = await import("nanoid");
+          const refundId = `RFD-C-${nanoid(8).toUpperCase()}`;
+          // Queue refund request
+          await db.prepare(`
+            INSERT INTO payout_requests (id, requesterId, requesterType, amount, bankName, accountNumber, accountName, status, notes)
+            VALUES (?, ?, 'customer_refund', ?, ?, ?, ?, 'pending', ?)
+          `).bind(
+            refundId, 
+            order.userId, 
+            order.totalPrice, 
+            refundBankName || "N/A", 
+            refundAccountNumber || "N/A", 
+            refundAccountName || "N/A",
+            `Refund for Order ${id}`
+          ).run();
+
+          // Change payment status to refund_pending
+          await db.prepare("UPDATE orders SET paymentStatus = 'refund_pending', updatedAt = CURRENT_TIMESTAMP WHERE id = ?").bind(id).run();
+        }
+      }
+
       const result = await transitionOrderStatus(
         db,
         id,

@@ -235,8 +235,8 @@ export default function FinanceAdminPage() {
            <tr key={p.id} className="hover:bg-indigo-50/20 transition-colors group">
             <td className="px-4 py-5">
              <div className="flex items-center gap-3">
-               <div className={`w-8 h-8 rounded-lg flex items-center justify-center font-black text-[10px] text-white ${p.requesterType === 'store' ? 'bg-indigo-500' : 'bg-orange-500'}`}>
-                {p.requesterType === 'store' ? 'S' : 'R'}
+               <div className={`w-8 h-8 rounded-lg flex items-center justify-center font-black text-[10px] text-white ${p.requesterType === 'store' ? 'bg-indigo-500' : p.requesterType === 'customer_refund' ? 'bg-rose-500' : 'bg-orange-500'}`}>
+                {p.requesterType === 'store' ? 'S' : p.requesterType === 'customer_refund' ? 'C' : 'R'}
                </div>
                <div>
                 <p className="font-black text-slate-900 text-sm">{p.requesterName}</p>
@@ -247,6 +247,9 @@ export default function FinanceAdminPage() {
             <td className="px-4 py-5">
              <p className="text-xs font-black text-slate-700">{p.bankName}</p>
              <p className="text-[10px] font-mono font-bold text-slate-400">{p.accountNumber} • {p.accountName}</p>
+             {p.requesterType === 'customer_refund' && p.notes && (
+               <p className="text-[9px] font-bold text-rose-500 mt-1 uppercase">Refund: {p.notes}</p>
+             )}
             </td>
             <td className="px-4 py-5 text-right font-black text-slate-900 text-lg">฿{p.amount.toLocaleString()}</td>
             <td className="px-4 py-5">
