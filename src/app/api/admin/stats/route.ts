@@ -171,11 +171,81 @@ export async function GET(req: Request) {
       topServices = financialBatch[6].results || [];
 
       const rawLocations = financialBatch[7].results || [];
-      topLocations = rawLocations.map((loc: any) => {
-        let shortName = loc.address;
-        if (shortName.length > 30) shortName = shortName.substring(0, 30) + '...';
-        return { name: shortName, count: loc.count };
-      });
+      
+      // Parse JSON address fields and aggregate by area name
+      const areaCounter = new Map<string, number>();
+      
+      for (const loc of rawLocations as any[]) {
+        let areaName = "ไม่ระบุ";
+        try {
+          const addr = typeof loc.address === 'string' ? JSON.parse(loc.address) : loc.address;
+          
+          if (addr?.lat && addr?.lng) {
+            // Round lat/lng to ~1km grid for grouping nearby addresses
+            const gridLat = Math.round(addr.lat * 100) / 100;
+            const gridLng = Math.round(addr.lng * 100) / 100;
+            // Use label + grid as area key
+            areaName = addr.label || addr.details?.split(' ').slice(0, 3).join(' ') || `${gridLat}, ${gridLng}`;
+          } else if (addr?.label) {
+            areaName = addr.label;
+          } else if (addr?.details) {
+            areaName = addr.details.split(' ').slice(0, 4).join(' ');
+          }
+        } catch {
+          // Not JSON — use raw truncated
+          areaName = String(loc.address || "ไม่ระบุ").substring(0, 30);
+        }
+        areaCounter.set(areaName, (areaCounter.get(areaName) || 0) + loc.count);
+      }
+      
+      topLocations = Array.from(areaCounter.entries())
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 5)
+        .map(([name, count]) => ({ name, count }));
+      
+      // Reverse geocode top locations for real area names (using Nominatim)
+      try {
+        const geocodePromises = (financialBatch[7].results || []).slice(0, 5).map(async (loc: any) => {
+          try {
+            const addr = typeof loc.address === 'string' ? JSON.parse(loc.address) : loc.address;
+            if (!addr?.lat || !addr?.lng) return null;
+            
+            const res = await fetch(
+              `https://nominatim.openstreetmap.org/reverse?lat=${addr.lat}&lon=${addr.lng}&format=json&zoom=14&accept-language=th`,
+              { signal: AbortSignal.timeout(3000) }
+            );
+            const geo = await res.json();
+            const parts = [
+              geo.address?.suburb,
+              geo.address?.subdistrict, 
+              geo.address?.city_district,
+              geo.address?.city,
+              geo.address?.town,
+              geo.address?.county,
+            ].filter(Boolean);
+            
+            return parts.length > 0 ? { 
+              name: parts.slice(0, 2).join(', '), 
+              count: loc.count 
+            } : null;
+          } catch { return null; }
+        });
+        
+        const geocoded = (await Promise.all(geocodePromises)).filter(Boolean);
+        if (geocoded.length > 0) {
+          // Merge geocoded results by area name
+          const geoCounter = new Map<string, number>();
+          for (const g of geocoded as any[]) {
+            geoCounter.set(g.name, (geoCounter.get(g.name) || 0) + g.count);
+          }
+          topLocations = Array.from(geoCounter.entries())
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, 5)
+            .map(([name, count]) => ({ name, count }));
+        }
+      } catch {
+        // Geocoding failed — keep parsed label fallback
+      }
     } catch (e) {
       console.warn("Financial batch failed (non-fatal):", e);
     }
