@@ -371,7 +371,7 @@ export default function RubberOrderDetailPage() {
                     <h3 className="text-base font-black text-slate-900 uppercase">{order?.userName || t("common.guest")}</h3>
                     <div className="flex items-center gap-1.5 mt-1">
                        <span className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_5px_rgba(16,185,129,0.5)]" />
-                       <p className="text-xs text-slate-500 font-bold uppercase">{t("rubber.profile.verifiedHero")} — {order?.isExpress ? t("tiers.platinum") : t("tiers.silver")}</p>
+                       <p className="text-xs text-slate-500 font-bold uppercase">ลูกค้า — {order?.isExpress ? t("tiers.platinum") : t("tiers.silver")}</p>
                     </div>
                 </div>
                 <div className="flex gap-2">

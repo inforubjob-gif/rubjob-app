@@ -119,7 +119,7 @@ export default function RubberProfilePage() {
             <div className="flex flex-wrap gap-2">
               <span className="px-3 py-1 bg-white/20 backdrop-blur-md rounded-lg text-[10px] font-black uppercase tracking-wider flex items-center gap-1.5 border border-white/10">
                 <Icons.Guarantee size={10} className="text-emerald-400" />
-                {t("rubber.profile.verifiedHero")}
+                RUBBER
               </span>
               <span className="px-3 py-1 bg-black/20 backdrop-blur-md rounded-lg text-[10px] font-black uppercase tracking-wider text-white/70">
                 #{String(rubberSession?.id || '').slice(-4)}
@@ -325,7 +325,7 @@ export default function RubberProfilePage() {
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-black uppercase tracking-widest">{t("rubber.profile.logout")}</p>
-            <p className="text-[10px] text-white/40 uppercase font-black tracking-widest">{t("rubber.profile.verifiedHero")} #{String(rubberSession?.id || '').slice(-4)}</p>
+            <p className="text-[10px] text-white/40 uppercase font-black tracking-widest">RUBBER #{String(rubberSession?.id || '').slice(-4)}</p>
           </div>
           <Icons.Back size={16} className="text-white/20 rotate-180" />
         </button>
