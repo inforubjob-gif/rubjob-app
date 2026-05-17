@@ -10,6 +10,7 @@ import GlobalInput from "@/components/ui/GlobalInput";
 import GlobalTextarea from "@/components/ui/GlobalTextarea";
 import { useTranslation } from "@/components/providers/LanguageProvider";
 import { useToast } from "@/components/providers/ToastProvider";
+import Modal from "@/components/ui/Modal";
 
 const MapPicker = dynamic(() => import("@/components/ui/MapPicker"), {
   ssr: false,
@@ -22,16 +23,22 @@ interface OnboardingFlowProps {
 
 export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
   const { profile } = useLiff();
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
   const { showToast } = useToast();
-  const [step, setStep] = useState<1 | 2>(1);
+  const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Step 1: Phone
   const [phone, setPhone] = useState("");
   const [phoneError, setPhoneError] = useState("");
 
-  // Step 2: Address
+  // Step 2: Terms
+  const [agreedTerms, setAgreedTerms] = useState(false);
+
+  // Step 3: Location permission popup
+  const [showLocationModal, setShowLocationModal] = useState(false);
+
+  // Step 4: Address
   const [addressLabel, setAddressLabel] = useState("");
   const [addressDetails, setAddressDetails] = useState("");
   const [addressNote, setAddressNote] = useState("");
@@ -81,6 +88,34 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
     }
   }
 
+  function handleTermsAccept() {
+    setStep(3);
+    // Show location permission modal after a short delay
+    setTimeout(() => setShowLocationModal(true), 300);
+  }
+
+  function handleLocationPermission() {
+    setShowLocationModal(false);
+    // Request location permission
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          setPinLat(parseFloat(pos.coords.latitude.toFixed(6)));
+          setPinLng(parseFloat(pos.coords.longitude.toFixed(6)));
+          setPinSet(true);
+          setStep(4);
+        },
+        () => {
+          // Permission denied or error — still proceed
+          setStep(4);
+        },
+        { enableHighAccuracy: true, timeout: 10000 }
+      );
+    } else {
+      setStep(4);
+    }
+  }
+
   function handlePinLocation(lat: number, lng: number) {
     setPinLat(parseFloat(lat.toFixed(6)));
     setPinLng(parseFloat(lng.toFixed(6)));
@@ -116,6 +151,20 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
     }
   }
 
+  // Step title and subtitle
+  const stepTitles: Record<number, string> = {
+    1: t("onboarding.welcomeTitle"),
+    2: language === 'th' ? "ข้อตกลงการใช้งาน" : "Terms of Service",
+    3: language === 'th' ? "เปิดใช้งานโลเคชัน" : "Enable Location",
+    4: t("onboarding.addressTitle"),
+  };
+  const stepSubtitles: Record<number, string> = {
+    1: t("onboarding.phoneSubtitle"),
+    2: language === 'th' ? "กรุณาอ่านและยอมรับข้อตกลงก่อนใช้งาน" : "Please read and accept before continuing",
+    3: language === 'th' ? "เราต้องการตำแหน่งของคุณเพื่อค้นหาร้านซักใกล้บ้าน" : "We need your location to find nearby laundry shops",
+    4: t("onboarding.addressSubtitle"),
+  };
+
   return (
     <div className="flex flex-col min-h-dvh bg-white relative overflow-hidden">
       {/* Gradient Header */}
@@ -129,19 +178,18 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
             <Icons.Logo size={80} variant="icon" />
           </div>
           <h1 className="text-xl font-black text-white">
-            {step === 1 ? t("onboarding.welcomeTitle") : t("onboarding.addressTitle")}
+            {stepTitles[step]}
           </h1>
           <p className="text-sm text-white/80 mt-1 font-medium">
-            {step === 1
-              ? t("onboarding.phoneSubtitle")
-              : t("onboarding.addressSubtitle")}
+            {stepSubtitles[step]}
           </p>
         </div>
 
-        {/* Step indicator */}
-        <div className="flex gap-3 justify-center mt-6 relative z-10">
-          <div className={`h-1.5 w-16 rounded-full transition-all duration-500 ${step >= 1 ? "bg-white" : "bg-white/30"}`} />
-          <div className={`h-1.5 w-16 rounded-full transition-all duration-500 ${step >= 2 ? "bg-white" : "bg-white/30"}`} />
+        {/* Step indicator — 4 steps */}
+        <div className="flex gap-2 justify-center mt-6 relative z-10">
+          {[1, 2, 3, 4].map((s) => (
+            <div key={s} className={`h-1.5 w-10 rounded-full transition-all duration-500 ${step >= s ? "bg-white" : "bg-white/30"}`} />
+          ))}
         </div>
       </div>
 
@@ -182,20 +230,6 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
               </p>
             </Card>
 
-            <Card className="p-4 shadow-sm border-blue-100 bg-blue-50/50 ring-1 ring-blue-100">
-              <div className="flex items-start gap-3">
-                <div className="w-9 h-9 bg-blue-100 rounded-xl flex items-center justify-center text-blue-600 shrink-0 mt-0.5">
-                  <Icons.MapPin size={18} />
-                </div>
-                <div className="flex-1">
-                  <h4 className="text-xs font-black text-blue-800 mb-1">{t("onboarding.gpsTitle")}</h4>
-                  <p className="text-[11px] text-blue-600 font-medium leading-relaxed">
-                    {t("onboarding.gpsDesc")}
-                  </p>
-                </div>
-              </div>
-            </Card>
-
             <Button
               fullWidth
               size="lg"
@@ -208,8 +242,149 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
           </div>
         )}
 
-        {/* ─── Step 2: Address ─── */}
+        {/* ─── Step 2: Terms of Service ─── */}
         {step === 2 && (
+          <div className="animate-fade-in space-y-5">
+            <Card className="p-5 shadow-xl shadow-slate-200/50 border-slate-100 ring-1 ring-slate-100">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-11 h-11 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-600 shadow-sm">
+                  <Icons.FileText size={22} />
+                </div>
+                <div>
+                  <h3 className="text-base font-black text-foreground">
+                    {language === 'th' ? 'เงื่อนไขการใช้บริการ' : 'Terms & Conditions'}
+                  </h3>
+                  <p className="text-xs text-muted mt-0.5">
+                    {language === 'th' ? 'กรุณาอ่านอย่างละเอียดก่อนดำเนินการต่อ' : 'Please read carefully before proceeding'}
+                  </p>
+                </div>
+              </div>
+
+              {/* Scrollable terms content */}
+              <div className="bg-slate-50 rounded-xl p-4 max-h-[45vh] overflow-y-auto border border-slate-100 space-y-4 text-sm text-slate-600 leading-relaxed">
+                <div>
+                  <h4 className="font-black text-slate-800 mb-1">1. {language === 'th' ? 'การยอมรับข้อกำหนด' : 'Acceptance of Terms'}</h4>
+                  <p>{language === 'th' 
+                    ? 'การเข้าถึงและใช้งานแพลตฟอร์ม Rubjob ถือว่าคุณยอมรับข้อตกลงและเงื่อนไขเหล่านี้ทุกประการ หากคุณไม่ยอมรับข้อกำหนดเหล่านี้ กรุณางดเว้นการใช้บริการ'
+                    : 'By accessing and using the Rubjob platform, you fully accept these terms and conditions.'}</p>
+                </div>
+                <div>
+                  <h4 className="font-black text-slate-800 mb-1">2. {language === 'th' ? 'ขอบเขตบริการ' : 'Scope of Service'}</h4>
+                  <p>{language === 'th' 
+                    ? 'Rubjob เป็นสื่อกลางในการเชื่อมต่อลูกค้ากับผู้ให้บริการซักอบรีดและพนักงานขนส่ง เรามุ่งมั่นที่จะให้บริการที่มีคุณภาพและปลอดภัยสูงสุดสำหรับเสื้อผ้าทุกชิ้น'
+                    : 'Rubjob acts as an intermediary connecting customers with laundry service providers and delivery personnel.'}</p>
+                </div>
+                <div>
+                  <h4 className="font-black text-slate-800 mb-1">3. {language === 'th' ? 'นโยบายการชดเชย' : 'Compensation Policy'}</h4>
+                  <p>{language === 'th' 
+                    ? 'ในกรณีที่ผ้าเกิดความเสียหายหรือสูญหายอันเนื่องมาจากการปฏิบัติงาน Rubjob จะดำเนินการชดเชยตามเงื่อนไขที่กำหนดไว้ในนโยบายการรับประกันของเรา'
+                    : 'In the event of damage or loss, Rubjob will provide compensation according to our guarantee policy.'}</p>
+                </div>
+                <div>
+                  <h4 className="font-black text-slate-800 mb-1">4. {language === 'th' ? 'ความเป็นส่วนตัว' : 'Privacy'}</h4>
+                  <p>{language === 'th' 
+                    ? 'เราเก็บรวบรวมข้อมูลส่วนบุคคลเท่าที่จำเป็นสำหรับการให้บริการ รวมถึง ชื่อ เบอร์โทร ที่อยู่ และตำแหน่งที่ตั้ง ข้อมูลของคุณจะถูกเก็บรักษาอย่างปลอดภัยและไม่เปิดเผยต่อบุคคลที่สาม'
+                    : 'We collect personal data necessary for service delivery including name, phone, address, and location. Your data is stored securely and not shared with third parties.'}</p>
+                </div>
+                <div>
+                  <h4 className="font-black text-slate-800 mb-1">5. {language === 'th' ? 'การใช้ตำแหน่งที่ตั้ง' : 'Location Usage'}</h4>
+                  <p>{language === 'th' 
+                    ? 'แอปจะใช้ตำแหน่งที่ตั้งของคุณเพื่อค้นหาร้านซักอบรีดและคนขับที่อยู่ใกล้เคียง รวมถึงคำนวณค่าจัดส่งตามระยะทางจริง ตำแหน่งของคุณจะถูกใช้เฉพาะเมื่อคุณใช้งานแอปเท่านั้น'
+                    : 'The app uses your location to find nearby laundry shops and drivers, and to calculate delivery fees. Your location is only used while the app is active.'}</p>
+                </div>
+              </div>
+
+              {/* Agree checkbox */}
+              <label className="flex items-center gap-3 mt-5 p-3.5 rounded-xl border-2 border-slate-100 cursor-pointer hover:bg-slate-50 transition-colors active:scale-[0.98]" onClick={() => setAgreedTerms(!agreedTerms)}>
+                <div className={`w-6 h-6 rounded-lg flex items-center justify-center shrink-0 transition-all duration-300 ${agreedTerms ? 'bg-primary text-white shadow-md shadow-primary/30' : 'bg-slate-100 text-transparent border-2 border-slate-200'}`}>
+                  <Icons.Check size={14} strokeWidth={4} />
+                </div>
+                <span className="text-sm font-bold text-slate-700">
+                  {language === 'th' ? 'ฉันได้อ่านและยอมรับข้อตกลงการใช้งานแล้ว' : 'I have read and agree to the Terms of Service'}
+                </span>
+              </label>
+            </Card>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => setStep(1)}
+                className="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center text-slate-500 active:scale-95 transition-transform shrink-0"
+              >
+                <Icons.Back size={20} />
+              </button>
+              <Button
+                fullWidth
+                size="lg"
+                disabled={!agreedTerms}
+                onClick={handleTermsAccept}
+              >
+                {t("onboarding.nextButton")}
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {/* ─── Step 3: Location Permission ─── */}
+        {step === 3 && (
+          <div className="animate-fade-in space-y-5">
+            <Card className="p-6 shadow-xl shadow-slate-200/50 border-slate-100 ring-1 ring-slate-100 text-center">
+              <div className="w-24 h-24 bg-blue-50 rounded-3xl flex items-center justify-center mx-auto mb-5 border-2 border-blue-100">
+                <Icons.MapPin size={48} className="text-blue-500" />
+              </div>
+              <h3 className="text-lg font-black text-foreground mb-2">
+                {language === 'th' ? 'เปิดใช้งานตำแหน่งที่ตั้ง' : 'Enable Location Access'}
+              </h3>
+              <p className="text-sm text-slate-500 leading-relaxed mb-6">
+                {language === 'th' 
+                  ? 'ในขั้นตอนถัดไป ระบบจะขออนุญาตเข้าถึงตำแหน่งของคุณ กรุณากด "อนุญาต" เพื่อให้เราค้นหาร้านซักและคำนวณค่าจัดส่งได้อย่างแม่นยำ'
+                  : 'In the next step, the system will request your location. Please tap "Allow" so we can find nearby shops and calculate delivery fees accurately.'}
+              </p>
+
+              {/* Visual instruction */}
+              <div className="bg-blue-50/50 rounded-xl p-4 border border-blue-100 space-y-3">
+                <div className="flex items-center gap-3 text-left">
+                  <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600 shrink-0 text-sm font-black">1</div>
+                  <p className="text-xs text-blue-700 font-bold">
+                    {language === 'th' ? 'กดปุ่ม "เปิดโลเคชัน" ด้านล่าง' : 'Tap "Enable Location" below'}
+                  </p>
+                </div>
+                <div className="flex items-center gap-3 text-left">
+                  <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600 shrink-0 text-sm font-black">2</div>
+                  <p className="text-xs text-blue-700 font-bold">
+                    {language === 'th' ? 'เมื่อระบบถาม กรุณากด "อนุญาต" หรือ "Allow"' : 'When prompted, tap "Allow"'}
+                  </p>
+                </div>
+                <div className="flex items-center gap-3 text-left">
+                  <div className="w-8 h-8 bg-emerald-100 rounded-lg flex items-center justify-center text-emerald-600 shrink-0 text-sm font-black">3</div>
+                  <p className="text-xs text-emerald-700 font-bold">
+                    {language === 'th' ? 'ระบบจะตั้งค่าตำแหน่งของคุณอัตโนมัติ' : 'Your location will be set automatically'}
+                  </p>
+                </div>
+              </div>
+            </Card>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => setStep(2)}
+                className="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center text-slate-500 active:scale-95 transition-transform shrink-0"
+              >
+                <Icons.Back size={20} />
+              </button>
+              <Button
+                fullWidth
+                size="lg"
+                onClick={handleLocationPermission}
+                className="bg-blue-500 hover:bg-blue-600"
+              >
+                <Icons.MapPin size={18} className="mr-2 inline" />
+                {language === 'th' ? 'เปิดโลเคชัน' : 'Enable Location'}
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {/* ─── Step 4: Address ─── */}
+        {step === 4 && (
           <div className="animate-fade-in space-y-5">
             <Card className="p-6 shadow-xl shadow-slate-200/50 border-slate-100 ring-1 ring-slate-100">
               <div className="flex items-center gap-3 mb-5">
@@ -300,10 +475,10 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
 
             <div className="flex gap-3">
               <button
-                onClick={() => setStep(1)}
+                onClick={() => setStep(3)}
                 className="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center text-slate-500 active:scale-95 transition-transform shrink-0"
               >
-                <Icons.Back size={20} />
+              <Icons.Back size={20} />
               </button>
               <Button
                 fullWidth
