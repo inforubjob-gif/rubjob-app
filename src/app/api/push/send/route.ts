@@ -2,14 +2,10 @@ export const runtime = "edge";
 
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
-
-const VAPID_PUBLIC_KEY = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY || "";
-const VAPID_PRIVATE_KEY = process.env.VAPID_PRIVATE_KEY || "";
+import { sendPushNotification } from "@/lib/onesignal";
 
 // Web Push using raw fetch (Edge Runtime compatible, no node crypto)
 async function sendWebPush(subscription: { endpoint: string; p256dh: string; auth: string }, payload: string) {
-  // For Cloudflare Workers / Edge Runtime, we use a lightweight approach
-  // The service worker will handle the notification display
   try {
     const response = await fetch(subscription.endpoint, {
       method: "POST",
@@ -28,14 +24,34 @@ async function sendWebPush(subscription: { endpoint: string; p256dh: string; aut
 // Send push to all rubber users (or specific ones)
 export async function POST(req: NextRequest) {
   try {
-    const { title, body, url, targetUserIds, userType } = await req.json();
+    const { title, body, url, targetUserIds, userType, sendToAll } = await req.json();
     
     if (!title || !body) {
       return NextResponse.json({ error: "Missing title or body" }, { status: 400 });
     }
 
     const db = await getDb(req);
+    const env = (globalThis as any).process?.env || {};
+    const osAppId = env.ONESIGNAL_APP_ID || "";
+    const osApiKey = env.ONESIGNAL_REST_API_KEY || "";
 
+    // ===== Strategy 1: OneSignal (if configured) =====
+    if (osAppId && osApiKey) {
+      const result = await sendPushNotification(
+        {
+          title,
+          message: body,
+          url: url || "/",
+          userIds: targetUserIds,
+          sendToAll: sendToAll || !targetUserIds?.length,
+        },
+        osAppId,
+        osApiKey
+      );
+      return NextResponse.json({ ...result, provider: "onesignal" });
+    }
+
+    // ===== Strategy 2: Fallback to Web Push =====
     let subscriptions;
     if (targetUserIds && targetUserIds.length > 0) {
       const placeholders = targetUserIds.map(() => "?").join(",");
@@ -61,12 +77,11 @@ export async function POST(req: NextRequest) {
         sent++;
       } else {
         failed++;
-        // Remove invalid subscriptions
         await db.prepare(`DELETE FROM push_subscriptions WHERE endpoint = ?`).bind(sub.endpoint).run();
       }
     }
 
-    return NextResponse.json({ success: true, sent, failed, total: (subscriptions.results || []).length });
+    return NextResponse.json({ success: true, sent, failed, total: (subscriptions.results || []).length, provider: "webpush" });
   } catch (error: unknown) {
     console.error("Push send error:", error);
     return NextResponse.json({ error: "Failed to send push" }, { status: 500 });
