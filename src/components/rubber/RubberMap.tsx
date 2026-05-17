@@ -180,24 +180,22 @@ export default function RubberMap({
         <Marker position={userPos} icon={userIcon} />
         {rubberPos && <Marker position={rubberPos} icon={rubberIcon} />}
         
-        {/* Background route: store ↔ customer (dashed, light) */}
+        {/* Background route: store ↔ customer (lighter solid) */}
         {rubberPos && bgRouteCoords && (
           <Polyline 
             positions={bgRouteCoords} 
             color="#FF9F1C" 
-            weight={3} 
-            opacity={0.3} 
-            dashArray="8, 8"
+            weight={5} 
+            opacity={0.4} 
           />
         )}
 
-        {/* Main route: rubber → destination (solid, bold road route) */}
+        {/* Main route: rubber → destination (bold solid road route) */}
         <Polyline 
           positions={routeData?.coords || [fromPos, toPos]} 
           color={rubberPos ? "#3B82F6" : "#FF9F1C"} 
-          weight={rubberPos ? 6 : 4} 
-          opacity={0.85} 
-          dashArray={rubberPos ? "" : "10, 10"}
+          weight={7} 
+          opacity={1} 
         />
         
         <MapBoundsSetter points={boundsPoints} />
