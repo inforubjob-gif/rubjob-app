@@ -422,12 +422,12 @@ export default function RubberDashboard() {
         </div>
 
         {/* Stats Grid — hides on scroll */}
-        <div className={`grid grid-cols-2 gap-4 text-center header-element-collapse ${isCollapsed ? "header-element-hidden" : ""}`}>
-          <div className="bg-white/80 backdrop-blur-md p-4 rounded-xl border border-white shadow-sm">
+        <div className={`grid grid-cols-2 gap-4 text-center mt-4 header-element-collapse ${isCollapsed ? "header-element-hidden" : ""}`}>
+          <div className="bg-white/90 backdrop-blur-md p-4 rounded-2xl border border-white shadow-md">
             <p className="text-xs font-black text-slate-500 uppercase">{t("rubber.tasksToday")}</p>
             <p className="text-2xl font-black mt-1 text-slate-800">{todayTaskCount}</p>
           </div>
-          <div className="bg-white/80 backdrop-blur-md p-4 rounded-xl border border-white shadow-sm">
+          <div className="bg-white/90 backdrop-blur-md p-4 rounded-2xl border border-white shadow-md">
             <p className="text-xs font-black text-slate-500 uppercase">รายได้วันนี้</p>
             <p className="text-3xl font-black mt-1 text-slate-800">
               ฿{Math.ceil(todayEarnings).toLocaleString()}
@@ -437,19 +437,19 @@ export default function RubberDashboard() {
 
         {/* Weather Widget */}
         {weather && (
-          <div className={`header-element-collapse ${isCollapsed ? "header-element-hidden" : ""}`}>
-            <div className="bg-white/15 backdrop-blur-xl rounded-2xl p-3.5 border border-white/20">
+          <div className={`mt-4 header-element-collapse ${isCollapsed ? "header-element-hidden" : ""}`}>
+            <div className="bg-white/90 backdrop-blur-md rounded-2xl p-4 border border-white shadow-md">
               <div className="flex items-center gap-3">
-                <div className="w-11 h-11 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
+                <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-100 to-orange-100 flex items-center justify-center shrink-0 shadow-sm">
                   <span className="text-2xl leading-none">{weather.icon}</span>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs font-black text-white truncate">{weather.temp}°C — {weather.desc}</p>
-                  <p className="text-[10px] font-bold text-white/60 mt-0.5">{weather.tip}</p>
+                  <p className="text-sm font-black text-slate-800 truncate">{weather.desc}</p>
+                  <p className="text-[10px] font-bold text-slate-400 mt-0.5">{weather.tip}</p>
                 </div>
                 <div className="text-right shrink-0">
-                  <p className="text-2xl font-black text-white leading-none">{weather.temp}°</p>
-                  <p className="text-[8px] font-bold text-white/40 uppercase mt-0.5">ขอนแก่น</p>
+                  <p className="text-3xl font-black text-slate-800 leading-none">{weather.temp}°</p>
+                  <p className="text-[8px] font-bold text-slate-400 uppercase mt-0.5">ขอนแก่น</p>
                 </div>
               </div>
             </div>
