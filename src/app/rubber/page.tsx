@@ -50,6 +50,7 @@ export default function RubberDashboard() {
   const [todayTaskCount, setTodayTaskCount] = useState(0);
   const [unreadNotifCount, setUnreadNotifCount] = useState(0);
   const [weather, setWeather] = useState<any>(null);
+  const [weatherLocation, setWeatherLocation] = useState("ตำแหน่งของคุณ");
 
   const [verificationStatus, setVerificationStatus] = useState<"active" | "pending" | "unregistered" | "rejected">("pending");
 
@@ -74,12 +75,44 @@ export default function RubberDashboard() {
     }
   }, [router]);
 
-  // Fetch weather data
+  // Fetch weather data from real GPS
   useEffect(() => {
-    fetch("/api/weather")
-      .then(r => r.json())
-      .then(d => { if (d.current) setWeather(d.current); })
-      .catch(() => {});
+    if (!navigator.geolocation) {
+      // Fallback: no GPS support → use default (Khon Kaen)
+      fetch("/api/weather")
+        .then(r => r.json())
+        .then(d => { if (d.current) setWeather(d.current); })
+        .catch(() => {});
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const { latitude, longitude } = pos.coords;
+        // Fetch weather with real coords
+        fetch(`/api/weather?lat=${latitude}&lon=${longitude}`)
+          .then(r => r.json())
+          .then(d => { if (d.current) setWeather(d.current); })
+          .catch(() => {});
+        // Reverse geocode for area name
+        fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&accept-language=th&zoom=10`)
+          .then(r => r.json())
+          .then(geo => {
+            const name = geo.address?.city || geo.address?.town || geo.address?.state || geo.address?.county || "ตำแหน่งของคุณ";
+            setWeatherLocation(name);
+          })
+          .catch(() => {});
+      },
+      () => {
+        // GPS denied → fallback
+        fetch("/api/weather")
+          .then(r => r.json())
+          .then(d => { if (d.current) setWeather(d.current); })
+          .catch(() => {});
+        setWeatherLocation("ขอนแก่น");
+      },
+      { timeout: 5000 }
+    );
   }, []);
 
   // Poll notification count every 30 seconds
@@ -449,7 +482,7 @@ export default function RubberDashboard() {
                 </div>
                 <div className="text-right shrink-0">
                   <p className="text-3xl font-black text-slate-800 leading-none">{weather.temp}°</p>
-                  <p className="text-[8px] font-bold text-slate-400 uppercase mt-0.5">ขอนแก่น</p>
+                  <p className="text-[8px] font-bold text-slate-400 uppercase mt-0.5">{weatherLocation}</p>
                 </div>
               </div>
             </div>
