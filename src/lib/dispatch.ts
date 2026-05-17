@@ -143,8 +143,8 @@ export async function broadcastToEligibleRubbers(
   const { sendLinePush, rubberNewJobFlex } = await import("./line");
   const { createNotification } = await import("./notify-server");
 
-  // 15% commission + 15 THB Platform Fee
-  const totalOrderEarn = deliveryFee - (deliveryFee * 0.15) - 15;
+  // 10% commission + 10 THB Platform Fee
+  const totalOrderEarn = deliveryFee - (deliveryFee * 0.10) - 10;
   const legEarn = Math.max(totalOrderEarn * 0.5, 0);
 
   const eligibleRubbers = await getEligibleRubbers(db, orderAddress);

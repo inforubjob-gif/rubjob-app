@@ -41,8 +41,8 @@ export async function GET(req: Request) {
     const todayStartUTC = new Date(thTime.getTime() - 7 * 60 * 60 * 1000).getTime();
 
     (ordersRes.results as any[]).forEach(o => {
-      // 15% commission + 15 THB Platform Fee
-      const totalOrderEarn = o.deliveryFee - (o.deliveryFee * 0.15) - 15;
+      // 10% commission + 10 THB Platform Fee
+      const totalOrderEarn = o.deliveryFee - (o.deliveryFee * 0.10) - 10;
       const legEarn = totalOrderEarn * 0.5;
 
       // Leg 1: Pickup (Earned if status reached 'washing' or later)

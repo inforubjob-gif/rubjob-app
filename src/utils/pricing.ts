@@ -52,8 +52,8 @@ export function calculateOrderPrice(details: {
   }
 
   // Rubber Deductions
-  const rubberComm = deliveryFee * 0.15;
-  const platformServiceFee = 15;
+  const rubberComm = deliveryFee * 0.10;
+  const platformServiceFee = 10;
   const rubberNetIncome = deliveryFee - rubberComm - platformServiceFee;
 
   // 3. Add-ons

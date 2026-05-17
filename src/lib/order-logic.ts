@@ -101,7 +101,7 @@ export async function transitionOrderStatus(
         }
         
         const deliveryFee = order.deliveryFee || 0;
-        const totalRubberPayout = deliveryFee - (deliveryFee * 0.15) - 15;
+        const totalRubberPayout = deliveryFee - (deliveryFee * 0.10) - 10;
         const splitEarning = totalRubberPayout * 0.5; // 50% for pickup, 50% for delivery
 
         if (!driverId) return;

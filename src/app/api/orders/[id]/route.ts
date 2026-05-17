@@ -67,8 +67,8 @@ export async function GET(
     } catch (e) { /* leave as is */ }
  
     const deliveryFee = order.deliveryFee || 0;
-    // 15% commission + 15 THB Platform Fee
-    const totalRubberPayout = deliveryFee - (deliveryFee * 0.15) - 15;
+    // 10% commission + 10 THB Platform Fee
+    const totalRubberPayout = deliveryFee - (deliveryFee * 0.10) - 10;
     
     order.rubberEarn = totalRubberPayout; // Legacy field for backwards compatibility
     order.rubberPickupEarn = totalRubberPayout * 0.5;

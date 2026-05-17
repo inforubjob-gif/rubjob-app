@@ -27,7 +27,7 @@ export async function GET(req: Request) {
 
     const { results: settings } = await db.prepare("SELECT value FROM system_settings WHERE key = 'gp_rubber_percent'").all();
     const gpRubberRaw = settings?.[0]?.value;
-    const gpRubberFraction = gpRubberRaw !== undefined ? Number(gpRubberRaw) / 100 : 0.15;
+    const gpRubberFraction = gpRubberRaw !== undefined ? Number(gpRubberRaw) / 100 : 0.10;
 
     // Fetch wallet data for all rubbers in batch
     const { results: rubberEarnings } = await db.prepare(`

@@ -30,9 +30,9 @@ export async function GET(req: Request) {
     // Self-healing columns moved to db-init.ts (Phase 3.2)
 
     const calculateRubberEarn = (deliveryFee: number, status: string) => {
-      // 15% commission + 15 THB Platform Fee
-      const commission = deliveryFee * 0.15;
-      const totalEarn = deliveryFee - commission - 15;
+      // 10% commission + 10 THB Platform Fee
+      const commission = deliveryFee * 0.10;
+      const totalEarn = deliveryFee - commission - 10;
       // Split 50/50 between legs.
       return totalEarn * 0.5;
     };
