@@ -176,8 +176,8 @@ export default function RubberWalletPage() {
                   const dayEarnings = last7Days.map(date => {
                     const dayStr = date.toDateString();
                     const total = transactions
-                      .filter(t => t.amount > 0 && new Date(t.date).toDateString() === dayStr)
-                      .reduce((acc, t) => acc + Number(t.amount), 0);
+                      .filter(tx => tx.amount > 0 && new Date(tx.date).toDateString() === dayStr)
+                      .reduce((acc, tx) => acc + Number(tx.amount), 0);
                     return { date, total };
                   });
 
@@ -196,8 +196,8 @@ export default function RubberWalletPage() {
                            </div>
                            {/* Bar */}
                            <div 
-                             className={`w-4 sm:w-6 rounded-t-lg transition-all duration-700 ease-out ${isToday ? 'bg-primary shadow-lg shadow-primary/30' : 'bg-slate-100 group-hover:bg-primary/30'}`}
-                             style={{ height: `${Math.max(height, 5)}%` }}
+                             className={`w-6 sm:w-8 rounded-t-xl transition-all duration-700 ease-out ${isToday ? 'bg-primary shadow-lg shadow-primary/30' : d.total > 0 ? 'bg-primary/40' : 'bg-slate-100'} group-hover:bg-primary/60`}
+                             style={{ height: `${Math.max(height, 8)}%` }}
                            />
                         </div>
                         <span className={`text-[9px] font-black uppercase ${isToday ? 'text-primary' : 'text-slate-400'}`}>
@@ -219,22 +219,22 @@ export default function RubberWalletPage() {
                     {(() => {
                       const todayStr = new Date().toDateString();
                       const todayTrx = transactions
-                        .filter(t => t.amount > 0 && new Date(t.date).toDateString() === todayStr)
+                        .filter(tx => tx.amount > 0 && new Date(tx.date).toDateString() === todayStr)
                         .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
                       if (todayTrx.length === 0) {
                         return <p className="text-center py-4 text-[10px] text-slate-300 font-bold uppercase italic">{t("rubber.wallet.noEarningsToday") || "No earnings yet today"}</p>;
                       }
 
-                      return todayTrx.map((t, idx) => (
+                      return todayTrx.map((tx, idx) => (
                         <div key={idx} className="flex items-center justify-between">
                            <div className="flex items-center gap-3">
                               <div className="w-1.5 h-1.5 bg-primary rounded-full" />
                               <p className="text-[11px] font-black text-slate-700 uppercase tracking-tight">
-                                {new Date(t.date).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' })}
+                                {new Date(tx.date).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' })}
                               </p>
                            </div>
-                           <p className="text-xs font-black text-slate-900">฿{Number(t.amount).toLocaleString()}</p>
+                           <p className="text-xs font-black text-slate-900">฿{Number(tx.amount).toLocaleString()}</p>
                         </div>
                       ));
                     })()}
