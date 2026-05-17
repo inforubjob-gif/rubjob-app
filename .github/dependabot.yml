@@ -1,0 +1,34 @@
+# Dependabot Configuration
+# Auto-creates PRs to update vulnerable dependencies
+version: 2
+updates:
+  # npm dependencies
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "Asia/Bangkok"
+    # Limit to 5 PRs at a time to avoid overwhelm
+    open-pull-requests-limit: 5
+    # Group minor/patch updates together
+    groups:
+      production-dependencies:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
+    # Auto-assign reviewer
+    labels:
+      - "dependencies"
+      - "security"
+
+  # GitHub Actions versions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "ci"
