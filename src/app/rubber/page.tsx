@@ -398,27 +398,27 @@ export default function RubberDashboard() {
 
         {/* Work Status Toggle — hides on scroll */}
         <div className={`header-element-collapse ${isCollapsed ? "header-element-hidden" : ""}`}>
-          <Card className="mb-6 bg-white/10 backdrop-blur-xl border border-white/20 shadow-lg shadow-primary-dark/20 rounded-xl p-3 text-white">
+          <div className={`rounded-2xl p-3.5 transition-all duration-500 shadow-lg ${workStatus ? 'bg-emerald-500 shadow-emerald-500/30' : 'bg-slate-400 shadow-slate-400/20'}`}>
              <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2.5">
-                    <div className={`w-9 h-9 rounded-lg flex items-center justify-center transition-all shadow-sm ${workStatus ? 'bg-emerald-400/20 text-emerald-300' : 'bg-white/10 text-white/60'}`}>
-                        <Icons.Shield size={18} />
+                    <div className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all ${workStatus ? 'bg-white/20' : 'bg-white/15'}`}>
+                        <Icons.Shield size={18} className="text-white" />
                     </div>
                     <div>
-                        <p className="text-[9px] font-black text-white/50 uppercase leading-none mb-0.5">{t("rubber.profile.workStatus")}</p>
-                        <p className="text-sm font-black uppercase leading-none">
+                        <p className="text-[9px] font-black text-white/60 uppercase leading-none mb-0.5">{t("rubber.profile.workStatus")}</p>
+                        <p className="text-sm font-black uppercase leading-none text-white">
                           {workStatus ? t("rubber.profile.receivingJobs") : t("rubber.profile.notReceiving")}
                         </p>
                     </div>
                 </div>
                 <button 
                   onClick={() => setIsStatusModalOpen(true)}
-                  className={`w-11 h-6 rounded-full p-0.5 transition-all duration-300 ${workStatus ? 'bg-white shadow-md shadow-white/20' : 'bg-white/20'}`}
+                  className={`w-12 h-7 rounded-full p-0.5 transition-all duration-300 ${workStatus ? 'bg-white/30' : 'bg-white/20'}`}
                 >
-                  <div className={`w-5 h-5 rounded-full shadow-sm transition-all duration-300 ${workStatus ? 'bg-primary transform translate-x-5' : 'bg-white'}`} />
+                  <div className={`w-6 h-6 rounded-full shadow-sm transition-all duration-300 ${workStatus ? 'bg-white transform translate-x-5' : 'bg-white/80'}`} />
                 </button>
              </div>
-          </Card>
+          </div>
         </div>
 
         {/* Stats Grid — hides on scroll */}
@@ -438,13 +438,20 @@ export default function RubberDashboard() {
         {/* Weather Widget */}
         {weather && (
           <div className={`header-element-collapse ${isCollapsed ? "header-element-hidden" : ""}`}>
-            <div className={`flex items-center gap-3 px-4 py-3 rounded-xl border backdrop-blur-md ${weather.isRainy ? 'bg-blue-50/80 border-blue-200' : 'bg-amber-50/80 border-amber-200'}`}>
-              <span className="text-2xl">{weather.icon}</span>
-              <div className="flex-1 min-w-0">
-                <p className="text-xs font-black text-slate-700 truncate">{weather.temp}°C — {weather.desc}</p>
-                <p className={`text-[10px] font-bold ${weather.isRainy ? 'text-blue-500' : 'text-amber-600'}`}>{weather.tip}</p>
+            <div className="bg-white/15 backdrop-blur-xl rounded-2xl p-3.5 border border-white/20">
+              <div className="flex items-center gap-3">
+                <div className="w-11 h-11 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
+                  <span className="text-2xl leading-none">{weather.icon}</span>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-black text-white truncate">{weather.temp}°C — {weather.desc}</p>
+                  <p className="text-[10px] font-bold text-white/60 mt-0.5">{weather.tip}</p>
+                </div>
+                <div className="text-right shrink-0">
+                  <p className="text-2xl font-black text-white leading-none">{weather.temp}°</p>
+                  <p className="text-[8px] font-bold text-white/40 uppercase mt-0.5">ขอนแก่น</p>
+                </div>
               </div>
-              <span className="text-lg font-black text-slate-600 shrink-0">{weather.temp}°</span>
             </div>
           </div>
         )}
