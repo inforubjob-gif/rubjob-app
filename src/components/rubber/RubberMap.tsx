@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import L from "leaflet";
 import { MapContainer, TileLayer, Marker, Polyline, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
@@ -32,35 +32,51 @@ interface RubberMapProps {
   activeDestLng?: number;
 }
 
-// OSRM route fetcher with cache
-const routeCache = new Map<string, [number, number][]>();
+// OSRM route fetcher — returns geometry + distance/duration in ONE call
+const routeCache = new Map<string, { coords: [number, number][]; distanceKm: number; durationMin: number }>();
 
 async function fetchOSRMRoute(
   from: [number, number],
   to: [number, number]
-): Promise<[number, number][]> {
+): Promise<{ coords: [number, number][]; distanceKm: number; durationMin: number }> {
   const cacheKey = `${from[0].toFixed(4)},${from[1].toFixed(4)}-${to[0].toFixed(4)},${to[1].toFixed(4)}`;
   if (routeCache.has(cacheKey)) return routeCache.get(cacheKey)!;
 
   try {
     const res = await fetch(
       `https://router.project-osrm.org/route/v1/driving/${from[1]},${from[0]};${to[1]},${to[0]}?overview=full&geometries=geojson`,
-      { signal: AbortSignal.timeout(5000) }
+      { signal: AbortSignal.timeout(6000) }
     );
     const data = await res.json();
-    if (data.code === 'Ok' && data.routes?.[0]?.geometry?.coordinates) {
-      // GeoJSON uses [lng, lat] — Leaflet needs [lat, lng]
-      const coords: [number, number][] = data.routes[0].geometry.coordinates.map(
+    if (data.code === 'Ok' && data.routes?.[0]) {
+      const route = data.routes[0];
+      // GeoJSON [lng, lat] → Leaflet [lat, lng]
+      const coords: [number, number][] = route.geometry?.coordinates?.map(
         (c: [number, number]) => [c[1], c[0]] as [number, number]
-      );
-      routeCache.set(cacheKey, coords);
-      return coords;
+      ) || [from, to];
+
+      const result = {
+        coords,
+        distanceKm: parseFloat((route.distance / 1000).toFixed(1)),
+        durationMin: Math.max(1, Math.ceil(route.duration / 60)),
+      };
+      routeCache.set(cacheKey, result);
+      return result;
     }
   } catch (err) {
-    console.warn('OSRM route fetch failed, using straight line:', err);
+    console.warn('OSRM route fetch failed:', err);
   }
-  // Fallback: straight line
-  return [from, to];
+  // Fallback: straight line with Haversine estimate
+  const R = 6371;
+  const dLat = (to[0] - from[0]) * Math.PI / 180;
+  const dLon = (to[1] - from[1]) * Math.PI / 180;
+  const a = Math.sin(dLat/2)**2 + Math.cos(from[0]*Math.PI/180)*Math.cos(to[0]*Math.PI/180)*Math.sin(dLon/2)**2;
+  const haversineKm = R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  return {
+    coords: [from, to],
+    distanceKm: parseFloat(haversineKm.toFixed(1)),
+    durationMin: Math.max(1, Math.ceil(haversineKm * 2.5)), // rough estimate: 2.5 min/km
+  };
 }
 
 function MapBoundsSetter({ points }: { points: [number, number][] }) {
@@ -90,8 +106,9 @@ export default function RubberMap({
   activeDestLng
 }: RubberMapProps) {
   const [isMounted, setIsMounted] = useState(false);
-  const [routeCoords, setRouteCoords] = useState<[number, number][] | null>(null);
-  const [routeInfo, setRouteInfo] = useState<{ distanceKm: number; durationMin: number } | null>(null);
+  const [routeData, setRouteData] = useState<{ coords: [number, number][]; distanceKm: number; durationMin: number } | null>(null);
+  const [bgRouteCoords, setBgRouteCoords] = useState<[number, number][] | null>(null);
+  const lastFetchKey = useRef("");
 
   useEffect(() => {
     setIsMounted(true);
@@ -101,54 +118,38 @@ export default function RubberMap({
   const userPos: [number, number] = [userLat || 13.7563, userLng || 100.5018];
   const rubberPos: [number, number] | null = (rubberLat && rubberLng) ? [rubberLat, rubberLng] : null;
 
-  // Determine start and end points for routing
-  const fromPos = rubberPos || storePos;
-  const toPos = (activeDestLat && activeDestLng) 
-    ? [activeDestLat, activeDestLng] as [number, number]
-    : (rubberPos ? userPos : userPos);
+  // Determine start and end for routing
+  const fromPos: [number, number] = rubberPos || storePos;
+  const toPos: [number, number] = (activeDestLat && activeDestLng) 
+    ? [activeDestLat, activeDestLng]
+    : userPos;
 
-  // Fetch OSRM route
+  // Fetch route — debounced by checking if key changed significantly (> 0.001° ≈ 110m)
   useEffect(() => {
     if (!isMounted) return;
+
+    const newKey = `${fromPos[0].toFixed(3)},${fromPos[1].toFixed(3)}-${toPos[0].toFixed(3)},${toPos[1].toFixed(3)}`;
+    if (newKey === lastFetchKey.current) return;
+    lastFetchKey.current = newKey;
+
     let cancelled = false;
 
-    // Also fetch distance/duration info
-    async function loadRoute() {
-      const coords = await fetchOSRMRoute(fromPos, toPos);
-      if (!cancelled) {
-        setRouteCoords(coords);
-      }
+    fetchOSRMRoute(fromPos, toPos).then(result => {
+      if (!cancelled) setRouteData(result);
+    });
 
-      // Get distance info
-      try {
-        const res = await fetch(
-          `https://router.project-osrm.org/route/v1/driving/${fromPos[1]},${fromPos[0]};${toPos[1]},${toPos[0]}?overview=false`,
-          { signal: AbortSignal.timeout(5000) }
-        );
-        const data = await res.json();
-        if (!cancelled && data.code === 'Ok' && data.routes?.[0]) {
-          setRouteInfo({
-            distanceKm: Math.round(data.routes[0].distance / 100) / 10,
-            durationMin: Math.ceil(data.routes[0].duration / 60),
-          });
-        }
-      } catch {}
-    }
-
-    loadRoute();
     return () => { cancelled = true; };
   }, [isMounted, fromPos[0], fromPos[1], toPos[0], toPos[1]]);
 
-  // Also fetch store-to-user route if no rubber position
-  const [bgRouteCoords, setBgRouteCoords] = useState<[number, number][] | null>(null);
+  // Background route: store ↔ customer (only when rubber is active)
   useEffect(() => {
     if (!isMounted || !rubberPos) return;
     let cancelled = false;
-    fetchOSRMRoute(storePos, userPos).then(coords => {
-      if (!cancelled) setBgRouteCoords(coords);
+    fetchOSRMRoute(storePos, userPos).then(result => {
+      if (!cancelled) setBgRouteCoords(result.coords);
     });
     return () => { cancelled = true; };
-  }, [isMounted, rubberPos, storePos[0], storePos[1], userPos[0], userPos[1]]);
+  }, [isMounted, !!rubberPos, storePos[0], storePos[1], userPos[0], userPos[1]]);
 
   if (!isMounted) return (
     <div className="h-full w-full bg-slate-100 animate-pulse flex flex-col items-center justify-center gap-3">
@@ -190,9 +191,9 @@ export default function RubberMap({
           />
         )}
 
-        {/* Main route: rubber → destination (solid, bold) */}
+        {/* Main route: rubber → destination (solid, bold road route) */}
         <Polyline 
-          positions={routeCoords || [fromPos, toPos]} 
+          positions={routeData?.coords || [fromPos, toPos]} 
           color={rubberPos ? "#3B82F6" : "#FF9F1C"} 
           weight={rubberPos ? 6 : 4} 
           opacity={0.85} 
@@ -202,16 +203,16 @@ export default function RubberMap({
         <MapBoundsSetter points={boundsPoints} />
       </MapContainer>
 
-      {/* Route info overlay */}
-      {routeInfo && (
+      {/* Route info overlay — only show when we have real data */}
+      {routeData && routeData.distanceKm > 0 && (
         <div className="absolute top-3 left-3 z-[1000] bg-white/95 backdrop-blur-md rounded-xl px-3.5 py-2 shadow-lg border border-slate-200/50">
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-1.5">
               <div className="w-2 h-2 rounded-full bg-blue-500" />
-              <span className="text-xs font-black text-slate-800">{routeInfo.distanceKm} กม.</span>
+              <span className="text-xs font-black text-slate-800">{routeData.distanceKm} กม.</span>
             </div>
             <div className="w-px h-4 bg-slate-200" />
-            <span className="text-xs font-bold text-slate-500">~{routeInfo.durationMin} นาที</span>
+            <span className="text-xs font-bold text-slate-500">~{routeData.durationMin} นาที</span>
           </div>
         </div>
       )}
