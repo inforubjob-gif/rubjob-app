@@ -18,7 +18,7 @@ export default function FinanceAdminPage() {
  const [payouts, setPayouts] = useState<any[]>([]);
  const [isLoading, setIsLoading] = useState(true);
 
- const handleExport = () => {
+ const handleExport = async () => {
   if (!transactions.length) {
    showToast(t('admin.finance.empty.revenue'), 'warning');
    return;
@@ -41,10 +41,24 @@ export default function FinanceAdminPage() {
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
   link.href = url;
-  link.setAttribute('download', `rubjob_finance_export_${new Date().toISOString().split('T')[0]}.csv`);
+  const filename = `rubjob_finance_export_${new Date().toISOString().split('T')[0]}.csv`;
+  link.setAttribute('download', filename);
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
+  
+  // 📒 Record audit log for finance export
+  try {
+   await fetch("/api/admin/audit", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+     action: "finance_export",
+     targetType: "finance",
+     details: `Exported ${transactions.length} transactions as CSV (${filename})`
+    })
+   });
+  } catch (e) { console.error("Audit log error:", e); }
   
   showToast(t('admin.common.toast.updated', { item: 'Report' }), 'success');
  };
