@@ -32,6 +32,37 @@ interface RubberMapProps {
   activeDestLng?: number;
 }
 
+// OSRM route fetcher with cache
+const routeCache = new Map<string, [number, number][]>();
+
+async function fetchOSRMRoute(
+  from: [number, number],
+  to: [number, number]
+): Promise<[number, number][]> {
+  const cacheKey = `${from[0].toFixed(4)},${from[1].toFixed(4)}-${to[0].toFixed(4)},${to[1].toFixed(4)}`;
+  if (routeCache.has(cacheKey)) return routeCache.get(cacheKey)!;
+
+  try {
+    const res = await fetch(
+      `https://router.project-osrm.org/route/v1/driving/${from[1]},${from[0]};${to[1]},${to[0]}?overview=full&geometries=geojson`,
+      { signal: AbortSignal.timeout(5000) }
+    );
+    const data = await res.json();
+    if (data.code === 'Ok' && data.routes?.[0]?.geometry?.coordinates) {
+      // GeoJSON uses [lng, lat] — Leaflet needs [lat, lng]
+      const coords: [number, number][] = data.routes[0].geometry.coordinates.map(
+        (c: [number, number]) => [c[1], c[0]] as [number, number]
+      );
+      routeCache.set(cacheKey, coords);
+      return coords;
+    }
+  } catch (err) {
+    console.warn('OSRM route fetch failed, using straight line:', err);
+  }
+  // Fallback: straight line
+  return [from, to];
+}
+
 function MapBoundsSetter({ points }: { points: [number, number][] }) {
   const map = useMap();
   
@@ -59,10 +90,65 @@ export default function RubberMap({
   activeDestLng
 }: RubberMapProps) {
   const [isMounted, setIsMounted] = useState(false);
+  const [routeCoords, setRouteCoords] = useState<[number, number][] | null>(null);
+  const [routeInfo, setRouteInfo] = useState<{ distanceKm: number; durationMin: number } | null>(null);
 
   useEffect(() => {
     setIsMounted(true);
   }, []);
+
+  const storePos: [number, number] = [storeLat || 13.7563, storeLng || 100.5018];
+  const userPos: [number, number] = [userLat || 13.7563, userLng || 100.5018];
+  const rubberPos: [number, number] | null = (rubberLat && rubberLng) ? [rubberLat, rubberLng] : null;
+
+  // Determine start and end points for routing
+  const fromPos = rubberPos || storePos;
+  const toPos = (activeDestLat && activeDestLng) 
+    ? [activeDestLat, activeDestLng] as [number, number]
+    : (rubberPos ? userPos : userPos);
+
+  // Fetch OSRM route
+  useEffect(() => {
+    if (!isMounted) return;
+    let cancelled = false;
+
+    // Also fetch distance/duration info
+    async function loadRoute() {
+      const coords = await fetchOSRMRoute(fromPos, toPos);
+      if (!cancelled) {
+        setRouteCoords(coords);
+      }
+
+      // Get distance info
+      try {
+        const res = await fetch(
+          `https://router.project-osrm.org/route/v1/driving/${fromPos[1]},${fromPos[0]};${toPos[1]},${toPos[0]}?overview=false`,
+          { signal: AbortSignal.timeout(5000) }
+        );
+        const data = await res.json();
+        if (!cancelled && data.code === 'Ok' && data.routes?.[0]) {
+          setRouteInfo({
+            distanceKm: Math.round(data.routes[0].distance / 100) / 10,
+            durationMin: Math.ceil(data.routes[0].duration / 60),
+          });
+        }
+      } catch {}
+    }
+
+    loadRoute();
+    return () => { cancelled = true; };
+  }, [isMounted, fromPos[0], fromPos[1], toPos[0], toPos[1]]);
+
+  // Also fetch store-to-user route if no rubber position
+  const [bgRouteCoords, setBgRouteCoords] = useState<[number, number][] | null>(null);
+  useEffect(() => {
+    if (!isMounted || !rubberPos) return;
+    let cancelled = false;
+    fetchOSRMRoute(storePos, userPos).then(coords => {
+      if (!cancelled) setBgRouteCoords(coords);
+    });
+    return () => { cancelled = true; };
+  }, [isMounted, rubberPos, storePos[0], storePos[1], userPos[0], userPos[1]]);
 
   if (!isMounted) return (
     <div className="h-full w-full bg-slate-100 animate-pulse flex flex-col items-center justify-center gap-3">
@@ -71,22 +157,9 @@ export default function RubberMap({
     </div>
   );
 
-  const storePos: [number, number] = [storeLat || 13.7563, storeLng || 100.5018];
-  const userPos: [number, number] = [userLat || 13.7563, userLng || 100.5018];
-  const rubberPos: [number, number] | null = (rubberLat && rubberLng) ? [rubberLat, rubberLng] : null;
-  
-  // Decide what route to show
-  let routePoints: [number, number][] = [storePos, userPos];
-  let boundsPoints: [number, number][] = [storePos, userPos];
-
-  if (rubberPos) {
-    const destPos: [number, number] = (activeDestLat && activeDestLng) 
-      ? [activeDestLat, activeDestLng] 
-      : userPos;
-    
-    routePoints = [rubberPos, destPos];
-    boundsPoints = [rubberPos, destPos];
-  }
+  const boundsPoints: [number, number][] = rubberPos 
+    ? [rubberPos, toPos]
+    : [storePos, userPos];
 
   return (
     <div className="h-full w-full z-0 relative">
@@ -106,16 +179,42 @@ export default function RubberMap({
         <Marker position={userPos} icon={userIcon} />
         {rubberPos && <Marker position={rubberPos} icon={rubberIcon} />}
         
+        {/* Background route: store ↔ customer (dashed, light) */}
+        {rubberPos && bgRouteCoords && (
+          <Polyline 
+            positions={bgRouteCoords} 
+            color="#FF9F1C" 
+            weight={3} 
+            opacity={0.3} 
+            dashArray="8, 8"
+          />
+        )}
+
+        {/* Main route: rubber → destination (solid, bold) */}
         <Polyline 
-          positions={routePoints} 
+          positions={routeCoords || [fromPos, toPos]} 
           color={rubberPos ? "#3B82F6" : "#FF9F1C"} 
           weight={rubberPos ? 6 : 4} 
-          opacity={0.8} 
+          opacity={0.85} 
           dashArray={rubberPos ? "" : "10, 10"}
         />
         
         <MapBoundsSetter points={boundsPoints} />
       </MapContainer>
+
+      {/* Route info overlay */}
+      {routeInfo && (
+        <div className="absolute top-3 left-3 z-[1000] bg-white/95 backdrop-blur-md rounded-xl px-3.5 py-2 shadow-lg border border-slate-200/50">
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-1.5">
+              <div className="w-2 h-2 rounded-full bg-blue-500" />
+              <span className="text-xs font-black text-slate-800">{routeInfo.distanceKm} กม.</span>
+            </div>
+            <div className="w-px h-4 bg-slate-200" />
+            <span className="text-xs font-bold text-slate-500">~{routeInfo.durationMin} นาที</span>
+          </div>
+        </div>
+      )}
 
       {/* Subtle Overlay to match UI style */}
       <div className="absolute inset-0 pointer-events-none ring-inset ring-1 ring-slate-900/5 shadow-inner" />

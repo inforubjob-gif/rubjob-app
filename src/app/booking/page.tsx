@@ -14,6 +14,7 @@ import { loadStripe, Stripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
 import PromptPayCheckout from "@/components/checkout/PromptPayCheckout";
 
+// Haversine (straight-line) — used as instant fallback while OSRM loads
 function getDistanceKm(lat1: number, lon1: number, lat2: number, lon2: number) {
   const R = 6371; 
   const dLat = (lat2 - lat1) * (Math.PI / 180);
@@ -24,6 +25,35 @@ function getDistanceKm(lat1: number, lon1: number, lat2: number, lon2: number) {
     Math.sin(dLon / 2) * Math.sin(dLon / 2);
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   return R * c; 
+}
+
+// OSRM road distance — returns actual driving distance in km
+const osrmCache = new Map<string, { distanceKm: number; durationMin: number }>();
+
+async function getRoadDistance(
+  lat1: number, lon1: number, lat2: number, lon2: number
+): Promise<{ distanceKm: number; durationMin: number } | null> {
+  const cacheKey = `${lat1.toFixed(5)},${lon1.toFixed(5)}-${lat2.toFixed(5)},${lon2.toFixed(5)}`;
+  if (osrmCache.has(cacheKey)) return osrmCache.get(cacheKey)!;
+
+  try {
+    const res = await fetch(
+      `https://router.project-osrm.org/route/v1/driving/${lon1},${lat1};${lon2},${lat2}?overview=false`,
+      { signal: AbortSignal.timeout(5000) }
+    );
+    const data = await res.json();
+    if (data.code === 'Ok' && data.routes?.[0]) {
+      const result = {
+        distanceKm: data.routes[0].distance / 1000,
+        durationMin: Math.ceil(data.routes[0].duration / 60),
+      };
+      osrmCache.set(cacheKey, result);
+      return result;
+    }
+  } catch (err) {
+    console.warn('OSRM fallback to Haversine:', err);
+  }
+  return null;
 }
 import { useTranslation } from "@/components/providers/LanguageProvider";
 import { useLiff } from "@/components/providers/LiffProvider";
@@ -331,9 +361,38 @@ function BookingFlow() {
     }
   }, [pickupDate, pickupSlot, isSlotPassed]);
 
-  const distanceKm = selectedStore && selectedAddress?.lat && selectedAddress?.lng 
+  // Road distance state (OSRM)
+  const [roadDistance, setRoadDistance] = useState<{ distanceKm: number; durationMin: number } | null>(null);
+  const [isLoadingDistance, setIsLoadingDistance] = useState(false);
+
+  // Haversine as immediate estimate
+  const haversineKm = selectedStore && selectedAddress?.lat && selectedAddress?.lng 
     ? getDistanceKm(selectedAddress.lat, selectedAddress.lng, selectedStore.lat, selectedStore.lng)
-    : 5.1; 
+    : 5.1;
+
+  // Fetch real road distance when address/store changes
+  useEffect(() => {
+    if (!selectedStore || !selectedAddress?.lat || !selectedAddress?.lng) {
+      setRoadDistance(null);
+      return;
+    }
+    let cancelled = false;
+    setIsLoadingDistance(true);
+    getRoadDistance(
+      selectedAddress.lat, selectedAddress.lng,
+      selectedStore.lat, selectedStore.lng
+    ).then(result => {
+      if (!cancelled) {
+        setRoadDistance(result);
+        setIsLoadingDistance(false);
+      }
+    });
+    return () => { cancelled = true; };
+  }, [selectedStore?.id, selectedAddress?.lat, selectedAddress?.lng]);
+
+  // Use road distance if available, fallback to Haversine
+  const distanceKm = roadDistance?.distanceKm ?? haversineKm;
+  const estimatedMinutes = roadDistance?.durationMin ?? null;
   
   // Round Trip Delivery Fare = 50 base + (roundTripKm > 3 ? (roundTripKm - 3) * 10 : 0)
   const roundTripKm = distanceKm * 2;
@@ -1122,7 +1181,11 @@ function BookingFlow() {
                     value={deliverySpeed === "express" ? t("booking.speed.expressShort") : t("booking.speed.standardShort")}
                   />
                   {selectedStore && (
-                    <Row icon={<Icons.Home size={12} />} label={t("common.store")} value={`${selectedStore.name} (${distanceKm.toFixed(1)} ${t("booking.km")})`} />
+                    <Row icon={<Icons.Home size={12} />} label={t("common.store")} value={
+                      isLoadingDistance 
+                        ? `${selectedStore.name} (~${haversineKm.toFixed(1)} ${t("booking.km")}...)` 
+                        : `${selectedStore.name} (${distanceKm.toFixed(1)} ${t("booking.km")}${estimatedMinutes ? ` ~${estimatedMinutes} นาที` : ''})`
+                    } />
                   )}
                   <Row icon={<Icons.FileText size={11} />} label={t("booking.confirm.bagSize")} value={`${formatKg(bagSize)} ${bagSizeExtra > 0 ? `(+฿${bagSizeExtra})` : ""}`} />
                   <Row icon={<Icons.Tasks size={11} />} label={t("booking.confirm.extraService")} value={withFolding ? t("booking.options.withFoldingShort") : t("booking.options.noFoldingShort")} />
