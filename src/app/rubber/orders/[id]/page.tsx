@@ -348,7 +348,7 @@ export default function RubberOrderDetailPage() {
                 <div>
                    <p className="text-[10px] font-black text-white/60 uppercase tracking-widest mb-1">{t("rubber.earnAmountLabel")}</p>
                    <h2 className="text-4xl font-black italic">
-                     ฿{((['picking_up', 'delivering_to_store'].includes(status) ? (order?.rubberPickupEarn || 0) : (order?.rubberDeliveryEarn || (order?.rubberEarn || 0) * 0.5)) || 0).toFixed(0)}
+                     ฿{((['picking_up', 'delivering_to_store'].includes(status) ? (order?.rubberPickupEarn || 0) : (order?.rubberDeliveryEarn || (order?.rubberEarn || 0) * 0.5)) || 0).toFixed(2)}
                    </h2>
                 </div>
                 <div className="w-14 h-14 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center border border-white/30">

@@ -163,7 +163,7 @@ export async function broadcastToEligibleRubbers(
         userType: "rubber",
         type: "order_update",
         title: "💸 มีงานใหม่เข้า!",
-        message: `งาน #${orderId.slice(-6)} — รายได้ ฿${legEarn.toFixed(0)} กดรับงานด่วน!`,
+        message: `งาน #${orderId.slice(-6)} — รายได้ ฿${legEarn.toFixed(2)} กดรับงานด่วน!`,
         link: "/rubber"
       });
       console.log(`  ✅ [DISPATCH] In-app notification → rubber ${r.id}`);
@@ -191,7 +191,7 @@ export async function broadcastToEligibleRubbers(
         
         const pushPayload = JSON.stringify({
           title: "💸 งานใหม่เข้า!",
-          body: `งาน #${orderId.slice(-6)} — รายได้ ฿${legEarn.toFixed(0)} กดรับงานด่วน!`,
+          body: `งาน #${orderId.slice(-6)} — รายได้ ฿${legEarn.toFixed(2)} กดรับงานด่วน!`,
           url: "/rubber"
         });
 

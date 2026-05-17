@@ -694,7 +694,7 @@ export default function RubberDashboard() {
                      </div>
                   </div>
                   <div className="text-right">
-                     <p className="text-xl font-black text-slate-900 leading-none">฿{selectedJob.rubberEarn}</p>
+                     <p className="text-xl font-black text-slate-900 leading-none">฿{Number(selectedJob.rubberEarn || 0).toFixed(2)}</p>
                      <p className="text-xs text-slate-400 font-bold uppercase mt-1">{t("rubber.earnAmountLabel")}</p>
                    </div>
                </div>
@@ -841,7 +841,7 @@ function AvailableDeliveries({ t, router, jobs, onAccept, onViewDetails }: { t: 
                 </h3>
                  <div className="flex items-center gap-3 text-[11px] text-slate-500 font-medium">
                    <span className="flex items-center gap-1"><Icons.MapPin size={12} className="text-primary" /> {Number(job.distanceKm || 0.5).toFixed(1)} {t("rubber.nearby")}</span>
-                   <span className="flex items-center gap-1"><Icons.ArrowRight size={12} className="text-primary" /> {t("rubber.earnAmount")} ฿{job.rubberEarn}</span>
+                   <span className="flex items-center gap-1"><Icons.ArrowRight size={12} className="text-primary" /> {t("rubber.earnAmount")} ฿{Number(job.rubberEarn || 0).toFixed(2)}</span>
                  </div>
               </div>
             </div>
