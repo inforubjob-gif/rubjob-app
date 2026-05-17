@@ -108,6 +108,14 @@ export async function PATCH(
       }
     }
 
+    // 📒 Audit Log
+    try {
+      const { nanoid } = await import("nanoid");
+      const changes = Object.keys(body).filter(k => body[k] !== undefined).join(', ');
+      await db.prepare(`INSERT INTO audit_logs (id, adminId, adminName, action, targetType, targetId, details) VALUES (?, ?, ?, ?, 'order', ?, ?)`)
+        .bind(`AUD-${nanoid(8)}`, (session as any).id || 'unknown', (session as any).name || 'Admin', `order_update`, id, `Changed: ${changes}`).run();
+    } catch (e) { console.error("Audit log error:", e); }
+
     return NextResponse.json({ success: true });
   } catch (err: unknown) {
     console.error("Admin order update error:", err);

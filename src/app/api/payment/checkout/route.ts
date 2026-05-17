@@ -89,7 +89,14 @@ export async function POST(req: Request) {
       WHERE id = ?
     `).bind(orderId).run();
 
-    // 3. Return the clientSecret for the frontend to render the QR code
+    // 📒 Log payment attempt
+    try {
+      const { nanoid } = await import("nanoid");
+      await db.prepare(`INSERT INTO payment_logs (id, orderId, gateway, chargeId, amount, status, webhookEvent) VALUES (?, ?, 'stripe', ?, ?, 'pending', 'intent_created')`)
+        .bind(`PAY-${nanoid(8)}`, orderId, paymentIntent.id, amount).run();
+    } catch (e) { console.error("Payment log error:", e); }
+
+    // 4. Return the clientSecret for the frontend to render the QR code
     return NextResponse.json({
       success: true,
       clientSecret: paymentIntent.client_secret,

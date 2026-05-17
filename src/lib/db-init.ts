@@ -320,6 +320,50 @@ export async function ensureSchema(db: D1Database) {
       auth TEXT NOT NULL,
       createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
     );
+
+    CREATE TABLE IF NOT EXISTS wallet_transactions (
+      id TEXT PRIMARY KEY,
+      userId TEXT NOT NULL,
+      userType TEXT NOT NULL DEFAULT 'rubber',
+      type TEXT NOT NULL,
+      amount REAL NOT NULL DEFAULT 0,
+      referenceId TEXT,
+      description TEXT,
+      createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+
+    CREATE TABLE IF NOT EXISTS payment_logs (
+      id TEXT PRIMARY KEY,
+      orderId TEXT NOT NULL,
+      gateway TEXT NOT NULL DEFAULT 'stripe',
+      chargeId TEXT,
+      amount REAL NOT NULL DEFAULT 0,
+      status TEXT NOT NULL DEFAULT 'pending',
+      webhookEvent TEXT,
+      rawResponse TEXT,
+      createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+
+    CREATE TABLE IF NOT EXISTS user_coupons_history (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      userId TEXT NOT NULL,
+      couponId TEXT NOT NULL,
+      couponCode TEXT NOT NULL,
+      orderId TEXT,
+      discount REAL NOT NULL DEFAULT 0,
+      createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+
+    CREATE TABLE IF NOT EXISTS audit_logs (
+      id TEXT PRIMARY KEY,
+      adminId TEXT NOT NULL,
+      adminName TEXT,
+      action TEXT NOT NULL,
+      targetType TEXT,
+      targetId TEXT,
+      details TEXT,
+      createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
   `;
 
   // Execute standard tables

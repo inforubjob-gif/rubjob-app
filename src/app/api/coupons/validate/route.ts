@@ -13,7 +13,7 @@ export const runtime = "edge";
  */
 export async function POST(req: Request) {
   try {
-    const { code, subtotal, userRole } = await req.json() as any;
+    const { code, subtotal, userRole, userId } = await req.json() as any;
     const role = userRole || 'customer';
     
     if (!code || subtotal === undefined) {
@@ -62,6 +62,16 @@ export async function POST(req: Request) {
     // 3. Check Usage Limit
     if (coupon.usageLimit !== null && coupon.usedCount >= coupon.usageLimit) {
       return NextResponse.json({ error: "Coupon usage limit reached" }, { status: 400 });
+    }
+
+    // 3.5 Check per-user duplicate usage
+    if (userId) {
+      try {
+        const used = await db.prepare(`SELECT COUNT(*) as cnt FROM user_coupons_history WHERE userId = ? AND couponCode = ?`).bind(userId, code.toUpperCase()).first() as any;
+        if (used && used.cnt > 0) {
+          return NextResponse.json({ error: "คุณใช้คูปองนี้ไปแล้ว" }, { status: 400 });
+        }
+      } catch (e) { /* table may not exist yet, skip */ }
     }
 
     // 4. Check Minimum Order

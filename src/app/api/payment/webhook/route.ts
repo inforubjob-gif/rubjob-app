@@ -75,6 +75,13 @@ export async function POST(req: Request) {
 
           console.log(`✅ Order ${orderId} marked as PAID via Stripe Webhook`);
 
+          // 📒 Log successful payment
+          try {
+            const { nanoid } = await import("nanoid");
+            await db.prepare(`INSERT INTO payment_logs (id, orderId, gateway, chargeId, amount, status, webhookEvent, rawResponse) VALUES (?, ?, 'stripe', ?, ?, 'success', 'payment_intent.succeeded', ?)`)
+              .bind(`PAY-${nanoid(8)}`, orderId, paymentIntent.id, (paymentIntent.amount || 0) / 100, JSON.stringify({ id: paymentIntent.id, status: paymentIntent.status })).run();
+          } catch (e) { console.error("Payment log error:", e); }
+
           // Broadcast to Online Rubbers via LINE (Geo-Filtered)
           try {
             const orderData = await db.prepare(`

@@ -156,6 +156,15 @@ export async function transitionOrderStatus(
         // 💰 Earnings Notification for Pickup Driver (Leg 1)
         if (order.pickupDriverId) {
           await notifyRubberEarning(order.pickupDriverId, "รับผ้า");
+          // 📒 Record wallet ledger entry
+          try {
+            const deliveryFee = order.deliveryFee || 0;
+            const totalPayout = deliveryFee - (deliveryFee * 0.10) - 10;
+            const legEarn = totalPayout * 0.5;
+            const { nanoid } = await import("nanoid");
+            await db.prepare(`INSERT INTO wallet_transactions (id, userId, userType, type, amount, referenceId, description) VALUES (?, ?, 'rubber', 'credit', ?, ?, ?)`)
+              .bind(`WTX-${nanoid(8)}`, order.pickupDriverId, legEarn, orderId, `Pickup Leg #${orderId.slice(-6)}`).run();
+          } catch (e) { console.error("Wallet ledger (pickup) error:", e); }
         }
         break;
       case "ready_for_pickup":
@@ -183,6 +192,15 @@ export async function transitionOrderStatus(
         // 💰 Earnings Notification for Delivery Driver (Leg 2)
         if (order.deliveryDriverId) {
           await notifyRubberEarning(order.deliveryDriverId, "ส่งผ้าคืน");
+          // 📒 Record wallet ledger entry
+          try {
+            const deliveryFee = order.deliveryFee || 0;
+            const totalPayout = deliveryFee - (deliveryFee * 0.10) - 10;
+            const legEarn = totalPayout * 0.5;
+            const { nanoid } = await import("nanoid");
+            await db.prepare(`INSERT INTO wallet_transactions (id, userId, userType, type, amount, referenceId, description) VALUES (?, ?, 'rubber', 'credit', ?, ?, ?)`)
+              .bind(`WTX-${nanoid(8)}`, order.deliveryDriverId, legEarn, orderId, `Delivery Leg #${orderId.slice(-6)}`).run();
+          } catch (e) { console.error("Wallet ledger (delivery) error:", e); }
         }
         break;
       default:

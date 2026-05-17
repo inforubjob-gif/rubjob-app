@@ -159,6 +159,12 @@ export async function POST(req: Request) {
       VALUES (?, ?, 'rubber', ?, ?, ?, ?, 'pending')
     `).bind(id, rubberId, amount, bankName || "N/A", accountNumber || "N/A", accountName || "N/A").run();
 
+    // 📒 Record debit in wallet ledger
+    try {
+      await db.prepare(`INSERT INTO wallet_transactions (id, userId, userType, type, amount, referenceId, description) VALUES (?, ?, 'rubber', 'debit', ?, ?, ?)`)
+        .bind(`WTX-WDR-${id}`, rubberId, -amount, id, `Withdrawal ${id}`).run();
+    } catch (e) { console.error("Wallet ledger (withdrawal) error:", e); }
+
     // Create withdrawal notification
     try {
       await createNotification(db, {
