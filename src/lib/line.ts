@@ -280,7 +280,7 @@ export const deliveringToCustomerFlex = (orderId: string): LineFlexMessage =>
  */
 export const rubberNewJobFlex = (orderId: string, type: string, earn: number): LineFlexMessage => ({
   type: "flex",
-  altText: `💸 มีงานใหม่เข้า! รายได้ ฿${earn.toFixed(0)}`,
+  altText: `💸 มีงานใหม่เข้า! รายได้ ฿${earn.toFixed(2)}`,
   contents: {
     type: "bubble",
     hero: {
@@ -350,7 +350,7 @@ export const rubberNewJobFlex = (orderId: string, type: string, earn: number): L
             },
             {
               type: "text",
-              text: `฿${earn.toFixed(0)}`,
+              text: `฿${earn.toFixed(2)}`,
               color: "#f59e0b",
               size: "lg",
               weight: "bold",
@@ -452,7 +452,7 @@ export const orderCompletedFlex = (orderId: string): LineFlexMessage => ({
  */
 export const rubberEarningFlex = (orderId: string, role: string, earn: number): LineFlexMessage => ({
   type: "flex",
-  altText: `💰 รายได้เข้าแล้ว! ฿${earn.toFixed(0)}`,
+  altText: `💰 รายได้เข้าแล้ว! ฿${earn.toFixed(2)}`,
   contents: {
     type: "bubble",
     hero: {
@@ -522,7 +522,7 @@ export const rubberEarningFlex = (orderId: string, role: string, earn: number): 
             },
             {
               type: "text",
-              text: `฿${earn.toFixed(0)}`,
+              text: `฿${earn.toFixed(2)}`,
               color: "#f59e0b",
               size: "lg",
               weight: "bold",
