@@ -49,6 +49,7 @@ export default function RubberDashboard() {
   const [todayEarnings, setTodayEarnings] = useState(0);
   const [todayTaskCount, setTodayTaskCount] = useState(0);
   const [unreadNotifCount, setUnreadNotifCount] = useState(0);
+  const [weather, setWeather] = useState<any>(null);
 
   const [verificationStatus, setVerificationStatus] = useState<"active" | "pending" | "unregistered" | "rejected">("pending");
 
@@ -72,6 +73,14 @@ export default function RubberDashboard() {
       router.push("/rubber/login");
     }
   }, [router]);
+
+  // Fetch weather data
+  useEffect(() => {
+    fetch("/api/weather")
+      .then(r => r.json())
+      .then(d => { if (d.current) setWeather(d.current); })
+      .catch(() => {});
+  }, []);
 
   // Poll notification count every 30 seconds
   useEffect(() => {
@@ -425,6 +434,20 @@ export default function RubberDashboard() {
             </p>
           </div>
         </div>
+
+        {/* Weather Widget */}
+        {weather && (
+          <div className={`header-element-collapse ${isCollapsed ? "header-element-hidden" : ""}`}>
+            <div className={`flex items-center gap-3 px-4 py-3 rounded-xl border backdrop-blur-md ${weather.isRainy ? 'bg-blue-50/80 border-blue-200' : 'bg-amber-50/80 border-amber-200'}`}>
+              <span className="text-2xl">{weather.icon}</span>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-black text-slate-700 truncate">{weather.temp}°C — {weather.desc}</p>
+                <p className={`text-[10px] font-bold ${weather.isRainy ? 'text-blue-500' : 'text-amber-600'}`}>{weather.tip}</p>
+              </div>
+              <span className="text-lg font-black text-slate-600 shrink-0">{weather.temp}°</span>
+            </div>
+          </div>
+        )}
 
         {/* Dashboard Mascot Accent moved here or handled via background */}
       </header>

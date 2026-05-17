@@ -2,6 +2,7 @@ import { safeError } from "@/lib/api-utils";
 import { getRequestContext } from "@cloudflare/next-on-pages";
 import { NextResponse } from "next/server";
 import { getAdminSession } from "@/lib/auth-server";
+import { reverseGeocode } from "@/lib/longdo-map";
 
 export const runtime = "edge";
 
@@ -203,31 +204,16 @@ export async function GET(req: Request) {
         .slice(0, 5)
         .map(([name, count]) => ({ name, count }));
       
-      // Reverse geocode top locations for real area names (using Nominatim)
+      // Reverse geocode top locations using Longdo Map (or Nominatim fallback)
       try {
+        const longdoKey = (env as any).LONGDO_MAP_KEY || "";
         const geocodePromises = (financialBatch[7].results || []).slice(0, 5).map(async (loc: any) => {
           try {
             const addr = typeof loc.address === 'string' ? JSON.parse(loc.address) : loc.address;
             if (!addr?.lat || !addr?.lng) return null;
             
-            const res = await fetch(
-              `https://nominatim.openstreetmap.org/reverse?lat=${addr.lat}&lon=${addr.lng}&format=json&zoom=14&accept-language=th`,
-              { signal: AbortSignal.timeout(3000) }
-            );
-            const geo = await res.json();
-            const parts = [
-              geo.address?.suburb,
-              geo.address?.subdistrict, 
-              geo.address?.city_district,
-              geo.address?.city,
-              geo.address?.town,
-              geo.address?.county,
-            ].filter(Boolean);
-            
-            return parts.length > 0 ? { 
-              name: parts.slice(0, 2).join(', '), 
-              count: loc.count 
-            } : null;
+            const geo = await reverseGeocode(addr.lat, addr.lng, longdoKey);
+            return geo ? { name: geo.areaName, count: loc.count } : null;
           } catch { return null; }
         });
         
