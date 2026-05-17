@@ -255,6 +255,43 @@ function SettingsContent() {
 
  const getSetting = (key: string) => localSettings[key] || "";
 
+ // Data Reset (Danger Zone)
+ const [isResetting, setIsResetting] = useState(false);
+ const [resetResult, setResetResult] = useState("");
+
+ async function handleReset(target: "orders" | "payouts" | "all") {
+   const confirmMap: Record<string, string> = {
+     orders: "ลบออเดอร์ทั้งหมด",
+     payouts: "ลบคำขอถอนเงินทั้งหมด",
+     all: "ลบข้อมูลทดสอบทั้งหมด (ออเดอร์ + ถอนเงิน + logs)",
+   };
+   if (!confirm(`⚠️ ยืนยัน: ${confirmMap[target]}?\n\nข้อมูลจะถูกลบถาวร ไม่สามารถกู้คืนได้!`)) return;
+   
+   setIsResetting(true);
+   setResetResult("");
+   try {
+     const res = await fetch("/api/admin/reset", {
+       method: "POST",
+       headers: { "Content-Type": "application/json" },
+       body: JSON.stringify({ target }),
+     });
+     const data = await res.json() as any;
+     if (res.ok) {
+       setResetResult(`✅ ${data.message}`);
+       setSuccess(data.message);
+       setTimeout(() => { setSuccess(""); setResetResult(""); }, 5000);
+     } else {
+       setResetResult(`❌ ${data.error}`);
+       setError(data.error);
+     }
+   } catch (err) {
+     setResetResult("❌ เกิดข้อผิดพลาด");
+     setError(t("common.error"));
+   } finally {
+     setIsResetting(false);
+   }
+ }
+
  return (
   <div className="space-y-8 max-w-5xl pb-40">
    <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -906,6 +943,54 @@ function SettingsContent() {
            </div>
          </div>
         </div>
+      </Card>
+
+      {/* ═══════════ DANGER ZONE ═══════════ */}
+      <Card className="p-8 bg-white border-2 border-rose-100 shadow-sm rounded-xl relative overflow-hidden">
+        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-rose-400 via-red-500 to-rose-400" />
+        <div className="flex items-center gap-4 mb-6 relative z-10">
+          <div className="w-12 h-12 rounded-xl bg-rose-50 text-rose-500 flex items-center justify-center">
+            <Icons.Trash size={24} />
+          </div>
+          <div>
+            <h2 className="text-lg font-black text-rose-600 tracking-tight">Danger Zone</h2>
+            <p className="text-[10px] font-black uppercase tracking-widest text-rose-300">ล้างข้อมูลทดสอบ — ไม่สามารถกู้คืนได้</p>
+          </div>
+        </div>
+        <div className="space-y-3 relative z-10">
+          <div className="flex items-center justify-between p-4 bg-rose-50/50 rounded-xl border border-rose-100">
+            <div>
+              <p className="text-sm font-black text-slate-800">ลบออเดอร์ทั้งหมด</p>
+              <p className="text-[10px] font-bold text-slate-400">ลบออเดอร์ทดสอบ สถานะงาน และรูปถ่ายที่เกี่ยวข้อง</p>
+            </div>
+            <button disabled={isResetting} onClick={() => handleReset("orders")} className="px-5 py-2.5 bg-white text-rose-500 border-2 border-rose-200 rounded-xl text-xs font-black uppercase tracking-wider hover:bg-rose-500 hover:text-white hover:border-rose-500 transition-all active:scale-95 disabled:opacity-50 whitespace-nowrap ml-4">
+              {isResetting ? "กำลังลบ..." : "ลบออเดอร์"}
+            </button>
+          </div>
+          <div className="flex items-center justify-between p-4 bg-rose-50/50 rounded-xl border border-rose-100">
+            <div>
+              <p className="text-sm font-black text-slate-800">ลบคำขอถอนเงิน</p>
+              <p className="text-[10px] font-bold text-slate-400">ลบรายการถอนเงินทดสอบทั้งหมด</p>
+            </div>
+            <button disabled={isResetting} onClick={() => handleReset("payouts")} className="px-5 py-2.5 bg-white text-rose-500 border-2 border-rose-200 rounded-xl text-xs font-black uppercase tracking-wider hover:bg-rose-500 hover:text-white hover:border-rose-500 transition-all active:scale-95 disabled:opacity-50 whitespace-nowrap ml-4">
+              {isResetting ? "กำลังลบ..." : "ลบถอนเงิน"}
+            </button>
+          </div>
+          <div className="flex items-center justify-between p-4 bg-rose-100/50 rounded-xl border-2 border-rose-200">
+            <div>
+              <p className="text-sm font-black text-rose-700">🔥 ล้างข้อมูลทดสอบทั้งหมด</p>
+              <p className="text-[10px] font-bold text-rose-400">ลบออเดอร์ + คำขอถอนเงิน + webhook logs</p>
+            </div>
+            <button disabled={isResetting} onClick={() => handleReset("all")} className="px-5 py-2.5 bg-rose-500 text-white border-2 border-rose-500 rounded-xl text-xs font-black uppercase tracking-wider hover:bg-rose-600 hover:border-rose-600 transition-all active:scale-95 shadow-lg shadow-rose-500/20 disabled:opacity-50 whitespace-nowrap ml-4">
+              {isResetting ? "กำลังลบ..." : "ล้างทั้งหมด"}
+            </button>
+          </div>
+        </div>
+        {resetResult && (
+          <div className={`mt-4 p-3 rounded-xl text-sm font-bold text-center ${resetResult.startsWith('✅') ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-rose-50 text-rose-600 border border-rose-100'}`}>
+            {resetResult}
+          </div>
+        )}
       </Card>
      </div>
     </div>
