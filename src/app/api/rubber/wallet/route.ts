@@ -24,7 +24,7 @@ export async function GET(req: Request) {
 
     // 1. Calculate Earnings (completed orders or orders that reached the handover point)
     const ordersRes = await db.prepare(`
-      SELECT id, deliveryFee, createdAt, status,
+      SELECT id, deliveryFee, createdAt, updatedAt, status,
              pickupDriverId, deliveryDriverId
       FROM orders 
       WHERE (pickupDriverId = ? OR deliveryDriverId = ?)
@@ -32,6 +32,8 @@ export async function GET(req: Request) {
 
     let totalEarnings = 0;
     let todayEarnings = 0;
+    let todayTaskCount = 0;
+    const todayTaskIds = new Set<string>();
     const history: any[] = [];
     
     // Thailand timezone start of day
@@ -50,9 +52,11 @@ export async function GET(req: Request) {
       if (o.pickupDriverId === rubberId && pickupCompletedStatuses.includes(o.status)) {
         totalEarnings += legEarn;
         
-        // Check if earned today
-        if (new Date(o.createdAt).getTime() >= todayStartUTC) {
+        // Check if earned today — use updatedAt (when the leg was completed)
+        const earnDate = o.updatedAt || o.createdAt;
+        if (new Date(earnDate).getTime() >= todayStartUTC) {
           todayEarnings += legEarn;
+          todayTaskIds.add(o.id);
         }
 
         history.push({
@@ -68,9 +72,11 @@ export async function GET(req: Request) {
       if (o.deliveryDriverId === rubberId && o.status === 'completed') {
         totalEarnings += legEarn;
 
-        // Check if earned today
-        if (new Date(o.createdAt).getTime() >= todayStartUTC) {
+        // Check if earned today — use updatedAt
+        const earnDate = o.updatedAt || o.createdAt;
+        if (new Date(earnDate).getTime() >= todayStartUTC) {
           todayEarnings += legEarn;
+          todayTaskIds.add(o.id);
         }
 
         history.push({
@@ -81,7 +87,18 @@ export async function GET(req: Request) {
           status: "Success"
         });
       }
+
+      // Also count orders that are currently active today (not yet in completed statuses)
+      const activeStatuses = ['picking_up', 'delivering_to_store', 'at_shop', 'washing', 'ready_for_pickup', 'delivering_to_customer'];
+      if (activeStatuses.includes(o.status)) {
+        const activeDate = o.updatedAt || o.createdAt;
+        if (new Date(activeDate).getTime() >= todayStartUTC) {
+          todayTaskIds.add(o.id);
+        }
+      }
     });
+
+    todayTaskCount = todayTaskIds.size;
 
     // 3. Calculate Withdrawals
     const withdrawalsRes = await db.prepare(`
@@ -114,6 +131,7 @@ export async function GET(req: Request) {
     return NextResponse.json({ 
       balance: Math.max(0, balance),
       todayEarnings: Math.max(0, todayEarnings),
+      todayTaskCount,
       transactions: transactions.slice(0, 20)
     });
 

@@ -47,6 +47,7 @@ export default function RubberDashboard() {
   const [activeJobs, setActiveJobs] = useState<any[]>([]);
   const [balance, setBalance] = useState(0);
   const [todayEarnings, setTodayEarnings] = useState(0);
+  const [todayTaskCount, setTodayTaskCount] = useState(0);
   const [unreadNotifCount, setUnreadNotifCount] = useState(0);
 
   const [verificationStatus, setVerificationStatus] = useState<"active" | "pending" | "unregistered" | "rejected">("pending");
@@ -173,6 +174,7 @@ export default function RubberDashboard() {
       const walData = await walRes.json() as any;
       if (walData.balance !== undefined) setBalance(walData.balance);
       if (walData.todayEarnings !== undefined) setTodayEarnings(walData.todayEarnings);
+      if (walData.todayTaskCount !== undefined) setTodayTaskCount(walData.todayTaskCount);
     } catch (err) {
       console.error("Failed to fetch rubber dashboard data:", err);
     } finally {
@@ -414,7 +416,7 @@ export default function RubberDashboard() {
         <div className={`grid grid-cols-2 gap-4 text-center header-element-collapse ${isCollapsed ? "header-element-hidden" : ""}`}>
           <div className="bg-white/80 backdrop-blur-md p-4 rounded-xl border border-white shadow-sm">
             <p className="text-xs font-black text-slate-500 uppercase">{t("rubber.tasksToday")}</p>
-            <p className="text-2xl font-black mt-1 text-slate-800">{activeJobs.length}</p>
+            <p className="text-2xl font-black mt-1 text-slate-800">{todayTaskCount}</p>
           </div>
           <div className="bg-white/80 backdrop-blur-md p-4 rounded-xl border border-white shadow-sm">
             <p className="text-xs font-black text-slate-500 uppercase">รายได้วันนี้</p>
