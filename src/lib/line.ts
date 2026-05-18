@@ -285,7 +285,7 @@ export const rubberNewJobFlex = (orderId: string, type: string, earn: number): L
     type: "bubble",
     hero: {
       type: "image",
-      url: "https://app.rubjob-all.com/images/mascot-riding.png",
+      url: "https://app.rubjob-all.com/images/mascot-riding-v2.png",
       size: "full",
       aspectRatio: "20:13",
       aspectMode: "fit",
