@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslation } from "@/components/providers/LanguageProvider";
 import { Icons } from "@/components/ui/Icons";
@@ -75,7 +75,35 @@ export default function RubberForm({ initialData, isEdit }: RubberFormProps) {
   const { t } = useTranslation();
   const { showToast } = useToast();
   const [isSaving, setIsSaving] = useState(false);
-  
+
+  // Open regions from admin settings
+  const [openRegions, setOpenRegions] = useState<{ province: string; areas: string[] }[]>([]);
+  useEffect(() => {
+    fetch("/api/admin/settings")
+      .then(r => r.json())
+      .then((data: any) => {
+        try {
+          const settings: any[] = data.settings || [];
+          const regionSetting = settings.find((s: any) => s.key === "open_regions");
+          if (regionSetting?.value) {
+            setOpenRegions(JSON.parse(regionSetting.value) || []);
+          }
+        } catch { /* ignore */ }
+      })
+      .catch(() => {});
+  }, []);
+
+  // Parse existing serviceArea from rubber preferences
+  const existingPrefs = (() => { try { return JSON.parse(initialData?.preferences || "{}"); } catch { return {}; } })();
+  const [serviceProvince, setServiceProvince] = useState<string>(existingPrefs?.serviceArea?.province || "");
+  const [serviceAreas, setServiceAreas] = useState<string[]>(existingPrefs?.serviceArea?.areas || []);
+
+  // Available areas for selected province
+  const availableAreas = openRegions.find(r => r.province === serviceProvince)?.areas || [];
+
+  function toggleArea(area: string) {
+    setServiceAreas(prev => prev.includes(area) ? prev.filter(a => a !== area) : [...prev, area]);
+  }
   const parsed = parseAddress(initialData?.address || "");
 
   const [formData, setFormData] = useState({
@@ -131,17 +159,33 @@ export default function RubberForm({ initialData, isEdit }: RubberFormProps) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...formData, address: fullAddress, id: initialData?.id })
       });
-      
+
       if (res.ok) {
+        const saved = await res.json() as any;
+        const rubberId = initialData?.id || saved?.id;
+
+        // Save serviceArea to rubber preferences
+        if (rubberId && (serviceProvince || serviceAreas.length > 0)) {
+          await fetch("/api/users/preferences", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              userId: rubberId,
+              serviceArea: { province: serviceProvince, areas: serviceAreas },
+            }),
+          });
+        }
+
         showToast(isEdit ? t('admin.rubbers.form.errors.updateSuccess') : t('admin.rubbers.form.errors.approveSuccess'), "success");
         router.push("/admin/rubbers");
         router.refresh();
       } else {
-          const err = await res.json();
-          showToast(err.error || t('admin.rubbers.form.errors.saveFailed'), "error");
+        const err = await res.json();
+        showToast(err.error || t('admin.rubbers.form.errors.saveFailed'), "error");
       }
     } catch (err) {
       console.error("Save failed", err);
+      showToast(t('admin.rubbers.form.errors.saveFailed'), "error");
     } finally {
       setIsSaving(false);
     }
@@ -399,6 +443,85 @@ export default function RubberForm({ initialData, isEdit }: RubberFormProps) {
         
         {/* Right Column: Vehicle & Status */}
         <div className="space-y-8">
+
+           {/* ── Service Area (from admin open_regions) ── */}
+           <Card className="p-8 bg-white border border-slate-200/60 shadow-sm">
+              <div className="flex items-center gap-3 mb-6">
+                 <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
+                    <Icons.MapPin size={20} />
+                 </div>
+                 <div>
+                    <h2 className="text-xl font-black text-slate-900 uppercase tracking-tight">พื้นที่รับงาน</h2>
+                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-0.5">อ้างอิงจากพื้นที่ที่แอดมินเปิดให้บริการ</p>
+                 </div>
+              </div>
+
+              {openRegions.length === 0 ? (
+                <p className="text-xs font-bold text-slate-400 text-center py-4">
+                  ยังไม่มีพื้นที่ที่แอดมินเปิดไว้<br/>
+                  <span className="text-[10px]">ไปตั้งค่าได้ที่ Settings → Service Regions</span>
+                </p>
+              ) : (
+                <div className="space-y-5">
+                  {/* Province selector */}
+                  <div>
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block">จังหวัด</label>
+                    <div className="flex flex-wrap gap-2">
+                      {openRegions.map((r) => (
+                        <button
+                          key={r.province}
+                          type="button"
+                          onClick={() => { setServiceProvince(r.province); setServiceAreas([]); }}
+                          className={`px-4 py-2 rounded-xl text-xs font-black transition-all border-2 ${
+                            serviceProvince === r.province
+                              ? "bg-blue-500 text-white border-blue-500 shadow-md shadow-blue-500/20"
+                              : "bg-white text-slate-500 border-slate-200 hover:border-blue-300"
+                          }`}
+                        >
+                          {r.province}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Areas multiselect */}
+                  {serviceProvince && (
+                    <div className="animate-fade-in">
+                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block">
+                        ย่าน / ตำบล <span className="text-slate-300">(เลือกได้หลายย่าน)</span>
+                      </label>
+                      {availableAreas.length === 0 ? (
+                        <p className="text-xs text-slate-400">ไม่มีย่านสำหรับจังหวัดนี้</p>
+                      ) : (
+                        <div className="flex flex-wrap gap-2">
+                          {availableAreas.map((area) => (
+                            <button
+                              key={area}
+                              type="button"
+                              onClick={() => toggleArea(area)}
+                              className={`px-3 py-1.5 rounded-lg text-xs font-black transition-all border-2 ${
+                                serviceAreas.includes(area)
+                                  ? "bg-blue-50 text-blue-700 border-blue-300"
+                                  : "bg-slate-50 text-slate-400 border-slate-100 hover:border-slate-300"
+                              }`}
+                            >
+                              {serviceAreas.includes(area) ? "✓ " : ""}{area}
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {serviceProvince && (
+                    <div className="p-3 bg-slate-50 rounded-xl border border-slate-100 text-[11px] font-bold text-slate-500">
+                      📍 {serviceProvince}{serviceAreas.length > 0 ? ` → ${serviceAreas.join(", ")}` : " (ทุกย่าน)"}
+                    </div>
+                  )}
+                </div>
+              )}
+           </Card>
+
            <Card className="p-8 bg-slate-900 text-white border-none shadow-2xl">
               <div className="flex items-center gap-3 mb-8">
                  <div className="w-10 h-10 rounded-xl bg-white/10 text-white flex items-center justify-center">
