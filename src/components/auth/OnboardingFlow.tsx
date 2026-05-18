@@ -37,6 +37,7 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
 
   // Step 3: Location permission popup
   const [showLocationModal, setShowLocationModal] = useState(false);
+  const [isLocating, setIsLocating] = useState(false);
 
   // Step 4: Address
   const [addressLabel, setAddressLabel] = useState("");
@@ -96,22 +97,30 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
 
   function handleLocationPermission() {
     setShowLocationModal(false);
-    // Request location permission
+    setIsLocating(true);
+    // Request location permission — IMPORTANT: set lat/lng BEFORE setStep(4)
+    // so MapPicker receives real coords on first mount (prevents Bangkok default flicker)
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (pos) => {
-          setPinLat(parseFloat(pos.coords.latitude.toFixed(6)));
-          setPinLng(parseFloat(pos.coords.longitude.toFixed(6)));
+          const lat = parseFloat(pos.coords.latitude.toFixed(6));
+          const lng = parseFloat(pos.coords.longitude.toFixed(6));
+          // Batch all state updates together so MapPicker mounts with real coords
+          setPinLat(lat);
+          setPinLng(lng);
           setPinSet(true);
+          setIsLocating(false);
           setStep(4);
         },
         () => {
-          // Permission denied or error — still proceed
+          // Permission denied or error — still proceed, MapPicker will use Bangkok default
+          setIsLocating(false);
           setStep(4);
         },
         { enableHighAccuracy: true, timeout: 10000 }
       );
     } else {
+      setIsLocating(false);
       setStep(4);
     }
   }
@@ -328,45 +337,56 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
         {step === 3 && (
           <div className="animate-fade-in space-y-5">
             <Card className="p-6 shadow-xl shadow-slate-200/50 border-slate-100 ring-1 ring-slate-100 text-center">
-              <div className="w-24 h-24 bg-blue-50 rounded-3xl flex items-center justify-center mx-auto mb-5 border-2 border-blue-100">
-                <Icons.MapPin size={48} className="text-blue-500" />
+              <div className={`w-24 h-24 rounded-3xl flex items-center justify-center mx-auto mb-5 border-2 transition-all duration-500 ${isLocating ? 'bg-amber-50 border-amber-100' : 'bg-blue-50 border-blue-100'}`}>
+                {isLocating ? (
+                  <div className="w-12 h-12 border-4 border-amber-200 border-t-amber-500 rounded-full animate-spin" />
+                ) : (
+                  <Icons.MapPin size={48} className="text-blue-500" />
+                )}
               </div>
               <h3 className="text-lg font-black text-foreground mb-2">
-                {language === 'th' ? 'เปิดใช้งานตำแหน่งที่ตั้ง' : 'Enable Location Access'}
+                {isLocating
+                  ? (language === 'th' ? 'กำลังระบุตำแหน่ง...' : 'Getting your location...')
+                  : (language === 'th' ? 'เปิดใช้งานตำแหน่งที่ตั้ง' : 'Enable Location Access')}
               </h3>
               <p className="text-sm text-slate-500 leading-relaxed mb-6">
-                {language === 'th' 
-                  ? 'ในขั้นตอนถัดไป ระบบจะขออนุญาตเข้าถึงตำแหน่งของคุณ กรุณากด "อนุญาต" เพื่อให้เราค้นหาร้านซักและคำนวณค่าจัดส่งได้อย่างแม่นยำ'
-                  : 'In the next step, the system will request your location. Please tap "Allow" so we can find nearby shops and calculate delivery fees accurately.'}
+                {isLocating
+                  ? (language === 'th' ? 'รอสักครู่ ระบบกำลังดึงพิกัด GPS ของคุณ' : 'Please wait while we retrieve your GPS coordinates.')
+                  : (language === 'th'
+                    ? 'ในขั้นตอนถัดไป ระบบจะขออนุญาตเข้าถึงตำแหน่งของคุณ กรุณากด "อนุญาต" เพื่อให้เราค้นหาร้านซักและคำนวณค่าจัดส่งได้อย่างแม่นยำ'
+                    : 'In the next step, the system will request your location. Please tap "Allow" so we can find nearby shops and calculate delivery fees accurately.')}
               </p>
 
-              {/* Visual instruction */}
-              <div className="bg-blue-50/50 rounded-xl p-4 border border-blue-100 space-y-3">
-                <div className="flex items-center gap-3 text-left">
-                  <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600 shrink-0 text-sm font-black">1</div>
-                  <p className="text-xs text-blue-700 font-bold">
-                    {language === 'th' ? 'กดปุ่ม "เปิดโลเคชัน" ด้านล่าง' : 'Tap "Enable Location" below'}
-                  </p>
+              {/* Visual instruction — hide while locating */}
+              {!isLocating && (
+                <div className="bg-blue-50/50 rounded-xl p-4 border border-blue-100 space-y-3">
+                  <div className="flex items-center gap-3 text-left">
+                    <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600 shrink-0 text-sm font-black">1</div>
+                    <p className="text-xs text-blue-700 font-bold">
+                      {language === 'th' ? 'กดปุ่ม "เปิดโลเคชัน" ด้านล่าง' : 'Tap "Enable Location" below'}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-3 text-left">
+                    <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600 shrink-0 text-sm font-black">2</div>
+                    <p className="text-xs text-blue-700 font-bold">
+                      {language === 'th' ? 'เมื่อระบบถาม กรุณากด "อนุญาต" หรือ "Allow"' : 'When prompted, tap "Allow"'}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-3 text-left">
+                    <div className="w-8 h-8 bg-emerald-100 rounded-lg flex items-center justify-center text-emerald-600 shrink-0 text-sm font-black">3</div>
+                    <p className="text-xs text-emerald-700 font-bold">
+                      {language === 'th' ? 'ระบบจะตั้งค่าตำแหน่งของคุณอัตโนมัติ' : 'Your location will be set automatically'}
+                    </p>
+                  </div>
                 </div>
-                <div className="flex items-center gap-3 text-left">
-                  <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600 shrink-0 text-sm font-black">2</div>
-                  <p className="text-xs text-blue-700 font-bold">
-                    {language === 'th' ? 'เมื่อระบบถาม กรุณากด "อนุญาต" หรือ "Allow"' : 'When prompted, tap "Allow"'}
-                  </p>
-                </div>
-                <div className="flex items-center gap-3 text-left">
-                  <div className="w-8 h-8 bg-emerald-100 rounded-lg flex items-center justify-center text-emerald-600 shrink-0 text-sm font-black">3</div>
-                  <p className="text-xs text-emerald-700 font-bold">
-                    {language === 'th' ? 'ระบบจะตั้งค่าตำแหน่งของคุณอัตโนมัติ' : 'Your location will be set automatically'}
-                  </p>
-                </div>
-              </div>
+              )}
             </Card>
 
             <div className="flex gap-3">
               <button
                 onClick={() => setStep(2)}
-                className="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center text-slate-500 active:scale-95 transition-transform shrink-0"
+                disabled={isLocating}
+                className="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center text-slate-500 active:scale-95 transition-transform shrink-0 disabled:opacity-40"
               >
                 <Icons.Back size={20} />
               </button>
@@ -374,10 +394,14 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
                 fullWidth
                 size="lg"
                 onClick={handleLocationPermission}
+                disabled={isLocating}
+                isLoading={isLocating}
                 className="bg-blue-500 hover:bg-blue-600"
               >
-                <Icons.MapPin size={18} className="mr-2 inline" />
-                {language === 'th' ? 'เปิดโลเคชัน' : 'Enable Location'}
+                {!isLocating && <Icons.MapPin size={18} className="mr-2 inline" />}
+                {isLocating
+                  ? (language === 'th' ? 'กำลังดึงตำแหน่ง...' : 'Getting location...')
+                  : (language === 'th' ? 'เปิดโลเคชัน' : 'Enable Location')}
               </Button>
             </div>
           </div>
