@@ -156,6 +156,20 @@ export async function broadcastToEligibleRubbers(
   }
 
   for (const r of eligibleRubbers) {
+    // 🛡️ Dedup: skip if this order was already broadcast to this rubber for the same stage
+    // Allow 2 broadcasts per order: 1st for pickup leg (paid/pending), 2nd for return leg (ready_for_pickup)
+    try {
+      const dedupKey = `DISPATCH-${orderId}-${r.id}`;
+      const existing = await db.prepare(
+        `SELECT id FROM webhook_logs WHERE id LIKE ? AND channel = 'dispatch_success' LIMIT 1`
+      ).bind(`${dedupKey}%`).first();
+      
+      if (existing && status !== 'ready_for_pickup') {
+        console.log(`  ⏭️ [DISPATCH] Skipping duplicate for rubber ${r.id} (order ${orderId}, already broadcast)`);
+        continue;
+      }
+    } catch (e) { /* table may not exist, continue */ }
+
     // 1. In-App Notification (always works — uses rubber's primary ID)
     try {
       await createNotification(db, {
