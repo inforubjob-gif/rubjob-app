@@ -104,13 +104,15 @@ export default function RubberProfilePage() {
 
         <div className="flex items-center gap-4">
           {/* Avatar */}
-          <div className="w-16 h-16 rounded-[1.5rem] overflow-hidden bg-white/10 backdrop-blur-xl border-2 border-white/30 flex items-center justify-center text-white text-2xl font-bold shadow-xl relative group shrink-0">
-            <img 
-              src={!rubberSession?.pictureUrl ? `https://api.dicebear.com/7.x/avataaars/svg?seed=${rubberSession?.id || 'Rubjob'}` : (rubberSession.pictureUrl.startsWith('data:') || rubberSession.pictureUrl.startsWith('http')) ? rubberSession.pictureUrl : `/api/admin/documents/${rubberSession.pictureUrl}`} 
-              alt="Avatar" 
-              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" 
-            />
-            {workStatus && <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-emerald-400 rounded-full border-2 border-white shadow-lg animate-pulse" />}
+          <div className="relative group shrink-0 w-16 h-16">
+            <div className="w-full h-full rounded-[1.5rem] overflow-hidden bg-white/10 backdrop-blur-xl border-2 border-white/30 flex items-center justify-center text-white text-2xl font-bold shadow-xl">
+              <img 
+                src={!rubberSession?.pictureUrl ? `https://api.dicebear.com/7.x/avataaars/svg?seed=${rubberSession?.id || 'Rubjob'}` : (rubberSession.pictureUrl.startsWith('data:') || rubberSession.pictureUrl.startsWith('http')) ? rubberSession.pictureUrl : `/api/admin/documents/${rubberSession.pictureUrl}`} 
+                alt="Avatar" 
+                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" 
+              />
+            </div>
+            {workStatus && <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-emerald-400 rounded-full border-[2.5px] border-white shadow-lg animate-pulse z-10" />}
           </div>
           <div className="text-white flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1.5">
