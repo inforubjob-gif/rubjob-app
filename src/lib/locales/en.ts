@@ -909,6 +909,8 @@ export const en = {
       earningsInsight: "Earnings Insight",
       weeklyPerformance: "Weekly Performance",
       last7Days: "Last 7 Days",
+      monthlyEarnings: "This Month",
+      yearlyEarnings: "This Year",
       timeBreakdown: "Time Breakdown (Today)",
       realTime: "Real-time",
       noEarningsToday: "No earnings yet today",

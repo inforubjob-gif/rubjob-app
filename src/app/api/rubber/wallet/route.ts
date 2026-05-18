@@ -32,15 +32,19 @@ export async function GET(req: Request) {
 
     let totalEarnings = 0;
     let todayEarnings = 0;
+    let monthlyEarnings = 0;
+    let yearlyEarnings = 0;
     let todayTaskCount = 0;
     const todayTaskIds = new Set<string>();
     const history: any[] = [];
     
-    // Thailand timezone start of day
+    // Thailand timezone start boundaries
     const now = new Date();
     const thTime = new Date(now.getTime() + 7 * 60 * 60 * 1000);
     thTime.setUTCHours(0, 0, 0, 0);
     const todayStartUTC = new Date(thTime.getTime() - 7 * 60 * 60 * 1000).getTime();
+    const monthStartUTC = new Date(Date.UTC(thTime.getUTCFullYear(), thTime.getUTCMonth(), 1, -7, 0, 0, 0)).getTime();
+    const yearStartUTC = new Date(Date.UTC(thTime.getUTCFullYear(), 0, 1, -7, 0, 0, 0)).getTime();
 
     (ordersRes.results as any[]).forEach(o => {
       // 10% commission + 10 THB Platform Fee
@@ -52,12 +56,16 @@ export async function GET(req: Request) {
       if (o.pickupDriverId === rubberId && pickupCompletedStatuses.includes(o.status)) {
         totalEarnings += legEarn;
         
-        // Check if earned today — use updatedAt (when the leg was completed)
+        // Check if earned today, this month, this year
         const earnDate = o.updatedAt || o.createdAt;
-        if (new Date(earnDate).getTime() >= todayStartUTC) {
+        const earnTime = new Date(earnDate).getTime();
+        
+        if (earnTime >= todayStartUTC) {
           todayEarnings += legEarn;
           todayTaskIds.add(o.id);
         }
+        if (earnTime >= monthStartUTC) monthlyEarnings += legEarn;
+        if (earnTime >= yearStartUTC) yearlyEarnings += legEarn;
 
         history.push({
           id: `${o.id}-P`,
@@ -72,12 +80,16 @@ export async function GET(req: Request) {
       if (o.deliveryDriverId === rubberId && o.status === 'completed') {
         totalEarnings += legEarn;
 
-        // Check if earned today — use updatedAt
+        // Check if earned today, this month, this year
         const earnDate = o.updatedAt || o.createdAt;
-        if (new Date(earnDate).getTime() >= todayStartUTC) {
+        const earnTime = new Date(earnDate).getTime();
+        
+        if (earnTime >= todayStartUTC) {
           todayEarnings += legEarn;
           todayTaskIds.add(o.id);
         }
+        if (earnTime >= monthStartUTC) monthlyEarnings += legEarn;
+        if (earnTime >= yearStartUTC) yearlyEarnings += legEarn;
 
         history.push({
           id: `${o.id}-D`,
@@ -131,6 +143,8 @@ export async function GET(req: Request) {
     return NextResponse.json({ 
       balance: Math.max(0, balance),
       todayEarnings: Math.max(0, todayEarnings),
+      monthlyEarnings: Math.max(0, monthlyEarnings),
+      yearlyEarnings: Math.max(0, yearlyEarnings),
       todayTaskCount,
       transactions: transactions.slice(0, 20)
     });

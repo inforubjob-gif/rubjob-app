@@ -24,6 +24,8 @@ export default function RubberWalletPage() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [balance, setBalance] = useState(0);
   const [transactions, setTransactions] = useState<any[]>([]);
+  const [monthlyEarnings, setMonthlyEarnings] = useState(0);
+  const [yearlyEarnings, setYearlyEarnings] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [alertConfig, setAlertConfig] = useState<{ isOpen: boolean; title: string; message: string; type: "success" | "error" | "warning" }>({
     isOpen: false,
@@ -61,6 +63,8 @@ export default function RubberWalletPage() {
       const res = await fetch(`/api/rubber/wallet?rubberId=${rubberSession.id}`);
       const data = await res.json() as any;
       if (data.balance !== undefined) setBalance(data.balance);
+      if (data.monthlyEarnings !== undefined) setMonthlyEarnings(data.monthlyEarnings);
+      if (data.yearlyEarnings !== undefined) setYearlyEarnings(data.yearlyEarnings);
       if (data.transactions) setTransactions(data.transactions);
     } catch (err) {
       console.error(err);
@@ -212,6 +216,18 @@ export default function RubberWalletPage() {
                     );
                   });
                 })()}
+              </div>
+
+              {/* Monthly/Yearly Summary */}
+              <div className="flex items-center gap-4 border-t border-slate-50 pt-4 pb-2 mb-2">
+                 <div className="flex-1 bg-slate-50 rounded-xl p-3 text-center">
+                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">{t("rubber.wallet.monthlyEarnings") || "Monthly"}</p>
+                    <p className="text-sm font-black text-emerald-500">฿{monthlyEarnings.toLocaleString()}</p>
+                 </div>
+                 <div className="flex-1 bg-slate-50 rounded-xl p-3 text-center">
+                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">{t("rubber.wallet.yearlyEarnings") || "Yearly"}</p>
+                    <p className="text-sm font-black text-primary">฿{yearlyEarnings.toLocaleString()}</p>
+                 </div>
               </div>
 
               {/* Today's Breakdown */}

@@ -809,6 +809,8 @@ export const th = {
         earningsInsight: "ข้อมูลรายได้เชิงลึก",
         weeklyPerformance: "สรุปรายได้รายสัปดาห์",
         last7Days: "7 วันล่าสุด",
+        monthlyEarnings: "รายได้เดือนนี้",
+        yearlyEarnings: "รายได้ปีนี้",
         timeBreakdown: "รายได้วันนี้ตามช่วงเวลา",
         realTime: "เรียลไทม์",
         noEarningsToday: "ยังไม่มีรายได้ในวันนี้",
