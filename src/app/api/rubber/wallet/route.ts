@@ -63,7 +63,7 @@ export async function GET(req: Request) {
           id: `${o.id}-P`,
           type: "Pickup Earnings",
           amount: legEarn,
-          date: o.createdAt,
+          date: earnDate,
           status: "Success"
         });
       }
@@ -83,7 +83,7 @@ export async function GET(req: Request) {
           id: `${o.id}-D`,
           type: "Delivery Earnings",
           amount: legEarn,
-          date: o.createdAt,
+          date: earnDate,
           status: "Success"
         });
       }
