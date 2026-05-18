@@ -193,7 +193,7 @@ export default function RubberWalletPage() {
                     const isToday = d.date.toDateString() === new Date().toDateString();
                     
                     return (
-                      <div key={i} className="flex-1 flex flex-col items-center gap-2 group cursor-pointer">
+                      <div key={i} className="flex-1 flex flex-col items-center justify-end h-full gap-2 group cursor-pointer">
                         <div className="relative w-full flex flex-col items-center justify-end h-full">
                            {/* Tooltip on hover */}
                            <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-[9px] font-black py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-20">
