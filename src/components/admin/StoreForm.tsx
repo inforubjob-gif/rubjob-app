@@ -27,7 +27,7 @@ export default function StoreForm({ initialData, isEdit }: StoreFormProps) {
   
   const [formData, setFormData] = useState({
     name: initialData?.name || "",
-    ownerId: initialData?.ownerId || "system",
+    ownerId: initialData?.ownerId || "auto",
     email: initialData?.email || "",
     password: initialData?.password || "",
     address: initialData?.address || "",
