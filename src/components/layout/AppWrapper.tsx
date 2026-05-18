@@ -56,8 +56,11 @@ export default function AppWrapper({ children }: { children: React.ReactNode }) 
       return;
     }
 
-    // Fast check: skip if we've already done this on this device
-    if (localStorage.getItem("rubjob_onboarding_done") === "true") {
+    // Fast check: scoped to userId so deleting + re-registering forces fresh check
+    const onboardingKey = `rubjob_onboarded_${profile?.userId}`;
+    // Clean up legacy generic key if present
+    localStorage.removeItem("rubjob_onboarding_done");
+    if (localStorage.getItem(onboardingKey) === "true") {
       setNeedsOnboarding(false);
       return;
     }
@@ -75,8 +78,16 @@ export default function AppWrapper({ children }: { children: React.ReactNode }) 
 
         const hasPhone = !!userData.user?.phone;
         const hasAddress = (addrData.addresses?.length || 0) > 0;
+        const completed = hasPhone && hasAddress;
 
-        setNeedsOnboarding(!hasPhone || !hasAddress);
+        // If user not found in DB (deleted account) → force onboarding
+        if (userRes.status === 404 || !userData.user) {
+          localStorage.removeItem(`rubjob_onboarded_${profile?.userId}`);
+          setNeedsOnboarding(true);
+          return;
+        }
+
+        setNeedsOnboarding(!completed);
         
         // Automation: Subscribe to Push notifications if not already done
         if (hasPhone) {

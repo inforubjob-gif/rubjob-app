@@ -149,8 +149,10 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
           isDefault: true,
         }),
       });
-      // Set completion flag to skip onboarding on refresh
-      localStorage.setItem("rubjob_onboarding_done", "true");
+      // Set completion flag scoped to userId (prevents skip after account deletion + re-register)
+      if (profile?.userId) {
+        localStorage.setItem(`rubjob_onboarded_${profile.userId}`, "true");
+      }
       onComplete();
     } catch (err) {
       console.error("Failed to save address:", err);
