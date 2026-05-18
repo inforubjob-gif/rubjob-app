@@ -89,39 +89,41 @@ export default function RubberProfilePage() {
       <div className="absolute top-0 left-0 right-0 h-[380px] bg-gradient-to-b from-primary via-primary-dark to-slate-50 z-0" />
 
       {/* Profile Header */}
-      <header className="relative z-10 px-6 pt-4 pb-6">
+      <header className="relative z-10 px-5 pt-4 pb-10">
         {/* Back button */}
-        <button
-          onClick={() => router.back()}
-          className="absolute left-6 top-6 active:scale-95 transition-transform z-10"
-        >
-          <IconCircle variant="white" size="sm">
-            <Icons.Back size={16} />
-          </IconCircle>
-        </button>
+        <div className="flex items-center mb-6">
+          <button
+            onClick={() => router.back()}
+            className="active:scale-95 transition-transform"
+          >
+            <IconCircle variant="white" size="sm">
+              <Icons.Back size={16} />
+            </IconCircle>
+          </button>
+        </div>
 
-        <div className="flex items-center gap-5 mt-12">
+        <div className="flex items-center gap-4">
           {/* Avatar */}
-          <div className="w-20 h-20 rounded-[2rem] overflow-hidden bg-white/10 backdrop-blur-xl border-2 border-white/30 flex items-center justify-center text-white text-3xl font-bold shadow-2xl relative group">
+          <div className="w-16 h-16 rounded-[1.5rem] overflow-hidden bg-white/10 backdrop-blur-xl border-2 border-white/30 flex items-center justify-center text-white text-2xl font-bold shadow-xl relative group shrink-0">
             <img 
               src={!rubberSession?.pictureUrl ? `https://api.dicebear.com/7.x/avataaars/svg?seed=${rubberSession?.id || 'Rubjob'}` : (rubberSession.pictureUrl.startsWith('data:') || rubberSession.pictureUrl.startsWith('http')) ? rubberSession.pictureUrl : `/api/admin/documents/${rubberSession.pictureUrl}`} 
               alt="Avatar" 
               className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" 
             />
-            {workStatus && <div className="absolute bottom-1 right-1 w-4 h-4 bg-emerald-400 rounded-full border-2 border-white shadow-lg animate-pulse" />}
+            {workStatus && <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-emerald-400 rounded-full border-2 border-white shadow-lg animate-pulse" />}
           </div>
           <div className="text-white flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-1">
-              <h1 className="text-3xl font-black truncate drop-shadow-md">
+            <div className="flex items-center gap-2 mb-1.5">
+              <h1 className="text-xl sm:text-2xl font-black truncate drop-shadow-md">
                 {rubberSession?.name || t("common.guest")}
               </h1>
             </div>
             <div className="flex flex-wrap gap-2">
-              <span className="px-3 py-1 bg-white/20 backdrop-blur-md rounded-lg text-[10px] font-black uppercase tracking-wider flex items-center gap-1.5 border border-white/10">
+              <span className="px-2.5 py-1 bg-white/20 backdrop-blur-md rounded-md text-[9px] font-black uppercase tracking-wider flex items-center gap-1 border border-white/10">
                 <Icons.Guarantee size={10} className="text-emerald-400" />
                 RUBBER
               </span>
-              <span className="px-3 py-1 bg-black/20 backdrop-blur-md rounded-lg text-[10px] font-black uppercase tracking-wider text-white/70">
+              <span className="px-2.5 py-1 bg-black/20 backdrop-blur-md rounded-md text-[9px] font-black uppercase tracking-wider text-white/70">
                 #{String(rubberSession?.id || '').slice(-4)}
               </span>
             </div>
@@ -129,7 +131,7 @@ export default function RubberProfilePage() {
         </div>
       </header>
 
-      <div className="relative z-10 flex-1 px-6 -mt-6 space-y-8 pb-24 animate-fade-in">
+      <div className="relative z-10 flex-1 px-5 -mt-4 space-y-6 pb-24 animate-fade-in">
         {/* Status Section */}
         <section>
           <Card 
@@ -137,8 +139,8 @@ export default function RubberProfilePage() {
           >
              <div className="flex items-center justify-between">
                <div className="flex items-center gap-3">
-                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-500 shadow-sm ${workStatus ? 'bg-emerald-50 text-emerald-500 shadow-emerald-100' : 'bg-slate-200 text-slate-400'}`}>
-                      <Icons.Shield size={20} />
+                  <div className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-500 shadow-sm ${workStatus ? 'bg-emerald-50 text-emerald-500 shadow-emerald-100' : 'bg-slate-200 text-slate-400'}`}>
+                      <Icons.Shield size={18} />
                   </div>
                   <div>
                       <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none mb-0.5">{t("rubber.profile.workStatus")}</p>
@@ -160,7 +162,7 @@ export default function RubberProfilePage() {
         {/* Rubber Settings Menu */}
         <section>
           <h2 className="text-[11px] font-black text-slate-900 uppercase tracking-[0.2em] mb-4 px-2">{t("rubber.profile.settings")}</h2>
-          <Card className="divide-y divide-slate-50 shadow-2xl rounded-[2.5rem] bg-white border border-slate-100">
+          <Card className="divide-y divide-slate-50 shadow-xl rounded-[2rem] bg-white border border-slate-100 overflow-hidden">
             <button
               onClick={() => setShowLanguageModal(true)}
               className="w-full flex items-center gap-5 px-6 py-3 hover:bg-slate-50 transition-colors text-left group"
