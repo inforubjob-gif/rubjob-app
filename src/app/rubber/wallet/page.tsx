@@ -235,17 +235,22 @@ export default function RubberWalletPage() {
                         return <p className="text-center py-4 text-[10px] text-slate-300 font-bold uppercase italic">{t("rubber.wallet.noEarningsToday") || "No earnings yet today"}</p>;
                       }
 
-                      return todayTrx.map((tx, idx) => (
-                        <div key={idx} className="flex items-center justify-between">
-                           <div className="flex items-center gap-3">
-                              <div className="w-1.5 h-1.5 bg-primary rounded-full" />
-                              <p className="text-[11px] font-black text-slate-700 uppercase tracking-tight">
-                                {new Date(tx.date).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' })}
-                              </p>
+                      return todayTrx.map((tx, idx) => {
+                        const raw = tx.date || '';
+                        const safe = raw.includes('Z') ? raw : raw.replace(' ', 'T') + 'Z';
+                        
+                        return (
+                          <div key={idx} className="flex items-center justify-between">
+                             <div className="flex items-center gap-3">
+                                <div className="w-1.5 h-1.5 bg-primary rounded-full" />
+                                <p className="text-[11px] font-black text-slate-700 uppercase tracking-tight">
+                                  {new Date(safe).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' })}
+                                </p>
                            </div>
                            <p className="text-xs font-black text-slate-900">฿{Number(tx.amount).toLocaleString()}</p>
-                        </div>
-                      ));
+                         </div>
+                       );
+                     });
                     })()}
                  </div>
               </div>
@@ -255,22 +260,26 @@ export default function RubberWalletPage() {
           <section id="history-section">
             <h2 className="text-[11px] font-black text-slate-900 uppercase tracking-[0.2em] mb-4 px-2">{t("rubber.wallet.history")}</h2>
             <div className="space-y-3">
-              {transactions.map((trx) => (
-                <div key={trx.id} className="bg-white p-4 rounded-xl border border-slate-100 shadow-sm flex items-center gap-4 hover:shadow-md transition-shadow">
-                  <div className={`w-11 h-11 rounded-full flex items-center justify-center ${trx.amount > 0 ? 'bg-emerald-50 text-emerald-500' : 'bg-slate-100 text-slate-600'}`}>
-                    {trx.amount > 0 ? <Icons.Payment size={20} /> : <Icons.Clock size={20} />}
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-sm font-bold text-slate-900">{t(`rubber.wallet.types.${trx.type}`) || trx.type}</p>
-                    <p className="text-[10px] text-slate-400 font-medium uppercase">
-                      {new Date(trx.date).toLocaleDateString('th-TH', { 
-                        day: 'numeric', 
-                        month: 'short', 
-                        hour: '2-digit', 
-                        minute: '2-digit' 
-                      })}
-                    </p>
-                  </div>
+              {transactions.map((trx) => {
+                const raw = trx.date || '';
+                const safe = raw.includes('Z') ? raw : raw.replace(' ', 'T') + 'Z';
+
+                return (
+                  <div key={trx.id} className="bg-white p-4 rounded-xl border border-slate-100 shadow-sm flex items-center gap-4 hover:shadow-md transition-shadow">
+                    <div className={`w-11 h-11 rounded-full flex items-center justify-center ${trx.amount > 0 ? 'bg-emerald-50 text-emerald-500' : 'bg-slate-100 text-slate-600'}`}>
+                      {trx.amount > 0 ? <Icons.Payment size={20} /> : <Icons.Clock size={20} />}
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-sm font-bold text-slate-900">{t(`rubber.wallet.types.${trx.type}`) || trx.type}</p>
+                      <p className="text-[10px] text-slate-400 font-medium uppercase">
+                        {new Date(safe).toLocaleDateString('th-TH', { 
+                          day: 'numeric', 
+                          month: 'short', 
+                          hour: '2-digit', 
+                          minute: '2-digit' 
+                        })}
+                      </p>
+                    </div>
                   <div className="text-right">
                     <p className={`text-sm font-black ${trx.amount > 0 ? 'text-emerald-500' : 'text-slate-900'}`}>
                       {trx.amount > 0 ? `+฿${(Number(trx.amount) || 0).toLocaleString()}` : `-฿${(Math.abs(Number(trx.amount) || 0)).toLocaleString()}`}
@@ -280,7 +289,8 @@ export default function RubberWalletPage() {
                     </Badge>
                   </div>
                 </div>
-              ))}
+              );
+              })}
             </div>
           </section>
 
