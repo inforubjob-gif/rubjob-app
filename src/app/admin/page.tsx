@@ -123,7 +123,7 @@ export default function AdminDashboard() {
     </div>
     <div className="flex items-center gap-3">
      <div className="px-3 py-1.5 bg-slate-50 text-slate-500 rounded-lg text-[10px] font-black uppercase tracking-wider border border-slate-100">
-      GP: {stats.gpStore}% ร้าน / {stats.gpRubber}% Rubber + ฿15
+      GP: {stats.gpStore}% ร้าน / {stats.gpRubber}% Rubber + ฿10
      </div>
      {errorCount > 0 ? (
       <div className="flex items-center gap-2 px-3 py-1.5 bg-rose-50 text-rose-600 rounded-lg text-[10px] font-black border border-rose-100 animate-pulse">
@@ -241,7 +241,7 @@ export default function AdminDashboard() {
           <span className="font-black text-white/70">฿{Number(bd.rubberGP).toLocaleString()}</span>
          </div>
          <div className="flex justify-between text-[10px]">
-          <span className="text-white/40">ค่าบริการ (฿15/ออเดอร์)</span>
+          <span className="text-white/40">ค่าบริการ (฿10/ออเดอร์)</span>
           <span className="font-black text-white/70">฿{Number(bd.platformFee).toLocaleString()}</span>
          </div>
          {Number(bd.unassignedDeliveryFee) > 0 && (

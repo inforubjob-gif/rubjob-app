@@ -78,14 +78,14 @@ export async function GET(req: Request) {
         // [0] Rubber earnings breakdown (net, GP, platform fee)
         db.prepare(`
           SELECT 
-            COALESCE(SUM(CASE WHEN pickupDriverId IS NOT NULL THEN (deliveryFee - (deliveryFee * ?/100) - 15) * 0.5 ELSE 0 END), 0) +
-            COALESCE(SUM(CASE WHEN deliveryDriverId IS NOT NULL THEN (deliveryFee - (deliveryFee * ?/100) - 15) * 0.5 ELSE 0 END), 0) as netEarnings,
+            COALESCE(SUM(CASE WHEN pickupDriverId IS NOT NULL THEN (deliveryFee - (deliveryFee * ?/100) - 10) * 0.5 ELSE 0 END), 0) +
+            COALESCE(SUM(CASE WHEN deliveryDriverId IS NOT NULL THEN (deliveryFee - (deliveryFee * ?/100) - 10) * 0.5 ELSE 0 END), 0) as netEarnings,
             
             COALESCE(SUM(CASE WHEN pickupDriverId IS NOT NULL THEN (deliveryFee * ?/100) * 0.5 ELSE 0 END), 0) +
             COALESCE(SUM(CASE WHEN deliveryDriverId IS NOT NULL THEN (deliveryFee * ?/100) * 0.5 ELSE 0 END), 0) as gp,
             
-            COALESCE(SUM(CASE WHEN pickupDriverId IS NOT NULL THEN 7.5 ELSE 0 END), 0) +
-            COALESCE(SUM(CASE WHEN deliveryDriverId IS NOT NULL THEN 7.5 ELSE 0 END), 0) as platformFee
+            COALESCE(SUM(CASE WHEN pickupDriverId IS NOT NULL THEN 5 ELSE 0 END), 0) +
+            COALESCE(SUM(CASE WHEN deliveryDriverId IS NOT NULL THEN 5 ELSE 0 END), 0) as platformFee
           FROM orders WHERE status = 'completed' AND status != 'cancelled'
         `).bind(gpRubber, gpRubber, gpRubber, gpRubber),
 
@@ -105,8 +105,8 @@ export async function GET(req: Request) {
         // [2] Rubber total earnings (for wallet)
         db.prepare(`
           SELECT 
-            COALESCE(SUM(CASE WHEN pickupDriverId IS NOT NULL THEN (deliveryFee - (deliveryFee * ?/100) - 15) * 0.5 ELSE 0 END), 0) +
-            COALESCE(SUM(CASE WHEN deliveryDriverId IS NOT NULL THEN (deliveryFee - (deliveryFee * ?/100) - 15) * 0.5 ELSE 0 END), 0) as total
+            COALESCE(SUM(CASE WHEN pickupDriverId IS NOT NULL THEN (deliveryFee - (deliveryFee * ?/100) - 10) * 0.5 ELSE 0 END), 0) +
+            COALESCE(SUM(CASE WHEN deliveryDriverId IS NOT NULL THEN (deliveryFee - (deliveryFee * ?/100) - 10) * 0.5 ELSE 0 END), 0) as total
           FROM orders WHERE status = 'completed' AND status != 'cancelled'
         `).bind(gpRubber, gpRubber),
 
