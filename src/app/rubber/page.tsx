@@ -463,7 +463,7 @@ export default function RubberDashboard() {
           <div className="bg-white/90 backdrop-blur-md p-4 rounded-2xl border border-white shadow-md">
             <p className="text-xs font-black text-slate-500 uppercase">รายได้วันนี้</p>
             <p className="text-3xl font-black mt-1 text-slate-800">
-              ฿{Math.ceil(todayEarnings).toLocaleString()}
+              ฿{todayEarnings % 1 === 0 ? todayEarnings.toLocaleString() : todayEarnings.toFixed(1)}
             </p>
           </div>
         </div>
