@@ -11,6 +11,49 @@ import GlobalTextarea from "@/components/ui/GlobalTextarea";
 import GlobalSelect from "@/components/ui/GlobalSelect";
 import { useToast } from "@/components/providers/ToastProvider";
 
+const THAI_PROVINCES = [
+  "กระบี่","กรุงเทพมหานคร","กาญจนบุรี","กาฬสินธุ์","กำแพงเพชร",
+  "ขอนแก่น","จันทบุรี","ฉะเชิงเทรา","ชลบุรี","ชัยนาท","ชัยภูมิ","ชุมพร",
+  "เชียงราย","เชียงใหม่","ตรัง","ตราด","ตาก","นครนายก","นครปฐม",
+  "นครพนม","นครราชสีมา","นครศรีธรรมราช","นครสวรรค์","นนทบุรี","นราธิวาส",
+  "น่าน","บึงกาฬ","บุรีรัมย์","ปทุมธานี","ประจวบคีรีขันธ์","ปราจีนบุรี",
+  "ปัตตานี","พระนครศรีอยุธยา","พะเยา","พังงา","พัทลุง","พิจิตร","พิษณุโลก",
+  "เพชรบุรี","เพชรบูรณ์","แพร่","ภูเก็ต","มหาสารคาม","มุกดาหาร","แม่ฮ่องสอน",
+  "ยโสธร","ยะลา","ร้อยเอ็ด","ระนอง","ระยอง","ราชบุรี","ลพบุรี","ลำปาง",
+  "ลำพูน","เลย","ศรีสะเกษ","สกลนคร","สงขลา","สตูล","สมุทรปราการ",
+  "สมุทรสงคราม","สมุทรสาคร","สระแก้ว","สระบุรี","สิงห์บุรี","สุโขทัย",
+  "สุพรรณบุรี","สุราษฎร์ธานี","สุรินทร์","หนองคาย","หนองบัวลำภู","อ่างทอง",
+  "อำนาจเจริญ","อุดรธานี","อุตรดิตถ์","อุทัยธานี","อุบลราชธานี",
+];
+
+/** Parse rubber address string → { province, district, rest } */
+function parseAddress(addr: string): { province: string; district: string; rest: string } {
+  const lines = (addr || "").split("\n");
+  let province = "";
+  let district = "";
+  const rest: string[] = [];
+  for (const line of lines) {
+    const t = line.trim();
+    if (t.startsWith("จังหวัด:")) {
+      province = t.replace("จังหวัด:", "").trim();
+    } else if (t.startsWith("ย่าน/ตำบล:") || t.startsWith("ย่าน:") || t.startsWith("ตำบล:")) {
+      district = t.split(":").slice(1).join(":").trim();
+    } else if (t) {
+      rest.push(t);
+    }
+  }
+  return { province, district, rest: rest.join("\n") };
+}
+
+/** Build back address string in dispatch-compatible format */
+function buildAddress(rest: string, district: string, province: string): string {
+  const parts: string[] = [];
+  if (rest.trim()) parts.push(rest.trim());
+  if (district.trim()) parts.push(`ย่าน/ตำบล: ${district.trim()}`);
+  if (province.trim()) parts.push(`จังหวัด: ${province.trim()}`);
+  return parts.join("\n");
+}
+
 interface RubberFormProps {
   initialData?: any;
   isEdit?: boolean;
@@ -33,13 +76,17 @@ export default function RubberForm({ initialData, isEdit }: RubberFormProps) {
   const { showToast } = useToast();
   const [isSaving, setIsSaving] = useState(false);
   
+  const parsed = parseAddress(initialData?.address || "");
+
   const [formData, setFormData] = useState({
     name: initialData?.name || "",
     email: initialData?.email || "",
     password: "", // Only for new rubbers
     phone: initialData?.phone || "",
     vehicleType: initialData?.vehicleType || "bike",
-    address: initialData?.address || "",
+    address: parsed.rest,
+    province: parsed.province,
+    district: parsed.district,
     idNumber: initialData?.idNumber || "",
     licensePlate: initialData?.licensePlate || "",
     emergencyContact: initialData?.emergencyContact || "",
@@ -74,12 +121,15 @@ export default function RubberForm({ initialData, isEdit }: RubberFormProps) {
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSaving(true);
-    
+
+    // Build address in dispatch-compatible format
+    const fullAddress = buildAddress(formData.address, formData.district, formData.province);
+
     try {
       const res = await fetch("/api/admin/rubbers", {
         method: isEdit ? "PUT" : "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...formData, id: initialData?.id })
+        body: JSON.stringify({ ...formData, address: fullAddress, id: initialData?.id })
       });
       
       if (res.ok) {
@@ -235,11 +285,32 @@ export default function RubberForm({ initialData, isEdit }: RubberFormProps) {
 
                  <div className="md:col-span-2">
                     <GlobalTextarea 
-                      label={t('admin.rubbers.form.address')}
-                      rows={3}
+                      label="ที่อยู่ (ข้อมูลเพิ่มเติม)"
+                      rows={2}
                       value={formData.address}
                       onChange={e => setFormData({...formData, address: (e.target as HTMLTextAreaElement).value})}
-                      placeholder={t('admin.rubbers.form.placeholders.address')}
+                      placeholder="บ้านเลขที่ / หมู่บ้าน / ซอย (ไม่บังคับ)"
+                    />
+                 </div>
+
+                 <div>
+                    <GlobalSelect
+                      label="จังหวัด"
+                      value={formData.province}
+                      onChange={e => setFormData({...formData, province: e.target.value})}
+                      options={[
+                        { value: "", label: "— เลือกจังหวัด —" },
+                        ...THAI_PROVINCES.map(p => ({ value: p, label: p }))
+                      ]}
+                    />
+                 </div>
+
+                 <div>
+                    <GlobalInput
+                      label="ย่าน / ตำบล / อำเภอ"
+                      value={formData.district}
+                      onChange={e => setFormData({...formData, district: e.target.value})}
+                      placeholder="เช่น เมือง, บึงกุ่ม, ปากเกร็ด"
                     />
                  </div>
            </Card>
