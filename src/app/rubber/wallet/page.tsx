@@ -176,12 +176,17 @@ export default function RubberWalletPage() {
                   const dayEarnings = last7Days.map(date => {
                     const dayStr = date.toDateString();
                     const total = transactions
-                      .filter(tx => tx.amount > 0 && new Date(tx.date).toDateString() === dayStr)
-                      .reduce((acc, tx) => acc + Number(tx.amount), 0);
+                      .filter(tx => tx.amount > 0 && (() => {
+                        // SQLite dates lack Z suffix — normalize before comparing
+                        const raw = tx.date || '';
+                        const safe = raw.includes('Z') ? raw : raw.replace(' ', 'T') + 'Z';
+                        return new Date(safe).toDateString() === dayStr;
+                      })())
+                      .reduce((acc: number, tx: any) => acc + Number(tx.amount), 0);
                     return { date, total };
                   });
 
-                  const maxEarning = Math.max(...dayEarnings.map(d => d.total), 100);
+                  const maxEarning = Math.max(...dayEarnings.map(d => d.total), 1);
 
                   return dayEarnings.map((d, i) => {
                     const height = (d.total / maxEarning) * 100;
@@ -197,7 +202,7 @@ export default function RubberWalletPage() {
                            {/* Bar */}
                            <div 
                              className={`w-6 sm:w-8 rounded-t-xl transition-all duration-700 ease-out ${isToday ? 'bg-primary shadow-lg shadow-primary/30' : d.total > 0 ? 'bg-primary/40' : 'bg-slate-100'} group-hover:bg-primary/60`}
-                             style={{ height: `${Math.max(height, 8)}%` }}
+                             style={{ height: `${d.total > 0 ? Math.max(height, 15) : 8}%` }}
                            />
                         </div>
                         <span className={`text-[9px] font-black uppercase ${isToday ? 'text-primary' : 'text-slate-400'}`}>
@@ -219,7 +224,11 @@ export default function RubberWalletPage() {
                     {(() => {
                       const todayStr = new Date().toDateString();
                       const todayTrx = transactions
-                        .filter(tx => tx.amount > 0 && new Date(tx.date).toDateString() === todayStr)
+                        .filter(tx => tx.amount > 0 && (() => {
+                          const raw = tx.date || '';
+                          const safe = raw.includes('Z') ? raw : raw.replace(' ', 'T') + 'Z';
+                          return new Date(safe).toDateString() === todayStr;
+                        })())
                         .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
                       if (todayTrx.length === 0) {
