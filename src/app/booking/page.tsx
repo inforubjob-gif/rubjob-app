@@ -482,6 +482,8 @@ function BookingFlow() {
         pickupDateTime: `${pickupDate} ${pickupSlot}`,
         scheduledDate: deliverySpeed === "express" ? t("booking.speed.expressShort") : t("booking.speed.standardShort"),
         customerNote: customerNote.trim() || undefined,
+        discountCode: appliedCoupon?.code || undefined,
+        discountAmount: appliedCoupon?.discount || 0,
       };
 
       // 1. Create Booking

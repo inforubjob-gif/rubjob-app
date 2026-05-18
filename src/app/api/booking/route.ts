@@ -37,7 +37,7 @@ export async function POST(req: Request) {
     const address = tryParseJSON(body.address, "address");
     
     const { 
-      userId, storeId, providerId, serviceId, paymentMethod, scheduledDate, customerNote 
+      userId, storeId, providerId, serviceId, paymentMethod, scheduledDate, customerNote, discountCode, discountAmount
     } = body;
 
     // Access D1 from Cloudflare context
@@ -88,6 +88,24 @@ export async function POST(req: Request) {
       scheduledDate,
       customerNote || null
     ).run();
+
+    // Handle Coupon Usage
+    if (discountCode && discountAmount > 0) {
+      try {
+        const coupon = await db.prepare("SELECT id, code FROM coupons WHERE code = ?").bind(discountCode).first() as any;
+        if (coupon) {
+          // Increment used count
+          await db.prepare("UPDATE coupons SET usedCount = usedCount + 1 WHERE id = ?").bind(coupon.id).run();
+          // Record usage history
+          await db.prepare(`
+            INSERT INTO user_coupons_history (userId, couponId, couponCode, orderId, discount)
+            VALUES (?, ?, ?, ?, ?)
+          `).bind(userId, coupon.id, coupon.code, orderId, discountAmount).run();
+        }
+      } catch (err) {
+        console.error("Failed to record coupon usage:", err);
+      }
+    }
 
     // Fetch service info for notification (check both standard services and gigs)
     let serviceName = "Gig Service";
