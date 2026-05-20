@@ -132,7 +132,7 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
   }
 
   async function handleAddressSubmit() {
-    if (!addressLabel.trim() || !addressDetails.trim()) return;
+    if (!addressLabel.trim()) return;
     setIsSubmitting(true);
 
     try {
@@ -501,7 +501,7 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
                 fullWidth
                 size="lg"
                 isLoading={isSubmitting}
-                disabled={!addressLabel.trim() || !addressDetails.trim()}
+                disabled={!addressLabel.trim()}
                 onClick={handleAddressSubmit}
               >
                 {t("onboarding.startButton")}
