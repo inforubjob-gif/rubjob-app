@@ -458,16 +458,7 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
                   />
                 </div>
 
-                {/* Address details */}
-                <div>
-                  <label className="text-xs font-bold text-slate-500 mb-1.5 block">{t("onboarding.detailsLabel")}</label>
-                  <GlobalTextarea
-                    value={addressDetails}
-                    onChange={(e) => setAddressDetails(e.target.value)}
-                    placeholder={t("onboarding.detailsPlaceholder")}
-                    rows={3}
-                  />
-                </div>
+
 
                 {/* Note */}
                 <div>
