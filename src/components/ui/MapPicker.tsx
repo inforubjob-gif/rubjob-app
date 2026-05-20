@@ -140,44 +140,13 @@ export default function MapPicker({ lat, lng, onChange }: MapPickerProps) {
     }
   }, []);
 
-  // ── Nominatim (fallback) ─────────────────────────────────────────────────
+  // ── Nominatim via server proxy (prevents client-side rate limiting) ────────
   const nominatimSearch = useCallback(async (query: string): Promise<PlaceResult[]> => {
     try {
-      const params = new URLSearchParams({
-        format: "json",
-        q: query,
-        limit: "6",
-        "accept-language": "th,en",
-        addressdetails: "1",
-        countrycodes: "th",
-      });
-      const res = await fetch(
-        `https://nominatim.openstreetmap.org/search?${params.toString()}`,
-        { headers: { "User-Agent": "RubJob/1.0 (contact@rubjob-all.com)" } }
-      );
-      if (res.status === 429) {
-        await new Promise((r) => setTimeout(r, 1500));
-        const retry = await fetch(
-          `https://nominatim.openstreetmap.org/search?${params.toString()}`,
-          { headers: { "User-Agent": "RubJob/1.0 (contact@rubjob-all.com)" } }
-        );
-        if (!retry.ok) return [];
-        const data = await retry.json();
-        return (data || []).map((item: { place_id: number; display_name: string; lat: string; lon: string }) => ({
-          id: `nom-${item.place_id}`,
-          name: item.display_name,
-          lat: parseFloat(item.lat),
-          lng: parseFloat(item.lon),
-        }));
-      }
+      const res = await fetch(`/api/geocode?q=${encodeURIComponent(query)}`);
       if (!res.ok) return [];
       const data = await res.json();
-      return (data || []).map((item: { place_id: number; display_name: string; lat: string; lon: string }) => ({
-        id: `nom-${item.place_id}`,
-        name: item.display_name,
-        lat: parseFloat(item.lat),
-        lng: parseFloat(item.lon),
-      }));
+      return data.results || [];
     } catch {
       return [];
     }
@@ -277,7 +246,7 @@ export default function MapPicker({ lat, lng, onChange }: MapPickerProps) {
               <div className="px-4 py-5 text-center">
                 <p className="text-2xl mb-1">🔍</p>
                 <p className="text-xs font-bold text-slate-500">ไม่พบสถานที่</p>
-                <p className="text-[11px] text-slate-400 mt-0.5">ลองค้นหาด้วยชื่ออื่น หรือปักหมุดบนแผนที่แทน</p>
+                <p className="text-[11px] text-slate-400 mt-0.5">ลองพิมพ์ชื่อหมู่บ้าน ตำบล หรือสถานที่ใกล้เคียง แล้วปักหมุดบนแผนที่แทน</p>
               </div>
             )}
           </div>

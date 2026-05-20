@@ -878,7 +878,7 @@ function BookingFlow() {
                   </div>
                 </label>
               </div>
-              {roundTripDistanceBonus > 0 && <span className="text-[10px] text-muted block mt-2 ml-1">{t("booking.distanceNote").replace("{distance}", distanceKm.toFixed(1))}</span>}
+              {roundTripDistanceBonus > 0 && <span className="text-[10px] text-muted block mt-2 ml-1">{t("booking.distanceNote").replace("{distance}", roundTripKm.toFixed(1))}</span>}
             </section>
 
             {/* Luggage Size & Folding Option - Only for Laundry */}
@@ -1185,8 +1185,8 @@ function BookingFlow() {
                   {selectedStore && (
                     <Row icon={<Icons.Home size={12} />} label={t("common.store")} value={
                       isLoadingDistance 
-                        ? `${selectedStore.name} (~${haversineKm.toFixed(1)} ${t("booking.km")}...)` 
-                        : `${selectedStore.name} (${distanceKm.toFixed(1)} ${t("booking.km")}${estimatedMinutes ? ` ~${estimatedMinutes} นาที` : ''})`
+                        ? `${selectedStore.name} (~${(haversineKm * 2).toFixed(1)} ${t("booking.km")} ไป-กลับ...)` 
+                        : `${selectedStore.name} (${roundTripKm.toFixed(1)} ${t("booking.km")} ไป-กลับ${estimatedMinutes ? ` ~${estimatedMinutes * 2} นาที` : ''})`
                     } />
                   )}
                   <Row icon={<Icons.FileText size={11} />} label={t("booking.confirm.bagSize")} value={`${formatKg(bagSize)} ${bagSizeExtra > 0 ? `(+฿${bagSizeExtra})` : ""}`} />

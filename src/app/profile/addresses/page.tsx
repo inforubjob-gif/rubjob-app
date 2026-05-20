@@ -10,7 +10,7 @@ import { useLiff } from "@/components/providers/LiffProvider";
 import { useToast } from "@/components/providers/ToastProvider";
 import dynamic from "next/dynamic";
  
-const MapPicker = dynamic(() => import("@/components/ui/MapPicker"), {
+const MapPicker = dynamic(() => import("@/components/ui/GoogleMapPicker"), {
   ssr: false,
   loading: () => <div className="h-full w-full bg-slate-100 animate-pulse rounded-xl flex items-center justify-center font-bold text-slate-400">Loading Map...</div>,
 });

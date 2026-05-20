@@ -75,43 +75,66 @@ export default function RubberDashboard() {
     }
   }, [router]);
 
-  // Fetch weather data from real GPS
+  // Fetch weather data — cache GPS result 30 min in localStorage to avoid repeated permission prompts
   useEffect(() => {
-    if (!navigator.geolocation) {
-      // Fallback: no GPS support → use default (Khon Kaen)
+    const CACHE_KEY = "rubjob_gps_cache";
+    const CACHE_TTL_MS = 30 * 60 * 1000; // 30 minutes
+
+    function fetchWeatherWithCoords(latitude: number, longitude: number) {
+      fetch(`/api/weather?lat=${latitude}&lon=${longitude}`)
+        .then(r => r.json())
+        .then(d => { if (d.current) setWeather(d.current); })
+        .catch(() => {});
+      fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&accept-language=th&zoom=10`)
+        .then(r => r.json())
+        .then(geo => {
+          const name = geo.address?.city || geo.address?.town || geo.address?.state || geo.address?.county || "ตำแหน่งของคุณ";
+          setWeatherLocation(name);
+        })
+        .catch(() => {});
+    }
+
+    function fetchWeatherFallback() {
       fetch("/api/weather")
         .then(r => r.json())
         .then(d => { if (d.current) setWeather(d.current); })
         .catch(() => {});
+      setWeatherLocation("ขอนแก่น");
+    }
+
+    // Check cached GPS first
+    try {
+      const cached = localStorage.getItem(CACHE_KEY);
+      if (cached) {
+        const { lat, lng, ts } = JSON.parse(cached);
+        if (Date.now() - ts < CACHE_TTL_MS) {
+          // Still fresh — use cached coords, no permission prompt needed
+          fetchWeatherWithCoords(lat, lng);
+          return;
+        }
+      }
+    } catch (_) {}
+
+    // Cache expired or missing — request fresh GPS
+    if (!navigator.geolocation) {
+      fetchWeatherFallback();
       return;
     }
 
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         const { latitude, longitude } = pos.coords;
-        // Fetch weather with real coords
-        fetch(`/api/weather?lat=${latitude}&lon=${longitude}`)
-          .then(r => r.json())
-          .then(d => { if (d.current) setWeather(d.current); })
-          .catch(() => {});
-        // Reverse geocode for area name
-        fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&accept-language=th&zoom=10`)
-          .then(r => r.json())
-          .then(geo => {
-            const name = geo.address?.city || geo.address?.town || geo.address?.state || geo.address?.county || "ตำแหน่งของคุณ";
-            setWeatherLocation(name);
-          })
-          .catch(() => {});
+        // Save to cache
+        try {
+          localStorage.setItem(CACHE_KEY, JSON.stringify({ lat: latitude, lng: longitude, ts: Date.now() }));
+        } catch (_) {}
+        fetchWeatherWithCoords(latitude, longitude);
       },
       () => {
         // GPS denied → fallback
-        fetch("/api/weather")
-          .then(r => r.json())
-          .then(d => { if (d.current) setWeather(d.current); })
-          .catch(() => {});
-        setWeatherLocation("ขอนแก่น");
+        fetchWeatherFallback();
       },
-      { timeout: 5000 }
+      { timeout: 8000, maximumAge: 5 * 60 * 1000 } // allow browser to serve cached fix up to 5 min old
     );
   }, []);
 

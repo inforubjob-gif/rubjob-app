@@ -50,7 +50,7 @@ export default function RubberOrderDetailPage() {
           });
         },
         (err) => console.error("Rubber GPS Error:", err),
-        { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 5000 } // allow 5s cached fix to reduce re-prompts
       );
       return () => navigator.geolocation.clearWatch(watchId);
     }

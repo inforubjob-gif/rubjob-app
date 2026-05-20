@@ -8,7 +8,7 @@ import { Icons } from "@/components/ui/Icons";
 import Card from "@/components/ui/Card";
 import { useToast } from "@/components/providers/ToastProvider";
 
-const MapPicker = dynamic(() => import("@/components/ui/MapPicker"), { 
+const MapPicker = dynamic(() => import("@/components/ui/GoogleMapPicker"), { 
   ssr: false,
   loading: () => <div className="h-[400px] w-full bg-slate-100 animate-pulse rounded-xl flex items-center justify-center font-bold text-slate-400">Initializing Map Picker...</div>
 });
@@ -44,6 +44,26 @@ export default function StoreForm({ initialData, isEdit }: StoreFormProps) {
     services: initialData?.services || [] as any[], // [{ serviceId, price }]
     documents: initialData?.documents || [] as any[] // [{ type, url, status, notes }]
   });
+
+  // Custom (manual) services state
+  const [customServices, setCustomServices] = useState<{id: string; name: string; category: string; price: string}[]>(() => {
+    // Restore custom services from initialData if editing
+    const saved = initialData?.services || [];
+    return saved
+      .filter((s: any) => s.isCustom)
+      .map((s: any) => ({ id: s.serviceId, name: s.customName || s.serviceId, category: s.customCategory || 'custom', price: s.price?.toString() || '' }));
+  });
+  const [newCustomName, setNewCustomName] = useState('');
+  const [newCustomCategory, setNewCustomCategory] = useState('');
+  const [newCustomPrice, setNewCustomPrice] = useState('');
+
+  // Helper: translate known service names by ID
+  const getServiceName = (svcId: string, fallbackName: string) => {
+    const key = `admin.stores.form.serviceNames.${svcId}` as any;
+    const translated = t(key);
+    // If key resolves to itself (missing key), fall back to DB name
+    return translated && translated !== key ? translated : fallbackName;
+  };
 
   useEffect(() => {
     fetchServices();
@@ -105,17 +125,30 @@ export default function StoreForm({ initialData, isEdit }: StoreFormProps) {
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // 🛡️ Final Validation
+    // Merge custom services into formData.services before saving
+    const mergedServices = [
+      ...formData.services.filter((s: any) => !s.isCustom),
+      ...customServices
+        .filter(cs => cs.name.trim())
+        .map(cs => ({
+          serviceId: cs.id || `custom_${Date.now()}_${Math.random().toString(36).slice(2)}`,
+          price: parseFloat(cs.price) || null,
+          isCustom: true,
+          customName: cs.name,
+          customCategory: cs.category || 'custom'
+        }))
+    ];
     if (!formData.name.trim()) return showToast("Store Name is required", "error");
     if (!formData.address.trim()) return showToast("Physical Address is required", "error");
     if (!formData.email.trim()) return showToast("Store Login Email is required", "error");
     if (!isEdit && !formData.password.trim()) return showToast("Initial Password is required", "error");
-    if (formData.services.length === 0) return showToast("Please select at least one service", "error");
+    if (mergedServices.length === 0) return showToast("Please select at least one service", "error");
 
     setIsSaving(true);
     
     const payload = {
       ...formData,
+      services: mergedServices,
       lat: parseFloat(formData.lat) || 0,
       lng: parseFloat(formData.lng) || 0,
       serviceRadiusKm: parseFloat(formData.serviceRadiusKm) || 5,
@@ -379,7 +412,7 @@ export default function StoreForm({ initialData, isEdit }: StoreFormProps) {
                                         className="w-5 h-5 rounded-lg text-indigo-600 border-2 border-slate-200 focus:ring-indigo-500"
                                       />
                                       <div>
-                                         <p className="text-sm font-black text-slate-900">{svc.name}</p>
+                                         <p className="text-sm font-black text-slate-900">{getServiceName(svc.id, svc.name)}</p>
                                          <p className="text-[10px] text-slate-400 font-bold uppercase">{svc.category}</p>
                                       </div>
                                    </label>
@@ -405,6 +438,124 @@ export default function StoreForm({ initialData, isEdit }: StoreFormProps) {
                              </tr>
                           );
                        })}
+
+                       {/* Custom (Manual) Services */}
+                       {customServices.map((cs, idx) => (
+                         <tr key={`custom-${idx}`} className="bg-amber-50/30 transition-colors">
+                           <td className="px-6 py-4">
+                             <div className="flex items-center gap-3">
+                               <div className="w-5 h-5 rounded-lg bg-amber-400 flex items-center justify-center shrink-0">
+                                 <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M5 1v8M1 5h8" stroke="white" strokeWidth="2" strokeLinecap="round"/></svg>
+                               </div>
+                               <div className="flex-1 min-w-0">
+                                 <input
+                                   type="text"
+                                   value={cs.name}
+                                   onChange={e => {
+                                     const n = [...customServices];
+                                     n[idx] = { ...n[idx], name: e.target.value };
+                                     setCustomServices(n);
+                                   }}
+                                   placeholder={t('admin.stores.form.customServicePlaceholder')}
+                                   className="w-full text-sm font-black text-slate-900 bg-transparent border-b border-amber-200 focus:border-amber-500 outline-none py-0.5 transition-colors"
+                                 />
+                                 <input
+                                   type="text"
+                                   value={cs.category}
+                                   onChange={e => {
+                                     const n = [...customServices];
+                                     n[idx] = { ...n[idx], category: e.target.value };
+                                     setCustomServices(n);
+                                   }}
+                                   placeholder={t('admin.stores.form.customCategoryLabel')}
+                                   className="w-full text-[10px] font-bold text-slate-400 bg-transparent border-none outline-none mt-1"
+                                 />
+                               </div>
+                             </div>
+                           </td>
+                           <td className="px-6 py-4">
+                             <span className="text-[10px] text-amber-500 font-black uppercase tracking-widest">Custom</span>
+                           </td>
+                           <td className="px-6 py-4 text-right">
+                             <div className="flex items-center justify-end gap-2">
+                               <input
+                                 type="number"
+                                 value={cs.price}
+                                 onChange={e => {
+                                   const n = [...customServices];
+                                   n[idx] = { ...n[idx], price: e.target.value };
+                                   setCustomServices(n);
+                                 }}
+                                 placeholder={t('admin.stores.form.customServicePricePlaceholder')}
+                                 className="w-24 bg-white border-2 border-amber-200 rounded-xl px-3 py-2 text-sm font-black text-amber-600 text-right focus:outline-none focus:border-amber-400"
+                               />
+                               <button
+                                 type="button"
+                                 onClick={() => setCustomServices(prev => prev.filter((_, i) => i !== idx))}
+                                 className="w-8 h-8 rounded-lg bg-white border border-rose-100 text-rose-400 hover:bg-rose-50 hover:text-rose-600 flex items-center justify-center transition-all text-xs font-black shrink-0"
+                                 title={t('admin.stores.form.removeService')}
+                               >
+                                 ✕
+                               </button>
+                             </div>
+                           </td>
+                         </tr>
+                       ))}
+
+                       {/* Add Custom Service Row */}
+                       <tr className="bg-slate-50/50">
+                         <td colSpan={3} className="px-6 py-4">
+                           <div className="flex items-center gap-2">
+                             <input
+                               type="text"
+                               value={newCustomName}
+                               onChange={e => setNewCustomName(e.target.value)}
+                               onKeyDown={e => {
+                                 if (e.key === 'Enter') {
+                                   e.preventDefault();
+                                   if (!newCustomName.trim()) return;
+                                   setCustomServices(prev => [...prev, {
+                                     id: `custom_${Date.now()}`,
+                                     name: newCustomName.trim(),
+                                     category: newCustomCategory.trim() || 'custom',
+                                     price: newCustomPrice
+                                   }]);
+                                   setNewCustomName('');
+                                   setNewCustomCategory('');
+                                   setNewCustomPrice('');
+                                 }
+                               }}
+                               placeholder={t('admin.stores.form.customServicePlaceholder')}
+                               className="flex-1 bg-white border-2 border-dashed border-slate-200 rounded-xl px-4 py-2.5 text-sm font-bold text-slate-700 focus:border-primary/50 focus:outline-none transition-all placeholder:text-slate-300"
+                             />
+                             <input
+                               type="number"
+                               value={newCustomPrice}
+                               onChange={e => setNewCustomPrice(e.target.value)}
+                               placeholder="฿"
+                               className="w-20 bg-white border-2 border-dashed border-slate-200 rounded-xl px-3 py-2.5 text-sm font-black text-indigo-600 text-right focus:border-primary/50 focus:outline-none transition-all placeholder:text-slate-300"
+                             />
+                             <button
+                               type="button"
+                               onClick={() => {
+                                 if (!newCustomName.trim()) return;
+                                 setCustomServices(prev => [...prev, {
+                                   id: `custom_${Date.now()}`,
+                                   name: newCustomName.trim(),
+                                   category: newCustomCategory.trim() || 'custom',
+                                   price: newCustomPrice
+                                 }]);
+                                 setNewCustomName('');
+                                 setNewCustomCategory('');
+                                 setNewCustomPrice('');
+                               }}
+                               className="px-4 py-2.5 bg-primary text-white rounded-xl text-xs font-black uppercase tracking-widest hover:bg-primary-dark active:scale-95 transition-all shrink-0 shadow-sm shadow-primary/20"
+                             >
+                               {t('admin.stores.form.addCustomService')}
+                             </button>
+                           </div>
+                         </td>
+                       </tr>
                     </tbody>
                  </table>
               </div>

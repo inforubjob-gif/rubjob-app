@@ -12,7 +12,7 @@ import { useTranslation } from "@/components/providers/LanguageProvider";
 import { useToast } from "@/components/providers/ToastProvider";
 import Modal from "@/components/ui/Modal";
 
-const MapPicker = dynamic(() => import("@/components/ui/MapPicker"), {
+const MapPicker = dynamic(() => import("@/components/ui/GoogleMapPicker"), {
   ssr: false,
   loading: () => <div className="h-full w-full bg-slate-100 animate-pulse rounded-xl flex items-center justify-center text-slate-400 text-sm font-bold">Loading Map...</div>,
 });

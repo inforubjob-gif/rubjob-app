@@ -392,7 +392,7 @@ export default function AdminOrderDetailPage() {
         <span className="text-slate-900">฿{order.laundryFee || 0}</span>
        </div>
        <div className="flex justify-between text-sm font-bold border-b border-slate-50 pb-3">
-        <span className="text-slate-500">ค่าขนส่ง ({order.distanceKm ? `${Number(order.distanceKm).toFixed(1)} km` : '-'})</span>
+        <span className="text-slate-500">ค่าขนส่ง ({order.distanceKm ? `${(Number(order.distanceKm) * 2).toFixed(1)} km (ไป-กลับ)` : '-'})</span>
         <span className="text-slate-900">฿{order.deliveryFee || 0}</span>
        </div>
        {Number(order.cancellationFee) > 0 && (
