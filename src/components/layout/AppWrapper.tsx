@@ -50,20 +50,16 @@ export default function AppWrapper({ children }: { children: React.ReactNode }) 
   }, []);
 
   // Check if user has completed onboarding (has phone + at least 1 address)
+  // Always verify against the server — localStorage alone can't be trusted
+  // because an admin may delete the user from the DB at any time.
   useEffect(() => {
     if (!isReady || !isLoggedIn || !profile?.userId || isBackoffice || isLanding) {
       setNeedsOnboarding(null);
       return;
     }
 
-    // Fast check: scoped to userId so deleting + re-registering forces fresh check
-    const onboardingKey = `rubjob_onboarded_${profile?.userId}`;
     // Clean up legacy generic key if present
     localStorage.removeItem("rubjob_onboarding_done");
-    if (localStorage.getItem(onboardingKey) === "true") {
-      setNeedsOnboarding(false);
-      return;
-    }
 
     async function checkOnboarding() {
       setCheckingOnboarding(true);
@@ -76,15 +72,22 @@ export default function AppWrapper({ children }: { children: React.ReactNode }) 
         const userData = (await userRes.json()) as any;
         const addrData = (await addrRes.json()) as any;
 
-        const hasPhone = !!userData.user?.phone;
-        const hasAddress = (addrData.addresses?.length || 0) > 0;
-        const completed = hasPhone && hasAddress;
-
         // If user not found in DB (deleted account) → force onboarding
         if (userRes.status === 404 || !userData.user) {
           localStorage.removeItem(`rubjob_onboarded_${profile?.userId}`);
           setNeedsOnboarding(true);
           return;
+        }
+
+        const hasPhone = !!userData.user?.phone;
+        const hasAddress = (addrData.addresses?.length || 0) > 0;
+        const completed = hasPhone && hasAddress;
+
+        // Sync localStorage with actual server state
+        if (completed) {
+          localStorage.setItem(`rubjob_onboarded_${profile!.userId}`, "true");
+        } else {
+          localStorage.removeItem(`rubjob_onboarded_${profile?.userId}`);
         }
 
         setNeedsOnboarding(!completed);
