@@ -36,9 +36,23 @@ export default function PrivacyPolicyPage() {
         </section>
 
         <section>
+          <h2 className="text-base font-bold text-slate-900 mb-3">{t("profile.privacyPage.locationTitle")}</h2>
+          <p className="text-sm leading-relaxed">
+            {t("profile.privacyPage.locationDesc")}
+          </p>
+        </section>
+
+        <section>
           <h2 className="text-base font-bold text-slate-900 mb-3">{t("profile.privacyPage.securityTitle")}</h2>
           <p className="text-sm leading-relaxed">
             {t("profile.privacyPage.securityDesc")}
+          </p>
+        </section>
+
+        <section>
+          <h2 className="text-base font-bold text-slate-900 mb-3">{t("profile.privacyPage.rightsTitle")}</h2>
+          <p className="text-sm leading-relaxed">
+            {t("profile.privacyPage.rightsDesc")}
           </p>
         </section>
 

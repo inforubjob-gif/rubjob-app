@@ -106,8 +106,8 @@ export default function AppWrapper({ children }: { children: React.ReactNode }) 
         }
       } catch (err) {
         console.error("Failed to check onboarding status:", err);
-        // On error, let user through (don't block)
-        setNeedsOnboarding(false);
+        // On error, require onboarding to ensure phone + address are collected
+        setNeedsOnboarding(true);
       } finally {
         setCheckingOnboarding(false);
       }

@@ -21,33 +21,14 @@ export default function TOSPage() {
       </header>
 
       <main className="p-6 space-y-6 text-slate-600">
-        <section>
-          <h2 className="text-base font-bold text-slate-900 mb-3">{t("profile.tosPage.introTitle")}</h2>
-          <p className="text-sm leading-relaxed">
-            {t("profile.tosPage.introDesc")}
-          </p>
-        </section>
-
-        <section>
-          <h2 className="text-base font-bold text-slate-900 mb-3">{t("profile.tosPage.usageTitle")}</h2>
-          <p className="text-sm leading-relaxed">
-            {t("profile.tosPage.usageDesc")}
-          </p>
-        </section>
-
-        <section>
-          <h2 className="text-base font-bold text-slate-900 mb-3">{t("profile.tosPage.paymentTitle")}</h2>
-          <p className="text-sm leading-relaxed">
-            {t("profile.tosPage.paymentDesc")}
-          </p>
-        </section>
-
-        <section>
-          <h2 className="text-base font-bold text-slate-900 mb-3">{t("profile.tosPage.liabilityTitle")}</h2>
-          <p className="text-sm leading-relaxed">
-            {t("profile.tosPage.liabilityDesc")}
-          </p>
-        </section>
+        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map((n) => (
+          <section key={n}>
+            <h2 className="text-base font-bold text-slate-900 mb-3">{t(`profile.tosPage.section${n}Title`)}</h2>
+            <p className="text-sm leading-relaxed">
+              {t(`profile.tosPage.section${n}Desc`)}
+            </p>
+          </section>
+        ))}
 
         <div className="pt-8 border-t border-slate-50 text-center">
             <p className="text-[10px] text-slate-400">{t("profile.tosPage.lastUpdated")}</p>
