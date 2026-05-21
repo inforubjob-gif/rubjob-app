@@ -136,19 +136,25 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
     setIsSubmitting(true);
 
     try {
-      await fetch("/api/user/addresses", {
+      // Use label as fallback for details if not provided
+      const finalDetails = addressDetails.trim() || addressLabel.trim();
+      const res = await fetch("/api/user/addresses", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           userId: profile?.userId,
           label: addressLabel.trim(),
-          details: addressDetails.trim(),
+          details: finalDetails,
           note: addressNote.trim() || null,
           lat: pinLat,
           lng: pinLng,
           isDefault: true,
         }),
       });
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({})) as any;
+        throw new Error(errData.error || "Failed to save address");
+      }
       // Set completion flag scoped to userId (prevents skip after account deletion + re-register)
       if (profile?.userId) {
         localStorage.setItem(`rubjob_onboarded_${profile.userId}`, "true");
@@ -512,7 +518,7 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
                 {/* Pin location with real map */}
                 <div className="space-y-2">
                   <label className="text-xs font-bold text-slate-500 mb-1.5 block">{t("onboarding.pinLabel")}</label>
-                  <div className="h-52 w-full rounded-xl overflow-hidden border-2 border-slate-100">
+                  <div className="h-72 w-full rounded-xl overflow-hidden border-2 border-slate-100">
                     <MapPicker
                       lat={pinLat || 0}
                       lng={pinLng || 0}

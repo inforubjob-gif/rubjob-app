@@ -150,12 +150,29 @@ function MapContent({ lat, lng, onChange }: MapPickerProps) {
 // ── Main Export ───────────────────────────────────────────────────────────────
 export default function GoogleMapPicker({ lat, lng, onChange }: MapPickerProps) {
   const [isMounted, setIsMounted] = useState(false);
+  const [isLocating, setIsLocating] = useState(false);
   useEffect(() => setIsMounted(true), []);
 
   const handlePlaceSelect = useCallback(
     (placeLat: number, placeLng: number) => onChange(placeLat, placeLng),
     [onChange]
   );
+
+  const handleMyLocation = useCallback(() => {
+    if (!navigator.geolocation) return;
+    setIsLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        onChange(
+          parseFloat(pos.coords.latitude.toFixed(6)),
+          parseFloat(pos.coords.longitude.toFixed(6))
+        );
+        setIsLocating(false);
+      },
+      () => setIsLocating(false),
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+    );
+  }, [onChange]);
 
   if (!isMounted) return (
     <div className="h-full w-full bg-slate-100 animate-pulse rounded-xl flex items-center justify-center font-bold text-slate-400">
@@ -177,7 +194,28 @@ export default function GoogleMapPicker({ lat, lng, onChange }: MapPickerProps) 
       >
         <PlacesSearch onSelect={handlePlaceSelect} />
         <MapContent lat={lat} lng={lng} onChange={onChange} />
-        <div className="absolute bottom-3 left-3 right-3 z-[999] pointer-events-none">
+
+        {/* My Location Button */}
+        <button
+          onClick={handleMyLocation}
+          disabled={isLocating}
+          className="absolute bottom-14 right-3 z-[1000] w-11 h-11 bg-white rounded-full shadow-lg border border-slate-200 flex items-center justify-center active:scale-90 transition-all hover:shadow-xl disabled:opacity-60"
+          title="ตำแหน่งของฉัน"
+        >
+          {isLocating ? (
+            <div className="w-5 h-5 border-2 border-blue-200 border-t-blue-500 rounded-full animate-spin" />
+          ) : (
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-blue-500">
+              <circle cx="12" cy="12" r="3" />
+              <line x1="12" y1="2" x2="12" y2="6" />
+              <line x1="12" y1="18" x2="12" y2="22" />
+              <line x1="2" y1="12" x2="6" y2="12" />
+              <line x1="18" y1="12" x2="22" y2="12" />
+            </svg>
+          )}
+        </button>
+
+        <div className="absolute bottom-3 left-3 right-16 z-[999] pointer-events-none">
           <p className="text-[10px] font-bold text-slate-500 bg-white/80 backdrop-blur-sm px-3 py-1.5 rounded-lg shadow text-center">
             แตะแผนที่หรือลากหมุดเพื่อปรับตำแหน่ง
           </p>

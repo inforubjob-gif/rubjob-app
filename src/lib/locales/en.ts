@@ -345,6 +345,7 @@ export const en = {
     pinLocation: "Pin Location",
     bangkokThailand: "Bangkok, Thailand",
     confirmLocation: "Confirm Location",
+    myLocation: "My Location",
     pinned: "Pinned!",
     addressRequired: "Label and full address are required",
   },

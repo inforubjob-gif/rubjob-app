@@ -279,6 +279,7 @@ export const th = {
       pinLocation: "ปักหมุดที่ตั้ง",
       bangkokThailand: "กรุงเทพมหานคร, ประเทศไทย",
       confirmLocation: "ยืนยันพิกัดที่ตั้ง",
+      myLocation: "ตำแหน่งของฉัน",
       selectCoupon: "เลือกจากคูปองที่มี",
       noCoupons: "ไม่มีคูปองที่ใช้งานได้ในขณะนี้",
       pinned: "ปักหมุดแล้ว!",

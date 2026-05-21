@@ -152,11 +152,62 @@ export default function ManageAddressesPage() {
     }
   };
  
+  // Reverse geocode to get location name
+  const [locationName, setLocationName] = useState<string>("");
+  const [isLocatingHere, setIsLocatingHere] = useState(false);
+
+  useEffect(() => {
+    if (!location?.lat || !location?.lng) {
+      setLocationName("");
+      return;
+    }
+    const GKEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY;
+    if (!GKEY) return;
+
+    const timer = setTimeout(async () => {
+      try {
+        const res = await fetch(
+          `https://maps.googleapis.com/maps/api/geocode/json?latlng=${location.lat},${location.lng}&language=th&key=${GKEY}`
+        );
+        const data = await res.json() as any;
+        if (data.results?.[0]) {
+          // Try to get a short, meaningful name (subdistrict/district/province)
+          const parts = data.results[0].address_components as any[];
+          const province = parts?.find((p: any) => p.types?.includes("administrative_area_level_1"))?.long_name;
+          const district = parts?.find((p: any) => p.types?.includes("administrative_area_level_2"))?.long_name;
+          const subdistrict = parts?.find((p: any) => p.types?.includes("sublocality_level_1") || p.types?.includes("sublocality"))?.long_name;
+          const name = [subdistrict, district, province].filter(Boolean).join(", ");
+          setLocationName(name || data.results[0].formatted_address || "");
+        }
+      } catch {
+        setLocationName("");
+      }
+    }, 500); // Debounce to avoid excessive API calls
+
+    return () => clearTimeout(timer);
+  }, [location?.lat, location?.lng]);
+
+  const handleGoToMyLocation = () => {
+    if (!navigator.geolocation) return;
+    setIsLocatingHere(true);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setLocation({
+          lat: parseFloat(pos.coords.latitude.toFixed(6)),
+          lng: parseFloat(pos.coords.longitude.toFixed(6)),
+        });
+        setIsLocatingHere(false);
+      },
+      () => setIsLocatingHere(false),
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+    );
+  };
+
   const confirmLocation = () => {
     if (!location) return;
     setIsSelectingLocation(false);
   };
- 
+
   if (isSelectingLocation) {
     return (
       <div className="flex flex-col min-h-dvh bg-white animate-in slide-in-from-bottom duration-300">
@@ -192,13 +243,36 @@ export default function ManageAddressesPage() {
             {/* Address Overlay */}
             <div className="absolute bottom-10 left-5 right-5 z-20">
                <Card className="p-6 shadow-2xl shadow-slate-900/10 border-none bg-white/95 backdrop-blur-md rounded-[2rem]">
-                  <div className="flex gap-4 mb-6">
+                  <div className="flex gap-4 mb-4">
                      <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center text-2xl">📍</div>
-                     <div className="flex-1">
+                     <div className="flex-1 min-w-0">
                         <p className="text-sm font-black text-slate-900 uppercase tracking-tight">{t("profile.pinLocation")}</p>
-                        <p className="text-[11px] text-slate-500 font-medium mt-1 uppercase tracking-widest">{t("profile.bangkokThailand")}</p>
+                        <p className="text-[11px] text-slate-500 font-medium mt-1 truncate">
+                          {locationName || (location ? `${location.lat.toFixed(4)}, ${location.lng.toFixed(4)}` : t("profile.pinOnMap"))}
+                        </p>
                      </div>
                   </div>
+
+                  {/* My Location shortcut */}
+                  <button
+                    onClick={handleGoToMyLocation}
+                    disabled={isLocatingHere}
+                    className="w-full mb-3 py-3 bg-blue-50 text-blue-600 rounded-2xl text-[12px] font-black uppercase flex items-center justify-center gap-2 active:scale-95 transition-all disabled:opacity-60"
+                  >
+                    {isLocatingHere ? (
+                      <div className="w-4 h-4 border-2 border-blue-200 border-t-blue-500 rounded-full animate-spin" />
+                    ) : (
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <circle cx="12" cy="12" r="3" />
+                        <line x1="12" y1="2" x2="12" y2="6" />
+                        <line x1="12" y1="18" x2="12" y2="22" />
+                        <line x1="2" y1="12" x2="6" y2="12" />
+                        <line x1="18" y1="12" x2="22" y2="12" />
+                      </svg>
+                    )}
+                    {t("profile.myLocation") || "ตำแหน่งของฉัน"}
+                  </button>
+
                   <button 
                     onClick={confirmLocation}
                     disabled={!location}

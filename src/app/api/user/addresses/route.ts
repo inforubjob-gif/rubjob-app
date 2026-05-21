@@ -42,9 +42,11 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
   try {
     const body = (await req.json() as any) as any;
-    const { userId, label, details, note, lat, lng, isDefault } = body;
+    const { userId, label, note, lat, lng, isDefault } = body;
+    // details is optional — fallback to label if not provided
+    const details = body.details || label;
     
-    if (!userId || !label || !details) {
+    if (!userId || !label) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
