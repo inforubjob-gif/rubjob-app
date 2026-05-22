@@ -17,6 +17,8 @@ export interface PriceDetails {
   isExpress: boolean;
   needsDetergent: boolean;
   withFolding: boolean;
+  machineSize?: 'small' | 'large';
+  washMode?: 'standard' | 'extra';
 }
 
 export interface PricingResult {
@@ -34,14 +36,24 @@ export function calculateOrderPrice(
   details: PriceDetails,
   config: PricingConfig
 ): PricingResult {
-  const { weightKg, distanceKm, isExpress, needsDetergent, withFolding } = details;
+  const { weightKg, distanceKm, isExpress, needsDetergent, withFolding, machineSize, washMode } = details;
 
-  // 1. Laundry Cost Calculation
+  // 1. Laundry Cost (combo washer-dryer: wash+dry included)
   let laundryCost = 0;
-  if (weightKg <= 9) laundryCost = 120;
-  else if (weightKg <= 14) laundryCost = 140;
-  else if (weightKg <= 18) laundryCost = 170;
-  else laundryCost = 210; // Up to 28 kg.
+  if (machineSize && washMode) {
+    // MARU-style combo machine pricing
+    const priceMatrix: Record<string, Record<string, number>> = {
+      small:    { standard: 100, extra: 140 },
+      large:    { standard: 120, extra: 160 },
+    };
+    laundryCost = priceMatrix[machineSize]?.[washMode] ?? 100;
+  } else {
+    // Fallback: weight-based
+    if (weightKg <= 9) laundryCost = 100;
+    else if (weightKg <= 14) laundryCost = 120;
+    else if (weightKg <= 18) laundryCost = 140;
+    else laundryCost = 160;
+  }
 
   // 2. Delivery Fee Calculation (ระยะทางไปกลับ แล้วค่อยคิดเงิน)
   const roundTripKm = distanceKm * 2;

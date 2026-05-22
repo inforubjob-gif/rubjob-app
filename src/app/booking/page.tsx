@@ -123,6 +123,8 @@ function BookingFlow() {
   
   // Weight & Size based selection instead of per-piece items
   const [bagSize, setBagSize] = useState<"9kg" | "14kg" | "18kg" | "28kg">("9kg");
+  const [machineSize, setMachineSize] = useState<"small" | "large">("small");
+  const [washMode, setWashMode] = useState<"standard" | "extra">("standard");
   const [withFolding, setWithFolding] = useState<boolean>(true);
   const [needsDetergent, setNeedsDetergent] = useState<boolean>(false);
 
@@ -419,7 +421,9 @@ function BookingFlow() {
       distanceKm: distanceKm || 0,
       isExpress: deliverySpeed === "express",
       needsDetergent: needsDetergent,
-      withFolding: withFolding
+      withFolding: withFolding,
+      machineSize: machineSize,
+      washMode: washMode,
     }, pricingConfig);
   } catch (err) {
     console.error("Pricing error:", err);
@@ -892,17 +896,20 @@ function BookingFlow() {
               {roundTripDistanceBonus > 0 && <span className="text-[10px] text-muted block mt-2 ml-1">{t("booking.distanceNote").replace("{distance}", roundTripKm.toFixed(1))}</span>}
             </section>
 
-            {/* Luggage Size & Folding Option - Only for Laundry */}
+            {/* Machine Size & Wash Mode - Only for Laundry */}
             {service?.category === "laundry" && (
               <section>
-                <h3 className="text-sm font-black text-foreground mb-2 flex items-center gap-2 uppercase tracking-tight">
+                {/* ─── เลือกขนาดเครื่อง (ซัก+อบในตัว) ─── */}
+                <h3 className="text-sm font-black text-foreground mb-3 flex items-center gap-2 uppercase tracking-tight">
                   <IconCircle variant="orange" size="sm">
                     <Icons.FileText size={14} strokeWidth={3} />
                   </IconCircle>
-                  {t("booking.bagSizeTitle")}
+                  เลือกขนาดเครื่อง
                 </h3>
+                <p className="text-[10px] text-slate-400 font-bold mb-3 ml-1">เครื่องซัก+อบในตัว — ราคารวมซักและอบแล้ว</p>
+
                 {selectedService === "duvet_washing" ? (
-                  <div className="grid grid-cols-1 mb-4">
+                  <div className="grid grid-cols-1 mb-5">
                     <label className="flex flex-col items-center justify-center p-4 rounded-xl border-2 border-primary bg-primary/5 shadow-md shadow-primary/10">
                       <span className="text-sm font-black text-foreground">{t("booking.bagMaxSize")}</span>
                       <span className="text-[10px] text-muted font-bold mt-1">
@@ -911,19 +918,99 @@ function BookingFlow() {
                     </label>
                   </div>
                 ) : (
-                  <div className="grid grid-cols-2 gap-2 mb-4">
-                    {(["9kg", "14kg", "18kg", "28kg"] as const).map((size) => (
-                      <label key={size} className={`flex flex-col items-center justify-center p-3.5 rounded-xl border-2 cursor-pointer transition-all ${bagSize === size ? "border-primary bg-primary/5 shadow-md shadow-primary/10" : "border-slate-100 bg-white hover:bg-slate-50"}`} onClick={() => setBagSize(size)}>
-                        <span className="text-sm font-black text-foreground">{formatKg(size)}</span>
-                        <span className="text-[10px] text-muted font-bold">
-                          {({ "9kg": t("booking.bagPieces.9kg"), "14kg": t("booking.bagPieces.14kg"), "18kg": t("booking.bagPieces.18kg"), "28kg": t("booking.bagPieces.28kg") } as const)[size]}
-                        </span>
-                        {size === "28kg" && <span className="text-[10px] text-primary-dark font-black mt-1">+฿20</span>}
-                      </label>
-                    ))}
+                  <div className="grid grid-cols-2 gap-3 mb-6">
+                    {([
+                      { value: "small" as const, label: "Small", desc: "20-30 ชิ้น", priceStd: 100, priceExt: 140 },
+                      { value: "large" as const, label: "Large", desc: "50-80 ชิ้น", priceStd: 120, priceExt: 160 },
+                    ]).map((opt) => {
+                      const currentPrice = washMode === "extra" ? opt.priceExt : opt.priceStd;
+                      return (
+                        <button
+                          key={opt.value}
+                          onClick={() => {
+                            setMachineSize(opt.value);
+                            setBagSize(opt.value === "small" ? "9kg" : "18kg");
+                          }}
+                          className={`flex flex-col items-center p-5 rounded-2xl border-2 transition-all active:scale-[0.97] ${
+                            machineSize === opt.value
+                              ? "border-primary bg-primary/5 shadow-lg shadow-primary/10"
+                              : "border-slate-100 bg-white hover:border-slate-200"
+                          }`}
+                        >
+                          <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-3 ${
+                            machineSize === opt.value ? "bg-primary text-white" : "bg-slate-100 text-slate-500"
+                          }`}>
+                            <span className="text-2xl">🫧</span>
+                          </div>
+                          <p className={`text-base font-black ${machineSize === opt.value ? "text-primary" : "text-slate-900"}`}>{opt.label}</p>
+                          <p className="text-[10px] text-slate-400 font-bold mt-0.5">{opt.desc}</p>
+                          <p className={`text-lg font-black mt-2 ${machineSize === opt.value ? "text-primary" : "text-slate-700"}`}>฿{currentPrice}</p>
+                        </button>
+                      );
+                    })}
                   </div>
                 )}
 
+                {/* ─── เลือกโหมดการซัก ─── */}
+                <h3 className="text-sm font-black text-foreground mb-3 flex items-center gap-2 uppercase tracking-tight">
+                  <IconCircle variant="yellow" size="sm">
+                    <Icons.Tasks size={14} strokeWidth={3} />
+                  </IconCircle>
+                  เลือกโหมดการซัก
+                </h3>
+                <div className="space-y-2 mb-5">
+                  {/* Standard */}
+                  <button
+                    onClick={() => setWashMode("standard")}
+                    className={`w-full text-left p-4 rounded-2xl border-2 transition-all active:scale-[0.98] ${
+                      washMode === "standard"
+                        ? "border-primary bg-primary/5 shadow-lg shadow-primary/10"
+                        : "border-slate-100 bg-white hover:border-slate-200"
+                    }`}
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <span className="text-lg">✨</span>
+                        <p className={`text-sm font-black ${washMode === "standard" ? "text-primary" : "text-slate-900"}`}>Standard</p>
+                        <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${washMode === "standard" ? "bg-primary/10 text-primary" : "bg-slate-100 text-slate-400"}`}>~30 นาที</span>
+                      </div>
+                      <div className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 ${
+                        washMode === "standard" ? "bg-primary text-white" : "border-2 border-slate-200"
+                      }`}>
+                        {washMode === "standard" && <span className="text-xs font-bold">✓</span>}
+                      </div>
+                    </div>
+                    <p className="text-[11px] text-slate-500 leading-relaxed">ซักแบบมาตรฐาน เหมาะกับเสื้อผ้าประจำวัน ประหยัดเวลาและค่าใช้จ่าย</p>
+                    <p className={`text-base font-black mt-2 ${washMode === "standard" ? "text-primary" : "text-slate-700"}`}>฿{machineSize === "small" ? 100 : 120}</p>
+                  </button>
+
+                  {/* Extra */}
+                  <button
+                    onClick={() => setWashMode("extra")}
+                    className={`w-full text-left p-4 rounded-2xl border-2 transition-all active:scale-[0.98] ${
+                      washMode === "extra"
+                        ? "border-primary bg-primary/5 shadow-lg shadow-primary/10"
+                        : "border-slate-100 bg-white hover:border-slate-200"
+                    }`}
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <span className="text-lg">🔥</span>
+                        <p className={`text-sm font-black ${washMode === "extra" ? "text-primary" : "text-slate-900"}`}>Extra</p>
+                        <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${washMode === "extra" ? "bg-primary/10 text-primary" : "bg-slate-100 text-slate-400"}`}>~45 นาที</span>
+                      </div>
+                      <div className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 ${
+                        washMode === "extra" ? "bg-primary text-white" : "border-2 border-slate-200"
+                      }`}>
+                        {washMode === "extra" && <span className="text-xs font-bold">✓</span>}
+                      </div>
+                    </div>
+                    <p className="text-[11px] text-slate-500 leading-relaxed">ซักล้ำลึกด้วยน้ำร้อน ฆ่าเชื้อแบคทีเรีย เหมาะกับเครื่องนอน ผ้าเช็ดตัว ผ้ากีฬา</p>
+                    <p className={`text-base font-black mt-2 ${washMode === "extra" ? "text-primary" : "text-slate-700"}`}>฿{machineSize === "small" ? 140 : 160}</p>
+                  </button>
+                </div>
+
+                {/* ─── พับผ้า ─── */}
                 <h3 className="text-sm font-black text-foreground mb-2 flex items-center gap-2 uppercase tracking-tight">
                   <IconCircle variant="yellow" size="sm">
                     <Icons.Tasks size={14} strokeWidth={3} />
@@ -953,6 +1040,7 @@ function BookingFlow() {
                   </label>
                 </Card>
 
+                {/* ─── น้ำยาซักผ้า ─── */}
                 <h3 className="text-sm font-black text-foreground mb-2 flex items-center gap-2 uppercase tracking-tight">
                   <IconCircle variant="black" size="sm">
                     <Icons.Shield size={14} strokeWidth={3} />
