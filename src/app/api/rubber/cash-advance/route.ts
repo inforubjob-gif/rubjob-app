@@ -95,6 +95,8 @@ export async function POST(req: Request) {
         if (waterTemp === "cold") verifiedAmount = row.priceCold;
         else if (waterTemp === "warm") verifiedAmount = row.priceWarm;
         else if (waterTemp === "hot") verifiedAmount = row.priceHot;
+        else if (waterTemp === "standard") verifiedAmount = row.priceStandard;
+        else if (waterTemp === "extra") verifiedAmount = row.priceExtra;
         else {
           return NextResponse.json({ error: `Invalid water temp: ${waterTemp}` }, { status: 400 });
         }

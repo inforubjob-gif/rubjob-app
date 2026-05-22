@@ -10,10 +10,11 @@ interface CashAdvanceRecorderProps {
   storeId: string;
   storeName: string;
   rubberId: string;
+  serviceDetails?: any;
   onRecorded?: () => void;
 }
 
-export default function CashAdvanceRecorder({ orderId, storeId, storeName, rubberId, onRecorded }: CashAdvanceRecorderProps) {
+export default function CashAdvanceRecorder({ orderId, storeId, storeName, rubberId, serviceDetails, onRecorded }: CashAdvanceRecorderProps) {
   const [washers, setWashers] = useState<any[]>([]);
   const [dryers, setDryers] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -39,7 +40,30 @@ export default function CashAdvanceRecorder({ orderId, storeId, storeName, rubbe
       const data = await res.json() as any;
       setWashers(data.washers || []);
       setDryers(data.dryers || []);
-      setMachineType(data.machineType || "separate");
+      const mType = data.machineType || "separate";
+      setMachineType(mType);
+
+      // Auto-select based on customer serviceDetails
+      if (serviceDetails) {
+        const targetKg = parseInt(serviceDetails.bagSize) || 9;
+        
+        // Find nearest washer size
+        const wMatch = data.washers.find((w: any) => w.sizeKg >= targetKg) || data.washers[0];
+        if (wMatch) {
+          let temp = "cold";
+          if (mType === "combo") {
+            temp = serviceDetails.washMode === "extra" ? "extra" : "standard";
+          }
+          setSelectedWasher({ id: wMatch.id, waterTemp: temp });
+        }
+
+        // Find nearest dryer size if separate
+        if (mType === "separate") {
+          const dMatch = data.dryers.find((d: any) => d.sizeKg >= targetKg) || data.dryers[0];
+          if (dMatch) setSelectedDryer(dMatch.id);
+        }
+      }
+
     } catch (err) {
       console.error(err);
     } finally {
@@ -60,6 +84,8 @@ export default function CashAdvanceRecorder({ orderId, storeId, storeName, rubbe
   }
 
   function getWasherPrice(washer: any, temp: string): number {
+    if (temp === "standard") return washer.priceStandard;
+    if (temp === "extra") return washer.priceExtra;
     if (temp === "cold") return washer.priceCold;
     if (temp === "warm") return washer.priceWarm;
     return washer.priceHot;
@@ -129,6 +155,8 @@ export default function CashAdvanceRecorder({ orderId, storeId, storeName, rubbe
     cold: { label: "เย็น", color: "text-blue-600", bg: "bg-blue-50 border-blue-200" },
     warm: { label: "อุ่น", color: "text-amber-600", bg: "bg-amber-50 border-amber-200" },
     hot: { label: "ร้อน", color: "text-rose-600", bg: "bg-rose-50 border-rose-200" },
+    standard: { label: "Standard", color: "text-emerald-600", bg: "bg-emerald-50 border-emerald-200" },
+    extra: { label: "Extra", color: "text-purple-600", bg: "bg-purple-50 border-purple-200" },
   };
 
   if (isLoading) {
@@ -202,9 +230,18 @@ export default function CashAdvanceRecorder({ orderId, storeId, storeName, rubbe
                 <thead>
                   <tr>
                     <th className="px-2 py-2 text-[9px] font-black text-slate-300 uppercase">ขนาด</th>
-                    <th className="px-2 py-2 text-[9px] font-black text-blue-400 uppercase">เย็น</th>
-                    <th className="px-2 py-2 text-[9px] font-black text-amber-500 uppercase">อุ่น</th>
-                    <th className="px-2 py-2 text-[9px] font-black text-rose-400 uppercase">ร้อน</th>
+                    {machineType === "combo" ? (
+                      <>
+                        <th className="px-2 py-2 text-[9px] font-black text-emerald-500 uppercase">Standard</th>
+                        <th className="px-2 py-2 text-[9px] font-black text-purple-500 uppercase">Extra</th>
+                      </>
+                    ) : (
+                      <>
+                        <th className="px-2 py-2 text-[9px] font-black text-blue-400 uppercase">เย็น</th>
+                        <th className="px-2 py-2 text-[9px] font-black text-amber-500 uppercase">อุ่น</th>
+                        <th className="px-2 py-2 text-[9px] font-black text-rose-400 uppercase">ร้อน</th>
+                      </>
+                    )}
                   </tr>
                 </thead>
                 <tbody>
@@ -213,7 +250,7 @@ export default function CashAdvanceRecorder({ orderId, storeId, storeName, rubbe
                       <td className="px-2 py-1.5">
                         <span className="text-xs font-black text-slate-700">{w.sizeKg}kg</span>
                       </td>
-                      {(["cold", "warm", "hot"] as const).map(temp => {
+                      {(machineType === "combo" ? ["standard", "extra"] as const : ["cold", "warm", "hot"] as const).map(temp => {
                         const price = getWasherPrice(w, temp);
                         const isSelected = selectedWasher?.id === w.id && selectedWasher?.waterTemp === temp;
                         return (

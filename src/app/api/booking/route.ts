@@ -37,7 +37,7 @@ export async function POST(req: Request) {
     const address = tryParseJSON(body.address, "address");
     
     const { 
-      userId, storeId, providerId, serviceId, paymentMethod, scheduledDate, customerNote, discountCode, discountAmount
+      userId, storeId, providerId, serviceId, paymentMethod, scheduledDate, customerNote, serviceDetails, discountCode, discountAmount
     } = body;
 
     // Access D1 from Cloudflare context
@@ -68,9 +68,9 @@ export async function POST(req: Request) {
       INSERT INTO orders (
         id, userId, storeId, providerId, serviceId, status, 
         laundryFee, deliveryFee, distanceKm, totalPrice, 
-        paymentMethod, items, address, scheduledDate, customerNote
+        paymentMethod, items, address, scheduledDate, customerNote, serviceDetails
       )
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `).bind(
       orderId,
       userId,
@@ -86,7 +86,8 @@ export async function POST(req: Request) {
       JSON.stringify(items),
       JSON.stringify(address),
       scheduledDate,
-      customerNote || null
+      customerNote || null,
+      serviceDetails || null
     ).run();
 
     // Handle Coupon Usage

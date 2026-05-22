@@ -58,8 +58,8 @@ export async function POST(req: Request) {
       for (const w of washers) {
         const id = `WC-${nanoid(8)}`;
         await db.prepare(
-          "INSERT INTO store_washer_costs (id, storeId, sizeKg, sizeLabel, priceCold, priceWarm, priceHot) VALUES (?, ?, ?, ?, ?, ?, ?)"
-        ).bind(id, storeId, w.sizeKg, w.sizeLabel || null, w.priceCold, w.priceWarm, w.priceHot).run();
+          "INSERT INTO store_washer_costs (id, storeId, sizeKg, sizeLabel, priceCold, priceWarm, priceHot, priceStandard, priceExtra) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
+        ).bind(id, storeId, w.sizeKg, w.sizeLabel || null, w.priceCold, w.priceWarm, w.priceHot, w.priceStandard || 0, w.priceExtra || 0).run();
       }
     }
 

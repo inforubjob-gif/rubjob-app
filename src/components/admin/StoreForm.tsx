@@ -26,7 +26,7 @@ export default function StoreForm({ initialData, isEdit }: StoreFormProps) {
   const [allServices, setAllServices] = useState<any[]>([]);
   
   // Cost Matrix State
-  const [washerCosts, setWasherCosts] = useState<{sizeKg: string; sizeLabel: string; priceCold: string; priceWarm: string; priceHot: string}[]>([]);
+  const [washerCosts, setWasherCosts] = useState<{sizeKg: string; sizeLabel: string; priceCold: string; priceWarm: string; priceHot: string; priceStandard: string; priceExtra: string}[]>([]);
   const [dryerCosts, setDryerCosts] = useState<{sizeKg: string; sizeLabel: string; price: string; durationMinutes: string; extraPricePerMinute: string}[]>([]);
   const [isCostMatrixSaving, setIsCostMatrixSaving] = useState(false);
   
@@ -97,6 +97,8 @@ export default function StoreForm({ initialData, isEdit }: StoreFormProps) {
           priceCold: w.priceCold?.toString() || "",
           priceWarm: w.priceWarm?.toString() || "",
           priceHot: w.priceHot?.toString() || "",
+          priceStandard: w.priceStandard?.toString() || "",
+          priceExtra: w.priceExtra?.toString() || "",
         })));
       }
       if (data.dryers) {
@@ -122,12 +124,14 @@ export default function StoreForm({ initialData, isEdit }: StoreFormProps) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           storeId: initialData.id,
-          washers: washerCosts.filter(w => w.sizeKg && w.priceCold).map(w => ({
+          washers: washerCosts.filter(w => w.sizeKg && (w.priceCold || w.priceStandard)).map(w => ({
             sizeKg: parseFloat(w.sizeKg) || 0,
             sizeLabel: w.sizeLabel || null,
             priceCold: parseFloat(w.priceCold) || 0,
             priceWarm: parseFloat(w.priceWarm) || 0,
             priceHot: parseFloat(w.priceHot) || 0,
+            priceStandard: parseFloat(w.priceStandard) || 0,
+            priceExtra: parseFloat(w.priceExtra) || 0,
           })),
           dryers: dryerCosts.filter(d => d.sizeKg && d.price).map(d => ({
             sizeKg: parseFloat(d.sizeKg) || 0,
@@ -660,7 +664,7 @@ export default function StoreForm({ initialData, isEdit }: StoreFormProps) {
                      </h3>
                      <button
                        type="button"
-                       onClick={() => setWasherCosts(prev => [...prev, { sizeKg: "", sizeLabel: "", priceCold: "", priceWarm: "", priceHot: "" }])}
+                       onClick={() => setWasherCosts(prev => [...prev, { sizeKg: "", sizeLabel: "", priceCold: "", priceWarm: "", priceHot: "", priceStandard: "", priceExtra: "" }])}
                        className="px-3 py-1.5 bg-emerald-50 text-emerald-600 rounded-lg text-[10px] font-black uppercase tracking-widest border border-emerald-100 hover:bg-emerald-100 transition-all flex items-center gap-1"
                      >
                        <Icons.Plus size={12} /> เพิ่มขนาด
@@ -673,9 +677,18 @@ export default function StoreForm({ initialData, isEdit }: StoreFormProps) {
                            <tr>
                               <th className="px-4 py-3 text-[10px] font-black uppercase text-slate-400 tracking-widest">ขนาด (kg)</th>
                               <th className="px-4 py-3 text-[10px] font-black uppercase text-slate-400 tracking-widest">ชื่อ</th>
-                              <th className="px-4 py-3 text-[10px] font-black uppercase text-blue-400 tracking-widest text-center">น้ำเย็น (Cold)</th>
-                              <th className="px-4 py-3 text-[10px] font-black uppercase text-amber-500 tracking-widest text-center">น้ำอุ่น (Warm)</th>
-                              <th className="px-4 py-3 text-[10px] font-black uppercase text-rose-400 tracking-widest text-center">น้ำร้อน (Hot)</th>
+                              {formData.machineType === 'combo' ? (
+                                <>
+                                  <th className="px-4 py-3 text-[10px] font-black uppercase text-emerald-500 tracking-widest text-center">โหมดมาตรฐาน (Standard)</th>
+                                  <th className="px-4 py-3 text-[10px] font-black uppercase text-purple-500 tracking-widest text-center">โหมดพิเศษ (Extra)</th>
+                                </>
+                              ) : (
+                                <>
+                                  <th className="px-4 py-3 text-[10px] font-black uppercase text-blue-400 tracking-widest text-center">น้ำเย็น (Cold)</th>
+                                  <th className="px-4 py-3 text-[10px] font-black uppercase text-amber-500 tracking-widest text-center">น้ำอุ่น (Warm)</th>
+                                  <th className="px-4 py-3 text-[10px] font-black uppercase text-rose-400 tracking-widest text-center">น้ำร้อน (Hot)</th>
+                                </>
+                              )}
                               <th className="px-4 py-3 w-10"></th>
                            </tr>
                         </thead>
@@ -690,27 +703,48 @@ export default function StoreForm({ initialData, isEdit }: StoreFormProps) {
                                     <input type="text" value={w.sizeLabel} onChange={e => { const n = [...washerCosts]; n[i] = {...n[i], sizeLabel: e.target.value}; setWasherCosts(n); }}
                                       placeholder="Standard" className="w-24 bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold focus:border-primary focus:outline-none transition-all" />
                                  </td>
-                                 <td className="px-4 py-3">
-                                    <div className="flex items-center justify-center gap-1">
-                                      <span className="text-slate-300 text-xs">฿</span>
-                                      <input type="number" value={w.priceCold} onChange={e => { const n = [...washerCosts]; n[i] = {...n[i], priceCold: e.target.value}; setWasherCosts(n); }}
-                                        placeholder="50" className="w-16 bg-blue-50 border border-blue-100 rounded-lg px-2 py-2 text-sm font-black text-blue-600 text-center focus:border-blue-400 focus:outline-none transition-all" />
-                                    </div>
-                                 </td>
-                                 <td className="px-4 py-3">
-                                    <div className="flex items-center justify-center gap-1">
-                                      <span className="text-slate-300 text-xs">฿</span>
-                                      <input type="number" value={w.priceWarm} onChange={e => { const n = [...washerCosts]; n[i] = {...n[i], priceWarm: e.target.value}; setWasherCosts(n); }}
-                                        placeholder="50" className="w-16 bg-amber-50 border border-amber-100 rounded-lg px-2 py-2 text-sm font-black text-amber-600 text-center focus:border-amber-400 focus:outline-none transition-all" />
-                                    </div>
-                                 </td>
-                                 <td className="px-4 py-3">
-                                    <div className="flex items-center justify-center gap-1">
-                                      <span className="text-slate-300 text-xs">฿</span>
-                                      <input type="number" value={w.priceHot} onChange={e => { const n = [...washerCosts]; n[i] = {...n[i], priceHot: e.target.value}; setWasherCosts(n); }}
-                                        placeholder="50" className="w-16 bg-rose-50 border border-rose-100 rounded-lg px-2 py-2 text-sm font-black text-rose-600 text-center focus:border-rose-400 focus:outline-none transition-all" />
-                                    </div>
-                                 </td>
+                                 {formData.machineType === 'combo' ? (
+                                   <>
+                                     <td className="px-4 py-3">
+                                        <div className="flex items-center justify-center gap-1">
+                                          <span className="text-slate-300 text-xs">฿</span>
+                                          <input type="number" value={w.priceStandard} onChange={e => { const n = [...washerCosts]; n[i] = {...n[i], priceStandard: e.target.value}; setWasherCosts(n); }}
+                                            placeholder="100" className="w-16 bg-emerald-50 border border-emerald-100 rounded-lg px-2 py-2 text-sm font-black text-emerald-600 text-center focus:border-emerald-400 focus:outline-none transition-all" />
+                                        </div>
+                                     </td>
+                                     <td className="px-4 py-3">
+                                        <div className="flex items-center justify-center gap-1">
+                                          <span className="text-slate-300 text-xs">฿</span>
+                                          <input type="number" value={w.priceExtra} onChange={e => { const n = [...washerCosts]; n[i] = {...n[i], priceExtra: e.target.value}; setWasherCosts(n); }}
+                                            placeholder="140" className="w-16 bg-purple-50 border border-purple-100 rounded-lg px-2 py-2 text-sm font-black text-purple-600 text-center focus:border-purple-400 focus:outline-none transition-all" />
+                                        </div>
+                                     </td>
+                                   </>
+                                 ) : (
+                                   <>
+                                     <td className="px-4 py-3">
+                                        <div className="flex items-center justify-center gap-1">
+                                          <span className="text-slate-300 text-xs">฿</span>
+                                          <input type="number" value={w.priceCold} onChange={e => { const n = [...washerCosts]; n[i] = {...n[i], priceCold: e.target.value}; setWasherCosts(n); }}
+                                            placeholder="50" className="w-16 bg-blue-50 border border-blue-100 rounded-lg px-2 py-2 text-sm font-black text-blue-600 text-center focus:border-blue-400 focus:outline-none transition-all" />
+                                        </div>
+                                     </td>
+                                     <td className="px-4 py-3">
+                                        <div className="flex items-center justify-center gap-1">
+                                          <span className="text-slate-300 text-xs">฿</span>
+                                          <input type="number" value={w.priceWarm} onChange={e => { const n = [...washerCosts]; n[i] = {...n[i], priceWarm: e.target.value}; setWasherCosts(n); }}
+                                            placeholder="50" className="w-16 bg-amber-50 border border-amber-100 rounded-lg px-2 py-2 text-sm font-black text-amber-600 text-center focus:border-amber-400 focus:outline-none transition-all" />
+                                        </div>
+                                     </td>
+                                     <td className="px-4 py-3">
+                                        <div className="flex items-center justify-center gap-1">
+                                          <span className="text-slate-300 text-xs">฿</span>
+                                          <input type="number" value={w.priceHot} onChange={e => { const n = [...washerCosts]; n[i] = {...n[i], priceHot: e.target.value}; setWasherCosts(n); }}
+                                            placeholder="50" className="w-16 bg-rose-50 border border-rose-100 rounded-lg px-2 py-2 text-sm font-black text-rose-600 text-center focus:border-rose-400 focus:outline-none transition-all" />
+                                        </div>
+                                     </td>
+                                   </>
+                                 )}
                                  <td className="px-4 py-3">
                                     <button type="button" onClick={() => setWasherCosts(prev => prev.filter((_, idx) => idx !== i))}
                                       className="w-8 h-8 rounded-lg bg-slate-50 text-slate-300 hover:bg-rose-50 hover:text-rose-500 flex items-center justify-center transition-all">

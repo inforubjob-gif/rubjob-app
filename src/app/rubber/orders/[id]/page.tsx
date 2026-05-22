@@ -530,6 +530,7 @@ export default function RubberOrderDetailPage() {
               storeId={order.storeId}
               storeName={order?.storeName || "Unknown Store"}
               rubberId={(() => { try { const s = JSON.parse(localStorage.getItem("rubjob_rubber_session") || "{}"); return s.id || ""; } catch { return ""; } })()}
+              serviceDetails={order?.serviceDetails ? JSON.parse(order.serviceDetails) : undefined}
             />
           )}
 

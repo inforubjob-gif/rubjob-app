@@ -374,6 +374,8 @@ export async function ensureSchema(db: D1Database) {
       priceCold REAL NOT NULL,
       priceWarm REAL NOT NULL,
       priceHot REAL NOT NULL,
+      priceStandard REAL DEFAULT 0,
+      priceExtra REAL DEFAULT 0,
       FOREIGN KEY (storeId) REFERENCES stores(id) ON DELETE CASCADE
     );
 
