@@ -248,7 +248,7 @@ export default function CashAdvanceRecorder({ orderId, storeId, storeName, rubbe
                   {washers.map(w => (
                     <tr key={w.id}>
                       <td className="px-2 py-1.5">
-                        <span className="text-xs font-black text-slate-700">{w.sizeKg}kg</span>
+                        <span className="text-xs font-black text-slate-700">{w.sizeLabel || `${w.sizeKg}kg`}</span>
                       </td>
                       {(machineType === "combo" ? ["standard", "extra"] as const : ["cold", "warm", "hot"] as const).map(temp => {
                         const price = getWasherPrice(w, temp);
@@ -295,7 +295,7 @@ export default function CashAdvanceRecorder({ orderId, storeId, storeName, rubbe
                         : "bg-orange-50 border-orange-200 text-orange-600 hover:opacity-80"
                     }`}
                   >
-                    <p className="text-sm font-black">{d.sizeKg}kg</p>
+                    <p className="text-sm font-black">{d.sizeLabel || `${d.sizeKg}kg`}</p>
                     <p className={`text-[10px] font-bold ${isSelected ? "text-white/70" : "text-orange-400"}`}>
                       ฿{d.price} • {d.durationMinutes || "—"}นาที
                     </p>
