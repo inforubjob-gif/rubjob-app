@@ -76,7 +76,7 @@ export async function POST(req: Request) {
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   try {
     const payload = await req.json() as any;
-    const { name, ownerId, email, password, address, lat, lng, serviceRadiusKm, baseDeliveryFee, extraFeePerKm, phone, services, bankName, accountNumber, accountName } = payload;
+    const { name, ownerId, email, password, address, lat, lng, serviceRadiusKm, baseDeliveryFee, extraFeePerKm, phone, machineType, services, bankName, accountNumber, accountName } = payload;
     const db = getRequestContext().env.DB;
     if (!db) return NextResponse.json({ error: "D1 not found" }, { status: 500 });
 
@@ -102,10 +102,10 @@ export async function POST(req: Request) {
 
     // Insert store
     await db.prepare(`
-      INSERT INTO stores (id, name, ownerId, email, password, address, lat, lng, serviceRadiusKm, baseDeliveryFee, extraFeePerKm, phone, isActive, bankName, accountNumber, accountName)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?, ?, ?)
+      INSERT INTO stores (id, name, ownerId, email, password, address, lat, lng, serviceRadiusKm, baseDeliveryFee, extraFeePerKm, phone, machineType, isActive, bankName, accountNumber, accountName)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?, ?, ?)
     `).bind(
-      id, name, finalOwnerId || 'system', email || null, password || null, address || "", lat || 0, lng || 0, serviceRadiusKm || 5, baseDeliveryFee || 0, extraFeePerKm || 0, phone || "", 
+      id, name, finalOwnerId || 'system', email || null, password || null, address || "", lat || 0, lng || 0, serviceRadiusKm || 5, baseDeliveryFee || 0, extraFeePerKm || 0, phone || "", machineType || 'separate',
       bankName || "", accountNumber || "", accountName || ""
     ).run();
 
@@ -127,7 +127,7 @@ export async function PUT(req: Request) {
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   try {
     const payload = await req.json() as any;
-    const { id, name, ownerId, email, password, address, lat, lng, serviceRadiusKm, baseDeliveryFee, extraFeePerKm, phone, isActive, status, services, bankName, accountNumber, accountName, documents } = payload;
+    const { id, name, ownerId, email, password, address, lat, lng, serviceRadiusKm, baseDeliveryFee, extraFeePerKm, phone, machineType, isActive, status, services, bankName, accountNumber, accountName, documents } = payload;
     const db = getRequestContext().env.DB;
     if (!db) return NextResponse.json({ error: "D1 not found" }, { status: 500 });
 
@@ -146,6 +146,7 @@ export async function PUT(req: Request) {
           baseDeliveryFee = COALESCE(?, baseDeliveryFee),
           extraFeePerKm = COALESCE(?, extraFeePerKm),
           phone = COALESCE(?, phone),
+          machineType = COALESCE(?, machineType),
           isActive = COALESCE(?, isActive),
           status = COALESCE(?, status),
           bankName = COALESCE(?, bankName),
@@ -153,7 +154,7 @@ export async function PUT(req: Request) {
           accountName = COALESCE(?, accountName)
       WHERE id = ?
     `).bind(
-      name || null, ownerId || null, email || null, password || null, address || null, lat || null, lng || null, serviceRadiusKm || null, baseDeliveryFee || null, extraFeePerKm || null, phone || null, isActive || null, 
+      name || null, ownerId || null, email || null, password || null, address || null, lat || null, lng || null, serviceRadiusKm || null, baseDeliveryFee || null, extraFeePerKm || null, phone || null, machineType || null, isActive || null, 
       status || null, bankName || null, accountNumber || null, accountName || null, id
     ).run();
 

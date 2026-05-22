@@ -25,7 +25,12 @@ export async function GET(req: Request) {
       "SELECT * FROM store_dryer_costs WHERE storeId = ? ORDER BY sizeKg ASC"
     ).bind(storeId).all();
 
-    return NextResponse.json({ washers, dryers });
+    const { results: storeResult } = await db.prepare(
+      "SELECT machineType FROM stores WHERE id = ?"
+    ).bind(storeId).all();
+    const machineType = storeResult?.[0]?.machineType || 'separate';
+
+    return NextResponse.json({ washers, dryers, machineType });
   } catch (error: unknown) {
     return NextResponse.json({ error: safeError(error) }, { status: 500 });
   }

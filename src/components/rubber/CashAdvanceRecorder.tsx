@@ -22,6 +22,7 @@ export default function CashAdvanceRecorder({ orderId, storeId, storeName, rubbe
   const [existingRecords, setExistingRecords] = useState<any[]>([]);
   const [isEditing, setIsEditing] = useState(false);
   const [error, setError] = useState("");
+  const [machineType, setMachineType] = useState<"separate" | "combo">("separate");
 
   // Selections
   const [selectedWasher, setSelectedWasher] = useState<{ id: string; waterTemp: string } | null>(null);
@@ -38,6 +39,7 @@ export default function CashAdvanceRecorder({ orderId, storeId, storeName, rubbe
       const data = await res.json() as any;
       setWashers(data.washers || []);
       setDryers(data.dryers || []);
+      setMachineType(data.machineType || "separate");
     } catch (err) {
       console.error(err);
     } finally {
@@ -192,7 +194,9 @@ export default function CashAdvanceRecorder({ orderId, storeId, storeName, rubbe
         {/* Washer Selection */}
         {washers.length > 0 && (
           <div className="mb-6">
-            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">🫧 เครื่องซัก</p>
+            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">
+              🫧 {machineType === "combo" ? "เครื่องซักอบในตัว (Combo)" : "เครื่องซัก"}
+            </p>
             <div className="overflow-x-auto -mx-2">
               <table className="w-full text-center">
                 <thead>
@@ -237,7 +241,7 @@ export default function CashAdvanceRecorder({ orderId, storeId, storeName, rubbe
         )}
 
         {/* Dryer Selection */}
-        {dryers.length > 0 && (
+        {machineType === "separate" && dryers.length > 0 && (
           <div className="mb-6">
             <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">🌀 เครื่องอบ (ถ้าใช้)</p>
             <div className="grid grid-cols-2 gap-2">

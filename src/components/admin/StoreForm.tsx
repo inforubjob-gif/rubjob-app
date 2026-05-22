@@ -42,6 +42,7 @@ export default function StoreForm({ initialData, isEdit }: StoreFormProps) {
     baseDeliveryFee: initialData?.baseDeliveryFee?.toString() || "0",
     extraFeePerKm: initialData?.extraFeePerKm?.toString() || "10",
     phone: initialData?.phone || "",
+    machineType: initialData?.machineType || "separate",
     bankName: initialData?.bankName || "",
     accountNumber: initialData?.accountNumber || "",
     accountName: initialData?.accountName || "",
@@ -373,6 +374,34 @@ export default function StoreForm({ initialData, isEdit }: StoreFormProps) {
                        </div>
                     </div>
                  </div>
+
+                 {/* Machine Type Selection */}
+                 <div>
+                    <label className="text-[10px] uppercase font-black text-slate-400 tracking-widest block mb-2 ml-1">ประเภทเครื่อง (ซักอบ)</label>
+                    <div className="grid grid-cols-2 gap-3">
+                       <label className={`cursor-pointer flex items-center gap-3 p-4 border-2 rounded-xl transition-all ${formData.machineType === 'separate' ? 'border-primary bg-primary/5 shadow-md shadow-primary/10' : 'border-slate-100 bg-white hover:border-slate-200'}`}>
+                          <input type="radio" name="machineType" value="separate" checked={formData.machineType === 'separate'} onChange={() => setFormData({...formData, machineType: 'separate'})} className="hidden" />
+                          <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${formData.machineType === 'separate' ? 'border-primary' : 'border-slate-300'}`}>
+                             {formData.machineType === 'separate' && <div className="w-2.5 h-2.5 rounded-full bg-primary" />}
+                          </div>
+                          <div>
+                             <span className={`block font-black text-sm ${formData.machineType === 'separate' ? 'text-primary' : 'text-slate-700'}`}>ซักอบแยก</span>
+                             <span className="block text-[10px] text-slate-400 font-bold">ถังซักและถังอบแยกกัน</span>
+                          </div>
+                       </label>
+                       <label className={`cursor-pointer flex items-center gap-3 p-4 border-2 rounded-xl transition-all ${formData.machineType === 'combo' ? 'border-primary bg-primary/5 shadow-md shadow-primary/10' : 'border-slate-100 bg-white hover:border-slate-200'}`}>
+                          <input type="radio" name="machineType" value="combo" checked={formData.machineType === 'combo'} onChange={() => setFormData({...formData, machineType: 'combo'})} className="hidden" />
+                          <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${formData.machineType === 'combo' ? 'border-primary' : 'border-slate-300'}`}>
+                             {formData.machineType === 'combo' && <div className="w-2.5 h-2.5 rounded-full bg-primary" />}
+                          </div>
+                          <div>
+                             <span className={`block font-black text-sm ${formData.machineType === 'combo' ? 'text-primary' : 'text-slate-700'}`}>ซักอบรวมในตัว (Combo)</span>
+                             <span className="block text-[10px] text-slate-400 font-bold">เครื่องเดียวจบ ไม่ต้องย้ายผ้า</span>
+                          </div>
+                       </label>
+                    </div>
+                 </div>
+
                  <div>
                     <label className="text-[10px] uppercase font-black text-slate-400 tracking-widest block mb-2 ml-1">{t('admin.stores.form.addressDetail')}</label>
                     <textarea 
@@ -627,7 +656,7 @@ export default function StoreForm({ initialData, isEdit }: StoreFormProps) {
                <div className="mt-6 mb-8">
                   <div className="flex items-center justify-between mb-3">
                      <h3 className="text-sm font-black text-slate-700 uppercase tracking-wider flex items-center gap-2">
-                        🫧 เครื่องซัก (Washer)
+                        🫧 {formData.machineType === 'combo' ? 'เครื่องซักอบในตัว (Combo)' : 'เครื่องซัก (Washer)'}
                      </h3>
                      <button
                        type="button"
@@ -699,6 +728,7 @@ export default function StoreForm({ initialData, isEdit }: StoreFormProps) {
                </div>
 
                {/* Dryer Costs Table */}
+               {formData.machineType === 'separate' && (
                <div className="mb-6">
                   <div className="flex items-center justify-between mb-3">
                      <h3 className="text-sm font-black text-slate-700 uppercase tracking-wider flex items-center gap-2">
@@ -767,8 +797,9 @@ export default function StoreForm({ initialData, isEdit }: StoreFormProps) {
                            )}
                         </tbody>
                      </table>
-                  </div>
+                   </div>
                </div>
+               )}
 
                {/* Save Cost Matrix Button */}
                <button

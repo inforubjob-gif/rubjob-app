@@ -23,6 +23,7 @@ export interface Store {
   extraFeePerKm: number;
   phone?: string;
   lineUserId?: string;
+  machineType?: 'separate' | 'combo';
   isActive: boolean;
   createdAt: string;
 }

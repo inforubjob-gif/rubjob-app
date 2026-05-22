@@ -66,6 +66,7 @@ export async function ensureSchema(db: D1Database) {
       baseDeliveryFee REAL DEFAULT 0,
       extraFeePerKm REAL DEFAULT 10,
       phone TEXT,
+      machineType TEXT DEFAULT 'separate',
       isActive INTEGER DEFAULT 1,
       status TEXT DEFAULT 'active',
       bankName TEXT,
