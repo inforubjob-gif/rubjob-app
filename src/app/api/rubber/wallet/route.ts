@@ -131,6 +131,17 @@ export async function GET(req: Request) {
       WHERE requesterId = ?
     `).bind(rubberId).all();
 
+    // 5. Fetch Cash Advance data
+    const pendingCARes = await db.prepare(`
+      SELECT COALESCE(SUM(amount), 0) as pendingTotal FROM cash_advances WHERE rubberId = ? AND status = 'pending'
+    `).bind(rubberId).first() as any;
+    const pendingCashAdvance = pendingCARes?.pendingTotal || 0;
+
+    const { results: cashAdvances } = await db.prepare(`
+      SELECT id, amount, createdAt, status, machineType, machineSizeKg, storeName, waterTemp
+      FROM cash_advances WHERE rubberId = ? ORDER BY createdAt DESC LIMIT 30
+    `).bind(rubberId).all();
+
     const transactions = [
       ...history,
       ...(payouts as any[]).map(p => ({ 
@@ -139,6 +150,19 @@ export async function GET(req: Request) {
         amount: -p.amount, 
         date: p.createdAt, 
         status: p.status 
+      })),
+      ...(cashAdvances as any[]).map(ca => ({
+        id: ca.id,
+        type: "Cash Advance",
+        amount: -ca.amount,
+        date: ca.createdAt,
+        status: ca.status === 'settled' ? 'Success' : ca.status === 'rejected' ? 'Rejected' : 'Pending',
+        meta: {
+          machineType: ca.machineType,
+          machineSizeKg: ca.machineSizeKg,
+          storeName: ca.storeName,
+          waterTemp: ca.waterTemp,
+        }
       }))
     ].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
@@ -148,7 +172,8 @@ export async function GET(req: Request) {
       monthlyEarnings: Math.max(0, monthlyEarnings),
       yearlyEarnings: Math.max(0, yearlyEarnings),
       todayTaskCount,
-      transactions: transactions.slice(0, 20)
+      pendingCashAdvance,
+      transactions: transactions.slice(0, 30)
     });
 
   } catch (error: unknown) {

@@ -23,6 +23,7 @@ export default function RubberWalletPage() {
   const [isSuccess, setIsSuccess] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [balance, setBalance] = useState(0);
+  const [pendingCashAdvance, setPendingCashAdvance] = useState(0);
   const [transactions, setTransactions] = useState<any[]>([]);
   const [monthlyEarnings, setMonthlyEarnings] = useState(0);
   const [yearlyEarnings, setYearlyEarnings] = useState(0);
@@ -65,6 +66,7 @@ export default function RubberWalletPage() {
       if (data.balance !== undefined) setBalance(data.balance);
       if (data.monthlyEarnings !== undefined) setMonthlyEarnings(data.monthlyEarnings);
       if (data.yearlyEarnings !== undefined) setYearlyEarnings(data.yearlyEarnings);
+      if (data.pendingCashAdvance !== undefined) setPendingCashAdvance(data.pendingCashAdvance);
       if (data.transactions) setTransactions(data.transactions);
     } catch (err) {
       console.error(err);
@@ -133,6 +135,12 @@ export default function RubberWalletPage() {
         <header className="bg-primary text-white px-5 pt-4 pb-6 rounded-b-[3rem] shadow-xl relative overflow-hidden text-center">
           <div className="absolute top-0 right-0 w-40 h-40 bg-white/20 rounded-full -mr-20 -mt-20 blur-3xl pointer-events-none" />
           <div className="relative z-10">
+            {/* Cash Advance badge — top right corner */}
+            {pendingCashAdvance > 0 && (
+              <div className="absolute top-0 right-0 bg-white/20 text-white/70 text-[9px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1">
+                <span>สำรองจ่าย ฿{pendingCashAdvance.toLocaleString()}</span>
+              </div>
+            )}
             <p className="text-[10px] font-black text-white/50 uppercase mb-2">{t("rubber.wallet.balance")}</p>
             <div className="flex items-baseline justify-center gap-2 mb-8 text-white">
               <span className="text-5xl font-black drop-shadow-md">฿{(Number(balance) || 0).toLocaleString()}</span>
@@ -273,26 +281,7 @@ export default function RubberWalletPage() {
             </Card>
           </section>
 
-          {/* Cash Advance Card */}
-          <section className="animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200">
-            <button 
-              onClick={() => router.push('/rubber/wallet/cash-advance')}
-              className="w-full text-left"
-            >
-              <Card className="p-5 bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-amber-100 shadow-sm rounded-[2rem] hover:shadow-md transition-all active:scale-[0.98]">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-amber-500 text-white flex items-center justify-center shadow-lg shadow-amber-500/20">
-                    💵
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-black text-slate-900">เงินสดสำรองจ่าย</p>
-                    <p className="text-[10px] font-bold text-amber-600 uppercase tracking-widest">Cash Advance — กดเพื่อดูรายละเอียด</p>
-                  </div>
-                  <Icons.ChevronDown size={16} className="text-amber-400 -rotate-90 shrink-0" />
-                </div>
-              </Card>
-            </button>
-          </section>
+
 
           <section id="history-section">
             <h2 className="text-[11px] font-black text-slate-900 uppercase tracking-[0.2em] mb-4 px-2">{t("rubber.wallet.history")}</h2>
@@ -300,15 +289,46 @@ export default function RubberWalletPage() {
               {transactions.map((trx) => {
                 const raw = trx.date || '';
                 const safe = raw.includes('Z') ? raw : raw.replace(' ', 'T') + 'Z';
+                const isCashAdvance = trx.type === 'Cash Advance';
+                const isEarning = trx.amount > 0;
+                const isWithdrawal = trx.type === 'Withdrawal';
+
+                // Icon & color logic
+                let iconBg = 'bg-slate-100 text-slate-600';
+                let icon = <Icons.Clock size={20} />;
+                if (isEarning) {
+                  iconBg = 'bg-emerald-50 text-emerald-500';
+                  icon = <Icons.Payment size={20} />;
+                } else if (isCashAdvance) {
+                  iconBg = 'bg-amber-50 text-amber-500';
+                  icon = <span className="text-lg">💵</span>;
+                } else if (isWithdrawal) {
+                  iconBg = 'bg-slate-100 text-slate-600';
+                  icon = <Icons.Payment size={20} />;
+                }
+
+                // Label
+                let label = t(`rubber.wallet.types.${trx.type}`) || trx.type;
+                if (isCashAdvance && trx.meta) {
+                  const machine = trx.meta.machineType === 'washer' ? 'ซัก' : 'อบ';
+                  label = `สำรองจ่าย — ${machine} ${trx.meta.machineSizeKg}kg`;
+                }
+
+                // Sub-label
+                let subLabel = '';
+                if (isCashAdvance && trx.meta?.storeName) {
+                  subLabel = trx.meta.storeName;
+                }
 
                 return (
                   <div key={trx.id} className="bg-white p-4 rounded-xl border border-slate-100 shadow-sm flex items-center gap-4 hover:shadow-md transition-shadow">
-                    <div className={`w-11 h-11 rounded-full flex items-center justify-center ${trx.amount > 0 ? 'bg-emerald-50 text-emerald-500' : 'bg-slate-100 text-slate-600'}`}>
-                      {trx.amount > 0 ? <Icons.Payment size={20} /> : <Icons.Clock size={20} />}
+                    <div className={`w-11 h-11 rounded-full flex items-center justify-center ${iconBg}`}>
+                      {icon}
                     </div>
-                    <div className="flex-1">
-                      <p className="text-sm font-bold text-slate-900">{t(`rubber.wallet.types.${trx.type}`) || trx.type}</p>
-                      <p className="text-[10px] text-slate-400 font-medium uppercase">
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-bold text-slate-900 truncate">{label}</p>
+                      <p className="text-[10px] text-slate-400 font-medium uppercase truncate">
+                        {subLabel ? `${subLabel} • ` : ''}
                         {new Date(safe).toLocaleDateString('th-TH', { 
                           day: 'numeric', 
                           month: 'short', 
@@ -317,12 +337,15 @@ export default function RubberWalletPage() {
                         })}
                       </p>
                     </div>
-                  <div className="text-right">
-                    <p className={`text-sm font-black ${trx.amount > 0 ? 'text-emerald-500' : 'text-slate-900'}`}>
-                      {trx.amount > 0 ? `+฿${(Number(trx.amount) || 0).toLocaleString()}` : `-฿${(Math.abs(Number(trx.amount) || 0)).toLocaleString()}`}
+                  <div className="text-right shrink-0">
+                    <p className={`text-sm font-black ${isEarning ? 'text-emerald-500' : isCashAdvance ? 'text-amber-600' : 'text-slate-900'}`}>
+                      {isEarning ? `+฿${(Number(trx.amount) || 0).toLocaleString()}` : `-฿${(Math.abs(Number(trx.amount) || 0)).toLocaleString()}`}
                     </p>
-                    <Badge variant={trx.status?.toLowerCase() === 'completed' || trx.status?.toLowerCase() === 'success' ? 'success' : 'warning'} className="text-[8px] font-black uppercase py-0.5 px-2">
-                       {t(`rubber.wallet.statuses.${trx.status?.toLowerCase()}`) || trx.status}
+                    <Badge variant={trx.status?.toLowerCase() === 'completed' || trx.status?.toLowerCase() === 'success' ? 'success' : trx.status?.toLowerCase() === 'rejected' ? 'danger' : 'warning'} className="text-[8px] font-black uppercase py-0.5 px-2">
+                       {isCashAdvance 
+                         ? (trx.status === 'Success' ? 'จ่ายแล้ว' : trx.status === 'Rejected' ? 'ปฏิเสธ' : 'รอจ่ายคืน')
+                         : (t(`rubber.wallet.statuses.${trx.status?.toLowerCase()}`) || trx.status)
+                       }
                     </Badge>
                   </div>
                 </div>

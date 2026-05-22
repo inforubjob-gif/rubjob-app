@@ -46,6 +46,7 @@ export default function RubberDashboard() {
   const [availableJobs, setAvailableJobs] = useState<any[]>([]);
   const [activeJobs, setActiveJobs] = useState<any[]>([]);
   const [balance, setBalance] = useState(0);
+  const [pendingCashAdvance, setPendingCashAdvance] = useState(0);
   const [todayEarnings, setTodayEarnings] = useState(0);
   const [todayTaskCount, setTodayTaskCount] = useState(0);
   const [unreadNotifCount, setUnreadNotifCount] = useState(0);
@@ -240,6 +241,7 @@ export default function RubberDashboard() {
       if (walData.balance !== undefined) setBalance(walData.balance);
       if (walData.todayEarnings !== undefined) setTodayEarnings(walData.todayEarnings);
       if (walData.todayTaskCount !== undefined) setTodayTaskCount(walData.todayTaskCount);
+      if (walData.pendingCashAdvance !== undefined) setPendingCashAdvance(walData.pendingCashAdvance);
     } catch (err) {
       console.error("Failed to fetch rubber dashboard data:", err);
     } finally {
@@ -483,11 +485,17 @@ export default function RubberDashboard() {
             <p className="text-xs font-black text-slate-500 uppercase">{t("rubber.tasksToday")}</p>
             <p className="text-2xl font-black mt-1 text-slate-800">{todayTaskCount}</p>
           </div>
-          <div className="bg-white/90 backdrop-blur-md p-4 rounded-2xl border border-white shadow-md">
+          <div className="bg-white/90 backdrop-blur-md p-4 rounded-2xl border border-white shadow-md relative">
             <p className="text-xs font-black text-slate-500 uppercase">รายได้วันนี้</p>
             <p className="text-3xl font-black mt-1 text-slate-800">
               ฿{todayEarnings % 1 === 0 ? todayEarnings.toLocaleString() : todayEarnings.toFixed(1)}
             </p>
+            {/* Cash Advance mini badge */}
+            {pendingCashAdvance > 0 && (
+              <div className="absolute -top-2 -right-2 bg-slate-400 text-white text-[8px] font-bold px-2 py-0.5 rounded-full shadow-sm flex items-center gap-0.5">
+                <span>฿{pendingCashAdvance.toLocaleString()}</span>
+              </div>
+            )}
           </div>
         </div>
 
