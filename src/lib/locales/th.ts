@@ -854,6 +854,7 @@ export const th = {
           "Pickup Earnings": "รายได้จากการรับผ้า",
           "Delivery Earnings": "รายได้จากการส่งผ้า",
           "Withdrawal": "ถอนเงิน",
+          "Cash Advance": "เงินสดสำรองจ่าย (ต้นทุนร้าน)",
         },
         statuses: {
           pending: "รอดำเนินการ",

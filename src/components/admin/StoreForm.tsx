@@ -463,15 +463,11 @@ export default function StoreForm({ initialData, isEdit }: StoreFormProps) {
                     <thead className="bg-slate-50 border-b border-slate-100">
                        <tr>
                           <th className="px-6 py-4 text-[10px] font-black uppercase text-slate-400 tracking-widest">{t('admin.stores.form.service')}</th>
-                          <th className="px-6 py-4 text-[10px] font-black uppercase text-slate-400 tracking-widest">{t('admin.stores.form.masterPrice')}</th>
-                          <th className="px-6 py-4 text-[10px] font-black uppercase text-slate-400 tracking-widest text-right">{t('admin.stores.form.storePrice')}</th>
                        </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-50">
                        {allServices.map(svc => {
-                          const storeSvc = formData.services.find(s => s.serviceId === svc.id);
-                          const isSelected = !!storeSvc;
-                          
+                          const isSelected = formData.services.some(s => s.serviceId === svc.id);
                           return (
                              <tr key={svc.id} className={`transition-colors ${isSelected ? 'bg-indigo-50/20' : ''}`}>
                                 <td className="px-6 py-5">
@@ -487,24 +483,6 @@ export default function StoreForm({ initialData, isEdit }: StoreFormProps) {
                                          <p className="text-[10px] text-slate-400 font-bold uppercase">{svc.category}</p>
                                       </div>
                                    </label>
-                                </td>
-                                <td className="px-6 py-5">
-                                   <span className="text-xs font-bold text-slate-400 italic">฿{svc.basePrice}</span>
-                                </td>
-                                <td className="px-6 py-5 text-right">
-                                   {isSelected ? (
-                                      <div className="flex justify-end">
-                                         <input 
-                                           type="number"
-                                           value={storeSvc.price !== null ? storeSvc.price : ""}
-                                           onChange={e => handlePriceChange(svc.id, e.target.value)}
-                                           placeholder={svc.basePrice.toString()}
-                                           className="w-24 bg-white border-2 border-indigo-100 rounded-xl px-3 py-2 text-sm font-black text-indigo-600 text-right focus:outline-none focus:border-indigo-400"
-                                         />
-                                      </div>
-                                   ) : (
-                                      <span className="text-[10px] font-black text-slate-300 uppercase italic">{t('admin.stores.form.notAuthorized')}</span>
-                                   )}
                                 </td>
                              </tr>
                           );

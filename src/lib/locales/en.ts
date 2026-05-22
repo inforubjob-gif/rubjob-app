@@ -954,6 +954,7 @@ export const en = {
         "Pickup Earnings": "Pickup Earnings",
         "Delivery Earnings": "Delivery Earnings",
         "Withdrawal": "Withdrawal",
+        "Cash Advance": "Cash Advance (Store Cost)",
       },
       statuses: {
         pending: "Pending",
