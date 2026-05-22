@@ -10,6 +10,7 @@ import {
   orderCompletedFlex 
 } from "./line";
 import { createNotification } from "./notify-server";
+import { getGPConfig, calcRubberPayout } from "@/lib/gp-config";
 
 /**
  * Handle Order Status Transitions and Notifications
@@ -101,7 +102,8 @@ export async function transitionOrderStatus(
         }
         
         const deliveryFee = order.deliveryFee || 0;
-        const totalRubberPayout = deliveryFee - (deliveryFee * 0.10) - 10;
+        const gp = await getGPConfig(db);
+        const totalRubberPayout = calcRubberPayout(deliveryFee, gp);
         const splitEarning = totalRubberPayout * 0.5; // 50% for pickup, 50% for delivery
 
         if (!driverId) return;
@@ -159,7 +161,8 @@ export async function transitionOrderStatus(
           // 📒 Record wallet ledger entry
           try {
             const deliveryFee = order.deliveryFee || 0;
-            const totalPayout = deliveryFee - (deliveryFee * 0.10) - 10;
+            const gp2 = await getGPConfig(db);
+            const totalPayout = calcRubberPayout(deliveryFee, gp2);
             const legEarn = totalPayout * 0.5;
             const { nanoid } = await import("nanoid");
             await db.prepare(`INSERT INTO wallet_transactions (id, userId, userType, type, amount, referenceId, description) VALUES (?, ?, 'rubber', 'credit', ?, ?, ?)`)
@@ -195,7 +198,8 @@ export async function transitionOrderStatus(
           // 📒 Record wallet ledger entry
           try {
             const deliveryFee = order.deliveryFee || 0;
-            const totalPayout = deliveryFee - (deliveryFee * 0.10) - 10;
+            const gp3 = await getGPConfig(db);
+            const totalPayout = calcRubberPayout(deliveryFee, gp3);
             const legEarn = totalPayout * 0.5;
             const { nanoid } = await import("nanoid");
             await db.prepare(`INSERT INTO wallet_transactions (id, userId, userType, type, amount, referenceId, description) VALUES (?, ?, 'rubber', 'credit', ?, ?, ?)`)

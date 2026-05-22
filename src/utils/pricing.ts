@@ -1,6 +1,15 @@
 /**
  * RubJob Pricing & Commission Logic (2026 Guidelines)
+ * 
+ * ⚠️ All GP values come from PricingConfig — NEVER hard-code!
+ * Frontend must fetch /api/settings/pricing first.
  */
+
+export interface PricingConfig {
+  gpRubberPercent: number;      // e.g. 10 = 10%
+  platformFeePerDelivery: number; // e.g. 10 THB
+  deliveryFeeBase: number;      // e.g. 50 THB
+}
 
 export interface PriceDetails {
   weightKg: number;
@@ -21,19 +30,11 @@ export interface PricingResult {
   };
 }
 
-export function calculateOrderPrice(details: {
-  weightKg: number;
-  distanceKm: number;
-  isExpress: boolean;
-  needsDetergent: boolean;
-  withFolding: boolean;
-}): PricingResult {
+export function calculateOrderPrice(
+  details: PriceDetails,
+  config: PricingConfig
+): PricingResult {
   const { weightKg, distanceKm, isExpress, needsDetergent, withFolding } = details;
-
-  // Distance limit handled in UI for better UX
-  // if (distanceKm > 10) {
-  //   throw new Error("Service unavailable: Distance exceeds 10km limit");
-  // }
 
   // 1. Laundry Cost Calculation
   let laundryCost = 0;
@@ -42,18 +43,16 @@ export function calculateOrderPrice(details: {
   else if (weightKg <= 18) laundryCost = 170;
   else laundryCost = 210; // Up to 28 kg.
 
-  const laundryPlatformGP = laundryCost * 0.10;
-
-  // 2. Delivery Fee Calculation (รวมระยะไปกลับก่อน แล้วคิดค่าส่งครั้งเดียว)
+  // 2. Delivery Fee Calculation (ระยะทางไปกลับ แล้วค่อยคิดเงิน)
   const roundTripKm = distanceKm * 2;
-  let deliveryFee = 50; // base fare ครั้งเดียว
+  let deliveryFee = config.deliveryFeeBase;
   if (roundTripKm > 3) {
     deliveryFee += ((roundTripKm - 3) * 10);
   }
 
-  // Rubber Deductions
-  const rubberComm = deliveryFee * 0.10;
-  const platformServiceFee = 10;
+  // Rubber Deductions (from settings, not hard-coded)
+  const rubberComm = deliveryFee * (config.gpRubberPercent / 100);
+  const platformServiceFee = config.platformFeePerDelivery;
   const rubberNetIncome = deliveryFee - rubberComm - platformServiceFee;
 
   // 3. Add-ons
@@ -68,7 +67,7 @@ export function calculateOrderPrice(details: {
   const finalAddons = Math.ceil(addonsTotal);
   const customerTotal = finalLaundry + finalDelivery + finalAddons;
   
-  const platformTotalRevenue = laundryPlatformGP + rubberComm + platformServiceFee;
+  const platformTotalRevenue = rubberComm + platformServiceFee;
 
   return {
     customerTotal,

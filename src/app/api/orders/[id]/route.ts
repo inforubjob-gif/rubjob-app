@@ -1,4 +1,5 @@
 import { safeError } from "@/lib/api-utils";
+import { getGPConfig, calcRubberPayout } from "@/lib/gp-config";
 import { getRequestContext } from "@cloudflare/next-on-pages";
 import { NextResponse } from "next/server";
 
@@ -67,8 +68,8 @@ export async function GET(
     } catch (e) { /* leave as is */ }
  
     const deliveryFee = order.deliveryFee || 0;
-    // 10% commission + 10 THB Platform Fee
-    const totalRubberPayout = deliveryFee - (deliveryFee * 0.10) - 10;
+    const gp = await getGPConfig(db);
+    const totalRubberPayout = calcRubberPayout(deliveryFee, gp);
     
     order.rubberEarn = totalRubberPayout; // Legacy field for backwards compatibility
     order.rubberPickupEarn = totalRubberPayout * 0.5;

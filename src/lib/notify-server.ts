@@ -6,7 +6,7 @@
 export interface CreateNotificationParams {
   userId: string;
   userType: "rubber" | "store" | "customer";
-  type: "support_reply" | "earning" | "withdrawal" | "order_update" | "system";
+  type: "support_reply" | "earning" | "withdrawal" | "order_update" | "system" | "cash_advance" | "cash_advance_settled";
   title: string;
   message: string;
   link?: string;

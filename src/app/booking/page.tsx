@@ -9,7 +9,7 @@ import type { ServiceType, Address, Store } from "@/types";
 
 import { Icons, getServiceIcon, IconCircle } from "@/components/ui/Icons";
 import Modal from "@/components/ui/Modal";
-import { calculateOrderPrice } from "@/utils/pricing";
+import { calculateOrderPrice, PricingConfig } from "@/utils/pricing";
 import { loadStripe, Stripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
 import PromptPayCheckout from "@/components/checkout/PromptPayCheckout";
@@ -142,6 +142,7 @@ function BookingFlow() {
   const [activeOrderId, setActiveOrderId] = useState<string | null>(null);
   const [publishableKey, setPublishableKey] = useState<string | null>(null);
   const [stripePromise, setStripePromise] = useState<Promise<Stripe | null> | null>(null);
+  const [pricingConfig, setPricingConfig] = useState<PricingConfig>({ gpRubberPercent: 10, platformFeePerDelivery: 10, deliveryFeeBase: 50 });
 
   // Fetch Payment Config
   useEffect(() => {
@@ -206,17 +207,19 @@ function BookingFlow() {
       setDataError(null);
       try {
         // Individual fetching with safe fallbacks
-        const [sRes, stRes, adRes, setRes] = await Promise.all([
+        const [sRes, stRes, adRes, setRes, pricingRes] = await Promise.all([
           fetch("/api/services").catch(() => null),
           fetch("/api/stores").catch(() => null),
           profile?.userId ? fetch(`/api/user/addresses?userId=${profile.userId}`).catch(() => null) : Promise.resolve(null),
-          fetch("/api/admin/settings").catch(() => null)
+          fetch("/api/admin/settings").catch(() => null),
+          fetch("/api/settings/pricing").catch(() => null),
         ]);
 
         const sData = sRes?.ok ? await sRes.json() as any : { services: [] };
         const stData = stRes?.ok ? await stRes.json() as any : { stores: [] };
         const adData = adRes?.ok ? await adRes.json() as any : { addresses: [] };
         const setData = setRes?.ok ? await setRes.json() as any : { settings: [] };
+        const pricingData = pricingRes?.ok ? await pricingRes.json() as any : null;
 
         if (sData?.services) setDbServices(sData.services);
         if (stData?.stores) setDbStores(stData.stores);
@@ -227,6 +230,14 @@ function BookingFlow() {
             if (s.key) settingsMap[s.key] = s.value;
           });
           setSystemSettings(settingsMap);
+        }
+
+        if (pricingData) {
+          setPricingConfig({
+            gpRubberPercent: pricingData.gpRubberPercent ?? 10,
+            platformFeePerDelivery: pricingData.platformFeePerDelivery ?? 10,
+            deliveryFeeBase: pricingData.deliveryFeeBase ?? 50,
+          });
         }
         
         if (adData?.addresses && Array.isArray(adData.addresses)) {
@@ -409,7 +420,7 @@ function BookingFlow() {
       isExpress: deliverySpeed === "express",
       needsDetergent: needsDetergent,
       withFolding: withFolding
-    });
+    }, pricingConfig);
   } catch (err) {
     console.error("Pricing error:", err);
   }

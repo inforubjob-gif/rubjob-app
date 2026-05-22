@@ -1,4 +1,5 @@
 import { D1Database } from "@cloudflare/workers-types";
+import { getGPConfig, calcRubberPayout } from "@/lib/gp-config";
 
 /**
  * Geo-Filtered Rubber Dispatch System
@@ -143,8 +144,8 @@ export async function broadcastToEligibleRubbers(
   const { sendLinePush, rubberNewJobFlex } = await import("./line");
   const { createNotification } = await import("./notify-server");
 
-  // 10% commission + 10 THB Platform Fee
-  const totalOrderEarn = deliveryFee - (deliveryFee * 0.10) - 10;
+  const gp = await getGPConfig(db);
+  const totalOrderEarn = calcRubberPayout(deliveryFee, gp);
   const legEarn = Math.max(totalOrderEarn * 0.5, 0);
 
   const eligibleRubbers = await getEligibleRubbers(db, orderAddress);

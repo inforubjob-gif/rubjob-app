@@ -4,6 +4,7 @@ import { NextResponse } from "next/server";
 import { getRubberSession } from "@/lib/auth-server";
 import { nanoid } from "nanoid";
 import { createNotification } from "@/lib/notify-server";
+import { getGPConfig, calcRubberPayout } from "@/lib/gp-config";
 
 export const runtime = "edge";
 
@@ -46,9 +47,10 @@ export async function GET(req: Request) {
     const monthStartUTC = new Date(Date.UTC(thTime.getUTCFullYear(), thTime.getUTCMonth(), 1, -7, 0, 0, 0)).getTime();
     const yearStartUTC = new Date(Date.UTC(thTime.getUTCFullYear(), 0, 1, -7, 0, 0, 0)).getTime();
 
+    const gp = await getGPConfig(db);
+
     (ordersRes.results as any[]).forEach(o => {
-      // 10% commission + 10 THB Platform Fee
-      const totalOrderEarn = o.deliveryFee - (o.deliveryFee * 0.10) - 10;
+      const totalOrderEarn = calcRubberPayout(o.deliveryFee || 0, gp);
       const legEarn = totalOrderEarn * 0.5;
 
       // Leg 1: Pickup (Earned if status reached 'washing' or later)

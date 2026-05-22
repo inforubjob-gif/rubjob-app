@@ -4,6 +4,7 @@ import { NextResponse } from "next/server";
 import { getProviderSession } from "@/lib/auth-server";
 import { nanoid } from "nanoid";
 import { cookies } from "next/headers";
+import { getGPConfig, calcStoreNet } from "@/lib/gp-config";
 
 export const runtime = "edge";
 
@@ -31,8 +32,8 @@ export async function GET(req: Request) {
       WHERE providerId = ? AND status = 'completed'
     `).bind(token).first() as any;
     
-    // Applying 10% platform GP per skill.md
-    const totalEarnings = (earningsRes?.totalEarnings || 0) * 0.90; 
+    const gp = await getGPConfig(db);
+    const totalEarnings = calcStoreNet(earningsRes?.totalEarnings || 0, gp);
 
     // Calculate Withdrawals
     const withdrawalsRes = await db.prepare(`
@@ -64,7 +65,7 @@ export async function GET(req: Request) {
       ...(orders as any[]).map(o => ({ 
         id: o.id, 
         type: "Service Earning", 
-        amount: o.amount * 0.90, 
+        amount: calcStoreNet(o.amount || 0, gp), 
         date: o.createdAt, 
         status: "Success" 
       })),
@@ -112,8 +113,8 @@ export async function POST(req: Request) {
       WHERE providerId = ? AND status = 'completed'
     `).bind(token).first() as any;
     
-    // Applying 10% platform GP per skill.md
-    const totalEarnings = (earningsRes?.totalEarnings || 0) * 0.90; 
+    const gp2 = await getGPConfig(db);
+    const totalEarnings = calcStoreNet(earningsRes?.totalEarnings || 0, gp2);
 
     const withdrawalsRes = await db.prepare(`
       SELECT SUM(amount) as totalWithdrawn 

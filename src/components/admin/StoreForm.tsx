@@ -25,6 +25,11 @@ export default function StoreForm({ initialData, isEdit }: StoreFormProps) {
   const [isSaving, setIsSaving] = useState(false);
   const [allServices, setAllServices] = useState<any[]>([]);
   
+  // Cost Matrix State
+  const [washerCosts, setWasherCosts] = useState<{sizeKg: string; sizeLabel: string; priceCold: string; priceWarm: string; priceHot: string}[]>([]);
+  const [dryerCosts, setDryerCosts] = useState<{sizeKg: string; sizeLabel: string; price: string; durationMinutes: string; extraPricePerMinute: string}[]>([]);
+  const [isCostMatrixSaving, setIsCostMatrixSaving] = useState(false);
+  
   const [formData, setFormData] = useState({
     name: initialData?.name || "",
     ownerId: initialData?.ownerId || "auto",
@@ -67,6 +72,7 @@ export default function StoreForm({ initialData, isEdit }: StoreFormProps) {
 
   useEffect(() => {
     fetchServices();
+    if (isEdit && initialData?.id) fetchCostMatrix(initialData.id);
   }, []);
 
   async function fetchServices() {
@@ -76,6 +82,71 @@ export default function StoreForm({ initialData, isEdit }: StoreFormProps) {
       if (data.services) setAllServices(data.services);
     } catch (err) {
       console.error(err);
+    }
+  }
+
+  async function fetchCostMatrix(storeId: string) {
+    try {
+      const res = await fetch(`/api/admin/stores/cost-matrix?storeId=${storeId}`);
+      const data = await res.json() as any;
+      if (data.washers) {
+        setWasherCosts(data.washers.map((w: any) => ({
+          sizeKg: w.sizeKg?.toString() || "",
+          sizeLabel: w.sizeLabel || "",
+          priceCold: w.priceCold?.toString() || "",
+          priceWarm: w.priceWarm?.toString() || "",
+          priceHot: w.priceHot?.toString() || "",
+        })));
+      }
+      if (data.dryers) {
+        setDryerCosts(data.dryers.map((d: any) => ({
+          sizeKg: d.sizeKg?.toString() || "",
+          sizeLabel: d.sizeLabel || "",
+          price: d.price?.toString() || "",
+          durationMinutes: d.durationMinutes?.toString() || "",
+          extraPricePerMinute: d.extraPricePerMinute?.toString() || "",
+        })));
+      }
+    } catch (err) {
+      console.error("Failed to fetch cost matrix:", err);
+    }
+  }
+
+  async function handleSaveCostMatrix() {
+    if (!initialData?.id) return;
+    setIsCostMatrixSaving(true);
+    try {
+      const res = await fetch("/api/admin/stores/cost-matrix", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          storeId: initialData.id,
+          washers: washerCosts.filter(w => w.sizeKg && w.priceCold).map(w => ({
+            sizeKg: parseFloat(w.sizeKg) || 0,
+            sizeLabel: w.sizeLabel || null,
+            priceCold: parseFloat(w.priceCold) || 0,
+            priceWarm: parseFloat(w.priceWarm) || 0,
+            priceHot: parseFloat(w.priceHot) || 0,
+          })),
+          dryers: dryerCosts.filter(d => d.sizeKg && d.price).map(d => ({
+            sizeKg: parseFloat(d.sizeKg) || 0,
+            sizeLabel: d.sizeLabel || null,
+            price: parseFloat(d.price) || 0,
+            durationMinutes: parseInt(d.durationMinutes) || null,
+            extraPricePerMinute: parseFloat(d.extraPricePerMinute) || null,
+          })),
+        }),
+      });
+      if (res.ok) {
+        showToast("บันทึกตารางต้นทุนเรียบร้อย", "success");
+      } else {
+        showToast("Failed to save cost matrix", "error");
+      }
+    } catch (err) {
+      console.error("Cost matrix save failed:", err);
+      showToast("Network error", "error");
+    } finally {
+      setIsCostMatrixSaving(false);
     }
   }
 
@@ -558,10 +629,183 @@ export default function StoreForm({ initialData, isEdit }: StoreFormProps) {
                        </tr>
                     </tbody>
                  </table>
-              </div>
-           </Card>
-        </div>
-        
+               </div>
+            </Card>
+
+            {/* Cost Matrix — ตารางต้นทุนเครื่องซัก/อบ */}
+            {isEdit && (
+            <Card className="p-8 bg-white border border-slate-200/60 shadow-sm">
+               <div className="flex items-center gap-3 mb-2">
+                  <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                     <Icons.Wallet size={20} />
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-black text-slate-900 uppercase tracking-tight">ตารางต้นทุนเครื่องซัก / อบ</h2>
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Cost Matrix — ราคาจริงที่ Rubber จ่ายให้ร้าน</p>
+                  </div>
+               </div>
+
+               {/* Washer Costs Table */}
+               <div className="mt-6 mb-8">
+                  <div className="flex items-center justify-between mb-3">
+                     <h3 className="text-sm font-black text-slate-700 uppercase tracking-wider flex items-center gap-2">
+                        🫧 เครื่องซัก (Washer)
+                     </h3>
+                     <button
+                       type="button"
+                       onClick={() => setWasherCosts(prev => [...prev, { sizeKg: "", sizeLabel: "", priceCold: "", priceWarm: "", priceHot: "" }])}
+                       className="px-3 py-1.5 bg-emerald-50 text-emerald-600 rounded-lg text-[10px] font-black uppercase tracking-widest border border-emerald-100 hover:bg-emerald-100 transition-all flex items-center gap-1"
+                     >
+                       <Icons.Plus size={12} /> เพิ่มขนาด
+                     </button>
+                  </div>
+
+                  <div className="overflow-hidden border border-slate-100 rounded-xl">
+                     <table className="w-full text-left">
+                        <thead className="bg-slate-50 border-b border-slate-100">
+                           <tr>
+                              <th className="px-4 py-3 text-[10px] font-black uppercase text-slate-400 tracking-widest">ขนาด (kg)</th>
+                              <th className="px-4 py-3 text-[10px] font-black uppercase text-slate-400 tracking-widest">ชื่อ</th>
+                              <th className="px-4 py-3 text-[10px] font-black uppercase text-blue-400 tracking-widest text-center">น้ำเย็น (Cold)</th>
+                              <th className="px-4 py-3 text-[10px] font-black uppercase text-amber-500 tracking-widest text-center">น้ำอุ่น (Warm)</th>
+                              <th className="px-4 py-3 text-[10px] font-black uppercase text-rose-400 tracking-widest text-center">น้ำร้อน (Hot)</th>
+                              <th className="px-4 py-3 w-10"></th>
+                           </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-50">
+                           {washerCosts.map((w, i) => (
+                              <tr key={i} className="hover:bg-slate-50/50 transition-colors">
+                                 <td className="px-4 py-3">
+                                    <input type="number" value={w.sizeKg} onChange={e => { const n = [...washerCosts]; n[i] = {...n[i], sizeKg: e.target.value}; setWasherCosts(n); }}
+                                      placeholder="14" className="w-20 bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm font-black text-center focus:border-primary focus:outline-none transition-all" />
+                                 </td>
+                                 <td className="px-4 py-3">
+                                    <input type="text" value={w.sizeLabel} onChange={e => { const n = [...washerCosts]; n[i] = {...n[i], sizeLabel: e.target.value}; setWasherCosts(n); }}
+                                      placeholder="Standard" className="w-24 bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold focus:border-primary focus:outline-none transition-all" />
+                                 </td>
+                                 <td className="px-4 py-3">
+                                    <div className="flex items-center justify-center gap-1">
+                                      <span className="text-slate-300 text-xs">฿</span>
+                                      <input type="number" value={w.priceCold} onChange={e => { const n = [...washerCosts]; n[i] = {...n[i], priceCold: e.target.value}; setWasherCosts(n); }}
+                                        placeholder="50" className="w-16 bg-blue-50 border border-blue-100 rounded-lg px-2 py-2 text-sm font-black text-blue-600 text-center focus:border-blue-400 focus:outline-none transition-all" />
+                                    </div>
+                                 </td>
+                                 <td className="px-4 py-3">
+                                    <div className="flex items-center justify-center gap-1">
+                                      <span className="text-slate-300 text-xs">฿</span>
+                                      <input type="number" value={w.priceWarm} onChange={e => { const n = [...washerCosts]; n[i] = {...n[i], priceWarm: e.target.value}; setWasherCosts(n); }}
+                                        placeholder="50" className="w-16 bg-amber-50 border border-amber-100 rounded-lg px-2 py-2 text-sm font-black text-amber-600 text-center focus:border-amber-400 focus:outline-none transition-all" />
+                                    </div>
+                                 </td>
+                                 <td className="px-4 py-3">
+                                    <div className="flex items-center justify-center gap-1">
+                                      <span className="text-slate-300 text-xs">฿</span>
+                                      <input type="number" value={w.priceHot} onChange={e => { const n = [...washerCosts]; n[i] = {...n[i], priceHot: e.target.value}; setWasherCosts(n); }}
+                                        placeholder="50" className="w-16 bg-rose-50 border border-rose-100 rounded-lg px-2 py-2 text-sm font-black text-rose-600 text-center focus:border-rose-400 focus:outline-none transition-all" />
+                                    </div>
+                                 </td>
+                                 <td className="px-4 py-3">
+                                    <button type="button" onClick={() => setWasherCosts(prev => prev.filter((_, idx) => idx !== i))}
+                                      className="w-8 h-8 rounded-lg bg-slate-50 text-slate-300 hover:bg-rose-50 hover:text-rose-500 flex items-center justify-center transition-all">
+                                      <Icons.Trash size={14} />
+                                    </button>
+                                 </td>
+                              </tr>
+                           ))}
+                           {washerCosts.length === 0 && (
+                              <tr><td colSpan={6} className="px-6 py-8 text-center text-xs font-bold text-slate-300 uppercase">ยังไม่มีข้อมูล — กด "เพิ่มขนาด" เพื่อเริ่มตั้งค่า</td></tr>
+                           )}
+                        </tbody>
+                     </table>
+                  </div>
+               </div>
+
+               {/* Dryer Costs Table */}
+               <div className="mb-6">
+                  <div className="flex items-center justify-between mb-3">
+                     <h3 className="text-sm font-black text-slate-700 uppercase tracking-wider flex items-center gap-2">
+                        🌀 เครื่องอบ (Dryer)
+                     </h3>
+                     <button
+                       type="button"
+                       onClick={() => setDryerCosts(prev => [...prev, { sizeKg: "", sizeLabel: "", price: "", durationMinutes: "", extraPricePerMinute: "" }])}
+                       className="px-3 py-1.5 bg-orange-50 text-orange-600 rounded-lg text-[10px] font-black uppercase tracking-widest border border-orange-100 hover:bg-orange-100 transition-all flex items-center gap-1"
+                     >
+                       <Icons.Plus size={12} /> เพิ่มขนาด
+                     </button>
+                  </div>
+
+                  <div className="overflow-hidden border border-slate-100 rounded-xl">
+                     <table className="w-full text-left">
+                        <thead className="bg-slate-50 border-b border-slate-100">
+                           <tr>
+                              <th className="px-4 py-3 text-[10px] font-black uppercase text-slate-400 tracking-widest">ขนาด (kg)</th>
+                              <th className="px-4 py-3 text-[10px] font-black uppercase text-slate-400 tracking-widest">ชื่อ</th>
+                              <th className="px-4 py-3 text-[10px] font-black uppercase text-slate-400 tracking-widest text-center">ราคา/รอบ</th>
+                              <th className="px-4 py-3 text-[10px] font-black uppercase text-slate-400 tracking-widest text-center">นาที/รอบ</th>
+                              <th className="px-4 py-3 text-[10px] font-black uppercase text-slate-400 tracking-widest text-center">฿/ต่อเวลา</th>
+                              <th className="px-4 py-3 w-10"></th>
+                           </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-50">
+                           {dryerCosts.map((d, i) => (
+                              <tr key={i} className="hover:bg-slate-50/50 transition-colors">
+                                 <td className="px-4 py-3">
+                                    <input type="number" value={d.sizeKg} onChange={e => { const n = [...dryerCosts]; n[i] = {...n[i], sizeKg: e.target.value}; setDryerCosts(n); }}
+                                      placeholder="15" className="w-20 bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm font-black text-center focus:border-primary focus:outline-none transition-all" />
+                                 </td>
+                                 <td className="px-4 py-3">
+                                    <input type="text" value={d.sizeLabel} onChange={e => { const n = [...dryerCosts]; n[i] = {...n[i], sizeLabel: e.target.value}; setDryerCosts(n); }}
+                                      placeholder="Standard" className="w-24 bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold focus:border-primary focus:outline-none transition-all" />
+                                 </td>
+                                 <td className="px-4 py-3">
+                                    <div className="flex items-center justify-center gap-1">
+                                      <span className="text-slate-300 text-xs">฿</span>
+                                      <input type="number" value={d.price} onChange={e => { const n = [...dryerCosts]; n[i] = {...n[i], price: e.target.value}; setDryerCosts(n); }}
+                                        placeholder="50" className="w-16 bg-orange-50 border border-orange-100 rounded-lg px-2 py-2 text-sm font-black text-orange-600 text-center focus:border-orange-400 focus:outline-none transition-all" />
+                                    </div>
+                                 </td>
+                                 <td className="px-4 py-3">
+                                    <input type="number" value={d.durationMinutes} onChange={e => { const n = [...dryerCosts]; n[i] = {...n[i], durationMinutes: e.target.value}; setDryerCosts(n); }}
+                                      placeholder="24" className="w-16 bg-slate-50 border border-slate-200 rounded-lg px-2 py-2 text-sm font-bold text-center focus:border-primary focus:outline-none transition-all mx-auto block" />
+                                 </td>
+                                 <td className="px-4 py-3">
+                                    <div className="flex items-center justify-center gap-1">
+                                      <span className="text-slate-300 text-xs">฿</span>
+                                      <input type="number" value={d.extraPricePerMinute} onChange={e => { const n = [...dryerCosts]; n[i] = {...n[i], extraPricePerMinute: e.target.value}; setDryerCosts(n); }}
+                                        placeholder="10" className="w-16 bg-slate-50 border border-slate-200 rounded-lg px-2 py-2 text-sm font-bold text-center focus:border-primary focus:outline-none transition-all" />
+                                    </div>
+                                 </td>
+                                 <td className="px-4 py-3">
+                                    <button type="button" onClick={() => setDryerCosts(prev => prev.filter((_, idx) => idx !== i))}
+                                      className="w-8 h-8 rounded-lg bg-slate-50 text-slate-300 hover:bg-rose-50 hover:text-rose-500 flex items-center justify-center transition-all">
+                                      <Icons.Trash size={14} />
+                                    </button>
+                                 </td>
+                              </tr>
+                           ))}
+                           {dryerCosts.length === 0 && (
+                              <tr><td colSpan={6} className="px-6 py-8 text-center text-xs font-bold text-slate-300 uppercase">ยังไม่มีข้อมูล — กด "เพิ่มขนาด" เพื่อเริ่มตั้งค่า</td></tr>
+                           )}
+                        </tbody>
+                     </table>
+                  </div>
+               </div>
+
+               {/* Save Cost Matrix Button */}
+               <button
+                 type="button"
+                 onClick={handleSaveCostMatrix}
+                 disabled={isCostMatrixSaving}
+                 className="w-full bg-emerald-500 text-white py-4 rounded-xl font-black text-xs uppercase tracking-widest shadow-xl shadow-emerald-500/20 hover:bg-emerald-600 active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+               >
+                 {isCostMatrixSaving ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <Icons.Check size={16} />}
+                 {isCostMatrixSaving ? "กำลังบันทึก..." : "บันทึกตารางต้นทุน"}
+               </button>
+            </Card>
+            )}
+         </div>
+         
         {/* Right Column: Fees & Operational Settings */}
         <div className="space-y-8">
            <Card className="p-8 bg-slate-900 text-white border-none shadow-2xl">

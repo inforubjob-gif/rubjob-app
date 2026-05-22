@@ -3,6 +3,7 @@ import { getRequestContext } from "@cloudflare/next-on-pages";
 import { NextResponse } from "next/server";
 import { getStoreSession } from "@/lib/auth-server";
 import { nanoid } from "nanoid";
+import { getGPConfig, calcStoreNet } from "@/lib/gp-config";
 
 export const runtime = "edge";
 
@@ -28,7 +29,8 @@ export async function GET(req: Request) {
       WHERE storeId = ? AND status = 'completed'
     `).bind(storeId).first() as any;
     
-    const totalEarnings = (earningsRes?.totalEarnings || 0) * 0.90; // Applying 10% platform GP per skill.md
+    const gp = await getGPConfig(db);
+    const totalEarnings = calcStoreNet(earningsRes?.totalEarnings || 0, gp);
 
     // 2. Calculate Withdrawals
     const withdrawalsRes = await db.prepare(`
@@ -60,7 +62,7 @@ export async function GET(req: Request) {
       ...(orders as any[]).map(o => ({ 
         id: o.id, 
         type: "Laundry Earning", 
-        amount: o.amount * 0.90, 
+        amount: calcStoreNet(o.amount || 0, gp), 
         date: o.createdAt, 
         status: "Success" 
       })),

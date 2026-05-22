@@ -8,7 +8,7 @@ import { useTranslation } from "@/components/providers/LanguageProvider";
 import { useToast } from "@/components/providers/ToastProvider";
 import Link from "next/link";
 
-type TabType = 'revenue' | 'payouts';
+type TabType = 'revenue' | 'payouts' | 'cash_advances';
 
 export default function FinanceAdminPage() {
  const { t } = useTranslation();
@@ -112,12 +112,10 @@ export default function FinanceAdminPage() {
   }
  }
 
- const totalGross = transactions.reduce((acc, t) => acc + (t.totalPrice || 0), 0);
- const totalPlatformComission = transactions.reduce((acc, t) => {
-  const gp = t.gpPercent ? t.gpPercent / 100 : 0.1;
-  return acc + (t.totalPrice * gp);
- }, 0);
- const totalPartnerCut = totalGross - totalPlatformComission;
+ const totalGross = transactions.reduce((acc: number, t: any) => acc + (t.totalPrice || 0), 0);
+ const totalStoreCost = transactions.reduce((acc: number, t: any) => acc + (t.storeCost || 0), 0);
+ const totalMargin = totalGross - totalStoreCost;
+ const marginPercent = totalGross > 0 ? ((totalMargin / totalGross) * 100).toFixed(1) : '0.0';
 
  return (
   <div className="space-y-6 max-w-7xl mx-auto pb-20">
@@ -134,26 +132,29 @@ export default function FinanceAdminPage() {
    </header>
 
    {/* Stats Overview */}
-   <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+   <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
      <Card className="p-6 bg-white border border-slate-200/60 shadow-sm relative overflow-hidden">
       <div className="absolute top-0 right-0 p-4 opacity-10 text-slate-900"><Icons.DollarSign size={48} /></div>
       <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{t('admin.finance.stats.gross')}</p>
       <p className="text-2xl font-black text-slate-900">฿{totalGross.toLocaleString()}</p>
-      <div className="mt-4 flex items-center gap-1.5 text-[10px] font-bold text-emerald-600 uppercase">
-        <Icons.TrendingUp size={12} /> +12.5% vs Last Period
+      <p className="mt-4 text-[10px] font-bold text-slate-400">ลูกค้าจ่ายรวม</p>
+     </Card>
+     <Card className="p-6 bg-white border border-slate-200/60 shadow-sm">
+      <p className="text-[10px] font-black text-amber-500 uppercase tracking-widest mb-1">💵 ต้นทุนร้านค้า (รายรับร้าน)</p>
+      <p className="text-2xl font-black text-amber-600">฿{totalStoreCost.toLocaleString()}</p>
+      <p className="mt-4 text-[10px] font-bold text-slate-400">Rubber จ่ายสดให้ร้าน</p>
+     </Card>
+     <Card className="p-6 bg-slate-900 text-white shadow-2xl shadow-slate-300 border-none">
+      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">📊 ส่วนต่าง (Margin)</p>
+      <p className="text-2xl font-black text-emerald-400">฿{totalMargin.toLocaleString()}</p>
+      <div className="mt-4 flex flex-wrap gap-2">
+        <span className="text-[8px] font-black bg-white/10 px-2 py-0.5 rounded-full uppercase">Margin {marginPercent}%</span>
       </div>
      </Card>
      <Card className="p-6 bg-white border border-slate-200/60 shadow-sm">
-      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{t('admin.finance.stats.partnerDebt')}</p>
-      <p className="text-2xl font-black text-rose-600">฿{totalPartnerCut.toLocaleString()}</p>
-      <p className="mt-4 text-[10px] font-bold text-slate-400 italic">Simulated 90:10 Split Ratio</p>
-     </Card>
-     <Card className="p-6 bg-slate-900 text-white shadow-2xl shadow-slate-300 border-none">
-      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{t('admin.finance.stats.platformCom')}</p>
-      <p className="text-2xl font-black text-emerald-400">฿{totalPlatformComission.toLocaleString()}</p>
-      <div className="mt-4 flex flex-wrap gap-2">
-        <span className="text-[8px] font-black bg-white/10 px-2 py-0.5 rounded-full uppercase">{t('admin.finance.stats.profit')}</span>
-      </div>
+      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">📦 จำนวน Order</p>
+      <p className="text-2xl font-black text-slate-900">{transactions.length}</p>
+      <p className="mt-4 text-[10px] font-bold text-slate-400">ออเดอร์ที่เสร็จแล้ว</p>
      </Card>
    </div>
 
@@ -173,6 +174,12 @@ export default function FinanceAdminPage() {
      {t('admin.finance.tabs.payouts')}
      {activeTab === 'payouts' && <div className="absolute bottom-0 left-0 right-0 h-1 bg-primary rounded-t-full shadow-lg shadow-primary/40 animate-in slide-in-from-bottom-1" />}
     </button>
+    <Link 
+      href="/admin/finance/cash-advances"
+      className="pb-4 text-[11px] font-black uppercase tracking-widest transition-all relative shrink-0 text-amber-500 hover:text-amber-600 flex items-center gap-1.5"
+     >
+      💰 Cash Advances
+     </Link>
    </div>
 
    {/* Table Section */}
@@ -195,13 +202,17 @@ export default function FinanceAdminPage() {
           <tr>
            <th className="px-4 py-5">{t('admin.finance.table.txCore')}</th>
            <th className="px-4 py-5">{t('admin.finance.table.date')}</th>
-           <th className="px-4 py-5 text-right">{t('admin.finance.table.gross')}</th>
-           <th className="px-4 py-5 text-right">{t('admin.finance.table.commission')}</th>
+           <th className="px-4 py-5 text-right">ลูกค้าจ่าย</th>
+           <th className="px-4 py-5 text-right">💵 ต้นทุนร้าน</th>
+           <th className="px-4 py-5 text-right">📊 Margin</th>
            <th className="px-4 py-5 text-right">{t('admin.finance.table.actions')}</th>
           </tr>
          </thead>
          <tbody className="divide-y divide-slate-50">
-          {transactions.map(tx => (
+          {transactions.map((tx: any) => {
+           const margin = (tx.totalPrice || 0) - (tx.storeCost || 0);
+           const marginPct = tx.totalPrice > 0 ? ((margin / tx.totalPrice) * 100).toFixed(0) : '—';
+           return (
            <tr key={tx.id} className="hover:bg-slate-50/50 transition-colors group">
             <td className="px-4 py-5">
              <div>
@@ -212,15 +223,30 @@ export default function FinanceAdminPage() {
             <td className="px-4 py-5">
              <p className="text-xs font-bold text-slate-500">{new Date(tx.createdAt).toLocaleDateString()}</p>
             </td>
-            <td className="px-4 py-5 text-right font-black text-slate-900">฿{tx.totalPrice.toLocaleString()}</td>
-            <td className="px-4 py-5 text-right font-black text-emerald-600">
-             ฿{(tx.totalPrice * (tx.gpPercent ? tx.gpPercent / 100 : 0.1)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            <td className="px-4 py-5 text-right font-black text-slate-900">฿{(tx.totalPrice || 0).toLocaleString()}</td>
+            <td className="px-4 py-5 text-right">
+             {tx.storeCost > 0 ? (
+              <span className="font-black text-amber-600">฿{tx.storeCost.toLocaleString()}</span>
+             ) : (
+              <span className="text-[10px] font-bold text-slate-300 italic">ไม่มีข้อมูล</span>
+             )}
+            </td>
+            <td className="px-4 py-5 text-right">
+             {tx.storeCost > 0 ? (
+              <div>
+               <span className="font-black text-emerald-600">฿{margin.toLocaleString()}</span>
+               <span className="text-[9px] font-bold text-slate-400 ml-1">({marginPct}%)</span>
+              </div>
+             ) : (
+              <span className="text-[10px] font-bold text-slate-300 italic">—</span>
+             )}
             </td>
             <td className="px-4 py-5 text-right">
              <Link href={`/admin/orders/${tx.id}`} className="text-[9px] font-black uppercase tracking-widest text-primary hover:underline">{t('admin.finance.action.verify')}</Link>
             </td>
            </tr>
-          ))}
+           );
+          })}
          </tbody>
         </table>
        </div>

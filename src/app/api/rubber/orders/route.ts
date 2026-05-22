@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { getRubberSession } from "@/lib/auth-server";
 import { transitionOrderStatus } from "@/lib/order-logic";
 import { safeError } from "@/lib/api-utils";
+import { getGPConfig, calcRubberPayout } from "@/lib/gp-config";
 
 export const runtime = "edge";
 
@@ -29,10 +30,10 @@ export async function GET(req: Request) {
 
     // Self-healing columns moved to db-init.ts (Phase 3.2)
 
+    const gp = await getGPConfig(db);
+
     const calculateRubberEarn = (deliveryFee: number, status: string) => {
-      // 10% commission + 10 THB Platform Fee
-      const commission = deliveryFee * 0.10;
-      const totalEarn = deliveryFee - commission - 10;
+      const totalEarn = calcRubberPayout(deliveryFee, gp);
       // Split 50/50 between legs.
       return totalEarn * 0.5;
     };

@@ -12,6 +12,7 @@ import { useTranslation } from "@/components/providers/LanguageProvider";
 import PhotoUpload from "@/components/ui/PhotoUpload";
 import dynamic from "next/dynamic";
 import OrderIssueModal from "@/components/orders/OrderIssueModal";
+import CashAdvanceRecorder from "@/components/rubber/CashAdvanceRecorder";
 import Modal from "@/components/ui/Modal";
 
 const RubberMap = dynamic(() => import("@/components/rubber/RubberMap"), { 
@@ -520,6 +521,16 @@ export default function RubberOrderDetailPage() {
                   </div>
                </div>
             </Card>
+          )}
+
+          {/* Cash Advance Recorder — show when Rubber is at shop */}
+          {(status === "at_shop" || status === "washing") && order?.storeId && (
+            <CashAdvanceRecorder
+              orderId={id!}
+              storeId={order.storeId}
+              storeName={order?.storeName || "Unknown Store"}
+              rubberId={(() => { try { const s = JSON.parse(localStorage.getItem("rubjob_rubber_session") || "{}"); return s.id || ""; } catch { return ""; } })()}
+            />
           )}
 
           {currentPhotoStep && status !== "at_shop" && (

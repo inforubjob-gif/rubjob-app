@@ -273,6 +273,27 @@ export default function RubberWalletPage() {
             </Card>
           </section>
 
+          {/* Cash Advance Card */}
+          <section className="animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200">
+            <button 
+              onClick={() => router.push('/rubber/wallet/cash-advance')}
+              className="w-full text-left"
+            >
+              <Card className="p-5 bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-amber-100 shadow-sm rounded-[2rem] hover:shadow-md transition-all active:scale-[0.98]">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-xl bg-amber-500 text-white flex items-center justify-center shadow-lg shadow-amber-500/20">
+                    💵
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-black text-slate-900">เงินสดสำรองจ่าย</p>
+                    <p className="text-[10px] font-bold text-amber-600 uppercase tracking-widest">Cash Advance — กดเพื่อดูรายละเอียด</p>
+                  </div>
+                  <Icons.ChevronDown size={16} className="text-amber-400 -rotate-90 shrink-0" />
+                </div>
+              </Card>
+            </button>
+          </section>
+
           <section id="history-section">
             <h2 className="text-[11px] font-black text-slate-900 uppercase tracking-[0.2em] mb-4 px-2">{t("rubber.wallet.history")}</h2>
             <div className="space-y-3">

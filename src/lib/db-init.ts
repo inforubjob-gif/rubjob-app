@@ -364,6 +364,49 @@ export async function ensureSchema(db: D1Database) {
       details TEXT,
       createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
     );
+
+    CREATE TABLE IF NOT EXISTS store_washer_costs (
+      id TEXT PRIMARY KEY,
+      storeId TEXT NOT NULL,
+      sizeKg REAL NOT NULL,
+      sizeLabel TEXT,
+      priceCold REAL NOT NULL,
+      priceWarm REAL NOT NULL,
+      priceHot REAL NOT NULL,
+      FOREIGN KEY (storeId) REFERENCES stores(id) ON DELETE CASCADE
+    );
+
+    CREATE TABLE IF NOT EXISTS store_dryer_costs (
+      id TEXT PRIMARY KEY,
+      storeId TEXT NOT NULL,
+      sizeKg REAL NOT NULL,
+      sizeLabel TEXT,
+      price REAL NOT NULL,
+      durationMinutes INTEGER,
+      extraPricePerMinute REAL,
+      FOREIGN KEY (storeId) REFERENCES stores(id) ON DELETE CASCADE
+    );
+
+    CREATE TABLE IF NOT EXISTS cash_advances (
+      id TEXT PRIMARY KEY,
+      rubberId TEXT NOT NULL,
+      orderId TEXT,
+      storeId TEXT,
+      storeName TEXT,
+      machineType TEXT NOT NULL,
+      machineSizeKg REAL,
+      waterTemp TEXT,
+      amount REAL NOT NULL,
+      costMatrixId TEXT,
+      note TEXT,
+      status TEXT DEFAULT 'pending',
+      settledAt DATETIME,
+      settledBy TEXT,
+      settlementNote TEXT,
+      createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (rubberId) REFERENCES rubber_users(id),
+      FOREIGN KEY (orderId) REFERENCES orders(id)
+    );
   `;
 
   // Execute standard tables

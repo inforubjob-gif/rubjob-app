@@ -161,6 +161,7 @@ export const Icons = {
   Lightbulb: (props: IconProps) => <MaterialIcon name="lightbulb" {...props} />,
   Relax: (props: IconProps) => <MaterialIcon name="spa" {...props} />,
   HeartHand: (props: IconProps) => <MaterialIcon name="volunteer_activism" {...props} />,
+  ChevronDown: (props: IconProps) => <MaterialIcon name="expand_more" {...props} />,
 };
 
 export function IconCircle({ 
