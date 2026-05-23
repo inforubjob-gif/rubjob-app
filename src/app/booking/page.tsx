@@ -124,9 +124,10 @@ function BookingFlow() {
   // Weight & Size based selection instead of per-piece items
   const [bagSize, setBagSize] = useState<string>("9kg");
   const [machineSize, setMachineSize] = useState<"small" | "large">("small");
-  const [washMode, setWashMode] = useState<"standard" | "extra">("extra");
+  const [washMode, setWashMode] = useState<"standard" | "extra">("standard");
   const [selectedSizePrice, setSelectedSizePrice] = useState<number>(0);
   const [selectedSizeCost, setSelectedSizeCost] = useState<number>(0);
+  const [selectedSizeExtraCost, setSelectedSizeExtraCost] = useState<number>(0);
   const [withFolding, setWithFolding] = useState<boolean>(true);
   const [needsDetergent, setNeedsDetergent] = useState<boolean>(false);
 
@@ -425,8 +426,10 @@ function BookingFlow() {
       needsDetergent: needsDetergent,
       withFolding: withFolding,
       machineSize: machineSize,
-      washMode: "extra", // Always bill the app price for combo machines
-      storePrices: selectedSizePrice > 0 ? { standard: selectedSizeCost || selectedSizePrice, extra: selectedSizePrice } : undefined,
+      washMode: "standard", // Always default to standard mode (customer can request extra via chat)
+      storePrices: selectedSizePrice > 0 ? { standard: selectedSizeCost || selectedSizePrice, extra: selectedSizeExtraCost || selectedSizePrice } : undefined,
+      laundryAppPrice: selectedSizePrice,
+      storeCostPrice: selectedSizeCost,
     }, pricingConfig);
   } catch (err) {
     console.error("Pricing error:", err);
@@ -937,38 +940,56 @@ function BookingFlow() {
                         ? [...store.washers].sort((a: any, b: any) => a.sizeKg - b.sizeKg)
                         : null;
                       
-                      // Use cost matrix from store — priceExtra = ราคาหน้าแอป (customer price)
+                      // Customer App Prices are FIXED: 120, 140, 170, 210
                       let sizeOptions: any[] = [];
                       if (store?.machineType === 'combo') {
-                        // Combo machines always show 4 sizes (9, 14, 18, 28)
-                        // Map them to the 2 prices provided by the admin (Small/Large)
-                        const smallOption = washers?.find((w: any) => w.sizeKg <= 15) || {};
-                        const largeOption = washers?.find((w: any) => w.sizeKg > 15) || {};
-                        const smallPrice = smallOption.priceExtra || 140;
-                        const smallCost = smallOption.priceStandard || smallPrice * 0.8;
-                        const largePrice = largeOption.priceExtra || 160;
-                        const largeCost = largeOption.priceStandard || largePrice * 0.8;
+                        // Combo Cost depends on Admin input (Standard/Extra) which only has Small/Large
+                        const smallWasher = washers?.find((w: any) => w.sizeKg <= 15) || {};
+                        const largeWasher = washers?.find((w: any) => w.sizeKg > 15) || {};
+
+                        const smallCost = smallWasher.priceStandard || 100;
+                        const smallExtraCost = smallWasher.priceExtra || 140;
+                        const largeCost = largeWasher.priceStandard || 120;
+                        const largeExtraCost = largeWasher.priceExtra || 160;
                         
                         sizeOptions = [
-                          { sizeKg: 9, label: "9 kg", price: smallPrice, cost: smallCost },
-                          { sizeKg: 14, label: "14 kg", price: smallPrice, cost: smallCost },
-                          { sizeKg: 18, label: "18 kg", price: largePrice, cost: largeCost },
-                          { sizeKg: 28, label: "28 kg", price: largePrice, cost: largeCost },
+                          { sizeKg: 9, label: "9 kg", price: 120, cost: smallCost, extraCost: smallExtraCost },
+                          { sizeKg: 14, label: "14 kg", price: 140, cost: smallCost, extraCost: smallExtraCost },
+                          { sizeKg: 18, label: "18 kg", price: 170, cost: largeCost, extraCost: largeExtraCost },
+                          { sizeKg: 28, label: "28 kg", price: 210, cost: largeCost, extraCost: largeExtraCost },
                         ];
                       } else {
-                        sizeOptions = washers && washers.length > 0
-                          ? washers.map((w: any) => ({
-                              sizeKg: w.sizeKg,
-                              label: w.sizeLabel || `${w.sizeKg} kg`,
-                              price: w.priceExtra || w.priceHot || 0,
-                              cost: w.priceStandard || w.priceCold || 0,
-                            }))
-                          : [
-                              { sizeKg: 9, label: "9 kg", price: 120, cost: 80 },
-                              { sizeKg: 14, label: "14 kg", price: 140, cost: 100 },
-                              { sizeKg: 18, label: "18 kg", price: 170, cost: 120 },
-                              { sizeKg: 28, label: "28 kg", price: 210, cost: 160 },
-                            ];
+                        // Separate Cost depends on Washer (Cold/Hot) + Dryer, matching all 4 weights
+                        const dryers = store?.dryers || [];
+                        const fixedSizes = [
+                          { sizeKg: 9, price: 120, defaultWash: 50, defaultDry: 50 },
+                          { sizeKg: 14, price: 140, defaultWash: 70, defaultDry: 50 },
+                          { sizeKg: 18, price: 170, defaultWash: 80, defaultDry: 70 },
+                          { sizeKg: 28, price: 210, defaultWash: 110, defaultDry: 70 },
+                        ];
+                        
+                        sizeOptions = fixedSizes.map(fs => {
+                           // Find closest washer
+                           const washer = washers?.length > 0 ? washers.reduce((prev: any, curr: any) => 
+                              Math.abs(curr.sizeKg - fs.sizeKg) < Math.abs(prev.sizeKg - fs.sizeKg) ? curr : prev
+                           ) : {};
+                           
+                           // Find closest dryer
+                           const dryer = dryers.length > 0 ? dryers.reduce((prev: any, curr: any) => 
+                              Math.abs(curr.sizeKg - fs.sizeKg) < Math.abs(prev.sizeKg - fs.sizeKg) ? curr : prev
+                           ) : {};
+                           
+                           const cost = (washer.priceCold || fs.defaultWash) + (dryer.priceStandard || dryer.priceCold || fs.defaultDry);
+                           const extraCost = (washer.priceHot || fs.defaultWash + 10) + (dryer.priceStandard || dryer.priceCold || fs.defaultDry);
+                           
+                           return {
+                              sizeKg: fs.sizeKg,
+                              label: `${fs.sizeKg} kg`,
+                              price: fs.price,
+                              cost: cost,
+                              extraCost: extraCost
+                           };
+                        });
                       }
 
                       // Approximate piece count per size
@@ -982,6 +1003,7 @@ function BookingFlow() {
                             setMachineSize(opt.sizeKg <= 14 ? "small" : "large");
                             setSelectedSizePrice(opt.price);
                             setSelectedSizeCost(opt.cost);
+                            setSelectedSizeExtraCost(opt.extraCost || opt.cost);
                           }}
                           className={`flex flex-col items-center p-5 rounded-2xl border-2 transition-all active:scale-[0.97] ${
                             bagSize === `${opt.sizeKg}kg`
