@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, Suspense, useMemo, useCallback } from "react";
+import { useState, useEffect, Suspense, useMemo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
@@ -337,7 +337,7 @@ function BookingFlow() {
     });
   }, [locale]);
 
-  const isSlotPassed = useCallback((slotStartTime: string, dateVal: string) => {
+  const isSlotPassed = (slotStartTime: string, dateVal: string) => {
     const now = new Date();
     // Use local time comparison
     const todayStr = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
@@ -348,9 +348,9 @@ function BookingFlow() {
     const currentH = now.getHours();
     const currentM = now.getMinutes();
 
-    // Disable if current time has passed the start time (with a 30 min buffer optionally, here strictly)
+    // Disable if current time has passed the start time
     return currentH > slotH || (currentH === slotH && currentM >= slotM);
-  }, []);
+  };
 
   // Set default pickup date/slot
   useEffect(() => {
@@ -358,7 +358,7 @@ function BookingFlow() {
       const validDate = dates.find(d => TIME_SLOTS.some(s => !isSlotPassed(s.startTime, d.value)));
       setPickupDate(validDate ? validDate.value : dates[0].value);
     }
-  }, [dates, pickupDate, isSlotPassed]);
+  }, [dates, pickupDate]);
 
   // Ensure selected slot is valid for the selected date
   useEffect(() => {
@@ -372,7 +372,7 @@ function BookingFlow() {
         setPickupSlot(""); // No slots available for this day
       }
     }
-  }, [pickupDate, pickupSlot, isSlotPassed]);
+  }, [pickupDate, pickupSlot]);
 
   // Road distance state (OSRM)
   const [roadDistance, setRoadDistance] = useState<{ distanceKm: number; durationMin: number } | null>(null);
@@ -1218,11 +1218,11 @@ function BookingFlow() {
                   <div>
                     <div className="flex items-center gap-1.5 mb-2 text-primary-dark font-bold">
                       <Icons.Tasks size={14} strokeWidth={2.5} />
-                      <span>{t("booking.summary.package")} {formatKg(bagSize)}</span>
+                      <span>{currentWasherPrices?.label || machineSize === 'small' ? 'Small' : 'Large'} {currentWasherPrices?.sizeKg ? `${currentWasherPrices.sizeKg} kg` : formatKg(bagSize)}</span>
                     </div>
                     <div className="space-y-2 pl-5">
                       <div className="flex items-center justify-between">
-                        <span>{t("booking.summary.package")} {formatKg(bagSize)}</span>
+                        <span>{washMode === 'standard' ? 'Standard' : 'Extra'} — {currentWasherPrices?.label || (machineSize === 'small' ? 'Small' : 'Large')}</span>
                         <span className="font-bold text-slate-800">฿{laundryFee}</span>
                       </div>
                       {deliverySpeed === "express" && (
