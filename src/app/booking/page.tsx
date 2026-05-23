@@ -124,8 +124,9 @@ function BookingFlow() {
   // Weight & Size based selection instead of per-piece items
   const [bagSize, setBagSize] = useState<string>("9kg");
   const [machineSize, setMachineSize] = useState<"small" | "large">("small");
-  const [washMode, setWashMode] = useState<"standard" | "extra">("standard");
+  const [washMode, setWashMode] = useState<"standard" | "extra">("extra");
   const [selectedSizePrice, setSelectedSizePrice] = useState<number>(0);
+  const [selectedSizeCost, setSelectedSizeCost] = useState<number>(0);
   const [withFolding, setWithFolding] = useState<boolean>(true);
   const [needsDetergent, setNeedsDetergent] = useState<boolean>(false);
 
@@ -424,8 +425,8 @@ function BookingFlow() {
       needsDetergent: needsDetergent,
       withFolding: withFolding,
       machineSize: machineSize,
-      washMode: washMode,
-      storePrices: selectedSizePrice > 0 ? { standard: selectedSizePrice } : undefined,
+      washMode: "extra", // Always bill the app price for combo machines
+      storePrices: selectedSizePrice > 0 ? { standard: selectedSizeCost || selectedSizePrice, extra: selectedSizePrice } : undefined,
     }, pricingConfig);
   } catch (err) {
     console.error("Pricing error:", err);
@@ -937,18 +938,38 @@ function BookingFlow() {
                         : null;
                       
                       // Use cost matrix from store — priceExtra = ราคาหน้าแอป (customer price)
-                      const sizeOptions = washers 
-                        ? washers.map((w: any) => ({
-                            sizeKg: w.sizeKg,
-                            label: w.sizeLabel || `${w.sizeKg} kg`,
-                            price: w.priceExtra || w.priceHot || 0,
-                          }))
-                        : [
-                            { sizeKg: 9, label: "9 kg", price: 120 },
-                            { sizeKg: 14, label: "14 kg", price: 140 },
-                            { sizeKg: 18, label: "18 kg", price: 170 },
-                            { sizeKg: 28, label: "28 kg", price: 210 },
-                          ];
+                      let sizeOptions: any[] = [];
+                      if (store?.machineType === 'combo') {
+                        // Combo machines always show 4 sizes (9, 14, 18, 28)
+                        // Map them to the 2 prices provided by the admin (Small/Large)
+                        const smallOption = washers?.find((w: any) => w.sizeKg <= 15) || {};
+                        const largeOption = washers?.find((w: any) => w.sizeKg > 15) || {};
+                        const smallPrice = smallOption.priceExtra || 140;
+                        const smallCost = smallOption.priceStandard || smallPrice * 0.8;
+                        const largePrice = largeOption.priceExtra || 160;
+                        const largeCost = largeOption.priceStandard || largePrice * 0.8;
+                        
+                        sizeOptions = [
+                          { sizeKg: 9, label: "9 kg", price: smallPrice, cost: smallCost },
+                          { sizeKg: 14, label: "14 kg", price: smallPrice, cost: smallCost },
+                          { sizeKg: 18, label: "18 kg", price: largePrice, cost: largeCost },
+                          { sizeKg: 28, label: "28 kg", price: largePrice, cost: largeCost },
+                        ];
+                      } else {
+                        sizeOptions = washers && washers.length > 0
+                          ? washers.map((w: any) => ({
+                              sizeKg: w.sizeKg,
+                              label: w.sizeLabel || `${w.sizeKg} kg`,
+                              price: w.priceExtra || w.priceHot || 0,
+                              cost: w.priceStandard || w.priceCold || 0,
+                            }))
+                          : [
+                              { sizeKg: 9, label: "9 kg", price: 120, cost: 80 },
+                              { sizeKg: 14, label: "14 kg", price: 140, cost: 100 },
+                              { sizeKg: 18, label: "18 kg", price: 170, cost: 120 },
+                              { sizeKg: 28, label: "28 kg", price: 210, cost: 160 },
+                            ];
+                      }
 
                       // Approximate piece count per size
                       const piecesMap: Record<number, string> = { 9: '20-30 ชิ้น', 14: '30-50 ชิ้น', 18: '50-70 ชิ้น', 28: '70-100 ชิ้น' };
@@ -960,6 +981,7 @@ function BookingFlow() {
                             setBagSize(`${opt.sizeKg}kg`);
                             setMachineSize(opt.sizeKg <= 14 ? "small" : "large");
                             setSelectedSizePrice(opt.price);
+                            setSelectedSizeCost(opt.cost);
                           }}
                           className={`flex flex-col items-center p-5 rounded-2xl border-2 transition-all active:scale-[0.97] ${
                             bagSize === `${opt.sizeKg}kg`

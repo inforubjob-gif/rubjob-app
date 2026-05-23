@@ -125,15 +125,28 @@ export default function StoreForm({ initialData, isEdit }: StoreFormProps) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           storeId: targetStoreId,
-          washers: washerCosts.filter(w => w.sizeKg && (w.priceCold || w.priceStandard)).map(w => ({
-            sizeKg: parseFloat(w.sizeKg) || 0,
-            sizeLabel: w.sizeLabel || null,
-            priceCold: parseFloat(w.priceCold) || 0,
-            priceWarm: parseFloat(w.priceWarm) || 0,
-            priceHot: parseFloat(w.priceHot) || 0,
-            priceStandard: parseFloat(w.priceStandard) || 0,
-            priceExtra: parseFloat(w.priceExtra) || 0,
-          })),
+          washers: washerCosts.filter(w => (formData.machineType === 'combo' ? w.sizeLabel : w.sizeKg) && (w.priceCold || w.priceStandard || w.priceExtra)).map((w, idx) => {
+            let mappedSizeKg = parseFloat(w.sizeKg) || 0;
+            if (formData.machineType === 'combo') {
+              const labelLower = w.sizeLabel?.toLowerCase() || '';
+              if (labelLower.includes('เล็ก') || labelLower.includes('small')) {
+                mappedSizeKg = 14;
+              } else if (labelLower.includes('ใหญ่') || labelLower.includes('large')) {
+                mappedSizeKg = 28;
+              } else if (mappedSizeKg === 0) {
+                mappedSizeKg = 14 + idx; // Fallback to unique number
+              }
+            }
+            return {
+              sizeKg: mappedSizeKg,
+              sizeLabel: w.sizeLabel || null,
+              priceCold: parseFloat(w.priceCold) || 0,
+              priceWarm: parseFloat(w.priceWarm) || 0,
+              priceHot: parseFloat(w.priceHot) || 0,
+              priceStandard: parseFloat(w.priceStandard) || 0,
+              priceExtra: parseFloat(w.priceExtra) || 0,
+            };
+          }),
           dryers: dryerCosts.filter(d => d.sizeKg && d.price).map(d => ({
             sizeKg: parseFloat(d.sizeKg) || 0,
             sizeLabel: d.sizeLabel || null,
@@ -745,7 +758,7 @@ export default function StoreForm({ initialData, isEdit }: StoreFormProps) {
                      <table className="w-full text-left">
                         <thead className="bg-slate-50 border-b border-slate-100">
                            <tr>
-                              <th className="px-4 py-3 text-[10px] font-black uppercase text-slate-400 tracking-widest">ขนาด (kg)</th>
+                              {formData.machineType !== 'combo' && <th className="px-4 py-3 text-[10px] font-black uppercase text-slate-400 tracking-widest">ขนาด (kg)</th>}
                               <th className="px-4 py-3 text-[10px] font-black uppercase text-slate-400 tracking-widest">ชื่อ</th>
                               {formData.machineType === 'combo' ? (
                                 <>
@@ -765,13 +778,15 @@ export default function StoreForm({ initialData, isEdit }: StoreFormProps) {
                         <tbody className="divide-y divide-slate-50">
                            {washerCosts.map((w, i) => (
                               <tr key={i} className="hover:bg-slate-50/50 transition-colors">
-                                 <td className="px-4 py-3">
-                                    <input type="number" value={w.sizeKg} onChange={e => { const n = [...washerCosts]; n[i] = {...n[i], sizeKg: e.target.value}; setWasherCosts(n); }}
-                                      placeholder="14" className="w-20 bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm font-black text-center focus:border-primary focus:outline-none transition-all" />
-                                 </td>
+                                 {formData.machineType !== 'combo' && (
+                                   <td className="px-4 py-3">
+                                      <input type="number" value={w.sizeKg} onChange={e => { const n = [...washerCosts]; n[i] = {...n[i], sizeKg: e.target.value}; setWasherCosts(n); }}
+                                        placeholder="14" className="w-20 bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm font-black text-center focus:border-primary focus:outline-none transition-all" />
+                                   </td>
+                                 )}
                                  <td className="px-4 py-3">
                                     <input type="text" value={w.sizeLabel} onChange={e => { const n = [...washerCosts]; n[i] = {...n[i], sizeLabel: e.target.value}; setWasherCosts(n); }}
-                                      placeholder="Standard" className="w-24 bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold focus:border-primary focus:outline-none transition-all" />
+                                      placeholder={formData.machineType === 'combo' ? "เช่น เล็ก, ใหญ่" : "Standard"} className="w-full min-w-[120px] bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold focus:border-primary focus:outline-none transition-all" />
                                  </td>
                                  {formData.machineType === 'combo' ? (
                                    <>
