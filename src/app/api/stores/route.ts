@@ -6,7 +6,7 @@ export const runtime = "edge";
 
 /**
  * GET /api/stores
- * Fetches all active stores from Cloudflare D1
+ * Fetches all active stores from Cloudflare D1, including cost matrix
  */
 export async function GET(req: Request) {
   try {
@@ -20,8 +20,33 @@ export async function GET(req: Request) {
       WHERE isActive = 1
     `).all();
 
+    // Fetch cost matrix for all active stores
+    const storeIds = results.map((s: any) => s.id);
+    let allWashers: any[] = [];
+    let allDryers: any[] = [];
+
+    if (storeIds.length > 0) {
+      const placeholders = storeIds.map(() => '?').join(',');
+      const { results: washers } = await db.prepare(
+        `SELECT * FROM store_washer_costs WHERE storeId IN (${placeholders}) ORDER BY sizeKg ASC`
+      ).bind(...storeIds).all();
+      allWashers = washers || [];
+
+      const { results: dryers } = await db.prepare(
+        `SELECT * FROM store_dryer_costs WHERE storeId IN (${placeholders}) ORDER BY sizeKg ASC`
+      ).bind(...storeIds).all();
+      allDryers = dryers || [];
+    }
+
+    // Attach cost matrix to each store
+    const storesWithCosts = results.map((store: any) => ({
+      ...store,
+      washers: allWashers.filter((w: any) => w.storeId === store.id),
+      dryers: allDryers.filter((d: any) => d.storeId === store.id),
+    }));
+
     return NextResponse.json(
-      { stores: results },
+      { stores: storesWithCosts },
       {
         headers: {
           "Cache-Control": "public, s-maxage=60, stale-while-revalidate=300",
@@ -33,3 +58,4 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: safeError(error) }, { status: 500 });
   }
 }
+

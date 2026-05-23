@@ -19,6 +19,11 @@ export interface PriceDetails {
   withFolding: boolean;
   machineSize?: 'small' | 'large';
   washMode?: 'standard' | 'extra';
+  /** Override prices from store cost matrix (if available) */
+  storePrices?: {
+    standard?: number;
+    extra?: number;
+  };
 }
 
 export interface PricingResult {
@@ -36,12 +41,17 @@ export function calculateOrderPrice(
   details: PriceDetails,
   config: PricingConfig
 ): PricingResult {
-  const { weightKg, distanceKm, isExpress, needsDetergent, withFolding, machineSize, washMode } = details;
+  const { weightKg, distanceKm, isExpress, needsDetergent, withFolding, machineSize, washMode, storePrices } = details;
 
   // 1. Laundry Cost (combo washer-dryer: wash+dry included)
   let laundryCost = 0;
-  if (machineSize && washMode) {
-    // MARU-style combo machine pricing
+  if (storePrices && (storePrices.standard || storePrices.extra)) {
+    // Use real store cost matrix prices
+    laundryCost = washMode === 'extra' 
+      ? (storePrices.extra || storePrices.standard || 100)
+      : (storePrices.standard || 100);
+  } else if (machineSize && washMode) {
+    // MARU-style combo machine pricing (fallback hardcode)
     const priceMatrix: Record<string, Record<string, number>> = {
       small:    { standard: 100, extra: 140 },
       large:    { standard: 120, extra: 160 },

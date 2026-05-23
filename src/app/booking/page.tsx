@@ -412,6 +412,25 @@ function BookingFlow() {
   const roundTripDistanceBonus = roundTripKm > 3 ? (roundTripKm - 3) * 10 : 0;
   const totalDeliveryBase = 50 + roundTripDistanceBonus;
     
+  // Helper: get washer cost matrix prices for the selected store + machine size
+  const getWasherPrices = (size: 'small' | 'large') => {
+    const store = selectedStore as any;
+    if (!store?.washers || store.washers.length === 0) return null;
+    // Match by sizeKg: small ~= smallest entry, large ~= largest entry
+    const sorted = [...store.washers].sort((a: any, b: any) => a.sizeKg - b.sizeKg);
+    const entry = size === 'small' ? sorted[0] : sorted[sorted.length - 1];
+    if (!entry) return null;
+    const machineType = store.machineType || 'separate';
+    if (machineType === 'combo') {
+      return { standard: entry.priceStandard || 0, extra: entry.priceExtra || 0, label: entry.sizeLabel, sizeKg: entry.sizeKg };
+    } else {
+      // For separate machines, use cold/warm/hot — standard = cold, extra = hot
+      return { standard: entry.priceCold || 0, extra: entry.priceHot || 0, label: entry.sizeLabel, sizeKg: entry.sizeKg };
+    }
+  };
+
+  const currentWasherPrices = getWasherPrices(machineSize);
+
   // Pricing Logic (2026 Strategy)
   let pricing: any = { customerTotal: 0, breakdown: { laundry: 0, delivery: 0, addons: 0 } };
   
@@ -424,6 +443,7 @@ function BookingFlow() {
       withFolding: withFolding,
       machineSize: machineSize,
       washMode: washMode,
+      storePrices: currentWasherPrices ? { standard: currentWasherPrices.standard, extra: currentWasherPrices.extra } : undefined,
     }, pricingConfig);
   } catch (err) {
     console.error("Pricing error:", err);
@@ -927,10 +947,14 @@ function BookingFlow() {
                 ) : (
                   <div className="grid grid-cols-2 gap-3 mb-6">
                     {([
-                      { value: "small" as const, label: "Small", desc: "20-30 ชิ้น", priceStd: 100, priceExt: 140 },
-                      { value: "large" as const, label: "Large", desc: "50-80 ชิ้น", priceStd: 120, priceExt: 160 },
+                      { value: "small" as const, label: "Small", desc: "20-30 ชิ้น" },
+                      { value: "large" as const, label: "Large", desc: "50-80 ชิ้น" },
                     ]).map((opt) => {
-                      const currentPrice = washMode === "extra" ? opt.priceExt : opt.priceStd;
+                      const wp = getWasherPrices(opt.value);
+                      const priceStd = wp?.standard || (opt.value === 'small' ? 100 : 120);
+                      const priceExt = wp?.extra || (opt.value === 'small' ? 140 : 160);
+                      const currentPrice = washMode === "extra" ? priceExt : priceStd;
+                      const sizeLabel = wp?.sizeKg ? `${wp.sizeKg} kg` : opt.desc;
                       return (
                         <button
                           key={opt.value}
@@ -949,8 +973,8 @@ function BookingFlow() {
                           }`}>
                             <span className="text-2xl">🫧</span>
                           </div>
-                          <p className={`text-base font-black ${machineSize === opt.value ? "text-primary" : "text-slate-900"}`}>{opt.label}</p>
-                          <p className="text-[10px] text-slate-400 font-bold mt-0.5">{opt.desc}</p>
+                          <p className={`text-base font-black ${machineSize === opt.value ? "text-primary" : "text-slate-900"}`}>{wp?.label || opt.label}</p>
+                          <p className="text-[10px] text-slate-400 font-bold mt-0.5">{sizeLabel}</p>
                           <p className={`text-lg font-black mt-2 ${machineSize === opt.value ? "text-primary" : "text-slate-700"}`}>฿{currentPrice}</p>
                         </button>
                       );
@@ -988,7 +1012,7 @@ function BookingFlow() {
                       </div>
                     </div>
                     <p className="text-[11px] text-slate-500 leading-relaxed">ซักแบบมาตรฐาน เหมาะกับเสื้อผ้าประจำวัน ประหยัดเวลาและค่าใช้จ่าย</p>
-                    <p className={`text-base font-black mt-2 ${washMode === "standard" ? "text-primary" : "text-slate-700"}`}>฿{machineSize === "small" ? 100 : 120}</p>
+                    <p className={`text-base font-black mt-2 ${washMode === "standard" ? "text-primary" : "text-slate-700"}`}>฿{currentWasherPrices?.standard || (machineSize === "small" ? 100 : 120)}</p>
                   </button>
 
                   {/* Extra */}
@@ -1013,7 +1037,7 @@ function BookingFlow() {
                       </div>
                     </div>
                     <p className="text-[11px] text-slate-500 leading-relaxed">ซักล้ำลึกด้วยน้ำร้อน ฆ่าเชื้อแบคทีเรีย เหมาะกับเครื่องนอน ผ้าเช็ดตัว ผ้ากีฬา</p>
-                    <p className={`text-base font-black mt-2 ${washMode === "extra" ? "text-primary" : "text-slate-700"}`}>฿{machineSize === "small" ? 140 : 160}</p>
+                    <p className={`text-base font-black mt-2 ${washMode === "extra" ? "text-primary" : "text-slate-700"}`}>฿{currentWasherPrices?.extra || (machineSize === "small" ? 140 : 160)}</p>
                   </button>
                 </div>
 
