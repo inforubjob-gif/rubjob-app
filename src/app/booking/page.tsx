@@ -420,13 +420,11 @@ function BookingFlow() {
     const sorted = [...store.washers].sort((a: any, b: any) => a.sizeKg - b.sizeKg);
     const entry = size === 'small' ? sorted[0] : sorted[sorted.length - 1];
     if (!entry) return null;
-    const machineType = store.machineType || 'separate';
-    if (machineType === 'combo') {
-      return { standard: entry.priceStandard || 0, extra: entry.priceExtra || 0, label: entry.sizeLabel, sizeKg: entry.sizeKg };
-    } else {
-      // For separate machines, use cold/warm/hot — standard = cold, extra = hot
-      return { standard: entry.priceCold || 0, extra: entry.priceHot || 0, label: entry.sizeLabel, sizeKg: entry.sizeKg };
-    }
+    // Auto-detect: use priceStandard/priceExtra if they have values, else priceCold/priceHot
+    const hasComboPrice = (entry.priceStandard && entry.priceStandard > 0) || (entry.priceExtra && entry.priceExtra > 0);
+    const standard = hasComboPrice ? (entry.priceStandard || 0) : (entry.priceCold || 0);
+    const extra = hasComboPrice ? (entry.priceExtra || 0) : (entry.priceHot || 0);
+    return { standard, extra, label: entry.sizeLabel, sizeKg: entry.sizeKg };
   };
 
   const currentWasherPrices = getWasherPrices(machineSize);
