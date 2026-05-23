@@ -470,6 +470,13 @@ export async function ensureSchema(db: D1Database) {
      "ALTER TABLE stores ADD COLUMN lineUserId TEXT",
      "ALTER TABLE stores ADD COLUMN status TEXT DEFAULT 'active'",
      "ALTER TABLE stores ADD COLUMN preferences TEXT",
+     "ALTER TABLE stores ADD COLUMN machineType TEXT DEFAULT 'separate'",
+     "ALTER TABLE stores ADD COLUMN baseDeliveryFee REAL DEFAULT 0",
+     "ALTER TABLE stores ADD COLUMN extraFeePerKm REAL DEFAULT 10",
+     "ALTER TABLE stores ADD COLUMN serviceRadiusKm REAL DEFAULT 5",
+     "ALTER TABLE stores ADD COLUMN bankName TEXT",
+     "ALTER TABLE stores ADD COLUMN accountNumber TEXT",
+     "ALTER TABLE stores ADD COLUMN accountName TEXT",
 
      // --- coupons ---
      "ALTER TABLE coupons ADD COLUMN title TEXT",

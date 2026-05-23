@@ -121,9 +121,8 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ success: true, id, ownerId: finalOwnerId });
   } catch (error: unknown) {
-    const rawMsg = error instanceof Error ? error.message : String(error);
-    console.error("POST /api/admin/stores error:", rawMsg, error);
-    return NextResponse.json({ error: rawMsg, debug: true }, { status: 500 });
+    console.error("POST /api/admin/stores error:", error);
+    return NextResponse.json({ error: safeError(error) }, { status: 500 });
   }
 }
 
