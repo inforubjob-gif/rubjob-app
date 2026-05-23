@@ -43,7 +43,7 @@ export default function AdminDashboard() {
  const [stats, setStats] = useState({ 
   users: 0, rawUsers: 0, stores: 0, activeStores: 0, 
   orders: 0, revenue: 0, earnings: 0, 
-  gpStore: 10, gpRubber: 15,
+  gpStore: 0, gpRubber: 0,
   totalRubbers: 0, activeRubbers: 0,
   tables: [] as string[],
   inventory: {} as Record<string, number>,

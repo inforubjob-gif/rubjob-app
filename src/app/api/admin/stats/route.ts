@@ -54,8 +54,8 @@ export async function GET(req: Request) {
     const settings = (coreStats[4].results || []) as { key: string, value: string }[];
     const gpStoreRaw = settings.find(s => s.key === 'gp_store_percent')?.value;
     const gpRubberRaw = settings.find(s => s.key === 'gp_rubber_percent')?.value;
-    const gpStore = gpStoreRaw !== undefined ? Number(gpStoreRaw) : 10;
-    const gpRubber = gpRubberRaw !== undefined ? Number(gpRubberRaw) : 15;
+    const gpStore = gpStoreRaw !== undefined ? Number(gpStoreRaw) : 0;
+    const gpRubber = gpRubberRaw !== undefined ? Number(gpRubberRaw) : 0;
 
     const displayTotalStores = storesCount;
 

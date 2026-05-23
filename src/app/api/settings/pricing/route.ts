@@ -31,7 +31,7 @@ export async function GET() {
 
     return NextResponse.json({
       gpStorePercent: parseFloat(map["gp_store_percent"] || "0"),
-      gpRubberPercent: parseFloat(map["gp_rubber_percent"] || "10"),
+      gpRubberPercent: parseFloat(map["gp_rubber_percent"] || "0"),
       platformFeePerDelivery: parseFloat(map["platform_fee_per_delivery"] || "10"),
       deliveryFeeBase: parseFloat(map["delivery_fee_base"] || "50"),
     });
