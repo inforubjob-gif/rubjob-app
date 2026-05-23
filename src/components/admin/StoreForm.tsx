@@ -673,28 +673,36 @@ export default function StoreForm({ initialData, isEdit }: StoreFormProps) {
                   <table className="w-full text-sm">
                      <thead>
                         <tr className="border-b-2 border-slate-100">
-                           <th className="text-left py-2 px-3 text-[10px] font-black text-slate-400 uppercase">ขนาด (KG)</th>
-                           <th className="text-left py-2 px-3 text-[10px] font-black text-slate-400 uppercase">ประมาณจำนวนชิ้น</th>
-                           <th className="text-left py-2 px-3 text-[10px] font-black text-slate-400 uppercase">ราคา (฿)</th>
+                           <th className="text-left py-2 px-3 text-[10px] font-black text-slate-400 uppercase">ขนาด</th>
+                           <th className="text-left py-2 px-3 text-[10px] font-black text-slate-400 uppercase">จำนวนชิ้น</th>
+                           <th className="text-right py-2 px-3 text-[10px] font-black text-red-400 uppercase">ต้นทุน</th>
+                           <th className="text-right py-2 px-3 text-[10px] font-black text-emerald-500 uppercase">ราคาแอป</th>
+                           <th className="text-right py-2 px-3 text-[10px] font-black text-blue-500 uppercase">ส่วนต่าง</th>
                         </tr>
                      </thead>
                      <tbody>
                         {(() => {
                            const washers = washerCosts.filter((w: any) => w.sizeKg);
-                           const piecesMap: Record<number, string> = { 9: '20-30 ชิ้น', 14: '30-50 ชิ้น', 18: '50-70 ชิ้น', 28: '70-100 ชิ้น' };
+                           const piecesMap: Record<number, string> = { 9: '20-30', 14: '30-50', 18: '50-70', 28: '70-100' };
                            if (washers.length === 0) {
                               return (
-                                 <tr><td colSpan={3} className="py-6 text-center text-slate-300 font-bold text-xs">กรุณาเพิ่มข้อมูลในตารางต้นทุนด้านล่างก่อน</td></tr>
+                                 <tr><td colSpan={5} className="py-6 text-center text-slate-300 font-bold text-xs">กรุณาเพิ่มข้อมูลในตารางต้นทุนด้านล่างก่อน</td></tr>
                               );
                            }
                            return washers.map((w: any, i: number) => {
                               const kg = parseFloat(w.sizeKg) || 0;
-                              const price = parseFloat(w.priceStandard) || parseFloat(w.priceCold) || 0;
+                              const cost = parseFloat(w.priceStandard) || parseFloat(w.priceCold) || 0;
+                              const appPrice = parseFloat(w.priceExtra) || parseFloat(w.priceHot) || 0;
+                              const margin = appPrice - cost;
                               return (
                                  <tr key={i} className="border-b border-slate-50 hover:bg-slate-50/50">
                                     <td className="py-3 px-3 font-black text-slate-800">{kg} kg</td>
-                                    <td className="py-3 px-3 text-slate-500 font-medium">{piecesMap[kg] || `~${Math.round(kg * 2.5)} ชิ้น`}</td>
-                                    <td className="py-3 px-3 font-black text-primary">฿{price}</td>
+                                    <td className="py-3 px-3 text-slate-500 font-medium">{piecesMap[kg] || `~${Math.round(kg * 2.5)}`} ชิ้น</td>
+                                    <td className="py-3 px-3 font-bold text-red-500 text-right">฿{cost}</td>
+                                    <td className="py-3 px-3 font-black text-emerald-600 text-right">฿{appPrice}</td>
+                                    <td className={`py-3 px-3 font-black text-right ${margin > 0 ? 'text-blue-600' : margin < 0 ? 'text-red-500' : 'text-slate-400'}`}>
+                                       {margin > 0 ? '+' : ''}{margin === 0 ? '-' : `฿${margin}`}
+                                    </td>
                                  </tr>
                               );
                            });
@@ -703,7 +711,7 @@ export default function StoreForm({ initialData, isEdit }: StoreFormProps) {
                   </table>
                </div>
 
-               <p className="text-[10px] text-slate-400 mt-3 font-medium">💡 ราคานี้มาจากช่อง &quot;โหมดมาตรฐาน (Standard)&quot; ในตารางต้นทุนด้านล่าง</p>
+               <p className="text-[10px] text-slate-400 mt-3 font-medium">💡 ต้นทุน = ราคาเครื่องจริง (Rubber จ่ายหน้าร้าน) | ราคาแอป = ราคาที่ลูกค้าเห็นและจ่าย | ส่วนต่าง = กำไร</p>
             </Card>
 
             {/* Cost Matrix — ตารางต้นทุนเครื่องซัก/อบ */}
@@ -771,14 +779,14 @@ export default function StoreForm({ initialData, isEdit }: StoreFormProps) {
                                         <div className="flex items-center justify-center gap-1">
                                           <span className="text-slate-300 text-xs">฿</span>
                                           <input type="number" value={w.priceStandard} onChange={e => { const n = [...washerCosts]; n[i] = {...n[i], priceStandard: e.target.value}; setWasherCosts(n); }}
-                                            placeholder="100" className="w-16 bg-emerald-50 border border-emerald-100 rounded-lg px-2 py-2 text-sm font-black text-emerald-600 text-center focus:border-emerald-400 focus:outline-none transition-all" />
+                                            placeholder="100" className="w-16 bg-red-50 border border-red-100 rounded-lg px-2 py-2 text-sm font-black text-red-600 text-center focus:border-red-400 focus:outline-none transition-all" />
                                         </div>
                                      </td>
                                      <td className="px-4 py-3">
                                         <div className="flex items-center justify-center gap-1">
                                           <span className="text-slate-300 text-xs">฿</span>
                                           <input type="number" value={w.priceExtra} onChange={e => { const n = [...washerCosts]; n[i] = {...n[i], priceExtra: e.target.value}; setWasherCosts(n); }}
-                                            placeholder="140" className="w-16 bg-purple-50 border border-purple-100 rounded-lg px-2 py-2 text-sm font-black text-purple-600 text-center focus:border-purple-400 focus:outline-none transition-all" />
+                                            placeholder="140" className="w-16 bg-emerald-50 border border-emerald-100 rounded-lg px-2 py-2 text-sm font-black text-emerald-600 text-center focus:border-emerald-400 focus:outline-none transition-all" />
                                         </div>
                                      </td>
                                    </>

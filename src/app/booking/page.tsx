@@ -934,12 +934,12 @@ function BookingFlow() {
                         ? [...store.washers].sort((a: any, b: any) => a.sizeKg - b.sizeKg)
                         : null;
                       
-                      // Use cost matrix from store, or fallback defaults
+                      // Use cost matrix from store — priceExtra = ราคาหน้าแอป (customer price)
                       const sizeOptions = washers 
                         ? washers.map((w: any) => ({
                             sizeKg: w.sizeKg,
                             label: w.sizeLabel || `${w.sizeKg} kg`,
-                            price: w.priceStandard || w.priceCold || 0,
+                            price: w.priceExtra || w.priceHot || 0,
                           }))
                         : [
                             { sizeKg: 9, label: "9 kg", price: 120 },
