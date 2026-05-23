@@ -236,9 +236,37 @@ export async function GET(req: Request) {
       console.warn("Financial batch failed (non-fatal):", e);
     }
 
+    // ─── Laundry Margin (ส่วนต่าง ราคาแอป - ต้นทุน) ───
+    let laundryMargin = 0;
+    try {
+      // Sum margin per completed order: for each order, find matching cost matrix entry
+      // Simple approach: average margin per store × orders per store
+      const marginResult = await db.prepare(`
+        SELECT COALESCE(SUM(
+          CASE WHEN swc.priceExtra > 0 AND swc.priceStandard > 0 
+            THEN (swc.priceExtra - swc.priceStandard) 
+            ELSE 0 END
+        ), 0) as totalMarginPerSize,
+        COUNT(*) as entryCount
+        FROM store_washer_costs swc
+        JOIN stores s ON swc.storeId = s.id
+        WHERE s.status = 'active'
+      `).first() as any;
+
+      const avgMarginPerSize = marginResult?.entryCount > 0 
+        ? (marginResult?.totalMarginPerSize || 0) / marginResult.entryCount 
+        : 0;
+
+      // Estimate: average margin × completed orders
+      const completedOrders = Number(ordersCount) || 0;
+      laundryMargin = Math.round(avgMarginPerSize * completedOrders);
+    } catch (e) {
+      console.warn("Laundry margin calc failed:", e);
+    }
+
     // Derived calculations
     const unassignedDeliveryFee = totalDelivery - (rubberNetEarnings + rubberGP + platformFeeTotal);
-    const totalPlatformEarnings = storeGP + rubberGP + platformFeeTotal + unassignedDeliveryFee - paymentGatewayFee;
+    const totalPlatformEarnings = storeGP + rubberGP + platformFeeTotal + unassignedDeliveryFee + laundryMargin - paymentGatewayFee;
 
     // ─── BATCH 3: Table Inventory (dynamic count per table) ───
     const inventory: Record<string, number> = {};
@@ -280,6 +308,7 @@ export async function GET(req: Request) {
         rubberNetEarnings,
         unassignedDeliveryFee,
         paymentGatewayFee,
+        laundryMargin,
       },
       gpStore,
       gpRubber,

@@ -49,7 +49,7 @@ export default function AdminDashboard() {
   inventory: {} as Record<string, number>,
   connection: "WAITING",
   rubberWalletBalance: 0, storeWalletBalance: 0,
-  revenueBreakdown: { totalLaundry: 0, totalDelivery: 0, storeGP: 0, rubberGP: 0, platformFee: 0, storeNetEarnings: 0, rubberNetEarnings: 0, unassignedDeliveryFee: 0, paymentGatewayFee: 0 },
+  revenueBreakdown: { totalLaundry: 0, totalDelivery: 0, storeGP: 0, rubberGP: 0, platformFee: 0, storeNetEarnings: 0, rubberNetEarnings: 0, unassignedDeliveryFee: 0, paymentGatewayFee: 0, laundryMargin: 0 },
   topServices: [] as any[],
   topLocations: [] as any[],
  });
@@ -93,7 +93,7 @@ export default function AdminDashboard() {
       connection: data.connection || "CONNECTED",
       rubberWalletBalance: data.rubberWalletBalance || 0,
       storeWalletBalance: data.storeWalletBalance || 0,
-      revenueBreakdown: data.revenueBreakdown || { totalLaundry: 0, totalDelivery: 0, storeGP: 0, rubberGP: 0, platformFee: 0, storeNetEarnings: 0, rubberNetEarnings: 0, unassignedDeliveryFee: 0, paymentGatewayFee: 0 },
+      revenueBreakdown: data.revenueBreakdown || { totalLaundry: 0, totalDelivery: 0, storeGP: 0, rubberGP: 0, platformFee: 0, storeNetEarnings: 0, rubberNetEarnings: 0, unassignedDeliveryFee: 0, paymentGatewayFee: 0, laundryMargin: 0 },
       topServices: data.topServices || [],
       topLocations: data.topLocations || [],
      });
@@ -244,6 +244,12 @@ export default function AdminDashboard() {
           <span className="text-white/40">ค่าบริการ (฿10/ออเดอร์)</span>
           <span className="font-black text-white/70">฿{Number(bd.platformFee).toLocaleString()}</span>
          </div>
+         {Number(bd.laundryMargin) > 0 && (
+          <div className="flex justify-between text-[10px]">
+           <span className="text-white/40">ส่วนต่างค่าซัก (ราคาแอป - ต้นทุน)</span>
+           <span className="font-black text-emerald-400">฿{Number(bd.laundryMargin).toLocaleString()}</span>
+          </div>
+         )}
          {Number(bd.unassignedDeliveryFee) > 0 && (
           <div className="flex justify-between text-[10px]">
            <span className="text-white/40">ค่าส่งส่วนเกิน (ไม่มีคนขับ)</span>
