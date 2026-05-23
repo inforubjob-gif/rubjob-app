@@ -22,7 +22,7 @@ export async function GET(req: Request) {
       // [2] Orders count
       db.prepare("SELECT COUNT(*) as total FROM orders WHERE status != 'cancelled'"),
       // [3] Revenue aggregates
-      db.prepare("SELECT SUM(totalPrice) as revenue, SUM(laundryFee) as totalLaundry, SUM(deliveryFee) as totalDelivery FROM orders WHERE status = 'completed' AND status != 'cancelled'"),
+      db.prepare("SELECT SUM(totalPrice) as revenue, SUM(laundryFee) as totalLaundry, SUM(laundryCost) as totalLaundryCost, SUM(deliveryFee) as totalDelivery FROM orders WHERE status = 'completed' AND status != 'cancelled'"),
       // [4] GP settings
       db.prepare("SELECT key, value FROM system_settings WHERE key IN ('gp_store_percent', 'gp_rubber_percent')"),
       // [5] Raw users count
@@ -49,6 +49,7 @@ export async function GET(req: Request) {
     const revResult = coreStats[3].results?.[0] || {} as any;
     const grossRevenue = revResult.revenue || 0;
     const totalLaundry = revResult.totalLaundry || 0;
+    const totalLaundryCost = revResult.totalLaundryCost || 0;
     const totalDelivery = revResult.totalDelivery || 0;
 
     const settings = (coreStats[4].results || []) as { key: string, value: string }[];
@@ -60,8 +61,8 @@ export async function GET(req: Request) {
     const displayTotalStores = storesCount;
 
     // Calculations
-    const storeGP = (totalLaundry * gpStore) / 100;
-    const storeNetEarnings = totalLaundry - storeGP;
+    const storeGP = (totalLaundryCost * gpStore) / 100;
+    const storeNetEarnings = totalLaundryCost - storeGP;
 
     // ─── BATCH 2: Financial Deep-Dive (rubber earnings, payment fees, wallets, insights) ───
     let rubberNetEarnings = 0;
@@ -118,7 +119,7 @@ export async function GET(req: Request) {
 
         // [4] Store earnings (for wallet)
         db.prepare(`
-          SELECT COALESCE(SUM(laundryFee * ?), 0) as total
+          SELECT COALESCE(SUM(laundryCost * ?), 0) as total
           FROM orders WHERE status = 'completed' AND status != 'cancelled' AND storeId IS NOT NULL
         `).bind((100 - gpStore) / 100),
 
@@ -239,27 +240,13 @@ export async function GET(req: Request) {
     // ─── Laundry Margin (ส่วนต่าง ราคาแอป - ต้นทุน) ───
     let laundryMargin = 0;
     try {
-      // Sum margin per completed order: for each order, find matching cost matrix entry
-      // Simple approach: average margin per store × orders per store
+      // Calculate exactly from orders (laundryFee - laundryCost)
       const marginResult = await db.prepare(`
-        SELECT COALESCE(SUM(
-          CASE WHEN swc.priceExtra > 0 AND swc.priceStandard > 0 
-            THEN (swc.priceExtra - swc.priceStandard) 
-            ELSE 0 END
-        ), 0) as totalMarginPerSize,
-        COUNT(*) as entryCount
-        FROM store_washer_costs swc
-        JOIN stores s ON swc.storeId = s.id
-        WHERE s.status = 'active'
+        SELECT COALESCE(SUM(laundryFee - laundryCost), 0) as exactMargin
+        FROM orders WHERE status = 'completed' AND status != 'cancelled'
       `).first() as any;
 
-      const avgMarginPerSize = marginResult?.entryCount > 0 
-        ? (marginResult?.totalMarginPerSize || 0) / marginResult.entryCount 
-        : 0;
-
-      // Estimate: average margin × completed orders
-      const completedOrders = Number(ordersCount) || 0;
-      laundryMargin = Math.round(avgMarginPerSize * completedOrders);
+      laundryMargin = marginResult?.exactMargin || 0;
     } catch (e) {
       console.warn("Laundry margin calc failed:", e);
     }

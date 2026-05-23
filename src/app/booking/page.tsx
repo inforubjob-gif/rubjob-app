@@ -432,6 +432,7 @@ function BookingFlow() {
   }
 
   const laundryFee = pricing.breakdown.laundry;
+  const laundryCost = pricing.breakdown.storeCost || laundryFee;
   const deliveryFee = pricing.breakdown.delivery;
   const addonsTotal = pricing.breakdown.addons;
 
@@ -493,6 +494,7 @@ function BookingFlow() {
         address: selectedAddress,
         paymentMethod: selectedPayment,
         laundryFee,
+        laundryCost,
         deliveryFee,
         distanceKm,
         totalPrice,

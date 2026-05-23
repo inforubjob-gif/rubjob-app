@@ -24,7 +24,7 @@ export async function GET(req: Request) {
 
     // 1. Calculate Earnings (sum of laundryFee from completed orders)
     const earningsRes = await db.prepare(`
-      SELECT SUM(laundryFee) as totalEarnings 
+      SELECT SUM(laundryCost) as totalEarnings 
       FROM orders 
       WHERE storeId = ? AND status = 'completed'
     `).bind(storeId).first() as any;
@@ -44,7 +44,7 @@ export async function GET(req: Request) {
 
     // 3. Fetch Recent Transactions (Orders + Payouts)
     const { results: orders } = await db.prepare(`
-      SELECT id, laundryFee as amount, createdAt, 'earning' as type, 'success' as status
+      SELECT id, laundryCost as amount, createdAt, 'earning' as type, 'success' as status
       FROM orders 
       WHERE storeId = ? AND status = 'completed'
       ORDER BY createdAt DESC LIMIT 10

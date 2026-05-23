@@ -29,6 +29,7 @@ export async function POST(req: Request) {
     validateRequired(body.address, "address");
     
     const laundryFee = validateNumber(body.laundryFee, "laundryFee", { min: 0 });
+    const laundryCost = validateNumber(body.laundryCost, "laundryCost", { min: 0 });
     const deliveryFee = validateNumber(body.deliveryFee, "deliveryFee", { min: 0 });
     const totalPrice = validateNumber(body.totalPrice, "totalPrice", { min: 0 });
     const distanceKm = validateNumber(body.distanceKm, "distanceKm", { min: 0 });
@@ -67,10 +68,10 @@ export async function POST(req: Request) {
     await db.prepare(`
       INSERT INTO orders (
         id, userId, storeId, providerId, serviceId, status, 
-        laundryFee, deliveryFee, distanceKm, totalPrice, 
+        laundryFee, laundryCost, deliveryFee, distanceKm, totalPrice, 
         paymentMethod, items, address, scheduledDate, customerNote, serviceDetails
       )
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `).bind(
       orderId,
       userId,
@@ -79,6 +80,7 @@ export async function POST(req: Request) {
       serviceId,
       "pending",
       laundryFee,
+      laundryCost,
       deliveryFee,
       distanceKm,
       totalPrice,

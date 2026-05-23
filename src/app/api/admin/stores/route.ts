@@ -42,7 +42,7 @@ export async function GET(req: Request) {
 
     // Fetch wallet data for all stores in batch
     const { results: storeEarningsData } = await db.prepare(`
-      SELECT storeId as id, SUM(laundryFee * ?) as earned
+      SELECT storeId as id, SUM(laundryCost * ?) as earned
       FROM orders WHERE status = 'completed' AND storeId IS NOT NULL
       GROUP BY storeId
     `).bind(gpStoreFraction).all();

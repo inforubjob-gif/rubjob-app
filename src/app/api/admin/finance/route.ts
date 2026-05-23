@@ -13,7 +13,7 @@ export async function GET(req: Request) {
     if (!db) return NextResponse.json({ error: "D1 not found" }, { status: 500 });
 
     const { results } = await db.prepare(`
-      SELECT o.id, o.storeId, o.totalPrice, o.laundryFee, o.deliveryFee, o.status, o.createdAt,
+      SELECT o.id, o.storeId, o.totalPrice, o.laundryFee, o.laundryCost, o.deliveryFee, o.status, o.createdAt,
              u.displayName as customerName, s.name as storeName, r.name as rubberName,
              COALESCE(ca_sum.storeCost, 0) as storeCost
       FROM orders o

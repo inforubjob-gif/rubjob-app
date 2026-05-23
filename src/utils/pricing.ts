@@ -32,6 +32,7 @@ export interface PricingResult {
   platformTotalRevenue: number;
   breakdown: {
     laundry: number;
+    storeCost: number;
     delivery: number;
     addons: number;
   };
@@ -43,13 +44,19 @@ export function calculateOrderPrice(
 ): PricingResult {
   const { weightKg, distanceKm, isExpress, needsDetergent, withFolding, machineSize, washMode, storePrices } = details;
 
-  // 1. Laundry Cost (combo washer-dryer: wash+dry included)
+  // 1. Laundry App Price (Combo washer-dryer: wash+dry included)
   let laundryCost = 0;
+  let laundryCostBase = 0; // Store Cost Price (priceStandard)
+  
   if (storePrices && (storePrices.standard || storePrices.extra)) {
     // Use real store cost matrix prices
+    // Customer pays priceExtra (if available, fallback to standard)
     laundryCost = washMode === 'extra' 
       ? (storePrices.extra || storePrices.standard || 100)
       : (storePrices.standard || 100);
+      
+    // Store earns priceStandard (cost)
+    laundryCostBase = storePrices.standard || 80;
   } else if (machineSize && washMode) {
     // MARU-style combo machine pricing (fallback hardcode)
     const priceMatrix: Record<string, Record<string, number>> = {
@@ -57,6 +64,7 @@ export function calculateOrderPrice(
       large:    { standard: 120, extra: 160 },
     };
     laundryCost = priceMatrix[machineSize]?.[washMode] ?? 100;
+    laundryCostBase = laundryCost * 0.8; // Fallback cost is 80% of app price
   } else {
     // Fallback: weight-based
     if (weightKg <= 9) laundryCost = 100;
@@ -85,6 +93,7 @@ export function calculateOrderPrice(
 
   // 4. Totals
   const finalLaundry = Math.ceil(laundryCost);
+  const finalStoreCost = Math.ceil(laundryCostBase);
   const finalDelivery = Math.ceil(deliveryFee);
   const finalAddons = Math.ceil(addonsTotal);
   const customerTotal = finalLaundry + finalDelivery + finalAddons;
@@ -97,8 +106,9 @@ export function calculateOrderPrice(
     platformTotalRevenue,
     breakdown: {
       laundry: finalLaundry,
+      storeCost: finalStoreCost,
       delivery: finalDelivery,
       addons: finalAddons,
-    },
+    }
   };
 }

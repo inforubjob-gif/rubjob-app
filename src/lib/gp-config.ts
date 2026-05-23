@@ -50,17 +50,17 @@ export function calcRubberPayout(deliveryFee: number, gp: GPConfig): number {
 }
 
 /**
- * Calculate store commission (GP taken from store sales).
- * commission = totalPrice * gpStorePercent/100
+ * Calculate store commission (GP taken from store cost).
+ * commission = laundryCost * gpStorePercent/100
  */
-export function calcStoreCommission(totalPrice: number, gp: GPConfig): number {
-  return totalPrice * (gp.gpStorePercent / 100);
+export function calcStoreCommission(laundryCost: number, gp: GPConfig): number {
+  return laundryCost * (gp.gpStorePercent / 100);
 }
 
 /**
  * Calculate store net payout after GP deduction.
- * net = totalPrice - commission
+ * net = laundryCost - commission
  */
-export function calcStoreNet(totalPrice: number, gp: GPConfig): number {
-  return totalPrice - calcStoreCommission(totalPrice, gp);
+export function calcStoreNet(laundryCost: number, gp: GPConfig): number {
+  return laundryCost - calcStoreCommission(laundryCost, gp);
 }
