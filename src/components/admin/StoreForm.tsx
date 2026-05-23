@@ -694,23 +694,64 @@ export default function StoreForm({ initialData, isEdit }: StoreFormProps) {
                         </tr>
                      </thead>
                      <tbody>
-                        {(() => {
-                           const washers = washerCosts.filter((w: any) => w.sizeKg);
+                         {(() => {
+                           const washers = washerCosts || [];
+                           const dryers = dryerCosts || [];
+                           
+                           const fixedSizes = [
+                             { sizeKg: 9, price: 120, defaultWash: 50, defaultDry: 50 },
+                             { sizeKg: 14, price: 140, defaultWash: 70, defaultDry: 50 },
+                             { sizeKg: 18, price: 170, defaultWash: 80, defaultDry: 70 },
+                             { sizeKg: 28, price: 210, defaultWash: 110, defaultDry: 70 },
+                           ];
                            const piecesMap: Record<number, string> = { 9: '20-30', 14: '30-50', 18: '50-70', 28: '70-100' };
-                           if (washers.length === 0) {
-                              return (
-                                 <tr><td colSpan={5} className="py-6 text-center text-slate-300 font-bold text-xs">กรุณาเพิ่มข้อมูลในตารางต้นทุนด้านล่างก่อน</td></tr>
-                              );
-                           }
-                           return washers.map((w: any, i: number) => {
-                              const kg = parseFloat(w.sizeKg) || 0;
-                              const cost = parseFloat(w.priceStandard) || parseFloat(w.priceCold) || 0;
-                              const appPrice = parseFloat(w.priceExtra) || parseFloat(w.priceHot) || 0;
+
+                           return fixedSizes.map((fs: any, i: number) => {
+                              let cost = 0;
+                              let appPrice = fs.price; // Fixed Customer App Price
+                              
+                              if (formData.machineType === 'combo') {
+                                 // Combo Mapping
+                                 const smallWasher = washers.find((w: any) => 
+                                    (parseFloat(w.sizeKg) <= 15) || 
+                                    (w.name?.toLowerCase().includes('small')) ||
+                                    (w.sizeKg === '14' || w.sizeKg === '9')
+                                 ) || washers[0] || {};
+                                 
+                                 const largeWasher = washers.find((w: any) => 
+                                    (parseFloat(w.sizeKg) > 15) || 
+                                    (w.name?.toLowerCase().includes('large')) ||
+                                    (w.sizeKg === '28' || w.sizeKg === '18')
+                                 ) || washers[1] || washers[0] || {};
+                                 
+                                 if (fs.sizeKg <= 15) {
+                                    cost = parseFloat(smallWasher.priceStandard) || 100;
+                                 } else {
+                                    cost = parseFloat(largeWasher.priceStandard) || 120;
+                                 }
+                              } else {
+                                 // Separate Mapping
+                                 if (washers.length === 0 && dryers.length === 0) {
+                                    cost = fs.defaultWash + fs.defaultDry;
+                                 } else {
+                                    const washer = washers.length > 0 ? washers.reduce((prev: any, curr: any) => 
+                                       Math.abs((parseFloat(curr.sizeKg)||0) - fs.sizeKg) < Math.abs((parseFloat(prev.sizeKg)||0) - fs.sizeKg) ? curr : prev
+                                    ) : {};
+                                    
+                                    const dryer = dryers.length > 0 ? dryers.reduce((prev: any, curr: any) => 
+                                       Math.abs((parseFloat(curr.sizeKg)||0) - fs.sizeKg) < Math.abs((parseFloat(prev.sizeKg)||0) - fs.sizeKg) ? curr : prev
+                                    ) : {};
+                                    
+                                    cost = (parseFloat(washer.priceCold) || fs.defaultWash) + (parseFloat(dryer.priceStandard) || parseFloat(dryer.priceCold) || fs.defaultDry);
+                                 }
+                              }
+                              
                               const margin = appPrice - cost;
+                              
                               return (
                                  <tr key={i} className="border-b border-slate-50 hover:bg-slate-50/50">
-                                    <td className="py-3 px-3 font-black text-slate-800">{kg} kg</td>
-                                    <td className="py-3 px-3 text-slate-500 font-medium">{piecesMap[kg] || `~${Math.round(kg * 2.5)}`} ชิ้น</td>
+                                    <td className="py-3 px-3 font-black text-slate-800">{fs.sizeKg} kg</td>
+                                    <td className="py-3 px-3 text-slate-500 font-medium">{piecesMap[fs.sizeKg]} ชิ้น</td>
                                     <td className="py-3 px-3 font-bold text-red-500 text-right">฿{cost}</td>
                                     <td className="py-3 px-3 font-black text-emerald-600 text-right">฿{appPrice}</td>
                                     <td className={`py-3 px-3 font-black text-right ${margin > 0 ? 'text-blue-600' : margin < 0 ? 'text-red-500' : 'text-slate-400'}`}>
@@ -719,7 +760,7 @@ export default function StoreForm({ initialData, isEdit }: StoreFormProps) {
                                  </tr>
                               );
                            });
-                        })()}
+                         })()}
                      </tbody>
                   </table>
                </div>

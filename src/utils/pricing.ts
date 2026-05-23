@@ -24,6 +24,8 @@ export interface PriceDetails {
     standard?: number;
     extra?: number;
   };
+  laundryAppPrice?: number;
+  storeCostPrice?: number;
 }
 
 export interface PricingResult {
@@ -42,20 +44,22 @@ export function calculateOrderPrice(
   details: PriceDetails,
   config: PricingConfig
 ): PricingResult {
-  const { weightKg, distanceKm, isExpress, needsDetergent, withFolding, machineSize, washMode, storePrices } = details;
+  const { weightKg, distanceKm, isExpress, needsDetergent, withFolding, machineSize, washMode, storePrices, laundryAppPrice, storeCostPrice } = details;
 
-  // 1. Laundry App Price (Combo washer-dryer: wash+dry included)
-  let laundryCost = 0;
+  // 1. Laundry App Price & Store Cost
+  let laundryCost = 0; // Customer App Price
   let laundryCostBase = 0; // Store Cost Price (priceStandard)
   
-  if (storePrices && (storePrices.standard || storePrices.extra)) {
-    // Use real store cost matrix prices
-    // Customer pays priceExtra (if available, fallback to standard)
+  if (laundryAppPrice !== undefined) {
+    laundryCost = laundryAppPrice;
+    // Default cost to 80% of app price if not provided
+    laundryCostBase = storeCostPrice !== undefined ? storeCostPrice : laundryAppPrice * 0.8;
+  } else if (storePrices && (storePrices.standard || storePrices.extra)) {
+    // Legacy support for non-combo machines
     laundryCost = washMode === 'extra' 
       ? (storePrices.extra || storePrices.standard || 100)
       : (storePrices.standard || 100);
       
-    // Store earns priceStandard (cost)
     laundryCostBase = storePrices.standard || 80;
   } else if (machineSize && washMode) {
     // MARU-style combo machine pricing (fallback hardcode)
