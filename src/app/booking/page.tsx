@@ -122,9 +122,10 @@ function BookingFlow() {
   const [customerNote, setCustomerNote] = useState("");
   
   // Weight & Size based selection instead of per-piece items
-  const [bagSize, setBagSize] = useState<"9kg" | "14kg" | "18kg" | "28kg">("9kg");
+  const [bagSize, setBagSize] = useState<string>("9kg");
   const [machineSize, setMachineSize] = useState<"small" | "large">("small");
   const [washMode, setWashMode] = useState<"standard" | "extra">("standard");
+  const [selectedSizePrice, setSelectedSizePrice] = useState<number>(0);
   const [withFolding, setWithFolding] = useState<boolean>(true);
   const [needsDetergent, setNeedsDetergent] = useState<boolean>(false);
 
@@ -412,23 +413,6 @@ function BookingFlow() {
   const roundTripDistanceBonus = roundTripKm > 3 ? (roundTripKm - 3) * 10 : 0;
   const totalDeliveryBase = pricingConfig.deliveryFeeBase + roundTripDistanceBonus;
     
-  // Helper: get washer cost matrix prices for the selected store + machine size
-  const getWasherPrices = (size: 'small' | 'large') => {
-    const store = selectedStore as any;
-    if (!store?.washers || store.washers.length === 0) return null;
-    // Match by sizeKg: small ~= smallest entry, large ~= largest entry
-    const sorted = [...store.washers].sort((a: any, b: any) => a.sizeKg - b.sizeKg);
-    const entry = size === 'small' ? sorted[0] : sorted[sorted.length - 1];
-    if (!entry) return null;
-    // Auto-detect: use priceStandard/priceExtra if they have values, else priceCold/priceHot
-    const hasComboPrice = (entry.priceStandard && entry.priceStandard > 0) || (entry.priceExtra && entry.priceExtra > 0);
-    const standard = hasComboPrice ? (entry.priceStandard || 0) : (entry.priceCold || 0);
-    const extra = hasComboPrice ? (entry.priceExtra || 0) : (entry.priceHot || 0);
-    return { standard, extra, label: entry.sizeLabel, sizeKg: entry.sizeKg };
-  };
-
-  const currentWasherPrices = getWasherPrices(machineSize);
-
   // Pricing Logic (2026 Strategy)
   let pricing: any = { customerTotal: 0, breakdown: { laundry: 0, delivery: 0, addons: 0 } };
   
@@ -441,7 +425,7 @@ function BookingFlow() {
       withFolding: withFolding,
       machineSize: machineSize,
       washMode: washMode,
-      storePrices: currentWasherPrices ? { standard: currentWasherPrices.standard, extra: currentWasherPrices.extra } : undefined,
+      storePrices: selectedSizePrice > 0 ? { standard: selectedSizePrice } : undefined,
     }, pricingConfig);
   } catch (err) {
     console.error("Pricing error:", err);
@@ -921,17 +905,17 @@ function BookingFlow() {
               {roundTripDistanceBonus > 0 && <span className="text-[10px] text-muted block mt-2 ml-1">{t("booking.distanceNote").replace("{distance}", roundTripKm.toFixed(1))}</span>}
             </section>
 
-            {/* Machine Size & Wash Mode - Only for Laundry */}
+            {/* Machine Size — Only for Laundry */}
             {service?.category === "laundry" && (
               <section>
-                {/* ─── เลือกขนาดเครื่อง (ซัก+อบในตัว) ─── */}
+                {/* ─── เลือกขนาดเครื่อง (ค่าซัก+อบผ้า) ─── */}
                 <h3 className="text-sm font-black text-foreground mb-3 flex items-center gap-2 uppercase tracking-tight">
                   <IconCircle variant="orange" size="sm">
                     <Icons.FileText size={14} strokeWidth={3} />
                   </IconCircle>
-                  เลือกขนาดเครื่อง
+                  ค่าซัก + อบผ้า
                 </h3>
-                <p className="text-[10px] text-slate-400 font-bold mb-3 ml-1">เครื่องซัก+อบในตัว — ราคารวมซักและอบแล้ว</p>
+                <p className="text-[10px] text-slate-400 font-bold mb-3 ml-1">เลือกขนาดที่เหมาะกับปริมาณผ้าของคุณ</p>
 
                 {selectedService === "duvet_washing" ? (
                   <div className="grid grid-cols-1 mb-5">
@@ -944,100 +928,52 @@ function BookingFlow() {
                   </div>
                 ) : (
                   <div className="grid grid-cols-2 gap-3 mb-6">
-                    {([
-                      { value: "small" as const, label: "Small", desc: "20-30 ชิ้น" },
-                      { value: "large" as const, label: "Large", desc: "50-80 ชิ้น" },
-                    ]).map((opt) => {
-                      const wp = getWasherPrices(opt.value);
-                      const priceStd = wp?.standard || (opt.value === 'small' ? 100 : 120);
-                      const priceExt = wp?.extra || (opt.value === 'small' ? 140 : 160);
-                      const currentPrice = washMode === "extra" ? priceExt : priceStd;
-                      const sizeLabel = wp?.sizeKg ? `${wp.sizeKg} kg` : opt.desc;
-                      return (
+                    {(() => {
+                      const store = selectedStore as any;
+                      const washers = store?.washers && store.washers.length > 0
+                        ? [...store.washers].sort((a: any, b: any) => a.sizeKg - b.sizeKg)
+                        : null;
+                      
+                      // Use cost matrix from store, or fallback defaults
+                      const sizeOptions = washers 
+                        ? washers.map((w: any) => ({
+                            sizeKg: w.sizeKg,
+                            label: w.sizeLabel || `${w.sizeKg} kg`,
+                            price: w.priceStandard || w.priceCold || 0,
+                          }))
+                        : [
+                            { sizeKg: 9, label: "9 kg", price: 120 },
+                            { sizeKg: 14, label: "14 kg", price: 140 },
+                            { sizeKg: 18, label: "18 kg", price: 170 },
+                            { sizeKg: 28, label: "28 kg", price: 210 },
+                          ];
+
+                      return sizeOptions.map((opt: any) => (
                         <button
-                          key={opt.value}
+                          key={opt.sizeKg}
                           onClick={() => {
-                            setMachineSize(opt.value);
-                            setBagSize(opt.value === "small" ? "9kg" : "18kg");
+                            setBagSize(`${opt.sizeKg}kg`);
+                            setMachineSize(opt.sizeKg <= 14 ? "small" : "large");
+                            setSelectedSizePrice(opt.price);
                           }}
                           className={`flex flex-col items-center p-5 rounded-2xl border-2 transition-all active:scale-[0.97] ${
-                            machineSize === opt.value
+                            bagSize === `${opt.sizeKg}kg`
                               ? "border-primary bg-primary/5 shadow-lg shadow-primary/10"
                               : "border-slate-100 bg-white hover:border-slate-200"
                           }`}
                         >
                           <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-3 ${
-                            machineSize === opt.value ? "bg-primary text-white" : "bg-slate-100 text-slate-500"
+                            bagSize === `${opt.sizeKg}kg` ? "bg-primary text-white" : "bg-slate-100 text-slate-500"
                           }`}>
                             <span className="text-2xl">🫧</span>
                           </div>
-                          <p className={`text-base font-black ${machineSize === opt.value ? "text-primary" : "text-slate-900"}`}>{wp?.label || opt.label}</p>
-                          <p className="text-[10px] text-slate-400 font-bold mt-0.5">{sizeLabel}</p>
-                          <p className={`text-lg font-black mt-2 ${machineSize === opt.value ? "text-primary" : "text-slate-700"}`}>฿{currentPrice}</p>
+                          <p className={`text-base font-black ${bagSize === `${opt.sizeKg}kg` ? "text-primary" : "text-slate-900"}`}>{opt.label}</p>
+                          <p className={`text-lg font-black mt-2 ${bagSize === `${opt.sizeKg}kg` ? "text-primary" : "text-slate-700"}`}>฿{opt.price}</p>
                         </button>
-                      );
-                    })}
+                      ));
+                    })()}
                   </div>
                 )}
-
-                {/* ─── เลือกโหมดการซัก ─── */}
-                <h3 className="text-sm font-black text-foreground mb-3 flex items-center gap-2 uppercase tracking-tight">
-                  <IconCircle variant="yellow" size="sm">
-                    <Icons.Tasks size={14} strokeWidth={3} />
-                  </IconCircle>
-                  เลือกโหมดการซัก
-                </h3>
-                <div className="space-y-2 mb-5">
-                  {/* Standard */}
-                  <button
-                    onClick={() => setWashMode("standard")}
-                    className={`w-full text-left p-4 rounded-2xl border-2 transition-all active:scale-[0.98] ${
-                      washMode === "standard"
-                        ? "border-primary bg-primary/5 shadow-lg shadow-primary/10"
-                        : "border-slate-100 bg-white hover:border-slate-200"
-                    }`}
-                  >
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center gap-2">
-                        <span className="text-lg">✨</span>
-                        <p className={`text-sm font-black ${washMode === "standard" ? "text-primary" : "text-slate-900"}`}>Standard</p>
-                        <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${washMode === "standard" ? "bg-primary/10 text-primary" : "bg-slate-100 text-slate-400"}`}>~30 นาที</span>
-                      </div>
-                      <div className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 ${
-                        washMode === "standard" ? "bg-primary text-white" : "border-2 border-slate-200"
-                      }`}>
-                        {washMode === "standard" && <span className="text-xs font-bold">✓</span>}
-                      </div>
-                    </div>
-                    <p className="text-[11px] text-slate-500 leading-relaxed">ซักแบบมาตรฐาน เหมาะกับเสื้อผ้าประจำวัน ประหยัดเวลาและค่าใช้จ่าย</p>
-                    <p className={`text-base font-black mt-2 ${washMode === "standard" ? "text-primary" : "text-slate-700"}`}>฿{currentWasherPrices?.standard || (machineSize === "small" ? 100 : 120)}</p>
-                  </button>
-
-                  {/* Extra */}
-                  <button
-                    onClick={() => setWashMode("extra")}
-                    className={`w-full text-left p-4 rounded-2xl border-2 transition-all active:scale-[0.98] ${
-                      washMode === "extra"
-                        ? "border-primary bg-primary/5 shadow-lg shadow-primary/10"
-                        : "border-slate-100 bg-white hover:border-slate-200"
-                    }`}
-                  >
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center gap-2">
-                        <span className="text-lg">🔥</span>
-                        <p className={`text-sm font-black ${washMode === "extra" ? "text-primary" : "text-slate-900"}`}>Extra</p>
-                        <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${washMode === "extra" ? "bg-primary/10 text-primary" : "bg-slate-100 text-slate-400"}`}>~45 นาที</span>
-                      </div>
-                      <div className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 ${
-                        washMode === "extra" ? "bg-primary text-white" : "border-2 border-slate-200"
-                      }`}>
-                        {washMode === "extra" && <span className="text-xs font-bold">✓</span>}
-                      </div>
-                    </div>
-                    <p className="text-[11px] text-slate-500 leading-relaxed">ซักล้ำลึกด้วยน้ำร้อน ฆ่าเชื้อแบคทีเรีย เหมาะกับเครื่องนอน ผ้าเช็ดตัว ผ้ากีฬา</p>
-                    <p className={`text-base font-black mt-2 ${washMode === "extra" ? "text-primary" : "text-slate-700"}`}>฿{currentWasherPrices?.extra || (machineSize === "small" ? 140 : 160)}</p>
-                  </button>
-                </div>
 
                 {/* ─── พับผ้า ─── */}
                 <h3 className="text-sm font-black text-foreground mb-2 flex items-center gap-2 uppercase tracking-tight">
@@ -1218,11 +1154,11 @@ function BookingFlow() {
                   <div>
                     <div className="flex items-center gap-1.5 mb-2 text-primary-dark font-bold">
                       <Icons.Tasks size={14} strokeWidth={2.5} />
-                      <span>{currentWasherPrices?.label || machineSize === 'small' ? 'Small' : 'Large'} {currentWasherPrices?.sizeKg ? `${currentWasherPrices.sizeKg} kg` : formatKg(bagSize)}</span>
+                      <span>ค่าซัก + อบผ้า {formatKg(bagSize)}</span>
                     </div>
                     <div className="space-y-2 pl-5">
                       <div className="flex items-center justify-between">
-                        <span>{washMode === 'standard' ? 'Standard' : 'Extra'} — {currentWasherPrices?.label || (machineSize === 'small' ? 'Small' : 'Large')}</span>
+                        <span>ค่าซัก + อบผ้า {formatKg(bagSize)}</span>
                         <span className="font-bold text-slate-800">฿{laundryFee}</span>
                       </div>
                       {deliverySpeed === "express" && (
