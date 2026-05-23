@@ -2,6 +2,7 @@ import { safeError } from "@/lib/api-utils";
 import { getRequestContext } from "@cloudflare/next-on-pages";
 import { NextResponse } from "next/server";
 import { getAdminSession } from "@/lib/auth-server";
+import { ensureSchema } from "@/lib/db-init";
 
 export const runtime = "edge";
 
@@ -80,6 +81,8 @@ export async function POST(req: Request) {
     const db = getRequestContext().env.DB;
     if (!db) return NextResponse.json({ error: "D1 not found" }, { status: 500 });
 
+    await ensureSchema(db);
+
     if (!name || !ownerId) return NextResponse.json({ error: "Missing name or ownerId" }, { status: 400 });
 
     let finalOwnerId = ownerId;
@@ -118,6 +121,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ success: true, id, ownerId: finalOwnerId });
   } catch (error: unknown) {
+    console.error("POST /api/admin/stores error:", error);
     return NextResponse.json({ error: safeError(error) }, { status: 500 });
   }
 }

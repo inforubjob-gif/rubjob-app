@@ -3,6 +3,7 @@ import { getRequestContext } from "@cloudflare/next-on-pages";
 import { NextResponse } from "next/server";
 import { getAdminSession } from "@/lib/auth-server";
 import { nanoid } from "nanoid";
+import { ensureSchema } from "@/lib/db-init";
 
 export const runtime = "edge";
 
@@ -20,6 +21,8 @@ export async function GET(req: Request) {
 
     const db = getRequestContext().env.DB;
     if (!db) return NextResponse.json({ error: "D1 not found" }, { status: 500 });
+
+    await ensureSchema(db);
 
     const { results: washers } = await db.prepare(
       "SELECT * FROM store_washer_costs WHERE storeId = ? ORDER BY sizeKg ASC"
@@ -48,6 +51,8 @@ export async function POST(req: Request) {
 
     const db = getRequestContext().env.DB;
     if (!db) return NextResponse.json({ error: "D1 not found" }, { status: 500 });
+
+    await ensureSchema(db);
 
     // Delete existing entries
     await db.prepare("DELETE FROM store_washer_costs WHERE storeId = ?").bind(storeId).run();
