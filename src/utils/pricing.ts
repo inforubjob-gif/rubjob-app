@@ -67,8 +67,7 @@ export function calculateOrderPrice(
 
   // 2. Delivery Fee Calculation (ระยะทางไปกลับ แล้วค่อยคิดเงิน)
   const roundTripKm = distanceKm * 2;
-  const baseDelivery = Math.max(config.deliveryFeeBase, 50); // Minimum ฿50
-  let deliveryFee = baseDelivery;
+  let deliveryFee = config.deliveryFeeBase;
   if (roundTripKm > 3) {
     deliveryFee += ((roundTripKm - 3) * 10);
   }

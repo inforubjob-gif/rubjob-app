@@ -407,10 +407,10 @@ function BookingFlow() {
   const distanceKm = roadDistance?.distanceKm ?? haversineKm;
   const estimatedMinutes = roadDistance?.durationMin ?? null;
   
-  // Round Trip Delivery Fare = min 50 base + (roundTripKm > 3 ? (roundTripKm - 3) * 10 : 0)
+  // Round Trip Delivery Fare = base + distance bonus
   const roundTripKm = distanceKm * 2;
   const roundTripDistanceBonus = roundTripKm > 3 ? (roundTripKm - 3) * 10 : 0;
-  const totalDeliveryBase = Math.max(pricingConfig.deliveryFeeBase, 50) + roundTripDistanceBonus;
+  const totalDeliveryBase = pricingConfig.deliveryFeeBase + roundTripDistanceBonus;
     
   // Helper: get washer cost matrix prices for the selected store + machine size
   const getWasherPrices = (size: 'small' | 'large') => {
