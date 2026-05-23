@@ -657,6 +657,55 @@ export default function StoreForm({ initialData, isEdit }: StoreFormProps) {
                </div>
             </Card>
 
+            {/* Customer Pricing — ราคาบริการลูกค้า */}
+            <Card className="p-8 bg-white border border-slate-200/60 shadow-sm">
+               <div className="flex items-center gap-3 mb-2">
+                  <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
+                     <Icons.FileText size={20} />
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-black text-slate-900 uppercase tracking-tight">ราคาบริการลูกค้า</h2>
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">ค่าดำเนินงาน — ค่าซัก + อบผ้า ที่ลูกค้าเห็น</p>
+                  </div>
+               </div>
+
+               <div className="mt-4">
+                  <table className="w-full text-sm">
+                     <thead>
+                        <tr className="border-b-2 border-slate-100">
+                           <th className="text-left py-2 px-3 text-[10px] font-black text-slate-400 uppercase">ขนาด (KG)</th>
+                           <th className="text-left py-2 px-3 text-[10px] font-black text-slate-400 uppercase">ประมาณจำนวนชิ้น</th>
+                           <th className="text-left py-2 px-3 text-[10px] font-black text-slate-400 uppercase">ราคา (฿)</th>
+                        </tr>
+                     </thead>
+                     <tbody>
+                        {(() => {
+                           const washers = washerCosts.filter((w: any) => w.sizeKg);
+                           const piecesMap: Record<number, string> = { 9: '20-30 ชิ้น', 14: '30-50 ชิ้น', 18: '50-70 ชิ้น', 28: '70-100 ชิ้น' };
+                           if (washers.length === 0) {
+                              return (
+                                 <tr><td colSpan={3} className="py-6 text-center text-slate-300 font-bold text-xs">กรุณาเพิ่มข้อมูลในตารางต้นทุนด้านล่างก่อน</td></tr>
+                              );
+                           }
+                           return washers.map((w: any, i: number) => {
+                              const kg = parseFloat(w.sizeKg) || 0;
+                              const price = parseFloat(w.priceStandard) || parseFloat(w.priceCold) || 0;
+                              return (
+                                 <tr key={i} className="border-b border-slate-50 hover:bg-slate-50/50">
+                                    <td className="py-3 px-3 font-black text-slate-800">{kg} kg</td>
+                                    <td className="py-3 px-3 text-slate-500 font-medium">{piecesMap[kg] || `~${Math.round(kg * 2.5)} ชิ้น`}</td>
+                                    <td className="py-3 px-3 font-black text-primary">฿{price}</td>
+                                 </tr>
+                              );
+                           });
+                        })()}
+                     </tbody>
+                  </table>
+               </div>
+
+               <p className="text-[10px] text-slate-400 mt-3 font-medium">💡 ราคานี้มาจากช่อง &quot;โหมดมาตรฐาน (Standard)&quot; ในตารางต้นทุนด้านล่าง</p>
+            </Card>
+
             {/* Cost Matrix — ตารางต้นทุนเครื่องซัก/อบ */}
             <Card className="p-8 bg-white border border-slate-200/60 shadow-sm">
                <div className="flex items-center gap-3 mb-2">

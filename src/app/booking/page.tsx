@@ -948,6 +948,9 @@ function BookingFlow() {
                             { sizeKg: 28, label: "28 kg", price: 210 },
                           ];
 
+                      // Approximate piece count per size
+                      const piecesMap: Record<number, string> = { 9: '20-30 ชิ้น', 14: '30-50 ชิ้น', 18: '50-70 ชิ้น', 28: '70-100 ชิ้น' };
+
                       return sizeOptions.map((opt: any) => (
                         <button
                           key={opt.sizeKg}
@@ -968,6 +971,7 @@ function BookingFlow() {
                             <span className="text-2xl">🫧</span>
                           </div>
                           <p className={`text-base font-black ${bagSize === `${opt.sizeKg}kg` ? "text-primary" : "text-slate-900"}`}>{opt.label}</p>
+                          <p className="text-[10px] text-slate-400 font-bold mt-0.5">{piecesMap[opt.sizeKg] || `~${Math.round(opt.sizeKg * 2.5)} ชิ้น`}</p>
                           <p className={`text-lg font-black mt-2 ${bagSize === `${opt.sizeKg}kg` ? "text-primary" : "text-slate-700"}`}>฿{opt.price}</p>
                         </button>
                       ));
