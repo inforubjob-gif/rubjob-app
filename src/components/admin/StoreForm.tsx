@@ -115,15 +115,16 @@ export default function StoreForm({ initialData, isEdit }: StoreFormProps) {
     }
   }
 
-  async function handleSaveCostMatrix() {
-    if (!initialData?.id) return;
+  async function handleSaveCostMatrix(storeId?: string) {
+    const targetStoreId = storeId || initialData?.id;
+    if (!targetStoreId) return;
     setIsCostMatrixSaving(true);
     try {
       const res = await fetch("/api/admin/stores/cost-matrix", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          storeId: initialData.id,
+          storeId: targetStoreId,
           washers: washerCosts.filter(w => w.sizeKg && (w.priceCold || w.priceStandard)).map(w => ({
             sizeKg: parseFloat(w.sizeKg) || 0,
             sizeLabel: w.sizeLabel || null,
@@ -142,10 +143,13 @@ export default function StoreForm({ initialData, isEdit }: StoreFormProps) {
           })),
         }),
       });
+      const resData = await res.json().catch(() => null) as any;
       if (res.ok) {
         showToast("บันทึกตารางต้นทุนเรียบร้อย", "success");
       } else {
-        showToast("Failed to save cost matrix", "error");
+        const errMsg = resData?.error || `HTTP ${res.status}`;
+        console.error("Cost matrix API error:", errMsg, resData);
+        showToast(`Failed to save cost matrix: ${errMsg}`, "error");
       }
     } catch (err) {
       console.error("Cost matrix save failed:", err);
@@ -243,6 +247,16 @@ export default function StoreForm({ initialData, isEdit }: StoreFormProps) {
       const data = await res.json() as any;
 
       if (res.ok) {
+        const resData = data;
+        // Save cost matrix if there's data
+        const hasWasherData = washerCosts.some(w => w.sizeKg && (w.priceCold || w.priceStandard));
+        const hasDryerData = dryerCosts.some(d => d.sizeKg && d.price);
+        if (hasWasherData || hasDryerData) {
+          const costStoreId = isEdit ? initialData?.id : resData?.id;
+          if (costStoreId) {
+            await handleSaveCostMatrix(costStoreId);
+          }
+        }
         showToast(isEdit ? "Branch updated successfully" : "New branch established!", "success");
         setTimeout(() => {
           router.push("/admin/stores");
@@ -644,7 +658,6 @@ export default function StoreForm({ initialData, isEdit }: StoreFormProps) {
             </Card>
 
             {/* Cost Matrix — ตารางต้นทุนเครื่องซัก/อบ */}
-            {isEdit && (
             <Card className="p-8 bg-white border border-slate-200/60 shadow-sm">
                <div className="flex items-center gap-3 mb-2">
                   <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
@@ -835,18 +848,24 @@ export default function StoreForm({ initialData, isEdit }: StoreFormProps) {
                </div>
                )}
 
-               {/* Save Cost Matrix Button */}
+               {/* Save Cost Matrix Button — only show separate button in edit mode */}
+               {isEdit && (
                <button
                  type="button"
-                 onClick={handleSaveCostMatrix}
+                 onClick={() => handleSaveCostMatrix()}
                  disabled={isCostMatrixSaving}
                  className="w-full bg-emerald-500 text-white py-4 rounded-xl font-black text-xs uppercase tracking-widest shadow-xl shadow-emerald-500/20 hover:bg-emerald-600 active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:opacity-50"
                >
                  {isCostMatrixSaving ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <Icons.Check size={16} />}
                  {isCostMatrixSaving ? "กำลังบันทึก..." : "บันทึกตารางต้นทุน"}
                </button>
+               )}
+               {!isEdit && (
+                 <p className="text-xs font-bold text-slate-400 text-center mt-4 py-3 bg-slate-50 rounded-xl">
+                   💡 ตารางต้นทุนจะถูกบันทึกพร้อมกันเมื่อกด &quot;สร้างร้านค้า&quot;
+                 </p>
+               )}
             </Card>
-            )}
          </div>
          
         {/* Right Column: Fees & Operational Settings */}
