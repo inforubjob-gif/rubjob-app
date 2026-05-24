@@ -1041,7 +1041,14 @@ function BookingFlow() {
                   </IconCircle>
                   {t("booking.foldingServiceTitle")}
                 </h3>
-                
+
+                {/* Promo banner — auto-hide after June 30, 2026 */}
+                {new Date() <= new Date("2026-06-30T23:59:59+07:00") && (
+                  <div className="flex items-center gap-2 px-3 py-2 bg-emerald-50 border border-emerald-200 rounded-xl mb-2 animate-page-enter">
+                    <span className="text-base">✨</span>
+                    <p className="text-[11px] font-bold text-emerald-700">มีคูปองพับผ้าฟรี! ถึง 30 มิ.ย. นี้</p>
+                  </div>
+                )}
                 <Card className="overflow-hidden mb-5">
                   <label className="flex items-center justify-between p-4 cursor-pointer hover:bg-slate-50 transition-colors border-b border-border" onClick={() => setWithFolding(false)}>
                     <div className="flex flex-col">
