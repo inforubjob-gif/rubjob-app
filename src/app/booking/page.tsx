@@ -442,8 +442,8 @@ function BookingFlow() {
       machineSize: machineSize,
       washMode: "standard", // Always default to standard mode (customer can request extra via chat)
       storePrices: selectedSizePrice > 0 ? { standard: selectedSizeCost || selectedSizePrice, extra: selectedSizeExtraCost || selectedSizePrice } : undefined,
-      laundryAppPrice: selectedSizePrice,
-      storeCostPrice: selectedSizeCost,
+      laundryAppPrice: selectedSizePrice > 0 ? selectedSizePrice : undefined,
+      storeCostPrice: selectedSizeCost > 0 ? selectedSizeCost : undefined,
     }, pricingConfig);
   } catch (err) {
     console.error("Pricing error:", err);

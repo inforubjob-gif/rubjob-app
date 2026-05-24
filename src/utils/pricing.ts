@@ -70,11 +70,11 @@ export function calculateOrderPrice(
     laundryCost = priceMatrix[machineSize]?.[washMode] ?? 100;
     laundryCostBase = laundryCost * 0.8; // Fallback cost is 80% of app price
   } else {
-    // Fallback: weight-based
-    if (weightKg <= 9) laundryCost = 100;
-    else if (weightKg <= 14) laundryCost = 120;
-    else if (weightKg <= 18) laundryCost = 140;
-    else laundryCost = 160;
+    // Fallback: weight-based (New RUBJOB app pricing)
+    if (weightKg <= 9) laundryCost = 120;
+    else if (weightKg <= 14) laundryCost = 140;
+    else if (weightKg <= 18) laundryCost = 170;
+    else laundryCost = 210;
   }
 
   // 2. Delivery Fee Calculation (ระยะทางไปกลับ แล้วค่อยคิดเงิน)
