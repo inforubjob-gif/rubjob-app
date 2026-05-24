@@ -947,7 +947,7 @@ function BookingFlow() {
                     </label>
                   </div>
                 ) : (
-                  <div className="grid grid-cols-2 gap-3 mb-6">
+                  <div className="grid grid-cols-4 gap-2 mb-5">
                     {(() => {
                       const store = selectedStore as any;
                       const washers = store?.washers && store.washers.length > 0
@@ -1007,7 +1007,7 @@ function BookingFlow() {
                       }
 
                       // Approximate piece count per size
-                      const piecesMap: Record<number, string> = { 9: '20-30 ชิ้น', 14: '30-50 ชิ้น', 18: '50-70 ชิ้น', 28: '70-100 ชิ้น' };
+                      const piecesMap: Record<number, string> = { 9: '~25 ชิ้น', 14: '~40 ชิ้น', 18: '~60 ชิ้น', 28: '~85 ชิ้น' };
 
                       return sizeOptions.map((opt: any) => (
                         <button
@@ -1019,20 +1019,15 @@ function BookingFlow() {
                             setSelectedSizeCost(opt.cost);
                             setSelectedSizeExtraCost(opt.extraCost || opt.cost);
                           }}
-                          className={`flex flex-col items-center p-5 rounded-2xl border-2 transition-all active:scale-[0.97] ${
+                          className={`flex flex-col items-center py-3 px-1 rounded-xl border-2 transition-all active:scale-[0.97] ${
                             bagSize === `${opt.sizeKg}kg`
-                              ? "border-primary bg-primary/5 shadow-lg shadow-primary/10"
+                              ? "border-primary bg-primary/5 shadow-md shadow-primary/10"
                               : "border-slate-100 bg-white hover:border-slate-200"
                           }`}
                         >
-                          <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-3 ${
-                            bagSize === `${opt.sizeKg}kg` ? "bg-primary text-white" : "bg-slate-100 text-slate-500"
-                          }`}>
-                            <span className="text-2xl">🫧</span>
-                          </div>
-                          <p className={`text-base font-black ${bagSize === `${opt.sizeKg}kg` ? "text-primary" : "text-slate-900"}`}>{opt.label}</p>
-                          <p className="text-[10px] text-slate-400 font-bold mt-0.5">{piecesMap[opt.sizeKg] || `~${Math.round(opt.sizeKg * 2.5)} ชิ้น`}</p>
-                          <p className={`text-lg font-black mt-2 ${bagSize === `${opt.sizeKg}kg` ? "text-primary" : "text-slate-700"}`}>฿{opt.price}</p>
+                          <p className={`text-sm font-black leading-tight ${bagSize === `${opt.sizeKg}kg` ? "text-primary" : "text-slate-900"}`}>{opt.label}</p>
+                          <p className="text-[8px] text-slate-400 font-bold mt-0.5">{piecesMap[opt.sizeKg]}</p>
+                          <p className={`text-xs font-black mt-1 ${bagSize === `${opt.sizeKg}kg` ? "text-primary" : "text-slate-500"}`}>฿{opt.price}</p>
                         </button>
                       ));
                     })()}
