@@ -15,7 +15,7 @@ const DEFAULT_SETTINGS = [
   { key: "gp_rubber_percent", value: "10", type: "number", description: "GP percentage taken from Rubber delivery fees." },
   { key: "platform_fee_per_delivery", value: "10", type: "number", description: "Fixed platform fee per delivery order (THB)." },
   { key: "min_order_amount", value: "0", type: "number", description: "Minimum order value required to place a booking." },
-  { key: "delivery_fee_base", value: "39", type: "number", description: "Base delivery fee charged to customers." },
+  { key: "delivery_fee_base", value: "50", type: "number", description: "Base delivery fee charged to customers." },
   { key: "line_token_regular", value: "", type: "string", description: "Channel Access Token for the Regular (Customer) LINE OA." },
   { key: "line_secret_regular", value: "", type: "string", description: "Channel Secret for the Regular (Customer) LINE OA." },
   { key: "line_token_rubber", value: "", type: "string", description: "Channel Access Token for the Rubber (Driver) LINE OA." },
