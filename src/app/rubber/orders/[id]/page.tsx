@@ -375,7 +375,7 @@ export default function RubberOrderDetailPage() {
                   </div>
                </div>
                <p className="text-xs font-bold text-rose-500/80 mt-2 leading-relaxed">
-                 * โปรดบันทึกบิลซักจริงอีกครั้งเมื่ออยู่ที่ร้าน ระบบจะโอนเงินคืนให้พร้อมค่ารอบ
+                 * โปรดบันทึกบิลซักจริงอีกครั้งเมื่ออยู่ที่ร้าน ระบบจะโอนคืนเมื่อจบวัน
                </p>
             </Card>
           )}
