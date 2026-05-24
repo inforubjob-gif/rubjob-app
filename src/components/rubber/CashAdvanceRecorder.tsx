@@ -23,6 +23,7 @@ export default function CashAdvanceRecorder({ orderId, storeId, storeName, rubbe
   const [existingRecords, setExistingRecords] = useState<any[]>([]);
   const [isEditing, setIsEditing] = useState(false);
   const [error, setError] = useState("");
+  const [note, setNote] = useState("");
   const [machineType, setMachineType] = useState<"separate" | "combo">("separate");
 
   // Selections
@@ -132,7 +133,7 @@ export default function CashAdvanceRecorder({ orderId, storeId, storeName, rubbe
       const res = await fetch("/api/rubber/cash-advance", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ rubberId, orderId, storeId, items }),
+        body: JSON.stringify({ rubberId, orderId, storeId, items, note }),
       });
 
       if (res.ok) {
@@ -315,6 +316,17 @@ export default function CashAdvanceRecorder({ orderId, storeId, storeName, rubbe
           <div className="flex items-center justify-between mb-4">
             <span className="text-xs font-black text-slate-400 uppercase">ยอดรวม</span>
             <span className="text-2xl font-black text-slate-900 italic">฿{totalAmount.toLocaleString()}</span>
+          </div>
+
+          <div className="mb-4">
+            <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">เหตุผลการเปลี่ยนแปลง (ถ้ามี)</label>
+            <textarea 
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
+              placeholder="เช่น ลูกค้าให้ผ้ามาเยอะกว่าที่ระบุ, ตู้ 9kg ไม่ว่าง"
+              className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs font-bold text-slate-700 placeholder:text-slate-300 focus:outline-none focus:border-primary/50 focus:ring-2 focus:ring-primary/20"
+              rows={2}
+            />
           </div>
 
           <button

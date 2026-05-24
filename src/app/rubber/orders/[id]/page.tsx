@@ -12,6 +12,7 @@ import { useTranslation } from "@/components/providers/LanguageProvider";
 import PhotoUpload from "@/components/ui/PhotoUpload";
 import dynamic from "next/dynamic";
 import OrderIssueModal from "@/components/orders/OrderIssueModal";
+import CashAdvanceRecorder from "@/components/rubber/CashAdvanceRecorder";
 import Modal from "@/components/ui/Modal";
 
 const RubberMap = dynamic(() => import("@/components/rubber/RubberMap"), { 
@@ -36,10 +37,10 @@ export default function RubberOrderDetailPage() {
   const [isUpdating, setIsUpdating] = useState(false);
   const [isIssueModalOpen, setIsIssueModalOpen] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
-  const [updateError, setUpdateError] = useState<string | null>(null);
   const [rubberCoords, setRubberCoords] = useState<{lat: number, lng: number} | null>(null);
   const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
   const [showAdvanceConfirm, setShowAdvanceConfirm] = useState(false);
+  const [isEditingAdvance, setIsEditingAdvance] = useState(false);
 
   useEffect(() => {
     if (typeof window !== "undefined" && navigator.geolocation) {
@@ -610,35 +611,66 @@ export default function RubberOrderDetailPage() {
 
       {/* Advance Payment Confirmation Modal */}
       <Modal isOpen={showAdvanceConfirm} onClose={() => setShowAdvanceConfirm(false)} title="💸 ยืนยันการสำรองจ่าย">
-        <div className="p-5 bg-white text-center">
-          <div className="w-16 h-16 bg-rose-50 text-rose-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg shadow-rose-500/20">
-            <Icons.Check size={32} strokeWidth={3} />
+        {!isEditingAdvance ? (
+          <div className="p-5 bg-white text-center">
+            <div className="w-16 h-16 bg-rose-50 text-rose-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg shadow-rose-500/20">
+              <Icons.Check size={32} strokeWidth={3} />
+            </div>
+            <h3 className="text-xl font-black text-slate-800 mb-2">ยืนยันการชำระเงิน</h3>
+            <p className="text-sm text-slate-500 mb-6 leading-relaxed">
+              คุณได้ทำการสำรองจ่ายค่าซักอบให้ร้าน <span className="font-bold text-slate-800">{order?.storeName}</span> 
+              จำนวนเงินประมาณ <span className="font-black text-rose-600 text-lg">฿{order?.laundryCost}</span> เรียบร้อยแล้วใช่หรือไม่?
+            </p>
+            
+            <div className="flex flex-col gap-3">
+              <Button 
+                fullWidth 
+                onClick={() => {
+                  setShowAdvanceConfirm(false);
+                  handleUpdateStatus(getNextStatus(status));
+                }}
+                className="bg-rose-500 hover:bg-rose-600 text-white font-black uppercase shadow-xl shadow-rose-500/20"
+              >
+                ยืนยันการจ่ายเงิน และถ่ายรูปจบงาน
+              </Button>
+              <div className="flex items-center justify-between mt-2">
+                <button 
+                  onClick={() => setIsEditingAdvance(true)}
+                  className="py-2 px-4 text-xs font-bold text-slate-400 hover:text-slate-600 flex items-center gap-1 transition-colors"
+                >
+                  ✏️ แก้ไขข้อมูลต้นทุน
+                </button>
+                <button 
+                  onClick={() => setShowAdvanceConfirm(false)}
+                  className="py-2 px-4 text-xs font-bold text-slate-400 hover:text-slate-600 uppercase transition-colors"
+                >
+                  ยกเลิก
+                </button>
+              </div>
+            </div>
           </div>
-          <h3 className="text-xl font-black text-slate-800 mb-2">ยืนยันการชำระเงิน</h3>
-          <p className="text-sm text-slate-500 mb-6 leading-relaxed">
-            คุณได้ทำการสำรองจ่ายค่าซักอบให้ร้าน <span className="font-bold text-slate-800">{order?.storeName}</span> 
-            จำนวนเงินประมาณ <span className="font-black text-rose-600 text-lg">฿{order?.laundryCost}</span> เรียบร้อยแล้วใช่หรือไม่?
-          </p>
-          
-          <div className="flex flex-col gap-3">
-            <Button 
-              fullWidth 
-              onClick={() => {
-                setShowAdvanceConfirm(false);
-                handleUpdateStatus(getNextStatus(status));
-              }}
-              className="bg-rose-500 hover:bg-rose-600 text-white font-black uppercase shadow-xl shadow-rose-500/20"
-            >
-              ยืนยันการจ่ายเงิน และถ่ายรูปจบงาน
-            </Button>
-            <button 
-              onClick={() => setShowAdvanceConfirm(false)}
-              className="py-3 text-sm font-bold text-slate-400 hover:text-slate-600 uppercase"
-            >
-              ยกเลิก
-            </button>
+        ) : (
+          <div className="p-4 bg-slate-50 border-t border-slate-100">
+             <CashAdvanceRecorder
+                orderId={id!}
+                storeId={order?.storeId || ''}
+                storeName={order?.storeName || "Unknown Store"}
+                rubberId={(() => { try { const s = JSON.parse(localStorage.getItem("rubjob_rubber_session") || "{}"); return s.id || ""; } catch { return ""; } })()}
+                serviceDetails={order?.serviceDetails ? JSON.parse(order.serviceDetails) : undefined}
+                onRecorded={() => {
+                   setShowAdvanceConfirm(false);
+                   setIsEditingAdvance(false);
+                   handleUpdateStatus(getNextStatus(status)); // proceed to next step
+                }}
+             />
+             <button 
+               onClick={() => setIsEditingAdvance(false)} 
+               className="w-full mt-4 py-3 text-xs font-bold text-slate-400 hover:text-slate-600 uppercase border border-slate-200 rounded-xl bg-white active:scale-95 transition-all"
+             >
+               ยกเลิกการแก้ไข
+             </button>
           </div>
-        </div>
+        )}
       </Modal>
 
     </div>
