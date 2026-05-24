@@ -424,9 +424,10 @@ function BookingFlow() {
   const distanceKm = roadDistance?.distanceKm ?? haversineKm;
   const estimatedMinutes = roadDistance?.durationMin ?? null;
   
-  // Delivery Fare = base + distance bonus (One-way distance calculation)
-  const distanceBonus = distanceKm > 3 ? (distanceKm - 3) * 10 : 0;
-  const totalDeliveryBase = pricingConfig.deliveryFeeBase + distanceBonus;
+  // Round Trip Delivery Fare = base + distance bonus
+  const roundTripKm = distanceKm * 2;
+  const roundTripDistanceBonus = roundTripKm > 3 ? (roundTripKm - 3) * 10 : 0;
+  const totalDeliveryBase = pricingConfig.deliveryFeeBase + roundTripDistanceBonus;
     
   // Pricing Logic (2026 Strategy)
   let pricing: any = { customerTotal: 0, breakdown: { laundry: 0, delivery: 0, addons: 0 } };
@@ -1024,7 +1025,7 @@ function BookingFlow() {
                       </div>
                     </label>
                   </div>
-                  {distanceBonus > 0 && <span className="text-[9px] text-muted block">{t("booking.distanceNote").replace("{distance}", distanceKm.toFixed(1))}</span>}
+                  {roundTripDistanceBonus > 0 && <span className="text-[9px] text-muted block">{t("booking.distanceNote").replace("{distance}", roundTripKm.toFixed(1))}</span>}
 
                   {/* Delivery subtotal */}
                   <div className="flex items-center justify-between pt-2 border-t border-primary/15">

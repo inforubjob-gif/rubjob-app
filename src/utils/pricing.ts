@@ -77,10 +77,11 @@ export function calculateOrderPrice(
     else laundryCost = 160;
   }
 
-  // 2. Delivery Fee Calculation (ตามระยะทางจริง ไม่ใช่ไปกลับ)
+  // 2. Delivery Fee Calculation (ระยะทางไปกลับ แล้วค่อยคิดเงิน)
+  const roundTripKm = distanceKm * 2;
   let deliveryFee = config.deliveryFeeBase;
-  if (distanceKm > 3) {
-    deliveryFee += ((distanceKm - 3) * 10);
+  if (roundTripKm > 3) {
+    deliveryFee += ((roundTripKm - 3) * 10);
   }
 
   // Rubber Deductions (from settings, not hard-coded)
