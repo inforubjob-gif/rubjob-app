@@ -258,6 +258,9 @@ export default function LiffProvider({ children }: { children: ReactNode }) {
       
       // Clear only auth-related session keys — preserve booking drafts
       sessionStorage.removeItem("rubber_auth_retries");
+      sessionStorage.removeItem("rubjob_pin_verified_rubber");
+      sessionStorage.removeItem("rubjob_pin_verified_store");
+      sessionStorage.removeItem("rubjob_pin_verified_customer");
 
       if (liff.isInClient?.()) {
         liff.closeWindow();

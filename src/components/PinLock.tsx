@@ -12,6 +12,30 @@ interface PinLockProps {
   children: React.ReactNode;
 }
 
+// Session-level PIN cache: skip re-entry within 15 minutes (like banking apps)
+const PIN_SESSION_TIMEOUT_MS = 15 * 60 * 1000; // 15 minutes
+
+function getPinSessionKey(type: string) {
+  return `rubjob_pin_verified_${type}`;
+}
+
+function isPinSessionValid(type: string): boolean {
+  try {
+    const raw = sessionStorage.getItem(getPinSessionKey(type));
+    if (!raw) return false;
+    const ts = parseInt(raw, 10);
+    return Date.now() - ts < PIN_SESSION_TIMEOUT_MS;
+  } catch {
+    return false;
+  }
+}
+
+function savePinSession(type: string) {
+  try {
+    sessionStorage.setItem(getPinSessionKey(type), Date.now().toString());
+  } catch {}
+}
+
 export default function PinLock({ type, userId, onVerified, children }: PinLockProps) {
   const router = useRouter();
   const { t } = useTranslation();
@@ -25,6 +49,13 @@ export default function PinLock({ type, userId, onVerified, children }: PinLockP
   const [isProcessing, setIsProcessing] = useState(false);
 
   useEffect(() => {
+    // Check session cache first — skip PIN if recently verified
+    if (isPinSessionValid(type)) {
+      setIsLocked(false);
+      setIsLoading(false);
+      onVerified();
+      return;
+    }
     checkPinStatus();
   }, []);
 
@@ -100,6 +131,7 @@ export default function PinLock({ type, userId, onVerified, children }: PinLockP
       });
       const data = await res.json() as any;
       if (data.success) {
+        savePinSession(type);
         setIsLocked(false);
         onVerified();
       } else {
@@ -126,6 +158,7 @@ export default function PinLock({ type, userId, onVerified, children }: PinLockP
       });
       const data = await res.json() as any;
       if (data.success) {
+        savePinSession(type);
         setIsLocked(false);
         onVerified();
       } else {
