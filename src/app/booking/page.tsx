@@ -844,443 +844,281 @@ function BookingFlow() {
               </div>
             </section>
 
-            <section>
-                <h3 className="text-xs font-black text-foreground mb-1.5 flex items-center gap-1.5 uppercase tracking-tight">
-                  <IconCircle variant="orange" size="xs">
-                    <Icons.Bell size={12} strokeWidth={3} />
-                  </IconCircle> {t("booking.pickupSelectTime")}
-                </h3>
-              
-              <div className="p-2.5 bg-slate-50/80 rounded-xl space-y-2.5 animate-page-enter border border-slate-100">
-
-                {/* Outside business hours banner */}
-                {(() => {
-                  const allSlotsDisabled = TIME_SLOTS.every(s => isSlotPassed(s.startTime, pickupDate));
-                  if (!allSlotsDisabled) return null;
-                  return (
-                    <div className="bg-amber-50 border border-amber-200 rounded-lg p-2.5 flex items-center gap-2 animate-page-enter">
-                      <Icons.Bell size={16} className="text-amber-500 shrink-0" />
-                      <div>
-                        <p className="text-xs font-bold text-amber-700">{t("booking.outsideHoursTitle")}</p>
-                        <p className="text-[10px] text-amber-600 mt-0.5">{t("booking.outsideHoursDesc")}</p>
-                      </div>
-                    </div>
-                  );
-                })()}
-
-                <div className="grid grid-cols-2 gap-2">
-                  {TIME_SLOTS.map((slot) => {
-                    const isDisabled = isSlotPassed(slot.startTime, pickupDate);
-                    return (
-                      <button
-                        key={slot.id}
-                        disabled={isDisabled}
-                        onClick={() => setPickupSlot(slot.id)}
-                        className={`py-3.5 px-3 rounded-xl text-center transition-all ${
-                          isDisabled 
-                            ? "bg-slate-50 text-slate-300 cursor-not-allowed opacity-40" 
-                            : pickupSlot === slot.id 
-                              ? "bg-primary text-white shadow-md shadow-primary/20" 
-                              : "bg-white text-foreground hover:bg-slate-100 border border-slate-200"
-                        }`}
-                      >
-                        <p className={`text-xs font-black ${isDisabled ? "line-through" : ""}`}>
-                          {t(`timeSlots.${slot.id}`) || slot.label}
-                        </p>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            </section>
-
-            {/* Delivery Options — 2 choices: มาตรฐาน + ด่วนพิเศษ */}
-            <section>
-                <h3 className="text-sm font-black text-foreground mb-2 flex items-center gap-2 uppercase tracking-tight">
-                  <IconCircle variant="black" size="sm">
-                    <Icons.Home size={14} strokeWidth={3} />
-                  </IconCircle> {t("booking.deliveryOptions")}
-                </h3>
-              <div className="space-y-2">
-                <label className={`flex items-center justify-between p-3.5 rounded-xl border-2 cursor-pointer transition-all ${deliverySpeed === "standard" ? "border-primary bg-primary/5 shadow-md shadow-primary/5" : "border-slate-100 bg-white hover:bg-slate-50"}`} onClick={() => setDeliverySpeed("standard")}>
-                  <div className="flex flex-col">
-                    <span className="text-sm font-bold text-foreground">{t("booking.speed.standardTitle")}</span>
-                    <span className="text-xs text-muted block mt-0.5">{t("booking.speed.standardDesc").replace("{fee}", Math.ceil(totalDeliveryBase).toString()).replace("{halfFee}", Math.ceil(totalDeliveryBase / 2).toString())}</span>
-                  </div>
-                  <div className={`w-5 h-5 rounded-full flex items-center justify-center transition-colors ${deliverySpeed === "standard" ? "bg-primary text-white" : "border-2 border-slate-200"}`}>
-                    {deliverySpeed === "standard" && <span className="text-xs font-bold leading-none flex items-center justify-center pt-0.5">✓</span>}
-                  </div>
-                </label>
-
-                <label className={`flex items-center justify-between p-3.5 rounded-xl border-2 cursor-pointer transition-all ${deliverySpeed === "express" ? "border-primary bg-[#fff8e1] shadow-md shadow-primary/10" : "border-slate-100 bg-white hover:bg-slate-50"}`} onClick={() => setDeliverySpeed("express")}>
-                  <div className="flex flex-col">
-                    <span className="text-sm font-bold text-primary">{t("booking.speed.expressTitle")}</span>
-                    <span className="text-xs text-primary/80 block mt-0.5">{t("booking.speed.expressDesc").replace("{fee}", Math.ceil(totalDeliveryBase + 20).toString()).replace("{halfFee}", Math.ceil((totalDeliveryBase + 20) / 2).toString())}</span>
-                  </div>
-                  <div className={`w-5 h-5 rounded-full flex items-center justify-center transition-colors ${deliverySpeed === "express" ? "bg-primary text-white" : "border-2 border-slate-200"}`}>
-                    {deliverySpeed === "express" && <span className="text-xs font-bold leading-none flex items-center justify-center pt-0.5">✓</span>}
-                  </div>
-                </label>
-              </div>
-              {roundTripDistanceBonus > 0 && <span className="text-[10px] text-muted block mt-2 ml-1">{t("booking.distanceNote").replace("{distance}", roundTripKm.toFixed(1))}</span>}
-            </section>
-
-            {/* Machine Size — Only for Laundry */}
+            {/* ═══════════════════════════════════════════════════════ */}
+            {/* 🟠 GROUP 1: ค่าซักผ้า (ส่วนนี้ต้องจ่ายอยู่แล้ว)       */}
+            {/* ═══════════════════════════════════════════════════════ */}
             {service?.category === "laundry" && (
               <section>
-                {/* ─── เลือกขนาดเครื่อง (ค่าซัก+อบผ้า) ─── */}
-                <h3 className="text-sm font-black text-foreground mb-3 flex items-center gap-2 uppercase tracking-tight">
-                  <IconCircle variant="orange" size="sm">
-                    <Icons.FileText size={14} strokeWidth={3} />
-                  </IconCircle>
-                  ค่าซัก + อบผ้า
-                </h3>
-                <p className="text-[10px] text-slate-400 font-bold mb-3 ml-1">เลือกขนาดที่เหมาะกับปริมาณผ้าของคุณ</p>
-
-                {selectedService === "duvet_washing" ? (
-                  <div className="grid grid-cols-1 mb-5">
-                    <label className="flex flex-col items-center justify-center p-4 rounded-xl border-2 border-primary bg-primary/5 shadow-md shadow-primary/10">
-                      <span className="text-sm font-black text-foreground">{t("booking.bagMaxSize")}</span>
-                      <span className="text-[10px] text-muted font-bold mt-1">
-                        {t("booking.bagMaxDesc")}
-                      </span>
-                    </label>
+                <div className="rounded-2xl border-2 border-amber-200/60 bg-gradient-to-b from-amber-50/50 to-white overflow-hidden mb-4">
+                  <div className="flex items-center gap-2 px-4 py-2.5 bg-amber-100/60 border-b border-amber-200/40">
+                    <Icons.Tasks size={14} strokeWidth={3} className="text-amber-600" />
+                    <span className="text-xs font-black text-amber-800 uppercase tracking-tight">ค่าซัก + อบผ้า</span>
+                    <span className="text-[9px] font-bold text-amber-500 ml-auto">ส่วนนี้ต้องจ่ายอยู่แล้ว</span>
                   </div>
-                ) : (
-                  <div className="grid grid-cols-4 gap-2 mb-5">
-                    {(() => {
-                      const store = selectedStore as any;
-                      const washers = store?.washers && store.washers.length > 0
-                        ? [...store.washers].sort((a: any, b: any) => a.sizeKg - b.sizeKg)
-                        : null;
-                      
-                      // Customer App Prices are FIXED: 120, 140, 170, 210
-                      let sizeOptions: any[] = [];
-                      if (store?.machineType === 'combo') {
-                        // Combo Cost depends on Admin input (Standard/Extra) which only has Small/Large
-                        const smallWasher = washers?.find((w: any) => w.sizeKg <= 15) || {};
-                        const largeWasher = washers?.find((w: any) => w.sizeKg > 15) || {};
+                  <div className="p-4 space-y-3">
+                    <p className="text-[10px] text-slate-400 font-bold">เลือกขนาดที่เหมาะกับปริมาณผ้าของคุณ</p>
+                    {selectedService === "duvet_washing" ? (
+                      <div className="grid grid-cols-1">
+                        <label className="flex flex-col items-center justify-center p-4 rounded-xl border-2 border-primary bg-primary/5 shadow-md shadow-primary/10">
+                          <span className="text-sm font-black text-foreground">{t("booking.bagMaxSize")}</span>
+                          <span className="text-[10px] text-muted font-bold mt-1">{t("booking.bagMaxDesc")}</span>
+                        </label>
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-4 gap-2">
+                        {(() => {
+                          const store = selectedStore as any;
+                          const washers = store?.washers && store.washers.length > 0
+                            ? [...store.washers].sort((a: any, b: any) => a.sizeKg - b.sizeKg) : null;
+                          let sizeOptions: any[] = [];
+                          if (store?.machineType === 'combo') {
+                            const smallWasher = washers?.find((w: any) => w.sizeKg <= 15) || {};
+                            const largeWasher = washers?.find((w: any) => w.sizeKg > 15) || {};
+                            const smallCost = smallWasher.priceStandard || 100;
+                            const smallExtraCost = smallWasher.priceExtra || 140;
+                            const largeCost = largeWasher.priceStandard || 120;
+                            const largeExtraCost = largeWasher.priceExtra || 160;
+                            sizeOptions = [
+                              { sizeKg: 9, label: "9 kg", price: 120, cost: smallCost, extraCost: smallExtraCost },
+                              { sizeKg: 14, label: "14 kg", price: 140, cost: smallCost, extraCost: smallExtraCost },
+                              { sizeKg: 18, label: "18 kg", price: 170, cost: largeCost, extraCost: largeExtraCost },
+                              { sizeKg: 28, label: "28 kg", price: 210, cost: largeCost, extraCost: largeExtraCost },
+                            ];
+                          } else {
+                            const dryers = store?.dryers || [];
+                            const fixedSizes = [
+                              { sizeKg: 9, price: 120, defaultWash: 50, defaultDry: 50 },
+                              { sizeKg: 14, price: 140, defaultWash: 70, defaultDry: 50 },
+                              { sizeKg: 18, price: 170, defaultWash: 80, defaultDry: 70 },
+                              { sizeKg: 28, price: 210, defaultWash: 110, defaultDry: 70 },
+                            ];
+                            sizeOptions = fixedSizes.map(fs => {
+                              const washer = washers?.length > 0 ? washers.reduce((prev: any, curr: any) =>
+                                Math.abs(curr.sizeKg - fs.sizeKg) < Math.abs(prev.sizeKg - fs.sizeKg) ? curr : prev
+                              ) : {};
+                              const dryer = dryers.length > 0 ? dryers.reduce((prev: any, curr: any) =>
+                                Math.abs(curr.sizeKg - fs.sizeKg) < Math.abs(prev.sizeKg - fs.sizeKg) ? curr : prev
+                              ) : {};
+                              const cost = (washer.priceCold || fs.defaultWash) + (dryer.priceStandard || dryer.priceCold || fs.defaultDry);
+                              const extraCost = (washer.priceHot || fs.defaultWash + 10) + (dryer.priceStandard || dryer.priceCold || fs.defaultDry);
+                              return { sizeKg: fs.sizeKg, label: `${fs.sizeKg} kg`, price: fs.price, cost, extraCost };
+                            });
+                          }
+                          const piecesMap: Record<number, string> = { 9: '~25 ชิ้น', 14: '~40 ชิ้น', 18: '~60 ชิ้น', 28: '~85 ชิ้น' };
+                          return sizeOptions.map((opt: any) => (
+                            <button key={opt.sizeKg} onClick={() => {
+                              setBagSize(`${opt.sizeKg}kg`); setMachineSize(opt.sizeKg <= 14 ? "small" : "large");
+                              setSelectedSizePrice(opt.price); setSelectedSizeCost(opt.cost); setSelectedSizeExtraCost(opt.extraCost || opt.cost);
+                            }} className={`flex flex-col items-center py-3 px-1 rounded-xl border-2 transition-all active:scale-[0.97] ${bagSize === `${opt.sizeKg}kg` ? "border-primary bg-primary/5 shadow-md shadow-primary/10" : "border-slate-100 bg-white hover:border-slate-200"}`}>
+                              <p className={`text-sm font-black leading-tight ${bagSize === `${opt.sizeKg}kg` ? "text-primary" : "text-slate-900"}`}>{opt.label}</p>
+                              <p className="text-[8px] text-slate-400 font-bold mt-0.5">{piecesMap[opt.sizeKg]}</p>
+                              <p className={`text-xs font-black mt-1 ${bagSize === `${opt.sizeKg}kg` ? "text-primary" : "text-slate-500"}`}>฿{opt.price}</p>
+                            </button>
+                          ));
+                        })()}
+                      </div>
+                    )}
 
-                        const smallCost = smallWasher.priceStandard || 100;
-                        const smallExtraCost = smallWasher.priceExtra || 140;
-                        const largeCost = largeWasher.priceStandard || 120;
-                        const largeExtraCost = largeWasher.priceExtra || 160;
-                        
-                        sizeOptions = [
-                          { sizeKg: 9, label: "9 kg", price: 120, cost: smallCost, extraCost: smallExtraCost },
-                          { sizeKg: 14, label: "14 kg", price: 140, cost: smallCost, extraCost: smallExtraCost },
-                          { sizeKg: 18, label: "18 kg", price: 170, cost: largeCost, extraCost: largeExtraCost },
-                          { sizeKg: 28, label: "28 kg", price: 210, cost: largeCost, extraCost: largeExtraCost },
-                        ];
-                      } else {
-                        // Separate Cost depends on Washer (Cold/Hot) + Dryer, matching all 4 weights
-                        const dryers = store?.dryers || [];
-                        const fixedSizes = [
-                          { sizeKg: 9, price: 120, defaultWash: 50, defaultDry: 50 },
-                          { sizeKg: 14, price: 140, defaultWash: 70, defaultDry: 50 },
-                          { sizeKg: 18, price: 170, defaultWash: 80, defaultDry: 70 },
-                          { sizeKg: 28, price: 210, defaultWash: 110, defaultDry: 70 },
-                        ];
-                        
-                        sizeOptions = fixedSizes.map(fs => {
-                           // Find closest washer
-                           const washer = washers?.length > 0 ? washers.reduce((prev: any, curr: any) => 
-                              Math.abs(curr.sizeKg - fs.sizeKg) < Math.abs(prev.sizeKg - fs.sizeKg) ? curr : prev
-                           ) : {};
-                           
-                           // Find closest dryer
-                           const dryer = dryers.length > 0 ? dryers.reduce((prev: any, curr: any) => 
-                              Math.abs(curr.sizeKg - fs.sizeKg) < Math.abs(prev.sizeKg - fs.sizeKg) ? curr : prev
-                           ) : {};
-                           
-                           const cost = (washer.priceCold || fs.defaultWash) + (dryer.priceStandard || dryer.priceCold || fs.defaultDry);
-                           const extraCost = (washer.priceHot || fs.defaultWash + 10) + (dryer.priceStandard || dryer.priceCold || fs.defaultDry);
-                           
-                           return {
-                              sizeKg: fs.sizeKg,
-                              label: `${fs.sizeKg} kg`,
-                              price: fs.price,
-                              cost: cost,
-                              extraCost: extraCost
-                           };
-                        });
-                      }
+                    {/* Inline add-ons — folding + detergent in one row */}
+                    <div className="flex gap-2">
+                      <button onClick={() => setWithFolding(!withFolding)} className={`flex-1 flex items-center gap-2 px-3 py-2.5 rounded-xl border-2 transition-all active:scale-[0.97] ${withFolding ? "border-primary bg-primary/5" : "border-slate-100 bg-white"}`}>
+                        <div className={`w-4 h-4 rounded-md flex items-center justify-center shrink-0 ${withFolding ? "bg-primary text-white" : "border-2 border-slate-200"}`}>
+                          {withFolding && <Icons.Check size={10} strokeWidth={3} />}
+                        </div>
+                        <div className="text-left">
+                          <p className="text-[11px] font-bold text-slate-800">{t("booking.options.withFolding")}</p>
+                          <p className="text-[9px] font-bold text-primary">+฿10</p>
+                        </div>
+                      </button>
+                      <button onClick={() => setNeedsDetergent(!needsDetergent)} className={`flex-1 flex items-center gap-2 px-3 py-2.5 rounded-xl border-2 transition-all active:scale-[0.97] ${needsDetergent ? "border-primary bg-primary/5" : "border-slate-100 bg-white"}`}>
+                        <div className={`w-4 h-4 rounded-md flex items-center justify-center shrink-0 ${needsDetergent ? "bg-primary text-white" : "border-2 border-slate-200"}`}>
+                          {needsDetergent && <Icons.Check size={10} strokeWidth={3} />}
+                        </div>
+                        <div className="text-left">
+                          <p className="text-[11px] font-bold text-slate-800">{t("booking.detergentLabel")}</p>
+                          <p className="text-[9px] font-bold text-primary">+฿15</p>
+                        </div>
+                      </button>
+                    </div>
 
-                      // Approximate piece count per size
-                      const piecesMap: Record<number, string> = { 9: '~25 ชิ้น', 14: '~40 ชิ้น', 18: '~60 ชิ้น', 28: '~85 ชิ้น' };
+                    {/* Promo banner */}
+                    {new Date() <= new Date("2026-06-30T23:59:59+07:00") && (
+                      <div className="flex items-center gap-2 px-3 py-2 bg-emerald-50 border border-emerald-200 rounded-xl animate-page-enter">
+                        <span className="text-base">✨</span>
+                        <p className="text-[11px] font-bold text-emerald-700">มีคูปองพับผ้าฟรี! ถึง 30 มิ.ย. นี้</p>
+                      </div>
+                    )}
 
-                      return sizeOptions.map((opt: any) => (
-                        <button
-                          key={opt.sizeKg}
-                          onClick={() => {
-                            setBagSize(`${opt.sizeKg}kg`);
-                            setMachineSize(opt.sizeKg <= 14 ? "small" : "large");
-                            setSelectedSizePrice(opt.price);
-                            setSelectedSizeCost(opt.cost);
-                            setSelectedSizeExtraCost(opt.extraCost || opt.cost);
-                          }}
-                          className={`flex flex-col items-center py-3 px-1 rounded-xl border-2 transition-all active:scale-[0.97] ${
-                            bagSize === `${opt.sizeKg}kg`
-                              ? "border-primary bg-primary/5 shadow-md shadow-primary/10"
-                              : "border-slate-100 bg-white hover:border-slate-200"
-                          }`}
-                        >
-                          <p className={`text-sm font-black leading-tight ${bagSize === `${opt.sizeKg}kg` ? "text-primary" : "text-slate-900"}`}>{opt.label}</p>
-                          <p className="text-[8px] text-slate-400 font-bold mt-0.5">{piecesMap[opt.sizeKg]}</p>
-                          <p className={`text-xs font-black mt-1 ${bagSize === `${opt.sizeKg}kg` ? "text-primary" : "text-slate-500"}`}>฿{opt.price}</p>
-                        </button>
-                      ));
-                    })()}
+                    {/* Laundry subtotal */}
+                    <div className="flex items-center justify-between pt-2 border-t border-amber-200/40">
+                      <span className="text-xs font-bold text-amber-700">รวมค่าซัก</span>
+                      <span className="text-sm font-black text-amber-800">฿{laundryFee + addonsTotal}</span>
+                    </div>
                   </div>
-                )}
-
-                {/* ─── พับผ้า ─── */}
-                <h3 className="text-sm font-black text-foreground mb-2 flex items-center gap-2 uppercase tracking-tight">
-                  <IconCircle variant="yellow" size="sm">
-                    <Icons.Tasks size={14} strokeWidth={3} />
-                  </IconCircle>
-                  {t("booking.foldingServiceTitle")}
-                </h3>
-
-                {/* Promo banner — auto-hide after June 30, 2026 */}
-                {new Date() <= new Date("2026-06-30T23:59:59+07:00") && (
-                  <div className="flex items-center gap-2 px-3 py-2 bg-emerald-50 border border-emerald-200 rounded-xl mb-2 animate-page-enter">
-                    <span className="text-base">✨</span>
-                    <p className="text-[11px] font-bold text-emerald-700">มีคูปองพับผ้าฟรี! ถึง 30 มิ.ย. นี้</p>
-                  </div>
-                )}
-                <Card className="overflow-hidden mb-5">
-                  <label className="flex items-center justify-between p-4 cursor-pointer hover:bg-slate-50 transition-colors border-b border-border" onClick={() => setWithFolding(false)}>
-                    <div className="flex flex-col">
-                      <span className="text-sm font-bold text-foreground">{t("booking.options.noFolding")}</span>
-                      <span className="text-xs text-muted">{t("booking.options.noFoldingDesc")}</span>
-                    </div>
-                    <div className={`w-5 h-5 rounded-full flex items-center justify-center transition-colors ${!withFolding ? "bg-primary text-white shadow-md shadow-primary/30" : "border-2 border-slate-200"}`}>
-                      {!withFolding && <span className="text-xs font-bold leading-none flex items-center justify-center pt-0.5">✓</span>}
-                    </div>
-                  </label>
-
-                  <label className="flex items-center justify-between p-4 cursor-pointer hover:bg-slate-50 transition-colors" onClick={() => setWithFolding(true)}>
-                    <div className="flex flex-col">
-                      <span className="text-sm font-bold text-foreground">{t("booking.options.withFolding")}</span>
-                      <span className="text-xs text-primary-dark font-medium">+฿10</span>
-                    </div>
-                    <div className={`w-5 h-5 rounded-full flex items-center justify-center transition-colors ${withFolding ? "bg-primary text-white shadow-md shadow-primary/30" : "border-2 border-slate-200"}`}>
-                      {withFolding && <span className="text-xs font-bold leading-none flex items-center justify-center pt-0.5">✓</span>}
-                    </div>
-                  </label>
-                </Card>
-
-                {/* ─── น้ำยาซักผ้า ─── */}
-                <h3 className="text-sm font-black text-foreground mb-2 flex items-center gap-2 uppercase tracking-tight">
-                  <IconCircle variant="black" size="sm">
-                    <Icons.Shield size={14} strokeWidth={3} />
-                  </IconCircle>
-                  {t("booking.detergentTitle")}
-                </h3>
-                <Card className="p-4 mb-4">
-                  <label className="flex items-center justify-between cursor-pointer" onClick={() => setNeedsDetergent(!needsDetergent)}>
-                    <div className="flex flex-col">
-                      <span className="text-sm font-bold text-foreground">{t("booking.detergentLabel")}</span>
-                      <span className="text-xs text-primary-dark font-medium">{t("booking.detergentPrice")}</span>
-                    </div>
-                    <div className={`w-[42px] h-[24px] rounded-full p-[2px] transition-colors duration-300 flex items-center ${needsDetergent ? "bg-primary" : "bg-slate-200"}`}>
-                      <div className={`w-5 h-5 rounded-full bg-white transition-transform duration-300 shadow-sm ${needsDetergent ? "translate-x-[18px]" : "translate-x-0"}`} />
-                    </div>
-                  </label>
-                </Card>
+                </div>
               </section>
             )}
 
-            {/* Discount & Points */}
-            <section className="animate-page-enter">
-              <div className="flex items-center justify-between mb-1.5 mt-4">
-                <h3 className="text-xs font-black text-foreground flex items-center gap-1.5 uppercase tracking-tight">
-                  <IconCircle variant="yellow" size="xs">
-                    <Icons.Ticket size={12} strokeWidth={3} />
-                  </IconCircle> {t("booking.discountsTitle")}
-                </h3>
-              </div>
-              
-              <Card className="p-4 space-y-4">
-                {/* Coupon Selector Button — Premium */}
-                <button 
-                  onClick={async () => {
-                    setIsCouponModalOpen(true);
-                    setIsLoadingCoupons(true);
-                    try {
-                      const res = await fetch("/api/coupons");
-                      const data = await res.json() as any;
-                      if (data.coupons) setAvailableCoupons(data.coupons);
-                    } catch (err) {
-                      console.error("Failed to fetch coupons", err);
-                    } finally {
-                      setIsLoadingCoupons(false);
-                    }
-                  }}
-                  className="w-full bg-gradient-to-r from-primary/10 via-amber-50 to-primary/5 hover:from-primary/15 hover:via-amber-100 hover:to-primary/10 border-2 border-dashed border-primary/30 hover:border-primary/50 rounded-2xl p-4 flex items-center justify-between group transition-all duration-300 active:scale-[0.98]"
-                >
-                  <div className="flex items-center gap-3.5">
-                    <div className="w-12 h-12 bg-primary/15 rounded-xl flex items-center justify-center text-primary shrink-0 group-hover:bg-primary/20 transition-colors shadow-sm">
-                      <Icons.Ticket size={22} />
-                    </div>
-                    <div className="text-left">
-                      <p className="text-sm font-black text-primary-dark leading-tight">{t("booking.selectCoupon")}</p>
-                      <p className="text-[10px] text-primary/60 font-bold mt-0.5">{t("booking.tapToViewCoupons")}</p>
-                    </div>
-                  </div>
-                  <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-sm border border-primary/10 group-hover:shadow-md transition-all">
-                    <Icons.ChevronRight size={16} className="text-primary group-hover:translate-x-0.5 transition-transform" />
-                  </div>
-                </button>
-
-                {/* Applied Coupon Banner */}
-                {appliedCoupon && (
-                  <div className="bg-emerald-50 text-emerald-700 text-xs font-bold px-4 py-3 rounded-xl flex items-center justify-between border border-emerald-200 animate-in fade-in shadow-sm">
-                    <span className="flex items-center gap-2">
-                      <Icons.Check size={16} strokeWidth={3} />
-                      {t("booking.couponApplied").replace("{code}", appliedCoupon.code)}
-                    </span>
-                    <button onClick={() => { setAppliedCoupon(null); setCouponCode(""); }} className="text-emerald-800 bg-emerald-100 px-2.5 py-1 rounded-lg text-[10px] font-black uppercase hover:bg-emerald-200 transition-colors">{t("common.remove")}</button>
-                  </div>
-                )}
-
-                {/* Manual Coupon Input */}
-                <div className="flex gap-2">
-                  <div className="flex-1 relative">
-                    <input 
-                      type="text" 
-                      placeholder={t("booking.couponPlaceholder")} 
-                      value={couponCode}
-                      onChange={(e) => setCouponCode(e.target.value)}
-                      className="w-full bg-slate-50 border-2 border-slate-100 focus:border-primary/40 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-0 font-bold uppercase placeholder:normal-case placeholder:font-medium placeholder:text-slate-300 transition-colors"
-                    />
-                  </div>
-                  <Button 
-                    onClick={async () => {
-                      if (!couponCode) return;
-                      try {
-                        const res = await fetch("/api/coupons/validate", {
-                          method: "POST",
-                          headers: { "Content-Type": "application/json" },
-                          body: JSON.stringify({ code: couponCode, subtotal: laundryFee + deliveryFee, userRole: 'customer' })
-                        });
-                        const data = await res.json() as any;
-                        if (res.ok && data.success) {
-                          setAppliedCoupon({ code: data.coupon.code, discount: data.coupon.discount });
-                          showToast(t("booking.couponSuccess").replace("{amount}", data.coupon.discount.toString()), "success");
-                          setCouponCode(data.coupon.code);
-                        } else {
-                          showToast(`❌ ${data.error || t("booking.couponErrorGeneric")}`, "error");
-                      }
-                    } catch (err) {
-                      console.error("Coupon validation error:", err);
-                      showToast(`❌ ${t("booking.couponErrorGeneric")}`, "error");
-                    }
-                    }}
-                    className="min-w-[80px] rounded-xl text-xs font-black shadow-md shadow-primary/20 py-3 px-5"
-                  >
-                    {t("booking.applyCoupon")}
-                  </Button>
+            {/* ═══════════════════════════════════════════════════════ */}
+            {/* 🔵 GROUP 2: ค่าบริการรับ-ส่ง RUBJOB                   */}
+            {/* ═══════════════════════════════════════════════════════ */}
+            <section>
+              <div className="rounded-2xl border-2 border-blue-200/60 bg-gradient-to-b from-blue-50/50 to-white overflow-hidden mb-4">
+                <div className="flex items-center gap-2 px-4 py-2.5 bg-blue-100/60 border-b border-blue-200/40">
+                  <Icons.Truck size={14} strokeWidth={3} className="text-blue-600" />
+                  <span className="text-xs font-black text-blue-800 uppercase tracking-tight">ค่าบริการรับ-ส่ง RUBJOB</span>
+                  <span className="text-[9px] font-bold text-blue-400 ml-auto">เพิ่มเติมจากบริการ</span>
                 </div>
+                <div className="p-4 space-y-3">
+                  {/* Time slot selection */}
+                  <p className="text-[10px] font-bold text-slate-400 flex items-center gap-1">
+                    <Icons.Bell size={10} strokeWidth={3} className="text-blue-500" /> {t("booking.pickupSelectTime")}
+                  </p>
 
-                {/* Divider */}
-                <div className="border-t border-slate-100" />
-
-                {/* Points Toggle */}
-                <label className="flex items-center justify-between cursor-pointer group" onClick={() => setUsePoints(!usePoints)}>
-                  <div className="flex items-center gap-3">
-                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-colors ${usePoints ? "bg-amber-100 text-amber-600" : "bg-slate-100 text-slate-400"}`}>
-                      <Icons.Guarantee size={20} />
-                    </div>
-                    <div className="flex flex-col">
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm font-bold text-foreground">{t("booking.usePoints")}</span>
-                        <span className="text-[10px] bg-gradient-to-r from-amber-100 to-amber-50 text-amber-700 px-2.5 py-1 rounded-lg font-black border border-amber-200/50 shadow-sm">{availablePoints} Pts</span>
+                  {TIME_SLOTS.every(s => isSlotPassed(s.startTime, pickupDate)) && (
+                    <div className="bg-amber-50 border border-amber-200 rounded-lg p-2.5 flex items-center gap-2 animate-page-enter">
+                      <Icons.Bell size={14} className="text-amber-500 shrink-0" />
+                      <div>
+                        <p className="text-[10px] font-bold text-amber-700">{t("booking.outsideHoursTitle")}</p>
+                        <p className="text-[9px] text-amber-600">{t("booking.outsideHoursDesc")}</p>
                       </div>
-                      <span className="text-[10px] text-muted mt-0.5 font-medium">{t("booking.pointsDesc")}</span>
-                    </div>
-                  </div>
-                  <div className={`w-[44px] h-[26px] rounded-full p-[3px] transition-all duration-300 flex items-center shadow-inner ${usePoints ? "bg-primary" : "bg-slate-200"}`}>
-                    <div className={`w-[20px] h-[20px] rounded-full bg-white transition-transform duration-300 shadow-md ${usePoints ? "translate-x-[18px]" : "translate-x-0"}`} />
-                  </div>
-                </label>
-              </Card>
-
-              {/* Billing Summary */}
-              <h3 className="text-sm font-black text-foreground mb-2 flex items-center gap-2 mt-6 uppercase tracking-tight">
-                <IconCircle variant="black" size="sm">
-                  <Icons.FileText size={14} strokeWidth={3} />
-                </IconCircle> {t("booking.summaryTitle")}
-              </h3>
-              <Card className="p-5">
-                <div className="space-y-4 mb-4 text-xs font-medium text-slate-600">
-                  
-                  {/* Service Section */}
-                  <div>
-                    <div className="flex items-center gap-1.5 mb-2 text-primary-dark font-bold">
-                      <Icons.Tasks size={14} strokeWidth={2.5} />
-                      <span>ค่าซัก + อบผ้า {formatKg(bagSize)}</span>
-                    </div>
-                    <div className="space-y-2 pl-5">
-                      <div className="flex items-center justify-between">
-                        <span>ค่าซัก + อบผ้า {formatKg(bagSize)}</span>
-                        <span className="font-bold text-slate-800">฿{laundryFee}</span>
-                      </div>
-                      {deliverySpeed === "express" && (
-                        <div className="flex items-center justify-between text-primary-dark">
-                          <span>{t("booking.expressLabel")}</span>
-                          <span className="font-bold">+฿20</span>
-                        </div>
-                      )}
-                      {needsDetergent && (
-                        <div className="flex items-center justify-between text-primary-dark">
-                          <span>{t("booking.detergentFeeLabel")}</span>
-                          <span className="font-bold">+฿15</span>
-                        </div>
-                      )}
-                      {withFolding && (
-                        <div className="flex items-center justify-between text-primary-dark">
-                          <span>{t("booking.options.withFoldingShort")}</span>
-                          <span className="font-bold">+฿10</span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Rubber Section */}
-                  <div className="pt-3 border-t border-dashed border-slate-200">
-                    <div className="flex items-center gap-1.5 mb-2 text-blue-600 font-bold">
-                      <Icons.Truck size={14} strokeWidth={2.5} />
-                      <span>{t("booking.summary.rubberSection")}</span>
-                    </div>
-                    <div className="space-y-2 pl-5">
-                      <div className="flex items-center justify-between">
-                        <span>{t("booking.summary.deliveryFee")}</span>
-                        <span className="font-bold text-slate-800">฿{deliveryFee}</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Discounts */}
-                  {(couponDiscount > 0 || pointsDiscount > 0) && (
-                    <div className="pt-3 border-t border-dashed border-slate-200 space-y-2">
-                       {couponDiscount > 0 && (
-                         <div className="flex items-center justify-between text-emerald-600 font-bold bg-emerald-50/50 px-2.5 py-1.5 rounded-lg">
-                           <span className="flex items-center gap-1"><Icons.Ticket size={12} /> {t("booking.summary.discountCoupon")}</span>
-                           <span>-฿{couponDiscount}</span>
-                         </div>
-                       )}
-                       {pointsDiscount > 0 && (
-                         <div className="flex items-center justify-between text-emerald-600 font-bold bg-emerald-50/50 px-2.5 py-1.5 rounded-lg">
-                           <span className="flex items-center gap-1"><Icons.Guarantee size={12} /> {t("booking.summary.discountPoints")}</span>
-                           <span>-฿{pointsDiscount}</span>
-                         </div>
-                       )}
                     </div>
                   )}
+
+                  <div className="grid grid-cols-2 gap-2">
+                    {TIME_SLOTS.map((slot) => {
+                      const isDisabled = isSlotPassed(slot.startTime, pickupDate);
+                      return (
+                        <button key={slot.id} disabled={isDisabled} onClick={() => setPickupSlot(slot.id)}
+                          className={`py-3 px-3 rounded-xl text-center transition-all ${
+                            isDisabled ? "bg-slate-50 text-slate-300 cursor-not-allowed opacity-40"
+                            : pickupSlot === slot.id ? "bg-blue-500 text-white shadow-md shadow-blue-500/20"
+                            : "bg-white text-foreground hover:bg-slate-100 border border-slate-200"
+                          }`}>
+                          <p className={`text-xs font-black ${isDisabled ? "line-through" : ""}`}>{t(`timeSlots.${slot.id}`) || slot.label}</p>
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  {/* Delivery speed */}
+                  <p className="text-[10px] font-bold text-slate-400 flex items-center gap-1 pt-1">
+                    <Icons.Home size={10} strokeWidth={3} className="text-blue-500" /> {t("booking.deliveryOptions")}
+                  </p>
+                  <div className="space-y-2">
+                    <label className={`flex items-center justify-between p-3 rounded-xl border-2 cursor-pointer transition-all ${deliverySpeed === "standard" ? "border-blue-400 bg-blue-50/50 shadow-sm" : "border-slate-100 bg-white"}`} onClick={() => setDeliverySpeed("standard")}>
+                      <div className="flex flex-col">
+                        <span className="text-xs font-bold text-foreground">{t("booking.speed.standardTitle")}</span>
+                        <span className="text-[10px] text-muted mt-0.5">{t("booking.speed.standardDesc").replace("{fee}", Math.ceil(totalDeliveryBase).toString()).replace("{halfFee}", Math.ceil(totalDeliveryBase / 2).toString())}</span>
+                      </div>
+                      <div className={`w-4 h-4 rounded-full flex items-center justify-center transition-colors ${deliverySpeed === "standard" ? "bg-blue-500 text-white" : "border-2 border-slate-200"}`}>
+                        {deliverySpeed === "standard" && <span className="text-[8px] font-bold">✓</span>}
+                      </div>
+                    </label>
+                    <label className={`flex items-center justify-between p-3 rounded-xl border-2 cursor-pointer transition-all ${deliverySpeed === "express" ? "border-blue-400 bg-blue-50/50 shadow-sm" : "border-slate-100 bg-white"}`} onClick={() => setDeliverySpeed("express")}>
+                      <div className="flex flex-col">
+                        <span className="text-xs font-bold text-blue-600">{t("booking.speed.expressTitle")}</span>
+                        <span className="text-[10px] text-blue-500/80 mt-0.5">{t("booking.speed.expressDesc").replace("{fee}", Math.ceil(totalDeliveryBase + 20).toString()).replace("{halfFee}", Math.ceil((totalDeliveryBase + 20) / 2).toString())}</span>
+                      </div>
+                      <div className={`w-4 h-4 rounded-full flex items-center justify-center transition-colors ${deliverySpeed === "express" ? "bg-blue-500 text-white" : "border-2 border-slate-200"}`}>
+                        {deliverySpeed === "express" && <span className="text-[8px] font-bold">✓</span>}
+                      </div>
+                    </label>
+                  </div>
+                  {roundTripDistanceBonus > 0 && <span className="text-[9px] text-muted block">{t("booking.distanceNote").replace("{distance}", roundTripKm.toFixed(1))}</span>}
+
+                  {/* Delivery subtotal */}
+                  <div className="flex items-center justify-between pt-2 border-t border-blue-200/40">
+                    <span className="text-xs font-bold text-blue-700">รวมค่าส่ง</span>
+                    <span className="text-sm font-black text-blue-800">฿{deliveryFee}</span>
+                  </div>
                 </div>
-                
+              </div>
+            </section>
+
+            {/* ═══════════════════════════════════════════════════════ */}
+            {/* GROUP 3: ยอดรวม + คูปอง                                */}
+            {/* ═══════════════════════════════════════════════════════ */}
+            <section className="animate-page-enter">
+              <Card className="p-4 space-y-3">
+                <div className="space-y-1.5 text-xs">
+                  <div className="flex items-center justify-between text-slate-500">
+                    <span className="flex items-center gap-1.5"><Icons.Tasks size={12} className="text-amber-500" /> ค่าซัก + อบผ้า {formatKg(bagSize)}</span>
+                    <span className="font-bold text-slate-700">฿{laundryFee + addonsTotal}</span>
+                  </div>
+                  <div className="flex items-center justify-between text-slate-500">
+                    <span className="flex items-center gap-1.5"><Icons.Truck size={12} className="text-blue-500" /> {t("booking.summary.deliveryFee")}</span>
+                    <span className="font-bold text-slate-700">฿{deliveryFee}</span>
+                  </div>
+                  {(couponDiscount > 0 || pointsDiscount > 0) && (<>
+                    {couponDiscount > 0 && (
+                      <div className="flex items-center justify-between text-emerald-600 font-bold">
+                        <span className="flex items-center gap-1"><Icons.Ticket size={12} /> {t("booking.summary.discountCoupon")}</span>
+                        <span>-฿{couponDiscount}</span>
+                      </div>
+                    )}
+                    {pointsDiscount > 0 && (
+                      <div className="flex items-center justify-between text-emerald-600 font-bold">
+                        <span className="flex items-center gap-1"><Icons.Guarantee size={12} /> {t("booking.summary.discountPoints")}</span>
+                        <span>-฿{pointsDiscount}</span>
+                      </div>
+                    )}
+                  </>)}
+                </div>
+
+                <div className="border-t border-slate-200 pt-3 flex items-center justify-between">
+                  <span className="text-sm font-black text-slate-900">{t("booking.summaryTitle")}</span>
+                  <span className="text-xl font-black text-primary">฿{totalPrice}</span>
+                </div>
+
+                {/* Compact coupon section */}
+                <div className="border-t border-slate-100 pt-3 space-y-2">
+                  <div className="flex gap-2">
+                    <button onClick={async () => {
+                      setIsCouponModalOpen(true); setIsLoadingCoupons(true);
+                      try { const res = await fetch("/api/coupons"); const data = await res.json() as any; if (data.coupons) setAvailableCoupons(data.coupons); }
+                      catch (err) { console.error("Failed to fetch coupons", err); }
+                      finally { setIsLoadingCoupons(false); }
+                    }} className="flex items-center gap-1.5 px-3 py-2.5 bg-primary/10 hover:bg-primary/15 border border-primary/20 rounded-xl transition-all active:scale-[0.97] shrink-0">
+                      <Icons.Ticket size={14} className="text-primary" />
+                      <span className="text-[11px] font-black text-primary">{t("booking.selectCoupon")}</span>
+                      <Icons.ChevronRight size={12} className="text-primary/50" />
+                    </button>
+                    <div className="flex-1 flex gap-1.5">
+                      <input type="text" placeholder={t("booking.couponPlaceholder")} value={couponCode} onChange={(e) => setCouponCode(e.target.value)}
+                        className="flex-1 min-w-0 bg-slate-50 border border-slate-200 focus:border-primary/40 rounded-xl px-3 py-2 text-xs focus:outline-none font-bold uppercase placeholder:normal-case placeholder:font-medium placeholder:text-slate-300 transition-colors" />
+                      <Button onClick={async () => {
+                        if (!couponCode) return;
+                        try {
+                          const res = await fetch("/api/coupons/validate", { method: "POST", headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ code: couponCode, subtotal: laundryFee + deliveryFee, userRole: 'customer' }) });
+                          const data = await res.json() as any;
+                          if (res.ok && data.success) { setAppliedCoupon({ code: data.coupon.code, discount: data.coupon.discount });
+                            showToast(t("booking.couponSuccess").replace("{amount}", data.coupon.discount.toString()), "success"); setCouponCode(data.coupon.code);
+                          } else { showToast(`❌ ${data.error || t("booking.couponErrorGeneric")}`, "error"); }
+                        } catch (err) { console.error("Coupon validation error:", err); showToast(`❌ ${t("booking.couponErrorGeneric")}`, "error"); }
+                      }} className="rounded-xl text-[10px] font-black py-2 px-3 shadow-sm">{t("booking.applyCoupon")}</Button>
+                    </div>
+                  </div>
+
+                  {appliedCoupon && (
+                    <div className="bg-emerald-50 text-emerald-700 text-[11px] font-bold px-3 py-2 rounded-xl flex items-center justify-between border border-emerald-200">
+                      <span className="flex items-center gap-1.5"><Icons.Check size={14} strokeWidth={3} />{t("booking.couponApplied").replace("{code}", appliedCoupon.code)}</span>
+                      <button onClick={() => { setAppliedCoupon(null); setCouponCode(""); }} className="text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-md text-[9px] font-black uppercase">{t("common.remove")}</button>
+                    </div>
+                  )}
+
+                  <label className="flex items-center justify-between cursor-pointer" onClick={() => setUsePoints(!usePoints)}>
+                    <div className="flex items-center gap-2">
+                      <Icons.Guarantee size={16} className={usePoints ? "text-amber-500" : "text-slate-300"} />
+                      <span className="text-xs font-bold text-foreground">{t("booking.usePoints")}</span>
+                      <span className="text-[9px] bg-amber-50 text-amber-600 px-1.5 py-0.5 rounded-md font-black border border-amber-100">{availablePoints} Pts</span>
+                    </div>
+                    <div className={`w-[38px] h-[22px] rounded-full p-[2px] transition-all duration-300 flex items-center ${usePoints ? "bg-primary" : "bg-slate-200"}`}>
+                      <div className={`w-[18px] h-[18px] rounded-full bg-white transition-transform duration-300 shadow-sm ${usePoints ? "translate-x-[16px]" : "translate-x-0"}`} />
+                    </div>
+                  </label>
+                </div>
               </Card>
             </section>
           </div>
