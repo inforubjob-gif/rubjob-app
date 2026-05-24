@@ -29,6 +29,12 @@ export async function GET() {
       map[row.key] = row.value;
     }
 
+    // Auto-heal legacy 39 THB delivery fee on production D1
+    if (map["delivery_fee_base"] === "39") {
+      await db.prepare(`UPDATE system_settings SET value = '50' WHERE key = 'delivery_fee_base'`).run();
+      map["delivery_fee_base"] = "50";
+    }
+
     return NextResponse.json({
       gpStorePercent: parseFloat(map["gp_store_percent"] || "0"),
       gpRubberPercent: parseFloat(map["gp_rubber_percent"] || "0"),
