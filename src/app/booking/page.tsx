@@ -138,6 +138,13 @@ function BookingFlow() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const isCollapsed = useScrollCollapse(40);
   const [isSkippingPayment, setIsSkippingPayment] = useState(false);
+
+  // Reactive clock — ticks every 30s so isSlotPassed re-evaluates as real time passes
+  const [clockTick, setClockTick] = useState(Date.now());
+  useEffect(() => {
+    const timer = setInterval(() => setClockTick(Date.now()), 30_000);
+    return () => clearInterval(timer);
+  }, []);
   const [isLoaded, setIsLoaded] = useState(false);
   const [dbServices, setDbServices] = useState<any[]>([]);
   const [dbStores, setDbStores] = useState<any[]>([]);
@@ -341,7 +348,8 @@ function BookingFlow() {
   }, [locale]);
 
   const isSlotPassed = (slotStartTime: string, dateVal: string) => {
-    const now = new Date();
+    // clockTick ensures this re-evaluates when time passes (every 30s)
+    const now = new Date(clockTick);
     // Use local time comparison
     const todayStr = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
     if (dateVal > todayStr) return false;
@@ -363,7 +371,7 @@ function BookingFlow() {
     }
   }, [dates, pickupDate]);
 
-  // Ensure selected slot is valid for the selected date
+  // Ensure selected slot is valid for the selected date (re-runs when clock ticks)
   useEffect(() => {
     if (pickupDate && TIME_SLOTS.length > 0) {
       const validSlots = TIME_SLOTS.filter(s => !isSlotPassed(s.startTime, pickupDate));
@@ -372,10 +380,16 @@ function BookingFlow() {
           setPickupSlot(validSlots[0].id);
         }
       } else {
-        setPickupSlot(""); // No slots available for this day
+        // All slots passed for today — auto-advance to next date with valid slots
+        const nextDate = dates.find(d => d.value > pickupDate && TIME_SLOTS.some(s => !isSlotPassed(s.startTime, d.value)));
+        if (nextDate) {
+          setPickupDate(nextDate.value);
+        } else {
+          setPickupSlot(""); // No slots available at all
+        }
       }
     }
-  }, [pickupDate, pickupSlot]);
+  }, [pickupDate, pickupSlot, clockTick]);
 
   // Road distance state (OSRM)
   const [roadDistance, setRoadDistance] = useState<{ distanceKm: number; durationMin: number } | null>(null);
