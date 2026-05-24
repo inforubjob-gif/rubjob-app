@@ -356,11 +356,27 @@ export default function RubberOrderDetailPage() {
                    <Icons.Logo variant="icon-white" size={32} />
                 </div>
              </div>
-             <div className="mt-4 pt-4 border-t border-white/10 flex items-center justify-between text-[10px] font-bold text-white/50 uppercase">
+              <div className="mt-4 pt-4 border-t border-white/10 flex items-center justify-between text-[10px] font-bold text-white/50 uppercase">
                 <span>{t("booking.standardTitle")}</span>
                 <span>{t("booking.instantConfirmation")}</span>
              </div>
           </Card>
+
+          {/* Expected Cash Advance Indicator */}
+          {order?.laundryCost > 0 && ['picking_up', 'delivering_to_store', 'at_shop'].includes(status) && (
+            <Card className="p-5 border-none shadow-xl shadow-rose-500/10 rounded-[2rem] bg-rose-50 relative overflow-hidden">
+               <div className="absolute top-0 right-0 w-24 h-24 bg-rose-100 rounded-full -mr-8 -mt-8 blur-2xl" />
+               <div className="relative z-10 flex items-center justify-between">
+                  <div>
+                     <p className="text-[10px] font-black text-rose-500 uppercase tracking-widest mb-1">💸 ยอดเตรียมสำรองจ่ายร้านซัก (โดยประมาณ)</p>
+                     <h3 className="text-3xl font-black text-rose-600 italic">฿{order.laundryCost}</h3>
+                  </div>
+               </div>
+               <p className="text-xs font-bold text-rose-500/80 mt-2 leading-relaxed">
+                 * โปรดบันทึกบิลซักจริงอีกครั้งเมื่ออยู่ที่ร้าน ระบบจะโอนเงินคืนให้พร้อมค่ารอบ
+               </p>
+            </Card>
+          )}
 
           <Card className="p-6 border-none shadow-xl shadow-primary/5 rounded-[2rem] bg-white relative overflow-hidden">
              <div className="absolute top-0 right-0 w-32 h-32 bg-orange-50 rounded-full -mr-16 -mt-16 blur-3xl opacity-50" />
