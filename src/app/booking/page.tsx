@@ -963,16 +963,16 @@ function BookingFlow() {
             {/* 🔵 GROUP 2: ค่าบริการรับ-ส่ง RUBJOB                   */}
             {/* ═══════════════════════════════════════════════════════ */}
             <section>
-              <div className="rounded-2xl border-2 border-blue-200/60 bg-gradient-to-b from-blue-50/50 to-white overflow-hidden mb-4">
-                <div className="flex items-center gap-2 px-4 py-2.5 bg-blue-100/60 border-b border-blue-200/40">
-                  <Icons.Truck size={14} strokeWidth={3} className="text-blue-600" />
-                  <span className="text-xs font-black text-blue-800 uppercase tracking-tight">ค่าบริการรับ-ส่ง RUBJOB</span>
-                  <span className="text-[9px] font-bold text-blue-400 ml-auto">เพิ่มเติมจากบริการ</span>
+              <div className="rounded-2xl border-2 border-primary/20 bg-gradient-to-b from-primary/5 to-white overflow-hidden mb-4">
+                <div className="flex items-center gap-2 px-4 py-2.5 bg-primary/10 border-b border-primary/15">
+                  <Icons.Truck size={14} strokeWidth={3} className="text-primary" />
+                  <span className="text-xs font-black text-primary-dark uppercase tracking-tight">ค่าบริการรับ-ส่ง RUBJOB</span>
+                  <span className="text-[9px] font-bold text-primary/50 ml-auto">เพิ่มเติมจากบริการ</span>
                 </div>
                 <div className="p-4 space-y-3">
                   {/* Time slot selection */}
                   <p className="text-[10px] font-bold text-slate-400 flex items-center gap-1">
-                    <Icons.Bell size={10} strokeWidth={3} className="text-blue-500" /> {t("booking.pickupSelectTime")}
+                    <Icons.Bell size={10} strokeWidth={3} className="text-primary" /> {t("booking.pickupSelectTime")}
                   </p>
 
                   {TIME_SLOTS.every(s => isSlotPassed(s.startTime, pickupDate)) && (
@@ -992,7 +992,7 @@ function BookingFlow() {
                         <button key={slot.id} disabled={isDisabled} onClick={() => setPickupSlot(slot.id)}
                           className={`py-3 px-3 rounded-xl text-center transition-all ${
                             isDisabled ? "bg-slate-50 text-slate-300 cursor-not-allowed opacity-40"
-                            : pickupSlot === slot.id ? "bg-blue-500 text-white shadow-md shadow-blue-500/20"
+                            : pickupSlot === slot.id ? "bg-primary text-white shadow-md shadow-primary/20"
                             : "bg-white text-foreground hover:bg-slate-100 border border-slate-200"
                           }`}>
                           <p className={`text-xs font-black ${isDisabled ? "line-through" : ""}`}>{t(`timeSlots.${slot.id}`) || slot.label}</p>
@@ -1003,24 +1003,24 @@ function BookingFlow() {
 
                   {/* Delivery speed */}
                   <p className="text-[10px] font-bold text-slate-400 flex items-center gap-1 pt-1">
-                    <Icons.Home size={10} strokeWidth={3} className="text-blue-500" /> {t("booking.deliveryOptions")}
+                    <Icons.Home size={10} strokeWidth={3} className="text-primary" /> {t("booking.deliveryOptions")}
                   </p>
                   <div className="space-y-2">
-                    <label className={`flex items-center justify-between p-3 rounded-xl border-2 cursor-pointer transition-all ${deliverySpeed === "standard" ? "border-blue-400 bg-blue-50/50 shadow-sm" : "border-slate-100 bg-white"}`} onClick={() => setDeliverySpeed("standard")}>
+                    <label className={`flex items-center justify-between p-3 rounded-xl border-2 cursor-pointer transition-all ${deliverySpeed === "standard" ? "border-primary bg-primary/5 shadow-sm" : "border-slate-100 bg-white"}`} onClick={() => setDeliverySpeed("standard")}>
                       <div className="flex flex-col">
                         <span className="text-xs font-bold text-foreground">{t("booking.speed.standardTitle")}</span>
                         <span className="text-[10px] text-muted mt-0.5">{t("booking.speed.standardDesc").replace("{fee}", Math.ceil(totalDeliveryBase).toString()).replace("{halfFee}", Math.ceil(totalDeliveryBase / 2).toString())}</span>
                       </div>
-                      <div className={`w-4 h-4 rounded-full flex items-center justify-center transition-colors ${deliverySpeed === "standard" ? "bg-blue-500 text-white" : "border-2 border-slate-200"}`}>
+                      <div className={`w-4 h-4 rounded-full flex items-center justify-center transition-colors ${deliverySpeed === "standard" ? "bg-primary text-white" : "border-2 border-slate-200"}`}>
                         {deliverySpeed === "standard" && <span className="text-[8px] font-bold">✓</span>}
                       </div>
                     </label>
-                    <label className={`flex items-center justify-between p-3 rounded-xl border-2 cursor-pointer transition-all ${deliverySpeed === "express" ? "border-blue-400 bg-blue-50/50 shadow-sm" : "border-slate-100 bg-white"}`} onClick={() => setDeliverySpeed("express")}>
+                    <label className={`flex items-center justify-between p-3 rounded-xl border-2 cursor-pointer transition-all ${deliverySpeed === "express" ? "border-primary bg-primary/5 shadow-sm" : "border-slate-100 bg-white"}`} onClick={() => setDeliverySpeed("express")}>
                       <div className="flex flex-col">
-                        <span className="text-xs font-bold text-blue-600">{t("booking.speed.expressTitle")}</span>
-                        <span className="text-[10px] text-blue-500/80 mt-0.5">{t("booking.speed.expressDesc").replace("{fee}", Math.ceil(totalDeliveryBase + 20).toString()).replace("{halfFee}", Math.ceil((totalDeliveryBase + 20) / 2).toString())}</span>
+                        <span className="text-xs font-bold text-primary-dark">{t("booking.speed.expressTitle")}</span>
+                        <span className="text-[10px] text-primary/60 mt-0.5">{t("booking.speed.expressDesc").replace("{fee}", Math.ceil(totalDeliveryBase + 20).toString()).replace("{halfFee}", Math.ceil((totalDeliveryBase + 20) / 2).toString())}</span>
                       </div>
-                      <div className={`w-4 h-4 rounded-full flex items-center justify-center transition-colors ${deliverySpeed === "express" ? "bg-blue-500 text-white" : "border-2 border-slate-200"}`}>
+                      <div className={`w-4 h-4 rounded-full flex items-center justify-center transition-colors ${deliverySpeed === "express" ? "bg-primary text-white" : "border-2 border-slate-200"}`}>
                         {deliverySpeed === "express" && <span className="text-[8px] font-bold">✓</span>}
                       </div>
                     </label>
@@ -1028,9 +1028,9 @@ function BookingFlow() {
                   {roundTripDistanceBonus > 0 && <span className="text-[9px] text-muted block">{t("booking.distanceNote").replace("{distance}", roundTripKm.toFixed(1))}</span>}
 
                   {/* Delivery subtotal */}
-                  <div className="flex items-center justify-between pt-2 border-t border-blue-200/40">
-                    <span className="text-xs font-bold text-blue-700">รวมค่าส่ง</span>
-                    <span className="text-sm font-black text-blue-800">฿{deliveryFee}</span>
+                  <div className="flex items-center justify-between pt-2 border-t border-primary/15">
+                    <span className="text-xs font-bold text-primary-dark">รวมค่าส่ง</span>
+                    <span className="text-sm font-black text-primary-dark">฿{deliveryFee}</span>
                   </div>
                 </div>
               </div>
@@ -1047,7 +1047,7 @@ function BookingFlow() {
                     <span className="font-bold text-slate-700">฿{laundryFee + addonsTotal}</span>
                   </div>
                   <div className="flex items-center justify-between text-slate-500">
-                    <span className="flex items-center gap-1.5"><Icons.Truck size={12} className="text-blue-500" /> {t("booking.summary.deliveryFee")}</span>
+                    <span className="flex items-center gap-1.5"><Icons.Truck size={12} className="text-primary" /> {t("booking.summary.deliveryFee")}</span>
                     <span className="font-bold text-slate-700">฿{deliveryFee}</span>
                   </div>
                   {(couponDiscount > 0 || pointsDiscount > 0) && (<>
@@ -1073,32 +1073,32 @@ function BookingFlow() {
 
                 {/* Compact coupon section */}
                 <div className="border-t border-slate-100 pt-3 space-y-2">
+                  {/* Coupon picker button — full width */}
+                  <button onClick={async () => {
+                    setIsCouponModalOpen(true); setIsLoadingCoupons(true);
+                    try { const res = await fetch("/api/coupons"); const data = await res.json() as any; if (data.coupons) setAvailableCoupons(data.coupons); }
+                    catch (err) { console.error("Failed to fetch coupons", err); }
+                    finally { setIsLoadingCoupons(false); }
+                  }} className="w-full flex items-center gap-2 px-3 py-2.5 bg-primary/10 hover:bg-primary/15 border border-primary/20 rounded-xl transition-all active:scale-[0.97]">
+                    <Icons.Ticket size={14} className="text-primary" />
+                    <span className="text-[11px] font-black text-primary">{t("booking.selectCoupon")}</span>
+                    <Icons.ChevronRight size={12} className="text-primary/50 ml-auto" />
+                  </button>
+                  {/* Manual code input — separate row */}
                   <div className="flex gap-2">
-                    <button onClick={async () => {
-                      setIsCouponModalOpen(true); setIsLoadingCoupons(true);
-                      try { const res = await fetch("/api/coupons"); const data = await res.json() as any; if (data.coupons) setAvailableCoupons(data.coupons); }
-                      catch (err) { console.error("Failed to fetch coupons", err); }
-                      finally { setIsLoadingCoupons(false); }
-                    }} className="flex items-center gap-1.5 px-3 py-2.5 bg-primary/10 hover:bg-primary/15 border border-primary/20 rounded-xl transition-all active:scale-[0.97] shrink-0">
-                      <Icons.Ticket size={14} className="text-primary" />
-                      <span className="text-[11px] font-black text-primary">{t("booking.selectCoupon")}</span>
-                      <Icons.ChevronRight size={12} className="text-primary/50" />
-                    </button>
-                    <div className="flex-1 flex gap-1.5">
-                      <input type="text" placeholder={t("booking.couponPlaceholder")} value={couponCode} onChange={(e) => setCouponCode(e.target.value)}
-                        className="flex-1 min-w-0 bg-slate-50 border border-slate-200 focus:border-primary/40 rounded-xl px-3 py-2 text-xs focus:outline-none font-bold uppercase placeholder:normal-case placeholder:font-medium placeholder:text-slate-300 transition-colors" />
-                      <Button onClick={async () => {
-                        if (!couponCode) return;
-                        try {
-                          const res = await fetch("/api/coupons/validate", { method: "POST", headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify({ code: couponCode, subtotal: laundryFee + deliveryFee, userRole: 'customer' }) });
-                          const data = await res.json() as any;
-                          if (res.ok && data.success) { setAppliedCoupon({ code: data.coupon.code, discount: data.coupon.discount });
-                            showToast(t("booking.couponSuccess").replace("{amount}", data.coupon.discount.toString()), "success"); setCouponCode(data.coupon.code);
-                          } else { showToast(`❌ ${data.error || t("booking.couponErrorGeneric")}`, "error"); }
-                        } catch (err) { console.error("Coupon validation error:", err); showToast(`❌ ${t("booking.couponErrorGeneric")}`, "error"); }
-                      }} className="rounded-xl text-[10px] font-black py-2 px-3 shadow-sm">{t("booking.applyCoupon")}</Button>
-                    </div>
+                    <input type="text" placeholder={t("booking.couponPlaceholder")} value={couponCode} onChange={(e) => setCouponCode(e.target.value)}
+                      className="flex-1 min-w-0 bg-slate-50 border border-slate-200 focus:border-primary/40 rounded-xl px-3 py-2.5 text-xs focus:outline-none font-bold uppercase placeholder:normal-case placeholder:font-medium placeholder:text-slate-300 transition-colors" />
+                    <Button onClick={async () => {
+                      if (!couponCode) return;
+                      try {
+                        const res = await fetch("/api/coupons/validate", { method: "POST", headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({ code: couponCode, subtotal: laundryFee + deliveryFee, userRole: 'customer' }) });
+                        const data = await res.json() as any;
+                        if (res.ok && data.success) { setAppliedCoupon({ code: data.coupon.code, discount: data.coupon.discount });
+                          showToast(t("booking.couponSuccess").replace("{amount}", data.coupon.discount.toString()), "success"); setCouponCode(data.coupon.code);
+                        } else { showToast(`❌ ${data.error || t("booking.couponErrorGeneric")}`, "error"); }
+                      } catch (err) { console.error("Coupon validation error:", err); showToast(`❌ ${t("booking.couponErrorGeneric")}`, "error"); }
+                    }} className="rounded-xl text-[10px] font-black py-2.5 px-4 shadow-sm shrink-0">{t("booking.applyCoupon")}</Button>
                   </div>
 
                   {appliedCoupon && (
