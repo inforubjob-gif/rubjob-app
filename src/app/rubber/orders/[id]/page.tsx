@@ -37,6 +37,7 @@ export default function RubberOrderDetailPage() {
   const [isUpdating, setIsUpdating] = useState(false);
   const [isIssueModalOpen, setIsIssueModalOpen] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [updateError, setUpdateError] = useState<string | null>(null);
   const [rubberCoords, setRubberCoords] = useState<{lat: number, lng: number} | null>(null);
   const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
   const [showAdvanceConfirm, setShowAdvanceConfirm] = useState(false);
