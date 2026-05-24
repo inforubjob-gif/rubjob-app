@@ -70,7 +70,7 @@ export async function GET(req: Request) {
       FROM orders o
       JOIN services s ON o.serviceId = s.id
       LEFT JOIN stores st ON o.storeId = st.id
-      WHERE (o.pickupDriverId = ? AND o.status IN ('picking_up', 'delivering_to_store', 'at_shop', 'washing'))
+      WHERE (o.pickupDriverId = ? AND o.status IN ('picking_up', 'delivering_to_store'))
          OR (o.deliveryDriverId = ? AND o.status IN ('ready_for_pickup', 'delivering_to_customer'))
     `).bind(rubberId, rubberId).all();
 
@@ -80,11 +80,12 @@ export async function GET(req: Request) {
       FROM orders o
       JOIN services s ON o.serviceId = s.id
       LEFT JOIN stores st ON o.storeId = st.id
-      WHERE (o.pickupDriverId = ? OR o.deliveryDriverId = ?) 
-        AND o.status IN ('completed', 'cancelled')
+      WHERE (o.pickupDriverId = ? AND o.status NOT IN ('pending', 'searching_driver', 'picking_up', 'delivering_to_store')) 
+         OR (o.deliveryDriverId = ? AND o.status NOT IN ('ready_for_pickup', 'delivering_to_customer'))
+         OR (o.status IN ('completed', 'cancelled') AND (o.pickupDriverId = ? OR o.deliveryDriverId = ?))
       ORDER BY o.updatedAt DESC
       LIMIT 50
-    `).bind(rubberId, rubberId).all();
+    `).bind(rubberId, rubberId, rubberId, rubberId).all();
 
     return NextResponse.json({ 
       status: verificationStatus,

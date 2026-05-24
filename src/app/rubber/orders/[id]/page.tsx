@@ -12,7 +12,6 @@ import { useTranslation } from "@/components/providers/LanguageProvider";
 import PhotoUpload from "@/components/ui/PhotoUpload";
 import dynamic from "next/dynamic";
 import OrderIssueModal from "@/components/orders/OrderIssueModal";
-import CashAdvanceRecorder from "@/components/rubber/CashAdvanceRecorder";
 import Modal from "@/components/ui/Modal";
 
 const RubberMap = dynamic(() => import("@/components/rubber/RubberMap"), { 
@@ -40,6 +39,7 @@ export default function RubberOrderDetailPage() {
   const [updateError, setUpdateError] = useState<string | null>(null);
   const [rubberCoords, setRubberCoords] = useState<{lat: number, lng: number} | null>(null);
   const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
+  const [showAdvanceConfirm, setShowAdvanceConfirm] = useState(false);
 
   useEffect(() => {
     if (typeof window !== "undefined" && navigator.geolocation) {
@@ -539,16 +539,7 @@ export default function RubberOrderDetailPage() {
             </Card>
           )}
 
-          {/* Cash Advance Recorder — show when Rubber is at shop */}
-          {(status === "at_shop" || status === "washing") && order?.storeId && (
-            <CashAdvanceRecorder
-              orderId={id!}
-              storeId={order.storeId}
-              storeName={order?.storeName || "Unknown Store"}
-              rubberId={(() => { try { const s = JSON.parse(localStorage.getItem("rubjob_rubber_session") || "{}"); return s.id || ""; } catch { return ""; } })()}
-              serviceDetails={order?.serviceDetails ? JSON.parse(order.serviceDetails) : undefined}
-            />
-          )}
+
 
           {currentPhotoStep && status !== "at_shop" && (
              <Card className="p-6 border-none shadow-xl shadow-primary/5 rounded-[2rem] bg-white border border-primary/10 relative overflow-hidden group">
@@ -589,7 +580,13 @@ export default function RubberOrderDetailPage() {
            ) : (
              <Button 
                 fullWidth 
-                onClick={() => handleUpdateStatus(getNextStatus(status))}
+                onClick={() => {
+                  if (status === "delivering_to_store") {
+                    setShowAdvanceConfirm(true);
+                  } else {
+                    handleUpdateStatus(getNextStatus(status));
+                  }
+                }}
                 isLoading={isUpdating}
                 className="bg-primary text-white hover:bg-primary-dark shadow-2xl shadow-primary/30 py-6 text-base font-black rounded-xl uppercase"
              >
@@ -608,6 +605,39 @@ export default function RubberOrderDetailPage() {
           {selectedPhoto && (
             <img src={selectedPhoto} className="max-w-full max-h-[70vh] rounded-xl shadow-2xl border-4 border-white" alt="Evidence" />
           )}
+        </div>
+      </Modal>
+
+      {/* Advance Payment Confirmation Modal */}
+      <Modal isOpen={showAdvanceConfirm} onClose={() => setShowAdvanceConfirm(false)} title="💸 ยืนยันการสำรองจ่าย">
+        <div className="p-5 bg-white text-center">
+          <div className="w-16 h-16 bg-rose-50 text-rose-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg shadow-rose-500/20">
+            <Icons.Check size={32} strokeWidth={3} />
+          </div>
+          <h3 className="text-xl font-black text-slate-800 mb-2">ยืนยันการชำระเงิน</h3>
+          <p className="text-sm text-slate-500 mb-6 leading-relaxed">
+            คุณได้ทำการสำรองจ่ายค่าซักอบให้ร้าน <span className="font-bold text-slate-800">{order?.storeName}</span> 
+            จำนวนเงินประมาณ <span className="font-black text-rose-600 text-lg">฿{order?.laundryCost}</span> เรียบร้อยแล้วใช่หรือไม่?
+          </p>
+          
+          <div className="flex flex-col gap-3">
+            <Button 
+              fullWidth 
+              onClick={() => {
+                setShowAdvanceConfirm(false);
+                handleUpdateStatus(getNextStatus(status));
+              }}
+              className="bg-rose-500 hover:bg-rose-600 text-white font-black uppercase shadow-xl shadow-rose-500/20"
+            >
+              ยืนยันการจ่ายเงิน และถ่ายรูปจบงาน
+            </Button>
+            <button 
+              onClick={() => setShowAdvanceConfirm(false)}
+              className="py-3 text-sm font-bold text-slate-400 hover:text-slate-600 uppercase"
+            >
+              ยกเลิก
+            </button>
+          </div>
         </div>
       </Modal>
 
