@@ -64,7 +64,7 @@ export default function NotificationsPage() {
       console.error("Failed to save settings:", err);
       // Revert on failure
       setSettings(prev => ({ ...prev, [key]: !newValue }));
-      showToast("Failed to save settings", "error");
+      showToast(t("common.error"), "error");
     }
   };
 

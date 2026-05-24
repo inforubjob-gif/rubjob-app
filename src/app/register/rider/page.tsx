@@ -48,7 +48,7 @@ export default function RubberRegisterPage() {
         setStep(4); // Success step
       } else {
         const err = await res.json() as any;
-        showToast(err.error || "Something went wrong", "error");
+        showToast(err.error || t("common.error"), "error");
       }
     } catch (err: unknown) {
       console.error(err);

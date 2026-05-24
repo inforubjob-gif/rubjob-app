@@ -500,6 +500,7 @@ export async function ensureSchema(db: D1Database) {
      // --- users ---
      "ALTER TABLE users ADD COLUMN walletPin TEXT",
      "ALTER TABLE users ADD COLUMN preferences TEXT",
+     "ALTER TABLE users ADD COLUMN termsAcceptedAt DATETIME",
 
      // --- provider_users (schema drift fix) ---
      "ALTER TABLE provider_users ADD COLUMN name TEXT DEFAULT ''",

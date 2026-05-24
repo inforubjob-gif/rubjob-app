@@ -256,8 +256,8 @@ export default function LiffProvider({ children }: { children: ReactNode }) {
       
       setCtx(prev => ({ ...prev, isLoggedIn: false, profile: null }));
       
-      // Clear session storage if any
-      sessionStorage.clear();
+      // Clear only auth-related session keys — preserve booking drafts
+      sessionStorage.removeItem("rubber_auth_retries");
 
       if (liff.isInClient?.()) {
         liff.closeWindow();

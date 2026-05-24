@@ -29,9 +29,9 @@ export async function POST(req: Request) {
     // Self-healing columns moved to db-init.ts
 
     // Upsert User (include phone if provided)
-    // When a previously-deleted user re-registers through LINE, reset their
-    // role back to 'user' and restore their profile data so they reappear in
-    // the admin panel.
+    // On INSERT (new user): set role='user' as default.
+    // On UPDATE (existing user): only sync profile fields — never reset
+    // role, walletPin, or preferences as those are managed elsewhere.
     if (phone) {
       await db.prepare(`
         INSERT INTO users (id, displayName, pictureUrl, phone, role, assignedStoreId) 
@@ -39,10 +39,7 @@ export async function POST(req: Request) {
         ON CONFLICT(id) DO UPDATE SET 
           displayName = excluded.displayName,
           pictureUrl = excluded.pictureUrl,
-          phone = excluded.phone,
-          role = 'user',
-          walletPin = NULL,
-          preferences = NULL
+          phone = excluded.phone
       `).bind(id, displayName, pictureUrl, phone).run();
     } else {
       await db.prepare(`
@@ -50,10 +47,7 @@ export async function POST(req: Request) {
         VALUES (?, ?, ?, 'user', NULL)
         ON CONFLICT(id) DO UPDATE SET 
           displayName = excluded.displayName,
-          pictureUrl = excluded.pictureUrl,
-          role = 'user',
-          walletPin = NULL,
-          preferences = NULL
+          pictureUrl = excluded.pictureUrl
       `).bind(id, displayName, pictureUrl).run();
     }
 

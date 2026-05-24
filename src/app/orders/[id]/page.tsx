@@ -54,13 +54,13 @@ export default function OrderDetailPage() {
       });
       const data = await res.json() as any;
       if (!res.ok) {
-        showToast(data.error || "Failed to cancel order", "error");
+        showToast(data.error || t("common.error"), "error");
         return;
       }
       showToast(t("orders.cancelSuccess") || "ยกเลิกออเดอร์สำเร็จ", "success");
       window.location.reload();
     } catch (e) {
-      showToast("Error cancelling order", "error");
+      showToast(t("common.error"), "error");
     } finally {
       setIsCancelling(false);
     }

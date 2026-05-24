@@ -57,7 +57,7 @@ export default function StoreRegisterPage() {
         setStep(4); // Success step
       } else {
         const err = await res.json() as any;
-        showToast(err.error || "Failed to submit store details", "error");
+        showToast(err.error || t("common.error"), "error");
       }
     } catch (err: unknown) {
       console.error(err);

@@ -50,8 +50,8 @@ export default function AppWrapper({ children }: { children: React.ReactNode }) 
   }, []);
 
   // Check if user has completed onboarding (has phone + at least 1 address)
-  // Always verify against the server — localStorage alone can't be trusted
-  // because an admin may delete the user from the DB at any time.
+  // Uses localStorage as a fast-path cache to avoid blocking on API calls,
+  // then verifies against the server in the background.
   useEffect(() => {
     if (!isReady || !isLoggedIn || !profile?.userId || isBackoffice || isLanding) {
       setNeedsOnboarding(null);
@@ -61,20 +61,39 @@ export default function AppWrapper({ children }: { children: React.ReactNode }) 
     // Clean up legacy generic key if present
     localStorage.removeItem("rubjob_onboarding_done");
 
+    const cacheKey = `rubjob_onboarded_${profile.userId}`;
+    const cachedDone = localStorage.getItem(cacheKey) === "true";
+
+    // Fast-path: if localStorage says onboarding is done, show children immediately
+    // We'll still verify with the server in the background
+    if (cachedDone) {
+      setNeedsOnboarding(false);
+      setCheckingOnboarding(false);
+    }
+
     async function checkOnboarding() {
-      setCheckingOnboarding(true);
+      // Only show loading spinner if we don't have a cached result
+      if (!cachedDone) {
+        setCheckingOnboarding(true);
+      }
+
+      // Timeout after 8 seconds to prevent indefinite loading
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 8000);
+
       try {
         const [userRes, addrRes] = await Promise.all([
-          fetch(`/api/user/${profile?.userId}`),
-          fetch(`/api/user/addresses?userId=${profile?.userId}`),
+          fetch(`/api/user/${profile?.userId}`, { signal: controller.signal }),
+          fetch(`/api/user/addresses?userId=${profile?.userId}`, { signal: controller.signal }),
         ]);
+        clearTimeout(timeout);
 
         const userData = (await userRes.json()) as any;
         const addrData = (await addrRes.json()) as any;
 
         // If user not found in DB (deleted account) → force onboarding
         if (userRes.status === 404 || !userData.user) {
-          localStorage.removeItem(`rubjob_onboarded_${profile?.userId}`);
+          localStorage.removeItem(cacheKey);
           setNeedsOnboarding(true);
           return;
         }
@@ -85,9 +104,9 @@ export default function AppWrapper({ children }: { children: React.ReactNode }) 
 
         // Sync localStorage with actual server state
         if (completed) {
-          localStorage.setItem(`rubjob_onboarded_${profile!.userId}`, "true");
+          localStorage.setItem(cacheKey, "true");
         } else {
-          localStorage.removeItem(`rubjob_onboarded_${profile?.userId}`);
+          localStorage.removeItem(cacheKey);
         }
 
         setNeedsOnboarding(!completed);
@@ -108,9 +127,15 @@ export default function AppWrapper({ children }: { children: React.ReactNode }) 
           }
         }
       } catch (err) {
+        clearTimeout(timeout);
         console.error("Failed to check onboarding status:", err);
-        // On error, require onboarding to ensure phone + address are collected
-        setNeedsOnboarding(true);
+        // On error: if localStorage says user already completed onboarding,
+        // trust the cache and let them through instead of forcing re-onboarding.
+        // Only force onboarding if there's no cached evidence of completion.
+        if (!cachedDone) {
+          setNeedsOnboarding(true);
+        }
+        // If cachedDone is true, needsOnboarding is already false — user passes through
       } finally {
         setCheckingOnboarding(false);
       }
@@ -125,7 +150,7 @@ export default function AppWrapper({ children }: { children: React.ReactNode }) 
     return (
       <div className="flex flex-col items-center justify-center min-h-dvh bg-slate-50">
         <div className="w-16 h-16 border-4 border-primary/20 border-t-primary rounded-full animate-spin mb-4" />
-        <p className="text-[10px] font-black text-slate-400 uppercase animate-pulse">Initializing RUBJOB...</p>
+        <p className="text-[10px] font-black text-slate-400 uppercase animate-pulse">เตรียมพร้อม... อีกแป๊บเดียว</p>
       </div>
     );
   }
@@ -153,14 +178,14 @@ export default function AppWrapper({ children }: { children: React.ReactNode }) 
     return (
       <div className="flex flex-col items-center justify-center min-h-dvh bg-slate-50">
         <div className="w-12 h-12 border-4 border-primary/20 border-t-primary rounded-full animate-spin mb-4" />
-        <p className="text-[10px] font-black text-slate-400 uppercase animate-pulse">Loading your profile...</p>
+        <p className="text-[10px] font-black text-slate-400 uppercase animate-pulse">กำลังเตรียมข้อมูลให้คุณ...</p>
         
-        {/* Fail-safe button if stuck */}
+        {/* Retry button if stuck — reload the page instead of skipping onboarding */}
         <button 
-          onClick={() => setNeedsOnboarding(false)}
+          onClick={() => window.location.reload()}
           className="mt-12 text-[10px] font-black text-slate-300 uppercase underline underline-offset-4"
         >
-          Skip Loading
+          ลองใหม่
         </button>
       </div>
     );

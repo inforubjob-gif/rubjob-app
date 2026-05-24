@@ -21,8 +21,8 @@ export default function Error({
 
   return (
     <div className="flex flex-col items-center justify-center min-h-dvh bg-slate-50 px-6 text-center">
-      <div className="w-24 h-24 bg-rose-50 text-rose-500 rounded-xl flex items-center justify-center mb-8 shadow-xl shadow-rose-500/10 animate-bounce">
-        <Icons.Lock size={48} strokeWidth={2.5} />
+      <div className="w-24 h-24 bg-amber-50 text-amber-500 rounded-xl flex items-center justify-center mb-8 shadow-xl shadow-amber-500/10 animate-bounce">
+        <Icons.AlertCircle size={48} strokeWidth={2.5} />
       </div>
       
       <h1 className="text-2xl font-black text-slate-900 mb-2 uppercase">{t("common.errorTitle")}</h1>

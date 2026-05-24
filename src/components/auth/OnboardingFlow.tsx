@@ -90,6 +90,13 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
   }
 
   function handleTermsAccept() {
+    // Fire-and-forget: record terms acceptance timestamp in DB for legal evidence
+    fetch("/api/user/accept-terms", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ userId: profile?.userId }),
+    }).catch(err => console.error("Failed to save terms acceptance:", err));
+
     setStep(3);
     // Show location permission modal after a short delay
     setTimeout(() => setShowLocationModal(true), 300);

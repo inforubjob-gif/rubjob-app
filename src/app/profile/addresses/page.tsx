@@ -76,7 +76,7 @@ export default function ManageAddressesPage() {
            router.back();
         }, 300);
       } else {
-        showToast(data.error || "Failed to select address", "error");
+        showToast(data.error || t("common.error"), "error");
       }
     } catch (err) {
       console.error("Select address error:", err);
@@ -142,11 +142,11 @@ export default function ManageAddressesPage() {
         setNewNote("");
         setLocation(null);
       } else {
-        showToast(data.error || "Failed to save address", "error");
+        showToast(data.error || t("common.error"), "error");
       }
     } catch (err) {
       console.error("Save address error:", err);
-      showToast("Failed to connect to server", "error");
+      showToast(t("common.error"), "error");
     } finally {
       setIsSaving(false);
     }

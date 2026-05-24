@@ -58,11 +58,11 @@ export default function RubberSetupPage() {
         router.push("/rubber/documents");
       } else {
         const data = await res.json() as any;
-        showToast(data.error || "Failed to setup rubber profile", "error");
+        showToast(data.error || t("common.error"), "error");
       }
     } catch (err) {
       console.error(err);
-      showToast("An error occurred", "error");
+      showToast(t("common.error"), "error");
     } finally {
       setIsSubmitting(false);
     }

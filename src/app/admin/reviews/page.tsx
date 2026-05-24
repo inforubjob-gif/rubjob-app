@@ -51,7 +51,7 @@ export default function ReviewsPage() {
         method: "DELETE",
       });
       if (!res.ok) throw new Error("Failed to delete review");
-      showToast("Review deleted successfully", "success");
+      showToast("ลบรีวิวเรียบร้อยแล้ว", "success");
       setReviews(reviews.filter(r => r.orderId !== orderId));
     } catch (err: unknown) {
       showToast((err instanceof Error) ? err.message : "เกิดข้อผิดพลาด", "error");
