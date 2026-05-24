@@ -23,6 +23,8 @@ export default function CashAdvanceRecorder({ orderId, storeId, storeName, rubbe
   const [existingRecords, setExistingRecords] = useState<any[]>([]);
   const [isEditing, setIsEditing] = useState(false);
   const [error, setError] = useState("");
+  const [totalAmount, setTotalAmount] = useState(0); // wait, it's a useMemo.
+  const [manualAmount, setManualAmount] = useState("");
   const [note, setNote] = useState("");
   const [machineType, setMachineType] = useState<"separate" | "combo">("separate");
 
@@ -92,18 +94,18 @@ export default function CashAdvanceRecorder({ orderId, storeId, storeName, rubbe
     return washer.priceHot;
   }
 
-  const totalAmount = (() => {
-    let total = 0;
+  const computedTotal = useMemo(() => {
+    let t = 0;
     if (selectedWasher) {
-      const w = washers.find(w => w.id === selectedWasher.id);
-      if (w) total += getWasherPrice(w, selectedWasher.waterTemp);
+      const w = washers.find(x => x.id === selectedWasher.id);
+      if (w) t += getWasherPrice(w, selectedWasher.waterTemp);
     }
     if (selectedDryer) {
-      const d = dryers.find(d => d.id === selectedDryer);
-      if (d) total += d.price;
+      const d = dryers.find(x => x.id === selectedDryer);
+      if (d) t += d.price;
     }
-    return total;
-  })();
+    return t;
+  }, [selectedWasher, selectedDryer, washers, dryers]);
 
   async function handleSave() {
     if (!selectedWasher && !selectedDryer) {
@@ -130,10 +132,15 @@ export default function CashAdvanceRecorder({ orderId, storeId, storeName, rubbe
     }
 
     try {
+      const payload: any = { rubberId, orderId, storeId, items, note };
+      if (computedTotal === 0 && manualAmount) {
+        payload.manualAmount = Number(manualAmount);
+      }
+
       const res = await fetch("/api/rubber/cash-advance", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ rubberId, orderId, storeId, items, note }),
+        body: JSON.stringify(payload),
       });
 
       if (res.ok) {
@@ -183,7 +190,7 @@ export default function CashAdvanceRecorder({ orderId, storeId, storeName, rubbe
 
   // Show saved state
   if (saved && !isEditing) {
-    const existingTotal = existingRecords.reduce((acc, r) => acc + r.amount, 0);
+    const existingTotal = existingRecords.reduce((acc, r) => acc + (r.amount || r.manualAmount || 0), 0);
     return (
       <Card className="p-6 bg-emerald-50 border-2 border-emerald-100 rounded-[2rem] shadow-sm">
         <div className="flex items-center gap-4">
@@ -226,6 +233,12 @@ export default function CashAdvanceRecorder({ orderId, storeId, storeName, rubbe
             <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">
               🫧 {machineType === "combo" ? "เครื่องซักอบในตัว (Combo)" : "เครื่องซัก"}
             </p>
+            {washers.every(w => getWasherPrice(w, 'cold') === 0) && (
+              <div className="bg-rose-50 text-rose-500 text-xs p-3 rounded-xl mb-3 font-bold border border-rose-100 flex items-start gap-2">
+                <span>⚠️</span>
+                <span>ร้านค้านี้ยังไม่ได้ตั้งราคาในระบบ ตัวเลขจึงเป็น 0 กรุณาระบุยอดที่จ่ายจริงด้านล่าง</span>
+              </div>
+            )}
             <div className="overflow-x-auto -mx-2">
               <table className="w-full text-center">
                 <thead>
@@ -308,18 +321,37 @@ export default function CashAdvanceRecorder({ orderId, storeId, storeName, rubbe
         )}
 
         {/* Total + Submit */}
-        <div className="border-t border-slate-100 pt-4">
+        <div className="border-t border-slate-100 pt-6">
           {error && (
             <p className="text-xs font-bold text-rose-500 mb-3">{error}</p>
           )}
           
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-xs font-black text-slate-400 uppercase">ยอดรวม</span>
-            <span className="text-2xl font-black text-slate-900 italic">฿{totalAmount.toLocaleString()}</span>
+          <div className="flex items-end justify-between mb-6">
+            <p className="text-xs font-black text-slate-400 uppercase">ยอดรวม</p>
+            <p className="text-4xl font-black text-slate-800 italic pr-2">
+              ฿{computedTotal === 0 && manualAmount ? manualAmount : computedTotal}
+            </p>
           </div>
 
-          <div className="mb-4">
-            <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">เหตุผลการเปลี่ยนแปลง (ถ้ามี)</label>
+          {computedTotal === 0 && (
+            <div className="mb-6">
+              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block">
+                ยอดเงินที่จ่ายจริง (บาท)
+              </label>
+              <input 
+                type="number" 
+                value={manualAmount}
+                onChange={(e) => setManualAmount(e.target.value)}
+                placeholder="ระบุยอดเงิน (เช่น 120)"
+                className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl p-4 text-slate-900 font-bold focus:outline-none focus:border-amber-500/50 transition-colors"
+              />
+            </div>
+          )}
+
+          <div className="mb-6">
+            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block">
+              เหตุผลการเปลี่ยนแปลง (ถ้ามี)
+            </label>
             <textarea 
               value={note}
               onChange={(e) => setNote(e.target.value)}

@@ -56,8 +56,8 @@ export async function POST(req: Request) {
   const session = await getRubberSession();
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   try {
-    const { rubberId, orderId, storeId, items, note } = await req.json() as any;
-    if (!rubberId || !storeId || !items?.length) {
+    const { rubberId, orderId, storeId, items, note, manualAmount } = await req.json() as any;
+    if (!rubberId || !storeId) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
@@ -69,6 +69,17 @@ export async function POST(req: Request) {
     const storeName = store?.name || "Unknown Store";
 
     const createdIds: string[] = [];
+
+    if (manualAmount !== undefined && manualAmount > 0) {
+      const id = `CA-${nanoid(8).toUpperCase()}`;
+      await db.prepare(`
+        INSERT INTO cash_advances (id, rubberId, orderId, storeId, storeName, machineType, amount, note, status)
+        VALUES (?, ?, ?, ?, ?, 'manual', ?, ?, 'pending')
+      `).bind(id, rubberId, orderId || null, storeId, storeName, manualAmount, note || "Manual entry").run();
+      createdIds.push(id);
+    } else {
+      if (!items?.length) return NextResponse.json({ error: "Missing items" }, { status: 400 });
+
 
     for (const item of items) {
       const { costMatrixId, machineType } = item;
@@ -131,6 +142,7 @@ export async function POST(req: Request) {
       ).run();
 
       createdIds.push(id);
+    }
     }
 
     // Create notification for rubber
