@@ -129,7 +129,7 @@ function BookingFlow() {
   const [selectedSizeCost, setSelectedSizeCost] = useState<number>(0);
   const [selectedSizeExtraCost, setSelectedSizeExtraCost] = useState<number>(0);
   const [withFolding, setWithFolding] = useState<boolean>(true);
-  const [needsDetergent, setNeedsDetergent] = useState<boolean>(false);
+  const [needsDetergent, setNeedsDetergent] = useState<boolean>(true);
 
   // Pickup: always scheduled (no more instant option)
   const [pickupDate, setPickupDate] = useState("");
