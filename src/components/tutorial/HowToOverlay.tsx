@@ -8,7 +8,6 @@ interface StepConfig {
   page: string;
   placement: "below" | "above";
   image: string;
-  alignX: "left" | "right" | "center";
 }
 
 const STEPS: StepConfig[] = [
@@ -18,7 +17,6 @@ const STEPS: StepConfig[] = [
     page: "/",
     placement: "below",
     image: "/images/tutorial_step_1.png",
-    alignX: "left", // Arrow is on the left
   },
   {
     // Step 2: Booking — ตรวจสอบประเภทบริการและที่อยู่รับผ้า
@@ -26,7 +24,6 @@ const STEPS: StepConfig[] = [
     page: "/booking",
     placement: "below",
     image: "/images/tutorial_step_2.png",
-    alignX: "center", // Arrow points down, centered
   },
   {
     // Step 3: Booking — เพิ่มโน้ตถึงคนขับ
@@ -34,23 +31,20 @@ const STEPS: StepConfig[] = [
     page: "/booking",
     placement: "below",
     image: "/images/tutorial_step_3.png",
-    alignX: "right", // Arrow is on the right
   },
   {
     // Step 4: Booking — เลือกน้ำหนักผ้า
     selector: '[data-tutorial-step="4"]',
     page: "/booking",
-    placement: "below",
+    placement: "above",
     image: "/images/tutorial_step_4.png",
-    alignX: "right", // Arrow is on the right
   },
   {
     // Step 5: Booking — เลือกเวลารับผ้า
     selector: '[data-tutorial-step="5"]',
     page: "/booking",
-    placement: "above",
+    placement: "below",
     image: "/images/tutorial_step_5.png",
-    alignX: "left", // Arrow is on the left
   },
   {
     // Step 6: Booking — เลือกใช้คูปอง
@@ -58,7 +52,6 @@ const STEPS: StepConfig[] = [
     page: "/booking",
     placement: "above",
     image: "/images/tutorial_step_6.png",
-    alignX: "left", // Arrow is on the left
   },
   {
     // Step 7: Booking Payment — ตรวจสอบความถูกต้อง
@@ -66,7 +59,6 @@ const STEPS: StepConfig[] = [
     page: "/booking",
     placement: "below",
     image: "/images/tutorial_step_7.png",
-    alignX: "left", // Arrow is on the left
   },
   {
     // Step 8: Booking Payment — สแกน QR Code
@@ -74,7 +66,6 @@ const STEPS: StepConfig[] = [
     page: "/booking",
     placement: "above",
     image: "/images/tutorial_step_8.png",
-    alignX: "left", // Arrow is on the left
   },
 ];
 
@@ -212,25 +203,14 @@ export default function HowToOverlay({
 
   let imageStyle: React.CSSProperties = {
     position: "fixed",
-    maxWidth: "60vw",
-    maxHeight: "25vh",
+    left: "50%",
+    transform: "translateX(-50%)",
+    width: "85vw",
+    maxWidth: "400px",
     objectFit: "contain",
     zIndex: 10003,
     filter: "drop-shadow(0 4px 12px rgba(0,0,0,0.5))",
   };
-
-  // Align horizontally
-  if (step.alignX === "left") {
-    // Arrow head on left of image -> align image left edge slightly offset from target center
-    imageStyle.left = targetRect.left + targetRect.width * 0.3;
-  } else if (step.alignX === "right") {
-    // Arrow head on right of image -> align image right edge slightly offset from target center
-    imageStyle.right = window.innerWidth - (targetRect.left + targetRect.width * 0.7);
-  } else {
-    // Center alignment
-    imageStyle.left = "50%";
-    imageStyle.transform = "translateX(-50%)";
-  }
 
   // Align vertically
   if (step.placement === "below") {
