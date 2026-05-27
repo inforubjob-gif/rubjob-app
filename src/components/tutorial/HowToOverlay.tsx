@@ -8,6 +8,9 @@ interface StepConfig {
   page: string;
   placement: "below" | "above";
   image: string;
+  customWidth?: string;
+  customLeft?: string;
+  customTransform?: string;
 }
 
 const STEPS: StepConfig[] = [
@@ -17,6 +20,9 @@ const STEPS: StepConfig[] = [
     page: "/",
     placement: "below",
     image: "/images/tutorial_step_1.png",
+    customWidth: "60vw",
+    customLeft: "25%",
+    customTransform: "none",
   },
   {
     // Step 2: Booking — ตรวจสอบประเภทบริการและที่อยู่รับผ้า
@@ -203,9 +209,9 @@ export default function HowToOverlay({
 
   let imageStyle: React.CSSProperties = {
     position: "fixed",
-    left: "50%",
-    transform: "translateX(-50%)",
-    width: "85vw",
+    left: step.customLeft || "50%",
+    transform: step.customTransform || "translateX(-50%)",
+    width: step.customWidth || "85vw",
     maxWidth: "400px",
     objectFit: "contain",
     zIndex: 10003,
@@ -226,22 +232,26 @@ export default function HowToOverlay({
       onClick={(e) => e.stopPropagation()}
     >
       {/* Dark overlay with spotlight hole */}
-      <div
-        className="absolute inset-0"
-        style={{
-          background: "rgba(0,0,0,0.7)",
-          clipPath: `polygon(
-            0% 0%, 0% 100%,
-            ${targetRect.left}px 100%,
-            ${targetRect.left}px ${targetRect.top}px,
-            ${targetRect.left + targetRect.width}px ${targetRect.top}px,
-            ${targetRect.left + targetRect.width}px ${targetRect.top + targetRect.height}px,
-            ${targetRect.left}px ${targetRect.top + targetRect.height}px,
-            ${targetRect.left}px 100%,
-            100% 100%, 100% 0%
-          )`,
-        }}
-      />
+      <svg
+        className="absolute inset-0 w-full h-full pointer-events-none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <defs>
+          <mask id="tutorial-hole">
+            <rect width="100%" height="100%" fill="white" />
+            <rect
+              x={targetRect.left}
+              y={targetRect.top}
+              width={targetRect.width}
+              height={targetRect.height}
+              rx={16}
+              ry={16}
+              fill="black"
+            />
+          </mask>
+        </defs>
+        <rect width="100%" height="100%" fill="rgba(0,0,0,0.7)" mask="url(#tutorial-hole)" />
+      </svg>
 
       {/* Step Image (combines arrow + text) */}
       <img
