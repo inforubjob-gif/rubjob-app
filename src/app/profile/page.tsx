@@ -36,6 +36,17 @@ export default function ProfilePage() {
       description: language === "th" ? "ไทย (TH)" : "English (EN)",
       onClick: () => setShowLanguageModal(true)
     },
+    { 
+      icon: <Icons.AlertCircle size={20} />, 
+      label: "วิธีใช้งาน", 
+      description: "ดูขั้นตอนการใช้งานอีกครั้ง",
+      onClick: () => {
+        if (profile?.userId) {
+          localStorage.removeItem(`rubjob_tutorial_seen_${profile.userId}`);
+        }
+        router.push("/");
+      }
+    },
     { icon: <Icons.FileText size={20} />, label: t("profile.termsOfService"), description: t("profile.termsOfServiceDesc"), href: "/profile/tos" },
     { icon: <Icons.Lock size={20} />, label: t("profile.privacyPolicy"), description: t("profile.privacyPolicyDesc"), href: "/profile/privacy" },
   ];

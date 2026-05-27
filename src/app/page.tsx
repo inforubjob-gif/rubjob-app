@@ -11,12 +11,33 @@ import { useTranslation } from "@/components/providers/LanguageProvider";
 import { useEffect, useState } from "react";
 import Button from "@/components/ui/Button";
 import { useScrollCollapse } from "@/hooks/useScrollCollapse";
+import HowToOverlay from "@/components/tutorial/HowToOverlay";
 
 export default function HomePage() {
   const { profile, isReady } = useLiff();
   const { t } = useTranslation();
   const [comingSoonModal, setComingSoonModal] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState("All");
+  const [showTutorial, setShowTutorial] = useState(false);
+
+  // Auto-show tutorial on first visit after onboarding
+  useEffect(() => {
+    if (!profile?.userId) return;
+    const tutorialKey = `rubjob_tutorial_seen_${profile.userId}`;
+    const seen = localStorage.getItem(tutorialKey);
+    if (!seen) {
+      // Small delay to let page fully render
+      const timer = setTimeout(() => setShowTutorial(true), 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [profile?.userId]);
+
+  function handleTutorialComplete() {
+    setShowTutorial(false);
+    if (profile?.userId) {
+      localStorage.setItem(`rubjob_tutorial_seen_${profile.userId}`, "true");
+    }
+  }
 
   // State for live data
   const [services, setServices] = useState<any[]>([]);
@@ -180,7 +201,7 @@ export default function HomePage() {
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-base font-bold text-foreground">{t("home.ourServices")}</h2>
           </div>
-          <div className="grid grid-cols-2 gap-4 stagger">
+          <div className="grid grid-cols-2 gap-4 stagger" data-tutorial-step="1">
             {laundryServices.map((svc) => (
               <ServiceCard key={svc.id} svc={svc} t={t} className="block w-full h-full" />
             ))}
@@ -276,6 +297,22 @@ export default function HomePage() {
             </Button>
           </div>
         </div>
+      )}
+
+      {/* Tutorial Overlay */}
+      {showTutorial && (
+        <HowToOverlay onComplete={handleTutorialComplete} startStep={0} />
+      )}
+
+      {/* FAB — วิธีใช้งาน */}
+      {!showTutorial && (
+        <button
+          onClick={() => setShowTutorial(true)}
+          className="fixed bottom-24 right-5 z-50 bg-white shadow-2xl shadow-slate-900/20 rounded-full px-4 py-3 flex items-center gap-2 border border-slate-100 active:scale-95 transition-all hover:shadow-primary/20"
+        >
+          <span className="text-lg">❓</span>
+          <span className="text-xs font-black text-slate-700">วิธีใช้งาน</span>
+        </button>
       )}
     </div>
   );

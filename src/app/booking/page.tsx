@@ -59,6 +59,7 @@ import { useTranslation } from "@/components/providers/LanguageProvider";
 import { useLiff } from "@/components/providers/LiffProvider";
 import { useToast } from "@/components/providers/ToastProvider";
 import { useScrollCollapse } from "@/hooks/useScrollCollapse";
+import HowToOverlay from "@/components/tutorial/HowToOverlay";
 
 const ITEM_KEY_MAP: Record<string, string> = {
   "T-shirt": "items.tshirt",
@@ -138,6 +139,42 @@ function BookingFlow() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const isCollapsed = useScrollCollapse(40);
   const [isSkippingPayment, setIsSkippingPayment] = useState(false);
+
+  // Tutorial support
+  const tutorialParam = searchParams.get("tutorial");
+  const [showTutorial, setShowTutorial] = useState(false);
+  const [tutorialStartStep, setTutorialStartStep] = useState(0);
+  useEffect(() => {
+    if (tutorialParam) {
+      const stepNum = parseInt(tutorialParam);
+      if (!isNaN(stepNum)) {
+        setTutorialStartStep(stepNum);
+        // Delay to let page render
+        setTimeout(() => setShowTutorial(true), 800);
+      }
+    } else {
+      // Check sessionStorage for tutorial continuation
+      const savedStep = sessionStorage.getItem("rubjob_tutorial_step");
+      if (savedStep) {
+        sessionStorage.removeItem("rubjob_tutorial_step");
+        const stepNum = parseInt(savedStep);
+        if (!isNaN(stepNum)) {
+          setTutorialStartStep(stepNum);
+          setTimeout(() => setShowTutorial(true), 800);
+        }
+      }
+    }
+  }, [tutorialParam]);
+
+  function handleTutorialComplete() {
+    setShowTutorial(false);
+    const userId = profile?.userId;
+    if (userId) {
+      localStorage.setItem(`rubjob_tutorial_seen_${userId}`, "true");
+    }
+    // Navigate back home after tutorial
+    router.push("/");
+  }
 
   // Reactive clock — ticks every 30s so isSlotPassed re-evaluates as real time passes
   const [clockTick, setClockTick] = useState(Date.now());
@@ -768,6 +805,7 @@ function BookingFlow() {
         {step === "details" && (
           <div className="space-y-5 animate-page-enter">
             {/* Service Selection (Editable) */}
+            <div data-tutorial-step="2">
             <section>
               {service && (
                 <Card
@@ -823,9 +861,10 @@ function BookingFlow() {
               )}
               {/* Auto-assigned store is hidden from the user per requirements */}
             </section>
+            </div>
 
             {/* Customer Note for Driver */}
-            <section>
+            <section data-tutorial-step="3">
               <h3 className="text-[10px] font-black text-slate-400 flex items-center gap-1 uppercase tracking-tight mb-1">
                 <Icons.Edit size={10} strokeWidth={3} className="text-primary" /> {t("booking.noteForDriver") || "โน้ตถึงคนขับ"}
               </h3>
@@ -849,7 +888,7 @@ function BookingFlow() {
             {/* ═══════════════════════════════════════════════════════ */}
             {service?.category === "laundry" && (
               <section>
-                <div className="rounded-2xl border-2 border-amber-200/60 bg-gradient-to-b from-amber-50/50 to-white overflow-hidden mb-4">
+                <div className="rounded-2xl border-2 border-amber-200/60 bg-gradient-to-b from-amber-50/50 to-white overflow-hidden mb-4" data-tutorial-step="4">
                   <div className="flex items-center gap-2 px-4 py-2.5 bg-amber-100/60 border-b border-amber-200/40">
                     <Icons.Tasks size={14} strokeWidth={3} className="text-amber-600" />
                     <span className="text-xs font-black text-amber-800 uppercase tracking-tight">ค่าซัก + อบผ้า</span>
@@ -963,7 +1002,7 @@ function BookingFlow() {
             {/* 🔵 GROUP 2: ค่าบริการรับ-ส่ง RUBJOB                   */}
             {/* ═══════════════════════════════════════════════════════ */}
             <section>
-              <div className="rounded-2xl border-2 border-primary/20 bg-gradient-to-b from-primary/5 to-white overflow-hidden mb-4">
+              <div className="rounded-2xl border-2 border-primary/20 bg-gradient-to-b from-primary/5 to-white overflow-hidden mb-4" data-tutorial-step="5">
                 <div className="flex items-center gap-2 px-4 py-2.5 bg-primary/10 border-b border-primary/15">
                   <Icons.Truck size={14} strokeWidth={3} className="text-primary" />
                   <span className="text-xs font-black text-primary-dark uppercase tracking-tight">ค่าบริการรับ-ส่ง RUBJOB</span>
@@ -1436,6 +1475,11 @@ function BookingFlow() {
             </div>
          </div>
       </Modal>
+
+      {/* Tutorial Overlay */}
+      {showTutorial && (
+        <HowToOverlay onComplete={handleTutorialComplete} startStep={tutorialStartStep} />
+      )}
     </div>
   );
 }
