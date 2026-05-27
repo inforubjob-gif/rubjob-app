@@ -3,61 +3,63 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 
-/**
- * Step config — arrow/text positions are calculated relative to the
- * highlighted element's bounding rect at runtime.
- */
 interface StepConfig {
   selector: string;
   text: string;
   page: string;
-  /**
-   * Where to place the arrow+text relative to the highlighted element:
-   * - "below-right": text below element, right-aligned, arrow pointing up
-   * - "below-center": text below element, centered
-   * - "right": text to the right of element, arrow pointing left
-   * - "above-left": text above element, arrow pointing down
-   */
-  placement: "below-right" | "below-center" | "right" | "above-left" | "above-right";
-  /** CSS rotation for the arrow image */
-  arrowRotate: string;
+  /** How to place arrow+text relative to the highlighted element */
+  placement: "below" | "above";
+  /** CSS transform for the arrow image */
+  arrowTransform: string;
+  /** Horizontal align of text */
+  textAlign: "left" | "center" | "right";
 }
 
 const STEPS: StepConfig[] = [
   {
+    // Step 1: Home — เลือกบริการ
     selector: '[data-tutorial-step="1"]',
     text: "เลือกบริการที่ต้องการ",
     page: "/",
-    placement: "right",
-    arrowRotate: "rotate(100deg) scaleX(-1)",
+    placement: "below",
+    arrowTransform: "scaleY(-1) rotate(-30deg)",
+    textAlign: "right",
   },
   {
+    // Step 2: Booking — ตรวจสอบประเภทบริการและที่อยู่รับผ้า
     selector: '[data-tutorial-step="2"]',
     text: "ตรวจสอบประเภทบริการ\nและที่อยู่รับผ้า",
     page: "/booking",
-    placement: "below-right",
-    arrowRotate: "rotate(10deg)",
+    placement: "below",
+    arrowTransform: "scaleY(-1)",
+    textAlign: "right",
   },
   {
+    // Step 3: Booking — เพิ่มโน้ตถึงคนขับ
     selector: '[data-tutorial-step="3"]',
     text: "เพิ่มโน้ตถึงคนขับในการรับ\n- ส่งผ้า",
     page: "/booking",
-    placement: "below-right",
-    arrowRotate: "rotate(10deg) scaleX(-1)",
+    placement: "below",
+    arrowTransform: "scaleY(-1) scaleX(-1)",
+    textAlign: "right",
   },
   {
+    // Step 4: Booking — เลือกน้ำหนักผ้า
     selector: '[data-tutorial-step="4"]',
     text: "เลือกน้ำหนักผ้าที่ต้องการ",
     page: "/booking",
-    placement: "below-right",
-    arrowRotate: "rotate(10deg) scaleX(-1)",
+    placement: "below",
+    arrowTransform: "scaleY(-1) scaleX(-1)",
+    textAlign: "right",
   },
   {
+    // Step 5: Booking — เลือกเวลารับผ้า
     selector: '[data-tutorial-step="5"]',
     text: "เลือกเวลารับผ้า\nและรูปแบบส่งคืน",
     page: "/booking",
-    placement: "above-left",
-    arrowRotate: "rotate(190deg)",
+    placement: "above",
+    arrowTransform: "rotate(0deg)",
+    textAlign: "left",
   },
 ];
 
@@ -79,30 +81,13 @@ export default function HowToOverlay({
   const [currentStep, setCurrentStep] = useState(startStep);
   const [targetRect, setTargetRect] = useState<Rect | null>(null);
   const [ready, setReady] = useState(false);
+  const retryRef = useRef<NodeJS.Timeout | null>(null);
   const retryCount = useRef(0);
-  const maxRetries = 20; // 20 * 150ms = 3 seconds max wait
 
   const step = STEPS[currentStep];
 
-  const findElement = useCallback(() => {
-    if (!step) return;
-    const el = document.querySelector(step.selector) as HTMLElement | null;
-    if (!el) {
-      // Retry until element appears (e.g., waiting for conditional render)
-      retryCount.current++;
-      if (retryCount.current < maxRetries) {
-        setTimeout(findElement, 150);
-      }
-      return;
-    }
-
-    retryCount.current = 0;
-
-    // Scroll into view first
-    el.scrollIntoView({ behavior: "smooth", block: "center" });
-
-    // Wait for scroll to settle, then measure
-    setTimeout(() => {
+  const measureElement = useCallback(
+    (el: HTMLElement) => {
       const rect = el.getBoundingClientRect();
       const pad = 6;
       setTargetRect({
@@ -112,15 +97,47 @@ export default function HowToOverlay({
         height: rect.height + pad * 2,
       });
       setReady(true);
-    }, 350);
-  }, [step]);
+    },
+    []
+  );
+
+  const findElement = useCallback(() => {
+    if (!step) return;
+    const el = document.querySelector(step.selector) as HTMLElement | null;
+
+    if (!el) {
+      retryCount.current++;
+      if (retryCount.current >= 30) {
+        // Element never appeared — skip this step
+        const nextIdx = currentStep + 1;
+        if (nextIdx >= STEPS.length) {
+          onComplete();
+        } else {
+          setCurrentStep(nextIdx);
+        }
+        return;
+      }
+      retryRef.current = setTimeout(findElement, 200);
+      return;
+    }
+
+    retryCount.current = 0;
+    el.scrollIntoView({ behavior: "smooth", block: "center" });
+    // Wait for scroll to finish
+    setTimeout(() => measureElement(el), 400);
+  }, [step, currentStep, measureElement, onComplete]);
 
   useEffect(() => {
     setReady(false);
     setTargetRect(null);
     retryCount.current = 0;
-    const timer = setTimeout(findElement, 100);
-    return () => clearTimeout(timer);
+    if (retryRef.current) clearTimeout(retryRef.current);
+
+    const timer = setTimeout(findElement, 150);
+    return () => {
+      clearTimeout(timer);
+      if (retryRef.current) clearTimeout(retryRef.current);
+    };
   }, [currentStep, findElement]);
 
   // Keep rect updated on scroll
@@ -129,14 +146,7 @@ export default function HowToOverlay({
     const update = () => {
       const el = document.querySelector(step.selector) as HTMLElement | null;
       if (!el) return;
-      const rect = el.getBoundingClientRect();
-      const pad = 6;
-      setTargetRect({
-        top: rect.top - pad,
-        left: rect.left - pad,
-        width: rect.width + pad * 2,
-        height: rect.height + pad * 2,
-      });
+      measureElement(el);
     };
     window.addEventListener("scroll", update, { passive: true });
     window.addEventListener("resize", update);
@@ -144,7 +154,7 @@ export default function HowToOverlay({
       window.removeEventListener("scroll", update);
       window.removeEventListener("resize", update);
     };
-  }, [step, ready]);
+  }, [step, ready, measureElement]);
 
   function handleNext() {
     const nextIdx = currentStep + 1;
@@ -155,7 +165,8 @@ export default function HowToOverlay({
     const nextStep = STEPS[nextIdx];
     if (nextStep.page !== step.page) {
       sessionStorage.setItem("rubjob_tutorial_step", String(nextIdx));
-      router.push(`${nextStep.page}?service=washing&tutorial=${nextIdx}`);
+      // Use correct service ID: wash_fold (not "washing")
+      router.push(`${nextStep.page}?service=wash_fold&tutorial=${nextIdx}`);
       return;
     }
     setCurrentStep(nextIdx);
@@ -163,119 +174,65 @@ export default function HowToOverlay({
 
   if (!step) return null;
 
-  // Loading overlay while searching for element
+  // Loading state
   if (!targetRect || !ready) {
     return (
       <div
         className="fixed inset-0 z-[9999] flex items-center justify-center"
         style={{ background: "rgba(0,0,0,0.7)" }}
       >
-        <div className="flex flex-col items-center gap-3">
-          <div className="w-8 h-8 border-3 border-white/20 border-t-white rounded-full animate-spin" />
-          <p className="text-white/60 text-xs font-bold">กำลังโหลด...</p>
-        </div>
+        <div className="w-8 h-8 border-3 border-white/20 border-t-white rounded-full animate-spin" />
       </div>
     );
   }
 
-  // Calculate arrow + text positions based on element rect and placement
-  const arrowSize = 70;
-  let arrowStyle: React.CSSProperties = {};
-  let textStyle: React.CSSProperties = {};
+  // Calculate arrow + text positions relative to element
+  const ARROW_H = 70;
+  const GAP = 8;
 
-  switch (step.placement) {
-    case "right": {
-      // Text to the right of element, arrow pointing left toward element
-      const textX = Math.min(targetRect.left + targetRect.width + 10, window.innerWidth - 200);
-      const textY = targetRect.top + targetRect.height / 2;
-      textStyle = {
-        position: "fixed",
-        top: textY + 30,
-        left: textX,
-        maxWidth: window.innerWidth - textX - 16,
-        textAlign: "left",
-      };
-      arrowStyle = {
-        position: "fixed",
-        top: textY - arrowSize / 2,
-        left: textX - 10,
-        width: arrowSize,
-        transform: step.arrowRotate,
-      };
-      break;
-    }
-    case "below-right": {
-      // Text below element, right side
-      textStyle = {
-        position: "fixed",
-        top: targetRect.top + targetRect.height + arrowSize + 5,
-        right: 16,
-        maxWidth: "60%",
-        textAlign: "right",
-      };
-      arrowStyle = {
-        position: "fixed",
-        top: targetRect.top + targetRect.height + 5,
-        right: window.innerWidth * 0.3,
-        width: arrowSize,
-        transform: step.arrowRotate,
-      };
-      break;
-    }
-    case "below-center": {
-      textStyle = {
-        position: "fixed",
-        top: targetRect.top + targetRect.height + arrowSize + 5,
-        left: "50%",
-        transform: "translateX(-50%)",
-        maxWidth: "80%",
-        textAlign: "center",
-      };
-      arrowStyle = {
-        position: "fixed",
-        top: targetRect.top + targetRect.height + 5,
-        left: "50%",
-        marginLeft: -arrowSize / 2,
-        width: arrowSize,
-        transform: step.arrowRotate,
-      };
-      break;
-    }
-    case "above-left": {
-      // Text above element, left side
-      textStyle = {
-        position: "fixed",
-        top: targetRect.top - arrowSize - 40,
-        left: 16,
-        maxWidth: "60%",
-        textAlign: "left",
-      };
-      arrowStyle = {
-        position: "fixed",
-        top: targetRect.top - arrowSize - 5,
-        left: window.innerWidth * 0.3,
-        width: arrowSize,
-        transform: step.arrowRotate,
-      };
-      break;
-    }
-    case "above-right": {
-      textStyle = {
-        position: "fixed",
-        top: targetRect.top - arrowSize - 40,
-        right: 16,
-        maxWidth: "60%",
-        textAlign: "right",
-      };
-      arrowStyle = {
-        position: "fixed",
-        top: targetRect.top - arrowSize - 5,
-        right: window.innerWidth * 0.3,
-        width: arrowSize,
-        transform: step.arrowRotate,
-      };
-      break;
-    }
+  let arrowStyle: React.CSSProperties;
+  let textStyle: React.CSSProperties;
+
+  if (step.placement === "below") {
+    // Arrow sits below the element, text below the arrow
+    arrowStyle = {
+      position: "fixed",
+      top: targetRect.top + targetRect.height + GAP,
+      left: targetRect.left + targetRect.width * 0.35,
+      width: ARROW_H,
+      transform: step.arrowTransform,
+      zIndex: 10002,
+    };
+    textStyle = {
+      position: "fixed",
+      top: targetRect.top + targetRect.height + GAP + ARROW_H + 8,
+      ...(step.textAlign === "right"
+        ? { right: 16, maxWidth: "65%" }
+        : step.textAlign === "left"
+        ? { left: 16, maxWidth: "65%" }
+        : { left: "50%", transform: "translateX(-50%)", maxWidth: "80%" }),
+      zIndex: 10003,
+    };
+  } else {
+    // "above" — arrow sits above the element, text above the arrow
+    arrowStyle = {
+      position: "fixed",
+      top: targetRect.top - GAP - ARROW_H,
+      left: targetRect.left + targetRect.width * 0.35,
+      width: ARROW_H,
+      transform: step.arrowTransform,
+      zIndex: 10002,
+    };
+    textStyle = {
+      position: "fixed",
+      top: targetRect.top - GAP - ARROW_H - 50,
+      ...(step.textAlign === "left"
+        ? { left: 16, maxWidth: "65%" }
+        : step.textAlign === "right"
+        ? { right: 16, maxWidth: "65%" }
+        : { left: "50%", transform: "translateX(-50%)", maxWidth: "80%" }),
+      zIndex: 10003,
+    };
   }
 
   return (
@@ -302,7 +259,7 @@ export default function HowToOverlay({
         }}
       />
 
-      {/* Arrow image (ASCII filename!) */}
+      {/* Arrow (PNG) */}
       <img
         key={`arrow-${currentStep}`}
         src="/images/arrow-curved.png"
@@ -310,36 +267,32 @@ export default function HowToOverlay({
         className="pointer-events-none"
         style={{
           ...arrowStyle,
-          zIndex: 10002,
           filter: "drop-shadow(0 2px 8px rgba(0,0,0,0.5))",
         }}
       />
 
-      {/* Text label */}
+      {/* Text */}
       <div
-        key={`label-${currentStep}`}
-        className="pointer-events-none z-[10003]"
-        style={{
-          ...textStyle,
-          padding: "0 4px",
-        }}
+        key={`text-${currentStep}`}
+        className="pointer-events-none"
+        style={textStyle}
       >
         <p
           className="text-white text-[17px] font-black leading-relaxed whitespace-pre-line"
           style={{
-            textShadow:
-              "0 2px 12px rgba(0,0,0,0.7), 0 0 4px rgba(0,0,0,0.4)",
+            textShadow: "0 2px 12px rgba(0,0,0,0.7), 0 0 4px rgba(0,0,0,0.4)",
+            textAlign: step.textAlign,
           }}
         >
           {step.text}
         </p>
       </div>
 
-      {/* Bottom bar */}
+      {/* Bottom controls */}
       <div className="fixed bottom-0 left-0 right-0 z-[10004] px-5 pb-8 pt-16 flex items-center justify-between bg-gradient-to-t from-black/70 via-black/30 to-transparent">
         <button
           onClick={() => onComplete()}
-          className="text-white/60 text-[11px] font-black uppercase tracking-widest px-3 py-3 active:text-white transition-colors"
+          className="text-white/60 text-[11px] font-black uppercase tracking-widest px-3 py-3"
         >
           ข้าม
         </button>
