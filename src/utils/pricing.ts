@@ -83,6 +83,11 @@ export function calculateOrderPrice(
   if (roundTripKm > 3) {
     deliveryFee += ((roundTripKm - 3) * 10);
   }
+  
+  // If Express, add extra to delivery fee (Express delivery is +20 THB usually to make it 70)
+  if (isExpress) {
+    deliveryFee += 20;
+  }
 
   // Rubber Deductions (from settings, not hard-coded)
   const rubberComm = deliveryFee * (config.gpRubberPercent / 100);
@@ -91,7 +96,6 @@ export function calculateOrderPrice(
 
   // 3. Add-ons
   let addonsTotal = 0;
-  if (isExpress) addonsTotal += 20;
   if (needsDetergent) addonsTotal += 15;
   if (withFolding) addonsTotal += 10;
 
