@@ -19,24 +19,26 @@ export default function HomePage() {
   const [comingSoonModal, setComingSoonModal] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [showTutorial, setShowTutorial] = useState(false);
+  const [tutorialSeen, setTutorialSeen] = useState(true); // default true to hide FAB initially
 
-  // Auto-show tutorial on first visit after onboarding
+  // Auto-show tutorial on first visit (only once, ever)
   useEffect(() => {
-    if (!profile?.userId) return;
-    const tutorialKey = `rubjob_tutorial_seen_${profile.userId}`;
-    const seen = localStorage.getItem(tutorialKey);
-    if (!seen) {
-      // Small delay to let page fully render
-      const timer = setTimeout(() => setShowTutorial(true), 1000);
-      return () => clearTimeout(timer);
+    if (!isReady) return;
+    const seen = localStorage.getItem("rubjob_tutorial_seen");
+    if (seen) {
+      setTutorialSeen(true);
+      return;
     }
-  }, [profile?.userId]);
+    setTutorialSeen(false);
+    // Auto-show on first visit after a short delay
+    const timer = setTimeout(() => setShowTutorial(true), 800);
+    return () => clearTimeout(timer);
+  }, [isReady]);
 
   function handleTutorialComplete() {
     setShowTutorial(false);
-    if (profile?.userId) {
-      localStorage.setItem(`rubjob_tutorial_seen_${profile.userId}`, "true");
-    }
+    setTutorialSeen(true);
+    localStorage.setItem("rubjob_tutorial_seen", "true");
   }
 
   // State for live data
@@ -304,8 +306,8 @@ export default function HomePage() {
         <HowToOverlay onComplete={handleTutorialComplete} startStep={0} />
       )}
 
-      {/* FAB — วิธีใช้งาน */}
-      {!showTutorial && (
+      {/* FAB — วิธีใช้งาน (only shown if tutorial hasn't been completed) */}
+      {!showTutorial && !tutorialSeen && (
         <button
           onClick={() => setShowTutorial(true)}
           className="fixed bottom-24 right-5 z-50 bg-white shadow-2xl shadow-slate-900/20 rounded-full px-4 py-3 flex items-center gap-2 border border-slate-100 active:scale-95 transition-all hover:shadow-primary/20"

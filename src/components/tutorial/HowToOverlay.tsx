@@ -10,8 +10,6 @@ interface StepConfig {
   placement: "below" | "above";
   arrowTransform: string;
   textAlign: "left" | "center" | "right";
-  /** Fine-tune text Y offset from default position (px) */
-  textOffsetY?: number;
 }
 
 const STEPS: StepConfig[] = [
@@ -27,22 +25,20 @@ const STEPS: StepConfig[] = [
   {
     // Step 2: Booking — ตรวจสอบประเภทบริการและที่อยู่รับผ้า
     selector: '[data-tutorial-step="2"]',
-    text: "ตรวจสอบประเภทบริการ\nและที่อยู่รับผ้า",
+    text: "ตรวจสอบประเภทบริการและที่อยู่รับผ้า",
     page: "/booking",
     placement: "below",
     arrowTransform: "scaleY(-1)",
     textAlign: "right",
-    textOffsetY: -10,
   },
   {
     // Step 3: Booking — เพิ่มโน้ตถึงคนขับ
     selector: '[data-tutorial-step="3"]',
-    text: "เพิ่มโน้ตถึงคนขับในการรับ\n- ส่งผ้า",
+    text: "เพิ่มโน้ตถึงคนขับในการรับ-ส่งผ้า",
     page: "/booking",
     placement: "below",
     arrowTransform: "scaleY(-1) scaleX(-1)",
     textAlign: "right",
-    textOffsetY: -10,
   },
   {
     // Step 4: Booking — เลือกน้ำหนักผ้า
@@ -52,12 +48,11 @@ const STEPS: StepConfig[] = [
     placement: "below",
     arrowTransform: "scaleY(-1) scaleX(-1)",
     textAlign: "center",
-    textOffsetY: -10,
   },
   {
     // Step 5: Booking — เลือกเวลารับผ้า
     selector: '[data-tutorial-step="5"]',
-    text: "เลือกเวลารับผ้า\nและรูปแบบส่งคืน",
+    text: "เลือกเวลารับผ้าและรูปแบบส่งคืน",
     page: "/booking",
     placement: "above",
     arrowTransform: "rotate(0deg)",
@@ -84,7 +79,7 @@ const STEPS: StepConfig[] = [
   {
     // Step 8: Booking Payment — สแกน QR Code
     selector: '[data-tutorial-step="8"]',
-    text: "สแกนหรือบันทึก QR Code\nเพื่อนำไปชำระผ่านแอปธนาคาร",
+    text: "สแกนหรือบันทึก QR Code เพื่อนำไปชำระผ่านแอปธนาคาร",
     page: "/booking",
     placement: "above",
     arrowTransform: "rotate(0deg)",
@@ -106,7 +101,6 @@ export default function HowToOverlay({
 }: {
   onComplete: () => void;
   startStep?: number;
-  /** Called when the tutorial moves to a new step index */
   onStepChange?: (stepIndex: number) => void;
 }) {
   const router = useRouter();
@@ -140,7 +134,6 @@ export default function HowToOverlay({
     if (!el) {
       retryCount.current++;
       if (retryCount.current >= 30) {
-        // Element never appeared — skip this step
         const nextIdx = currentStep + 1;
         if (nextIdx >= STEPS.length) {
           onComplete();
@@ -165,7 +158,6 @@ export default function HowToOverlay({
     retryCount.current = 0;
     if (retryRef.current) clearTimeout(retryRef.current);
 
-    // Notify parent about current step
     onStepChange?.(currentStep);
 
     const timer = setTimeout(findElement, 150);
@@ -175,7 +167,6 @@ export default function HowToOverlay({
     };
   }, [currentStep, findElement]);
 
-  // Keep rect updated on scroll
   useEffect(() => {
     if (!step || !ready) return;
     const update = () => {
@@ -203,7 +194,6 @@ export default function HowToOverlay({
       router.push(`${nextStep.page}?service=wash_fold&tutorial=${nextIdx}`);
       return;
     }
-    // Notify parent before changing step (so parent can switch to payment, etc.)
     onStepChange?.(nextIdx);
     setCurrentStep(nextIdx);
   }
@@ -222,50 +212,55 @@ export default function HowToOverlay({
     );
   }
 
-  // Calculate arrow + text positions relative to element
-  const ARROW_H = 50;
-  const GAP = 6;
-  const offsetY = step.textOffsetY || 0;
+  // Arrow size and gap
+  const ARROW_SIZE = 50;
+  const GAP = 4;
 
   let arrowStyle: React.CSSProperties;
   let textStyle: React.CSSProperties;
 
   if (step.placement === "below") {
+    // Arrow sits just below the element, text right after arrow (at the tail)
+    const arrowTop = targetRect.top + targetRect.height + GAP;
     arrowStyle = {
       position: "fixed",
-      top: targetRect.top + targetRect.height + GAP,
+      top: arrowTop,
       left: targetRect.left + targetRect.width * 0.35,
-      width: ARROW_H,
+      width: ARROW_SIZE,
       transform: step.arrowTransform,
       zIndex: 10002,
     };
+    // Text directly after arrow with no extra gap
     textStyle = {
       position: "fixed",
-      top: targetRect.top + targetRect.height + GAP + ARROW_H + 4 + offsetY,
+      top: arrowTop + ARROW_SIZE,
       ...(step.textAlign === "right"
-        ? { right: 16, maxWidth: "65%" }
+        ? { right: 16, maxWidth: "70%" }
         : step.textAlign === "left"
-        ? { left: 16, maxWidth: "65%" }
-        : { left: "50%", transform: "translateX(-50%)", maxWidth: "80%" }),
+        ? { left: 16, maxWidth: "70%" }
+        : { left: "50%", transform: "translateX(-50%)", maxWidth: "85%" }),
       zIndex: 10003,
     };
   } else {
+    // Arrow sits just above the element, text right above arrow (at the tail)
+    const arrowTop = targetRect.top - GAP - ARROW_SIZE;
     arrowStyle = {
       position: "fixed",
-      top: targetRect.top - GAP - ARROW_H,
+      top: arrowTop,
       left: targetRect.left + targetRect.width * 0.35,
-      width: ARROW_H,
+      width: ARROW_SIZE,
       transform: step.arrowTransform,
       zIndex: 10002,
     };
+    // Text directly above arrow with no extra gap
     textStyle = {
       position: "fixed",
-      top: targetRect.top - GAP - ARROW_H - 40 + offsetY,
+      top: arrowTop - 30,
       ...(step.textAlign === "left"
-        ? { left: 16, maxWidth: "65%" }
+        ? { left: 16, maxWidth: "70%" }
         : step.textAlign === "right"
-        ? { right: 16, maxWidth: "65%" }
-        : { left: "50%", transform: "translateX(-50%)", maxWidth: "80%" }),
+        ? { right: 16, maxWidth: "70%" }
+        : { left: "50%", transform: "translateX(-50%)", maxWidth: "85%" }),
       zIndex: 10003,
     };
   }
@@ -313,7 +308,7 @@ export default function HowToOverlay({
         style={textStyle}
       >
         <p
-          className="text-white text-[17px] font-black leading-relaxed whitespace-pre-line"
+          className="text-white text-[17px] font-black leading-snug"
           style={{
             textShadow: "0 2px 12px rgba(0,0,0,0.8), 0 0 6px rgba(0,0,0,0.6), 0 0 20px rgba(0,0,0,0.4)",
             textAlign: step.textAlign,
