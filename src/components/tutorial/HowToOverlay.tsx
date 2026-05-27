@@ -25,14 +25,14 @@ const STEPS: StepConfig[] = [
     customTransform: "none",
   },
   {
-    // Step 2: Home — ที่อยู่
+    // Step 2: Booking — ตรวจสอบประเภทบริการและที่อยู่รับผ้า
     selector: '[data-tutorial-step="2"]',
-    page: "/",
+    page: "/booking",
     placement: "below",
     image: "/images/tutorial_step_2.png?v=2",
   },
   {
-    // Step 3: Booking — เลือกบริการซักอบ
+    // Step 3: Booking — โน้ตถึงคนขับ
     selector: '[data-tutorial-step="3"]',
     page: "/booking",
     placement: "below",
@@ -49,7 +49,7 @@ const STEPS: StepConfig[] = [
     // Step 5: Booking — เลือกเวลารับผ้า
     selector: '[data-tutorial-step="5"]',
     page: "/booking",
-    placement: "above",
+    placement: "below",
     image: "/images/tutorial_step_5.png?v=2",
   },
   {
