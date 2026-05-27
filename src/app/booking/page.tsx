@@ -168,10 +168,8 @@ function BookingFlow() {
 
   function handleTutorialComplete() {
     setShowTutorial(false);
-    const userId = profile?.userId;
-    if (userId) {
-      localStorage.setItem(`rubjob_tutorial_seen_${userId}`, "true");
-    }
+    sessionStorage.removeItem("rubjob_tutorial_step");
+    localStorage.setItem("rubjob_tutorial_seen", "true");
     // Navigate back home after tutorial
     router.push("/");
   }

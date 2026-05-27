@@ -16,56 +16,56 @@ const STEPS: StepConfig[] = [
     selector: '[data-tutorial-step="1"]',
     page: "/",
     placement: "below",
-    image: "/images/การใช้งานครั้งแรก_step1.png",
+    image: "/images/tutorial_step_1.png",
   },
   {
     // Step 2: Booking — ตรวจสอบประเภทบริการและที่อยู่รับผ้า
     selector: '[data-tutorial-step="2"]',
     page: "/booking",
     placement: "below",
-    image: "/images/การใช้งานครั้งแรก_step2.png",
+    image: "/images/tutorial_step_2.png",
   },
   {
     // Step 3: Booking — เพิ่มโน้ตถึงคนขับ
     selector: '[data-tutorial-step="3"]',
     page: "/booking",
     placement: "below",
-    image: "/images/การใช้งานครั้งแรก_step3.png",
+    image: "/images/tutorial_step_3.png",
   },
   {
     // Step 4: Booking — เลือกน้ำหนักผ้า
     selector: '[data-tutorial-step="4"]',
     page: "/booking",
     placement: "below",
-    image: "/images/การใช้งานครั้งแรก_step4.png",
+    image: "/images/tutorial_step_4.png",
   },
   {
     // Step 5: Booking — เลือกเวลารับผ้า
     selector: '[data-tutorial-step="5"]',
     page: "/booking",
     placement: "above",
-    image: "/images/การใช้งานครั้งแรก_step5.png",
+    image: "/images/tutorial_step_5.png",
   },
   {
     // Step 6: Booking — เลือกใช้คูปอง
     selector: '[data-tutorial-step="6"]',
     page: "/booking",
     placement: "above",
-    image: "/images/การใช้งานครั้งแรก_step6.png",
+    image: "/images/tutorial_step_6.png",
   },
   {
     // Step 7: Booking Payment — ตรวจสอบความถูกต้อง
     selector: '[data-tutorial-step="7"]',
     page: "/booking",
     placement: "below",
-    image: "/images/การใช้งานครั้งแรก_step7.png",
+    image: "/images/tutorial_step_7.png",
   },
   {
     // Step 8: Booking Payment — สแกน QR Code
     selector: '[data-tutorial-step="8"]',
     page: "/booking",
     placement: "above",
-    image: "/images/การใช้งานครั้งแรก_step8.png",
+    image: "/images/tutorial_step_8.png",
   },
 ];
 
