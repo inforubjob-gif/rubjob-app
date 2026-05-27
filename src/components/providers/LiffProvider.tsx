@@ -62,8 +62,8 @@ export default function LiffProvider({ children }: { children: ReactNode }) {
     profile: null,
     error: null,
     isNewUser: false,
-    login: handleLogin,
-    logout: handleLogout,
+    login: () => {},
+    logout: () => {},
     markUserAsNotNew: () => setCtx(prev => ({ ...prev, isNewUser: false })),
   });
 
