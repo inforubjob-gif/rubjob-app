@@ -1,7 +1,7 @@
 import { safeError } from "@/lib/api-utils";
 import { getRequestContext } from "@cloudflare/next-on-pages";
 import { NextResponse } from "next/server";
-import { getDb } from "@/lib/db";
+import { ensureSchema } from "@/lib/db-init";
 
 export const runtime = "edge";
 
@@ -23,10 +23,8 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "D1 Database binding 'DB' not found" }, { status: 500 });
     }
 
-    // Self-healing: tables moved to db-init.ts
-
-
-    // Self-healing columns moved to db-init.ts
+    // Self-healing: ensure schema and new columns exist
+    await ensureSchema(db);
 
     // Upsert User (include phone if provided)
     // On INSERT (new user): set role='user' as default.
