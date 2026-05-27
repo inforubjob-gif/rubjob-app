@@ -1220,7 +1220,39 @@ function BookingFlow() {
                 }`} 
                 onClick={() => setSelectedPayment("promptpay")}
               >
-                {paymentQR && stripePromise ? (
+                {tutorialParam ? (
+                  <>
+                    <div className="bg-[#1a3d6d] px-5 py-2.5 rounded-xl flex items-center gap-3">
+                      <div className="w-7 h-7 bg-white rounded-lg flex items-center justify-center">
+                        <span className="text-[11px] font-black text-[#1a3d6d]">PP</span>
+                      </div>
+                      <span className="text-base font-black text-white">PromptPay</span>
+                    </div>
+                    
+                    <div className="bg-white p-4 rounded-xl shadow-inner border border-slate-100 relative overflow-hidden">
+                      {/* Tutorial-only fake QR — encodes a harmless text string */}
+                      <img 
+                        src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=RUBJOB-TUTORIAL-DEMO-NOT-REAL-PAYMENT"
+                        alt="Demo QR" 
+                        className="w-48 h-48 object-contain"
+                      />
+                      {/* ตัวอย่าง watermark */}
+                      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                        <span className="text-4xl font-black text-red-500/40 -rotate-30 select-none">ตัวอย่าง</span>
+                      </div>
+                    </div>
+                    
+                    <div className="text-center">
+                      <div className="flex items-baseline justify-center gap-1">
+                        <span className="text-sm font-bold text-muted">{t("booking.amountDue")}</span>
+                        <span className="text-2xl font-black text-foreground">฿{totalPrice}</span>
+                      </div>
+                      <p className="text-xs text-red-400 font-bold mt-1">
+                        โหมดสอนใช้งาน — ไม่ใช่การชำระเงินจริง
+                      </p>
+                    </div>
+                  </>
+                ) : paymentQR && stripePromise ? (
                    <Elements stripe={stripePromise} options={{ clientSecret: paymentQR, appearance: { theme: 'stripe' } }}>
                       <PromptPayCheckout clientSecret={paymentQR} autoConfirm />
                    </Elements>
