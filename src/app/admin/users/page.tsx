@@ -243,31 +243,67 @@ export default function UsersAdminPage() {
         </div>
        </div>
 
-       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="space-y-2">
-          <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t("admin.users.labelDisplayName")}</label>
-          <input 
-           type="text" 
-           className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-5 py-4 text-sm font-black focus:border-primary outline-none transition-all"
-           value={selectedUser.displayName || ""}
-           onChange={(e) => setSelectedUser({...selectedUser, displayName: e.target.value})}
-          />
-        </div>
-        <div className="space-y-2">
-          <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t("admin.users.labelPoints")}</label>
-          <div className="relative">
-           <div className="absolute left-5 top-1/2 -translate-y-1/2 text-amber-500">
-             <Icons.Ticket size={18} />
-           </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+         <div className="space-y-2">
+           <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t("admin.users.labelDisplayName")}</label>
            <input 
-            type="number" 
-            className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl pl-12 pr-5 py-4 text-sm font-black focus:border-primary outline-none transition-all"
-            value={selectedUser.points || 0}
-            onChange={(e) => setSelectedUser({...selectedUser, points: parseInt(e.target.value) || 0})}
+            type="text" 
+            className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-5 py-4 text-sm font-black focus:border-primary outline-none transition-all"
+            value={selectedUser.displayName || ""}
+            onChange={(e) => setSelectedUser({...selectedUser, displayName: e.target.value})}
            />
-          </div>
+         </div>
+         <div className="space-y-2">
+           <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t("admin.users.labelPoints")}</label>
+           <div className="relative">
+            <div className="absolute left-5 top-1/2 -translate-y-1/2 text-amber-500">
+              <Icons.Ticket size={18} />
+            </div>
+            <input 
+             type="number" 
+             className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl pl-12 pr-5 py-4 text-sm font-black focus:border-primary outline-none transition-all"
+             value={selectedUser.points || 0}
+             onChange={(e) => setSelectedUser({...selectedUser, points: parseInt(e.target.value) || 0})}
+            />
+           </div>
+         </div>
         </div>
-       </div>
+
+        {/* ── Customer Profile Info ── */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          {selectedUser.nickname && (
+            <div className="bg-slate-50 rounded-xl p-4 border border-slate-100">
+              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">ชื่อเล่น</p>
+              <p className="text-sm font-black text-slate-900 mt-1">{selectedUser.nickname}</p>
+            </div>
+          )}
+          {selectedUser.phone && (
+            <div className="bg-slate-50 rounded-xl p-4 border border-slate-100">
+              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">เบอร์โทร</p>
+              <p className="text-sm font-black text-slate-900 mt-1 font-mono">{selectedUser.phone.replace(/(\d{3})(\d{3})(\d{4})/, '$1-$2-$3')}</p>
+            </div>
+          )}
+          {selectedUser.birthday && (
+            <div className="bg-slate-50 rounded-xl p-4 border border-slate-100">
+              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">วันเกิด</p>
+              <p className="text-sm font-black text-slate-900 mt-1">{(() => {
+                const [y, m, d] = selectedUser.birthday.split('-');
+                const thMonths = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+                return `${parseInt(d)} ${thMonths[parseInt(m) - 1]} ${parseInt(y) + 543}`;
+              })()}</p>
+            </div>
+          )}
+          {selectedUser.gender && (
+            <div className="bg-slate-50 rounded-xl p-4 border border-slate-100">
+              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">เพศ</p>
+              <p className="text-sm font-black text-slate-900 mt-1">{
+                selectedUser.gender === 'male' ? 'ผู้ชาย' :
+                selectedUser.gender === 'female' ? 'ผู้หญิง' :
+                selectedUser.gender === 'lgbtq' ? 'LGBTQ+' : 'ไม่ระบุ'
+              }</p>
+            </div>
+          )}
+        </div>
 
        <div className="bg-indigo-50/50 p-6 rounded-xl border border-indigo-100/50 flex flex-col md:flex-row items-center justify-between gap-6">
         <div className="text-center md:text-left">

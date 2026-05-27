@@ -13,7 +13,7 @@ export async function GET(req: Request) {
     if (!db) return NextResponse.json({ error: "D1 not found" }, { status: 500 });
 
     const { results } = await db.prepare(`
-      SELECT id, displayName, pictureUrl, role, assignedStoreId, points, createdAt
+      SELECT id, displayName, pictureUrl, phone, nickname, birthday, gender, role, assignedStoreId, points, createdAt
       FROM users
       WHERE role IS NULL OR role = 'user'
       ORDER BY createdAt DESC

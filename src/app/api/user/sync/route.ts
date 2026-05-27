@@ -42,7 +42,8 @@ export async function POST(req: Request) {
           phone = excluded.phone,
           nickname = excluded.nickname,
           birthday = excluded.birthday,
-          gender = excluded.gender
+          gender = excluded.gender,
+          role = CASE WHEN users.role = 'deleted' THEN 'user' ELSE users.role END
       `).bind(id, nickname || displayName, pictureUrl, phone, nickname || null, birthday || null, gender || null).run();
     } else {
       await db.prepare(`
@@ -50,7 +51,8 @@ export async function POST(req: Request) {
         VALUES (?, ?, ?, 'user', NULL)
         ON CONFLICT(id) DO UPDATE SET 
           displayName = excluded.displayName,
-          pictureUrl = excluded.pictureUrl
+          pictureUrl = excluded.pictureUrl,
+          role = CASE WHEN users.role = 'deleted' THEN 'user' ELSE users.role END
       `).bind(id, displayName, pictureUrl).run();
     }
 
