@@ -19,59 +19,59 @@ const STEPS: StepConfig[] = [
     selector: '[data-tutorial-step="1"]',
     page: "/",
     placement: "above",
-    image: "/images/tutorial_step_1.png",
+    image: "/images/tutorial_step_1.png?v=2",
     customWidth: "60vw",
     customLeft: "25%",
     customTransform: "none",
   },
   {
-    // Step 2: Booking — ตรวจสอบประเภทบริการและที่อยู่รับผ้า
+    // Step 2: Home — ที่อยู่
     selector: '[data-tutorial-step="2"]',
-    page: "/booking",
+    page: "/",
     placement: "below",
-    image: "/images/tutorial_step_2.png",
+    image: "/images/tutorial_step_2.png?v=2",
   },
   {
-    // Step 3: Booking — เพิ่มโน้ตถึงคนขับ
+    // Step 3: Booking — เลือกบริการซักอบ
     selector: '[data-tutorial-step="3"]',
     page: "/booking",
     placement: "below",
-    image: "/images/tutorial_step_3.png",
+    image: "/images/tutorial_step_3.png?v=2",
   },
   {
-    // Step 4: Booking — เลือกน้ำหนักผ้า
+    // Step 4: Booking — เลือกตะกร้า
     selector: '[data-tutorial-step="4"]',
     page: "/booking",
     placement: "above",
-    image: "/images/tutorial_step_4.png",
+    image: "/images/tutorial_step_4.png?v=2",
   },
   {
     // Step 5: Booking — เลือกเวลารับผ้า
     selector: '[data-tutorial-step="5"]',
     page: "/booking",
-    placement: "below",
-    image: "/images/tutorial_step_5.png",
+    placement: "above",
+    image: "/images/tutorial_step_5.png?v=2",
   },
   {
-    // Step 6: Booking — เลือกใช้คูปอง
+    // Step 6: Booking — เลือกเวลาส่งผ้า
     selector: '[data-tutorial-step="6"]',
     page: "/booking",
     placement: "above",
-    image: "/images/tutorial_step_6.png",
+    image: "/images/tutorial_step_6.png?v=2",
   },
   {
-    // Step 7: Booking Payment — ตรวจสอบความถูกต้อง
+    // Step 7: Booking — เลือกจ่ายเงิน
     selector: '[data-tutorial-step="7"]',
     page: "/booking",
     placement: "below",
-    image: "/images/tutorial_step_7.png",
+    image: "/images/tutorial_step_7.png?v=2",
   },
   {
-    // Step 8: Booking Payment — สแกน QR Code
+    // Step 8: Booking — ยืนยันรายการ
     selector: '[data-tutorial-step="8"]',
     page: "/booking",
     placement: "above",
-    image: "/images/tutorial_step_8.png",
+    image: "/images/tutorial_step_8.png?v=2",
   },
 ];
 
