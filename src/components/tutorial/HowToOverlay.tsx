@@ -5,85 +5,67 @@ import { useRouter } from "next/navigation";
 
 interface StepConfig {
   selector: string;
-  text: string;
   page: string;
   placement: "below" | "above";
-  arrowTransform: string;
-  textAlign: "left" | "center" | "right";
+  image: string;
 }
 
 const STEPS: StepConfig[] = [
   {
     // Step 1: Home — เลือกบริการ
     selector: '[data-tutorial-step="1"]',
-    text: "เลือกบริการที่ต้องการ",
     page: "/",
     placement: "below",
-    arrowTransform: "scaleY(-1) rotate(-30deg)",
-    textAlign: "right",
+    image: "/images/การใช้งานครั้งแรก_step1.png",
   },
   {
     // Step 2: Booking — ตรวจสอบประเภทบริการและที่อยู่รับผ้า
     selector: '[data-tutorial-step="2"]',
-    text: "ตรวจสอบประเภทบริการและที่อยู่รับผ้า",
     page: "/booking",
     placement: "below",
-    arrowTransform: "scaleY(-1)",
-    textAlign: "right",
+    image: "/images/การใช้งานครั้งแรก_step2.png",
   },
   {
     // Step 3: Booking — เพิ่มโน้ตถึงคนขับ
     selector: '[data-tutorial-step="3"]',
-    text: "เพิ่มโน้ตถึงคนขับในการรับ-ส่งผ้า",
     page: "/booking",
     placement: "below",
-    arrowTransform: "scaleY(-1) scaleX(-1)",
-    textAlign: "right",
+    image: "/images/การใช้งานครั้งแรก_step3.png",
   },
   {
     // Step 4: Booking — เลือกน้ำหนักผ้า
     selector: '[data-tutorial-step="4"]',
-    text: "เลือกน้ำหนักผ้าที่ต้องการ",
     page: "/booking",
     placement: "below",
-    arrowTransform: "scaleY(-1) scaleX(-1)",
-    textAlign: "center",
+    image: "/images/การใช้งานครั้งแรก_step4.png",
   },
   {
     // Step 5: Booking — เลือกเวลารับผ้า
     selector: '[data-tutorial-step="5"]',
-    text: "เลือกเวลารับผ้าและรูปแบบส่งคืน",
     page: "/booking",
     placement: "above",
-    arrowTransform: "rotate(0deg)",
-    textAlign: "left",
+    image: "/images/การใช้งานครั้งแรก_step5.png",
   },
   {
     // Step 6: Booking — เลือกใช้คูปอง
     selector: '[data-tutorial-step="6"]',
-    text: "เลือกใช้คูปอง หรือกรอกโค้ดส่วนลด",
     page: "/booking",
     placement: "above",
-    arrowTransform: "rotate(0deg)",
-    textAlign: "left",
+    image: "/images/การใช้งานครั้งแรก_step6.png",
   },
   {
     // Step 7: Booking Payment — ตรวจสอบความถูกต้อง
     selector: '[data-tutorial-step="7"]',
-    text: "ตรวจสอบความถูกต้องก่อนชำระเงิน",
     page: "/booking",
     placement: "below",
-    arrowTransform: "scaleY(-1)",
-    textAlign: "left",
+    image: "/images/การใช้งานครั้งแรก_step7.png",
   },
   {
     // Step 8: Booking Payment — สแกน QR Code
     selector: '[data-tutorial-step="8"]',
-    text: "สแกนหรือบันทึก QR Code เพื่อนำไปชำระผ่านแอปธนาคาร",
     page: "/booking",
     placement: "above",
-    arrowTransform: "rotate(0deg)",
-    textAlign: "left",
+    image: "/images/การใช้งานครั้งแรก_step8.png",
   },
 ];
 
@@ -212,57 +194,24 @@ export default function HowToOverlay({
     );
   }
 
-  // Arrow size and gap
-  const ARROW_SIZE = 50;
-  const GAP = 4;
+  // GAP between element and image
+  const GAP = 12;
 
-  let arrowStyle: React.CSSProperties;
-  let textStyle: React.CSSProperties;
+  let imageStyle: React.CSSProperties = {
+    position: "fixed",
+    left: "50%",
+    transform: "translateX(-50%)",
+    maxWidth: "90vw",
+    maxHeight: "35vh",
+    objectFit: "contain",
+    zIndex: 10003,
+    filter: "drop-shadow(0 4px 12px rgba(0,0,0,0.5))",
+  };
 
   if (step.placement === "below") {
-    // Arrow sits just below the element, text right after arrow (at the tail)
-    const arrowTop = targetRect.top + targetRect.height + GAP;
-    arrowStyle = {
-      position: "fixed",
-      top: arrowTop,
-      left: targetRect.left + targetRect.width * 0.35,
-      width: ARROW_SIZE,
-      transform: step.arrowTransform,
-      zIndex: 10002,
-    };
-    // Text directly after arrow with no extra gap
-    textStyle = {
-      position: "fixed",
-      top: arrowTop + ARROW_SIZE,
-      ...(step.textAlign === "right"
-        ? { right: 16, maxWidth: "70%" }
-        : step.textAlign === "left"
-        ? { left: 16, maxWidth: "70%" }
-        : { left: "50%", transform: "translateX(-50%)", maxWidth: "85%" }),
-      zIndex: 10003,
-    };
+    imageStyle.top = targetRect.top + targetRect.height + GAP;
   } else {
-    // Arrow sits just above the element, text right above arrow (at the tail)
-    const arrowTop = targetRect.top - GAP - ARROW_SIZE;
-    arrowStyle = {
-      position: "fixed",
-      top: arrowTop,
-      left: targetRect.left + targetRect.width * 0.35,
-      width: ARROW_SIZE,
-      transform: step.arrowTransform,
-      zIndex: 10002,
-    };
-    // Text directly above arrow with no extra gap
-    textStyle = {
-      position: "fixed",
-      top: arrowTop - 30,
-      ...(step.textAlign === "left"
-        ? { left: 16, maxWidth: "70%" }
-        : step.textAlign === "right"
-        ? { right: 16, maxWidth: "70%" }
-        : { left: "50%", transform: "translateX(-50%)", maxWidth: "85%" }),
-      zIndex: 10003,
-    };
+    imageStyle.bottom = window.innerHeight - targetRect.top + GAP;
   }
 
   return (
@@ -289,34 +238,14 @@ export default function HowToOverlay({
         }}
       />
 
-      {/* Arrow (PNG) */}
+      {/* Step Image (combines arrow + text) */}
       <img
-        key={`arrow-${currentStep}`}
-        src="/images/arrow-curved.png"
+        key={`image-${currentStep}`}
+        src={step.image}
         alt=""
         className="pointer-events-none"
-        style={{
-          ...arrowStyle,
-          filter: "drop-shadow(0 2px 8px rgba(0,0,0,0.5))",
-        }}
+        style={imageStyle}
       />
-
-      {/* Text */}
-      <div
-        key={`text-${currentStep}`}
-        className="pointer-events-none"
-        style={textStyle}
-      >
-        <p
-          className="text-white text-[17px] font-black leading-snug"
-          style={{
-            textShadow: "0 2px 12px rgba(0,0,0,0.8), 0 0 6px rgba(0,0,0,0.6), 0 0 20px rgba(0,0,0,0.4)",
-            textAlign: step.textAlign,
-          }}
-        >
-          {step.text}
-        </p>
-      </div>
 
       {/* Bottom controls */}
       <div className="fixed bottom-0 left-0 right-0 z-[10004] px-5 pb-8 pt-16 flex items-center justify-between bg-gradient-to-t from-black/70 via-black/30 to-transparent">
