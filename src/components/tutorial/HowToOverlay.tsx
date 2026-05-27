@@ -10,6 +10,8 @@ interface StepConfig {
   placement: "below" | "above";
   arrowTransform: string;
   textAlign: "left" | "center" | "right";
+  /** Fine-tune text Y offset from default position (px) */
+  textOffsetY?: number;
 }
 
 const STEPS: StepConfig[] = [
@@ -30,6 +32,7 @@ const STEPS: StepConfig[] = [
     placement: "below",
     arrowTransform: "scaleY(-1)",
     textAlign: "right",
+    textOffsetY: -10,
   },
   {
     // Step 3: Booking — เพิ่มโน้ตถึงคนขับ
@@ -39,6 +42,7 @@ const STEPS: StepConfig[] = [
     placement: "below",
     arrowTransform: "scaleY(-1) scaleX(-1)",
     textAlign: "right",
+    textOffsetY: -10,
   },
   {
     // Step 4: Booking — เลือกน้ำหนักผ้า
@@ -47,7 +51,8 @@ const STEPS: StepConfig[] = [
     page: "/booking",
     placement: "below",
     arrowTransform: "scaleY(-1) scaleX(-1)",
-    textAlign: "right",
+    textAlign: "center",
+    textOffsetY: -10,
   },
   {
     // Step 5: Booking — เลือกเวลารับผ้า
@@ -218,8 +223,9 @@ export default function HowToOverlay({
   }
 
   // Calculate arrow + text positions relative to element
-  const ARROW_H = 70;
-  const GAP = 8;
+  const ARROW_H = 50;
+  const GAP = 6;
+  const offsetY = step.textOffsetY || 0;
 
   let arrowStyle: React.CSSProperties;
   let textStyle: React.CSSProperties;
@@ -235,7 +241,7 @@ export default function HowToOverlay({
     };
     textStyle = {
       position: "fixed",
-      top: targetRect.top + targetRect.height + GAP + ARROW_H + 8,
+      top: targetRect.top + targetRect.height + GAP + ARROW_H + 4 + offsetY,
       ...(step.textAlign === "right"
         ? { right: 16, maxWidth: "65%" }
         : step.textAlign === "left"
@@ -254,7 +260,7 @@ export default function HowToOverlay({
     };
     textStyle = {
       position: "fixed",
-      top: targetRect.top - GAP - ARROW_H - 50,
+      top: targetRect.top - GAP - ARROW_H - 40 + offsetY,
       ...(step.textAlign === "left"
         ? { left: 16, maxWidth: "65%" }
         : step.textAlign === "right"
@@ -300,27 +306,21 @@ export default function HowToOverlay({
         }}
       />
 
-      {/* Text with dark background */}
+      {/* Text */}
       <div
         key={`text-${currentStep}`}
         className="pointer-events-none"
         style={textStyle}
       >
-        <div
-          className="inline-block px-4 py-2.5 rounded-2xl"
+        <p
+          className="text-white text-[17px] font-black leading-relaxed whitespace-pre-line"
           style={{
-            background: "rgba(0,0,0,0.75)",
-            backdropFilter: "blur(8px)",
-            WebkitBackdropFilter: "blur(8px)",
+            textShadow: "0 2px 12px rgba(0,0,0,0.8), 0 0 6px rgba(0,0,0,0.6), 0 0 20px rgba(0,0,0,0.4)",
+            textAlign: step.textAlign,
           }}
         >
-          <p
-            className="text-white text-[16px] font-black leading-relaxed whitespace-pre-line"
-            style={{ textAlign: step.textAlign }}
-          >
-            {step.text}
-          </p>
-        </div>
+          {step.text}
+        </p>
       </div>
 
       {/* Bottom controls */}

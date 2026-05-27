@@ -1,6 +1,6 @@
-import type { ReactNode } from "react";
+import type { ReactNode, HTMLAttributes } from "react";
 
-interface CardProps {
+interface CardProps extends HTMLAttributes<HTMLDivElement> {
   children: ReactNode;
   className?: string;
   onClick?: () => void;
@@ -12,6 +12,7 @@ export default function Card({
   className = "",
   onClick,
   hoverable = false,
+  ...rest
 }: CardProps) {
   return (
     <div
@@ -26,6 +27,7 @@ export default function Card({
         ${hoverable ? "hover:shadow-[var(--shadow-card-hover)] transition-all duration-300 cursor-pointer active:scale-[0.98] hover:-translate-y-0.5" : "border-none"}
         ${className}
       `}
+      {...rest}
     >
       {children}
     </div>
