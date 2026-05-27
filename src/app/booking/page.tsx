@@ -507,6 +507,11 @@ function BookingFlow() {
   const isTooFar = distanceKm > 10;
 
   async function handleConfirm(): Promise<boolean> {
+    // Block real order creation during tutorial mode
+    if (tutorialParam) {
+      showToast("นี่คือโหมดสอนใช้งาน ไม่สามารถสั่งจริงได้", "info");
+      return false;
+    }
     if (isTooFar) {
       showToast(t("booking.errors.tooFar") || "ขออภัย ระยะทางไกลเกิน 10 กม. ไม่สามารถให้บริการได้", "error");
       return false;
