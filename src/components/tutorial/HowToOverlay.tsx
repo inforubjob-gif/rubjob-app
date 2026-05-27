@@ -7,11 +7,8 @@ interface StepConfig {
   selector: string;
   text: string;
   page: string;
-  /** How to place arrow+text relative to the highlighted element */
   placement: "below" | "above";
-  /** CSS transform for the arrow image */
   arrowTransform: string;
-  /** Horizontal align of text */
   textAlign: "left" | "center" | "right";
 }
 
@@ -61,6 +58,33 @@ const STEPS: StepConfig[] = [
     arrowTransform: "rotate(0deg)",
     textAlign: "left",
   },
+  {
+    // Step 6: Booking — เลือกใช้คูปอง
+    selector: '[data-tutorial-step="6"]',
+    text: "เลือกใช้คูปอง หรือกรอกโค้ดส่วนลด",
+    page: "/booking",
+    placement: "above",
+    arrowTransform: "rotate(0deg)",
+    textAlign: "left",
+  },
+  {
+    // Step 7: Booking Payment — ตรวจสอบความถูกต้อง
+    selector: '[data-tutorial-step="7"]',
+    text: "ตรวจสอบความถูกต้องก่อนชำระเงิน",
+    page: "/booking",
+    placement: "below",
+    arrowTransform: "scaleY(-1)",
+    textAlign: "left",
+  },
+  {
+    // Step 8: Booking Payment — สแกน QR Code
+    selector: '[data-tutorial-step="8"]',
+    text: "สแกนหรือบันทึก QR Code\nเพื่อนำไปชำระผ่านแอปธนาคาร",
+    page: "/booking",
+    placement: "above",
+    arrowTransform: "rotate(0deg)",
+    textAlign: "left",
+  },
 ];
 
 interface Rect {
@@ -73,9 +97,12 @@ interface Rect {
 export default function HowToOverlay({
   onComplete,
   startStep = 0,
+  onStepChange,
 }: {
   onComplete: () => void;
   startStep?: number;
+  /** Called when the tutorial moves to a new step index */
+  onStepChange?: (stepIndex: number) => void;
 }) {
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState(startStep);
@@ -114,6 +141,7 @@ export default function HowToOverlay({
           onComplete();
         } else {
           setCurrentStep(nextIdx);
+          onStepChange?.(nextIdx);
         }
         return;
       }
@@ -123,15 +151,17 @@ export default function HowToOverlay({
 
     retryCount.current = 0;
     el.scrollIntoView({ behavior: "smooth", block: "center" });
-    // Wait for scroll to finish
     setTimeout(() => measureElement(el), 400);
-  }, [step, currentStep, measureElement, onComplete]);
+  }, [step, currentStep, measureElement, onComplete, onStepChange]);
 
   useEffect(() => {
     setReady(false);
     setTargetRect(null);
     retryCount.current = 0;
     if (retryRef.current) clearTimeout(retryRef.current);
+
+    // Notify parent about current step
+    onStepChange?.(currentStep);
 
     const timer = setTimeout(findElement, 150);
     return () => {
@@ -165,10 +195,11 @@ export default function HowToOverlay({
     const nextStep = STEPS[nextIdx];
     if (nextStep.page !== step.page) {
       sessionStorage.setItem("rubjob_tutorial_step", String(nextIdx));
-      // Use correct service ID: wash_fold (not "washing")
       router.push(`${nextStep.page}?service=wash_fold&tutorial=${nextIdx}`);
       return;
     }
+    // Notify parent before changing step (so parent can switch to payment, etc.)
+    onStepChange?.(nextIdx);
     setCurrentStep(nextIdx);
   }
 
@@ -194,7 +225,6 @@ export default function HowToOverlay({
   let textStyle: React.CSSProperties;
 
   if (step.placement === "below") {
-    // Arrow sits below the element, text below the arrow
     arrowStyle = {
       position: "fixed",
       top: targetRect.top + targetRect.height + GAP,
@@ -214,7 +244,6 @@ export default function HowToOverlay({
       zIndex: 10003,
     };
   } else {
-    // "above" — arrow sits above the element, text above the arrow
     arrowStyle = {
       position: "fixed",
       top: targetRect.top - GAP - ARROW_H,

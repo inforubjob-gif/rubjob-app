@@ -1116,7 +1116,7 @@ function BookingFlow() {
                 </div>
 
                 {/* Compact coupon section */}
-                <div className="border-t border-slate-100 pt-3 space-y-2">
+                <div className="border-t border-slate-100 pt-3 space-y-2" data-tutorial-step="6">
                   {/* Coupon picker button — full width */}
                   <button onClick={async () => {
                     setIsCouponModalOpen(true); setIsLoadingCoupons(true);
@@ -1172,7 +1172,7 @@ function BookingFlow() {
         {step === "payment" && (
           <div className="space-y-6 animate-page-enter">
             {/* Order Summary */}
-            <section className="space-y-3">
+            <section className="space-y-3" data-tutorial-step="7">
               <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
                 <Icons.FileText size={18} className="text-primary" /> {t("booking.confirmOrder")}
               </h3>
@@ -1214,7 +1214,7 @@ function BookingFlow() {
 
             {/* Main PromptPay QR Section */}
             <div className="flex flex-col items-center gap-4 py-2">
-              <Card 
+              <Card data-tutorial-step="8" 
                 className={`p-6 border-2 transition-all duration-300 flex flex-col items-center gap-5 w-full max-w-[320px] mx-auto ${
                   selectedPayment === "promptpay" ? "border-primary bg-primary/5 shadow-2xl shadow-primary/10 scale-[1.02]" : "border-slate-100 opacity-60 grayscale"
                 }`} 
@@ -1483,7 +1483,16 @@ function BookingFlow() {
 
       {/* Tutorial Overlay */}
       {showTutorial && (
-        <HowToOverlay onComplete={handleTutorialComplete} startStep={tutorialStartStep} />
+        <HowToOverlay
+          onComplete={handleTutorialComplete}
+          startStep={tutorialStartStep}
+          onStepChange={(stepIdx) => {
+            // Switch to payment step when tutorial reaches steps 7-8
+            if (stepIdx >= 6) {
+              setStep("payment");
+            }
+          }}
+        />
       )}
     </div>
   );
