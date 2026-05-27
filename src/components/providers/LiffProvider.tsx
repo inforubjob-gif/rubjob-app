@@ -18,6 +18,7 @@ interface LiffContextValue {
   isNewUser?: boolean;
   login: () => void;
   logout: (redirectPath?: string) => void;
+  markUserAsNotNew: () => void;
 }
 
 const LiffContext = createContext<LiffContextValue>({
@@ -29,6 +30,7 @@ const LiffContext = createContext<LiffContextValue>({
   isNewUser: false,
   login: () => {},
   logout: () => {},
+  markUserAsNotNew: () => {},
 });
 
 export function useLiff() {
@@ -59,8 +61,10 @@ export default function LiffProvider({ children }: { children: ReactNode }) {
     isInClient: false,
     profile: null,
     error: null,
-    login: () => {},
-    logout: () => {},
+    isNewUser: false,
+    login: handleLogin,
+    logout: handleLogout,
+    markUserAsNotNew: () => setCtx(prev => ({ ...prev, isNewUser: false })),
   });
 
   useEffect(() => {

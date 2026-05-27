@@ -14,7 +14,7 @@ import { useScrollCollapse } from "@/hooks/useScrollCollapse";
 import HowToOverlay from "@/components/tutorial/HowToOverlay";
 
 export default function HomePage() {
-  const { profile, isReady, isNewUser } = useLiff();
+  const { profile, isReady, isNewUser, markUserAsNotNew } = useLiff();
   const { t } = useTranslation();
   const [comingSoonModal, setComingSoonModal] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState("All");
@@ -50,6 +50,7 @@ export default function HomePage() {
   function handleTutorialComplete() {
     setShowTutorial(false);
     setTutorialSeen(true);
+    markUserAsNotNew(); // Break the loop for new users!
     try {
       localStorage.setItem("rubjob_tutorial_seen_v2", "true");
     } catch (err) {

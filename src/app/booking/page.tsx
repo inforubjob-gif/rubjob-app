@@ -170,8 +170,11 @@ function BookingFlow() {
     }
   }, [tutorialParam]);
 
+  const { markUserAsNotNew } = useLiff();
+  
   function handleTutorialComplete() {
     setShowTutorial(false);
+    markUserAsNotNew(); // Break the isNewUser loop!
     try {
       localStorage.setItem("rubjob_tutorial_seen_v2", "true");
     } catch (err) {
