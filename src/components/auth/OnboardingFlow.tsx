@@ -250,25 +250,25 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
   return (
     <div className="flex flex-col min-h-dvh bg-white relative overflow-hidden">
       {/* Gradient Header */}
-      <div className="relative bg-gradient-to-br from-[#F3B34E] via-[#F5C16E] to-[#F3B34E] px-6 pt-14 pb-10 text-center overflow-hidden">
+      <div className="relative bg-gradient-to-br from-[#F3B34E] via-[#F5C16E] to-[#F3B34E] px-6 pt-8 pb-8 text-center overflow-hidden">
         {/* Decorative circles */}
         <div className="absolute -top-8 -right-8 w-40 h-40 bg-white/10 rounded-full" />
         <div className="absolute -bottom-6 -left-10 w-32 h-32 bg-white/10 rounded-full" />
 
         <div className="relative z-10">
-          <div className="w-20 h-20 bg-white/20 backdrop-blur-md rounded-xl flex items-center justify-center mx-auto mb-4 shadow-xl shadow-amber-500/20 ring-4 ring-white/30 overflow-hidden">
-            <Icons.Logo size={80} variant="icon" />
+          <div className="w-16 h-16 bg-white/20 backdrop-blur-md rounded-xl flex items-center justify-center mx-auto mb-3 shadow-xl shadow-amber-500/20 ring-4 ring-white/30 overflow-hidden">
+            <Icons.Logo size={60} variant="icon" />
           </div>
-          <h1 className="text-xl font-black text-white">
+          <h1 className="text-xl font-black text-white leading-tight">
             {stepTitles[step]}
           </h1>
-          <p className="text-sm text-white/80 mt-1 font-medium">
+          <p className="text-xs text-white/80 mt-1 font-medium">
             {stepSubtitles[step]}
           </p>
         </div>
 
         {/* Step indicator — 4 steps */}
-        <div className="flex gap-2 justify-center mt-6 relative z-10">
+        <div className="flex gap-2 justify-center mt-4 relative z-10">
           {[1, 2, 3, 4].map((s) => (
             <div key={s} className={`h-1.5 w-10 rounded-full transition-all duration-500 ${step >= s ? "bg-white" : "bg-white/30"}`} />
           ))}
