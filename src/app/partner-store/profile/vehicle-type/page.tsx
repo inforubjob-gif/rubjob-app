@@ -11,9 +11,9 @@ import { useStoreAuth } from "@/components/providers/StoreProvider";
 import { useEffect } from "react";
 
 const VEHICLES = [
-  { id: "motorcycle", name: "Motorcycle", icon: <Icons.Bike size={24} />, desc: "Fast & Agile (Up to 10 kg.)" },
-  { id: "car", name: "Small Car", icon: <Icons.Truck size={24} />, desc: "Standard (Up to 30 kg.)" },
-  { id: "van", name: "Van / Pickup", icon: <Icons.Truck size={24} />, desc: "Large (Unlimited)" }
+  { id: "motorcycle", name: "Motorcycle", icon: Icons.Bike, desc: "Fast & Agile (Up to 10 kg.)" },
+  { id: "car", name: "Small Car", icon: Icons.Truck, desc: "Standard (Up to 30 kg.)" },
+  { id: "van", name: "Van / Pickup", icon: Icons.Truck, desc: "Large (Unlimited)" }
 ];
 
 export default function StaffVehicleTypePage() {
@@ -87,7 +87,7 @@ export default function StaffVehicleTypePage() {
                     <div className={`w-14 h-14 rounded-xl flex items-center justify-center ${
                         selectedVehicle === v.id ? 'bg-primary text-white shadow-lg' : 'bg-slate-50 text-slate-400'
                     }`}>
-                        {v.icon}
+                        <v.icon size={24} />
                     </div>
                     <div>
                         <h3 className="font-black text-slate-900 uppercase">{v.name}</h3>
