@@ -138,7 +138,7 @@ export default function HomePage() {
                />
             </Link>
             
-            <Link href="/profile/addresses" className={`flex-1 bg-white/20 backdrop-blur-md rounded-full flex items-center gap-2 border border-white/10 active:scale-95 transition-all truncate header-element-collapse ${
+            <Link href="/profile/addresses" data-tutorial-step="2" className={`flex-1 bg-white/20 backdrop-blur-md rounded-full flex items-center gap-2 border border-white/10 active:scale-95 transition-all truncate header-element-collapse ${
               isCollapsed ? "px-3 py-1 header-element-hidden" : "px-4 py-2"
             }`}>
                <Icons.MapPin size={16} className="text-white shrink-0" />
