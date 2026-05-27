@@ -18,7 +18,7 @@ const STEPS: StepConfig[] = [
     // Step 1: Home — เลือกบริการ
     selector: '[data-tutorial-step="1"]',
     page: "/",
-    placement: "below",
+    placement: "above",
     image: "/images/tutorial_step_1.png",
     customWidth: "60vw",
     customLeft: "25%",
