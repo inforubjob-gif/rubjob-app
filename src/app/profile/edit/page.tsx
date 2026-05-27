@@ -19,15 +19,39 @@ export default function EditProfilePage() {
   const [photoUrl, setPhotoUrl] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
+  const [nickname, setNickname] = useState("");
+  const [birthday, setBirthday] = useState({ day: "", month: "", year: "" });
+  const [gender, setGender] = useState("");
   const [isVerifying, setIsVerifying] = useState(false);
   const [otp, setOtp] = useState("");
   const [isVerified, setIsVerified] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    if (profile?.displayName) setName(profile.displayName);
-    if (profile?.pictureUrl) setPhotoUrl(profile.pictureUrl);
-    if (profile?.email) setEmail(profile.email);
+    if (!profile?.userId) return;
+    
+    if (profile.displayName) setName(profile.displayName);
+    if (profile.pictureUrl) setPhotoUrl(profile.pictureUrl);
+    if (profile.email) setEmail(profile.email);
+
+    // Fetch full profile to get phone, nickname, etc.
+    fetch(`/api/user/${profile.userId}`)
+      .then(res => res.json() as any)
+      .then(data => {
+        if (data.user) {
+          if (data.user.phone) {
+            setPhone(data.user.phone);
+            setIsVerified(true);
+          }
+          if (data.user.nickname) setNickname(data.user.nickname);
+          if (data.user.gender) setGender(data.user.gender);
+          if (data.user.birthday) {
+            const [y, m, d] = data.user.birthday.split('-');
+            if (y && m && d) setBirthday({ day: String(parseInt(d)), month: String(parseInt(m)), year: y });
+          }
+        }
+      })
+      .catch(console.error);
   }, [profile]);
 
   const handleVerify = () => {
@@ -61,6 +85,9 @@ export default function EditProfilePage() {
           displayName: name,
           pictureUrl: photoUrl,
           phone,
+          nickname: nickname.trim() || null,
+          birthday: birthday.day && birthday.month && birthday.year ? `${birthday.year}-${birthday.month.padStart(2, '0')}-${birthday.day.padStart(2, '0')}` : null,
+          gender: gender || null,
         }),
       });
     } catch (err) {
@@ -148,6 +175,22 @@ export default function EditProfilePage() {
           </div>
 
           <div className="space-y-2">
+            <label className="text-[11px] font-black text-slate-500 uppercase ml-2 block">ชื่อเล่น (ที่ต้องการให้เรียก)</label>
+            <div className="relative">
+              <input
+                type="text"
+                value={nickname}
+                onChange={(e) => setNickname(e.target.value)}
+                className="w-full bg-white rounded-xl pl-14 pr-6 py-5 font-extrabold text-slate-900 shadow-xl shadow-slate-200/40 outline-none focus:ring-4 focus:ring-primary/20 transition-all border-none"
+                placeholder="ชื่อเล่นของคุณ"
+              />
+              <div className="absolute left-5 top-1/2 -translate-y-1/2 w-8 h-8 bg-slate-50 rounded-lg flex items-center justify-center text-slate-400">
+                <Icons.User size={18} />
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-2">
             <label className="text-[11px] font-black text-slate-500 uppercase ml-2 block">{t("profile.email")}</label>
             <div className="relative">
               <input
@@ -203,6 +246,61 @@ export default function EditProfilePage() {
                  <span className="w-1 h-1 bg-emerald-500 rounded-full" /> {t("profile.verified")}
               </p>
             )}
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-[11px] font-black text-slate-500 uppercase ml-2 block">วันเกิด (รับโปรโมชั่นพิเศษ)</label>
+            <div className="flex gap-2">
+              <input 
+                type="number" 
+                placeholder="วัน" 
+                value={birthday.day}
+                onChange={(e) => {
+                  const val = parseInt(e.target.value);
+                  if (!e.target.value || (val >= 1 && val <= 31)) setBirthday({...birthday, day: e.target.value});
+                }}
+                className="w-1/3 bg-white rounded-xl px-4 py-5 font-extrabold text-slate-900 text-center shadow-xl shadow-slate-200/40 outline-none focus:ring-4 focus:ring-primary/20 transition-all border-none"
+              />
+              <input 
+                type="number" 
+                placeholder="เดือน" 
+                value={birthday.month}
+                onChange={(e) => {
+                  const val = parseInt(e.target.value);
+                  if (!e.target.value || (val >= 1 && val <= 12)) setBirthday({...birthday, month: e.target.value});
+                }}
+                className="w-1/3 bg-white rounded-xl px-4 py-5 font-extrabold text-slate-900 text-center shadow-xl shadow-slate-200/40 outline-none focus:ring-4 focus:ring-primary/20 transition-all border-none"
+              />
+              <input 
+                type="number" 
+                placeholder="ปี (ค.ศ.)" 
+                value={birthday.year}
+                onChange={(e) => {
+                  if (e.target.value.length <= 4) setBirthday({...birthday, year: e.target.value});
+                }}
+                className="w-1/3 bg-white rounded-xl px-4 py-5 font-extrabold text-slate-900 text-center shadow-xl shadow-slate-200/40 outline-none focus:ring-4 focus:ring-primary/20 transition-all border-none"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-[11px] font-black text-slate-500 uppercase ml-2 block">เพศ</label>
+            <div className="grid grid-cols-2 gap-3">
+              {[
+                { id: 'male', label: 'ผู้ชาย' },
+                { id: 'female', label: 'ผู้หญิง' },
+                { id: 'lgbtq', label: 'LGBTQ+' },
+                { id: 'unspecified', label: 'ไม่ระบุ' }
+              ].map((g) => (
+                <button
+                  key={g.id}
+                  onClick={() => setGender(g.id)}
+                  className={`py-4 rounded-xl font-black text-sm transition-all border-2 ${gender === g.id ? 'bg-primary/10 border-primary text-primary shadow-sm' : 'bg-white border-transparent text-slate-400 hover:bg-slate-50'}`}
+                >
+                  {g.label}
+                </button>
+              ))}
+            </div>
           </div>
         </section>
 
