@@ -173,9 +173,13 @@ function BookingFlow() {
   function handleTutorialComplete() {
     setShowTutorial(false);
     try {
+      localStorage.setItem("rubjob_tutorial_seen_v2", "true");
+    } catch (err) {
+      console.warn("localStorage not accessible", err);
+    }
+    try {
       sessionStorage.removeItem("rubjob_tutorial_step");
     } catch (e) {}
-    localStorage.setItem("rubjob_tutorial_seen", "true");
     // Navigate back home after tutorial
     router.push("/");
   }

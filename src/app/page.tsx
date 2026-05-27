@@ -25,7 +25,7 @@ export default function HomePage() {
   useEffect(() => {
     if (!isReady) return;
     try {
-      const seen = localStorage.getItem("rubjob_tutorial_seen");
+      const seen = localStorage.getItem("rubjob_tutorial_seen_v2");
       if (seen) {
         setTutorialSeen(true);
         return;
@@ -43,7 +43,7 @@ export default function HomePage() {
     setShowTutorial(false);
     setTutorialSeen(true);
     try {
-      localStorage.setItem("rubjob_tutorial_seen", "true");
+      localStorage.setItem("rubjob_tutorial_seen_v2", "true");
     } catch (err) {
       console.warn("localStorage not accessible", err);
     }
