@@ -300,21 +300,27 @@ export default function HowToOverlay({
         }}
       />
 
-      {/* Text */}
+      {/* Text with dark background */}
       <div
         key={`text-${currentStep}`}
         className="pointer-events-none"
         style={textStyle}
       >
-        <p
-          className="text-white text-[17px] font-black leading-relaxed whitespace-pre-line"
+        <div
+          className="inline-block px-4 py-2.5 rounded-2xl"
           style={{
-            textShadow: "0 2px 12px rgba(0,0,0,0.7), 0 0 4px rgba(0,0,0,0.4)",
-            textAlign: step.textAlign,
+            background: "rgba(0,0,0,0.75)",
+            backdropFilter: "blur(8px)",
+            WebkitBackdropFilter: "blur(8px)",
           }}
         >
-          {step.text}
-        </p>
+          <p
+            className="text-white text-[16px] font-black leading-relaxed whitespace-pre-line"
+            style={{ textAlign: step.textAlign }}
+          >
+            {step.text}
+          </p>
+        </div>
       </div>
 
       {/* Bottom controls */}
