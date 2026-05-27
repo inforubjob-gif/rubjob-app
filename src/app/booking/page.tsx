@@ -154,21 +154,27 @@ function BookingFlow() {
       }
     } else {
       // Check sessionStorage for tutorial continuation
-      const savedStep = sessionStorage.getItem("rubjob_tutorial_step");
-      if (savedStep) {
-        sessionStorage.removeItem("rubjob_tutorial_step");
-        const stepNum = parseInt(savedStep);
-        if (!isNaN(stepNum)) {
-          setTutorialStartStep(stepNum);
-          setTimeout(() => setShowTutorial(true), 800);
+      try {
+        const savedStep = sessionStorage.getItem("rubjob_tutorial_step");
+        if (savedStep) {
+          sessionStorage.removeItem("rubjob_tutorial_step");
+          const stepNum = parseInt(savedStep);
+          if (!isNaN(stepNum)) {
+            setTutorialStartStep(stepNum);
+            setTimeout(() => setShowTutorial(true), 800);
+          }
         }
+      } catch (err) {
+        console.warn("sessionStorage not accessible", err);
       }
     }
   }, [tutorialParam]);
 
   function handleTutorialComplete() {
     setShowTutorial(false);
-    sessionStorage.removeItem("rubjob_tutorial_step");
+    try {
+      sessionStorage.removeItem("rubjob_tutorial_step");
+    } catch (e) {}
     localStorage.setItem("rubjob_tutorial_seen", "true");
     // Navigate back home after tutorial
     router.push("/");
