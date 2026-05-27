@@ -15,6 +15,7 @@ interface LiffContextValue {
   isInClient: boolean;
   profile: User | null;
   error: string | null;
+  isNewUser?: boolean;
   login: () => void;
   logout: (redirectPath?: string) => void;
 }
@@ -25,6 +26,7 @@ const LiffContext = createContext<LiffContextValue>({
   isInClient: false,
   profile: null,
   error: null,
+  isNewUser: false,
   login: () => {},
   logout: () => {},
 });
@@ -186,7 +188,7 @@ export default function LiffProvider({ children }: { children: ReactNode }) {
         // Background Sync with Cloudflare D1
         (async () => {
           try {
-            await fetch("/api/user/sync", {
+            const syncRes = await fetch("/api/user/sync", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
@@ -195,6 +197,15 @@ export default function LiffProvider({ children }: { children: ReactNode }) {
                 pictureUrl: profile.pictureUrl
               }),
             });
+            const syncData = await syncRes.json() as any;
+
+            if (syncData.isNewUser) {
+              try {
+                localStorage.removeItem("rubjob_tutorial_seen_v2");
+                localStorage.removeItem("rubjob_tutorial_seen");
+              } catch (e) {}
+              setCtx(prev => ({ ...prev, isNewUser: true }));
+            }
 
             const dbRes = await fetch(`/api/user/${profile.userId}`);
             if (dbRes.ok) {

@@ -26,6 +26,12 @@ export async function POST(req: Request) {
     // Self-healing: ensure schema and new columns exist
     await ensureSchema(db);
 
+    // Fetch updated user to return phone status and check if they are new/deleted
+    const existingUser = await db.prepare(`SELECT phone, role FROM users WHERE id = ?`).bind(id).first<any>();
+    
+    // If the user doesn't exist yet, they are new. If they exist but role is 'deleted', they are returning as new.
+    const isNewUser = !existingUser || existingUser.role === 'deleted';
+
     // Upsert User (include phone if provided)
     // On INSERT (new user): set role='user' as default.
     // On UPDATE (existing user): only sync profile fields — never reset
@@ -54,10 +60,10 @@ export async function POST(req: Request) {
       `).bind(id, displayName, pictureUrl).run();
     }
 
-    // Fetch updated user to return phone status
-    const user = await db.prepare(`SELECT phone FROM users WHERE id = ?`).bind(id).first();
+    // Fetch the final user to ensure we return the correct phone if they just inserted it
+    const finalUser = await db.prepare(`SELECT phone FROM users WHERE id = ?`).bind(id).first<any>();
 
-    return NextResponse.json({ success: true, phone: user?.phone || null });
+    return NextResponse.json({ success: true, phone: finalUser?.phone || null, isNewUser });
   } catch (error: unknown) {
     console.error("Sync user error:", error);
     return NextResponse.json({ error: safeError(error) }, { status: 500 });

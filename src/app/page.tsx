@@ -14,7 +14,7 @@ import { useScrollCollapse } from "@/hooks/useScrollCollapse";
 import HowToOverlay from "@/components/tutorial/HowToOverlay";
 
 export default function HomePage() {
-  const { profile, isReady } = useLiff();
+  const { profile, isReady, isNewUser } = useLiff();
   const { t } = useTranslation();
   const [comingSoonModal, setComingSoonModal] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState("All");
@@ -38,6 +38,14 @@ export default function HomePage() {
     const timer = setTimeout(() => setShowTutorial(true), 800);
     return () => clearTimeout(timer);
   }, [isReady]);
+
+  // Force show if background sync detects a brand new user (or returning after deletion)
+  useEffect(() => {
+    if (isNewUser) {
+      setTutorialSeen(false);
+      setShowTutorial(true);
+    }
+  }, [isNewUser]);
 
   function handleTutorialComplete() {
     setShowTutorial(false);
