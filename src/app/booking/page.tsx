@@ -1260,18 +1260,7 @@ function BookingFlow() {
         )}
         {step === "details" && (
           <div className="space-y-3">
-            {!profile?.phone && (
-              <div className="bg-amber-50 border border-amber-100 p-3 rounded-xl">
-                <p className="text-xs font-bold text-amber-700 mb-2">{t("booking.identifyPhone")}</p>
-                <input 
-                  type="tel" 
-                  placeholder="081-234-5678" 
-                  className="w-full bg-white border border-amber-200 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 font-bold"
-                  value={tempPhone}
-                  onChange={(e) => setTempPhone(e.target.value)}
-                />
-              </div>
-            )}
+
             {isTooFar && (
               <div className="bg-red-50 text-red-600 text-[11px] font-bold p-2 rounded-lg flex items-center gap-2 border border-red-100">
                 <Icons.AlertCircle size={14} />
@@ -1299,27 +1288,7 @@ function BookingFlow() {
                       showToast(t("booking.errors.noDateTime"), "error");
                       return;
                     }
-                    if (!profile?.phone && !tempPhone) {
-                      showToast(t("booking.errors.noPhone"), "error");
-                      return;
-                    }
-                    if (tempPhone && !profile?.phone) {
-                      try {
-                        await fetch("/api/user/sync", {
-                          method: "POST",
-                          headers: { "Content-Type": "application/json" },
-                          body: JSON.stringify({
-                            id: profile?.userId,
-                            displayName: profile?.displayName,
-                            pictureUrl: profile?.pictureUrl,
-                            phone: tempPhone
-                          })
-                        });
-                        profile!.phone = tempPhone; 
-                      } catch (e) {
-                        console.error("Phone sync failed", e);
-                      }
-                    }
+
                     const success = await handleConfirm();
                     if (success) setStep("payment");
                   }}

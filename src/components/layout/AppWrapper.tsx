@@ -100,7 +100,8 @@ export default function AppWrapper({ children }: { children: React.ReactNode }) 
 
         const hasPhone = !!userData.user?.phone;
         const hasAddress = (addrData.addresses?.length || 0) > 0;
-        const completed = hasPhone && hasAddress;
+        const hasAcceptedTerms = !!userData.user?.termsAcceptedAt;
+        const completed = hasPhone && hasAddress && hasAcceptedTerms;
 
         // Sync localStorage with actual server state
         if (completed) {

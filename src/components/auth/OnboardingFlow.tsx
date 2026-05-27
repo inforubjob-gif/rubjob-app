@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import { Icons } from "@/components/ui/Icons";
@@ -27,6 +27,39 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
   const { showToast } = useToast();
   const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isCheckingProgress, setIsCheckingProgress] = useState(true);
+
+  // Resume from the step where user left off (if they exited mid-onboarding before)
+  useEffect(() => {
+    if (!profile?.userId) {
+      setIsCheckingProgress(false);
+      return;
+    }
+    async function checkProgress() {
+      try {
+        const res = await fetch(`/api/user/${profile?.userId}`);
+        if (!res.ok) { setIsCheckingProgress(false); return; }
+        const data = await res.json() as any;
+        const user = data.user;
+        if (!user) { setIsCheckingProgress(false); return; }
+
+        if (user.phone && user.termsAcceptedAt) {
+          // Phone + terms done → skip to location/address (Step 3)
+          setStep(3);
+        } else if (user.phone) {
+          // Phone done, terms not yet → skip to terms (Step 2)
+          setPhone(user.phone.replace(/(\d{3})(\d{3})(\d{4})/, '$1-$2-$3'));
+          setStep(2);
+        }
+        // else: start from Step 1
+      } catch (err) {
+        console.error("Failed to check onboarding progress:", err);
+      } finally {
+        setIsCheckingProgress(false);
+      }
+    }
+    checkProgress();
+  }, [profile?.userId]);
 
   // Step 1: Phone
   const [phone, setPhone] = useState("");
@@ -188,6 +221,15 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
     3: language === 'th' ? "เราต้องการตำแหน่งของคุณเพื่อค้นหาร้านซักใกล้บ้าน" : "We need your location to find nearby laundry shops",
     4: t("onboarding.addressSubtitle"),
   };
+
+  if (isCheckingProgress) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-dvh bg-white">
+        <div className="w-12 h-12 border-4 border-primary/20 border-t-primary rounded-full animate-spin mb-4" />
+        <p className="text-[10px] font-black text-slate-400 uppercase animate-pulse">กำลังเตรียมข้อมูล...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col min-h-dvh bg-white relative overflow-hidden">
