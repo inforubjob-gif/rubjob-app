@@ -24,10 +24,14 @@ export default function HomePage() {
   // Auto-show tutorial on first visit (only once, ever)
   useEffect(() => {
     if (!isReady) return;
-    const seen = localStorage.getItem("rubjob_tutorial_seen");
-    if (seen) {
-      setTutorialSeen(true);
-      return;
+    try {
+      const seen = localStorage.getItem("rubjob_tutorial_seen");
+      if (seen) {
+        setTutorialSeen(true);
+        return;
+      }
+    } catch (err) {
+      console.warn("localStorage not accessible", err);
     }
     setTutorialSeen(false);
     // Auto-show on first visit after a short delay
@@ -38,7 +42,11 @@ export default function HomePage() {
   function handleTutorialComplete() {
     setShowTutorial(false);
     setTutorialSeen(true);
-    localStorage.setItem("rubjob_tutorial_seen", "true");
+    try {
+      localStorage.setItem("rubjob_tutorial_seen", "true");
+    } catch (err) {
+      console.warn("localStorage not accessible", err);
+    }
   }
 
   // State for live data
