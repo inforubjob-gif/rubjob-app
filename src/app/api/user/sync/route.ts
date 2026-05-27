@@ -11,7 +11,7 @@ export const runtime = "edge";
  */
 export async function POST(req: Request) {
   try {
-    const { id, displayName, pictureUrl, phone } = await req.json() as any;
+    const { id, displayName, pictureUrl, phone, nickname, birthday, gender } = await req.json() as any;
     
     if (!id) {
       return NextResponse.json({ error: "User ID required" }, { status: 400 });
@@ -34,13 +34,16 @@ export async function POST(req: Request) {
     // role, walletPin, or preferences as those are managed elsewhere.
     if (phone) {
       await db.prepare(`
-        INSERT INTO users (id, displayName, pictureUrl, phone, role, assignedStoreId) 
-        VALUES (?, ?, ?, ?, 'user', NULL)
+        INSERT INTO users (id, displayName, pictureUrl, phone, nickname, birthday, gender, role, assignedStoreId) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, 'user', NULL)
         ON CONFLICT(id) DO UPDATE SET 
           displayName = excluded.displayName,
           pictureUrl = excluded.pictureUrl,
-          phone = excluded.phone
-      `).bind(id, displayName, pictureUrl, phone).run();
+          phone = excluded.phone,
+          nickname = excluded.nickname,
+          birthday = excluded.birthday,
+          gender = excluded.gender
+      `).bind(id, nickname || displayName, pictureUrl, phone, nickname || null, birthday || null, gender || null).run();
     } else {
       await db.prepare(`
         INSERT INTO users (id, displayName, pictureUrl, role, assignedStoreId) 

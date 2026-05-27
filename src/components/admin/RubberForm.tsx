@@ -264,7 +264,7 @@ export default function RubberForm({ initialData, isEdit }: RubberFormProps) {
                     <AdminDocumentUpload 
                        variant="square"
                        label="Profile Photo"
-                       value={formData.documents.find((d: any) => d.type === 'profile_photo')?.id || formData.documents.find((d: any) => d.type === 'profile_photo')?.url}
+                       value={formData.documents.find((d: any) => d.type === 'profile_photo')?.id || formData.documents.find((d: any) => d.type === 'profile_photo')?.url || formData.pictureUrl}
                        onChange={(val) => handleDocChange('profile_photo', 'url', val)}
                     />
                  </div>

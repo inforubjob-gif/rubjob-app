@@ -162,6 +162,8 @@ export const Icons = {
   Relax: (props: IconProps) => <MaterialIcon name="spa" {...props} />,
   HeartHand: (props: IconProps) => <MaterialIcon name="volunteer_activism" {...props} />,
   ChevronDown: (props: IconProps) => <MaterialIcon name="expand_more" {...props} />,
+  Calendar: (props: IconProps) => <MaterialIcon name="calendar_month" {...props} />,
+  Heart: (props: IconProps) => <MaterialIcon name="favorite" {...props} />,
 };
 
 export function IconCircle({ 

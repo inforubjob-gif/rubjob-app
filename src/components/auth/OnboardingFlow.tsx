@@ -45,10 +45,17 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
 
         if (user.phone && user.termsAcceptedAt) {
           // Phone + terms done → skip to location/address (Step 3)
+          if (user.nickname) setNickname(user.nickname);
           setStep(3);
         } else if (user.phone) {
           // Phone done, terms not yet → skip to terms (Step 2)
           setPhone(user.phone.replace(/(\d{3})(\d{3})(\d{4})/, '$1-$2-$3'));
+          if (user.nickname) setNickname(user.nickname);
+          if (user.birthday) {
+            const [y, m, d] = user.birthday.split("-");
+            setBirthday({ day: d, month: m, year: y });
+          }
+          if (user.gender) setGender(user.gender);
           setStep(2);
         }
         // else: start from Step 1
@@ -61,9 +68,12 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
     checkProgress();
   }, [profile?.userId]);
 
-  // Step 1: Phone
+  // Step 1: Phone + Profile
+  const [nickname, setNickname] = useState(profile?.displayName || "");
   const [phone, setPhone] = useState("");
   const [phoneError, setPhoneError] = useState("");
+  const [birthday, setBirthday] = useState({ day: "", month: "", year: "" });
+  const [gender, setGender] = useState<string>("");
 
   // Step 2: Terms
   const [agreedTerms, setAgreedTerms] = useState(false);
@@ -103,14 +113,20 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
 
     try {
       const cleanPhone = phone.replace(/\D/g, "");
+      const birthdayStr = birthday.day && birthday.month && birthday.year
+        ? `${birthday.year}-${birthday.month.padStart(2, '0')}-${birthday.day.padStart(2, '0')}`
+        : null;
       await fetch("/api/user/sync", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           id: profile?.userId,
-          displayName: profile?.displayName,
+          displayName: nickname.trim() || profile?.displayName,
           pictureUrl: profile?.pictureUrl,
           phone: cleanPhone,
+          nickname: nickname.trim() || null,
+          birthday: birthdayStr,
+          gender: gender || null,
         }),
       });
       setStep(2);
@@ -265,7 +281,28 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
         {step === 1 && (
           <div className="animate-fade-in space-y-5">
             <Card className="p-6 shadow-xl shadow-slate-200/50 border-slate-100 ring-1 ring-slate-100">
-              <div className="flex items-center gap-3 mb-5">
+              {/* ── Nickname ── */}
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-11 h-11 bg-primary-light rounded-xl flex items-center justify-center text-primary-dark shadow-sm">
+                  <Icons.User size={22} />
+                </div>
+                <div>
+                  <h3 className="text-base font-black text-foreground">{t("onboarding.nicknameLabel")}</h3>
+                  <p className="text-xs text-muted mt-0.5">{t("onboarding.nicknameDesc")}</p>
+                </div>
+              </div>
+              <GlobalInput
+                value={nickname}
+                onChange={(e) => setNickname(e.target.value)}
+                placeholder={t("onboarding.nicknamePlaceholder")}
+                variant="default"
+              />
+
+              {/* ── Divider ── */}
+              <div className="border-t border-slate-100 my-5" />
+
+              {/* ── Phone ── */}
+              <div className="flex items-center gap-3 mb-4">
                 <div className="w-11 h-11 bg-primary-light rounded-xl flex items-center justify-center text-primary-dark shadow-sm">
                   <Icons.Phone size={22} />
                 </div>
@@ -274,33 +311,118 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
                   <p className="text-xs text-muted mt-0.5">{t("onboarding.phoneDesc")}</p>
                 </div>
               </div>
+              <GlobalInput
+                type="tel"
+                inputMode="numeric"
+                value={phone}
+                onChange={(e) => {
+                  setPhone(formatPhone(e.target.value));
+                  setPhoneError("");
+                }}
+                placeholder="08X-XXX-XXXX"
+                error={phoneError}
+                variant="default"
+                className="text-center text-lg"
+              />
 
-              <div className="relative">
-                <GlobalInput
-                  type="tel"
-                  inputMode="numeric"
-                  value={phone}
-                  onChange={(e) => {
-                    setPhone(formatPhone(e.target.value));
-                    setPhoneError("");
-                  }}
-                  placeholder="08X-XXX-XXXX"
-                  error={phoneError}
-                  variant="default"
-                  className="text-center text-lg"
-                />
+              {/* ── Divider ── */}
+              <div className="border-t border-slate-100 my-5" />
+
+              {/* ── Birthday ── */}
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-11 h-11 bg-amber-50 rounded-xl flex items-center justify-center text-amber-600 shadow-sm">
+                  <Icons.Calendar size={22} />
+                </div>
+                <div>
+                  <h3 className="text-sm font-black text-foreground">{t("onboarding.birthdayLabel")}</h3>
+                  <p className="text-[11px] text-muted mt-0.5">{t("onboarding.birthdayDesc")}</p>
+                </div>
+              </div>
+              <div className="grid grid-cols-3 gap-2">
+                <select
+                  value={birthday.day}
+                  onChange={(e) => setBirthday(prev => ({ ...prev, day: e.target.value }))}
+                  className="bg-slate-50 border-2 border-slate-100 rounded-xl px-3 py-3 text-sm font-bold text-slate-700 focus:border-primary focus:ring-4 focus:ring-primary/20 transition-all outline-none appearance-none text-center"
+                >
+                  <option value="">{t("onboarding.birthdayDay")}</option>
+                  {Array.from({ length: 31 }, (_, i) => i + 1).map(d => (
+                    <option key={d} value={String(d)}>{d}</option>
+                  ))}
+                </select>
+                <select
+                  value={birthday.month}
+                  onChange={(e) => setBirthday(prev => ({ ...prev, month: e.target.value }))}
+                  className="bg-slate-50 border-2 border-slate-100 rounded-xl px-3 py-3 text-sm font-bold text-slate-700 focus:border-primary focus:ring-4 focus:ring-primary/20 transition-all outline-none appearance-none text-center"
+                >
+                  <option value="">{t("onboarding.birthdayMonth")}</option>
+                  {(language === 'th'
+                    ? ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.']
+                    : ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
+                  ).map((m, i) => (
+                    <option key={i} value={String(i + 1)}>{m}</option>
+                  ))}
+                </select>
+                <select
+                  value={birthday.year}
+                  onChange={(e) => setBirthday(prev => ({ ...prev, year: e.target.value }))}
+                  className="bg-slate-50 border-2 border-slate-100 rounded-xl px-3 py-3 text-sm font-bold text-slate-700 focus:border-primary focus:ring-4 focus:ring-primary/20 transition-all outline-none appearance-none text-center"
+                >
+                  <option value="">{t("onboarding.birthdayYear")}</option>
+                  {(() => {
+                    const currentYear = new Date().getFullYear();
+                    const offset = language === 'th' ? 543 : 0;
+                    return Array.from({ length: 80 }, (_, i) => currentYear - 10 - i).map(y => (
+                      <option key={y} value={String(y)}>{y + offset}</option>
+                    ));
+                  })()}
+                </select>
               </div>
 
-              <p className="text-[11px] text-muted text-center mt-3 opacity-70">
-                {t("onboarding.phonePrivacy")}
-              </p>
+              {/* ── Divider ── */}
+              <div className="border-t border-slate-100 my-5" />
+
+              {/* ── Gender ── */}
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-11 h-11 bg-violet-50 rounded-xl flex items-center justify-center text-violet-600 shadow-sm">
+                  <Icons.Heart size={22} />
+                </div>
+                <div>
+                  <h3 className="text-sm font-black text-foreground">{t("onboarding.genderLabel")}</h3>
+                  <p className="text-[11px] text-muted mt-0.5">{t("onboarding.genderDesc")}</p>
+                </div>
+              </div>
+              <div className="grid grid-cols-4 gap-2">
+                {[
+                  { value: 'male', label: t('onboarding.genderMale') },
+                  { value: 'female', label: t('onboarding.genderFemale') },
+                  { value: 'lgbtq', label: t('onboarding.genderLgbtq') },
+                  { value: 'prefer_not_to_say', label: t('onboarding.genderNotSay') },
+                ].map(opt => (
+                  <button
+                    key={opt.value}
+                    type="button"
+                    onClick={() => setGender(gender === opt.value ? '' : opt.value)}
+                    className={`py-2.5 px-1 rounded-xl text-[11px] font-bold border-2 transition-all active:scale-95 ${
+                      gender === opt.value
+                        ? 'border-primary bg-primary/10 text-primary-dark'
+                        : 'border-slate-100 bg-white text-slate-500 hover:border-slate-200'
+                    }`}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
             </Card>
+
+            <p className="text-[10px] text-muted text-center opacity-60 px-4">
+              {t("onboarding.privacyNote")}
+            </p>
 
             <Button
               fullWidth
               size="lg"
               isLoading={isSubmitting}
-              disabled={phone.replace(/\D/g, "").length < 10}
+              disabled={!nickname.trim() || phone.replace(/\D/g, "").length < 10 || !birthday.day || !birthday.month || !birthday.year || !gender}
               onClick={handlePhoneSubmit}
             >
               {t("onboarding.nextButton")}
