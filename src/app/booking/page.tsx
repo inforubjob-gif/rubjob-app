@@ -1529,14 +1529,6 @@ function BookingFlow() {
         <HowToOverlay
           onComplete={handleTutorialComplete}
           startStep={tutorialStartStep}
-          onStepChange={(stepIdx) => {
-            // Step indices: 0-4 = details steps, 5 = coupon (still details), 6-7 = payment steps
-            if (stepIdx >= 6) {
-              setStep("payment");
-            } else {
-              setStep("details");
-            }
-          }}
         />
       )}
     </div>
