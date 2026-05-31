@@ -28,7 +28,9 @@ export async function GET(
              u_customer.displayName as userName,
              st.name as storeName, st.lat as storeLat, st.lng as storeLng,
              COALESCE(r_pickup.name, u_pickup.displayName) as pickupDriverName,
-             COALESCE(r_delivery.name, u_delivery.displayName) as deliveryDriverName
+             COALESCE(r_pickup.phone, u_pickup.phone) as pickupDriverPhone,
+             COALESCE(r_delivery.name, u_delivery.displayName) as deliveryDriverName,
+             COALESCE(r_delivery.phone, u_delivery.phone) as deliveryDriverPhone
       FROM orders o
       JOIN services s ON o.serviceId = s.id
       JOIN users u_customer ON o.userId = u_customer.id
