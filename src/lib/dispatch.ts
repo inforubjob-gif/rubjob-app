@@ -1,13 +1,29 @@
 import { D1Database } from "@cloudflare/workers-types";
 import { getGPConfig, calcRubberPayout } from "@/lib/gp-config";
 
+/** Max distance (km) between order and rubber's serviceAreaCoords to be eligible */
+const GEO_THRESHOLD_KM = 30;
+
 /**
  * Geo-Filtered Rubber Dispatch System
  * 
- * Instead of broadcasting to ALL online rubbers nationwide,
- * this module filters rubbers by province/area to match the order's delivery address.
- * This saves LINE Push Message quota and reduces noise for drivers.
+ * Filters rubbers by distance (Haversine) or province to match the order's delivery address.
+ * Only broadcasts to active, online rubbers within range.
  */
+
+/**
+ * Haversine formula — compute straight-line distance between two lat/lng points.
+ * Pure math, no external API, zero cost.
+ */
+function haversineKm(lat1: number, lng1: number, lat2: number, lng2: number): number {
+  const R = 6371;
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLng = (lng2 - lng1) * Math.PI / 180;
+  const a = Math.sin(dLat / 2) ** 2 +
+            Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+            Math.sin(dLng / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
 
 /**
  * Parse order address to extract province and area
@@ -49,10 +65,12 @@ function parseRubberAddress(address: string | null): { province: string | null; 
 /**
  * Get list of eligible rubbers for an order based on geo-matching.
  * 
- * Matching Logic:
- * 1. If rubber has a registered province AND order has a province -> must match
- * 2. If rubber has no registered province (legacy/old data) -> include them (backwards compatible)
- * 3. Only include rubbers who are online (workStatus === true)
+ * Matching Logic (priority order):
+ * 1. Only include rubbers with status = 'active'
+ * 2. Only include rubbers who are explicitly online (workStatus === true)
+ * 3. If rubber has serviceAreaCoords AND order has lat/lng → Haversine distance ≤ 30km
+ * 4. Fallback: province text matching
+ * 5. If no geo data available at all → skip (safe default)
  */
 export async function getEligibleRubbers(
   db: D1Database,
@@ -60,11 +78,22 @@ export async function getEligibleRubbers(
 ): Promise<{ id: string; lineUserId: string | null; preferences: string }[]> {
   const { province: orderProvince } = parseOrderAddress(orderAddress);
   
-  // Select ALL rubbers — not just those with lineUserId
-  // Rubbers registered via web (phone+password) may not have linked LINE yet
+  // Parse order lat/lng for distance-based filtering
+  let orderLat: number | null = null;
+  let orderLng: number | null = null;
+  try {
+    const parsed = typeof orderAddress === 'string' ? JSON.parse(orderAddress) : orderAddress;
+    if (parsed?.lat && parsed?.lng) {
+      orderLat = Number(parsed.lat);
+      orderLng = Number(parsed.lng);
+    }
+  } catch {}
+  
+  // Fix 1: Only select active rubbers (excludes pending/suspended)
   const { results: allRubbers } = await db.prepare(`
     SELECT id, lineUserId, preferences, address
     FROM rubber_users
+    WHERE status = 'active'
   `).all() as any;
 
   const eligible: { id: string; lineUserId: string | null; preferences: string }[] = [];
@@ -73,23 +102,38 @@ export async function getEligibleRubbers(
     try {
       const prefs = JSON.parse(r.preferences || "{}");
       
-      // Must be online (default to true if undefined)
-      if (prefs.workStatus === false) {
-         db.prepare("INSERT INTO webhook_logs (id, channel, payload, error) VALUES (?, ?, ?, ?)").bind(`FILTER-WORK-${r.id}-${Date.now()}`, 'filter_skip', 'workStatus is false', null).run().catch(() => {});
+      // Fix 2: Must be explicitly online (workStatus === true required)
+      if (prefs.workStatus !== true) {
+         db.prepare("INSERT INTO webhook_logs (id, channel, payload, error) VALUES (?, ?, ?, ?)").bind(`FILTER-WORK-${r.id}-${Date.now()}`, 'filter_skip', `workStatus is ${prefs.workStatus} (not true)`, null).run().catch(() => {});
          continue;
       }
       
-      // Geo-filter: check province match
-      if (orderProvince) {
-        const rubberAddr = parseRubberAddress(r.address);
-        
-        // 🛡️ Phase 2.3: Re-enabled geo-filter — rubber must be in same province as order
-        if (rubberAddr.province && rubberAddr.province !== orderProvince) {
-          db.prepare("INSERT INTO webhook_logs (id, channel, payload, error) VALUES (?, ?, ?, ?)").bind(`FILTER-GEO-${r.id}-${Date.now()}`, 'filter_skip', `Order: ${orderProvince}, Rubber: ${rubberAddr.province}`, null).run().catch(() => {});
-          continue;
+      // Fix 3: Geo-filter — distance-based (Haversine) with province fallback
+      let geoFiltered = false;
+      
+      // Priority 1: Distance-based using serviceAreaCoords
+      if (orderLat && orderLng && prefs.serviceAreaCoords?.lat && prefs.serviceAreaCoords?.lng) {
+        const dist = haversineKm(orderLat, orderLng, Number(prefs.serviceAreaCoords.lat), Number(prefs.serviceAreaCoords.lng));
+        if (dist > GEO_THRESHOLD_KM) {
+          db.prepare("INSERT INTO webhook_logs (id, channel, payload, error) VALUES (?, ?, ?, ?)").bind(`FILTER-GEO-${r.id}-${Date.now()}`, 'filter_skip', `Distance: ${dist.toFixed(1)}km > ${GEO_THRESHOLD_KM}km`, null).run().catch(() => {});
+          geoFiltered = true;
         }
-        // If rubber has no province registered (legacy data) -> include them
       }
+      // Priority 2: Province text matching (fallback)
+      else if (orderProvince) {
+        const rubberAddr = parseRubberAddress(r.address);
+        if (rubberAddr.province && rubberAddr.province !== orderProvince) {
+          db.prepare("INSERT INTO webhook_logs (id, channel, payload, error) VALUES (?, ?, ?, ?)").bind(`FILTER-GEO-${r.id}-${Date.now()}`, 'filter_skip', `Province: Order=${orderProvince}, Rubber=${rubberAddr.province}`, null).run().catch(() => {});
+          geoFiltered = true;
+        }
+        // If rubber has no province registered (legacy) → include them for now
+      }
+      // No geo data at all on both sides → skip for safety
+      else if (!orderLat && !orderProvince) {
+        // Order has no location data — cannot filter, include rubber
+      }
+      
+      if (geoFiltered) continue;
       
       eligible.push({
         id: r.id,

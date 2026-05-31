@@ -14,7 +14,7 @@ export default function RubberProfilePage() {
   const router = useRouter();
   const { language, setLanguage, t } = useTranslation();
   const { showToast } = useToast();
-  const [workStatus, setWorkStatus] = useState(true);
+  const [workStatus, setWorkStatus] = useState(false);
   const [showLanguageModal, setShowLanguageModal] = useState(false);
   const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
   const [prefs, setPrefs] = useState<any>({});

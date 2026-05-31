@@ -10,6 +10,7 @@ import { Icons } from "@/components/ui/Icons";
 import { useTranslation } from "@/components/providers/LanguageProvider";
 import { useToast } from "@/components/providers/ToastProvider";
 import GlobalSelect from "@/components/ui/GlobalSelect";
+import BankSelector from "@/components/ui/BankSelector";
 import Modal from "@/components/ui/Modal";
 
 const STATUS_FLOW = [
@@ -45,6 +46,7 @@ export default function AdminOrderDetailPage() {
  const [changeModal, setChangeModal] = useState<{ type: 'store' | 'pickup' | 'delivery' } | null>(null);
  const [changeModalValue, setChangeModalValue] = useState("");
  const [isSkippingPayment, setIsSkippingPayment] = useState(false);
+ const [isBroadcasting, setIsBroadcasting] = useState<string | null>(null);
  const [refundBankName, setRefundBankName] = useState("");
  const [refundAccountNumber, setRefundAccountNumber] = useState("");
  const [refundAccountName, setRefundAccountName] = useState("");
@@ -126,6 +128,26 @@ export default function AdminOrderDetailPage() {
    }
   } catch { showToast(t("admin.broadcast.genericError"), "error"); }
   finally { setIsUpdating(false); }
+ }
+
+ async function handleRebroadcast(type: 'pickup' | 'delivery') {
+  if (!confirm(`ยืนยันบรอดแคสหาไรเดอร์ ${type === 'pickup' ? 'รับผ้า' : 'ส่งคืน'} ใหม่?\n\nระบบจะปลดไรเดอร์เดิมออก และส่งแจ้งเตือนหาคนขับทุกคนที่ออนไลน์อยู่`)) return;
+  setIsBroadcasting(type);
+  try {
+   const res = await fetch(`/api/admin/orders/${id}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ rebroadcastType: type }),
+   });
+   if (res.ok) {
+    showToast(`📡 บรอดแคสหาไรเดอร์${type === 'pickup' ? 'รับผ้า' : 'ส่งคืน'}ใหม่สำเร็จ!`, "success");
+    fetchOrder();
+   } else {
+    const err = await res.json() as any;
+    showToast(err.error || "เกิดข้อผิดพลาด", "error");
+   }
+  } catch { showToast("เกิดข้อผิดพลาดในการเชื่อมต่อ", "error"); }
+  finally { setIsBroadcasting(null); }
  }
 
   function parseAddress(addr: any) {
@@ -494,7 +516,17 @@ export default function AdminOrderDetailPage() {
      <Card className="p-5">
       <div className="flex items-center justify-between mb-4">
        <h3 className="text-[10px] font-black text-emerald-600 uppercase tracking-widest">🏍️ ไรเดอร์รับผ้า</h3>
-       <button onClick={() => { setChangeModal({ type: 'pickup' }); setChangeModalValue(order.pickupDriverId || ""); }} className="text-[10px] font-black bg-emerald-50 text-emerald-600 px-3 py-1.5 rounded-lg hover:bg-emerald-100 transition-colors uppercase">เปลี่ยน (ฉุกเฉิน)</button>
+        <button 
+         onClick={() => handleRebroadcast('pickup')}
+         disabled={!!isBroadcasting}
+         className="text-[10px] font-black bg-emerald-50 text-emerald-600 px-3 py-1.5 rounded-lg hover:bg-emerald-100 transition-colors uppercase disabled:opacity-50 flex items-center gap-1.5"
+        >
+         {isBroadcasting === 'pickup' ? (
+          <><div className="w-3 h-3 border-2 border-emerald-300 border-t-emerald-600 rounded-full animate-spin" /> กำลังบรอดแคส...</>
+         ) : (
+          <>📡 บรอดแคสใหม่</>
+         )}
+        </button>
       </div>
       {order.pickupRiderName ? (
        <>
@@ -520,7 +552,17 @@ export default function AdminOrderDetailPage() {
      <Card className="p-5">
       <div className="flex items-center justify-between mb-4">
        <h3 className="text-[10px] font-black text-blue-600 uppercase tracking-widest">📦 ไรเดอร์ส่งคืน</h3>
-       <button onClick={() => { setChangeModal({ type: 'delivery' }); setChangeModalValue(order.deliveryDriverId || ""); }} className="text-[10px] font-black bg-blue-50 text-blue-600 px-3 py-1.5 rounded-lg hover:bg-blue-100 transition-colors uppercase">เปลี่ยน (ฉุกเฉิน)</button>
+        <button 
+         onClick={() => handleRebroadcast('delivery')}
+         disabled={!!isBroadcasting}
+         className="text-[10px] font-black bg-blue-50 text-blue-600 px-3 py-1.5 rounded-lg hover:bg-blue-100 transition-colors uppercase disabled:opacity-50 flex items-center gap-1.5"
+        >
+         {isBroadcasting === 'delivery' ? (
+          <><div className="w-3 h-3 border-2 border-blue-300 border-t-blue-600 rounded-full animate-spin" /> กำลังบรอดแคส...</>
+         ) : (
+          <>📡 บรอดแคสใหม่</>
+         )}
+        </button>
       </div>
       {order.deliveryRiderName ? (
        <>
@@ -589,12 +631,11 @@ export default function AdminOrderDetailPage() {
         <div className="mt-4 p-4 bg-orange-50 rounded-xl border border-orange-100 text-left space-y-3">
           <p className="text-xs font-black text-orange-600 uppercase tracking-widest">💸 ออเดอร์นี้ชำระเงินแล้ว โปรดระบุบัญชีเพื่อคืนเงินลูกค้า</p>
           <div>
-            <label className="text-[10px] font-bold text-slate-500 uppercase mb-1 block">ชื่อธนาคาร / PromptPay</label>
-            <input type="text" value={refundBankName} onChange={e => setRefundBankName(e.target.value)} className="w-full text-sm p-2 rounded-lg border border-orange-200 outline-none focus:border-orange-400" placeholder="เช่น KBank หรือ PromptPay" />
+            <BankSelector value={refundBankName} onChange={setRefundBankName} label="ชื่อธนาคาร" placeholder="เลือกธนาคารเพื่อคืนเงิน" />
           </div>
           <div>
             <label className="text-[10px] font-bold text-slate-500 uppercase mb-1 block">เลขบัญชี / เบอร์โทร</label>
-            <input type="text" value={refundAccountNumber} onChange={e => setRefundAccountNumber(e.target.value)} className="w-full text-sm p-2 rounded-lg border border-orange-200 outline-none focus:border-orange-400" placeholder="เช่น 0123456789" />
+            <input type="tel" inputMode="numeric" pattern="[0-9-]*" value={refundAccountNumber} onChange={e => setRefundAccountNumber(e.target.value.replace(/[^0-9-]/g, ''))} className="w-full text-sm p-2 rounded-lg border border-orange-200 outline-none focus:border-orange-400" placeholder="เช่น 0123456789" />
           </div>
           <div>
             <label className="text-[10px] font-bold text-slate-500 uppercase mb-1 block">ชื่อบัญชีลูกค้า</label>
@@ -642,20 +683,17 @@ export default function AdminOrderDetailPage() {
     </div>
    </Modal>
 
-   {/* ── Emergency Change Modal ── */}
-   <Modal isOpen={!!changeModal} onClose={() => setChangeModal(null)} title={changeModal?.type === 'store' ? "เปลี่ยนร้านซัก (ฉุกเฉิน)" : "เปลี่ยนไรเดอร์ (ฉุกเฉิน)"}>
+   {/* ── Emergency Change Modal (Store Only) ── */}
+   <Modal isOpen={!!changeModal} onClose={() => setChangeModal(null)} title="เปลี่ยนร้านซัก (ฉุกเฉิน)">
     <div className="p-6 space-y-6">
      <div>
-      <label className="text-[10px] font-black text-slate-400 uppercase block mb-2">เลือกคนใหม่</label>
+      <label className="text-[10px] font-black text-slate-400 uppercase block mb-2">เลือกร้านใหม่</label>
       <GlobalSelect
        value={changeModalValue}
        onChange={setChangeModalValue}
-       options={changeModal?.type === 'store' ? [
+       options={[
         { label: "-- ยกเลิกการระบุร้าน --", value: "" },
         ...stores.map(s => ({ label: s.name + (s.phone ? " (" + s.phone + ")" : ""), value: s.id }))
-       ] : [
-        { label: "-- ยกเลิกการระบุคนขับ --", value: "" },
-        ...riders.filter(r => r.status === 'active').map(r => ({ label: r.name + (r.phone ? " (" + r.phone + ")" : ""), value: r.id }))
        ]}
        disabled={isUpdating}
       />
@@ -670,12 +708,7 @@ export default function AdminOrderDetailPage() {
       <button
        onClick={async () => {
         if (!changeModal) return;
-        const updates: any = {};
-        if (changeModal.type === 'store') updates.storeId = changeModalValue;
-        if (changeModal.type === 'pickup') updates.pickupDriverId = changeModalValue;
-        if (changeModal.type === 'delivery') updates.deliveryDriverId = changeModalValue;
-        
-        await handleUpdate(updates);
+        await handleUpdate({ storeId: changeModalValue });
         setChangeModal(null);
        }}
        disabled={isUpdating}

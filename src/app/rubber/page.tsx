@@ -31,7 +31,7 @@ export default function RubberDashboard() {
   
   const [activeTab, setActiveTab] = useState<"available" | "active">("available");
   const [isLoading, setIsLoading] = useState(true);
-  const [workStatus, setWorkStatus] = useState(true);
+  const [workStatus, setWorkStatus] = useState(false);
   const [selectedJob, setSelectedJob] = useState<any | null>(null);
   const [rubber, setRubber] = useState<any>(null);
   const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
@@ -130,6 +130,15 @@ export default function RubberDashboard() {
           localStorage.setItem(CACHE_KEY, JSON.stringify({ lat: latitude, lng: longitude, ts: Date.now() }));
         } catch (_) {}
         fetchWeatherWithCoords(latitude, longitude);
+
+        // Fix 5: Auto-update serviceAreaCoords for dispatch geo-filtering (free — no API cost)
+        if (rubber?.id) {
+          fetch("/api/users/preferences", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ userId: rubber.id, serviceAreaCoords: { lat: latitude, lng: longitude } })
+          }).catch(() => {});
+        }
       },
       () => {
         // GPS denied → fallback

@@ -22,7 +22,7 @@ export async function PATCH(
   try {
     const { id } = await params;
     const body = await request.json();
-    const { status, pickupDriverId, deliveryDriverId, storeId, staffNote, paymentStatus, refundBankName, refundAccountNumber, refundAccountName } = body;
+    const { status, pickupDriverId, deliveryDriverId, storeId, staffNote, paymentStatus, refundBankName, refundAccountNumber, refundAccountName, rebroadcastType } = body;
     const env = getRequestContext().env;
     const db = env.DB;
 
@@ -67,6 +67,41 @@ export async function PATCH(
       } catch (err) {
         console.error("Admin skip-payment broadcast error:", err);
         // Non-fatal: payment status was already updated
+      }
+    }
+
+    // If admin requests re-broadcast (emergency driver change)
+    if (rebroadcastType === 'pickup' || rebroadcastType === 'delivery') {
+      // Clear old driver assignment
+      const driverField = rebroadcastType === 'pickup' ? 'pickupDriverId' : 'deliveryDriverId';
+      await db.prepare(`UPDATE orders SET ${driverField} = NULL, updatedAt = CURRENT_TIMESTAMP WHERE id = ?`).bind(id).run();
+
+      try {
+        const order = await db.prepare(
+          "SELECT address, deliveryFee, status FROM orders WHERE id = ?"
+        ).bind(id).first() as any;
+
+        if (order) {
+          const { broadcastToEligibleRubbers } = await import("@/lib/dispatch");
+          const orderAddress = (() => {
+            try { return typeof order.address === "string" ? JSON.parse(order.address) : order.address; }
+            catch { return null; }
+          })();
+
+          // Delete old dispatch logs so dedup doesn't block re-broadcast
+          await db.prepare(
+            `DELETE FROM webhook_logs WHERE id LIKE ? AND channel IN ('dispatch_success', 'dispatch_webpush', 'dispatch_fail')`
+          ).bind(`DISPATCH-${id}-%`).run().catch(() => {});
+
+          await broadcastToEligibleRubbers(
+            db, env, id,
+            orderAddress,
+            order.deliveryFee || 0,
+            order.status || 'pending'
+          );
+        }
+      } catch (err) {
+        console.error("Admin rebroadcast error:", err);
       }
     }
 
