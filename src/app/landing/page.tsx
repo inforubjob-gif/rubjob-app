@@ -141,13 +141,15 @@ export default function LandingPage() {
       name: t("landing.contact.list.facebook.name"),
       desc: t("landing.contact.list.facebook.desc"),
       icon: <Icons.Facebook size={64} />,
-      bgClass: ""
+      bgClass: "",
+      href: "https://www.facebook.com/rubjob.all"
     },
     {
       name: t("landing.contact.list.line.name"),
       desc: t("landing.contact.list.line.desc"),
       icon: <Icons.Line size={64} />,
-      bgClass: ""
+      bgClass: "",
+      href: "https://lin.ee/n8y9NrP"
     }
   ];
 
@@ -669,13 +671,13 @@ export default function LandingPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
             {CONTACTS.map((contact, i) => (
-              <div key={i} className="group bg-white p-10 rounded-[40px] shadow-sm hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border border-slate-50 flex flex-col items-center">
+              <a key={i} href={contact.href} target="_blank" rel="noopener noreferrer" className="group bg-white p-10 rounded-[40px] shadow-sm hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border border-slate-50 flex flex-col items-center cursor-pointer">
                 <div className={`flex items-center justify-center mb-8 group-hover:scale-110 transition-transform ${contact.bgClass || ""}`}>
                   {contact.icon}
                 </div>
                 <h4 className="text-2xl font-black text-slate-900 group-hover:text-primary transition-colors mb-2">{contact.name}</h4>
                 <p className="text-slate-400 font-bold text-sm">{contact.desc}</p>
-              </div>
+              </a>
             ))}
           </div>
         </div>
