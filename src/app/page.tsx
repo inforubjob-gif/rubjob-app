@@ -269,6 +269,47 @@ export default function HomePage() {
           </section>
         )}
 
+        {/* ─── Social Links ─── */}
+        <section>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-base font-bold text-foreground">ติดต่อเรา</h2>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <a
+              href="https://www.facebook.com/rubjob.all"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block"
+            >
+              <Card className="p-6 flex flex-col items-center justify-center text-center group border-2 border-transparent hover:border-blue-200 transition-all" hoverable>
+                <div className="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform shadow-sm">
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="#1877F2">
+                    <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                  </svg>
+                </div>
+                <h3 className="text-sm font-black text-foreground leading-tight">Facebook</h3>
+                <p className="text-[10px] text-muted mt-1 font-medium">อัปเดตข่าวสารและโปรโมชั่น</p>
+              </Card>
+            </a>
+            <a
+              href="https://lin.ee/n8y9NrP"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block"
+            >
+              <Card className="p-6 flex flex-col items-center justify-center text-center group border-2 border-transparent hover:border-emerald-200 transition-all" hoverable>
+                <div className="w-14 h-14 bg-emerald-50 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform shadow-sm">
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="#06C755">
+                    <path d="M24 10.304c0-5.369-5.383-9.738-12-9.738-6.616 0-12 4.369-12 9.738 0 4.814 4.269 8.846 10.036 9.608.39.084.923.258 1.058.592.121.303.079.778.039 1.085l-.171 1.027c-.053.303-.242 1.186 1.039.647 1.281-.54 6.911-4.069 9.428-6.967C23.271 14.255 24 12.382 24 10.304zm-15.898 2.89a.204.204 0 01-.204.204H5.476a.204.204 0 01-.204-.204V8.488a.204.204 0 01.204-.204h.608a.204.204 0 01.204.204v4.098h1.614a.204.204 0 01.204.204v.404zm1.87 0a.204.204 0 01-.204.204h-.608a.204.204 0 01-.204-.204V8.488a.204.204 0 01.204-.204h.608a.204.204 0 01.204.204v4.706zm5.142 0a.204.204 0 01-.204.204h-.608a.205.205 0 01-.168-.088l-1.746-2.36v2.244a.204.204 0 01-.204.204h-.608a.204.204 0 01-.204-.204V8.488a.204.204 0 01.204-.204h.608a.205.205 0 01.168.088l1.746 2.36V8.488a.204.204 0 01.204-.204h.608a.204.204 0 01.204.204v4.706zm3.578-4.302a.204.204 0 01-.204.204H16.874v1.043h1.614a.204.204 0 01.204.204v.404a.204.204 0 01-.204.204H16.874v1.043h1.614a.204.204 0 01.204.204v.404a.204.204 0 01-.204.204h-2.426a.204.204 0 01-.204-.204V8.488a.204.204 0 01.204-.204h2.426a.204.204 0 01.204.204v.404z"/>
+                  </svg>
+                </div>
+                <h3 className="text-sm font-black text-foreground leading-tight">LINE Official</h3>
+                <p className="text-[10px] text-muted mt-1 font-medium">ทักแชทสอบถาม แอดมินตอบไว</p>
+              </Card>
+            </a>
+          </div>
+        </section>
+
         {/* ─── Trust Bar ─── */}
         <section className="pb-4">
           <Card className="p-5 bg-gradient-to-r from-primary-light to-amber-50">
