@@ -290,8 +290,16 @@ export default function LandingPage() {
                 <br/><br/>
                 <span className="text-primary font-bold">{t("landing.line.footer")}</span>
               </p>
-              
-              {/* App link removed per request */}
+              <a 
+                href="https://lin.ee/n8y9NrP" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-3 px-8 py-4 bg-[#00B900] hover:bg-[#00a000] text-white font-black text-lg rounded-2xl shadow-xl shadow-[#00B900]/30 hover:shadow-2xl hover:shadow-[#00B900]/40 transition-all hover:-translate-y-1 active:translate-y-0 relative overflow-hidden group/line"
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 -translate-x-full group-hover/line:translate-x-full transition-transform duration-1000" />
+                <Icons.Line size={28} />
+                <span className="relative z-10 uppercase tracking-widest">เพิ่มเพื่อน LINE</span>
+              </a>
             </div>
 
             {/* Mascot Showcase Right */}
