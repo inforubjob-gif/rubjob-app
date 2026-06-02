@@ -162,9 +162,10 @@ export default function LoginTemplate({
       <ConfirmModal 
         isOpen={showAlert}
         onClose={() => setShowAlert(false)}
+        onConfirm={() => setShowAlert(false)}
         title={t("common.forgotPassword") || "Forgot Password?"}
-        message={t("common.forgotPasswordMessage")}
-        type="warning"
+        description={t("common.forgotPasswordMessage")}
+        confirmLabel={t("common.gotIt") || "OK"}
       />
     </div>
   );

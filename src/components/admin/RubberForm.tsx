@@ -304,6 +304,22 @@ export default function RubberForm({ initialData, isEdit }: RubberFormProps) {
                           />
                        </div>
                     )}
+                    {isEdit && (
+                        <div>
+                           <GlobalInput
+                             label="รีเซ็ตรหัสผ่าน"
+                             type="password"
+                             value={formData.password}
+                             onChange={e => setFormData({...formData, password: e.target.value})}
+                             placeholder="ใส่รหัสผ่านใหม่ (เว้นว่างถ้าไม่เปลี่ยน)"
+                           />
+                           {formData.password && (
+                             <p className="text-[10px] font-bold text-amber-600 mt-1.5 flex items-center gap-1">
+                               ⚠️ รหัสผ่านจะถูกเปลี่ยนเมื่อกดบันทึก
+                             </p>
+                           )}
+                        </div>
+                     )}
                  </div>
               </div>
                  
