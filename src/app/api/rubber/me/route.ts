@@ -68,6 +68,29 @@ export async function PATCH(req: Request) {
       return NextResponse.json({ success: true });
     }
 
+    if (payload.action === 'update_picture' && payload.pictureUrl) {
+      // Update rubber_users.pictureUrl
+      await db.prepare("UPDATE rubber_users SET pictureUrl = ? WHERE id = ?").bind(payload.pictureUrl, rubberId).run();
+
+      // Sync to rubber_documents (profile_photo)
+      const existingDoc = await db.prepare(
+        "SELECT id FROM rubber_documents WHERE rubberId = ? AND type = 'profile_photo' LIMIT 1"
+      ).bind(rubberId).first() as any;
+
+      if (existingDoc) {
+        await db.prepare(
+          "UPDATE rubber_documents SET url = ?, status = 'verified' WHERE id = ?"
+        ).bind(payload.pictureUrl, existingDoc.id).run();
+      } else {
+        const docId = `DOC-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
+        await db.prepare(
+          "INSERT INTO rubber_documents (id, rubberId, type, status, url) VALUES (?, ?, 'profile_photo', 'verified', ?)"
+        ).bind(docId, rubberId, payload.pictureUrl).run();
+      }
+
+      return NextResponse.json({ success: true, pictureUrl: payload.pictureUrl });
+    }
+
     return NextResponse.json({ error: "Invalid action" }, { status: 400 });
   } catch (error: unknown) {
     return NextResponse.json({ error: safeError(error) }, { status: 500 });

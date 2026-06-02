@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
@@ -20,6 +20,8 @@ export default function RubberProfilePage() {
   const [prefs, setPrefs] = useState<any>({});
   const [rubberData, setRubberData] = useState<any>(null);
   const [rubberSession, setRubberSession] = useState<any>(null);
+  const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
+  const photoInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     try {
@@ -83,6 +85,61 @@ export default function RubberProfilePage() {
     }
   };
 
+  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !rubberSession?.id) return;
+
+    setIsUploadingPhoto(true);
+    try {
+      // Compress image
+      const reader = new FileReader();
+      reader.onload = async (event) => {
+        const img = new Image();
+        img.onload = async () => {
+          const canvas = document.createElement("canvas");
+          const MAX = 800;
+          let w = img.width, h = img.height;
+          if (w > h) { if (w > MAX) { h *= MAX / w; w = MAX; } }
+          else { if (h > MAX) { w *= MAX / h; h = MAX; } }
+          canvas.width = w;
+          canvas.height = h;
+          const ctx = canvas.getContext("2d");
+          ctx?.drawImage(img, 0, 0, w, h);
+          const compressed = canvas.toDataURL("image/jpeg", 0.6);
+
+          try {
+            const res = await fetch("/api/rubber/me", {
+              method: "PATCH",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ action: "update_picture", pictureUrl: compressed }),
+            });
+            const data = await res.json() as any;
+            if (data.success) {
+              // Update local state & localStorage
+              setRubberSession((prev: any) => ({ ...prev, pictureUrl: compressed }));
+              const session = JSON.parse(localStorage.getItem("rubjob_rubber_session") || "{}");
+              localStorage.setItem("rubjob_rubber_session", JSON.stringify({ ...session, pictureUrl: compressed }));
+              showToast(t("common.saved") || "บันทึกรูปภาพสำเร็จ", "success");
+            } else {
+              showToast(data.error || "เกิดข้อผิดพลาด", "error");
+            }
+          } catch {
+            showToast("ไม่สามารถอัปโหลดรูปได้", "error");
+          } finally {
+            setIsUploadingPhoto(false);
+          }
+        };
+        img.src = event.target?.result as string;
+      };
+      reader.readAsDataURL(file);
+    } catch {
+      showToast("ไม่สามารถอ่านไฟล์ได้", "error");
+      setIsUploadingPhoto(false);
+    }
+    // Reset input so same file can be selected again
+    if (photoInputRef.current) photoInputRef.current.value = "";
+  };
+
   return (
     <div className="flex flex-col min-h-dvh bg-slate-50 relative">
       {/* Background Gradient Layer */}
@@ -105,14 +162,40 @@ export default function RubberProfilePage() {
         <div className="flex items-center gap-4">
           {/* Avatar */}
           <div className="relative group shrink-0 w-16 h-16">
-            <div className="w-full h-full rounded-[1.5rem] overflow-hidden bg-white/10 backdrop-blur-xl border-2 border-white/30 flex items-center justify-center text-white text-2xl font-bold shadow-xl">
+            <div 
+              onClick={() => photoInputRef.current?.click()}
+              className="w-full h-full rounded-[1.5rem] overflow-hidden bg-white/10 backdrop-blur-xl border-2 border-white/30 flex items-center justify-center text-white text-2xl font-bold shadow-xl cursor-pointer relative"
+            >
               <img 
                 src={!rubberSession?.pictureUrl ? `https://api.dicebear.com/7.x/avataaars/svg?seed=${rubberSession?.id || 'Rubjob'}` : (rubberSession.pictureUrl.startsWith('data:') || rubberSession.pictureUrl.startsWith('http')) ? rubberSession.pictureUrl : `/api/admin/documents/${rubberSession.pictureUrl}`} 
                 alt="Avatar" 
                 className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" 
               />
+              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 active:bg-black/40 transition-colors flex items-center justify-center">
+                <div className="opacity-0 group-hover:opacity-100 active:opacity-100 transition-opacity">
+                  {isUploadingPhoto ? (
+                    <div className="w-5 h-5 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+                  ) : (
+                    <Icons.Camera size={18} className="text-white drop-shadow-lg" />
+                  )}
+                </div>
+              </div>
             </div>
             {workStatus && <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-emerald-400 rounded-full border-[2.5px] border-white shadow-lg animate-pulse z-10" />}
+            {/* Camera badge */}
+            <div 
+              onClick={() => photoInputRef.current?.click()}
+              className="absolute -bottom-1 -left-1 w-6 h-6 bg-white rounded-full flex items-center justify-center shadow-lg border-2 border-primary/20 cursor-pointer active:scale-90 transition-transform z-20"
+            >
+              <Icons.Camera size={11} className="text-primary" />
+            </div>
+            <input 
+              ref={photoInputRef}
+              type="file" 
+              accept="image/*" 
+              onChange={handlePhotoUpload} 
+              className="hidden" 
+            />
           </div>
           <div className="text-white flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1.5">
