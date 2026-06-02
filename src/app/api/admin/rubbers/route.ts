@@ -152,12 +152,21 @@ export async function PUT(req: Request) {
             await db.prepare(`
                UPDATE rubber_documents SET status = ?, url = ?, notes = ? WHERE id = ?
             `).bind(doc.status, doc.url, doc.notes, doc.id).run();
-        } else {
+        } else if (doc.type && doc.url) {
             const docId = `DOC-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
             await db.prepare(`
                INSERT INTO rubber_documents (id, rubberId, type, status, url, notes)
                VALUES (?, ?, ?, ?, ?, ?)
             `).bind(docId, id, doc.type, doc.status || 'pending', doc.url || "", doc.notes || "").run();
+        }
+      }
+
+      // Sync profile_photo → rubber_users.pictureUrl
+      const profileDoc = documents.find((d: any) => d.type === 'profile_photo');
+      if (profileDoc) {
+        const picValue = profileDoc.id || profileDoc.url || null;
+        if (picValue) {
+          await db.prepare(`UPDATE rubber_users SET pictureUrl = ? WHERE id = ?`).bind(picValue, id).run();
         }
       }
     }
