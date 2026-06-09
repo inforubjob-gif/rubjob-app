@@ -60,7 +60,7 @@ export async function POST(
       console.error("Failed to send refund confirmation LINE:", lineErr);
     }
 
-    return NextResponse.json({ success: true, message: "ส่งข้อมูลบัญชีเรียบร้อยแล้ว เราจะคืนเงินภายใน 1-3 วันทำการ" });
+    return NextResponse.json({ success: true, message: "ส่งข้อมูลบัญชีเรียบร้อยแล้ว เราจะคืนเงินภายใน 1 วันทำการ" });
   } catch (error: unknown) {
     console.error("Refund info submission error:", error);
     return NextResponse.json({ error: safeError(error) }, { status: 500 });

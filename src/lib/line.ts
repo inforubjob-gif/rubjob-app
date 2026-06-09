@@ -693,7 +693,7 @@ export const refundInfoReceivedFlex = (orderId: string, amount: number): LineFle
         },
         {
           type: "text",
-          text: `ออเดอร์ ${orderId} — เราจะดำเนินการคืนเงินจำนวน ฿${amount.toLocaleString()} ให้คุณภายใน 1-3 วันทำการ`,
+          text: `ออเดอร์ ${orderId} — เราจะดำเนินการคืนเงินจำนวน ฿${amount.toLocaleString()} ให้คุณภายใน 1 วันทำการ`,
           size: "sm",
           color: "#4b5563",
           wrap: true,

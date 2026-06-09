@@ -373,7 +373,7 @@ export default function OrderDetailPage() {
                     <Icons.Check size={32} strokeWidth={3} />
                   </div>
                   <h4 className="text-base font-black text-emerald-700 mb-1">ส่งข้อมูลเรียบร้อยแล้ว!</h4>
-                  <p className="text-xs text-slate-500 font-bold">เราจะดำเนินการคืนเงินภายใน 1-3 วันทำการ</p>
+                  <p className="text-xs text-slate-500 font-bold">เราจะดำเนินการคืนเงินภายใน 1 วันทำการ</p>
                 </div>
               ) : (
                 <div className="space-y-4">
