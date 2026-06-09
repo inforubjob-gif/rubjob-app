@@ -98,7 +98,9 @@ export default function middleware(req: NextRequest) {
 
   // ─── Unknown domain (e.g. localhost:3000) — pass through ───
   if (subdomain === null) {
-    return NextResponse.next();
+    const response = NextResponse.next();
+    response.headers.set("X-Robots-Tag", "noindex, nofollow, noarchive, nosnippet");
+    return response;
   }
 
   // ─── Root domain (rubjob-all.com, no subdomain) → Landing page ───
@@ -121,10 +123,14 @@ export default function middleware(req: NextRequest) {
     // e.g. rubjob.com/register/rubber -> serves from src/app/landing/register/rubber
     if (!pathname.startsWith("/landing") && !pathname.startsWith("/api") && !pathname.startsWith("/auth") && !pathname.includes(".")) {
       url.pathname = `/landing${pathname === "/" ? "" : pathname}`;
-      return NextResponse.rewrite(url);
+      const response = NextResponse.rewrite(url);
+      response.headers.set("X-Robots-Tag", "noindex, nofollow, noarchive, nosnippet");
+      return response;
     }
 
-    return NextResponse.next();
+    const response = NextResponse.next();
+    response.headers.set("X-Robots-Tag", "noindex, nofollow, noarchive, nosnippet");
+    return response;
   }
 
   // 3. Subdomain rewrite logic
@@ -133,7 +139,9 @@ export default function middleware(req: NextRequest) {
   // Shared routes (like /auth) should NOT be rewritten to a subdomain folder.
   // They serve as global routes accessible from all portals.
   if (pathname.startsWith("/auth")) {
-    return NextResponse.next();
+    const response = NextResponse.next();
+    response.headers.set("X-Robots-Tag", "noindex, nofollow, noarchive, nosnippet");
+    return response;
   }
 
   if (targetPrefix !== undefined) {
@@ -175,12 +183,14 @@ export default function middleware(req: NextRequest) {
     }
 
     // Prevent indexing of portal subdomains by search engines and AI bots
-    response.headers.set("X-Robots-Tag", "noindex, nofollow");
+    response.headers.set("X-Robots-Tag", "noindex, nofollow, noarchive, nosnippet");
 
     return response;
   }
 
   // 4. Default fallback: serve the main app for unrecognized domains
   // Instead of redirecting to the root domain, we just let it serve the root files.
-  return NextResponse.next();
+  const response = NextResponse.next();
+  response.headers.set("X-Robots-Tag", "noindex, nofollow, noarchive, nosnippet");
+  return response;
 }

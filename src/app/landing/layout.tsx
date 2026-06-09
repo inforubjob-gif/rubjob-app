@@ -10,11 +10,14 @@ export const metadata: Metadata = {
     apple: "/images/rubjob-complete_logo-color.png",
   },
   robots: {
-    index: true,
-    follow: true,
+    index: false,
+    follow: false,
     googleBot: {
-      index: true,
-      follow: true,
+      index: false,
+      follow: false,
+      "max-snippet": -1,
+      "max-image-preview": "none",
+      "max-video-preview": -1,
     },
   },
   openGraph: {
