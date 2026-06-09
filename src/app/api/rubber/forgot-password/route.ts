@@ -44,10 +44,9 @@ export async function POST(req: Request) {
       return NextResponse.json({ success: true, message: "หากอีเมลนี้มีอยู่ในระบบ คุณจะได้รับลิงก์รีเซ็ตรหัสผ่าน" });
     }
 
-    // Generate token
-    const { nanoid } = await import("nanoid");
-    const token = nanoid(32);
-    const tokenId = `RST-${nanoid(8).toUpperCase()}`;
+    // Generate token using native crypto (Edge-compatible, no npm deps)
+    const token = crypto.randomUUID().replace(/-/g, '') + crypto.randomUUID().replace(/-/g, '').slice(0, 8);
+    const tokenId = `RST-${crypto.randomUUID().slice(0, 8).toUpperCase()}`;
     const expiresAt = new Date(Date.now() + 15 * 60 * 1000).toISOString(); // 15 minutes
 
     await db.prepare(`
@@ -58,7 +57,7 @@ export async function POST(req: Request) {
     const resetLink = `https://rubber.rubjob-all.com/reset-password?token=${token}`;
 
     // 📧 Send Email (always)
-    const resendKey = env.RESEND_API_KEY;
+    const resendKey = (env as any).RESEND_API_KEY;
     if (resendKey) {
       try {
         const { sendEmail, buildPasswordResetEmail } = await import("@/lib/email");
@@ -67,16 +66,18 @@ export async function POST(req: Request) {
         console.log(`[RESET] Email sent to ${email}`);
       } catch (e) {
         console.error("[RESET] Email send failed:", e);
+        // Don't fail the request if email fails — LINE might still work
       }
+    } else {
+      console.warn("[RESET] RESEND_API_KEY not set, skipping email");
     }
 
     // 💬 Send LINE message (if linked)
     if (rubber.lineUserId) {
       try {
-        const accessToken = env.LINE_CHANNEL_ACCESS_TOKEN_RUBBER || env.LINE_CHANNEL_ACCESS_TOKEN;
+        const accessToken = (env as any).LINE_CHANNEL_ACCESS_TOKEN_RUBBER || (env as any).LINE_CHANNEL_ACCESS_TOKEN;
         if (accessToken) {
-          const { sendLinePush } = await import("@/lib/line");
-          const { passwordResetFlex } = await import("@/lib/line");
+          const { sendLinePush, passwordResetFlex } = await import("@/lib/line");
           await sendLinePush(rubber.lineUserId, [passwordResetFlex(resetLink)], accessToken);
           console.log(`[RESET] LINE message sent to ${rubber.lineUserId}`);
         }
