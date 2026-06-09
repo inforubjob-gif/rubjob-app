@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Icons } from "@/components/ui/Icons";
 
 interface AdminDocumentUploadProps {
@@ -14,6 +14,13 @@ export default function AdminDocumentUpload({ value, onChange, label, variant = 
   const [preview, setPreview] = useState<string | null>(value || null);
   const [isCompressing, setIsCompressing] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Sync preview when value prop changes (e.g. after async data fetch)
+  useEffect(() => {
+    if (value && value !== preview) {
+      setPreview(value);
+    }
+  }, [value]);
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
