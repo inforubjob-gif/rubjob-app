@@ -11,8 +11,8 @@ export default function RubberAuthGate({ children }: { children: React.ReactNode
 
   useEffect(() => {
     async function checkAuth() {
-      const isLoginPage = pathname === "/rubber/login" || pathname === "/login";
-      if (isLoginPage) {
+      const isPublicPage = pathname === "/rubber/login" || pathname === "/login" || pathname.startsWith("/rubber/reset-password");
+      if (isPublicPage) {
         setIsAuthenticated(true);
         return; 
       }
@@ -85,8 +85,8 @@ export default function RubberAuthGate({ children }: { children: React.ReactNode
   }
 
   // Prevent flicker on protected pages, or while waiting to redirect
-  const isLoginPage = pathname === "/rubber/login" || pathname === "/login";
-  if ((isAuthenticated === null || isAuthenticated === false) && !isLoginPage) {
+  const isPublicPage = pathname === "/rubber/login" || pathname === "/login" || pathname.startsWith("/rubber/reset-password");
+  if ((isAuthenticated === null || isAuthenticated === false) && !isPublicPage) {
     return (
       <div className="flex h-screen w-full items-center justify-center bg-slate-50 relative z-[999]">
         <div className="w-10 h-10 border-4 border-primary/20 border-t-primary rounded-full animate-spin"></div>
