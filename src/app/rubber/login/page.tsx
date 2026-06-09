@@ -86,6 +86,7 @@ export default function RubberLoginPage() {
       emailLabel={t("rubber.login.emailLabel")}
       passwordLabel={t("rubber.login.passwordLabel")}
       onForgotPassword={handleForgotPassword}
+      showContactAdmin={false}
     />
   );
 }
