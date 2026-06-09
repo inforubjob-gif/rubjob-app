@@ -117,11 +117,14 @@ export async function PUT(req: Request) {
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   try {
     const payload = await req.json() as any;
-    const { id, status, name, phone, vehicleType, address, idNumber, licensePlate, emergencyContact, bankName, accountNumber, accountName, documents, password } = payload;
+    const { id, status, name, phone, vehicleType, address, idNumber, licensePlate, emergencyContact, bankName, accountNumber, accountName, documents, password, rejectionReasons, rejectionNote } = payload;
     const db = getRequestContext().env.DB;
     if (!db) return NextResponse.json({ error: "D1 not found" }, { status: 500 });
 
     if (!id) return NextResponse.json({ error: "Missing ID" }, { status: 400 });
+
+    // Fetch current rubber data before update (for status change detection)
+    const currentRubber = await db.prepare("SELECT status, email, name, rubber_number FROM rubber_users WHERE id = ?").bind(id).first() as any;
 
     // Update main rubber info
     await db.prepare(`
@@ -167,6 +170,39 @@ export async function PUT(req: Request) {
         const picValue = profileDoc.id || profileDoc.url || null;
         if (picValue) {
           await db.prepare(`UPDATE rubber_users SET pictureUrl = ? WHERE id = ?`).bind(picValue, id).run();
+        }
+      }
+    }
+
+    // ─── 📧 Email Notifications on Status Change ─────────────────
+    if (currentRubber && status && currentRubber.status !== status) {
+      const env = getRequestContext().env;
+      const resendKey = env.RESEND_API_KEY;
+
+      if (resendKey && currentRubber.email) {
+        try {
+          const { sendEmail, buildWelcomeEmail, buildRejectionEmail } = await import("@/lib/email");
+          const rubberName = name || currentRubber.name || "Rubber";
+          const rubberEmail = currentRubber.email;
+
+          if (status === "active" && currentRubber.status === "pending") {
+            // ✅ Approved — send welcome email
+            const displayId = currentRubber.rubber_number 
+              ? `RD-${String(currentRubber.rubber_number).padStart(4, '0')}` 
+              : id;
+            const { subject, html } = buildWelcomeEmail({ name: rubberName, email: rubberEmail, displayId });
+            await sendEmail({ to: rubberEmail, subject, html, apiKey: resendKey });
+            console.log(`[APPROVE] Welcome email sent to ${rubberEmail}`);
+          } else if (status === "rejected") {
+            // ❌ Rejected — send rejection email with reasons
+            const reasons = rejectionReasons || ["ข้อมูลไม่ครบถ้วน"];
+            const { subject, html } = buildRejectionEmail({ name: rubberName, reasons, adminNote: rejectionNote });
+            await sendEmail({ to: rubberEmail, subject, html, apiKey: resendKey });
+            console.log(`[REJECT] Rejection email sent to ${rubberEmail}`);
+          }
+        } catch (emailErr) {
+          // Non-fatal: don't block the status update if email fails
+          console.error("[EMAIL] Failed to send notification:", emailErr);
         }
       }
     }

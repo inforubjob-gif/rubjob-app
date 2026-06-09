@@ -18,6 +18,7 @@ export async function GET(req: Request) {
                WHEN p.requesterType = 'store' THEN s.name
                WHEN p.requesterType = 'rubber' THEN r.name
                WHEN p.requesterType = 'provider' THEN u_sp.displayName
+               WHEN p.requesterType = 'customer_refund' THEN COALESCE(u_cust.displayName, u_cust.nickname, 'ลูกค้า #' || SUBSTR(p.requesterId, -4))
                ELSE 'Unknown'
              END as requesterName
       FROM payout_requests p
@@ -25,6 +26,7 @@ export async function GET(req: Request) {
       LEFT JOIN rubber_users r ON p.requesterId = r.id AND p.requesterType = 'rubber'
       LEFT JOIN specialist_profiles sp ON p.requesterId = sp.id AND p.requesterType = 'provider'
       LEFT JOIN users u_sp ON sp.id = u_sp.id AND p.requesterType = 'provider'
+      LEFT JOIN users u_cust ON p.requesterId = u_cust.id AND p.requesterType = 'customer_refund'
       ORDER BY p.createdAt DESC
     `).all();
 

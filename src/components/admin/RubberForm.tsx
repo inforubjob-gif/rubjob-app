@@ -59,6 +59,15 @@ interface RubberFormProps {
   isEdit?: boolean;
 }
 
+const REJECTION_REASONS = [
+  "เอกสารไม่ชัดเจน / อ่านไม่ได้",
+  "บัตรประชาชนหมดอายุ",
+  "ใบขับขี่ไม่ตรงกับประเภทรถ",
+  "รูปรถไม่ครบ / ไม่ชัด",
+  "ข้อมูลส่วนตัวไม่ครบถ้วน",
+  "ข้อมูลบัญชีธนาคารไม่ถูกต้อง"
+];
+
 const DOCUMENT_TYPES = [
   { id: 'profile_photo', label: 'Rubber Profile Photo', icon: <Icons.User size={18} /> },
   { id: 'id_card', label: 'ID Card / National Identity', icon: <Icons.User size={18} /> },
@@ -75,6 +84,10 @@ export default function RubberForm({ initialData, isEdit }: RubberFormProps) {
   const { t } = useTranslation();
   const { showToast } = useToast();
   const [isSaving, setIsSaving] = useState(false);
+  const [showRejectModal, setShowRejectModal] = useState(false);
+  const [selectedReasons, setSelectedReasons] = useState<string[]>([]);
+  const [rejectNote, setRejectNote] = useState("");
+  const [customReason, setCustomReason] = useState("");
 
   // Open regions from admin settings
   const [openRegions, setOpenRegions] = useState<{ province: string; areas: string[] }[]>([]);
@@ -211,6 +224,41 @@ export default function RubberForm({ initialData, isEdit }: RubberFormProps) {
     }
   };
 
+  const handleReject = async () => {
+    const allReasons = [...selectedReasons];
+    if (customReason.trim()) allReasons.push(customReason.trim());
+    if (allReasons.length === 0) {
+      showToast("กรุณาเลือกเหตุผลอย่างน้อย 1 ข้อ", "error");
+      return;
+    }
+    setIsSaving(true);
+    try {
+      const res = await fetch("/api/admin/rubbers", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: initialData.id,
+          status: 'rejected',
+          rejectionReasons: allReasons,
+          rejectionNote: rejectNote || undefined,
+        })
+      });
+      if (res.ok) {
+        showToast("ปฏิเสธใบสมัครและส่ง Email แจ้ง Rubber แล้ว", "success");
+        setShowRejectModal(false);
+        router.push("/admin/rubbers");
+        router.refresh();
+      } else {
+        showToast("เกิดข้อผิดพลาด", "error");
+      }
+    } catch (e) {
+      console.error(e);
+      showToast("เกิดข้อผิดพลาด", "error");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   return (
     <form onSubmit={handleSave} className="space-y-8 pb-20 animate-in fade-in slide-in-from-bottom-4 duration-500">
       {initialData?.status === 'pending' && (
@@ -233,12 +281,13 @@ export default function RubberForm({ initialData, isEdit }: RubberFormProps) {
               >
                 {isSaving ? t('common.processing') : t('admin.rubbers.form.approve')}
               </button>
-              <button 
-                type="button"
-                className="flex-1 sm:flex-none px-8 py-3 bg-white border-2 border-amber-200 text-amber-500 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-amber-100 transition-all"
-              >
-                {t('admin.rubbers.form.reject')}
-              </button>
+               <button 
+                 type="button"
+                 onClick={() => setShowRejectModal(true)}
+                 className="flex-1 sm:flex-none px-8 py-3 bg-white border-2 border-amber-200 text-amber-500 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-amber-100 transition-all"
+               >
+                 {t('admin.rubbers.form.reject')}
+               </button>
            </div>
         </div>
       )}
@@ -705,6 +754,88 @@ export default function RubberForm({ initialData, isEdit }: RubberFormProps) {
            )}
         </div>
       </div>
+      {/* ─── Rejection Modal ─── */}
+      {showRejectModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+          <div className="bg-white rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden animate-in slide-in-from-bottom-4 duration-300">
+            <div className="p-6 bg-rose-500 text-white">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
+                  <Icons.Shield size={20} />
+                </div>
+                <div>
+                  <h3 className="font-black text-lg uppercase tracking-tight">ปฏิเสธใบสมัคร</h3>
+                  <p className="text-xs font-bold opacity-80">ระบุเหตุผลเพื่อแจ้ง Rubber ผ่าน Email</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="p-6 space-y-5 max-h-[60vh] overflow-y-auto">
+              <div>
+                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">เลือกเหตุผล (เลือกได้หลายข้อ)</p>
+                <div className="space-y-2">
+                  {REJECTION_REASONS.map((reason) => (
+                    <label key={reason} className={`flex items-center gap-3 p-3 rounded-xl border-2 cursor-pointer transition-all ${
+                      selectedReasons.includes(reason) ? 'border-rose-300 bg-rose-50' : 'border-slate-100 hover:border-slate-200'
+                    }`}>
+                      <input
+                        type="checkbox"
+                        checked={selectedReasons.includes(reason)}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setSelectedReasons(prev => [...prev, reason]);
+                          } else {
+                            setSelectedReasons(prev => prev.filter(r => r !== reason));
+                          }
+                        }}
+                        className="w-4 h-4 rounded border-slate-300 text-rose-500 focus:ring-rose-500"
+                      />
+                      <span className="text-sm font-bold text-slate-700">{reason}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <GlobalInput
+                  label="เหตุผลอื่น ๆ (ถ้ามี)"
+                  value={customReason}
+                  onChange={(e) => setCustomReason(e.target.value)}
+                  placeholder="ระบุเหตุผลเพิ่มเติม..."
+                />
+              </div>
+
+              <div>
+                <GlobalTextarea
+                  label="ข้อความถึง Rubber (ไม่บังคับ)"
+                  rows={3}
+                  value={rejectNote}
+                  onChange={(e) => setRejectNote((e.target as HTMLTextAreaElement).value)}
+                  placeholder="เช่น กรุณาส่งรูปบัตรประชาชนด้านหน้าที่ชัดเจนขึ้น..."
+                />
+              </div>
+            </div>
+
+            <div className="p-6 border-t border-slate-100 flex gap-3">
+              <button
+                type="button"
+                onClick={() => { setShowRejectModal(false); setSelectedReasons([]); setRejectNote(""); setCustomReason(""); }}
+                className="flex-1 py-3 bg-white border-2 border-slate-200 text-slate-400 rounded-xl font-black text-[10px] uppercase tracking-widest hover:text-slate-600 transition-all"
+              >
+                ยกเลิก
+              </button>
+              <button
+                type="button"
+                onClick={handleReject}
+                disabled={isSaving}
+                className="flex-1 py-3 bg-rose-500 text-white rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-rose-600 transition-all shadow-lg shadow-rose-500/20 disabled:opacity-50"
+              >
+                {isSaving ? "กำลังส่ง..." : "📧 ส่ง Email และปฏิเสธ"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </form>
   );
 }

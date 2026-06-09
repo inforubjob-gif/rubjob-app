@@ -411,6 +411,16 @@ export async function ensureSchema(db: D1Database) {
       FOREIGN KEY (rubberId) REFERENCES rubber_users(id),
       FOREIGN KEY (orderId) REFERENCES orders(id)
     );
+
+    CREATE TABLE IF NOT EXISTS password_reset_tokens (
+      id TEXT PRIMARY KEY,
+      rubberId TEXT NOT NULL,
+      email TEXT NOT NULL,
+      token TEXT UNIQUE NOT NULL,
+      status TEXT DEFAULT 'pending',
+      expiresAt DATETIME NOT NULL,
+      createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
   `;
 
   // Execute standard tables

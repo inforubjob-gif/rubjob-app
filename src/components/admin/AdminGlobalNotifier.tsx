@@ -89,6 +89,26 @@ export default function AdminGlobalNotifier() {
           }
         }
       }
+
+      // 3. Pending Password Reset Requests (Rubbers without LINE)
+      try {
+        const resetRes = await fetch("/api/admin/password-resets").catch(() => null);
+        if (resetRes && resetRes.ok) {
+          const resetData = await resetRes.json() as any;
+          if (resetData.pendingCount > 0) {
+            newAlerts.push({
+              id: "pending_resets",
+              type: "warning",
+              title: "คำขอรีเซ็ตรหัสผ่าน",
+              desc: `มี ${resetData.pendingCount} คำขอที่รอดำเนินการ`,
+              count: resetData.pendingCount,
+              link: "/admin/rubbers",
+              icon: Icons.Shield
+            });
+          }
+        }
+      } catch {}
+
       
       let isNew = false;
       const changedIds: string[] = [];

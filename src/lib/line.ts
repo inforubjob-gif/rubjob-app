@@ -550,3 +550,63 @@ export const rubberEarningFlex = (orderId: string, role: string, earn: number): 
     },
   },
 });
+
+/**
+ * Flex Message for Password Reset Link (For Rubbers)
+ */
+export const passwordResetFlex = (resetLink: string): LineFlexMessage => ({
+  type: "flex",
+  altText: "🔐 ลิงก์ตั้งรหัสผ่านใหม่ — Rubjob",
+  contents: {
+    type: "bubble",
+    body: {
+      type: "box",
+      layout: "vertical",
+      spacing: "md",
+      contents: [
+        {
+          type: "text",
+          text: "🔐 ตั้งรหัสผ่านใหม่",
+          weight: "bold",
+          size: "xl",
+          color: "#f59e0b",
+        },
+        {
+          type: "text",
+          text: "เราได้รับคำขอรีเซ็ตรหัสผ่านของคุณ กดปุ่มด้านล่างเพื่อตั้งรหัสผ่านใหม่",
+          size: "sm",
+          color: "#4b5563",
+          wrap: true,
+        },
+        {
+          type: "separator",
+          margin: "md",
+        },
+        {
+          type: "text",
+          text: "⏰ ลิงก์นี้จะหมดอายุใน 15 นาที",
+          size: "xs",
+          color: "#ef4444",
+          margin: "md",
+          weight: "bold",
+        },
+      ],
+    },
+    footer: {
+      type: "box",
+      layout: "vertical",
+      contents: [
+        {
+          type: "button",
+          style: "primary",
+          color: "#f59e0b",
+          action: {
+            type: "uri",
+            label: "🔑 ตั้งรหัสผ่านใหม่",
+            uri: resetLink,
+          },
+        },
+      ],
+    },
+  },
+});

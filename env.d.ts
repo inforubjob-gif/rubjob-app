@@ -14,6 +14,7 @@ interface CloudflareEnv {
   LINE_CHANNEL_ACCESS_TOKEN_HELP?: string;
   LINE_CHANNEL_ACCESS_TOKEN_REGULAR?: string;
   LINE_ADMIN_GROUP_ID?: string;
+  RESEND_API_KEY?: string;
 }
 
 declare namespace NodeJS {

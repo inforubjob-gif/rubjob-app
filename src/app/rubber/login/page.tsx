@@ -63,6 +63,18 @@ export default function RubberLoginPage() {
     }
   };
 
+  const handleForgotPassword = async (email: string) => {
+    const res = await fetch("/api/rubber/forgot-password", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email }),
+    });
+    const data = await res.json() as any;
+    if (!res.ok) {
+      throw new Error(data.error || "เกิดข้อผิดพลาด");
+    }
+  };
+
   return (
     <LoginTemplate
       portalName={t("rubber.login.portal")}
@@ -73,6 +85,7 @@ export default function RubberLoginPage() {
       mode="fullpage"
       emailLabel={t("rubber.login.emailLabel")}
       passwordLabel={t("rubber.login.passwordLabel")}
+      onForgotPassword={handleForgotPassword}
     />
   );
 }
