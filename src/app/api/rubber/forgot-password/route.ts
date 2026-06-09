@@ -34,6 +34,19 @@ export async function POST(req: Request) {
       return NextResponse.json({ success: true, message: "หากอีเมลนี้มีอยู่ในระบบ คุณจะได้รับลิงก์รีเซ็ตรหัสผ่าน" });
     }
 
+    // Self-heal: ensure table exists
+    await db.prepare(`
+      CREATE TABLE IF NOT EXISTS password_reset_tokens (
+        id TEXT PRIMARY KEY,
+        rubberId TEXT NOT NULL,
+        email TEXT NOT NULL,
+        token TEXT UNIQUE NOT NULL,
+        status TEXT DEFAULT 'pending',
+        expiresAt DATETIME NOT NULL,
+        createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
+      )
+    `).run();
+
     // Rate limit: 3 requests per hour per email
     const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
     const recentRequests = await db.prepare(
