@@ -113,22 +113,33 @@ export async function PATCH(
         if (order && order.paymentStatus === 'paid') {
           const { nanoid } = await import("nanoid");
           const refundId = `RFD-C-${nanoid(8).toUpperCase()}`;
-          // Queue refund request
+          // Queue refund request with awaiting_info status — customer must provide bank details
           await db.prepare(`
             INSERT INTO payout_requests (id, requesterId, requesterType, amount, bankName, accountNumber, accountName, status, notes)
-            VALUES (?, ?, 'customer_refund', ?, ?, ?, ?, 'pending', ?)
+            VALUES (?, ?, 'customer_refund', ?, 'รอข้อมูลจากลูกค้า', 'รอข้อมูล', 'รอข้อมูล', 'awaiting_info', ?)
           `).bind(
             refundId, 
             order.userId, 
             order.totalPrice, 
-            refundBankName || "N/A", 
-            refundAccountNumber || "N/A", 
-            refundAccountName || "N/A",
             `Refund for Order ${id}`
           ).run();
 
           // Change payment status to refund_pending
           await db.prepare("UPDATE orders SET paymentStatus = 'refund_pending', updatedAt = CURRENT_TIMESTAMP WHERE id = ?").bind(id).run();
+
+          // Send LINE message to customer requesting bank account info
+          try {
+            const { sendLinePush, refundAccountRequestFlex } = await import("@/lib/line");
+            const user = await db.prepare("SELECT id FROM users WHERE id = ?").bind(order.userId).first() as any;
+            if (user) {
+              const accessToken = env.LINE_CHANNEL_ACCESS_TOKEN;
+              if (accessToken) {
+                await sendLinePush(order.userId, [refundAccountRequestFlex(id, order.totalPrice)], accessToken);
+              }
+            }
+          } catch (lineErr) {
+            console.error("Failed to send refund LINE notification:", lineErr);
+          }
         }
       }
 

@@ -610,3 +610,170 @@ export const passwordResetFlex = (resetLink: string): LineFlexMessage => ({
     },
   },
 });
+
+/**
+ * Flex Message to request bank account info from customer for refund
+ */
+export const refundAccountRequestFlex = (orderId: string, amount: number): LineFlexMessage => ({
+  type: "flex",
+  altText: `💳 กรุณาระบุบัญชีรับเงินคืน — ออเดอร์ ${orderId}`,
+  contents: {
+    type: "bubble",
+    body: {
+      type: "box",
+      layout: "vertical",
+      spacing: "md",
+      contents: [
+        {
+          type: "text",
+          text: "💳 คืนเงินออเดอร์",
+          weight: "bold",
+          size: "xl",
+          color: "#f59e0b",
+        },
+        {
+          type: "text",
+          text: `ออเดอร์ ${orderId} ของคุณถูกยกเลิก เราจะคืนเงินจำนวน ฿${amount.toLocaleString()} ให้คุณ`,
+          size: "sm",
+          color: "#4b5563",
+          wrap: true,
+        },
+        {
+          type: "separator",
+          margin: "md",
+        },
+        {
+          type: "text",
+          text: "กรุณากดปุ่มด้านล่างเพื่อระบุบัญชีธนาคารที่ต้องการรับเงินคืน",
+          size: "xs",
+          color: "#6b7280",
+          margin: "md",
+          wrap: true,
+        },
+      ],
+    },
+    footer: {
+      type: "box",
+      layout: "vertical",
+      contents: [
+        {
+          type: "button",
+          style: "primary",
+          color: "#f59e0b",
+          action: {
+            type: "uri",
+            label: "📝 ระบุบัญชีรับเงินคืน",
+            uri: `https://liff.line.me/${process.env.NEXT_PUBLIC_LIFF_ID}/orders/${orderId}`,
+          },
+        },
+      ],
+    },
+  },
+});
+
+/**
+ * Flex Message to confirm refund info received
+ */
+export const refundInfoReceivedFlex = (orderId: string, amount: number): LineFlexMessage => ({
+  type: "flex",
+  altText: `✅ ได้รับข้อมูลบัญชีแล้ว — ออเดอร์ ${orderId}`,
+  contents: {
+    type: "bubble",
+    body: {
+      type: "box",
+      layout: "vertical",
+      spacing: "md",
+      contents: [
+        {
+          type: "text",
+          text: "✅ ได้รับข้อมูลบัญชีแล้ว",
+          weight: "bold",
+          size: "xl",
+          color: "#10b981",
+        },
+        {
+          type: "text",
+          text: `ออเดอร์ ${orderId} — เราจะดำเนินการคืนเงินจำนวน ฿${amount.toLocaleString()} ให้คุณภายใน 1-3 วันทำการ`,
+          size: "sm",
+          color: "#4b5563",
+          wrap: true,
+        },
+        {
+          type: "separator",
+          margin: "md",
+        },
+        {
+          type: "text",
+          text: "ขอบคุณที่ให้ความร่วมมือครับ 🙏",
+          size: "xs",
+          color: "#6b7280",
+          margin: "md",
+        },
+      ],
+    },
+    footer: {
+      type: "box",
+      layout: "vertical",
+      contents: [
+        {
+          type: "button",
+          style: "link",
+          height: "sm",
+          action: {
+            type: "uri",
+            label: "ดูรายละเอียดออเดอร์",
+            uri: `https://liff.line.me/${process.env.NEXT_PUBLIC_LIFF_ID}/orders/${orderId}`,
+          },
+        },
+      ],
+    },
+  },
+});
+
+/**
+ * Flex Message for refund reminder (re-send request)
+ */
+export const refundReminderFlex = (orderId: string, amount: number): LineFlexMessage => ({
+  type: "flex",
+  altText: `⏰ แจ้งเตือน: กรุณาระบุบัญชีรับเงินคืน — ${orderId}`,
+  contents: {
+    type: "bubble",
+    body: {
+      type: "box",
+      layout: "vertical",
+      spacing: "md",
+      contents: [
+        {
+          type: "text",
+          text: "⏰ แจ้งเตือนคืนเงิน",
+          weight: "bold",
+          size: "xl",
+          color: "#ef4444",
+        },
+        {
+          type: "text",
+          text: `คุณยังไม่ได้ระบุบัญชีรับเงินคืนสำหรับออเดอร์ ${orderId} (฿${amount.toLocaleString()}) กรุณากดปุ่มด้านล่างเพื่อกรอกข้อมูล`,
+          size: "sm",
+          color: "#4b5563",
+          wrap: true,
+        },
+      ],
+    },
+    footer: {
+      type: "box",
+      layout: "vertical",
+      contents: [
+        {
+          type: "button",
+          style: "primary",
+          color: "#ef4444",
+          action: {
+            type: "uri",
+            label: "📝 ระบุบัญชีรับเงินคืน",
+            uri: `https://liff.line.me/${process.env.NEXT_PUBLIC_LIFF_ID}/orders/${orderId}`,
+          },
+        },
+      ],
+    },
+  },
+});

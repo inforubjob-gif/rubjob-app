@@ -17,6 +17,22 @@ export default function FinanceAdminPage() {
  const [transactions, setTransactions] = useState<any[]>([]);
  const [payouts, setPayouts] = useState<any[]>([]);
  const [isLoading, setIsLoading] = useState(true);
+ const [adminFillModal, setAdminFillModal] = useState<{ id: string; notes: string; amount: number } | null>(null);
+ const [adminBankName, setAdminBankName] = useState("");
+ const [adminAccountNumber, setAdminAccountNumber] = useState("");
+ const [adminAccountName, setAdminAccountName] = useState("");
+ const [isSavingBankInfo, setIsSavingBankInfo] = useState(false);
+
+ const THAI_BANKS = [
+  "ธนาคารกสิกรไทย (KBANK)",
+  "ธนาคารกรุงเทพ (BBL)",
+  "ธนาคารกรุงไทย (KTB)",
+  "ธนาคารไทยพาณิชย์ (SCB)",
+  "ธนาคารกรุงศรีอยุธยา (BAY)",
+  "ธนาคารทหารไทยธนชาต (TTB)",
+  "ธนาคารออมสิน (GSB)",
+  "พร้อมเพย์ (PromptPay)",
+ ];
 
  const handleExport = async () => {
   if (!transactions.length) {
@@ -109,6 +125,54 @@ export default function FinanceAdminPage() {
    }
   } catch (err) {
    console.error("Failed to update payout", err);
+  }
+ }
+
+ async function handleAdminFillBankInfo() {
+  if (!adminFillModal || !adminBankName || !adminAccountNumber || !adminAccountName) return;
+  setIsSavingBankInfo(true);
+  try {
+   const res = await fetch("/api/admin/finance/payouts", {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+     id: adminFillModal.id,
+     status: "pending",
+     bankName: adminBankName,
+     accountNumber: adminAccountNumber,
+     accountName: adminAccountName,
+    })
+   });
+   if (res.ok) {
+    setPayouts(prev => prev.map(p => p.id === adminFillModal.id ? { ...p, status: 'pending', bankName: adminBankName, accountNumber: adminAccountNumber, accountName: adminAccountName } : p));
+    setAdminFillModal(null);
+    setAdminBankName("");
+    setAdminAccountNumber("");
+    setAdminAccountName("");
+    showToast("อัปเดตข้อมูลบัญชีเรียบร้อย", "success");
+   }
+  } catch (err) {
+   console.error("Failed to update bank info", err);
+  } finally {
+   setIsSavingBankInfo(false);
+  }
+ }
+
+ async function sendRefundReminder(payoutId: string) {
+  try {
+   const res = await fetch("/api/admin/finance/payouts/remind", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ payoutId })
+   });
+   if (res.ok) {
+    showToast("ส่งแจ้งเตือนไปที่ LINE ลูกค้าเรียบร้อยแล้ว", "success");
+   } else {
+    const data = await res.json() as any;
+    showToast(data.error || "ส่งไม่สำเร็จ", "error");
+   }
+  } catch (err) {
+   showToast("เกิดข้อผิดพลาด", "error");
   }
  }
 
@@ -310,30 +374,45 @@ export default function FinanceAdminPage() {
             </td>
             <td className="px-4 py-5 text-right font-black text-slate-900 text-lg">฿{p.amount.toLocaleString()}</td>
             <td className="px-4 py-5">
-             <Badge variant={p.status === 'completed' ? 'success' : p.status === 'pending' ? 'warning' : 'danger'}>
-               {p.status === 'completed' ? t('common.done') : p.status === 'pending' ? t('common.pending') : p.status === 'rejected' ? 'ถูกปฏิเสธ' : 'ล้มเหลว'}
-             </Badge>
+              <Badge variant={p.status === 'completed' ? 'success' : p.status === 'pending' ? 'warning' : p.status === 'awaiting_info' ? 'info' : 'danger'}>
+                {p.status === 'completed' ? t('common.done') : p.status === 'pending' ? t('common.pending') : p.status === 'awaiting_info' ? '⏳ รอข้อมูลลูกค้า' : p.status === 'rejected' ? 'ถูกปฏิเสธ' : 'ล้มเหลว'}
+              </Badge>
             </td>
-            <td className="px-4 py-5 text-right">
-             {p.status === 'pending' ? (
-               <div className="flex justify-end gap-2">
-                <button 
-                 onClick={() => updatePayoutStatus(p.id, 'completed')}
-                 className="px-4 py-2 bg-emerald-600 text-white rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-emerald-700 active:scale-95 transition-all"
-                >
-                  {t('admin.finance.action.confirm')}
-                </button>
-                <button 
-                 onClick={() => updatePayoutStatus(p.id, 'rejected')}
-                 className="px-4 py-2 bg-white border border-slate-200 text-slate-400 rounded-xl text-[9px] font-black uppercase tracking-widest hover:text-rose-600 hover:border-rose-100 transition-all"
-                >
-                  {t('admin.finance.action.reject')}
-                </button>
-               </div>
-             ) : (
-               <span className="text-[9px] font-black text-slate-300 uppercase italic">{t('admin.finance.status.archived')}</span>
-             )}
-            </td>
+             <td className="px-4 py-5 text-right">
+              {p.status === 'pending' ? (
+                <div className="flex justify-end gap-2">
+                 <button 
+                  onClick={() => updatePayoutStatus(p.id, 'completed')}
+                  className="px-4 py-2 bg-emerald-600 text-white rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-emerald-700 active:scale-95 transition-all"
+                 >
+                   {t('admin.finance.action.confirm')}
+                 </button>
+                 <button 
+                  onClick={() => updatePayoutStatus(p.id, 'rejected')}
+                  className="px-4 py-2 bg-white border border-slate-200 text-slate-400 rounded-xl text-[9px] font-black uppercase tracking-widest hover:text-rose-600 hover:border-rose-100 transition-all"
+                 >
+                   {t('admin.finance.action.reject')}
+                 </button>
+                </div>
+              ) : p.status === 'awaiting_info' ? (
+                <div className="flex justify-end gap-2 flex-wrap">
+                 <button
+                  onClick={() => { setAdminFillModal({ id: p.id, notes: p.notes || '', amount: p.amount }); setAdminBankName(''); setAdminAccountNumber(''); setAdminAccountName(''); }}
+                  className="px-4 py-2 bg-amber-500 text-white rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-amber-600 active:scale-95 transition-all"
+                 >
+                   ✏️ กรอกแทน
+                 </button>
+                 <button
+                  onClick={() => sendRefundReminder(p.id)}
+                  className="px-4 py-2 bg-white border border-amber-200 text-amber-600 rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-amber-50 active:scale-95 transition-all"
+                 >
+                   🔔 แจ้งเตือนซ้ำ
+                 </button>
+                </div>
+              ) : (
+                <span className="text-[9px] font-black text-slate-300 uppercase italic">{t('admin.finance.status.archived')}</span>
+              )}
+             </td>
            </tr>
           ))}
          </tbody>
@@ -341,7 +420,38 @@ export default function FinanceAdminPage() {
        </div>
       )
     )}
-   </Card>
-  </div>
- );
+    </Card>
+
+    {/* Admin Fill Bank Info Modal */}
+    {adminFillModal && (
+     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={() => setAdminFillModal(null)}>
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 space-y-4" onClick={(e) => e.stopPropagation()}>
+       <h3 className="text-lg font-black text-slate-900 mb-1">✏️ กรอกข้อมูลบัญชีแทนลูกค้า</h3>
+       <p className="text-xs text-slate-400 font-bold">{adminFillModal.notes} • ฿{adminFillModal.amount.toLocaleString()}</p>
+       <div>
+        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 block">ธนาคาร</label>
+        <select value={adminBankName} onChange={(e) => setAdminBankName(e.target.value)} className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl p-3 text-sm font-bold text-slate-900 focus:outline-none focus:border-amber-400 appearance-none">
+         <option value="">— เลือกธนาคาร —</option>
+         {THAI_BANKS.map(bank => <option key={bank} value={bank}>{bank}</option>)}
+        </select>
+       </div>
+       <div>
+        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 block">เลขบัญชี / พร้อมเพย์</label>
+        <input type="text" value={adminAccountNumber} onChange={(e) => setAdminAccountNumber(e.target.value)} placeholder="123-4-56789-0" className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl p-3 text-sm font-bold text-slate-900 placeholder:text-slate-300 focus:outline-none focus:border-amber-400" />
+       </div>
+       <div>
+        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 block">ชื่อบัญชี</label>
+        <input type="text" value={adminAccountName} onChange={(e) => setAdminAccountName(e.target.value)} placeholder="ชื่อ-นามสกุล" className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl p-3 text-sm font-bold text-slate-900 placeholder:text-slate-300 focus:outline-none focus:border-amber-400" />
+       </div>
+       <div className="flex gap-3 pt-2">
+        <button onClick={handleAdminFillBankInfo} disabled={isSavingBankInfo || !adminBankName || !adminAccountNumber || !adminAccountName} className="flex-1 bg-amber-500 text-white py-3 rounded-xl font-black text-sm uppercase hover:bg-amber-600 active:scale-95 transition-all disabled:opacity-50">
+         {isSavingBankInfo ? 'กำลังบันทึก...' : '💾 บันทึกข้อมูล'}
+        </button>
+        <button onClick={() => setAdminFillModal(null)} className="px-6 py-3 bg-slate-100 text-slate-500 rounded-xl font-black text-sm uppercase hover:bg-slate-200 active:scale-95 transition-all">ปิด</button>
+       </div>
+      </div>
+     </div>
+    )}
+   </div>
+  );
 }

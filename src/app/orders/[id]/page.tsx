@@ -42,6 +42,55 @@ export default function OrderDetailPage() {
   const [stripePromise, setStripePromise] = useState<Promise<Stripe | null> | null>(null);
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [isCancelling, setIsCancelling] = useState(false);
+  const [refundBankName, setRefundBankName] = useState("");
+  const [refundAccountNumber, setRefundAccountNumber] = useState("");
+  const [refundAccountName, setRefundAccountName] = useState("");
+  const [isSubmittingRefund, setIsSubmittingRefund] = useState(false);
+  const [refundSubmitted, setRefundSubmitted] = useState(false);
+
+  const THAI_BANKS = [
+    "ธนาคารกสิกรไทย (KBANK)",
+    "ธนาคารกรุงเทพ (BBL)",
+    "ธนาคารกรุงไทย (KTB)",
+    "ธนาคารไทยพาณิชย์ (SCB)",
+    "ธนาคารกรุงศรีอยุธยา (BAY)",
+    "ธนาคารทหารไทยธนชาต (TTB)",
+    "ธนาคารออมสิน (GSB)",
+    "ธนาคาร ซีไอเอ็มบี ไทย (CIMBT)",
+    "ธนาคารเกียรตินาคินภัทร (KKP)",
+    "ธนาคารแลนด์ แอนด์ เฮ้าส์ (LHFG)",
+    "พร้อมเพย์ (PromptPay)",
+  ];
+
+  const handleSubmitRefundInfo = async () => {
+    if (!refundBankName || !refundAccountNumber || !refundAccountName) {
+      showToast("กรุณากรอกข้อมูลให้ครบถ้วน", "error");
+      return;
+    }
+    setIsSubmittingRefund(true);
+    try {
+      const res = await fetch(`/api/orders/${id}/refund-info`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          bankName: refundBankName,
+          accountNumber: refundAccountNumber,
+          accountName: refundAccountName,
+        }),
+      });
+      const data = await res.json() as any;
+      if (!res.ok) {
+        showToast(data.error || "เกิดข้อผิดพลาด", "error");
+        return;
+      }
+      setRefundSubmitted(true);
+      showToast("ส่งข้อมูลบัญชีเรียบร้อยแล้ว 🎉", "success");
+    } catch (e) {
+      showToast("เกิดข้อผิดพลาด กรุณาลองใหม่", "error");
+    } finally {
+      setIsSubmittingRefund(false);
+    }
+  };
 
   const handleCancelOrder = async () => {
     if (!confirm(t("orders.confirmCancel") || "คุณแน่ใจหรือไม่ว่าต้องการยกเลิกออเดอร์นี้? (สามารถยกเลิกได้ก่อนชำระเงินหรือเริ่มดำเนินการเท่านั้น)")) return;
@@ -301,6 +350,77 @@ export default function OrderDetailPage() {
                 <h3 className="text-sm font-black text-emerald-800 uppercase">✅ ชำระเงินเรียบร้อย</h3>
                 <p className="text-xs text-emerald-600 font-bold mt-0.5">กำลังจัดหาพนักงานไปรับผ้าของคุณ...</p>
               </div>
+            </div>
+          </Card>
+        )}
+
+        {/* Refund Bank Account Form */}
+        {order.paymentStatus === "refund_pending" && (
+          <Card className="p-0 overflow-hidden border-2 border-amber-300 shadow-lg shadow-amber-500/10">
+            <div className="bg-amber-50 p-4 border-b border-amber-200 flex items-center gap-3">
+              <div className="w-10 h-10 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center shrink-0">
+                <Icons.CreditCard size={20} />
+              </div>
+              <div>
+                <h3 className="text-sm font-black text-amber-800 uppercase">💳 คืนเงินออเดอร์</h3>
+                <p className="text-xs text-amber-600 font-bold mt-0.5">฿{Math.ceil(order.totalPrice).toLocaleString()} • กรุณาระบุบัญชีรับเงินคืน</p>
+              </div>
+            </div>
+            <div className="p-5">
+              {refundSubmitted ? (
+                <div className="flex flex-col items-center py-6 text-center">
+                  <div className="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mb-4">
+                    <Icons.Check size={32} strokeWidth={3} />
+                  </div>
+                  <h4 className="text-base font-black text-emerald-700 mb-1">ส่งข้อมูลเรียบร้อยแล้ว!</h4>
+                  <p className="text-xs text-slate-500 font-bold">เราจะดำเนินการคืนเงินภายใน 1-3 วันทำการ</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <div>
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block">ธนาคาร</label>
+                    <select
+                      value={refundBankName}
+                      onChange={(e) => setRefundBankName(e.target.value)}
+                      className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl p-3.5 text-sm font-bold text-slate-900 focus:outline-none focus:border-amber-400 transition-colors appearance-none"
+                    >
+                      <option value="">— เลือกธนาคาร —</option>
+                      {THAI_BANKS.map(bank => (
+                        <option key={bank} value={bank}>{bank}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block">เลขบัญชี / เบอร์พร้อมเพย์</label>
+                    <input
+                      type="text"
+                      value={refundAccountNumber}
+                      onChange={(e) => setRefundAccountNumber(e.target.value)}
+                      placeholder="เช่น 123-4-56789-0"
+                      className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl p-3.5 text-sm font-bold text-slate-900 placeholder:text-slate-300 focus:outline-none focus:border-amber-400 transition-colors"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block">ชื่อบัญชี</label>
+                    <input
+                      type="text"
+                      value={refundAccountName}
+                      onChange={(e) => setRefundAccountName(e.target.value)}
+                      placeholder="ชื่อ-นามสกุล ตามบัญชี"
+                      className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl p-3.5 text-sm font-bold text-slate-900 placeholder:text-slate-300 focus:outline-none focus:border-amber-400 transition-colors"
+                    />
+                  </div>
+                  <Button
+                    fullWidth
+                    onClick={handleSubmitRefundInfo}
+                    isLoading={isSubmittingRefund}
+                    disabled={isSubmittingRefund || !refundBankName || !refundAccountNumber || !refundAccountName}
+                    className="bg-amber-500 hover:bg-amber-600 text-white font-black py-4 rounded-xl shadow-lg shadow-amber-500/20 active:scale-95 transition-all uppercase tracking-wider mt-2"
+                  >
+                    📝 ส่งข้อมูลบัญชีรับเงินคืน
+                  </Button>
+                </div>
+              )}
             </div>
           </Card>
         )}

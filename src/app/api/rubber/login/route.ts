@@ -55,7 +55,11 @@ export async function POST(req: Request) {
         const hostname = req.headers.get("host") || "";
         const rootDomain = ["rubjob-all.com", "rubjob-app.pages.dev", "lvh.me"].find(d => hostname.endsWith(d));
 
-        cookieStore.set("rubber_token", String(rubber.id), {
+        // Use the last 8 characters of the password hash as a session version token.
+        // When the password is reset, this hash will change, invalidating all cookies.
+        const sessionToken = String(rubber.password).slice(-8);
+
+        cookieStore.set("rubber_token", `${rubber.id}:${sessionToken}`, {
           httpOnly: true,
           secure: process.env.NODE_ENV === "production",
           sameSite: "lax",

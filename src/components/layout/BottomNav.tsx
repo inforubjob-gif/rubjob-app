@@ -50,7 +50,9 @@ export default function BottomNav() {
     pathname.startsWith("/auth/link-line") ||
     pathname.startsWith("/rubber/link-line") ||
     pathname.startsWith("/rubber/reset-password") ||
-    pathname.startsWith("/rubber/forgot-password");
+    pathname.startsWith("/rubber/forgot-password") ||
+    pathname.startsWith("/reset-password") ||
+    pathname.startsWith("/forgot-password");
 
   // Determine if we are in a valid app context (Store, Rubber, Provider, or User App)
   const isAppContext = 

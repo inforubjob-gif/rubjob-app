@@ -41,7 +41,7 @@ export async function PUT(req: Request) {
   const session = await getAdminSession();
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   try {
-    const { id, status, receiptUrl, notes } = await req.json() as any;
+    const { id, status, receiptUrl, notes, bankName, accountNumber, accountName } = await req.json() as any;
     const db = getRequestContext().env.DB;
     if (!db) return NextResponse.json({ error: "D1 not found" }, { status: 500 });
 
@@ -54,9 +54,12 @@ export async function PUT(req: Request) {
       SET status = ?, 
           receiptUrl = COALESCE(?, receiptUrl), 
           notes = COALESCE(?, notes),
+          bankName = COALESCE(?, bankName),
+          accountNumber = COALESCE(?, accountNumber),
+          accountName = COALESCE(?, accountName),
           processedAt = COALESCE(?, processedAt)
       WHERE id = ?
-    `).bind(status, receiptUrl || null, notes || null, processedAt, id).run();
+    `).bind(status, receiptUrl || null, notes || null, bankName || null, accountNumber || null, accountName || null, processedAt, id).run();
 
     return NextResponse.json({ success: true });
   } catch (error: unknown) {
