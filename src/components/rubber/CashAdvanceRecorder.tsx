@@ -23,7 +23,7 @@ export default function CashAdvanceRecorder({ orderId, storeId, storeName, rubbe
   const [existingRecords, setExistingRecords] = useState<any[]>([]);
   const [isEditing, setIsEditing] = useState(false);
   const [error, setError] = useState("");
-  const [totalAmount, setTotalAmount] = useState(0); // wait, it's a useMemo.
+
   const [manualAmount, setManualAmount] = useState("");
   const [note, setNote] = useState("");
   const [machineType, setMachineType] = useState<"separate" | "combo">("separate");
@@ -364,7 +364,7 @@ export default function CashAdvanceRecorder({ orderId, storeId, storeName, rubbe
           <button
             type="button"
             onClick={handleSave}
-            disabled={isSaving || totalAmount === 0}
+            disabled={isSaving || (computedTotal === 0 && !manualAmount)}
             className="w-full bg-amber-500 text-white py-4 rounded-xl font-black text-sm uppercase tracking-wider shadow-xl shadow-amber-500/20 hover:bg-amber-600 active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:opacity-50"
           >
             {isSaving ? (
@@ -372,7 +372,7 @@ export default function CashAdvanceRecorder({ orderId, storeId, storeName, rubbe
             ) : (
               <Icons.Check size={18} />
             )}
-            {isSaving ? "กำลังบันทึก..." : `ยืนยันต้นทุน ฿${totalAmount.toLocaleString()}`}
+            {isSaving ? "กำลังบันทึก..." : `ยืนยันต้นทุน ฿${computedTotal === 0 && manualAmount ? manualAmount : computedTotal.toLocaleString()}`}
           </button>
 
           {isEditing && (
