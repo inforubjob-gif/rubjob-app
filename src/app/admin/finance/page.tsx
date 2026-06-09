@@ -275,9 +275,13 @@ export default function FinanceAdminPage() {
            <tr key={p.id} className="hover:bg-indigo-50/20 transition-colors group">
             <td className="px-4 py-5">
              <div className="flex items-center gap-3">
-               <div className={`w-8 h-8 rounded-lg flex items-center justify-center font-black text-[10px] text-white ${p.requesterType === 'store' ? 'bg-indigo-500' : p.requesterType === 'customer_refund' ? 'bg-sky-500' : 'bg-orange-500'}`}>
-                {p.requesterType === 'store' ? 'S' : p.requesterType === 'customer_refund' ? 'C' : 'R'}
-               </div>
+               {p.requesterType === 'customer_refund' && p.customerAvatar ? (
+                 <img src={p.customerAvatar} alt={p.requesterName} className="w-8 h-8 rounded-lg object-cover bg-slate-100" />
+               ) : (
+                 <div className={`w-8 h-8 rounded-lg flex items-center justify-center font-black text-[10px] text-white ${p.requesterType === 'store' ? 'bg-indigo-500' : p.requesterType === 'customer_refund' ? 'bg-sky-500' : 'bg-orange-500'}`}>
+                  {p.requesterType === 'store' ? 'S' : p.requesterType === 'customer_refund' ? 'C' : 'R'}
+                 </div>
+               )}
                <div>
                 <p className="font-black text-slate-900 text-sm">{p.requesterName}</p>
                 <p className="text-[9px] font-black uppercase text-slate-400 tracking-tighter">{p.requesterType}</p>
