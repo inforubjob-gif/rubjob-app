@@ -10,7 +10,7 @@ import { Icons } from "@/components/ui/Icons";
 import { useTranslation } from "@/components/providers/LanguageProvider";
 import { useToast } from "@/components/providers/ToastProvider";
 import GlobalSelect from "@/components/ui/GlobalSelect";
-import BankSelector from "@/components/ui/BankSelector";
+
 import Modal from "@/components/ui/Modal";
 
 const STATUS_FLOW = [
@@ -47,9 +47,6 @@ export default function AdminOrderDetailPage() {
  const [changeModalValue, setChangeModalValue] = useState("");
  const [isSkippingPayment, setIsSkippingPayment] = useState(false);
  const [isBroadcasting, setIsBroadcasting] = useState<string | null>(null);
- const [refundBankName, setRefundBankName] = useState("");
- const [refundAccountNumber, setRefundAccountNumber] = useState("");
- const [refundAccountName, setRefundAccountName] = useState("");
  const [elapsedTime, setElapsedTime] = useState("00:00:00");
  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -626,21 +623,11 @@ export default function AdminOrderDetailPage() {
        </div>
       )}
       
-      {/* Refund Form if Order is Paid and Cancelling */}
+      {/* Auto Refund Notice */}
       {confirmModal?.key === 'cancelled' && order?.paymentStatus === 'paid' && (
-        <div className="mt-4 p-4 bg-orange-50 rounded-xl border border-orange-100 text-left space-y-3">
-          <p className="text-xs font-black text-orange-600 uppercase tracking-widest">💸 ออเดอร์นี้ชำระเงินแล้ว โปรดระบุบัญชีเพื่อคืนเงินลูกค้า</p>
-          <div>
-            <BankSelector value={refundBankName} onChange={setRefundBankName} label="ชื่อธนาคาร" placeholder="เลือกธนาคารเพื่อคืนเงิน" />
-          </div>
-          <div>
-            <label className="text-[10px] font-bold text-slate-500 uppercase mb-1 block">เลขบัญชี / เบอร์โทร</label>
-            <input type="tel" inputMode="numeric" pattern="[0-9-]*" value={refundAccountNumber} onChange={e => setRefundAccountNumber(e.target.value.replace(/[^0-9-]/g, ''))} className="w-full text-sm p-2 rounded-lg border border-orange-200 outline-none focus:border-orange-400" placeholder="เช่น 0123456789" />
-          </div>
-          <div>
-            <label className="text-[10px] font-bold text-slate-500 uppercase mb-1 block">ชื่อบัญชีลูกค้า</label>
-            <input type="text" value={refundAccountName} onChange={e => setRefundAccountName(e.target.value)} className="w-full text-sm p-2 rounded-lg border border-orange-200 outline-none focus:border-orange-400" placeholder="เช่น นายสมชาย ใจดี" />
-          </div>
+        <div className="mt-4 p-4 bg-sky-50 rounded-xl border border-sky-100 text-left">
+          <p className="text-xs font-black text-sky-600 flex items-center gap-2">💬 ระบบจะส่ง LINE แจ้งลูกค้าให้กรอกเลขบัญชีเพื่อรับเงินคืนอัตโนมัติ</p>
+          <p className="text-[10px] font-bold text-sky-500 mt-1">ไม่ต้องขอข้อมูลจากลูกค้าเองครับ ระบบจัดการให้ทั้งหมด</p>
         </div>
       )}
 
@@ -655,20 +642,12 @@ export default function AdminOrderDetailPage() {
       <button
        onClick={async () => {
         if (!confirmModal) return;
-        if (confirmModal.key === 'cancelled' && order?.paymentStatus === 'paid' && (!refundBankName || !refundAccountNumber)) {
-          showToast("กรุณากรอกข้อมูลบัญชีรับเงินคืนให้ครบถ้วน", "error");
-          return;
-        }
         
         const updates: any = { status: confirmModal.key };
-        if (confirmModal.key === 'cancelled' && order?.paymentStatus === 'paid') {
-          updates.refundBankName = refundBankName;
-          updates.refundAccountNumber = refundAccountNumber;
-          updates.refundAccountName = refundAccountName;
-        }
         
         setConfirmModal(null);
         await handleUpdate(updates);
+
        }}
        disabled={isUpdating}
        className={`py-4 text-white font-black text-sm rounded-xl transition-all active:scale-95 disabled:opacity-50 ${
