@@ -292,7 +292,20 @@ export default function FinanceAdminPage() {
              <p className="text-xs font-black text-slate-700">{p.bankName}</p>
              <p className="text-[10px] font-mono font-bold text-slate-400">{p.accountNumber} • {p.accountName}</p>
              {p.requesterType === 'customer_refund' && p.notes && (
-               <p className="text-[9px] font-bold text-sky-500 mt-1 uppercase">Refund: {p.notes}</p>
+               <div className="mt-1">
+                 {(() => {
+                   const match = p.notes.match(/(RJ-[A-Z0-9\-]+)/i);
+                   const orderId = match ? match[1] : null;
+                   if (orderId) {
+                     return (
+                       <Link href={`/admin/orders/${orderId}`} className="text-[9px] font-bold text-sky-500 hover:text-sky-600 hover:underline uppercase inline-flex items-center gap-1">
+                         Refund: {p.notes} <Icons.ArrowRight size={10} />
+                       </Link>
+                     );
+                   }
+                   return <p className="text-[9px] font-bold text-sky-500 uppercase">Refund: {p.notes}</p>;
+                 })()}
+               </div>
              )}
             </td>
             <td className="px-4 py-5 text-right font-black text-slate-900 text-lg">฿{p.amount.toLocaleString()}</td>
