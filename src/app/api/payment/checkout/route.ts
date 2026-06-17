@@ -63,6 +63,9 @@ export async function POST(req: Request) {
 
     // Create Beam Charge for PromptPay
     // Amount must be in satang (THB * 100)
+    // QR expiry: 30 minutes from now
+    const expiryTime = new Date(Date.now() + 30 * 60 * 1000).toISOString();
+
     const beamResponse = await fetch(`${BEAM_API_URL}/api/v1/charges`, {
       method: "POST",
       headers: {
@@ -73,7 +76,10 @@ export async function POST(req: Request) {
         amount: Math.round(amount * 100),
         currency: "THB",
         paymentMethod: {
-          paymentMethodType: "PROMPTPAY"
+          paymentMethodType: "QR_PROMPT_PAY",
+          qrPromptPay: {
+            expiryTime
+          }
         },
         referenceId: orderId,
         returnUrl: "https://app.rubjob-all.com/orders/" + orderId
@@ -83,7 +89,7 @@ export async function POST(req: Request) {
     if (!beamResponse.ok) {
       const errBody = await beamResponse.text();
       console.error("Beam API error:", beamResponse.status, errBody);
-      return NextResponse.json({ error: `Beam API error: ${beamResponse.status}` }, { status: 500 });
+      return NextResponse.json({ error: `BEAM API ERROR: ${beamResponse.status} — ${errBody.slice(0, 200)}` }, { status: 500 });
     }
 
     const beamData = await beamResponse.json() as any;
