@@ -73,11 +73,10 @@ export async function POST(req: Request) {
         amount: Math.round(amount * 100),
         currency: "THB",
         paymentMethod: {
-          type: "PROMPT_PAY"
+          paymentMethodType: "PROMPTPAY"
         },
-        order: {
-          referenceId: orderId
-        }
+        referenceId: orderId,
+        returnUrl: "https://app.rubjob-all.com/orders/" + orderId
       }),
     });
 
