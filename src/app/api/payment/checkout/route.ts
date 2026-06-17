@@ -96,18 +96,27 @@ export async function POST(req: Request) {
     console.log("Beam response:", JSON.stringify(beamData));
 
     // Extract QR code data from Beam response
-    // Beam may return different structures — try multiple paths
+    // Try all known paths where Beam might put the QR data
     let qrCodeData: string | null = null;
 
+    // Path 1: Direct fields
     if (beamData.encodedImage) {
       qrCodeData = beamData.encodedImage;
     } else if (beamData.qrCodeData) {
       qrCodeData = beamData.qrCodeData;
-    } else if (beamData.paymentMethod?.qrPromptPay?.qrCodeData) {
+    } else if (beamData.qrData) {
+      qrCodeData = beamData.qrData;
+    }
+    // Path 2: Nested under paymentMethod.qrPromptPay
+    else if (beamData.paymentMethod?.qrPromptPay?.qrCodeData) {
       qrCodeData = beamData.paymentMethod.qrPromptPay.qrCodeData;
     } else if (beamData.paymentMethod?.qrPromptPay?.encodedImage) {
       qrCodeData = beamData.paymentMethod.qrPromptPay.encodedImage;
-    } else if (beamData.actionRequired === "REDIRECT" && beamData.redirect?.url) {
+    } else if (beamData.paymentMethod?.qrPromptPay?.qrData) {
+      qrCodeData = beamData.paymentMethod.qrPromptPay.qrData;
+    }
+    // Path 3: Redirect fallback
+    else if (beamData.actionRequired === "REDIRECT" && beamData.redirect?.url) {
       return NextResponse.json({
         success: true,
         chargeId: beamData.id,
@@ -119,9 +128,14 @@ export async function POST(req: Request) {
     if (!qrCodeData) {
       console.error("No QR data found in Beam response:", JSON.stringify(beamData));
       return NextResponse.json({ 
-        error: `Beam returned no QR data. Keys: ${Object.keys(beamData).join(", ")}`,
-        beamResponse: beamData
+        error: `Beam returned no QR data. Keys: ${Object.keys(beamData).join(", ")}. PaymentMethod keys: ${beamData.paymentMethod ? Object.keys(beamData.paymentMethod).join(", ") : "none"}. qrPromptPay keys: ${beamData.paymentMethod?.qrPromptPay ? Object.keys(beamData.paymentMethod.qrPromptPay).join(", ") : "none"}`,
       }, { status: 500 });
+    }
+
+    // If qrCodeData is a PromptPay EMVCo payload (starts with "0002"), convert to QR image URL
+    // PromptPay payloads are text strings that need to be rendered as QR codes
+    if (typeof qrCodeData === "string" && qrCodeData.startsWith("0002")) {
+      qrCodeData = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(qrCodeData)}`;
     }
 
     // Self-healing: Fix any empty strings in foreign key columns
