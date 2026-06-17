@@ -92,19 +92,36 @@ export async function POST(req: Request) {
 
     const beamData = await beamResponse.json() as any;
 
+    // Log full Beam response for debugging
+    console.log("Beam response:", JSON.stringify(beamData));
+
     // Extract QR code data from Beam response
+    // Beam may return different structures — try multiple paths
     let qrCodeData: string | null = null;
 
-    if (beamData.actionRequired === "ENCODED_IMAGE" && beamData.encodedImage) {
-      // Beam returns base64 encoded QR image
+    if (beamData.encodedImage) {
       qrCodeData = beamData.encodedImage;
+    } else if (beamData.qrCodeData) {
+      qrCodeData = beamData.qrCodeData;
+    } else if (beamData.paymentMethod?.qrPromptPay?.qrCodeData) {
+      qrCodeData = beamData.paymentMethod.qrPromptPay.qrCodeData;
+    } else if (beamData.paymentMethod?.qrPromptPay?.encodedImage) {
+      qrCodeData = beamData.paymentMethod.qrPromptPay.encodedImage;
     } else if (beamData.actionRequired === "REDIRECT" && beamData.redirect?.url) {
-      // Fallback: redirect URL (shouldn't happen for PromptPay but handle gracefully)
       return NextResponse.json({
         success: true,
         chargeId: beamData.id,
         redirectUrl: beamData.redirect.url,
       });
+    }
+
+    // If we still don't have QR data, return the full Beam response for debugging
+    if (!qrCodeData) {
+      console.error("No QR data found in Beam response:", JSON.stringify(beamData));
+      return NextResponse.json({ 
+        error: `Beam returned no QR data. Keys: ${Object.keys(beamData).join(", ")}`,
+        beamResponse: beamData
+      }, { status: 500 });
     }
 
     // Self-healing: Fix any empty strings in foreign key columns
