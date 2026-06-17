@@ -5,7 +5,6 @@ import { NextResponse } from "next/server";
 
 export const runtime = "edge";
 export const dynamic = "force-dynamic";
-import Stripe from "stripe";
 
 /**
  * GET /api/orders/[id]
@@ -122,34 +121,7 @@ export async function PATCH(
 
     await db.prepare("UPDATE orders SET status = 'cancelled', updatedAt = CURRENT_TIMESTAMP WHERE id = ?").bind(id).run();
 
-    // Cancel Stripe PaymentIntent if pending
-    if (order.paymentMethod === "promptpay" && order.paymentStatus === "pending") {
-      try {
-        const env = getRequestContext().env as any;
-        let stripeSecretKey = env?.STRIPE_SECRET_KEY;
-        if (!stripeSecretKey) {
-          const setting = await db.prepare("SELECT value FROM system_settings WHERE key = 'stripe_secret_key'").first() as { value: string };
-          stripeSecretKey = setting?.value;
-        }
-
-        if (stripeSecretKey) {
-          const stripe = new Stripe(stripeSecretKey, {
-            apiVersion: "2024-06-20",
-            httpClient: Stripe.createFetchHttpClient(),
-          });
-          
-          const intents = await stripe.paymentIntents.search({
-            query: `metadata['orderId']:'${id}' AND status:'requires_action'`,
-          });
-          
-          for (const intent of intents.data) {
-            await stripe.paymentIntents.cancel(intent.id);
-          }
-        }
-      } catch (e) {
-        console.error("Failed to cancel stripe payment intent", e);
-      }
-    }
+    // Beam charges expire naturally — no need to cancel them manually
 
     return NextResponse.json({ success: true, message: "Order cancelled successfully" });
   } catch (error: unknown) {
@@ -157,4 +129,3 @@ export async function PATCH(
     return NextResponse.json({ error: safeError(error) }, { status: 500 });
   }
 }
-

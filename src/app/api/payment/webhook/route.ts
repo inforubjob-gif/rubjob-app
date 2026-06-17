@@ -1,13 +1,12 @@
 import { safeError } from "@/lib/api-utils";
 import { getRequestContext } from "@cloudflare/next-on-pages";
 import { NextResponse } from "next/server";
-import Stripe from "stripe";
 
 export const runtime = "edge";
 
 /**
  * POST /api/payment/webhook
- * Handles Stripe Webhook Events
+ * Handles Beam Webhook Events (charge.succeeded, etc.)
  */
 export async function POST(req: Request) {
   const env = getRequestContext().env;
@@ -15,136 +14,99 @@ export async function POST(req: Request) {
 
   if (!db) return NextResponse.json({ error: "DB not found" }, { status: 500 });
 
-  // Try Env first, then DB
-  let stripeSecretKey = env?.STRIPE_SECRET_KEY;
-  if (!stripeSecretKey) {
-    const setting = await db.prepare("SELECT value FROM system_settings WHERE key = 'stripe_secret_key'").first() as { value: string };
-    stripeSecretKey = setting?.value;
-  }
-
-  let webhookSecret = env?.STRIPE_WEBHOOK_SECRET;
-  if (!webhookSecret) {
-    const setting = await db.prepare("SELECT value FROM system_settings WHERE key = 'stripe_webhook_secret'").first() as { value: string };
-    webhookSecret = setting?.value;
-  }
-
-  if (!stripeSecretKey || !webhookSecret) {
-    return NextResponse.json({ error: "Missing Stripe Server Configuration" }, { status: 500 });
-  }
-
-  // Initialize Stripe
-  const stripe = new Stripe(stripeSecretKey, {
-    apiVersion: "2024-06-20",
-    httpClient: Stripe.createFetchHttpClient(),
-  });
-
-  const body = await req.text();
-  const signature = req.headers.get("stripe-signature");
-
-  let event: Stripe.Event;
-
   try {
-    if (!signature) throw new Error("Missing stripe-signature header");
-    
-    event = await stripe.webhooks.constructEventAsync(
-      body,
-      signature,
-      webhookSecret
-    );
-  } catch (err: unknown) {
-    console.error(`Webhook signature verification failed: ${safeError(err)}`);
-    return NextResponse.json({ error: safeError(err) }, { status: 400 });
-  }
+    const body = await req.json() as any;
 
-  try {
-    // Handle the event
-    switch (event.type) {
-      case "payment_intent.succeeded":
-        const paymentIntent = event.data.object as Stripe.PaymentIntent;
-        const orderId = paymentIntent.metadata?.orderId;
+    // Beam webhook payload contains event type and charge data
+    const eventType = body.event || body.type;
+    const chargeData = body.data || body;
 
-        if (orderId) {
-          // Update Order Status in D1
-          await db.prepare(`
-            UPDATE orders 
-            SET paymentStatus = 'paid', 
-                status = 'searching_driver',
-                updatedAt = CURRENT_TIMESTAMP 
-            WHERE id = ?
-          `).bind(orderId).run();
+    console.log(`Beam webhook received: ${eventType}`, JSON.stringify(body).slice(0, 500));
 
-          console.log(`✅ Order ${orderId} marked as PAID via Stripe Webhook`);
+    // Handle charge succeeded
+    if (eventType === "charge.succeeded" || chargeData.status === "SUCCEEDED") {
+      const orderId = chargeData.order?.referenceId || chargeData.metadata?.orderId;
 
-          // 📒 Log successful payment
-          try {
-            const { nanoid } = await import("nanoid");
-            await db.prepare(`INSERT INTO payment_logs (id, orderId, gateway, chargeId, amount, status, webhookEvent, rawResponse) VALUES (?, ?, 'stripe', ?, ?, 'success', 'payment_intent.succeeded', ?)`)
-              .bind(`PAY-${nanoid(8)}`, orderId, paymentIntent.id, (paymentIntent.amount || 0) / 100, JSON.stringify({ id: paymentIntent.id, status: paymentIntent.status })).run();
-          } catch (e) { console.error("Payment log error:", e); }
+      if (orderId) {
+        // Update Order Status in D1
+        await db.prepare(`
+          UPDATE orders 
+          SET paymentStatus = 'paid', 
+              status = 'searching_driver',
+              updatedAt = CURRENT_TIMESTAMP 
+          WHERE id = ?
+        `).bind(orderId).run();
 
-          // Broadcast to Online Rubbers via LINE (Geo-Filtered)
-          try {
-            const orderData = await db.prepare(`
-              SELECT o.deliveryFee, o.userId, o.totalPrice, o.serviceId, o.address,
-                     s.name as serviceName, p.title as gigName
-              FROM orders o
-              LEFT JOIN services s ON o.serviceId = s.id
-              LEFT JOIN provider_services p ON o.serviceId = p.id
-              WHERE o.id = ?
-            `).bind(orderId).first() as any;
-            if (orderData) {
-              const serviceName = orderData.serviceName || orderData.gigName || "Laundry Service";
+        console.log(`✅ Order ${orderId} marked as PAID via Beam Webhook`);
 
-              // In-App Notification for Customer (always works)
-              try {
-                const { createNotification } = await import("@/lib/notify-server");
-                await createNotification(db, {
-                  userId: orderData.userId,
-                  userType: "customer",
-                  type: "order_update",
-                  title: "✅ ชำระเงินสำเร็จ",
-                  message: `งาน #${orderId.slice(-6)} — ${serviceName} ฿${orderData.totalPrice} ได้รับการยืนยันแล้ว`,
-                  link: `/orders/${orderId}`
-                });
-              } catch (e) {
-                console.error("Customer in-app notification error:", e);
-              }
+        // 📒 Log successful payment
+        try {
+          const { nanoid } = await import("nanoid");
+          const chargeId = chargeData.id || chargeData.chargeId || '';
+          const chargeAmount = (chargeData.amount || 0) / 100;
+          await db.prepare(`INSERT INTO payment_logs (id, orderId, gateway, chargeId, amount, status, webhookEvent, rawResponse) VALUES (?, ?, 'beam', ?, ?, 'success', 'charge.succeeded', ?)`)
+            .bind(`PAY-${nanoid(8)}`, orderId, chargeId, chargeAmount, JSON.stringify({ id: chargeId, status: 'SUCCEEDED' })).run();
+        } catch (e) { console.error("Payment log error:", e); }
 
-              // LINE Push to Customer via Customer OA
-              let customerToken = env.LINE_CHANNEL_ACCESS_TOKEN;
-              if (!customerToken) {
-                const setting = await db.prepare("SELECT value FROM system_settings WHERE key = 'line_token_regular'").first() as any;
-                if (setting?.value) customerToken = setting.value;
-              }
-              
-              if (customerToken && orderData.userId) {
-                const { sendLinePush, bookingConfirmationFlex } = await import("@/lib/line");
-                sendLinePush(
-                  orderData.userId, 
-                  [bookingConfirmationFlex(orderId, serviceName, orderData.totalPrice || 0)],
-                  customerToken
-                ).catch(err => console.error("Customer push error in webhook:", err));
-              }
+        // Broadcast to Online Rubbers via LINE (Geo-Filtered)
+        try {
+          const orderData = await db.prepare(`
+            SELECT o.deliveryFee, o.userId, o.totalPrice, o.serviceId, o.address,
+                   s.name as serviceName, p.title as gigName
+            FROM orders o
+            LEFT JOIN services s ON o.serviceId = s.id
+            LEFT JOIN provider_services p ON o.serviceId = p.id
+            WHERE o.id = ?
+          `).bind(orderId).first() as any;
+          if (orderData) {
+            const serviceName = orderData.serviceName || orderData.gigName || "Laundry Service";
 
-              // Geo-Filtered Broadcast to matching rubbers only (LINE + In-App)
-              const { broadcastToEligibleRubbers } = await import("@/lib/dispatch");
-              await broadcastToEligibleRubbers(
-                db, env, orderId,
-                orderData.address,
-                orderData.deliveryFee || 0,
-                'paid'
-              );
-              // Web Push is now handled inside broadcastToEligibleRubbers (dispatch.ts)
-              // It checks per-user: PWA installed → Web Push only, no PWA → LINE only
+            // In-App Notification for Customer (always works)
+            try {
+              const { createNotification } = await import("@/lib/notify-server");
+              await createNotification(db, {
+                userId: orderData.userId,
+                userType: "customer",
+                type: "order_update",
+                title: "✅ ชำระเงินสำเร็จ",
+                message: `งาน #${orderId.slice(-6)} — ${serviceName} ฿${orderData.totalPrice} ได้รับการยืนยันแล้ว`,
+                link: `/orders/${orderId}`
+              });
+            } catch (e) {
+              console.error("Customer in-app notification error:", e);
             }
-          } catch (e) {
-            console.error("Failed to broadcast to rubbers from webhook:", e);
-          }
-        }
-        break;
 
-      default:
-        console.log(`Unhandled event type ${event.type}`);
+            // LINE Push to Customer via Customer OA
+            let customerToken = env.LINE_CHANNEL_ACCESS_TOKEN;
+            if (!customerToken) {
+              const setting = await db.prepare("SELECT value FROM system_settings WHERE key = 'line_token_regular'").first() as any;
+              if (setting?.value) customerToken = setting.value;
+            }
+            
+            if (customerToken && orderData.userId) {
+              const { sendLinePush, bookingConfirmationFlex } = await import("@/lib/line");
+              sendLinePush(
+                orderData.userId, 
+                [bookingConfirmationFlex(orderId, serviceName, orderData.totalPrice || 0)],
+                customerToken
+              ).catch(err => console.error("Customer push error in webhook:", err));
+            }
+
+            // Geo-Filtered Broadcast to matching rubbers only (LINE + In-App)
+            const { broadcastToEligibleRubbers } = await import("@/lib/dispatch");
+            await broadcastToEligibleRubbers(
+              db, env, orderId,
+              orderData.address,
+              orderData.deliveryFee || 0,
+              'paid'
+            );
+          }
+        } catch (e) {
+          console.error("Failed to broadcast to rubbers from webhook:", e);
+        }
+      }
+    } else {
+      console.log(`Unhandled Beam event type: ${eventType}`);
     }
 
     return NextResponse.json({ received: true });

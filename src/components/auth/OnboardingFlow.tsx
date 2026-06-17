@@ -189,6 +189,19 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
 
   async function handleAddressSubmit() {
     if (!addressLabel.trim()) return;
+
+    // Guard: LIFF profile must be loaded
+    if (!profile?.userId) {
+      showToast(language === 'th' ? "ไม่พบข้อมูลผู้ใช้ กรุณาปิดแล้วเปิดใหม่" : "User not found. Please restart the app.", "error");
+      return;
+    }
+
+    // Guard: must pin location on map
+    if (!pinLat || !pinLng) {
+      showToast(language === 'th' ? "กรุณาปักหมุดตำแหน่งที่อยู่ของคุณบนแผนที่" : "Please pin your location on the map", "error");
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
@@ -198,12 +211,12 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          userId: profile?.userId,
+          userId: profile.userId,
           label: addressLabel.trim(),
           details: finalDetails,
           note: addressNote.trim() || null,
-          lat: pinLat,
-          lng: pinLng,
+          lat: pinLat ?? 0,
+          lng: pinLng ?? 0,
           isDefault: true,
         }),
       });
@@ -212,13 +225,12 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
         throw new Error(errData.error || "Failed to save address");
       }
       // Set completion flag scoped to userId (prevents skip after account deletion + re-register)
-      if (profile?.userId) {
-        localStorage.setItem(`rubjob_onboarded_${profile.userId}`, "true");
-      }
+      localStorage.setItem(`rubjob_onboarded_${profile.userId}`, "true");
       onComplete();
     } catch (err) {
       console.error("Failed to save address:", err);
-      showToast(t("common.error"), "error");
+      const msg = err instanceof Error ? err.message : t("common.error");
+      showToast(msg, "error");
     } finally {
       setIsSubmitting(false);
     }

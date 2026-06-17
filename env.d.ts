@@ -6,8 +6,8 @@ interface CloudflareEnv {
   KV?: KVNamespace;
   R2?: R2Bucket;
   ADMIN_SECRET?: string;
-  STRIPE_SECRET_KEY?: string;
-  STRIPE_WEBHOOK_SECRET?: string;
+  BEAM_MERCHANT_ID?: string;
+  BEAM_API_KEY?: string;
   LINE_CHANNEL_ACCESS_TOKEN?: string;
   LINE_CHANNEL_SECRET?: string;
   LINE_CHANNEL_ACCESS_TOKEN_RUBBER?: string;
@@ -22,7 +22,6 @@ declare namespace NodeJS {
     NEXT_PUBLIC_LIFF_ID?: string;
     NEXT_PUBLIC_LIFF_ID_RUBBER?: string;
     NEXT_PUBLIC_LIFF_ID_QUICK?: string;
-    NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY?: string;
     ADMIN_EMAIL?: string;
     ADMIN_PASSWORD?: string;
   }

@@ -6,7 +6,7 @@ import { getAdminSession } from "@/lib/auth-server";
 export const runtime = "edge";
 
 // Keys that contain secrets — only visible to authenticated admins
-const SENSITIVE_KEY_PREFIXES = ["stripe_", "line_token_", "line_secret_"];
+const SENSITIVE_KEY_PREFIXES = ["beam_", "line_token_", "line_secret_"];
 
 const DEFAULT_SETTINGS = [
   { key: "is_open", value: "true", type: "boolean", description: "Whether the platform is currently accepting new orders." },
@@ -22,9 +22,8 @@ const DEFAULT_SETTINGS = [
   { key: "line_secret_rubber", value: "", type: "string", description: "Channel Secret for the Rubber (Driver) LINE OA." },
   { key: "line_token_help", value: "", type: "string", description: "Channel Access Token for the Help Support LINE OA." },
   { key: "line_secret_help", value: "", type: "string", description: "Channel Secret for the Help Support LINE OA." },
-  { key: "stripe_publishable_key", value: "", type: "string", description: "Stripe Publishable Key (pk_test_...)" },
-  { key: "stripe_secret_key", value: "", type: "string", description: "Stripe Secret Key (sk_test_...)" },
-  { key: "stripe_webhook_secret", value: "", type: "string", description: "Stripe Webhook Signing Secret (whsec_...)" },
+  { key: "beam_merchant_id", value: "", type: "string", description: "Beam Merchant ID (e.g. rubjob-yvqpfl)" },
+  { key: "beam_api_key", value: "", type: "string", description: "Beam API Key (from Lighthouse dashboard)" },
   { key: "open_regions", value: JSON.stringify([{ province: "ขอนแก่น", areas: ["กังสดาล"] }]), type: "json", description: "Configurable regions open for service" },
 ];
 

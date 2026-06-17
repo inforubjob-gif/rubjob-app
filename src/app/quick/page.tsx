@@ -7,9 +7,7 @@ import { useTranslation } from "@/components/providers/LanguageProvider";
 import { Icons, getServiceIcon, IconCircle } from "@/components/ui/Icons";
 import Card from "@/components/ui/Card";
 import { TIME_SLOTS } from "@/lib/constants";
-import { loadStripe, type Stripe } from "@stripe/stripe-js";
-import { Elements } from "@stripe/react-stripe-js";
-import PromptPayCheckout from "@/components/checkout/PromptPayCheckout";
+import BeamCheckout from "@/components/checkout/BeamCheckout";
 
 export default function QuickBookPage() {
   const router = useRouter();
@@ -24,28 +22,11 @@ export default function QuickBookPage() {
   const [favIds, setFavIds] = useState<string[]>([]);
   
   // Payment state
-  const [stripePromise, setStripePromise] = useState<Promise<Stripe | null> | null>(null);
-  const [clientSecret, setClientSecret] = useState<string | null>(null);
+  const [qrCodeData, setQrCodeData] = useState<string | null>(null);
   const [paymentStatus, setPaymentStatus] = useState<"idle" | "loading" | "creating" | "ready" | "error">("idle");
 
   // Prevent double-submit
   const hasSubmittedRef = useRef(false);
-
-  // Fetch Stripe config
-  useEffect(() => {
-    async function fetchStripeConfig() {
-      try {
-        const res = await fetch("/api/payment/config");
-        const data = await res.json() as any;
-        if (data.publishableKey) {
-          setStripePromise(loadStripe(data.publishableKey));
-        }
-      } catch (err) {
-        console.error("Failed to fetch payment config", err);
-      }
-    }
-    fetchStripeConfig();
-  }, []);
 
   // Fetch recent order
   useEffect(() => {
@@ -165,8 +146,8 @@ export default function QuickBookPage() {
       });
 
       const payData = await payRes.json() as any;
-      if (payRes.ok && payData.clientSecret) {
-        setClientSecret(payData.clientSecret);
+      if (payRes.ok && payData.qrCodeData) {
+        setQrCodeData(payData.qrCodeData);
         setPaymentStatus("ready");
       } else {
         throw new Error("Payment initialization failed");
@@ -394,12 +375,10 @@ export default function QuickBookPage() {
           </div>
         </Card>
 
-        {/* PromptPay QR via Stripe */}
-        {clientSecret && stripePromise ? (
+        {/* PromptPay QR via Beam */}
+        {qrCodeData ? (
           <Card className="p-6 border-2 border-primary bg-primary/5 shadow-2xl shadow-primary/10">
-            <Elements stripe={stripePromise} options={{ clientSecret, appearance: { theme: 'stripe' } }}>
-              <PromptPayCheckout clientSecret={clientSecret} autoConfirm />
-            </Elements>
+            <BeamCheckout qrCodeData={qrCodeData} orderId={activeOrderId!} amount={totalPrice} />
           </Card>
         ) : (
           <Card className="p-8 flex flex-col items-center gap-4">

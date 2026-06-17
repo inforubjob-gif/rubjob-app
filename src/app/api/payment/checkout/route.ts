@@ -1,13 +1,14 @@
 import { getRequestContext } from "@cloudflare/next-on-pages";
 import { NextResponse } from "next/server";
-import Stripe from "stripe";
 import { safeError } from "@/lib/api-utils";
 
 export const runtime = "edge";
 
+const BEAM_API_URL = "https://api.beamcheckout.com";
+
 /**
  * POST /api/payment/checkout
- * Creates a Stripe PaymentIntent for PromptPay
+ * Creates a Beam Charge for PromptPay QR
  */
 export async function POST(req: Request) {
   try {
@@ -25,7 +26,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Missing DB Connection" }, { status: 500 });
     }
 
-    // 🛡️ Phase 2.1: Validate amount against actual order in DB
+    // 🛡️ Validate amount against actual order in DB
     const order = await db.prepare(
       "SELECT totalPrice, paymentStatus FROM orders WHERE id = ?"
     ).bind(orderId).first() as { totalPrice: number; paymentStatus: string } | null;
@@ -40,34 +41,70 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Amount mismatch" }, { status: 400 });
     }
 
-    // Try Env first, then DB
-    let stripeSecretKey = env?.STRIPE_SECRET_KEY;
-    if (!stripeSecretKey) {
-      const setting = await db.prepare("SELECT value FROM system_settings WHERE key = 'stripe_secret_key'").first() as { value: string };
-      stripeSecretKey = setting?.value;
+    // Get Beam credentials: try Env first, then DB
+    let merchantId = env?.BEAM_MERCHANT_ID;
+    if (!merchantId) {
+      const setting = await db.prepare("SELECT value FROM system_settings WHERE key = 'beam_merchant_id'").first() as { value: string };
+      merchantId = setting?.value;
     }
 
-    if (!stripeSecretKey) {
-      return NextResponse.json({ error: "Stripe Secret Key not configured" }, { status: 500 });
+    let apiKey = env?.BEAM_API_KEY;
+    if (!apiKey) {
+      const setting = await db.prepare("SELECT value FROM system_settings WHERE key = 'beam_api_key'").first() as { value: string };
+      apiKey = setting?.value;
     }
 
-    // Initialize Stripe
-    const stripe = new Stripe(stripeSecretKey, {
-      apiVersion: "2024-06-20", // Use a stable version
-      httpClient: Stripe.createFetchHttpClient(), // Required for Edge Runtime
-    });
+    if (!merchantId || !apiKey) {
+      return NextResponse.json({ error: "Beam credentials not configured" }, { status: 500 });
+    }
 
-    // 1. Create PaymentIntent for PromptPay
+    // Beam uses HTTP Basic Auth: Base64(merchantId:apiKey)
+    const authHeader = btoa(`${merchantId}:${apiKey}`);
+
+    // Create Beam Charge for PromptPay
     // Amount must be in satang (THB * 100)
-    const paymentIntent = await stripe.paymentIntents.create({
-      amount: Math.round(amount * 100),
-      currency: "thb",
-      payment_method_types: ["promptpay"],
-      description: `Payment for Rubjob Order ${orderId}`,
-      metadata: { orderId },
+    const beamResponse = await fetch(`${BEAM_API_URL}/api/v1/charges`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Basic ${authHeader}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        amount: Math.round(amount * 100),
+        currency: "THB",
+        paymentMethod: {
+          type: "PROMPT_PAY"
+        },
+        order: {
+          referenceId: orderId
+        }
+      }),
     });
 
-    // 2. Self-healing: Fix any empty strings in foreign key columns to avoid SQLITE_CONSTRAINT during UPDATE
+    if (!beamResponse.ok) {
+      const errBody = await beamResponse.text();
+      console.error("Beam API error:", beamResponse.status, errBody);
+      return NextResponse.json({ error: `Beam API error: ${beamResponse.status}` }, { status: 500 });
+    }
+
+    const beamData = await beamResponse.json() as any;
+
+    // Extract QR code data from Beam response
+    let qrCodeData: string | null = null;
+
+    if (beamData.actionRequired === "ENCODED_IMAGE" && beamData.encodedImage) {
+      // Beam returns base64 encoded QR image
+      qrCodeData = beamData.encodedImage;
+    } else if (beamData.actionRequired === "REDIRECT" && beamData.redirect?.url) {
+      // Fallback: redirect URL (shouldn't happen for PromptPay but handle gracefully)
+      return NextResponse.json({
+        success: true,
+        chargeId: beamData.id,
+        redirectUrl: beamData.redirect.url,
+      });
+    }
+
+    // Self-healing: Fix any empty strings in foreign key columns
     try {
       await db.prepare(`
         UPDATE orders 
@@ -81,7 +118,7 @@ export async function POST(req: Request) {
       console.warn("Auto-healing foreign keys failed", e);
     }
 
-    // 3. Update Order in D1 with PaymentIntent ID
+    // Update Order with Beam Charge ID
     await db.prepare(`
       UPDATE orders 
       SET paymentStatus = 'pending', 
@@ -92,19 +129,19 @@ export async function POST(req: Request) {
     // 📒 Log payment attempt
     try {
       const { nanoid } = await import("nanoid");
-      await db.prepare(`INSERT INTO payment_logs (id, orderId, gateway, chargeId, amount, status, webhookEvent) VALUES (?, ?, 'stripe', ?, ?, 'pending', 'intent_created')`)
-        .bind(`PAY-${nanoid(8)}`, orderId, paymentIntent.id, amount).run();
+      await db.prepare(`INSERT INTO payment_logs (id, orderId, gateway, chargeId, amount, status, webhookEvent) VALUES (?, ?, 'beam', ?, ?, 'pending', 'charge_created')`)
+        .bind(`PAY-${nanoid(8)}`, orderId, beamData.id || '', amount).run();
     } catch (e) { console.error("Payment log error:", e); }
 
-    // 4. Return the clientSecret for the frontend to render the QR code
+    // Return QR code data for the frontend
     return NextResponse.json({
       success: true,
-      clientSecret: paymentIntent.client_secret,
-      paymentIntentId: paymentIntent.id
+      chargeId: beamData.id,
+      qrCodeData,
     });
 
   } catch (error: unknown) {
-    console.error("Stripe Checkout error:", error);
+    console.error("Beam Checkout error:", error);
     return NextResponse.json({ error: safeError(error) }, { status: 500 });
   }
 }

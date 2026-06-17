@@ -13,9 +13,7 @@ import { Icons, getServiceIcon, IconCircle } from "@/components/ui/Icons";
 import { useTranslation } from "@/components/providers/LanguageProvider";
 import { useLiff } from "@/components/providers/LiffProvider";
 import { useToast } from "@/components/providers/ToastProvider";
-import { loadStripe, type Stripe } from "@stripe/stripe-js";
-import { Elements } from "@stripe/react-stripe-js";
-import PromptPayCheckout from "@/components/checkout/PromptPayCheckout";
+import BeamCheckout from "@/components/checkout/BeamCheckout";
 
 const ITEM_KEY_MAP: Record<string, string> = {
   "T-shirt": "items.tshirt",
@@ -39,8 +37,8 @@ export default function OrderDetailPage() {
   const [driverRating, setDriverRating] = useState(0);
   const [driverReview, setDriverReview] = useState("");
   const [isSubmittingReview, setIsSubmittingReview] = useState(false);
-  const [stripePromise, setStripePromise] = useState<Promise<Stripe | null> | null>(null);
-  const [clientSecret, setClientSecret] = useState<string | null>(null);
+  const [qrCodeData, setQrCodeData] = useState<string | null>(null);
+  const [beamChargeId, setBeamChargeId] = useState<string | null>(null);
   const [isCancelling, setIsCancelling] = useState(false);
   const [refundBankName, setRefundBankName] = useState("");
   const [refundAccountNumber, setRefundAccountNumber] = useState("");
@@ -144,15 +142,8 @@ export default function OrderDetailPage() {
         const data = (await res.json()) as any;
         if (data.order) {
           setOrder(data.order);
-          // If payment is pending, initialize Stripe and generate QR
+          // If payment is pending, create Beam charge for QR
           if (data.order.paymentStatus === "pending" || data.order.status === "pending") {
-            fetch("/api/payment/config")
-              .then(r => r.json())
-              .then((res: any) => {
-                if (res.publishableKey) setStripePromise(loadStripe(res.publishableKey));
-              })
-              .catch(console.error);
-
             fetch("/api/payment/checkout", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
@@ -160,7 +151,8 @@ export default function OrderDetailPage() {
             })
               .then(r => r.json())
               .then((res: any) => {
-                if (res.clientSecret) setClientSecret(res.clientSecret);
+                if (res.qrCodeData) setQrCodeData(res.qrCodeData);
+                if (res.chargeId) setBeamChargeId(res.chargeId);
               })
               .catch(console.error);
           }
@@ -325,10 +317,8 @@ export default function OrderDetailPage() {
               <span className="text-lg font-black text-primary-dark">฿{Math.ceil(order.totalPrice)}</span>
             </div>
             <div className="p-5 flex flex-col items-center">
-              {clientSecret && stripePromise ? (
-                <Elements stripe={stripePromise} options={{ clientSecret, appearance: { theme: 'stripe' } }}>
-                  <PromptPayCheckout clientSecret={clientSecret} autoConfirm />
-                </Elements>
+              {qrCodeData ? (
+                <BeamCheckout qrCodeData={qrCodeData} orderId={order.id} amount={Math.ceil(order.totalPrice)} />
               ) : (
                 <div className="flex flex-col items-center gap-3 py-6">
                   <div className="w-8 h-8 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />

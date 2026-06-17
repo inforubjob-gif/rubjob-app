@@ -804,7 +804,7 @@ function SettingsContent() {
      </div>
 
      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-      {/* Stripe Card */}
+      {/* Beam Checkout Card */}
       <Card className="p-10 bg-white border border-slate-100 shadow-xl rounded-xl relative overflow-hidden group">
         <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 blur-[80px] -mr-16 -mt-16 group-hover:bg-primary/20 transition-all duration-700" />
         
@@ -813,42 +813,31 @@ function SettingsContent() {
           <Icons.Payment size={28} />
          </div>
          <div>
-          <h2 className="text-xl font-black text-slate-900 tracking-tight">{t("admin.settings.stripeTitle")}</h2>
-          <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mt-0.5">{t("admin.settings.stripeSub")}</p>
+          <h2 className="text-xl font-black text-slate-900 tracking-tight">Beam Checkout</h2>
+          <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mt-0.5">ระบบชำระเงิน PromptPay</p>
          </div>
         </div>
 
         <div className="space-y-6 relative z-10">
          <div className="space-y-2">
-          <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t("admin.settings.stripeLabelPublishableKey")}</label>
+          <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Beam Merchant ID</label>
           <input 
            type="text" 
            className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-6 py-4 text-sm text-slate-900 font-black focus:border-primary transition-all outline-none"
-           placeholder="pk_test_..."
-           value={getSetting("stripe_publishable_key")}
-           onChange={(e) => updateLocalSetting("stripe_publishable_key", e.target.value)}
+           placeholder="rubjob-yvqpfl"
+           value={getSetting("beam_merchant_id")}
+           onChange={(e) => updateLocalSetting("beam_merchant_id", e.target.value)}
           />
          </div>
 
          <div className="space-y-2">
-          <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t("admin.settings.stripeLabelSecretKey")}</label>
+          <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Beam API Key</label>
           <input 
            type="password" 
            className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-6 py-4 text-sm text-slate-900 font-black focus:border-primary transition-all outline-none"
-           placeholder="sk_test_..."
-           value={getSetting("stripe_secret_key")}
-           onChange={(e) => updateLocalSetting("stripe_secret_key", e.target.value)}
-          />
-         </div>
-
-         <div className="space-y-2">
-          <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t("admin.settings.stripeLabelWebhookSecret")}</label>
-          <input 
-           type="password" 
-           className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-6 py-4 text-sm text-slate-900 font-black focus:border-primary transition-all outline-none"
-           placeholder="whsec_..."
-           value={getSetting("stripe_webhook_secret")}
-           onChange={(e) => updateLocalSetting("stripe_webhook_secret", e.target.value)}
+           placeholder="API Key จาก Beam Lighthouse"
+           value={getSetting("beam_api_key")}
+           onChange={(e) => updateLocalSetting("beam_api_key", e.target.value)}
           />
          </div>
         </div>

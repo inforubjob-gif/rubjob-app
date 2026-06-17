@@ -10,9 +10,7 @@ import type { ServiceType, Address, Store } from "@/types";
 import { Icons, getServiceIcon, IconCircle } from "@/components/ui/Icons";
 import Modal from "@/components/ui/Modal";
 import { calculateOrderPrice, PricingConfig } from "@/utils/pricing";
-import { loadStripe, Stripe } from "@stripe/stripe-js";
-import { Elements } from "@stripe/react-stripe-js";
-import PromptPayCheckout from "@/components/checkout/PromptPayCheckout";
+import BeamCheckout from "@/components/checkout/BeamCheckout";
 
 // Haversine (straight-line) — used as instant fallback while OSRM loads
 function getDistanceKm(lat1: number, lon1: number, lat2: number, lon2: number) {
@@ -200,26 +198,7 @@ function BookingFlow() {
   const [systemSettings, setSystemSettings] = useState<any>({});
   const [paymentQR, setPaymentQR] = useState<string | null>(null);
   const [activeOrderId, setActiveOrderId] = useState<string | null>(null);
-  const [publishableKey, setPublishableKey] = useState<string | null>(null);
-  const [stripePromise, setStripePromise] = useState<Promise<Stripe | null> | null>(null);
   const [pricingConfig, setPricingConfig] = useState<PricingConfig>({ gpRubberPercent: 10, platformFeePerDelivery: 10, deliveryFeeBase: 50 });
-
-  // Fetch Payment Config
-  useEffect(() => {
-    async function fetchConfig() {
-      try {
-        const res = await fetch("/api/payment/config");
-        const data = await res.json() as any;
-        if (data.publishableKey) {
-          setPublishableKey(data.publishableKey);
-          setStripePromise(loadStripe(data.publishableKey));
-        }
-      } catch (err) {
-        console.error("Failed to fetch payment config", err);
-      }
-    }
-    fetchConfig();
-  }, []);
 
   // Auto-assign store based on selected address
   function autoAssignStore(address: Address, stores: any[]): Store | null {
@@ -608,8 +587,9 @@ function BookingFlow() {
       });
 
       const payData = await payRes.json() as any;
-      if (payRes.ok && payData.clientSecret) {
-        setPaymentQR(payData.clientSecret);
+      if (payRes.ok && payData.qrCodeData) {
+        setPaymentQR(payData.qrCodeData);
+        setActiveOrderId(orderId);
         return true;
       } else {
         // Show specific error from payment API
@@ -1263,10 +1243,8 @@ function BookingFlow() {
                       </p>
                     </div>
                   </>
-                ) : paymentQR && stripePromise ? (
-                   <Elements stripe={stripePromise} options={{ clientSecret: paymentQR, appearance: { theme: 'stripe' } }}>
-                      <PromptPayCheckout clientSecret={paymentQR} autoConfirm />
-                   </Elements>
+                ) : paymentQR && activeOrderId ? (
+                   <BeamCheckout qrCodeData={paymentQR} orderId={activeOrderId} amount={totalPrice} />
                 ) : (
                   <>
                     <div className="bg-[#1a3d6d] px-5 py-2.5 rounded-xl flex items-center gap-3">

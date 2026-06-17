@@ -2,117 +2,73 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
-import {
-  PaymentElement,
-  useStripe,
-  useElements,
-} from "@stripe/react-stripe-js";
 import { Icons } from "@/components/ui/Icons";
 import Button from "@/components/ui/Button";
 import { useTranslation } from "@/components/providers/LanguageProvider";
 
-interface PromptPayCheckoutProps {
-  clientSecret: string;
-  autoConfirm?: boolean;
+interface BeamCheckoutProps {
+  qrCodeData: string; // Base64 encoded QR image from Beam
+  orderId: string;
+  amount?: number;
 }
 
-export default function PromptPayCheckout({ clientSecret, autoConfirm }: PromptPayCheckoutProps) {
-  const stripe = useStripe();
-  const elements = useElements();
+export default function BeamCheckout({ qrCodeData, orderId, amount }: BeamCheckoutProps) {
   const { t } = useTranslation();
 
-  const [qrCodeUrl, setQrCodeUrl] = useState<string | null>(null);
-  const [message, setMessage] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isPaid, setIsPaid] = useState(false);
   const [generatedQrUrl, setGeneratedQrUrl] = useState<string | null>(null);
-  const hasAutoConfirmed = useRef(false);
 
-  const [paymentAmount, setPaymentAmount] = useState<number | null>(null);
+  // Construct the QR image source from base64 data
+  const qrImageSrc = qrCodeData.startsWith("data:") 
+    ? qrCodeData 
+    : qrCodeData.startsWith("http") 
+      ? qrCodeData 
+      : `data:image/png;base64,${qrCodeData}`;
 
-  // Poll for payment success
+  // Poll for payment success by checking order status
   useEffect(() => {
-    if (!qrCodeUrl || !stripe || !clientSecret) return;
-    
+    if (isPaid) return;
+
     const intervalId = setInterval(async () => {
       try {
-        const { paymentIntent, error } = await stripe.retrievePaymentIntent(clientSecret);
-        if (error) {
-          console.error("Poll error:", error);
-          return;
-        }
-        if (paymentIntent && paymentIntent.status === "succeeded") {
+        const res = await fetch(`/api/orders/${orderId}`);
+        const data = await res.json() as any;
+        if (data.order?.paymentStatus === "paid") {
+          setIsPaid(true);
           clearInterval(intervalId);
-          window.location.reload(); // Reload to show updated order status or success page
+          window.location.reload(); // Reload to show updated order status
         }
       } catch (err) {
-        console.error("Failed to poll payment intent", err);
+        console.error("Failed to poll order status", err);
       }
     }, 3000); // Check every 3 seconds
 
     return () => clearInterval(intervalId);
-  }, [qrCodeUrl, stripe, clientSecret]);
-
-  useEffect(() => {
-    if (autoConfirm && stripe && !hasAutoConfirmed.current && !isLoading && !qrCodeUrl) {
-      hasAutoConfirmed.current = true;
-      doConfirm();
-    }
-  }, [autoConfirm, stripe]);
-
-  const doConfirm = async () => {
-    if (!stripe) return;
-
-    setIsLoading(true);
-    setMessage(null);
-
-    try {
-      const { error, paymentIntent } = await stripe.confirmPromptPayPayment(clientSecret, {
-        payment_method: {
-          billing_details: {
-            email: "customer@rubjob.com",
-            name: "Customer",
-          },
-        },
-      }, { handleActions: false });
-
-      if (error) {
-        setMessage(error.message || "An error occurred.");
-      } else if (
-        paymentIntent &&
-        paymentIntent.status === "requires_action" &&
-        paymentIntent.next_action?.type === "promptpay_display_qr_code"
-      ) {
-        setPaymentAmount(paymentIntent.amount / 100);
-
-        const qrUrl = (paymentIntent.next_action as any).promptpay_display_qr_code.image_url_svg || 
-                      (paymentIntent.next_action as any).promptpay_display_qr_code.image_url_png ||
-                      (paymentIntent.next_action as any).promptpay_display_qr_code.hosted_instructions_url;
-        
-        if (qrUrl.includes('.svg') || qrUrl.includes('.png')) {
-           setQrCodeUrl(qrUrl);
-        } else {
-           // Fallback to iframe or redirect if only hosted instructions are available
-           window.location.href = qrUrl;
-        }
-      } else if (paymentIntent && paymentIntent.status === "succeeded") {
-        window.location.href = "/success";
-      }
-    } catch (err: unknown) {
-      setMessage((err instanceof Error) ? err.message : "An unexpected error occurred while confirming payment.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  }, [orderId, isPaid]);
 
   const handleSaveQR = async () => {
-    if (!qrCodeUrl) return;
     try {
-      // Use our proxy API to avoid CORS issues
-      const proxyUrl = `/api/payment/proxy-image?url=${encodeURIComponent(qrCodeUrl)}`;
-      const response = await fetch(proxyUrl);
-      if (!response.ok) throw new Error("Failed to fetch image via proxy");
-      
-      const blob = await response.blob();
+      // Fetch the QR image
+      let blob: Blob;
+      if (qrCodeData.startsWith("http")) {
+        const proxyUrl = `/api/payment/proxy-image?url=${encodeURIComponent(qrCodeData)}`;
+        const response = await fetch(proxyUrl);
+        if (!response.ok) throw new Error("Failed to fetch image via proxy");
+        blob = await response.blob();
+      } else {
+        // Convert base64 to blob
+        const base64Data = qrCodeData.startsWith("data:") 
+          ? qrCodeData.split(",")[1] 
+          : qrCodeData;
+        const byteCharacters = atob(base64Data);
+        const byteNumbers = new Array(byteCharacters.length);
+        for (let i = 0; i < byteCharacters.length; i++) {
+          byteNumbers[i] = byteCharacters.charCodeAt(i);
+        }
+        const byteArray = new Uint8Array(byteNumbers);
+        blob = new Blob([byteArray], { type: "image/png" });
+      }
+
       const qrBlobUrl = window.URL.createObjectURL(blob);
 
       // Create a canvas to draw the custom beautiful QR image
@@ -124,7 +80,7 @@ export default function PromptPayCheckout({ clientSecret, autoConfirm }: PromptP
       canvas.width = 600;
       canvas.height = 850;
 
-      // Draw background (White with subtle rounding look via borders if needed, but standard is white)
+      // Draw background
       ctx.fillStyle = "#ffffff";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
@@ -138,7 +94,6 @@ export default function PromptPayCheckout({ clientSecret, autoConfirm }: PromptP
       await new Promise((resolve, reject) => {
         logoImg.onload = resolve;
         logoImg.onerror = reject;
-        // In case the app is deployed to a subpath, window.location.origin is safer
         logoImg.src = `${window.location.origin}/images/rubjob-complete_Text-white.png`;
       });
       const logoHeight = 90;
@@ -168,11 +123,11 @@ export default function PromptPayCheckout({ clientSecret, autoConfirm }: PromptP
       ctx.fillText("สแกนเพื่อชำระเงิน / Scan to Pay", canvas.width / 2, 660);
 
       // Draw Amount
-      if (paymentAmount) {
+      if (amount) {
         ctx.fillStyle = "#FF9F1C";
         ctx.font = "900 64px 'Helvetica Neue', Helvetica, Arial, sans-serif";
         ctx.textAlign = "center";
-        ctx.fillText(`฿${paymentAmount.toLocaleString()}`, canvas.width / 2, 740);
+        ctx.fillText(`฿${amount.toLocaleString()}`, canvas.width / 2, 740);
       }
 
       // Draw Footer
@@ -188,7 +143,7 @@ export default function PromptPayCheckout({ clientSecret, autoConfirm }: PromptP
 
         try {
           if (navigator.share && navigator.canShare) {
-            const file = new File([canvasBlob], `rubjob-qr-${paymentAmount || 'payment'}.png`, { type: 'image/png' });
+            const file = new File([canvasBlob], `rubjob-qr-${amount || 'payment'}.png`, { type: 'image/png' });
             if (navigator.canShare({ files: [file] })) {
               await navigator.share({
                 files: [file],
@@ -203,7 +158,7 @@ export default function PromptPayCheckout({ clientSecret, autoConfirm }: PromptP
 
         const link = document.createElement("a");
         link.href = generatedDataUrl;
-        link.download = `rubjob-qr-${paymentAmount || 'payment'}.png`;
+        link.download = `rubjob-qr-${amount || 'payment'}.png`;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
@@ -213,19 +168,11 @@ export default function PromptPayCheckout({ clientSecret, autoConfirm }: PromptP
       window.URL.revokeObjectURL(qrBlobUrl);
     } catch (err) {
       console.error("Failed to generate custom QR", err);
-      const link = document.createElement("a");
-      link.href = qrCodeUrl;
-      link.download = "rubjob-promptpay-qr.png";
-      link.target = "_blank";
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      // Fallback: open QR in new tab
+      if (qrCodeData.startsWith("http")) {
+        window.open(qrCodeData, "_blank");
+      }
     }
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    doConfirm();
   };
 
   return (
@@ -250,45 +197,25 @@ export default function PromptPayCheckout({ clientSecret, autoConfirm }: PromptP
 
       <div className="space-y-6 animate-fade-in">
         <div className="bg-white rounded-xl p-6 border border-slate-100 shadow-xl shadow-slate-200/50 flex flex-col items-center justify-center min-h-[300px]">
-          {qrCodeUrl ? (
-            <div className="flex flex-col items-center animate-scale-in w-full">
-              <img src={qrCodeUrl} alt="PromptPay QR Code" className="w-64 h-64 object-contain mb-6 border-4 border-slate-50 rounded-xl shadow-inner" />
-              
-              <button 
-                onClick={handleSaveQR}
-                className="mb-6 flex items-center justify-center gap-2 px-6 py-3 bg-white border-2 border-slate-200 text-slate-700 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-slate-50 active:scale-95 transition-all shadow-sm w-full max-w-[250px]"
-              >
-                <Icons.Download size={18} />
-                {t("orders.payment.saveQR")}
-              </button>
+          <div className="flex flex-col items-center animate-scale-in w-full">
+            <img src={qrImageSrc} alt="PromptPay QR Code" className="w-64 h-64 object-contain mb-6 border-4 border-slate-50 rounded-xl shadow-inner" />
+            
+            <button 
+              onClick={handleSaveQR}
+              className="mb-6 flex items-center justify-center gap-2 px-6 py-3 bg-white border-2 border-slate-200 text-slate-700 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-slate-50 active:scale-95 transition-all shadow-sm w-full max-w-[250px]"
+            >
+              <Icons.Download size={18} />
+              {t("orders.payment.saveQR")}
+            </button>
 
-              <p className="text-sm font-bold text-slate-500 uppercase tracking-widest animate-pulse">{t("orders.payment.waitingForPayment")}</p>
-            </div>
-          ) : (
-            <div className="w-full flex flex-col items-center justify-center space-y-4">
-              {!isLoading && !message && (
-                <Icons.Payment size={48} className="text-slate-200" />
-              )}
-              {isLoading && (
-                <Icons.Refresh size={32} className="text-primary animate-spin" />
-              )}
-              <Button
-                disabled={isLoading || !stripe}
-                onClick={handleSubmit}
-                fullWidth
-                className="bg-primary text-white py-5 rounded-xl font-black uppercase shadow-2xl shadow-primary/30 active:scale-95 transition-all text-sm"
-                isLoading={isLoading}
-              >
-                {isLoading ? t("orders.payment.processing") : t("orders.payment.confirmPayment")}
-              </Button>
-            </div>
-          )}
+            <p className="text-sm font-bold text-slate-500 uppercase tracking-widest animate-pulse">{t("orders.payment.waitingForPayment")}</p>
+          </div>
         </div>
 
-        {/* Show any error or success messages */}
-        {message && (
-          <div id="payment-message" className="text-center text-sm font-bold text-rose-500 bg-rose-50 p-4 rounded-xl animate-bounce">
-            {message}
+        {/* Payment status indicator */}
+        {isPaid && (
+          <div className="text-center text-sm font-bold text-emerald-600 bg-emerald-50 p-4 rounded-xl animate-bounce">
+            ✅ ชำระเงินสำเร็จแล้ว! กำลังอัพเดตสถานะ...
           </div>
         )}
       </div>
@@ -296,7 +223,7 @@ export default function PromptPayCheckout({ clientSecret, autoConfirm }: PromptP
       <div className="text-center">
         <div className="inline-flex items-center gap-2 px-4 py-2 bg-slate-100 rounded-full text-[10px] font-black text-slate-400 uppercase">
            <Icons.Shield size={12} />
-           {t("orders.payment.securePaymentByStripe")}
+           ระบบชำระเงินปลอดภัย 100% โดย Beam
         </div>
       </div>
 
