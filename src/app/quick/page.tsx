@@ -376,9 +376,9 @@ export default function QuickBookPage() {
         </Card>
 
         {/* PromptPay QR via Beam */}
-        {qrCodeData ? (
+        {qrCodeData && activeOrderId ? (
           <Card className="p-6 border-2 border-primary bg-primary/5 shadow-2xl shadow-primary/10">
-            <BeamCheckout qrCodeData={qrCodeData} orderId={activeOrderId!} amount={totalPrice} />
+            <BeamCheckout qrCodeData={qrCodeData} orderId={activeOrderId} amount={totalPrice} />
           </Card>
         ) : (
           <Card className="p-8 flex flex-col items-center gap-4">
