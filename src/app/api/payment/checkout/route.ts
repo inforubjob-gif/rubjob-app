@@ -67,7 +67,8 @@ export async function POST(req: Request) {
       amount: Math.round(amount * 100),
       currency: "THB",
       paymentMethod: {
-        paymentMethodType: "QR_PROMPT_PAY"
+        paymentMethodType: "QR_PROMPT_PAY",
+        qrPromptPay: {}
       },
       referenceId: orderId
     };
