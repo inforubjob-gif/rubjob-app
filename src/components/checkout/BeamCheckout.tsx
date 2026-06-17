@@ -18,12 +18,15 @@ export default function BeamCheckout({ qrCodeData, orderId, amount }: BeamChecko
   const [isPaid, setIsPaid] = useState(false);
   const [generatedQrUrl, setGeneratedQrUrl] = useState<string | null>(null);
 
+  // Safety: ensure qrCodeData is always a string
+  const safeQrData = typeof qrCodeData === "string" ? qrCodeData : String(qrCodeData || "");
+
   // Construct the QR image source from base64 data
-  const qrImageSrc = qrCodeData.startsWith("data:") 
-    ? qrCodeData 
-    : qrCodeData.startsWith("http") 
-      ? qrCodeData 
-      : `data:image/png;base64,${qrCodeData}`;
+  const qrImageSrc = safeQrData.startsWith("data:") 
+    ? safeQrData 
+    : safeQrData.startsWith("http") 
+      ? safeQrData 
+      : `data:image/png;base64,${safeQrData}`;
 
   // Poll for payment success by checking order status
   useEffect(() => {
@@ -50,16 +53,16 @@ export default function BeamCheckout({ qrCodeData, orderId, amount }: BeamChecko
     try {
       // Fetch the QR image
       let blob: Blob;
-      if (qrCodeData.startsWith("http")) {
-        const proxyUrl = `/api/payment/proxy-image?url=${encodeURIComponent(qrCodeData)}`;
+      if (safeQrData.startsWith("http")) {
+        const proxyUrl = `/api/payment/proxy-image?url=${encodeURIComponent(safeQrData)}`;
         const response = await fetch(proxyUrl);
         if (!response.ok) throw new Error("Failed to fetch image via proxy");
         blob = await response.blob();
       } else {
         // Convert base64 to blob
-        const base64Data = qrCodeData.startsWith("data:") 
-          ? qrCodeData.split(",")[1] 
-          : qrCodeData;
+        const base64Data = safeQrData.startsWith("data:") 
+          ? safeQrData.split(",")[1] 
+          : safeQrData;
         const byteCharacters = atob(base64Data);
         const byteNumbers = new Array(byteCharacters.length);
         for (let i = 0; i < byteCharacters.length; i++) {
@@ -169,8 +172,8 @@ export default function BeamCheckout({ qrCodeData, orderId, amount }: BeamChecko
     } catch (err) {
       console.error("Failed to generate custom QR", err);
       // Fallback: open QR in new tab
-      if (qrCodeData.startsWith("http")) {
-        window.open(qrCodeData, "_blank");
+      if (safeQrData.startsWith("http")) {
+        window.open(safeQrData, "_blank");
       }
     }
   };
