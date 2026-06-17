@@ -95,28 +95,19 @@ export async function POST(req: Request) {
     // Log full Beam response for debugging
     console.log("Beam response:", JSON.stringify(beamData));
 
-    // Extract QR code data from Beam response
-    // Try all known paths where Beam might put the QR data
-    let qrCodeData: string | null = null;
+    // === TEMPORARY DEBUG: Return full Beam response so we can see exact structure ===
+    // Try to find QR data in any possible location
+    const qrCodeData = 
+      beamData.encodedImage ||
+      beamData.qrCodeData ||
+      beamData.qrData ||
+      beamData.paymentMethod?.qrPromptPay?.qrCodeData ||
+      beamData.paymentMethod?.qrPromptPay?.encodedImage ||
+      beamData.paymentMethod?.qrPromptPay?.qrData ||
+      beamData.paymentMethod?.qrPromptPay?.image ||
+      null;
 
-    // Path 1: Direct fields
-    if (beamData.encodedImage) {
-      qrCodeData = beamData.encodedImage;
-    } else if (beamData.qrCodeData) {
-      qrCodeData = beamData.qrCodeData;
-    } else if (beamData.qrData) {
-      qrCodeData = beamData.qrData;
-    }
-    // Path 2: Nested under paymentMethod.qrPromptPay
-    else if (beamData.paymentMethod?.qrPromptPay?.qrCodeData) {
-      qrCodeData = beamData.paymentMethod.qrPromptPay.qrCodeData;
-    } else if (beamData.paymentMethod?.qrPromptPay?.encodedImage) {
-      qrCodeData = beamData.paymentMethod.qrPromptPay.encodedImage;
-    } else if (beamData.paymentMethod?.qrPromptPay?.qrData) {
-      qrCodeData = beamData.paymentMethod.qrPromptPay.qrData;
-    }
-    // Path 3: Redirect fallback
-    else if (beamData.actionRequired === "REDIRECT" && beamData.redirect?.url) {
+    if (beamData.actionRequired === "REDIRECT" && beamData.redirect?.url) {
       return NextResponse.json({
         success: true,
         chargeId: beamData.id,
@@ -124,18 +115,18 @@ export async function POST(req: Request) {
       });
     }
 
-    // If we still don't have QR data, return the full Beam response for debugging
+    // If no QR data found, return full Beam response for debugging
     if (!qrCodeData) {
-      console.error("No QR data found in Beam response:", JSON.stringify(beamData));
       return NextResponse.json({ 
-        error: `Beam returned no QR data. Keys: ${Object.keys(beamData).join(", ")}. PaymentMethod keys: ${beamData.paymentMethod ? Object.keys(beamData.paymentMethod).join(", ") : "none"}. qrPromptPay keys: ${beamData.paymentMethod?.qrPromptPay ? Object.keys(beamData.paymentMethod.qrPromptPay).join(", ") : "none"}`,
+        error: "No QR data found",
+        _debug_beam_response: beamData,
       }, { status: 500 });
     }
 
     // If qrCodeData is a PromptPay EMVCo payload (starts with "0002"), convert to QR image URL
-    // PromptPay payloads are text strings that need to be rendered as QR codes
+    let finalQrData = qrCodeData;
     if (typeof qrCodeData === "string" && qrCodeData.startsWith("0002")) {
-      qrCodeData = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(qrCodeData)}`;
+      finalQrData = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(qrCodeData)}`;
     }
 
     // Self-healing: Fix any empty strings in foreign key columns
@@ -171,7 +162,9 @@ export async function POST(req: Request) {
     return NextResponse.json({
       success: true,
       chargeId: beamData.id,
-      qrCodeData,
+      qrCodeData: finalQrData,
+      _debug_beam_keys: Object.keys(beamData),
+      _debug_qr_raw: typeof qrCodeData === "string" ? qrCodeData.slice(0, 100) : qrCodeData,
     });
 
   } catch (error: unknown) {
