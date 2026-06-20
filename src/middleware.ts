@@ -124,12 +124,12 @@ export default function middleware(req: NextRequest) {
     if (!pathname.startsWith("/landing") && !pathname.startsWith("/api") && !pathname.startsWith("/auth") && !pathname.includes(".")) {
       url.pathname = `/landing${pathname === "/" ? "" : pathname}`;
       const response = NextResponse.rewrite(url);
-      response.headers.set("X-Robots-Tag", "noindex, nofollow, noarchive, nosnippet");
+      // Landing page: ALLOW indexing for SEO — no X-Robots-Tag
       return response;
     }
 
     const response = NextResponse.next();
-    response.headers.set("X-Robots-Tag", "noindex, nofollow, noarchive, nosnippet");
+    // Landing page: ALLOW indexing for SEO — no X-Robots-Tag
     return response;
   }
 
