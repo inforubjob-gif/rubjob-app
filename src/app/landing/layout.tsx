@@ -48,7 +48,7 @@ export const metadata: Metadata = {
     siteName: "RUBJOB",
     images: [
       {
-        url: "https://rubjob-all.com/images/og-cover.png",
+        url: "https://rubjob-all.com/images/og-cover-v2.png",
         width: 1200,
         height: 630,
         alt: "RUBJOB - บริการซักอบรีด รับส่งถึงบ้าน",
@@ -62,7 +62,7 @@ export const metadata: Metadata = {
     title: "RUBJOB — บริการซักอบรีด รับ-ส่งถึงบ้าน",
     description:
       "สั่งซักผ้าง่ายๆ ผ่าน LINE รับ-ส่งถึงบ้าน ราคาเริ่มต้น ฿120",
-    images: ["https://rubjob-all.com/images/og-cover.png"],
+    images: ["https://rubjob-all.com/images/og-cover-v2.png"],
   },
 };
 
@@ -86,7 +86,7 @@ export default function LandingLayout({
     "description": "บริการซักอบรีดครบวงจร รับ-ส่งผ้าถึงหน้าบ้าน สั่งง่ายผ่าน LINE สะอาด รวดเร็ว ติดตามสถานะแบบเรียลไทม์",
     "url": "https://rubjob-all.com",
     "logo": "https://rubjob-all.com/images/rubjob-complete_logo-color.png",
-    "image": "https://rubjob-all.com/images/og-cover.png",
+    "image": "https://rubjob-all.com/images/og-cover-v2.png",
     "address": {
       "@type": "PostalAddress",
       "addressLocality": "กรุงเทพมหานคร",
