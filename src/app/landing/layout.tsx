@@ -3,7 +3,7 @@ import type { Metadata, Viewport } from "next";
 export const metadata: Metadata = {
   title: "RUBJOB — ซักอบรีด รับ-ส่งถึงบ้าน | เรารับจบให้",
   description:
-    "บริการซักอบรีดครบวงจร รับ-ส่งผ้าถึงหน้าบ้าน สั่งง่ายผ่าน LINE สะอาด รวดเร็ว ราคาเริ่มต้น ฿120 ติดตามสถานะแบบเรียลไทม์ ให้บริการในกรุงเทพฯ และปริมณฑล",
+    "บริการซักอบรีดครบวงจร รับ-ส่งผ้าถึงหน้าบ้าน สั่งง่ายผ่าน LINE สะอาด รวดเร็ว ราคาเริ่มต้น ฿120 ติดตามสถานะแบบเรียลไทม์ ให้บริการในขอนแก่น มข. กังสดาล",
   keywords: [
     "ซักผ้า",
     "ซักอบรีด",
@@ -14,7 +14,14 @@ export const metadata: Metadata = {
     "ซักแห้ง",
     "ซักรีด",
     "ซักผ้านวม",
-    "ซักผ้ากรุงเทพ",
+    "ซักผ้าขอนแก่น",
+    "ซักผ้า มข.",
+    "ซักผ้ากังสดาล",
+    "ร้านซักผ้าขอนแก่น",
+    "ซักผ้าใกล้ มข",
+    "ซักอบรีดขอนแก่น",
+    "ร้านซักรีดกังสดาล",
+    "laundry khon kaen",
     "laundry delivery",
     "rubjob",
     "LINE ซักผ้า",
@@ -43,7 +50,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "RUBJOB — บริการซักอบรีด รับ-ส่งถึงบ้าน",
     description:
-      "ไม่ต้องคิด ไม่ต้องกังวล บริการซักอบรีดที่เหมือนมีคนจัดการชีวิตแทนคุณ รวดเร็ว สะอาด ติดตามสถานะได้ตลอดเวลา",
+      "บริการซักอบรีดรับ-ส่งถึงบ้าน ในขอนแก่น มข. กังสดาล สั่งง่ายผ่าน LINE สะอาด รวดเร็ว ติดตามสถานะได้ตลอด",
     url: "https://rubjob-all.com",
     siteName: "RUBJOB",
     images: [
@@ -89,13 +96,15 @@ export default function LandingLayout({
     "image": "https://rubjob-all.com/images/og-cover-v2.png",
     "address": {
       "@type": "PostalAddress",
-      "addressLocality": "กรุงเทพมหานคร",
+      "addressLocality": "ขอนแก่น",
+      "addressRegion": "ขอนแก่น",
       "addressCountry": "TH",
     },
-    "areaServed": {
-      "@type": "City",
-      "name": "กรุงเทพมหานคร",
-    },
+    "areaServed": [
+      { "@type": "City", "name": "ขอนแก่น" },
+      { "@type": "Place", "name": "กังสดาล" },
+      { "@type": "Place", "name": "มหาวิทยาลัยขอนแก่น" },
+    ],
     "priceRange": "฿120 - ฿500",
     "openingHours": "Mo-Su 09:00-17:00",
     "sameAs": [
