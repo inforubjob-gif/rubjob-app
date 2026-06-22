@@ -57,14 +57,29 @@ export async function getRubberSession(): Promise<{ id: string; name: string } |
     const token = cookieStore.get("rubber_token")?.value;
     if (!token) return null;
 
+    // Parse "id:sessionToken" format (login sets cookie as "RUB-XXX:hash8")
+    // Also supports legacy plain-id cookies for backward compatibility
+    const colonIndex = token.lastIndexOf(":");
+    const rubberId = colonIndex !== -1 ? token.substring(0, colonIndex) : token;
+    const sessionToken = colonIndex !== -1 ? token.substring(colonIndex + 1) : null;
+
     const db = getRequestContext().env.DB;
     if (!db) return null;
 
     const rubber = await db.prepare(
-      "SELECT id, name FROM rubber_users WHERE id = ?"
-    ).bind(token).first() as { id: string; name: string } | null;
+      "SELECT id, name, password FROM rubber_users WHERE id = ?"
+    ).bind(rubberId).first() as { id: string; name: string; password: string } | null;
 
-    return rubber;
+    if (!rubber) return null;
+
+    // Verify session token against last 8 chars of password hash
+    // This ensures sessions are invalidated when password changes
+    if (sessionToken && rubber.password) {
+      const expectedToken = String(rubber.password).slice(-8);
+      if (sessionToken !== expectedToken) return null;
+    }
+
+    return { id: rubber.id, name: rubber.name };
   } catch {
     return null;
   }

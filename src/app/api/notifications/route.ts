@@ -12,7 +12,12 @@ export const runtime = "edge";
 async function resolveIdentity(): Promise<{ id: string; type: string } | null> {
   const cookieStore = await cookies();
   const rubberToken = cookieStore.get("rubber_token")?.value;
-  if (rubberToken) return { id: rubberToken, type: "rubber" };
+  if (rubberToken) {
+    // Parse "id:sessionToken" format — extract just the id
+    const colonIndex = rubberToken.lastIndexOf(":");
+    const rubberId = colonIndex !== -1 ? rubberToken.substring(0, colonIndex) : rubberToken;
+    return { id: rubberId, type: "rubber" };
+  }
   const storeToken = cookieStore.get("store_token")?.value;
   if (storeToken) return { id: storeToken, type: "store" };
   return null;
