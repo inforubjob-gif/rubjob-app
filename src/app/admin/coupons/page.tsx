@@ -482,6 +482,44 @@ export default function CouponsAdminPage() {
            </div>
           )}
         </div>
+
+        {/* Free Items selector (only for free_item type) */}
+        {formData.type === 'free_item' && (
+          <div className="p-4 bg-pink-50 rounded-xl border border-pink-100 space-y-3">
+           <p className="text-[10px] uppercase font-black text-pink-700 tracking-widest flex items-center gap-1.5">
+            🎁 เลือกรายการที่ให้ฟรี
+           </p>
+           <div className="flex flex-wrap gap-2">
+            {FREE_ITEM_OPTIONS.map(item => {
+             const isSelected = selectedFreeItems.has(item.key);
+             return (
+              <button
+               key={item.key}
+               type="button"
+               onClick={() => {
+                setSelectedFreeItems(prev => {
+                 const next = new Set(prev);
+                 if (next.has(item.key)) next.delete(item.key);
+                 else next.add(item.key);
+                 return next;
+                });
+               }}
+               className={`py-2 px-4 rounded-xl text-xs font-black transition-all border-2 active:scale-95 ${
+                isSelected
+                 ? 'bg-pink-100 border-pink-300 text-pink-700 shadow-sm'
+                 : 'bg-white border-slate-100 text-slate-400 hover:border-pink-200'
+               }`}
+              >
+               {item.label}
+              </button>
+             );
+            })}
+           </div>
+           <p className="text-[9px] text-pink-500 font-bold">
+            ⚠️ คูปองนี้จะไม่แสดงใน wallet — ลูกค้าต้องกรอกโค้ดเท่านั้น
+           </p>
+          </div>
+         )}
         
         <div className="grid grid-cols-2 gap-4">
          <div>
