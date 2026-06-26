@@ -25,7 +25,16 @@ export async function POST(req: Request) {
 
     // Handle charge succeeded
     if (eventType === "charge.succeeded" || chargeData.status === "SUCCEEDED") {
-      const orderId = chargeData.order?.referenceId || chargeData.metadata?.orderId;
+      // Beam returns referenceId as a top-level field on the charge object
+      // Try multiple paths to handle different Beam payload versions
+      const orderId = chargeData.referenceId
+        || chargeData.order?.referenceId
+        || chargeData.metadata?.orderId
+        || body.referenceId;
+
+      if (!orderId) {
+        console.error(`❌ Beam webhook: charge.succeeded but could NOT extract orderId! Full payload:`, JSON.stringify(body));
+      }
 
       if (orderId) {
         // Update Order Status in D1
