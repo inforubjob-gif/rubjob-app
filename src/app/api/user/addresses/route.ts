@@ -141,3 +141,31 @@ export async function PATCH(req: Request) {
     return NextResponse.json({ error: safeError(error) }, { status: 500 });
   }
 }
+
+/**
+ * DELETE /api/user/addresses
+ * Deletes a saved address
+ */
+export async function DELETE(req: Request) {
+  try {
+    const body = (await req.json() as any) as any;
+    const { id, userId } = body;
+
+    if (!id || !userId) {
+      return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+    }
+
+    const db = getRequestContext().env.DB;
+    if (!db) {
+      return NextResponse.json({ error: "D1 Database binding 'DB' not found" }, { status: 500 });
+    }
+
+    // Only delete if it belongs to the user
+    await db.prepare(`DELETE FROM addresses WHERE id = ? AND userId = ?`).bind(id, userId).run();
+
+    return NextResponse.json({ success: true });
+  } catch (error: unknown) {
+    console.error("Delete address error:", error);
+    return NextResponse.json({ error: safeError(error) }, { status: 500 });
+  }
+}

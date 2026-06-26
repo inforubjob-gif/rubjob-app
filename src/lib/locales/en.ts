@@ -341,6 +341,8 @@ export const en = {
     noteLabel: "Note to Driver (Optional)",
     notePlaceholder: "Call on arrival / Leave at lobby",
     saveAddress: "Save Address",
+    confirmDeleteAddress: "Delete this address?",
+    addressDeleted: "Address deleted",
     setCoordinates: "Set Map Coordinates",
     pinLocation: "Pin Location",
     bangkokThailand: "Bangkok, Thailand",

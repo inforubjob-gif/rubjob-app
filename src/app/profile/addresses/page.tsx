@@ -93,6 +93,29 @@ export default function ManageAddressesPage() {
     setLocation({ lat: addr.lat || 13.7563, lng: addr.lng || 100.5018 });
     setIsAdding(true);
   };
+
+  const handleDeleteAddress = async (addr: Address) => {
+    if (!profile?.userId || !addr.id) return;
+    if (!window.confirm(t("profile.confirmDeleteAddress") || `ลบที่อยู่ "${addr.label}"?`)) return;
+
+    try {
+      const res = await fetch("/api/user/addresses", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: addr.id, userId: profile.userId }),
+      });
+      const data = await res.json() as any;
+      if (data.success) {
+        setAddresses(prev => prev.filter(a => a.id !== addr.id));
+        showToast(t("profile.addressDeleted") || "ลบที่อยู่สำเร็จ", "success");
+      } else {
+        showToast(data.error || t("common.error"), "error");
+      }
+    } catch (err) {
+      console.error("Delete address error:", err);
+      showToast(t("common.error"), "error");
+    }
+  };
  
   const handleAddAddress = async () => {
     if (!profile?.userId) return;
@@ -406,15 +429,26 @@ export default function ManageAddressesPage() {
                   </div>
                 </div>
  
-                <button 
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleEditClick(addr);
-                  }}
-                  className="text-slate-300 p-3 self-center hover:text-primary transition-colors active:scale-90"
-                >
-                  <Icons.Edit size={20} />
-                </button>
+                <div className="flex flex-col gap-1 self-center shrink-0">
+                  <button 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleEditClick(addr);
+                    }}
+                    className="text-slate-300 p-2 hover:text-primary transition-colors active:scale-90 rounded-xl hover:bg-primary/5"
+                  >
+                    <Icons.Edit size={18} />
+                  </button>
+                  <button 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDeleteAddress(addr);
+                    }}
+                    className="text-slate-200 p-2 hover:text-rose-500 transition-colors active:scale-90 rounded-xl hover:bg-rose-50"
+                  >
+                    <Icons.Trash size={18} />
+                  </button>
+                </div>
               </div>
             </Card>
           ))}

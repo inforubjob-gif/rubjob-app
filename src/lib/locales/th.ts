@@ -275,6 +275,8 @@ export const th = {
       noteLabel: "หมายเหตุถึงคนขับ (ถ้ามี)",
       notePlaceholder: "โทรเมื่อถึง / ฝากไว้ที่นิติ",
       saveAddress: "บันทึกที่อยู่",
+      confirmDeleteAddress: "ต้องการลบที่อยู่นี้หรือไม่?",
+      addressDeleted: "ลบที่อยู่สำเร็จ",
       setCoordinates: "ระบุพิกัดบนแผนที่",
       pinLocation: "ปักหมุดที่ตั้ง",
       bangkokThailand: "กรุงเทพมหานคร, ประเทศไทย",
