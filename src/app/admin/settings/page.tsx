@@ -782,6 +782,70 @@ function SettingsContent() {
            </div>
           </div>
 
+          {/* Service Hours */}
+          <div className="space-y-4 pt-6 border-t border-slate-50">
+           <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">⏰ เวลาให้บริการ</label>
+           <div className="grid grid-cols-2 gap-3">
+             <div>
+              <label className="text-[9px] font-bold text-slate-400 uppercase block mb-1 ml-1">เปิด</label>
+              <input 
+               type="time" 
+               className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-4 py-3 text-sm text-slate-900 font-black focus:border-primary transition-all outline-none"
+               value={getSetting("service_open_time") || "08:00"}
+               onChange={(e) => updateLocalSetting("service_open_time", e.target.value)}
+              />
+             </div>
+             <div>
+              <label className="text-[9px] font-bold text-slate-400 uppercase block mb-1 ml-1">ปิด (ปกติ)</label>
+              <input 
+               type="time" 
+               className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-4 py-3 text-sm text-slate-900 font-black focus:border-primary transition-all outline-none"
+               value={getSetting("service_close_time") || "18:00"}
+               onChange={(e) => updateLocalSetting("service_close_time", e.target.value)}
+              />
+             </div>
+           </div>
+
+           {/* Extended Hours Toggle */}
+           <div className={`p-4 rounded-xl border-2 transition-all ${getSetting("service_extended") === "true" ? "bg-indigo-50/50 border-indigo-200" : "bg-slate-50 border-slate-100"}`}>
+             <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${getSetting("service_extended") === "true" ? "bg-indigo-100 text-indigo-600" : "bg-slate-100 text-slate-400"}`}>
+                 <Icons.Bell size={20} />
+                </div>
+                <div>
+                 <p className="text-xs font-black text-slate-900">🌙 ขยายเวลาถึง 2 ทุ่ม</p>
+                 <p className="text-[9px] font-bold text-slate-400 mt-0.5">ปิดเวลา 20:00 แทน (toggle ค้างถาวร)</p>
+                </div>
+              </div>
+              <div 
+                onClick={() => updateLocalSetting("service_extended", getSetting("service_extended") === "true" ? "false" : "true")}
+                className={`w-12 h-6 rounded-full transition-all cursor-pointer relative ${getSetting("service_extended") === "true" ? "bg-indigo-500" : "bg-slate-200"}`}
+              >
+                <div className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-all ${getSetting("service_extended") === "true" ? "left-7" : "left-1"}`} />
+              </div>
+             </div>
+             {getSetting("service_extended") === "true" && (
+              <div className="mt-3 flex items-center gap-2 text-[10px] font-bold text-indigo-600 animate-in slide-in-from-top-2 duration-300">
+                <span>✨</span>
+                <span>ขณะนี้ให้บริการถึง 20:00 น. (ปิดเมื่อ: {getSetting("service_extended_close") || "20:00"})</span>
+              </div>
+             )}
+           </div>
+
+           {getSetting("service_extended") === "true" && (
+             <div>
+              <label className="text-[9px] font-bold text-slate-400 uppercase block mb-1 ml-1">เวลาปิดเมื่อขยาย</label>
+              <input 
+               type="time" 
+               className="w-full bg-indigo-50 border-2 border-indigo-100 rounded-xl px-4 py-3 text-sm text-indigo-900 font-black focus:border-indigo-400 transition-all outline-none"
+               value={getSetting("service_extended_close") || "20:00"}
+               onChange={(e) => updateLocalSetting("service_extended_close", e.target.value)}
+              />
+             </div>
+           )}
+          </div>
+
           <div className="space-y-4">
            <div className="flex items-center justify-between px-1">
             <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t("admin.settings.financeLabelRubberGP")}</label>

@@ -347,7 +347,7 @@ function BookingFlow() {
 
   // Discounts
   const [couponCode, setCouponCode] = useState("");
-  const [appliedCoupon, setAppliedCoupon] = useState<{ code: string, discount: number } | null>(null);
+  const [appliedCoupon, setAppliedCoupon] = useState<{ code: string, discount: number, freeItems?: string[] } | null>(null);
   const [isCouponModalOpen, setIsCouponModalOpen] = useState(false);
   const [availableCoupons, setAvailableCoupons] = useState<any[]>([]);
   const [isLoadingCoupons, setIsLoadingCoupons] = useState(false);
@@ -685,6 +685,37 @@ function BookingFlow() {
             <span key={i}>{line}{i === 0 && <br/>}</span>
           ))}
         </p>
+        <Button 
+          variant="outline" 
+          className="mt-10 rounded-xl border-2 font-black px-10"
+          onClick={() => router.push("/")}
+        >
+          {t("common.goHome")}
+        </Button>
+      </div>
+    );
+  }
+
+  // 5. Handle outside service hours
+  const serviceOpenTime = systemSettings.service_open_time || "08:00";
+  const serviceCloseTime = systemSettings.service_extended === "true"
+    ? (systemSettings.service_extended_close || "20:00")
+    : (systemSettings.service_close_time || "18:00");
+  const nowBangkok = new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Bangkok" }));
+  const nowHHMM = `${String(nowBangkok.getHours()).padStart(2, "0")}:${String(nowBangkok.getMinutes()).padStart(2, "0")}`;
+  const isOutsideHours = isLoaded && systemSettings.is_open !== "false" && (nowHHMM < serviceOpenTime || nowHHMM >= serviceCloseTime);
+
+  if (isOutsideHours) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-dvh px-10 text-center animate-page-enter bg-slate-50">
+        <div className="w-24 h-24 bg-white rounded-xl shadow-xl flex items-center justify-center mb-8 border border-slate-100">
+           <Icons.Bell size={48} className="text-amber-400" />
+        </div>
+        <h2 className="text-2xl font-black text-slate-900">{t("booking.errors.outsideHoursTitle")}</h2>
+        <p className="text-slate-500 mt-3 font-medium leading-relaxed">
+          {t("booking.errors.outsideHoursDesc").replace("{open}", serviceOpenTime).replace("{close}", serviceCloseTime)}
+        </p>
+        <p className="text-xs text-slate-400 font-bold mt-2">⏰ {serviceOpenTime} - {serviceCloseTime}</p>
         <Button 
           variant="outline" 
           className="mt-10 rounded-xl border-2 font-black px-10"
@@ -1129,17 +1160,29 @@ function BookingFlow() {
                         const res = await fetch("/api/coupons/validate", { method: "POST", headers: { "Content-Type": "application/json" },
                           body: JSON.stringify({ code: couponCode, subtotal: laundryFee + deliveryFee, userRole: 'customer' }) });
                         const data = await res.json() as any;
-                        if (res.ok && data.success) { setAppliedCoupon({ code: data.coupon.code, discount: data.coupon.discount });
-                          showToast(t("booking.couponSuccess").replace("{amount}", data.coupon.discount.toString()), "success"); setCouponCode(data.coupon.code);
+                        if (res.ok && data.success) { setAppliedCoupon({ code: data.coupon.code, discount: data.coupon.discount, freeItems: data.coupon.freeItems || [] });
+                          if (data.coupon.type === 'free_item') { showToast(`🎁 ใช้คูปอง ${data.coupon.code} สำเร็จ! ได้รับของฟรี`, "success"); }
+                          else { showToast(t("booking.couponSuccess").replace("{amount}", data.coupon.discount.toString()), "success"); } setCouponCode(data.coupon.code);
                         } else { showToast(`❌ ${data.error || t("booking.couponErrorGeneric")}`, "error"); }
                       } catch (err) { console.error("Coupon validation error:", err); showToast(`❌ ${t("booking.couponErrorGeneric")}`, "error"); }
                     }} className="rounded-xl text-[10px] font-black py-2.5 px-4 shadow-sm shrink-0">{t("booking.applyCoupon")}</Button>
                   </div>
 
                   {appliedCoupon && (
-                    <div className="bg-emerald-50 text-emerald-700 text-[11px] font-bold px-3 py-2 rounded-xl flex items-center justify-between border border-emerald-200">
-                      <span className="flex items-center gap-1.5"><Icons.Check size={14} strokeWidth={3} />{t("booking.couponApplied").replace("{code}", appliedCoupon.code)}</span>
-                      <button onClick={() => { setAppliedCoupon(null); setCouponCode(""); }} className="text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-md text-[9px] font-black uppercase">{t("common.remove")}</button>
+                    <div className="space-y-2">
+                      <div className="bg-emerald-50 text-emerald-700 text-[11px] font-bold px-3 py-2 rounded-xl flex items-center justify-between border border-emerald-200">
+                        <span className="flex items-center gap-1.5"><Icons.Check size={14} strokeWidth={3} />{t("booking.couponApplied").replace("{code}", appliedCoupon.code)}</span>
+                        <button onClick={() => { setAppliedCoupon(null); setCouponCode(""); }} className="text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-md text-[9px] font-black uppercase">{t("common.remove")}</button>
+                      </div>
+                      {appliedCoupon.freeItems && appliedCoupon.freeItems.length > 0 && (
+                        <div className="flex flex-wrap gap-1.5">
+                          {appliedCoupon.freeItems.map(item => (
+                            <span key={item} className="text-[10px] font-black text-pink-600 bg-pink-50 px-2 py-1 rounded-lg border border-pink-100">
+                              🎁 ฟรี! {item === 'detergent' ? 'น้ำยาซักผ้า' : item === 'softener' ? 'น้ำยาปรับผ้านุ่ม' : item === 'folding' ? 'พับผ้า' : item}
+                            </span>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   )}
 
@@ -1197,6 +1240,19 @@ function BookingFlow() {
                 </div>
               </Card>
             </section>
+
+            {/* Detergent preparation warning */}
+            {!needsDetergent && (
+              <div className="flex items-start gap-3 p-4 bg-amber-50 border border-amber-200 rounded-xl animate-page-enter">
+                <div className="w-8 h-8 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center shrink-0 mt-0.5">
+                  <Icons.Info size={16} />
+                </div>
+                <div>
+                  <p className="text-xs font-black text-amber-800">{t("booking.detergentWarningTitle")}</p>
+                  <p className="text-[11px] text-amber-700 font-medium mt-0.5 leading-relaxed">{t("booking.detergentWarningDesc")}</p>
+                </div>
+              </div>
+            )}
 
             <div className="text-center space-y-1 pt-2">
               <h2 className="text-base font-black text-foreground">{t("booking.selectPayment")}</h2>
@@ -1417,8 +1473,9 @@ function BookingFlow() {
                         });
                         const data = await res.json() as any;
                         if (res.ok && data.success) {
-                           setAppliedCoupon({ code: data.coupon.code, discount: data.coupon.discount });
-                           showToast(t("booking.couponSuccess").replace("{amount}", data.coupon.discount.toString()), "success");
+                           setAppliedCoupon({ code: data.coupon.code, discount: data.coupon.discount, freeItems: data.coupon.freeItems || [] });
+                           if (data.coupon.type === 'free_item') { showToast(`🎁 ใช้คูปอง ${data.coupon.code} สำเร็จ! ได้รับของฟรี`, "success"); }
+                           else { showToast(t("booking.couponSuccess").replace("{amount}", data.coupon.discount.toString()), "success"); }
                         } else {
                            showToast(`❌ ${data.error || t("booking.couponErrorGeneric")}`, "error");
                         }

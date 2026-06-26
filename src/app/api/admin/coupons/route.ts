@@ -29,21 +29,22 @@ export async function POST(req: Request) {
   const session = await getAdminSession();
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   try {
-    const { code, type, value, minOrder, maxDiscount, expiryDate, usageLimit, isVisible, title, description, eligibleRoles } = await req.json() as any;
+    const { code, type, value, minOrder, maxDiscount, expiryDate, usageLimit, isVisible, title, description, eligibleRoles, freeItems } = await req.json() as any;
     const db = getRequestContext().env.DB;
     if (!db) return NextResponse.json({ error: "D1 not found" }, { status: 500 });
 
     // Self-healing
 
-    if (!code || !type || !value) return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+    if (!code || !type) return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+    if (type !== 'free_item' && !value) return NextResponse.json({ error: "Missing value" }, { status: 400 });
 
     const id = `CPN-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
 
     await db.prepare(`
-      INSERT INTO coupons (id, code, type, value, minOrder, maxDiscount, expiryDate, usageLimit, isVisible, title, description, eligibleRoles)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO coupons (id, code, type, value, minOrder, maxDiscount, expiryDate, usageLimit, isVisible, title, description, eligibleRoles, freeItems)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `).bind(
-      id, code.toUpperCase(), type, value, minOrder || 0, maxDiscount || null, expiryDate || null, usageLimit || null, isVisible ? 1 : 0, title || null, description || null, eligibleRoles || 'all'
+      id, code.toUpperCase(), type, value || 0, minOrder || 0, maxDiscount || null, expiryDate || null, usageLimit || null, isVisible ? 1 : 0, title || null, description || null, eligibleRoles || 'all', freeItems || null
     ).run();
 
     return NextResponse.json({ success: true, id });
@@ -59,7 +60,7 @@ export async function PUT(req: Request) {
   const session = await getAdminSession();
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   try {
-    const { id, code, type, value, minOrder, maxDiscount, expiryDate, usageLimit, isActive, isVisible, title, description, eligibleRoles } = await req.json() as any;
+    const { id, code, type, value, minOrder, maxDiscount, expiryDate, usageLimit, isActive, isVisible, title, description, eligibleRoles, freeItems } = await req.json() as any;
     const db = getRequestContext().env.DB;
     if (!db) return NextResponse.json({ error: "D1 not found" }, { status: 500 });
 
@@ -82,12 +83,13 @@ export async function PUT(req: Request) {
             isVisible = COALESCE(?, isVisible),
             title = ?,
             description = ?,
-            eligibleRoles = COALESCE(?, eligibleRoles)
+            eligibleRoles = COALESCE(?, eligibleRoles),
+            freeItems = COALESCE(?, freeItems)
         WHERE id = ?
       `).bind(
         code?.toUpperCase(),
         type,
-        value,
+        value || 0,
         minOrder,
         maxDiscount || null,
         expiryDate || null,
@@ -97,6 +99,7 @@ export async function PUT(req: Request) {
         title || null,
         description || null,
         eligibleRoles || null,
+        freeItems || null,
         id
       ).run();
     } else {

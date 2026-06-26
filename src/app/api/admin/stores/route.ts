@@ -9,6 +9,8 @@ export const runtime = "edge";
 export async function GET(req: Request) {
   const session = await getAdminSession();
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const { searchParams } = new URL(req.url);
+  const showDeleted = searchParams.get("showDeleted") === "true";
   try {
     const db = getRequestContext().env.DB;
     if (!db) return NextResponse.json({ error: "D1 not found" }, { status: 500 });
@@ -17,14 +19,15 @@ export async function GET(req: Request) {
 
 
 
-    const { results: stores } = await db.prepare(`
-      SELECT s.*, u.displayName as ownerName, COUNT(o.id) as orderCount
-      FROM stores s
-      LEFT JOIN users u ON s.ownerId = u.id
-      LEFT JOIN orders o ON s.id = o.storeId
-      GROUP BY s.id
-      ORDER BY s.createdAt DESC
-    `).all();
+    const storeQuery = showDeleted
+      ? `SELECT s.*, u.displayName as ownerName, COUNT(o.id) as orderCount
+         FROM stores s LEFT JOIN users u ON s.ownerId = u.id LEFT JOIN orders o ON s.id = o.storeId
+         GROUP BY s.id ORDER BY s.createdAt DESC`
+      : `SELECT s.*, u.displayName as ownerName, COUNT(o.id) as orderCount
+         FROM stores s LEFT JOIN users u ON s.ownerId = u.id LEFT JOIN orders o ON s.id = o.storeId
+         WHERE (s.status IS NULL OR s.status != 'deleted')
+         GROUP BY s.id ORDER BY s.createdAt DESC`;
+    const { results: stores } = await db.prepare(storeQuery).all();
 
     // Fetch services with prices for each store
     const { results: storeServices } = await db.prepare(`
@@ -198,7 +201,8 @@ export async function DELETE(req: Request) {
     const db = getRequestContext().env.DB;
     if (!db) return NextResponse.json({ error: "D1 not found" }, { status: 500 });
 
-    await db.prepare(`DELETE FROM stores WHERE id = ?`).bind(id).run();
+    // Soft delete — keep data for referential integrity with orders
+    await db.prepare(`UPDATE stores SET status = 'deleted', isActive = 0 WHERE id = ?`).bind(id).run();
 
     return NextResponse.json({ success: true });
   } catch (error: unknown) {

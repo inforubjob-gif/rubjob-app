@@ -406,6 +406,8 @@ export const en = {
       tooFar: "Sorry, the distance exceeds 10 km. Service unavailable.",
       tooFarTitle: "Out of Service Area",
       tooFarDesc: "Sorry, your address is out of service area.\nPlease specify a new address.",
+      outsideHoursTitle: "🕐 Outside Service Hours",
+      outsideHoursDesc: "Service hours: {open} - {close}\nPlease come back during service hours.",
     },
     loginRequiredTitle: "Login to Book",
     loginRequiredDesc: "Please log in via LINE to start booking a laundry service.",
@@ -478,6 +480,8 @@ export const en = {
     expressLabel: "Express Surcharge",
     detergentFeeLabel: "Detergent / Softener Fee",
     genericError: "An error occurred",
+    detergentWarningTitle: "📌 Important Note",
+    detergentWarningDesc: "Please prepare your own detergent and fabric softener for the Rubber driver.",
   },
   items: {
     tshirt: "T-Shirt",

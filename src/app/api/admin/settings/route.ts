@@ -25,6 +25,10 @@ const DEFAULT_SETTINGS = [
   { key: "beam_merchant_id", value: "", type: "string", description: "Beam Merchant ID (e.g. rubjob-yvqpfl)" },
   { key: "beam_api_key", value: "", type: "string", description: "Beam API Key (from Lighthouse dashboard)" },
   { key: "open_regions", value: JSON.stringify([{ province: "ขอนแก่น", areas: ["กังสดาล"] }]), type: "json", description: "Configurable regions open for service" },
+  { key: "service_open_time", value: "08:00", type: "string", description: "Daily service opening time (HH:mm)" },
+  { key: "service_close_time", value: "18:00", type: "string", description: "Default daily service closing time (HH:mm)" },
+  { key: "service_extended", value: "false", type: "boolean", description: "Permanent toggle: extend service hours to service_extended_close" },
+  { key: "service_extended_close", value: "20:00", type: "string", description: "Closing time when extended hours are active (HH:mm)" },
 ];
 
 /**

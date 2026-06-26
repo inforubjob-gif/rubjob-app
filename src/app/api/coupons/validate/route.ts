@@ -83,7 +83,13 @@ export async function POST(req: Request) {
 
     // 5. Calculate Discount
     let discount = 0;
-    if (coupon.type === "percentage") {
+    let freeItems: string[] = [];
+
+    if (coupon.type === "free_item") {
+      // No monetary discount — just grant free items
+      discount = 0;
+      try { freeItems = JSON.parse(coupon.freeItems || '[]'); } catch { freeItems = []; }
+    } else if (coupon.type === "percentage") {
       discount = (subtotal * coupon.value) / 100;
       if (coupon.maxDiscount && discount > coupon.maxDiscount) {
         discount = coupon.maxDiscount;
@@ -99,7 +105,8 @@ export async function POST(req: Request) {
         type: coupon.type,
         value: coupon.value,
         discount: Math.round(discount),
-        eligibleRoles: coupon.eligibleRoles
+        eligibleRoles: coupon.eligibleRoles,
+        freeItems,
       } 
     });
 

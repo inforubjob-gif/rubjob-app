@@ -339,6 +339,8 @@ export const th = {
         tooFar: "ขออภัย ระยะทางไกลเกิน 10 กม. ไม่สามารถให้บริการได้",
         tooFarTitle: "อยู่นอกพื้นที่บริการ",
         tooFarDesc: "ขออภัย ที่อยู่ของท่านอยู่นอกพื้นที่\nกรุณาระบุที่อยู่ใหม่อีกครั้ง",
+        outsideHoursTitle: "🕐 ขณะนี้อยู่นอกเวลาทำการ",
+        outsideHoursDesc: "เวลาให้บริการ {open} - {close} น.\nกรุณากลับมาใหม่ในเวลาทำการนะคะ",
       },
       loginRequiredTitle: "เข้าสู่ระบบเพื่อจองงาน",
       loginRequiredDesc: "กรุณาเข้าสู่ระบบผ่าน LINE เพื่อเริ่มขั้นตอนการสั่งบริการซักอบรีด",
@@ -414,6 +416,8 @@ export const th = {
       expressLabel: "ค่าบริการด่วนพิเศษ (Express)",
       detergentFeeLabel: "ค่าน้ำยาซักผ้า/ปรับผ้านุ่ม",
       genericError: "อุ๊ปส์ มีอะไรผิดพลาดนิดหน่อย",
+      detergentWarningTitle: "📌 หมายเหตุสำคัญ",
+      detergentWarningDesc: "กรุณาเตรียมน้ำยาซักผ้าและน้ำยาปรับผ้านุ่มให้กับ Rubber ด้วยนะคะ",
     },
     items: {
       tshirt: "เสื้อยืด",

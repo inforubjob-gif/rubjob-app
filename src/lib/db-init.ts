@@ -496,6 +496,7 @@ export async function ensureSchema(db: D1Database) {
      "ALTER TABLE coupons ADD COLUMN isVisible INTEGER DEFAULT 1",
      "ALTER TABLE coupons ADD COLUMN maxDiscount REAL",
      "ALTER TABLE coupons ADD COLUMN eligibleRoles TEXT DEFAULT 'all'",
+     "ALTER TABLE coupons ADD COLUMN freeItems TEXT",
 
      // --- support_tickets ---
      "ALTER TABLE support_tickets ADD COLUMN userType TEXT DEFAULT 'customer'",

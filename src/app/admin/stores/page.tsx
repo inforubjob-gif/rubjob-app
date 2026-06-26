@@ -17,6 +17,7 @@ export default function StoresAdminPage() {
  const [search, setSearch] = useState("");
  const [allServices, setAllServices] = useState<any[]>([]);
  const [isLoading, setIsLoading] = useState(true);
+ const [showDeleted, setShowDeleted] = useState(false);
 
  useEffect(() => {
   fetchStores();
@@ -34,10 +35,11 @@ export default function StoresAdminPage() {
   );
  }, [search, stores]);
 
- async function fetchStores() {
+ async function fetchStores(includeDeleted = false) {
   setIsLoading(true);
   try {
-   const res = await fetch("/api/admin/stores");
+   const url = includeDeleted ? "/api/admin/stores?showDeleted=true" : "/api/admin/stores";
+   const res = await fetch(url);
    const data = await res.json() as any;
    if (data.stores) {
     setStores(data.stores);
@@ -60,16 +62,32 @@ export default function StoresAdminPage() {
   }
  }
 
- async function toggleStoreStatus(id: string, currentStatus: number) {
+ async function suspendStore(id: string) {
   try {
    await fetch("/api/admin/stores", {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ id, isActive: currentStatus === 1 ? 0 : 1 })
+    body: JSON.stringify({ id, status: 'suspended', isActive: 0 })
    });
-   showToast(currentStatus === 1 ? t('admin.rubbers.form.suspended') : t('admin.rubbers.form.verified'), "success");
+   setStores(prev => prev.map(s => s.id === id ? { ...s, status: 'suspended', isActive: 0 } : s));
+   showToast('ระงับร้านสำเร็จ', "success");
   } catch (err) {
-   console.error("Failed to toggle status", err);
+   console.error("Failed to suspend", err);
+   showToast(t('admin.common.toast.error'), "error");
+  }
+ }
+
+ async function activateStore(id: string) {
+  try {
+   await fetch("/api/admin/stores", {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ id, status: 'active', isActive: 1 })
+   });
+   setStores(prev => prev.map(s => s.id === id ? { ...s, status: 'active', isActive: 1 } : s));
+   showToast('เปิดใช้งานร้านสำเร็จ', "success");
+  } catch (err) {
+   console.error("Failed to activate", err);
    showToast(t('admin.common.toast.error'), "error");
   }
  }
@@ -86,8 +104,9 @@ export default function StoresAdminPage() {
    
    if (!res.ok) throw new Error("Failed to delete");
    
-   setStores(prev => prev.filter(s => s.id !== id));
-   showToast(t('admin.common.toast.deleted', { item: t('admin.common.store') }), "success");
+   setStores(prev => prev.map(s => s.id === id ? { ...s, status: 'deleted', isActive: 0 } : s));
+   showToast('ลบร้านสำเร็จ (soft delete)', "success");
+   if (!showDeleted) setStores(prev => prev.filter(s => s.status !== 'deleted'));
   } catch (err) {
    console.error(err);
    showToast(t('admin.common.toast.error'), "error");
@@ -121,6 +140,10 @@ export default function StoresAdminPage() {
       <Icons.Plus size={16} /> {t('admin.stores.list.newBtn')}
      </Link>
     </div>
+    <label className="flex items-center gap-2 cursor-pointer">
+     <input type="checkbox" checked={showDeleted} onChange={(e) => { setShowDeleted(e.target.checked); fetchStores(e.target.checked); }} className="rounded" />
+     <span className="text-[10px] font-bold text-slate-400 uppercase">แสดงร้านที่ลบแล้ว</span>
+    </label>
    </header>
 
    <Card className="bg-white border border-slate-200/60 shadow-xl shadow-slate-200/20 rounded-xl overflow-hidden">
@@ -201,12 +224,16 @@ export default function StoresAdminPage() {
           <td className="px-4 py-6">
             <Badge variant={
              store.status === 'active' ? "success" : 
+             store.status === 'suspended' ? "warning" : 
+             store.status === 'deleted' ? "danger" :
              store.status === 'pending' ? "warning" : 
              "danger"
             }>
-             {store.status === 'active' ? t('admin.rubbers.form.verified') : 
-              store.status === 'pending' ? t('admin.rubbers.form.pendingReview') : 
-              t('admin.rubbers.form.rejected')}
+             {store.status === 'active' ? '🟢 เปิดใช้งาน' : 
+              store.status === 'suspended' ? '🟡 ระงับ' :
+              store.status === 'deleted' ? '🔴 ลบแล้ว' :
+              store.status === 'pending' ? '🟡 รอตรวจสอบ' : 
+              '❌ ปิด'}
             </Badge>
           </td>
           <td className="px-4 py-6 text-right">
@@ -227,12 +254,35 @@ export default function StoresAdminPage() {
               >
                <Icons.Edit size={18} />
               </Link>
-              <button 
-               onClick={() => toggleStoreStatus(store.id, store.isActive)}
-               className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all active:scale-95 shadow-sm border ${store.isActive === 1 ? 'bg-rose-50 border-rose-100 text-rose-600 hover:bg-rose-100' : 'bg-emerald-50 border-emerald-100 text-emerald-600 hover:bg-emerald-100'}`}
-              >
-               {store.status === 'active' ? t('common.suspend') : store.status === 'pending' ? t('common.review') : t('common.activate') }
-              </button>
+              {store.status === 'active' ? (
+                <button 
+                 onClick={() => suspendStore(store.id)}
+                 className="px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all active:scale-95 shadow-sm border bg-amber-50 border-amber-100 text-amber-600 hover:bg-amber-100"
+                >
+                 ⏸ ระงับ
+                </button>
+               ) : store.status === 'suspended' ? (
+                <button 
+                 onClick={() => activateStore(store.id)}
+                 className="px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all active:scale-95 shadow-sm border bg-emerald-50 border-emerald-100 text-emerald-600 hover:bg-emerald-100"
+                >
+                 ▶️ เปิดใช้งาน
+                </button>
+               ) : store.status === 'deleted' ? (
+                <button 
+                 onClick={() => activateStore(store.id)}
+                 className="px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all active:scale-95 shadow-sm border bg-blue-50 border-blue-100 text-blue-600 hover:bg-blue-100"
+                >
+                 ♻️ กู้คืน
+                </button>
+               ) : (
+                <button 
+                 onClick={() => activateStore(store.id)}
+                 className="px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all active:scale-95 shadow-sm border bg-emerald-50 border-emerald-100 text-emerald-600 hover:bg-emerald-100"
+                >
+                 {t('common.activate')}
+                </button>
+               )}
               <button 
                onClick={() => deleteStore(store.id)}
                className="w-10 h-10 bg-slate-50 hover:bg-rose-50 text-slate-300 hover:text-rose-500 rounded-xl flex items-center justify-center transition-all group-hover:bg-rose-50/50"

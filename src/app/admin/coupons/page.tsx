@@ -15,6 +15,12 @@ const ROLE_OPTIONS = [
  { key: "store", label: "🏪 ร้านค้า", color: "bg-purple-50 text-purple-600 ring-purple-200" },
 ];
 
+const FREE_ITEM_OPTIONS = [
+ { key: "detergent", label: "🧴 น้ำยาซักผ้า", emoji: "🧴" },
+ { key: "softener", label: "🌸 น้ำยาปรับผ้านุ่ม", emoji: "🌸" },
+ { key: "folding", label: "👕 พับผ้า", emoji: "👕" },
+];
+
 function getEligibleRoleBadges(eligibleRoles: string) {
  if (!eligibleRoles || eligibleRoles === 'all') {
   return [{ label: '🌟 ALL', class: 'bg-amber-50 text-amber-600' }];
@@ -42,7 +48,7 @@ export default function CouponsAdminPage() {
  // Form State
  const [formData, setFormData] = useState({
   code: "",
-  type: "percentage", // percentage, fixed
+  type: "percentage", // percentage, fixed, free_item
   value: "",
   minOrder: "0",
   maxDiscount: "",
@@ -51,11 +57,13 @@ export default function CouponsAdminPage() {
   isVisible: false,
   title: "",
   description: "",
-  eligibleRoles: "all" as string, // 'all' | 'customer' | 'rubber' | 'store' | 'rubber,store' etc.
+  eligibleRoles: "all" as string,
+  freeItems: "" as string, // JSON array e.g. '["detergent","softener"]'
  });
 
  // Selected roles for the checkbox UI
  const [selectedRoles, setSelectedRoles] = useState<Set<string>>(new Set(["all"]));
+ const [selectedFreeItems, setSelectedFreeItems] = useState<Set<string>>(new Set());
 
  useEffect(() => {
   fetchCoupons();
@@ -90,7 +98,14 @@ export default function CouponsAdminPage() {
   try {
    const url = "/api/admin/coupons";
    const method = editingId ? "PUT" : "POST";
-   const payload = editingId ? { ...formData, id: editingId } : formData;
+   // Build final payload — for free_item type, force isVisible=false and set freeItems
+   const finalFormData = { ...formData };
+   if (finalFormData.type === 'free_item') {
+    finalFormData.isVisible = false;
+    finalFormData.value = '0';
+    finalFormData.freeItems = JSON.stringify(Array.from(selectedFreeItems));
+   }
+   const payload = editingId ? { ...finalFormData, id: editingId } : finalFormData;
 
    const res = await fetch(url, {
     method,
@@ -115,8 +130,9 @@ export default function CouponsAdminPage() {
  };
 
  function resetForm() {
-  setFormData({ code: "", type: "percentage", value: "", minOrder: "0", maxDiscount: "", expiryDate: "", usageLimit: "", isVisible: false, title: "", description: "", eligibleRoles: "all" });
+  setFormData({ code: "", type: "percentage", value: "", minOrder: "0", maxDiscount: "", expiryDate: "", usageLimit: "", isVisible: false, title: "", description: "", eligibleRoles: "all", freeItems: "" });
   setSelectedRoles(new Set(["all"]));
+  setSelectedFreeItems(new Set());
  }
 
  const handleEdit = (coupon: any) => {
@@ -134,7 +150,13 @@ export default function CouponsAdminPage() {
    title: coupon.title || "",
    description: coupon.description || "",
    eligibleRoles: roles,
+   freeItems: coupon.freeItems || "",
   });
+  // Parse freeItems into set
+  try {
+   const items = JSON.parse(coupon.freeItems || '[]');
+   setSelectedFreeItems(new Set(items));
+  } catch { setSelectedFreeItems(new Set()); }
   // Parse roles into set
   if (roles === "all") {
    setSelectedRoles(new Set(["all"]));
@@ -277,12 +299,24 @@ export default function CouponsAdminPage() {
             </div>
            </td>
            <td className="px-4 py-4">
-             <span className="font-black text-indigo-600">
-              {coupon.type === 'percentage' ? `${coupon.value}%` : `฿${coupon.value}`}
-             </span>
-             <p className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter mt-0.5">
-              Min ฿{coupon.minOrder || 0}
-             </p>
+              {coupon.type === 'free_item' ? (
+               <div className="flex flex-wrap gap-1">
+                {(() => { try { return JSON.parse(coupon.freeItems || '[]'); } catch { return []; } })().map((item: string) => (
+                 <span key={item} className="text-[9px] font-black text-pink-600 bg-pink-50 px-1.5 py-0.5 rounded-md">
+                  🎁 {FREE_ITEM_OPTIONS.find(o => o.key === item)?.label || item}
+                 </span>
+                ))}
+               </div>
+              ) : (
+               <>
+                <span className="font-black text-indigo-600">
+                 {coupon.type === 'percentage' ? `${coupon.value}%` : `฿${coupon.value}`}
+                </span>
+                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter mt-0.5">
+                 Min ฿{coupon.minOrder || 0}
+                </p>
+               </>
+              )}
            </td>
            <td className="px-4 py-4">
             <div className="flex flex-wrap gap-1">
@@ -354,23 +388,25 @@ export default function CouponsAdminPage() {
    {/* New Coupon Modal */}
    <Modal isOpen={isModalOpen} onClose={() => { setIsModalOpen(false); setEditingId(null); }} title={editingId ? t('admin.coupons.modal.titleEdit') || "Edit Coupon" : t('admin.coupons.modal.title')}>
      <form onSubmit={handleSubmit} className="space-y-6 pt-2 h-[80vh] overflow-y-auto px-1 custom-scrollbar">
-      <div className="p-4 bg-indigo-50 rounded-xl border border-indigo-100">
-        <label className="flex items-center gap-3 cursor-pointer">
-         <div className={`w-12 h-6 rounded-full transition-colors relative ${formData.isVisible ? 'bg-indigo-500' : 'bg-slate-300'}`}>
-           <input 
-            type="checkbox"
-            checked={formData.isVisible}
-            onChange={e => setFormData({...formData, isVisible: e.target.checked})}
-            className="hidden"
-           />
-           <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${formData.isVisible ? 'left-7' : 'left-1'}`} />
-         </div>
-         <div className="flex flex-col">
-           <span className="text-xs font-black text-slate-900 uppercase tracking-tight">{t('admin.coupons.modal.visibilityTitle')}</span>
-           <span className="text-[10px] text-slate-500 font-medium">{t('admin.coupons.modal.visibilitySub')}</span>
-         </div>
-        </label>
-      </div>
+      {formData.type !== 'free_item' && (
+        <div className="p-4 bg-indigo-50 rounded-xl border border-indigo-100">
+          <label className="flex items-center gap-3 cursor-pointer">
+           <div className={`w-12 h-6 rounded-full transition-colors relative ${formData.isVisible ? 'bg-indigo-500' : 'bg-slate-300'}`}>
+             <input 
+              type="checkbox"
+              checked={formData.isVisible}
+              onChange={e => setFormData({...formData, isVisible: e.target.checked})}
+              className="hidden"
+             />
+             <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${formData.isVisible ? 'left-7' : 'left-1'}`} />
+           </div>
+           <div className="flex flex-col">
+             <span className="text-xs font-black text-slate-900 uppercase tracking-tight">{t('admin.coupons.modal.visibilityTitle')}</span>
+             <span className="text-[10px] text-slate-500 font-medium">{t('admin.coupons.modal.visibilitySub')}</span>
+           </div>
+          </label>
+        </div>
+      )}
 
       {/* ─── Eligible Roles Selector ─── */}
       <div className="p-4 bg-gradient-to-r from-amber-50 to-orange-50 rounded-xl border border-amber-100">
@@ -396,12 +432,6 @@ export default function CouponsAdminPage() {
           );
          })}
         </div>
-        <p className="text-[9px] text-amber-600/70 font-bold mt-2.5 leading-relaxed">
-         {selectedRoles.has("all") 
-          ? "✨ ผู้ใช้ทุกกลุ่มสามารถใช้คูปองนี้ได้"
-          : `🔒 ใช้ได้เฉพาะ: ${Array.from(selectedRoles).map(r => ROLE_OPTIONS.find(o => o.key === r)?.label || r).join(", ")}`
-         }
-        </p>
       </div>
 
       <div className="space-y-4">
@@ -426,17 +456,6 @@ export default function CouponsAdminPage() {
          />
         </div>
 
-        <div>
-         <label className="text-[10px] uppercase font-black text-slate-400 tracking-widest block mb-1.5 ml-1">{t('admin.coupons.modal.descLabel') || "Description"}</label>
-         <textarea 
-          value={formData.description}
-          onChange={e => setFormData({...formData, description: e.target.value})}
-          placeholder="e.g. Get 20% off all laundry services..."
-          rows={2}
-          className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-4 py-3 text-sm font-bold focus:outline-none focus:border-primary/50 resize-none"
-         />
-        </div>
-
         <div className="grid grid-cols-2 gap-4">
          <div>
            <label className="text-[10px] uppercase font-black text-slate-400 tracking-widest block mb-1.5 ml-1">{t('admin.coupons.modal.type')}</label>
@@ -447,18 +466,21 @@ export default function CouponsAdminPage() {
            >
             <option value="percentage">{t('admin.coupons.modal.typePercent')}</option>
             <option value="fixed">{t('admin.coupons.modal.typeFixed')}</option>
+            <option value="free_item">🎁 ฟรีรายการ</option>
            </select>
-         </div>
-         <div>
-           <label className="text-[10px] uppercase font-black text-slate-400 tracking-widest block mb-1.5 ml-1">{t('admin.coupons.modal.value')}</label>
-           <input 
-            required type="number"
-            value={formData.value}
-            onChange={e => setFormData({...formData, value: e.target.value})}
-            placeholder={formData.type === 'percentage' ? "10" : "150"}
-            className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-4 py-3 text-sm font-bold focus:outline-none focus:border-primary/50"
-           />
-         </div>
+          </div>
+          {formData.type !== 'free_item' && (
+           <div>
+            <label className="text-[10px] uppercase font-black text-slate-400 tracking-widest block mb-1.5 ml-1">{t('admin.coupons.modal.value')}</label>
+            <input 
+             required type="number"
+             value={formData.value}
+             onChange={e => setFormData({...formData, value: e.target.value})}
+             placeholder={formData.type === 'percentage' ? "10" : "150"}
+             className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-4 py-3 text-sm font-bold focus:outline-none focus:border-primary/50"
+            />
+           </div>
+          )}
         </div>
         
         <div className="grid grid-cols-2 gap-4">
