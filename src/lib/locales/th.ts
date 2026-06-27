@@ -436,6 +436,7 @@ export const th = {
     timeSlots: {
       morning: "เช้า (09:00 - 12:00)",
       afternoon: "บ่าย (14:00 - 17:00)",
+      evening: "เย็น (17:00 - 20:00)",
     },
     addresses: {
       home: "บ้าน",

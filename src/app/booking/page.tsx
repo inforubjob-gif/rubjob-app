@@ -402,15 +402,15 @@ function BookingFlow() {
 
   const isSlotPassed = (slotStartTime: string, dateVal: string) => {
     // clockTick ensures this re-evaluates when time passes (every 30s)
-    const now = new Date(clockTick);
-    // Use local time comparison
-    const todayStr = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+    // Always use Bangkok timezone to avoid UTC mismatch on SSR/edge
+    const nowBKK = new Date(new Date(clockTick).toLocaleString("en-US", { timeZone: "Asia/Bangkok" }));
+    const todayStr = `${nowBKK.getFullYear()}-${String(nowBKK.getMonth() + 1).padStart(2, "0")}-${String(nowBKK.getDate()).padStart(2, "0")}`;
     if (dateVal > todayStr) return false;
     if (dateVal < todayStr) return true;
 
     const [slotH, slotM] = slotStartTime.split(":").map(Number);
-    const currentH = now.getHours();
-    const currentM = now.getMinutes();
+    const currentH = nowBKK.getHours();
+    const currentM = nowBKK.getMinutes();
 
     // Disable if current time has passed the start time
     return currentH > slotH || (currentH === slotH && currentM >= slotM);
@@ -419,22 +419,22 @@ function BookingFlow() {
   // Set default pickup date/slot
   useEffect(() => {
     if (!pickupDate && dates.length > 0) {
-      const validDate = dates.find(d => TIME_SLOTS.some(s => !isSlotPassed(s.startTime, d.value)));
+      const validDate = dates.find(d => activeTimeSlots.some(s => !isSlotPassed(s.startTime, d.value)));
       setPickupDate(validDate ? validDate.value : dates[0].value);
     }
-  }, [dates, pickupDate]);
+  }, [dates, pickupDate, activeTimeSlots]);
 
   // Ensure selected slot is valid for the selected date (re-runs when clock ticks)
   useEffect(() => {
-    if (pickupDate && TIME_SLOTS.length > 0) {
-      const validSlots = TIME_SLOTS.filter(s => !isSlotPassed(s.startTime, pickupDate));
+    if (pickupDate && activeTimeSlots.length > 0) {
+      const validSlots = activeTimeSlots.filter(s => !isSlotPassed(s.startTime, pickupDate));
       if (validSlots.length > 0) {
-        if (!pickupSlot || isSlotPassed(TIME_SLOTS.find(s => s.id === pickupSlot)?.startTime || "00:00", pickupDate)) {
+        if (!pickupSlot || isSlotPassed(activeTimeSlots.find(s => s.id === pickupSlot)?.startTime || "00:00", pickupDate)) {
           setPickupSlot(validSlots[0].id);
         }
       } else {
         // All slots passed for today — auto-advance to next date with valid slots
-        const nextDate = dates.find(d => d.value > pickupDate && TIME_SLOTS.some(s => !isSlotPassed(s.startTime, d.value)));
+        const nextDate = dates.find(d => d.value > pickupDate && activeTimeSlots.some(s => !isSlotPassed(s.startTime, d.value)));
         if (nextDate) {
           setPickupDate(nextDate.value);
         } else {
@@ -442,7 +442,7 @@ function BookingFlow() {
         }
       }
     }
-  }, [pickupDate, pickupSlot, clockTick]);
+  }, [pickupDate, pickupSlot, clockTick, activeTimeSlots]);
 
   // Road distance state (OSRM)
   const [roadDistance, setRoadDistance] = useState<{ distanceKm: number; durationMin: number } | null>(null);
@@ -517,6 +517,17 @@ function BookingFlow() {
 
   const minOrderAmount = Number(systemSettings.min_order_amount) || 0;
   const isBelowMinOrder = totalPrice < minOrderAmount;
+
+  // Dynamic time slots: add evening slot when extended hours are enabled
+  const isExtendedHours = systemSettings.service_extended === "true";
+  const extendedCloseTime = systemSettings.service_extended_close || "20:00";
+  const activeTimeSlots = useMemo(() => {
+    const slots = [...TIME_SLOTS];
+    if (isExtendedHours) {
+      slots.push({ id: "evening", label: `17:00 - ${extendedCloseTime}`, startTime: "17:00", endTime: extendedCloseTime });
+    }
+    return slots;
+  }, [isExtendedHours, extendedCloseTime]);
 
   const unitLabel = service?.unit === "hour" ? t("booking.hours") : service?.unit === "session" ? t("home.perSession") : t("home.perPiece");
 
@@ -1083,12 +1094,19 @@ function BookingFlow() {
                   <span className="text-[9px] font-bold text-primary/50 ml-auto">เพิ่มเติมจากบริการ</span>
                 </div>
                 <div className="p-4 space-y-3">
+                  {/* Extended hours banner */}
+                  {isExtendedHours && (
+                    <div className="flex items-center gap-2 px-3 py-2 bg-indigo-50 border border-indigo-200 rounded-xl">
+                      <span className="text-base">🌙</span>
+                      <p className="text-[10px] font-black text-indigo-700">วันนี้ขยายเวลาให้บริการถึง {extendedCloseTime} น.</p>
+                    </div>
+                  )}
                   {/* Time slot selection */}
                   <p className="text-[10px] font-bold text-slate-400 flex items-center gap-1">
                     <Icons.Bell size={10} strokeWidth={3} className="text-primary" /> {t("booking.pickupSelectTime")}
                   </p>
 
-                  {TIME_SLOTS.every(s => isSlotPassed(s.startTime, pickupDate)) && (
+                  {activeTimeSlots.every(s => isSlotPassed(s.startTime, pickupDate)) && (
                     <div className="bg-amber-50 border border-amber-200 rounded-lg p-2.5 flex items-center gap-2 animate-page-enter">
                       <Icons.Bell size={14} className="text-amber-500 shrink-0" />
                       <div>
@@ -1099,7 +1117,7 @@ function BookingFlow() {
                   )}
 
                   <div className="grid grid-cols-2 gap-2">
-                    {TIME_SLOTS.map((slot) => {
+                    {activeTimeSlots.map((slot) => {
                       const isDisabled = isSlotPassed(slot.startTime, pickupDate);
                       return (
                         <button key={slot.id} disabled={isDisabled} onClick={() => setPickupSlot(slot.id)}
@@ -1275,7 +1293,7 @@ function BookingFlow() {
 
                 <div className="bg-slate-50/50 p-3.5 rounded-xl space-y-2.5 border border-slate-100">
                   <Row icon={<Icons.MapPin size={12} />} label={t("booking.confirm.pickupLocation")} value={selectedAddress?.label || ""} />
-                  <Row icon={<Icons.Bell size={12} />} label={t("booking.confirm.pickupDate")} value={`${pickupDate} ${TIME_SLOTS.find(s => s.id === pickupSlot)?.label || pickupSlot}`} />
+                  <Row icon={<Icons.Bell size={12} />} label={t("booking.confirm.pickupDate")} value={`${pickupDate} ${activeTimeSlots.find(s => s.id === pickupSlot)?.label || pickupSlot}`} />
                   <Row
                     icon={<Icons.Truck size={12} />}
                     label={t("booking.confirm.deliveryService")}

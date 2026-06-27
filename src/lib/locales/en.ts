@@ -500,6 +500,7 @@ export const en = {
   timeSlots: {
     morning: "Morning (09:00 - 12:00)",
     afternoon: "Afternoon (14:00 - 17:00)",
+    evening: "Evening (17:00 - 20:00)",
   },
   addresses: {
     home: "Home",
