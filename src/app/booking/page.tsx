@@ -196,6 +196,7 @@ function BookingFlow() {
   const [dbStores, setDbStores] = useState<any[]>([]);
   const [dbAddresses, setDbAddresses] = useState<any[]>([]);
   const [systemSettings, setSystemSettings] = useState<any>({});
+  const [userPoints, setUserPoints] = useState<number>(0);
   const [isTestUser, setIsTestUser] = useState(false);
   const [paymentQR, setPaymentQR] = useState<string | null>(null);
   const [activeOrderId, setActiveOrderId] = useState<string | null>(null);
@@ -255,6 +256,9 @@ function BookingFlow() {
               const userData = await userRes.json() as any;
               userIsTest = !!userData?.user?.isTest;
               setIsTestUser(userIsTest);
+              if (userData?.user?.points !== undefined) {
+                setUserPoints(Number(userData.user.points) || 0);
+              }
             }
           } catch {}
         }
@@ -367,8 +371,8 @@ function BookingFlow() {
   const [availableCoupons, setAvailableCoupons] = useState<any[]>([]);
   const [isLoadingCoupons, setIsLoadingCoupons] = useState(false);
   const [usePoints, setUsePoints] = useState(false);
-  const availablePoints = 500;
-  const pointsDiscount = usePoints ? 50 : 0;
+  const availablePoints = userPoints;
+  const pointsDiscount = usePoints && availablePoints > 0 ? Math.min(Math.floor(availablePoints / 10), 50) : 0;
   // Calculate free item discount from coupon
   const freeItemDiscount = (() => {
     if (!appliedCoupon?.freeItems || appliedCoupon.freeItems.length === 0) return 0;
