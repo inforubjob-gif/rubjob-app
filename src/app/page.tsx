@@ -84,7 +84,13 @@ export default function HomePage() {
       try {
         const res = await fetch("/api/admin/settings");
         const data = await res.json() as any;
-        if (data.settings) setSystemSettings(data.settings);
+        if (data.settings && Array.isArray(data.settings)) {
+          const settingsMap = data.settings.reduce((acc: any, setting: any) => {
+            acc[setting.key] = setting.value;
+            return acc;
+          }, {});
+          setSystemSettings(settingsMap);
+        }
       } catch (err) {
         console.error("Failed to fetch settings:", err);
       }
