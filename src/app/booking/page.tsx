@@ -369,7 +369,18 @@ function BookingFlow() {
   const [usePoints, setUsePoints] = useState(false);
   const availablePoints = 500;
   const pointsDiscount = usePoints ? 50 : 0;
-  const couponDiscount = appliedCoupon ? appliedCoupon.discount : 0;
+  // Calculate free item discount from coupon
+  const freeItemDiscount = (() => {
+    if (!appliedCoupon?.freeItems || appliedCoupon.freeItems.length === 0) return 0;
+    let discount = 0;
+    for (const item of appliedCoupon.freeItems) {
+      if (item === 'detergent' && needsDetergent) discount += 15; // ค่าน้ำยาซักผ้า
+      if (item === 'softener') discount += 0; // softener included with detergent price
+      if (item === 'folding' && withFolding) discount += 10; // ค่าพับผ้า
+    }
+    return discount;
+  })();
+  const couponDiscount = appliedCoupon ? (appliedCoupon.discount + freeItemDiscount) : 0;
 
   const service = dbServices.find((s) => s.id === selectedService);
 
@@ -1153,10 +1164,16 @@ function BookingFlow() {
                     <span className="font-bold text-slate-700">฿{deliveryFee}</span>
                   </div>
                   {(couponDiscount > 0 || pointsDiscount > 0) && (<>
-                    {couponDiscount > 0 && (
+                    {appliedCoupon && appliedCoupon.discount > 0 && (
                       <div className="flex items-center justify-between text-emerald-600 font-bold">
                         <span className="flex items-center gap-1"><Icons.Ticket size={12} /> {t("booking.summary.discountCoupon")}</span>
-                        <span>-฿{couponDiscount}</span>
+                        <span>-฿{appliedCoupon.discount}</span>
+                      </div>
+                    )}
+                    {freeItemDiscount > 0 && (
+                      <div className="flex items-center justify-between text-pink-600 font-bold">
+                        <span className="flex items-center gap-1">🎁 ฟรี Add-ons (คูปอง)</span>
+                        <span>-฿{freeItemDiscount}</span>
                       </div>
                     )}
                     {pointsDiscount > 0 && (
@@ -1422,6 +1439,18 @@ function BookingFlow() {
               <div className="bg-red-50 text-red-600 text-[11px] font-bold p-2 rounded-lg flex items-center gap-2 border border-red-100">
                 <Icons.AlertCircle size={14} />
                 {t("booking.errors.tooFar") || "ขออภัย ระยะทางไกลเกิน 10 กม. ไม่สามารถให้บริการได้"}
+              </div>
+            )}
+            {/* Detergent preparation warning in details step */}
+            {!needsDetergent && (
+              <div className="flex items-start gap-3 p-3 bg-amber-50 border border-amber-200 rounded-xl">
+                <div className="w-7 h-7 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center shrink-0 mt-0.5">
+                  <Icons.Info size={14} />
+                </div>
+                <div>
+                  <p className="text-[11px] font-black text-amber-800">{t("booking.detergentWarningTitle")}</p>
+                  <p className="text-[10px] text-amber-700 font-medium mt-0.5 leading-relaxed">{t("booking.detergentWarningDesc")}</p>
+                </div>
               </div>
             )}
             <div className="bg-white rounded-2xl shadow-xl shadow-slate-200/50 border border-slate-100 p-4">
