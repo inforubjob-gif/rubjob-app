@@ -402,6 +402,18 @@ function BookingFlow() {
 
   const locale = language === "th" ? "th" : "en";
 
+  // Dynamic time slots: add evening slot when extended hours are enabled
+  // MUST be declared before useEffects that reference it
+  const isExtendedHours = systemSettings.service_extended === "true";
+  const extendedCloseTime = systemSettings.service_extended_close || "20:00";
+  const activeTimeSlots = useMemo(() => {
+    const slots = [...TIME_SLOTS];
+    if (isExtendedHours) {
+      slots.push({ id: "evening", label: `17:00 - ${extendedCloseTime}`, startTime: "17:00", endTime: extendedCloseTime });
+    }
+    return slots;
+  }, [isExtendedHours, extendedCloseTime]);
+
   // Date/time constraints and generation...
   const dates = useMemo(() => {
     return Array.from({ length: 7 }, (_, i) => {
@@ -533,17 +545,6 @@ function BookingFlow() {
 
   const minOrderAmount = Number(systemSettings.min_order_amount) || 0;
   const isBelowMinOrder = totalPrice < minOrderAmount;
-
-  // Dynamic time slots: add evening slot when extended hours are enabled
-  const isExtendedHours = systemSettings.service_extended === "true";
-  const extendedCloseTime = systemSettings.service_extended_close || "20:00";
-  const activeTimeSlots = useMemo(() => {
-    const slots = [...TIME_SLOTS];
-    if (isExtendedHours) {
-      slots.push({ id: "evening", label: `17:00 - ${extendedCloseTime}`, startTime: "17:00", endTime: extendedCloseTime });
-    }
-    return slots;
-  }, [isExtendedHours, extendedCloseTime]);
 
   const unitLabel = service?.unit === "hour" ? t("booking.hours") : service?.unit === "session" ? t("home.perSession") : t("home.perPiece");
 
