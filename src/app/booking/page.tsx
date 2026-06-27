@@ -256,8 +256,20 @@ function BookingFlow() {
               const userData = await userRes.json() as any;
               userIsTest = !!userData?.user?.isTest;
               setIsTestUser(userIsTest);
-              if (userData?.user?.points !== undefined) {
-                setUserPoints(Number(userData.user.points) || 0);
+            }
+          } catch {}
+        }
+
+        // Fetch user's completed orders to calculate real points (฿100 = 1 point)
+        if (profile?.userId) {
+          try {
+            const ordersRes = await fetch(`/api/orders?userId=${profile.userId}`);
+            if (ordersRes.ok) {
+              const ordersData = await ordersRes.json() as any;
+              if (ordersData?.orders) {
+                const completedOrders = ordersData.orders.filter((o: any) => o.status === 'completed' && !o.isTest);
+                const totalSpent = completedOrders.reduce((acc: number, order: any) => acc + (order.totalPrice || 0), 0);
+                setUserPoints(Math.floor(totalSpent / 100));
               }
             }
           } catch {}

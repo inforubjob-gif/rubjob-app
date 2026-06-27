@@ -62,8 +62,9 @@ export default function PromotionsPage() {
     fetchCoupons();
   }, []);
 
-  // Points formula: Every ฿100 spent = 1 point
-  const totalPoints = Math.floor(orders.reduce((acc, order) => acc + (order.totalPrice || 0), 0) / 100);
+  // Points formula: Every ฿100 spent on COMPLETED real orders = 1 point
+  const completedOrders = orders.filter((o: any) => o.status === 'completed' && !o.isTest);
+  const totalPoints = Math.floor(completedOrders.reduce((acc, order) => acc + (order.totalPrice || 0), 0) / 100);
   const currentTier = totalPoints >= 300 ? 'diamond' : totalPoints >= 150 ? 'gold' : totalPoints >= 50 ? 'silver' : 'bronze';
   const nextTierPoints = totalPoints >= 300 ? 300 : totalPoints >= 150 ? 300 : totalPoints >= 50 ? 150 : 50;
   const progress = Math.min((totalPoints / nextTierPoints) * 100, 100);
