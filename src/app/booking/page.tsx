@@ -196,6 +196,7 @@ function BookingFlow() {
   const [dbStores, setDbStores] = useState<any[]>([]);
   const [dbAddresses, setDbAddresses] = useState<any[]>([]);
   const [systemSettings, setSystemSettings] = useState<any>({});
+  const [isTestUser, setIsTestUser] = useState(false);
   const [paymentQR, setPaymentQR] = useState<string | null>(null);
   const [activeOrderId, setActiveOrderId] = useState<string | null>(null);
   const [pricingConfig, setPricingConfig] = useState<PricingConfig>({ gpRubberPercent: 10, platformFeePerDelivery: 10, deliveryFeeBase: 50 });
@@ -245,10 +246,24 @@ function BookingFlow() {
       setIsDataLoading(true);
       setDataError(null);
       try {
+        // First: check if user is a test account
+        let userIsTest = false;
+        if (profile?.userId) {
+          try {
+            const userRes = await fetch(`/api/user/${profile.userId}`);
+            if (userRes.ok) {
+              const userData = await userRes.json() as any;
+              userIsTest = !!userData?.user?.isTest;
+              setIsTestUser(userIsTest);
+            }
+          } catch {}
+        }
+
         // Individual fetching with safe fallbacks
+        const storesUrl = userIsTest ? "/api/stores?isTest=1" : "/api/stores";
         const [sRes, stRes, adRes, setRes, pricingRes] = await Promise.all([
           fetch("/api/services").catch(() => null),
-          fetch("/api/stores").catch(() => null),
+          fetch(storesUrl).catch(() => null),
           profile?.userId ? fetch(`/api/user/addresses?userId=${profile.userId}`).catch(() => null) : Promise.resolve(null),
           fetch("/api/admin/settings").catch(() => null),
           fetch("/api/settings/pricing").catch(() => null),
@@ -672,8 +687,8 @@ function BookingFlow() {
     );
   }
 
-  // 4. Handle platform closed state
-  if (isLoaded && systemSettings.is_open === "false") {
+  // 4. Handle platform closed state (bypass for test users)
+  if (isLoaded && systemSettings.is_open === "false" && !isTestUser) {
     return (
       <div className="flex flex-col items-center justify-center min-h-dvh px-10 text-center animate-page-enter bg-slate-50">
         <div className="w-24 h-24 bg-white rounded-xl shadow-xl flex items-center justify-center mb-8 border border-slate-100">
@@ -695,6 +710,27 @@ function BookingFlow() {
       </div>
     );
   }
+  // 4.5 Block real users when Test Mode is ON
+  if (isLoaded && systemSettings.test_mode_enabled === "true" && !isTestUser) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-dvh px-10 text-center animate-page-enter bg-slate-50">
+        <div className="w-24 h-24 bg-amber-50 rounded-xl shadow-xl flex items-center justify-center mb-8 border border-amber-200">
+          <span className="text-5xl">🧪</span>
+        </div>
+        <h2 className="text-2xl font-black text-slate-900">ระบบอยู่ในโหมดทดสอบ</h2>
+        <p className="text-slate-500 mt-3 font-medium leading-relaxed">
+          ขณะนี้ระบบกำลังอยู่ในโหมดทดสอบ<br/>กรุณาลองใหม่ภายหลัง
+        </p>
+        <Button 
+          variant="outline" 
+          className="mt-10 rounded-xl border-2 font-black px-10"
+          onClick={() => router.push("/")}
+        >
+          {t("common.goHome")}
+        </Button>
+      </div>
+    );
+  }
 
   // 5. Handle outside service hours
   const serviceOpenTime = systemSettings.service_open_time || "08:00";
@@ -703,7 +739,7 @@ function BookingFlow() {
     : (systemSettings.service_close_time || "18:00");
   const nowBangkok = new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Bangkok" }));
   const nowHHMM = `${String(nowBangkok.getHours()).padStart(2, "0")}:${String(nowBangkok.getMinutes()).padStart(2, "0")}`;
-  const isOutsideHours = isLoaded && systemSettings.is_open !== "false" && (nowHHMM < serviceOpenTime || nowHHMM >= serviceCloseTime);
+  const isOutsideHours = isLoaded && systemSettings.is_open !== "false" && !isTestUser && (nowHHMM < serviceOpenTime || nowHHMM >= serviceCloseTime);
 
   if (isOutsideHours) {
     return (
@@ -1423,19 +1459,49 @@ function BookingFlow() {
           </div>
         )}
         {step === "payment" && (
-          <Button
-            fullWidth
-            size="lg"
-            isLoading={isSubmitting}
-            disabled={isSubmitting || !paymentQR}
-            className={(!paymentQR) ? "bg-slate-300 text-slate-500 shadow-none border-transparent cursor-not-allowed" : ""}
-            onClick={() => {
-              if (activeOrderId) router.push(`/orders/${activeOrderId}`);
-            }}
-          >
-            {isSubmitting ? t("common.loading") : 
-             paymentQR ? t("booking.viewMyOrders") : t("common.loading")}
-          </Button>
+          <div className="flex flex-col gap-3">
+            <Button
+              fullWidth
+              size="lg"
+              isLoading={isSubmitting}
+              disabled={isSubmitting || !paymentQR}
+              className={(!paymentQR) ? "bg-slate-300 text-slate-500 shadow-none border-transparent cursor-not-allowed" : ""}
+              onClick={() => {
+                if (activeOrderId) router.push(`/orders/${activeOrderId}`);
+              }}
+            >
+              {isSubmitting ? t("common.loading") : 
+               paymentQR ? t("booking.viewMyOrders") : t("common.loading")}
+            </Button>
+            {isTestUser && activeOrderId && (
+              <Button
+                fullWidth
+                size="lg"
+                variant="outline"
+                className="border-2 border-amber-300 text-amber-700 bg-amber-50 hover:bg-amber-100 font-black"
+                onClick={async () => {
+                  try {
+                    const res = await fetch("/api/payment/skip-test", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ orderId: activeOrderId }),
+                    });
+                    const data = await res.json() as any;
+                    if (data.success) {
+                      showToast("🧪 ข้ามการจ่ายเงิน — ส่ง broadcast ทดสอบแล้ว", "success");
+                      router.push(`/orders/${activeOrderId}`);
+                    } else {
+                      showToast(data.error || "Error", "error");
+                    }
+                  } catch (err) {
+                    showToast("Failed to skip payment", "error");
+                  }
+                }}
+              >
+                🧪 ข้ามการจ่ายเงิน (ทดสอบ)
+              </Button>
+            )}
+          </div>
         )}
       </div>
       

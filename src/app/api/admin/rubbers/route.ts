@@ -117,7 +117,7 @@ export async function PUT(req: Request) {
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   try {
     const payload = await req.json() as any;
-    const { id, status, name, phone, vehicleType, address, idNumber, licensePlate, emergencyContact, bankName, accountNumber, accountName, documents, password, rejectionReasons, rejectionNote } = payload;
+    const { id, status, name, phone, vehicleType, address, idNumber, licensePlate, emergencyContact, bankName, accountNumber, accountName, documents, password, rejectionReasons, rejectionNote, isTest } = payload;
     const db = getRequestContext().env.DB;
     if (!db) return NextResponse.json({ error: "D1 not found" }, { status: 500 });
 
@@ -141,11 +141,12 @@ export async function PUT(req: Request) {
           accountNumber = COALESCE(?, accountNumber),
           accountName = COALESCE(?, accountName),
           pictureUrl = COALESCE(?, pictureUrl),
-          password = COALESCE(?, password)
+          password = COALESCE(?, password),
+          isTest = COALESCE(?, isTest)
       WHERE id = ?
     `).bind(
       status || null, name || null, phone || null, vehicleType || null, address || null, idNumber || null, licensePlate || null, emergencyContact || null, 
-      bankName || null, accountNumber || null, accountName || null, payload.pictureUrl || null, password || null, id
+      bankName || null, accountNumber || null, accountName || null, payload.pictureUrl || null, password || null, isTest !== undefined ? (isTest ? 1 : 0) : null, id
     ).run();
 
     // Handle documents if provided

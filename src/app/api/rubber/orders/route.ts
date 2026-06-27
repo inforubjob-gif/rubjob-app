@@ -48,8 +48,9 @@ export async function GET(req: Request) {
     };
 
     // 0. Fetch Rubber Profile status and pictureUrl
-    const rubberProfile = await db.prepare("SELECT status, pictureUrl FROM rubber_users WHERE id = ?").bind(rubberId).first() as any;
+    const rubberProfile = await db.prepare("SELECT status, pictureUrl, isTest FROM rubber_users WHERE id = ?").bind(rubberId).first() as any;
     const verificationStatus = rubberProfile?.status || "unregistered";
+    const isTestRubber = !!rubberProfile?.isTest;
 
     // 1. Available Jobs: 
     // - Must have paymentStatus = 'paid' (confirmed via payment webhook)
@@ -61,9 +62,10 @@ export async function GET(req: Request) {
       LEFT JOIN services s ON o.serviceId = s.id
       LEFT JOIN provider_services p ON o.serviceId = p.id
       LEFT JOIN stores st ON o.storeId = st.id
-      WHERE (o.status IN ('pending', 'searching_driver') AND o.pickupDriverId IS NULL AND o.paymentStatus = 'paid')
-         OR (o.status = 'ready_for_pickup' AND o.deliveryDriverId IS NULL)
-    `).all();
+      WHERE ((o.status IN ('pending', 'searching_driver') AND o.pickupDriverId IS NULL AND o.paymentStatus = 'paid')
+         OR (o.status = 'ready_for_pickup' AND o.deliveryDriverId IS NULL))
+         AND (o.isTest = ? OR o.isTest IS NULL)
+    `).bind(isTestRubber ? 1 : 0).all();
 
     // 2. Active Jobs: rubber is assigned as pickup or delivery driver
     const activeJobs = await db.prepare(`

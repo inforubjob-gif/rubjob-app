@@ -48,7 +48,7 @@ export async function PATCH(
     if (paymentStatus === "paid") {
       try {
         const order = await db.prepare(
-          "SELECT address, deliveryFee FROM orders WHERE id = ?"
+          "SELECT address, deliveryFee, isTest FROM orders WHERE id = ?"
         ).bind(id).first() as any;
 
         if (order) {
@@ -61,7 +61,8 @@ export async function PATCH(
             db, env, id,
             orderAddress,
             order.deliveryFee || 0,
-            "pending"
+            "pending",
+            !!order.isTest
           );
         }
       } catch (err) {
@@ -78,7 +79,7 @@ export async function PATCH(
 
       try {
         const order = await db.prepare(
-          "SELECT address, deliveryFee, status FROM orders WHERE id = ?"
+          "SELECT address, deliveryFee, status, isTest FROM orders WHERE id = ?"
         ).bind(id).first() as any;
 
         if (order) {
@@ -97,7 +98,8 @@ export async function PATCH(
             db, env, id,
             orderAddress,
             order.deliveryFee || 0,
-            order.status || 'pending'
+            order.status || 'pending',
+            !!order.isTest
           );
         }
       } catch (err) {

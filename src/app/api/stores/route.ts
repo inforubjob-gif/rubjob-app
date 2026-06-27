@@ -15,10 +15,13 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: "D1 Database binding 'DB' not found" }, { status: 500 });
     }
 
+    const { searchParams } = new URL(req.url);
+    const showTest = searchParams.get("isTest") === "1";
+
     const { results } = await db.prepare(`
       SELECT * FROM stores 
-      WHERE isActive = 1
-    `).all();
+      WHERE isActive = 1 AND (isTest = ? OR isTest IS NULL)
+    `).bind(showTest ? 1 : 0).all();
 
     // Fetch cost matrix for all active stores
     const storeIds = results.map((s: any) => s.id);

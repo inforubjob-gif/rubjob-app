@@ -64,14 +64,21 @@ export async function POST(req: Request) {
       }
     }
 
+    // Check if user is a test account
+    let isTestOrder = 0;
+    try {
+      const user = await db.prepare("SELECT isTest FROM users WHERE id = ?").bind(userId).first() as any;
+      if (user?.isTest) isTestOrder = 1;
+    } catch {}
+
     // Insert Order
     await db.prepare(`
       INSERT INTO orders (
         id, userId, storeId, providerId, serviceId, status, 
         laundryFee, laundryCost, deliveryFee, distanceKm, totalPrice, 
-        paymentMethod, items, address, scheduledDate, customerNote, serviceDetails
+        paymentMethod, items, address, scheduledDate, customerNote, serviceDetails, isTest
       )
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `).bind(
       orderId,
       userId,
@@ -89,7 +96,8 @@ export async function POST(req: Request) {
       JSON.stringify(address),
       scheduledDate,
       customerNote || null,
-      serviceDetails || null
+      serviceDetails || null,
+      isTestOrder
     ).run();
 
     // Handle Coupon Usage

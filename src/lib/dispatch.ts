@@ -74,7 +74,8 @@ function parseRubberAddress(address: string | null): { province: string | null; 
  */
 export async function getEligibleRubbers(
   db: D1Database,
-  orderAddress: any
+  orderAddress: any,
+  isTestOrder: boolean = false
 ): Promise<{ id: string; lineUserId: string | null; preferences: string }[]> {
   const { province: orderProvince } = parseOrderAddress(orderAddress);
   
@@ -90,11 +91,12 @@ export async function getEligibleRubbers(
   } catch {}
   
   // Fix 1: Only select active rubbers (excludes pending/suspended)
+  // Test mode: filter by isTest flag
   const { results: allRubbers } = await db.prepare(`
     SELECT id, lineUserId, preferences, address
     FROM rubber_users
-    WHERE status = 'active'
-  `).all() as any;
+    WHERE status = 'active' AND (isTest = ? OR isTest IS NULL)
+  `).bind(isTestOrder ? 1 : 0).all() as any;
 
   const eligible: { id: string; lineUserId: string | null; preferences: string }[] = [];
 
@@ -160,7 +162,8 @@ export async function broadcastToEligibleRubbers(
   orderId: string,
   orderAddress: any,
   deliveryFee: number,
-  status: string = 'pending'
+  status: string = 'pending',
+  isTestOrder: boolean = false
 ) {
   // Get Rubber LINE OA token — MUST be separate from Customer OA
   // Priority: env variable → DB setting (admin dashboard)
@@ -192,7 +195,7 @@ export async function broadcastToEligibleRubbers(
   const totalOrderEarn = calcRubberPayout(deliveryFee, gp);
   const legEarn = Math.max(totalOrderEarn * 0.5, 0);
 
-  const eligibleRubbers = await getEligibleRubbers(db, orderAddress);
+  const eligibleRubbers = await getEligibleRubbers(db, orderAddress, isTestOrder);
   
   console.log(`📡 [DISPATCH] Order ${orderId}: Broadcasting to ${eligibleRubbers.length} eligible rubbers (status: ${status}, deliveryFee: ${deliveryFee}, legEarn: ${legEarn.toFixed(0)})`);
 

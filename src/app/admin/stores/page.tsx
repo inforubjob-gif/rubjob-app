@@ -92,6 +92,21 @@ export default function StoresAdminPage() {
   }
  }
 
+ async function toggleTestStore(id: string, currentIsTest: boolean) {
+  try {
+   await fetch("/api/admin/stores", {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ id, isTest: !currentIsTest })
+   });
+   setStores(prev => prev.map(s => s.id === id ? { ...s, isTest: !currentIsTest ? 1 : 0 } : s));
+   showToast(!currentIsTest ? '🧪 ตั้งเป็นร้านทดสอบ' : '✅ ยกเลิกร้านทดสอบ', "success");
+  } catch (err) {
+   console.error("Failed to toggle test", err);
+   showToast(t('admin.common.toast.error'), "error");
+  }
+ }
+
  async function deleteStore(id: string) {
   if (!window.confirm(t('admin.common.confirmDelete', { item: t('admin.common.store') }))) return;
   
@@ -186,7 +201,7 @@ export default function StoresAdminPage() {
               <Icons.Office size={24} />
              </div>
              <div className="flex flex-col">
-              <span className="font-black text-slate-900 tracking-tight block">{store.name}</span>
+              <span className="font-black text-slate-900 tracking-tight block">{store.name}{store.isTest ? <span className="ml-1.5 text-[9px] bg-amber-100 text-amber-600 px-1.5 py-0.5 rounded-md font-black">🧪 TEST</span> : null}</span>
               <span className="text-[10px] font-bold text-slate-400 mt-0.5 font-mono">{store.id.substring(0, 8)}...</span>
              </div>
            </div>
@@ -283,6 +298,13 @@ export default function StoresAdminPage() {
                  {t('common.activate')}
                 </button>
                )}
+              <button 
+               onClick={() => toggleTestStore(store.id, !!store.isTest)}
+               className={`px-3 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all active:scale-95 shadow-sm border ${store.isTest ? 'bg-amber-50 border-amber-200 text-amber-600 hover:bg-amber-100' : 'bg-slate-50 border-slate-100 text-slate-400 hover:bg-amber-50 hover:text-amber-600 hover:border-amber-200'}`}
+               title={store.isTest ? 'ยกเลิก Test' : 'ตั้งเป็น Test'}
+              >
+               🧪
+              </button>
               <button 
                onClick={() => deleteStore(store.id)}
                className="w-10 h-10 bg-slate-50 hover:bg-rose-50 text-slate-300 hover:text-rose-500 rounded-xl flex items-center justify-center transition-all group-hover:bg-rose-50/50"

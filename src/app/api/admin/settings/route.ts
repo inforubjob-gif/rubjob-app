@@ -29,6 +29,7 @@ const DEFAULT_SETTINGS = [
   { key: "service_close_time", value: "18:00", type: "string", description: "Default daily service closing time (HH:mm)" },
   { key: "service_extended", value: "false", type: "boolean", description: "Permanent toggle: extend service hours to service_extended_close" },
   { key: "service_extended_close", value: "20:00", type: "string", description: "Closing time when extended hours are active (HH:mm)" },
+  { key: "test_mode_enabled", value: "false", type: "boolean", description: "Test mode: blocks real customers, only test accounts can book" },
 ];
 
 /**

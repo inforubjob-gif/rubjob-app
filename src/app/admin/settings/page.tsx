@@ -563,6 +563,33 @@ function SettingsContent() {
              </div>
             </div>
 
+           {/* Test Mode Toggle */}
+           <div className={`p-4 rounded-xl border-2 transition-all ${getSetting("test_mode_enabled") === "true" ? "bg-amber-50/50 border-amber-300 ring-2 ring-amber-200" : "bg-slate-50 border-slate-100"}`}>
+             <div className="flex items-center justify-between">
+               <div className="flex items-center gap-3">
+                <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${getSetting("test_mode_enabled") === "true" ? "bg-amber-100 text-amber-600" : "bg-slate-100 text-slate-400"}`}>
+                  <span className="text-lg">🧪</span>
+                </div>
+                <div>
+                  <p className="text-sm font-black text-slate-900">โหมดทดสอบ (Test Mode)</p>
+                  <p className="text-[10px] text-slate-400 font-bold">เปิดใช้ → block ลูกค้าจริง, เฉพาะ test accounts เท่านั้น</p>
+                </div>
+               </div>
+               <div
+                onClick={() => updateLocalSetting("test_mode_enabled", getSetting("test_mode_enabled") === "true" ? "false" : "true")}
+                className={`w-12 h-6 rounded-full transition-all cursor-pointer relative ${getSetting("test_mode_enabled") === "true" ? "bg-amber-500" : "bg-slate-200"}`}
+               >
+                <div className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-all ${getSetting("test_mode_enabled") === "true" ? "left-7" : "left-1"}`} />
+               </div>
+             </div>
+             {getSetting("test_mode_enabled") === "true" && (
+               <div className="mt-3 text-[10px] font-bold text-amber-700 bg-amber-100/50 px-3 py-2 rounded-lg flex items-center gap-1.5">
+                <span>⚠️</span>
+                <span>ลูกค้าจริงจะไม่สามารถจองได้จนกว่าจะปิดโหมดทดสอบ</span>
+               </div>
+             )}
+           </div>
+
             <div className="space-y-4">
              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t("admin.settings.languagePrefs")}</label>
              <div className="grid grid-cols-2 gap-4">

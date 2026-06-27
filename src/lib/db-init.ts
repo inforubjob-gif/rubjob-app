@@ -533,6 +533,12 @@ export async function ensureSchema(db: D1Database) {
      "ALTER TABLE provider_services ADD COLUMN unit TEXT",
      "ALTER TABLE provider_services ADD COLUMN icon TEXT DEFAULT 'Stars'",
      "ALTER TABLE provider_services ADD COLUMN packages TEXT DEFAULT '[]'",
+
+     // --- Test Mode (isTest flag for all account types + orders) ---
+     "ALTER TABLE users ADD COLUMN isTest INTEGER DEFAULT 0",
+     "ALTER TABLE rubber_users ADD COLUMN isTest INTEGER DEFAULT 0",
+     "ALTER TABLE stores ADD COLUMN isTest INTEGER DEFAULT 0",
+     "ALTER TABLE orders ADD COLUMN isTest INTEGER DEFAULT 0",
   ];
 
   for (const migration of migrations) {

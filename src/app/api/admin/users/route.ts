@@ -16,7 +16,7 @@ export async function GET(req: Request) {
     await ensureSchema(db);
 
     const { results } = await db.prepare(`
-      SELECT id, displayName, pictureUrl, phone, nickname, birthday, gender, role, assignedStoreId, points, createdAt
+      SELECT id, displayName, pictureUrl, phone, nickname, birthday, gender, role, assignedStoreId, points, isTest, createdAt
       FROM users
       WHERE role IS NULL OR role = 'user'
       ORDER BY createdAt DESC
@@ -32,7 +32,7 @@ export async function POST(req: Request) {
   const session = await getAdminSession();
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   try {
-    const { id, role, assignedStoreId, displayName, points } = await req.json() as any;
+    const { id, role, assignedStoreId, displayName, points, isTest } = await req.json() as any;
     if (!id) return NextResponse.json({ error: "Missing user ID" }, { status: 400 });
 
     const db = getRequestContext().env.DB;
@@ -43,13 +43,15 @@ export async function POST(req: Request) {
       SET role = COALESCE(?, role), 
           assignedStoreId = COALESCE(?, assignedStoreId),
           displayName = COALESCE(?, displayName),
-          points = COALESCE(?, points)
+          points = COALESCE(?, points),
+          isTest = COALESCE(?, isTest)
       WHERE id = ?
     `).bind(
       role || null, 
       assignedStoreId || null, 
       displayName || null, 
       points !== undefined ? points : null,
+      isTest !== undefined ? (isTest ? 1 : 0) : null,
       id
     ).run();
 
