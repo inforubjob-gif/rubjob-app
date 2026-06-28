@@ -99,8 +99,8 @@ export default function OrdersPage() {
           </div>
         ) : filtered.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-24 text-center">
-            <div className="w-20 h-20 bg-white rounded-[2rem] shadow-xl shadow-slate-200/50 flex items-center justify-center mb-6 text-slate-200 border border-slate-50">
-              <Icons.FileText size={40} strokeWidth={1.5} />
+            <div className="mb-6 flex items-center justify-center">
+              <img src="/images/no-order.png" alt="No Orders" className="w-32 h-auto" />
             </div>
             <p className="text-sm font-black text-slate-900 uppercase tracking-tight">{t("orders.noOrders")}</p>
             <p className="text-xs text-slate-400 mt-2 font-medium max-w-[200px] mx-auto leading-relaxed">

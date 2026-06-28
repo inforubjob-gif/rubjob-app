@@ -783,8 +783,8 @@ function BookingFlow() {
   if (isOutsideHours) {
     return (
       <div className="flex flex-col items-center justify-center min-h-dvh px-10 text-center animate-page-enter bg-slate-50">
-        <div className="w-24 h-24 bg-white rounded-xl shadow-xl flex items-center justify-center mb-8 border border-slate-100">
-           <Icons.Bell size={48} className="text-amber-400" />
+        <div className="mb-8 flex items-center justify-center">
+           <img src="/images/sleep.png" alt="Outside Hours" className="w-32 h-auto block" />
         </div>
         <h2 className="text-2xl font-black text-slate-900">{t("booking.errors.outsideHoursTitle")}</h2>
         <p className="text-slate-500 mt-3 font-medium leading-relaxed">
