@@ -100,7 +100,7 @@ export default function OrdersPage() {
         ) : filtered.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-24 text-center">
             <div className="mb-6 flex items-center justify-center">
-              <img src="/images/no-order.png" alt="No Orders" className="w-32 h-auto" />
+              <img src="/images/no-order.png?v=2" alt="No Orders" className="w-32 h-auto" />
             </div>
             <p className="text-sm font-black text-slate-900 uppercase tracking-tight">{t("orders.noOrders")}</p>
             <p className="text-xs text-slate-400 mt-2 font-medium max-w-[200px] mx-auto leading-relaxed">

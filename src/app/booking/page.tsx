@@ -784,7 +784,7 @@ function BookingFlow() {
     return (
       <div className="flex flex-col items-center justify-center min-h-dvh px-10 text-center animate-page-enter bg-slate-50">
         <div className="mb-8 flex items-center justify-center">
-           <img src="/images/sleep.png" alt="Outside Hours" className="w-32 h-auto block" />
+           <img src="/images/sleep.png?v=2" alt="Outside Hours" className="w-32 h-auto block" />
         </div>
         <h2 className="text-2xl font-black text-slate-900">{t("booking.errors.outsideHoursTitle")}</h2>
         <p className="text-slate-500 mt-3 font-medium leading-relaxed">
