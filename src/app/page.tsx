@@ -204,7 +204,7 @@ export default function HomePage() {
         {/* ─── Hero Ads ─── */}
         <section className="relative w-full rounded-xl shadow-2xl shadow-primary/20 group active:scale-[0.98] transition-all duration-500 bg-white border-4 border-white/50 overflow-hidden">
           <img 
-            src={heroIndex === 0 ? "/images/ads/cover-2pm.png" : "/images/ads/rubjobfull.png"}
+            src={heroIndex === 0 ? "/images/ads/cover-2pm.png?v=2" : "/images/ads/rubjobfull.png?v=2"}
             alt="Rubjob Promotion"
             className="w-full h-auto block animate-fade-in"
           />
