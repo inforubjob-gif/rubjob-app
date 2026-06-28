@@ -400,15 +400,15 @@ export default function HomePage() {
       {/* ─── Promo Popup ─── */}
       {showPromoPopup && (
         <div className="fixed inset-0 z-[110] flex items-center justify-center p-6 animate-fade-in">
-          <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setShowPromoPopup(false)} />
+          <div className="absolute inset-0 bg-black/60" onClick={() => setShowPromoPopup(false)} />
           <div className="relative w-full max-w-[340px] animate-scale-in">
             <button 
               onClick={() => setShowPromoPopup(false)}
-              className="absolute -top-4 -right-4 z-10 w-9 h-9 bg-white text-slate-800 rounded-full flex items-center justify-center shadow-lg border border-slate-200"
+              className="absolute -top-4 -right-4 z-10 w-9 h-9 bg-white text-slate-800 rounded-full flex items-center justify-center shadow-md"
             >
               <Icons.Close size={18} />
             </button>
-            <Link href="/booking" onClick={() => setShowPromoPopup(false)} className="block relative bg-transparent rounded-2xl overflow-hidden shadow-2xl">
+            <Link href="/booking" onClick={() => setShowPromoPopup(false)} className="block relative">
               <img 
                 src="/images/ads/Free.png" 
                 alt="Special Promotion"
