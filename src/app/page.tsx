@@ -363,6 +363,14 @@ export default function HomePage() {
             </div>
           </Card>
         </section>
+        {/* ─── Bottom Background Image ─── */}
+        <section className="-mx-5 mt-8 border-t border-slate-100">
+          <img 
+            src="/images/ads/end-homepage.png" 
+            alt="End Background" 
+            className="w-full h-auto block opacity-90" 
+          />
+        </section>
       </div>
 
       {/* ─── Coming Soon Modal ─── */}
