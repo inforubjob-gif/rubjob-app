@@ -334,23 +334,7 @@ export default function HomePage() {
         )}
 
 
-        {/* ─── Extended Hours Banner ─── */}
-        {systemSettings?.service_extended === "true" && (
-          <section className="pb-4">
-            <div className="bg-indigo-50 border-2 border-indigo-100 rounded-xl p-4 flex items-center gap-3 shadow-sm">
-              <span className="text-3xl animate-pulse drop-shadow-sm">🌙</span>
-              <div className="flex-1">
-                <h3 className="text-[13px] font-black text-indigo-800 uppercase tracking-tight">ขยายเวลาให้บริการพิเศษ</h3>
-                <p className="text-[11px] font-bold text-indigo-500/80 mt-0.5 leading-tight">วันนี้รับซักอบพับถึง {systemSettings?.service_extended_close || "20:00"} น. รีบกดจองเลย!</p>
-              </div>
-              <Link href="/booking">
-                <Button size="sm" className="bg-indigo-600 text-white font-black text-[10px] uppercase px-3 py-1.5 shadow-md shadow-indigo-600/20 active:scale-95">
-                  จอง
-                </Button>
-              </Link>
-            </div>
-          </section>
-        )}
+
 
 
 
