@@ -20,6 +20,7 @@ export default function HomePage() {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [showTutorial, setShowTutorial] = useState(false);
   const [tutorialSeen, setTutorialSeen] = useState(true); // default true to hide FAB initially
+  const [heroIndex, setHeroIndex] = useState(0);
 
   // Auto-show tutorial on first visit (only once, ever)
   useEffect(() => {
@@ -46,6 +47,14 @@ export default function HomePage() {
       setShowTutorial(true);
     }
   }, [isNewUser]);
+
+  // Auto-slide hero images every 3 seconds
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setHeroIndex(prev => (prev === 0 ? 1 : 0));
+    }, 3000);
+    return () => clearInterval(timer);
+  }, []);
 
   function handleTutorialComplete() {
     setShowTutorial(false);
@@ -193,12 +202,23 @@ export default function HomePage() {
 
       <div className="relative z-10 px-5 space-y-7 pt-2 pb-24 animate-page-enter">
         {/* ─── Hero Ads ─── */}
-        <section className="relative w-full rounded-xl shadow-2xl shadow-primary/20 group active:scale-[0.98] transition-all duration-500 bg-white border-4 border-white/50">
-          <img 
-            src="/images/ads/rubjobfull.png" 
-            alt="Rubjob Promotion"
-            className="w-full h-auto block"
-          />
+        <section className="relative w-full rounded-xl shadow-2xl shadow-primary/20 group active:scale-[0.98] transition-all duration-500 bg-white border-4 border-white/50 overflow-hidden">
+          <div className="relative w-full flex">
+            <img 
+              src="/images/ads/cover-2pm.png" 
+              alt="Rubjob Promotion"
+              className={`w-full h-auto block transition-opacity duration-1000 ${heroIndex === 0 ? 'opacity-100' : 'opacity-0'}`}
+            />
+            <img 
+              src="/images/ads/rubjobfull.png" 
+              alt="Rubjob Promotion"
+              className={`absolute top-0 left-0 w-full h-full object-cover transition-opacity duration-1000 ${heroIndex === 1 ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+            />
+            <div className="absolute bottom-2 left-0 right-0 flex justify-center gap-1.5 z-10 pointer-events-none">
+              <div className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${heroIndex === 0 ? 'bg-white scale-125 shadow-sm' : 'bg-white/40'}`} />
+              <div className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${heroIndex === 1 ? 'bg-white scale-125 shadow-sm' : 'bg-white/40'}`} />
+            </div>
+          </div>
         </section>
 
         {/* ─── Active Orders ─── */}
