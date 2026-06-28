@@ -165,6 +165,15 @@ export default function HomePage() {
 
   return (
     <div className="flex flex-col min-h-dvh bg-slate-50 relative">
+      {/* ─── Fixed Bottom Background ─── */}
+      <div className="fixed bottom-[68px] left-0 right-0 z-0 pointer-events-none pb-[env(safe-area-inset-bottom,0px)]">
+        <img 
+          src="/images/ads/end-homepage.png?v=2" 
+          alt="Background" 
+          className="w-full h-auto block" 
+        />
+      </div>
+
       {/* Background Gradient Layer */}
       <div className="absolute top-0 left-0 right-0 h-[250px] bg-gradient-to-b from-primary via-primary/90 to-slate-50 z-0" />
 
@@ -344,14 +353,7 @@ export default function HomePage() {
         )}
 
 
-        {/* ─── Bottom Background Image ─── */}
-        <section className="-mx-5 mt-auto">
-          <img 
-            src="/images/ads/end-homepage.png" 
-            alt="End Background" 
-            className="w-full h-auto block" 
-          />
-        </section>
+
       </div>
 
       {/* ─── Coming Soon Modal ─── */}
