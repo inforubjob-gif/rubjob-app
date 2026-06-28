@@ -40,51 +40,18 @@ export default function PaymentMethodsPage() {
           <h1 className="text-lg font-bold text-slate-900">{t("profile.paymentsPage.title")}</h1>
         </header>
 
-        <main className="p-5 space-y-6">
-          <section>
-            <p className="text-xs font-bold text-slate-400 uppercase mb-3">{t("profile.paymentsPage.savedCards")}</p>
-            {isLoading ? (
-               <div className="p-5 flex justify-center text-slate-300">...</div>
-            ) : prefs?.savedCards?.length > 0 ? (
-              prefs.savedCards.map((card: any, idx: number) => (
-                <Card key={idx} className="p-5 bg-gradient-to-br from-indigo-500 via-primary to-orange-400 text-white relative overflow-hidden shadow-2xl shadow-primary/20 mb-4">
-                   <div className="relative z-10">
-                     <div className="flex justify-between items-start mb-8">
-                       <span className="text-lg font-bold">{card.brand || "CARD"}</span>
-                       <span className="text-xs opacity-60">{t("profile.paymentsPage.creditCard")}</span>
-                     </div>
-                     <p className="text-lg font-mono mb-4">•••• •••• •••• {card.last4 || "0000"}</p>
-                     <div className="flex justify-between items-end">
-                       <span className="text-[10px] uppercase opacity-60">{t("profile.paymentsPage.cardHolder")}</span>
-                       <span className="text-sm font-bold">{profile?.displayName || t("common.guest")}</span>
-                     </div>
-                   </div>
-                   <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-white/5 rounded-full blur-2xl" />
-                </Card>
-              ))
-            ) : (
-               <div className="p-5 text-center border-2 border-dashed border-slate-200 rounded-xl">
-                 <p className="text-sm font-bold text-slate-400">{t("profile.paymentsPage.noSavedCards") || "No saved cards"}</p>
-               </div>
-            )}
-          </section>
-
-          <section className="space-y-3">
-            <p className="text-xs font-bold text-slate-400 uppercase">{t("profile.paymentsPage.otherOptions")}</p>
-            <Card className="p-4 flex items-center justify-between" hoverable>
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center text-xl">🏦</div>
-                <div>
-                  <p className="text-sm font-bold">{t("profile.paymentsPage.bankTransfer")}</p>
-                  <p className="text-[10px] text-slate-500">{t("profile.paymentsPage.promptPayQR")}</p>
-                </div>
-              </div>
-              <div className="w-5 h-5 rounded-full border-2 border-primary" />
-            </Card>
-            <button className="w-full py-3.5 border-2 border-dashed border-slate-200 rounded-xl text-slate-400 text-sm font-bold hover:border-primary hover:text-primary transition-colors">
-              {t("profile.paymentsPage.addNew")}
-            </button>
-          </section>
+        <main className="flex-1 flex flex-col items-center justify-center p-8 text-center animate-page-enter">
+          <div className="w-40 h-40 mb-6 bg-slate-100/50 rounded-[2rem] p-6 shadow-inner border border-slate-200/50 flex items-center justify-center">
+            <img 
+              src="/images/icon-qr-payment.png" 
+              alt="QR Payment Only" 
+              className="w-full h-full object-contain"
+            />
+          </div>
+          <h2 className="text-xl font-black text-slate-900 mb-3">รองรับการจ่ายเงินผ่าน<br/><span className="text-primary">Promptpay</span> เท่านั้น</h2>
+          <p className="text-sm font-medium text-slate-500 max-w-[250px] mx-auto leading-relaxed">
+            ขออภัยในความไม่สะดวก ทางเรากำลังพัฒนาระบบชำระเงินรูปแบบอื่นๆ เพิ่มเติมครับ
+          </p>
         </main>
       </div>
     </PinLock>
