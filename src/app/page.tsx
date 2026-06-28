@@ -345,11 +345,11 @@ export default function HomePage() {
 
 
         {/* ─── Bottom Background Image ─── */}
-        <section className="-mx-5 mt-8 border-t border-slate-100">
+        <section className="-mx-5 mt-auto">
           <img 
             src="/images/ads/end-homepage.png" 
             alt="End Background" 
-            className="w-full h-auto block opacity-90" 
+            className="w-full h-auto block" 
           />
         </section>
       </div>
