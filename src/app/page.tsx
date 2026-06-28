@@ -203,7 +203,7 @@ export default function HomePage() {
       <div className="relative z-10 px-5 space-y-7 pt-2 pb-24 animate-page-enter">
         {/* ─── Hero Ads ─── */}
         <section className="relative w-full rounded-xl shadow-2xl shadow-primary/20 group active:scale-[0.98] transition-all duration-500 bg-white border-4 border-white/50 overflow-hidden">
-          <div className="relative w-full flex">
+          <div className="relative w-full flex aspect-[2084/938]">
             <img 
               src="/images/ads/cover-2pm.png" 
               alt="Rubjob Promotion"
