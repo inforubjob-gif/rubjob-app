@@ -343,26 +343,7 @@ export default function HomePage() {
           </section>
         )}
 
-        {/* ─── Trust Bar ─── */}
-        <section className="pb-4">
-          <Card className="p-5 bg-gradient-to-r from-primary-light to-amber-50">
-            <div className="flex items-center gap-3">
-              <div className="w-14 h-14 bg-amber-50 rounded-xl flex items-center justify-center p-2.5 shrink-0 shadow-sm border border-amber-100 transition-transform active:scale-95 duration-300">
-                <img 
-                  src="/images/icon/icon-shield.png" 
-                  alt={t("home.guaranteeTitle")} 
-                  className="w-full h-full object-contain" 
-                />
-              </div>
-              <div>
-                <h3 className="text-sm font-bold text-foreground">{t("home.guaranteeTitle")}</h3>
-                <p className="text-xs text-muted mt-0.5">
-                  {t("home.guaranteeDesc")}
-                </p>
-              </div>
-            </div>
-          </Card>
-        </section>
+
         {/* ─── Bottom Background Image ─── */}
         <section className="-mx-5 mt-8 border-t border-slate-100">
           <img 
