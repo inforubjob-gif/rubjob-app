@@ -21,6 +21,20 @@ export default function HomePage() {
   const [showTutorial, setShowTutorial] = useState(false);
   const [tutorialSeen, setTutorialSeen] = useState(true); // default true to hide FAB initially
   const [heroIndex, setHeroIndex] = useState(0);
+  const [showPromoPopup, setShowPromoPopup] = useState(false);
+
+  // Auto-show promo popup on first visit per session
+  useEffect(() => {
+    if (!isReady) return;
+    const timer = setTimeout(() => {
+      const seen = sessionStorage.getItem("promo_free_seen");
+      if (!seen) {
+        setShowPromoPopup(true);
+        sessionStorage.setItem("promo_free_seen", "true");
+      }
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, [isReady]);
 
   // Auto-show tutorial on first visit (only once, ever)
   useEffect(() => {
@@ -205,7 +219,7 @@ export default function HomePage() {
         <section className="relative w-full rounded-xl shadow-2xl shadow-primary/20 group active:scale-[0.98] transition-all duration-500 bg-white border-4 border-white/50 overflow-hidden">
           <div className="grid">
             <img 
-              src="/images/ads/cover-2pm.png?v=2"
+              src="/images/ads/cover-2pm.png?v=3"
               alt="Rubjob Promotion"
               className={`col-start-1 row-start-1 w-full h-auto block transition-opacity duration-1000 ${heroIndex === 0 ? 'opacity-100' : 'opacity-0'}`}
             />
@@ -381,6 +395,28 @@ export default function HomePage() {
       {/* Tutorial Overlay */}
       {showTutorial && (
         <HowToOverlay onComplete={handleTutorialComplete} startStep={0} />
+      )}
+
+      {/* ─── Promo Popup ─── */}
+      {showPromoPopup && (
+        <div className="fixed inset-0 z-[110] flex items-center justify-center p-6 animate-fade-in">
+          <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setShowPromoPopup(false)} />
+          <div className="relative w-full max-w-[340px] animate-scale-in">
+            <button 
+              onClick={() => setShowPromoPopup(false)}
+              className="absolute -top-4 -right-4 z-10 w-9 h-9 bg-white text-slate-800 rounded-full flex items-center justify-center shadow-lg border border-slate-200"
+            >
+              <Icons.Close size={18} />
+            </button>
+            <Link href="/booking" onClick={() => setShowPromoPopup(false)} className="block relative bg-transparent rounded-2xl overflow-hidden shadow-2xl">
+              <img 
+                src="/images/ads/Free.png" 
+                alt="Special Promotion"
+                className="w-full h-auto block"
+              />
+            </Link>
+          </div>
+        </div>
       )}
 
       {/* FAB — วิธีใช้งาน (only shown if tutorial hasn't been completed) */}
