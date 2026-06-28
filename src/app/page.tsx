@@ -48,11 +48,11 @@ export default function HomePage() {
     }
   }, [isNewUser]);
 
-  // Auto-slide hero images every 3 seconds
+  // Auto-slide hero images every 5 seconds
   useEffect(() => {
     const timer = setInterval(() => {
       setHeroIndex(prev => (prev === 0 ? 1 : 0));
-    }, 3000);
+    }, 5000);
     return () => clearInterval(timer);
   }, []);
 
@@ -203,11 +203,18 @@ export default function HomePage() {
       <div className="relative z-10 px-5 space-y-7 pt-2 pb-24 animate-page-enter">
         {/* ─── Hero Ads ─── */}
         <section className="relative w-full rounded-xl shadow-2xl shadow-primary/20 group active:scale-[0.98] transition-all duration-500 bg-white border-4 border-white/50 overflow-hidden">
-          <img 
-            src={heroIndex === 0 ? "/images/ads/cover-2pm.png?v=2" : "/images/ads/rubjobfull.png?v=2"}
-            alt="Rubjob Promotion"
-            className="w-full h-auto block animate-fade-in"
-          />
+          <div className="grid">
+            <img 
+              src="/images/ads/cover-2pm.png?v=2"
+              alt="Rubjob Promotion"
+              className={`col-start-1 row-start-1 w-full h-auto block transition-opacity duration-1000 ${heroIndex === 0 ? 'opacity-100' : 'opacity-0'}`}
+            />
+            <img 
+              src="/images/ads/rubjobfull.png?v=2"
+              alt="Rubjob Promotion"
+              className={`col-start-1 row-start-1 w-full h-auto block transition-opacity duration-1000 ${heroIndex === 1 ? 'opacity-100' : 'opacity-0'}`}
+            />
+          </div>
           <div className="absolute bottom-2 left-0 right-0 flex justify-center gap-1.5 z-10 pointer-events-none">
             <div className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${heroIndex === 0 ? 'bg-white scale-125 shadow-sm' : 'bg-white/40'}`} />
             <div className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${heroIndex === 1 ? 'bg-white scale-125 shadow-sm' : 'bg-white/40'}`} />
