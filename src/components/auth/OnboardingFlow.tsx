@@ -116,7 +116,7 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
       const birthdayStr = birthday.day && birthday.month && birthday.year
         ? `${birthday.year}-${birthday.month.padStart(2, '0')}-${birthday.day.padStart(2, '0')}`
         : null;
-      await fetch("/api/user/sync", {
+      const syncRes = await fetch("/api/user/sync", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -129,6 +129,10 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
           gender: gender || null,
         }),
       });
+      if (!syncRes.ok) {
+        const errData = await syncRes.json().catch(() => ({})) as any;
+        throw new Error(errData.error || (language === 'th' ? 'ไม่สามารถบันทึกข้อมูลได้ กรุณาลองใหม่' : 'Failed to save profile'));
+      }
       setStep(2);
     } catch (err) {
       console.error("Failed to save phone:", err);
@@ -205,6 +209,21 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
     setIsSubmitting(true);
 
     try {
+      // Safety net: ensure the user record exists before inserting address
+      // This prevents FK violation if Step 1 sync silently failed
+      const ensureRes = await fetch("/api/user/sync", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: profile.userId,
+          displayName: profile.displayName,
+          pictureUrl: profile.pictureUrl,
+        }),
+      });
+      if (!ensureRes.ok) {
+        throw new Error(language === 'th' ? 'ไม่สามารถยืนยันข้อมูลผู้ใช้ได้ กรุณาลองใหม่' : 'Failed to verify user');
+      }
+
       // Use label as fallback for details if not provided
       const finalDetails = addressDetails.trim() || addressLabel.trim();
       const res = await fetch("/api/user/addresses", {
