@@ -90,7 +90,10 @@ export default function ManageAddressesPage() {
     setNewLabel(addr.label);
     setNewAddress(addr.details);
     setNewNote(addr.note || "");
-    setLocation({ lat: addr.lat || 13.7563, lng: addr.lng || 100.5018 });
+    setLocation({ 
+      lat: addr.lat ? Number(addr.lat) : 13.7563, 
+      lng: addr.lng ? Number(addr.lng) : 100.5018 
+    });
     setIsAdding(true);
   };
 
@@ -257,8 +260,8 @@ export default function ManageAddressesPage() {
          <div className="flex-1 relative bg-slate-100 overflow-hidden">
             <div className="absolute inset-0 z-0">
               <MapPicker
-                lat={location?.lat || 0}
-                lng={location?.lng || 0}
+                lat={location?.lat ? Number(location.lat) : 0}
+                lng={location?.lng ? Number(location.lng) : 0}
                 onChange={(lat, lng) => setLocation({ lat, lng })}
               />
             </div>

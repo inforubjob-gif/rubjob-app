@@ -44,7 +44,11 @@ function ClassicMarker({ lat, lng, onChange }: MapPickerProps) {
       });
     }
 
-    markerRef.current.setPosition({ lat, lng });
+    const nLat = Number(lat);
+    const nLng = Number(lng);
+    if (!isNaN(nLat) && !isNaN(nLng)) {
+      markerRef.current.setPosition({ lat: nLat, lng: nLng });
+    }
     markerRef.current.setMap(map);
 
     return () => {
@@ -126,10 +130,13 @@ function MapContent({ lat, lng, onChange }: MapPickerProps) {
     );
   }, [lat, lng, onChange]);
 
-  // Pan เมื่อ coords เปลี่ยน
   useEffect(() => {
-    if (!map || lat === 0 || lng === 0) return;
-    map.panTo({ lat, lng });
+    if (!map || !lat || !lng) return;
+    const nLat = Number(lat);
+    const nLng = Number(lng);
+    if (isNaN(nLat) || isNaN(nLng) || (nLat === 0 && nLng === 0)) return;
+    
+    map.panTo({ lat: nLat, lng: nLng });
     if ((map.getZoom() ?? 0) < 14) map.setZoom(15);
   }, [map, lat, lng]);
 
@@ -153,7 +160,11 @@ function MapContent({ lat, lng, onChange }: MapPickerProps) {
   return (
     <Map
       style={{ width: "100%", height: "100%" }}
-      defaultCenter={lat !== 0 && lng !== 0 ? { lat, lng } : { lat: 13.7563, lng: 100.5018 }}
+      defaultCenter={
+        lat !== 0 && lng !== 0 && !isNaN(Number(lat)) && !isNaN(Number(lng))
+          ? { lat: Number(lat), lng: Number(lng) }
+          : { lat: 13.7563, lng: 100.5018 }
+      }
       defaultZoom={13}
       gestureHandling="greedy"
       onClick={handleMapClick}
