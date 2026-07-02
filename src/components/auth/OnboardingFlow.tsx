@@ -703,9 +703,18 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
                     variant="default"
                   />
                 </div>
-
-
-
+                {/* Address details */}
+                <div>
+                  <label className="text-xs font-bold text-slate-500 mb-1.5 block">
+                    {language === 'th' ? "ที่อยู่โดยละเอียด (บ้านเลขที่, ถนน, ตำบล, อำเภอ)" : "Detailed Address"}
+                  </label>
+                  <GlobalTextarea
+                    value={addressDetails}
+                    onChange={(e) => setAddressDetails(e.target.value)}
+                    placeholder={language === 'th' ? "123/45 หมู่บ้าน, ถนน, แขวง, เขต... (ปักหมุดเพื่อดึงที่อยู่อัตโนมัติ)" : "123/45 Street, Sub-district... (Pin to auto-fill)"}
+                    rows={2}
+                  />
+                </div>
                 {/* Note */}
                 <div>
                   <label className="text-xs font-bold text-slate-500 mb-1.5 block">{t("onboarding.noteLabel")}</label>
