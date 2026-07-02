@@ -189,7 +189,7 @@ function ReverseGeocoder({ lat, lng, onAddressChange }: { lat: number; lng: numb
     if (lat === 0 && lng === 0) return;
 
     const timer = setTimeout(() => {
-      geocoderRef.current?.geocode({ location: { lat, lng }, language: "th" }, (results, status) => {
+      geocoderRef.current?.geocode({ location: { lat, lng }, language: "th" }, async (results, status) => {
         if (status === "OK" && results && results[0]) {
           const formattedAddress = results[0].formatted_address;
           const parts = results[0].address_components;
@@ -199,7 +199,20 @@ function ReverseGeocoder({ lat, lng, onAddressChange }: { lat: number; lng: numb
           const shortName = [subdistrict, district, province].filter(Boolean).join(", ") || formattedAddress;
           onAddressChange(formattedAddress, shortName);
         } else {
-          onAddressChange("", "");
+          // FALLBACK to OpenStreetMap Nominatim if Google Maps fails (e.g. no billing enabled)
+          try {
+            const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&accept-language=th`);
+            const data = await res.json();
+            if (data && data.display_name) {
+              const address = data.display_name;
+              const shortName = [data.address?.suburb, data.address?.city || data.address?.town, data.address?.state].filter(Boolean).join(", ") || address;
+              onAddressChange(address, shortName);
+            } else {
+              onAddressChange("", "");
+            }
+          } catch (e) {
+            onAddressChange("", "");
+          }
         }
       });
     }, 500);
