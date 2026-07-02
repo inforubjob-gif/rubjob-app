@@ -189,6 +189,16 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
     setPinLat(parseFloat(lat.toFixed(6)));
     setPinLng(parseFloat(lng.toFixed(6)));
     setPinSet(true);
+
+    // Auto reverse-geocode in the background
+    fetch(`/api/reverse-geocode?lat=${lat}&lng=${lng}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.results?.[0]) {
+          setAddressDetails(data.results[0].formatted_address || "");
+        }
+      })
+      .catch((err) => console.error("Reverse geocode failed:", err));
   }
 
   async function handleAddressSubmit() {
