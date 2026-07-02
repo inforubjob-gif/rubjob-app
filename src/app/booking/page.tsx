@@ -141,14 +141,20 @@ function BookingFlow() {
   // Tutorial support
   const tutorialParam = searchParams.get("tutorial");
   const [showTutorial, setShowTutorial] = useState(false);
+  const [isTutorialPending, setIsTutorialPending] = useState(!!tutorialParam);
   const [tutorialStartStep, setTutorialStartStep] = useState(0);
+  const isTutorialActive = showTutorial || isTutorialPending;
+
   useEffect(() => {
     if (tutorialParam) {
       const stepNum = parseInt(tutorialParam);
       if (!isNaN(stepNum)) {
         setTutorialStartStep(stepNum);
         // Delay to let page render
-        setTimeout(() => setShowTutorial(true), 800);
+        setTimeout(() => {
+          setShowTutorial(true);
+          setIsTutorialPending(false);
+        }, 800);
       }
     } else {
       // Check sessionStorage for tutorial continuation
@@ -159,7 +165,11 @@ function BookingFlow() {
           const stepNum = parseInt(savedStep);
           if (!isNaN(stepNum)) {
             setTutorialStartStep(stepNum);
-            setTimeout(() => setShowTutorial(true), 800);
+            setIsTutorialPending(true);
+            setTimeout(() => {
+              setShowTutorial(true);
+              setIsTutorialPending(false);
+            }, 800);
           }
         }
       } catch (err) {
@@ -172,6 +182,7 @@ function BookingFlow() {
   
   function handleTutorialComplete() {
     setShowTutorial(false);
+    setIsTutorialPending(false);
     markUserAsNotNew(); // Break the isNewUser loop!
     try {
       localStorage.setItem("rubjob_tutorial_seen_v2", "true");
@@ -181,8 +192,6 @@ function BookingFlow() {
     try {
       sessionStorage.removeItem("rubjob_tutorial_step");
     } catch (e) {}
-    // Navigate back home after tutorial
-    router.push("/");
   }
 
   // Reactive clock — ticks every 30s so isSlotPassed re-evaluates as real time passes
@@ -727,7 +736,7 @@ function BookingFlow() {
   }
 
   // 4. Handle platform closed state (bypass for test users)
-  if (isLoaded && systemSettings.is_open === "false" && !isTestUser) {
+  if (isLoaded && systemSettings.is_open === "false" && !isTestUser && !isTutorialActive) {
     return (
       <div className="flex flex-col items-center justify-center min-h-dvh px-10 text-center animate-page-enter bg-slate-50">
         <div className="w-24 h-24 bg-white rounded-xl shadow-xl flex items-center justify-center mb-8 border border-slate-100">
@@ -750,7 +759,7 @@ function BookingFlow() {
     );
   }
   // 4.5 Block real users when Test Mode is ON
-  if (isLoaded && systemSettings.test_mode_enabled === "true" && !isTestUser) {
+  if (isLoaded && systemSettings.test_mode_enabled === "true" && !isTestUser && !isTutorialActive) {
     return (
       <div className="flex flex-col items-center justify-center min-h-dvh px-10 text-center animate-page-enter bg-slate-50">
         <div className="w-24 h-24 bg-amber-50 rounded-xl shadow-xl flex items-center justify-center mb-8 border border-amber-200">
@@ -780,7 +789,7 @@ function BookingFlow() {
   const nowHHMM = `${String(nowBangkok.getHours()).padStart(2, "0")}:${String(nowBangkok.getMinutes()).padStart(2, "0")}`;
   const isOutsideHours = isLoaded && systemSettings.is_open !== "false" && !isTestUser && (nowHHMM < serviceOpenTime || nowHHMM >= serviceCloseTime);
 
-  if (isOutsideHours) {
+  if (isOutsideHours && !isTutorialActive) {
     return (
       <div className="flex flex-col items-center justify-center min-h-dvh px-10 text-center animate-page-enter bg-slate-50">
         <div className="mb-8 flex items-center justify-center">
@@ -1664,7 +1673,7 @@ function BookingFlow() {
       </Modal>
       
       {/* Too Far Modal */}
-      <Modal isOpen={isTooFar} onClose={() => router.push("/")} title={t("booking.errors.tooFarTitle") || "อยู่นอกพื้นที่บริการ"}>
+      <Modal isOpen={isTooFar && !isTutorialActive} onClose={() => router.push("/")} title={t("booking.errors.tooFarTitle") || "อยู่นอกพื้นที่บริการ"}>
          <div 
            className="flex flex-col items-center justify-center py-10 px-5 text-center cursor-pointer active:opacity-80 transition-opacity"
            onClick={() => router.push("/")}
