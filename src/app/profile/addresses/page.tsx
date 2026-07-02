@@ -186,34 +186,8 @@ export default function ManageAddressesPage() {
   useEffect(() => {
     if (!location?.lat || !location?.lng) {
       setLocationName("");
-      return;
+      setFullAddress("");
     }
-    const GKEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY;
-    if (!GKEY) return;
-
-    const timer = setTimeout(async () => {
-      try {
-        const res = await fetch(
-          `/api/reverse-geocode?lat=${location.lat}&lng=${location.lng}`
-        );
-        const data = await res.json() as any;
-        if (data.results?.[0]) {
-          // Try to get a short, meaningful name (subdistrict/district/province)
-          const parts = data.results[0].address_components as any[];
-          const province = parts?.find((p: any) => p.types?.includes("administrative_area_level_1"))?.long_name;
-          const district = parts?.find((p: any) => p.types?.includes("administrative_area_level_2"))?.long_name;
-          const subdistrict = parts?.find((p: any) => p.types?.includes("sublocality_level_1") || p.types?.includes("sublocality"))?.long_name;
-          const name = [subdistrict, district, province].filter(Boolean).join(", ");
-          setLocationName(name || data.results[0].formatted_address || "");
-          setFullAddress(data.results[0].formatted_address || "");
-        }
-      } catch {
-        setLocationName("");
-        setFullAddress("");
-      }
-    }, 500); // Debounce to avoid excessive API calls
-
-    return () => clearTimeout(timer);
   }, [location?.lat, location?.lng]);
 
   const handleGoToMyLocation = () => {
@@ -271,6 +245,10 @@ export default function ManageAddressesPage() {
                 lat={location?.lat ? Number(location.lat) : 0}
                 lng={location?.lng ? Number(location.lng) : 0}
                 onChange={(lat, lng) => setLocation({ lat, lng })}
+                onAddressChange={(address, shortName) => {
+                  setFullAddress(address);
+                  setLocationName(shortName);
+                }}
               />
             </div>
  

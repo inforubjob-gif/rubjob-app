@@ -9,6 +9,7 @@ interface MapPickerProps {
   lat: number;
   lng: number;
   onChange: (lat: number, lng: number) => void;
+  onAddressChange?: (address: string, shortName: string) => void;
 }
 
 // ── Classic Marker (ไม่ต้องใช้ mapId) ────────────────────────────────────────
@@ -174,8 +175,43 @@ function MapContent({ lat, lng, onChange }: MapPickerProps) {
   );
 }
 
+// ── Reverse Geocoder ────────────────────────────────────────────────────────
+function ReverseGeocoder({ lat, lng, onAddressChange }: { lat: number; lng: number; onAddressChange?: (address: string, shortName: string) => void }) {
+  const geocodingLib = useMapsLibrary("geocoding");
+  const geocoderRef = useRef<google.maps.Geocoder | null>(null);
+
+  useEffect(() => {
+    if (!geocodingLib || !onAddressChange) return;
+    if (!geocoderRef.current) {
+      geocoderRef.current = new geocodingLib.Geocoder();
+    }
+    
+    if (lat === 0 && lng === 0) return;
+
+    const timer = setTimeout(() => {
+      geocoderRef.current?.geocode({ location: { lat, lng }, language: "th" }, (results, status) => {
+        if (status === "OK" && results && results[0]) {
+          const formattedAddress = results[0].formatted_address;
+          const parts = results[0].address_components;
+          const province = parts?.find((p) => p.types?.includes("administrative_area_level_1"))?.long_name;
+          const district = parts?.find((p) => p.types?.includes("administrative_area_level_2"))?.long_name;
+          const subdistrict = parts?.find((p) => p.types?.includes("sublocality_level_1") || p.types?.includes("sublocality"))?.long_name;
+          const shortName = [subdistrict, district, province].filter(Boolean).join(", ") || formattedAddress;
+          onAddressChange(formattedAddress, shortName);
+        } else {
+          onAddressChange("", "");
+        }
+      });
+    }, 500);
+    
+    return () => clearTimeout(timer);
+  }, [lat, lng, geocodingLib, onAddressChange]);
+
+  return null;
+}
+
 // ── Main Export ───────────────────────────────────────────────────────────────
-export default function GoogleMapPicker({ lat, lng, onChange }: MapPickerProps) {
+export default function GoogleMapPicker({ lat, lng, onChange, onAddressChange }: MapPickerProps) {
   const [isMounted, setIsMounted] = useState(false);
   const [isLocating, setIsLocating] = useState(false);
   useEffect(() => setIsMounted(true), []);
@@ -221,6 +257,7 @@ export default function GoogleMapPicker({ lat, lng, onChange }: MapPickerProps) 
       >
         <PlacesSearch onSelect={handlePlaceSelect} />
         <MapContent lat={lat} lng={lng} onChange={onChange} />
+        <ReverseGeocoder lat={lat} lng={lng} onAddressChange={onAddressChange} />
 
         {/* My Location Button */}
         <button
