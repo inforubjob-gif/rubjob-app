@@ -35,8 +35,10 @@ function ClassicMarker({ lat, lng, onChange }: MapPickerProps) {
         if (pos) {
           const plat = typeof pos.lat === "function" ? pos.lat() : pos.lat;
           const plng = typeof pos.lng === "function" ? pos.lng() : pos.lng;
-          if (typeof plat === "number" && typeof plng === "number" && !isNaN(plat) && !isNaN(plng)) {
-            onChange(parseFloat(plat.toFixed(6)), parseFloat(plng.toFixed(6)));
+          const nLat = Number(plat);
+          const nLng = Number(plng);
+          if (!isNaN(nLat) && !isNaN(nLng)) {
+            onChange(Number(nLat.toFixed(6)), Number(nLng.toFixed(6)));
           }
         }
       });
@@ -76,8 +78,10 @@ function PlacesSearch({ onSelect }: { onSelect: (lat: number, lng: number) => vo
         const loc = place.geometry.location;
         const plat = typeof loc.lat === "function" ? loc.lat() : loc.lat;
         const plng = typeof loc.lng === "function" ? loc.lng() : loc.lng;
-        if (typeof plat === "number" && typeof plng === "number" && !isNaN(plat) && !isNaN(plng)) {
-          onSelect(plat, plng);
+        const nLat = Number(plat);
+        const nLng = Number(plng);
+        if (!isNaN(nLat) && !isNaN(nLng)) {
+          onSelect(nLat, nLng);
         }
         if (inputRef.current) {
           inputRef.current.value = place.name || place.formatted_address || "";
@@ -137,8 +141,10 @@ function MapContent({ lat, lng, onChange }: MapPickerProps) {
       const plat = typeof latLng.lat === "function" ? latLng.lat() : latLng.lat;
       const plng = typeof latLng.lng === "function" ? latLng.lng() : latLng.lng;
 
-      if (typeof plat === "number" && typeof plng === "number" && !isNaN(plat) && !isNaN(plng)) {
-        onChange(parseFloat(plat.toFixed(6)), parseFloat(plng.toFixed(6)));
+      const nLat = Number(plat);
+      const nLng = Number(plng);
+      if (!isNaN(nLat) && !isNaN(nLng)) {
+        onChange(Number(nLat.toFixed(6)), Number(nLng.toFixed(6)));
       }
     },
     [onChange]

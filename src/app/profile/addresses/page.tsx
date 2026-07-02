@@ -271,7 +271,7 @@ export default function ManageAddressesPage() {
                      <div className="flex-1 min-w-0">
                         <p className="text-sm font-black text-slate-900 uppercase tracking-tight">{t("profile.pinLocation")}</p>
                         <p className="text-[11px] text-slate-500 font-medium mt-1 truncate">
-                          {locationName || (location ? `${location.lat.toFixed(4)}, ${location.lng.toFixed(4)}` : t("profile.pinOnMap"))}
+                          {locationName || (location ? `${Number(location.lat).toFixed(4)}, ${Number(location.lng).toFixed(4)}` : t("profile.pinOnMap"))}
                         </p>
                      </div>
                   </div>
