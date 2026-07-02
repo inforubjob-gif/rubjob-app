@@ -133,8 +133,8 @@ export default function RubberServiceAreaPage() {
                       {hasPinned ? t("rubber.serviceAreaPage.pinnedLocation") : t("rubber.serviceAreaPage.selectYourArea")}
                     </p>
                     <p className="text-[10px] text-slate-400 font-mono font-bold truncate">
-                      LAT: {location.lat.toFixed(6)} <br/>
-                      LNG: {location.lng.toFixed(6)}
+                      LAT: {Number(location.lat).toFixed(6)} <br/>
+                      LNG: {Number(location.lng).toFixed(6)}
                     </p>
                  </div>
               </div>

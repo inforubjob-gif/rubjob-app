@@ -102,7 +102,7 @@ export default function ServiceAreaPage() {
                     <p className="text-sm font-black text-slate-900 uppercase mb-1">{location ? t("store.profile.pinned") : t("store.profile.pinLocation")}</p>
                     <p className="text-xs text-slate-500 font-medium">
                       {location
-                        ? `Lat: ${location.lat.toFixed(6)}, Lng: ${location.lng.toFixed(6)}`
+                        ? `Lat: ${Number(location.lat).toFixed(6)}, Lng: ${Number(location.lng).toFixed(6)}`
                         : t("store.profile.bangkokThailand")}
                     </p>
                  </div>

@@ -21,6 +21,7 @@ export default function RubberProfilePage() {
   const [rubberData, setRubberData] = useState<any>(null);
   const [rubberSession, setRubberSession] = useState<any>(null);
   const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const photoInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
