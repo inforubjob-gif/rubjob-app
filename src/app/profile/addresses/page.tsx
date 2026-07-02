@@ -180,6 +180,7 @@ export default function ManageAddressesPage() {
  
   // Reverse geocode to get location name
   const [locationName, setLocationName] = useState<string>("");
+  const [fullAddress, setFullAddress] = useState<string>("");
   const [isLocatingHere, setIsLocatingHere] = useState(false);
 
   useEffect(() => {
@@ -204,9 +205,11 @@ export default function ManageAddressesPage() {
           const subdistrict = parts?.find((p: any) => p.types?.includes("sublocality_level_1") || p.types?.includes("sublocality"))?.long_name;
           const name = [subdistrict, district, province].filter(Boolean).join(", ");
           setLocationName(name || data.results[0].formatted_address || "");
+          setFullAddress(data.results[0].formatted_address || "");
         }
       } catch {
         setLocationName("");
+        setFullAddress("");
       }
     }, 500); // Debounce to avoid excessive API calls
 
@@ -231,6 +234,11 @@ export default function ManageAddressesPage() {
 
   const confirmLocation = () => {
     if (!location) return;
+    if (!newAddress && fullAddress) {
+      setNewAddress(fullAddress);
+    } else if (!newAddress && locationName) {
+      setNewAddress(locationName);
+    }
     setIsSelectingLocation(false);
   };
 
