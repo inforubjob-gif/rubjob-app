@@ -32,7 +32,13 @@ function ClassicMarker({ lat, lng, onChange }: MapPickerProps) {
 
       markerRef.current.addListener("dragend", () => {
         const pos = markerRef.current?.getPosition();
-        if (pos) onChange(parseFloat(pos.lat().toFixed(6)), parseFloat(pos.lng().toFixed(6)));
+        if (pos) {
+          const plat = typeof pos.lat === "function" ? pos.lat() : pos.lat;
+          const plng = typeof pos.lng === "function" ? pos.lng() : pos.lng;
+          if (typeof plat === "number" && typeof plng === "number" && !isNaN(plat) && !isNaN(plng)) {
+            onChange(parseFloat(plat.toFixed(6)), parseFloat(plng.toFixed(6)));
+          }
+        }
       });
     }
 
@@ -67,7 +73,12 @@ function PlacesSearch({ onSelect }: { onSelect: (lat: number, lng: number) => vo
     autocompleteRef.current.addListener("place_changed", () => {
       const place = autocompleteRef.current?.getPlace();
       if (place?.geometry?.location) {
-        onSelect(place.geometry.location.lat(), place.geometry.location.lng());
+        const loc = place.geometry.location;
+        const plat = typeof loc.lat === "function" ? loc.lat() : loc.lat;
+        const plng = typeof loc.lng === "function" ? loc.lng() : loc.lng;
+        if (typeof plat === "number" && typeof plng === "number" && !isNaN(plat) && !isNaN(plng)) {
+          onSelect(plat, plng);
+        }
         if (inputRef.current) {
           inputRef.current.value = place.name || place.formatted_address || "";
         }
@@ -119,9 +130,15 @@ function MapContent({ lat, lng, onChange }: MapPickerProps) {
   }, [map, lat, lng]);
 
   const handleMapClick = useCallback(
-    (e: google.maps.MapMouseEvent) => {
-      if (e.latLng) {
-        onChange(parseFloat(e.latLng.lat().toFixed(6)), parseFloat(e.latLng.lng().toFixed(6)));
+    (e: any) => {
+      const latLng = e.detail?.latLng || e.latLng;
+      if (!latLng) return;
+
+      const plat = typeof latLng.lat === "function" ? latLng.lat() : latLng.lat;
+      const plng = typeof latLng.lng === "function" ? latLng.lng() : latLng.lng;
+
+      if (typeof plat === "number" && typeof plng === "number" && !isNaN(plat) && !isNaN(plng)) {
+        onChange(parseFloat(plat.toFixed(6)), parseFloat(plng.toFixed(6)));
       }
     },
     [onChange]
