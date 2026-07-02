@@ -40,18 +40,12 @@ function ClassicMarker({ lat, lng, onChange }: MapPickerProps) {
     markerRef.current.setMap(map);
 
     return () => {
-      markerRef.current?.setMap(null);
-      markerRef.current = null;
+      if (markerRef.current) {
+        markerRef.current.setMap(null);
+      }
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [map]);
-
-  // อัปเดต position เมื่อ lat/lng เปลี่ยน
-  useEffect(() => {
-    if (!markerRef.current || lat === 0 || lng === 0) return;
-    markerRef.current.setPosition({ lat, lng });
-    markerRef.current.setMap(map);
-  }, [lat, lng, map]);
+  }, [map, lat, lng]);
 
   return null;
 }
@@ -134,16 +128,15 @@ function MapContent({ lat, lng, onChange }: MapPickerProps) {
   );
 
   return (
-    <>
-      <Map
-        style={{ width: "100%", height: "100%" }}
-        defaultCenter={lat !== 0 && lng !== 0 ? { lat, lng } : { lat: 13.7563, lng: 100.5018 }}
-        defaultZoom={13}
-        gestureHandling="greedy"
-        onClick={handleMapClick}
-      />
+    <Map
+      style={{ width: "100%", height: "100%" }}
+      defaultCenter={lat !== 0 && lng !== 0 ? { lat, lng } : { lat: 13.7563, lng: 100.5018 }}
+      defaultZoom={13}
+      gestureHandling="greedy"
+      onClick={handleMapClick}
+    >
       <ClassicMarker lat={lat} lng={lng} onChange={onChange} />
-    </>
+    </Map>
   );
 }
 
