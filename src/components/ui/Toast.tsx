@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { Icons } from "./Icons";
 
-export type ToastType = "success" | "error" | "info";
+export type ToastType = "success" | "error" | "info" | "warning";
 
 export interface ToastProps {
   message: string;
@@ -28,6 +28,7 @@ export default function Toast({ message, type, isVisible, onClose }: ToastProps)
     success: { icon: <Icons.Check size={18} />, bg: "bg-emerald-500", text: "text-white" },
     error: { icon: <Icons.Lock size={18} />, bg: "bg-danger", text: "text-white" },
     info: { icon: <Icons.Package size={18} />, bg: "bg-primary", text: "text-white" },
+    warning: { icon: <Icons.AlertCircle size={18} />, bg: "bg-amber-500", text: "text-white" },
   };
 
   const config = typeConfig[type];
