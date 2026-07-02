@@ -194,7 +194,7 @@ export default function ManageAddressesPage() {
     const timer = setTimeout(async () => {
       try {
         const res = await fetch(
-          `https://maps.googleapis.com/maps/api/geocode/json?latlng=${location.lat},${location.lng}&language=th&key=${GKEY}`
+          `/api/reverse-geocode?lat=${location.lat}&lng=${location.lng}`
         );
         const data = await res.json() as any;
         if (data.results?.[0]) {
