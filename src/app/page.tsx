@@ -373,7 +373,7 @@ export default function HomePage() {
       )}
 
       {/* ─── Promo Popup ─── */}
-      {showPromoPopup && (
+      {showPromoPopup && !showTutorial && (
         <div className="fixed inset-0 z-[110] flex items-center justify-center p-6 animate-fade-in">
           <div className="absolute inset-0 bg-black/60" onClick={() => setShowPromoPopup(false)} />
           <div className="relative w-full max-w-[340px] animate-scale-in">
