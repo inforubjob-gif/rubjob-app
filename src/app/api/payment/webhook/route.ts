@@ -27,10 +27,25 @@ export async function POST(req: Request) {
     if (eventType === "charge.succeeded" || chargeData.status === "SUCCEEDED") {
       // Beam returns referenceId as a top-level field on the charge object
       // Try multiple paths to handle different Beam payload versions
-      const orderId = chargeData.referenceId
+      let orderId = chargeData.referenceId
         || chargeData.order?.referenceId
         || chargeData.metadata?.orderId
         || body.referenceId;
+
+      // Fallback: ถ้าแกะ orderId จาก payload ไม่ได้ → ค้นจาก chargeId ที่บันทึกตอนสร้าง QR
+      if (!orderId && (chargeData.id || chargeData.chargeId)) {
+        try {
+          const log = await db.prepare(
+            "SELECT orderId FROM payment_logs WHERE chargeId = ? AND gateway = 'beam' LIMIT 1"
+          ).bind(chargeData.id || chargeData.chargeId).first() as { orderId: string } | null;
+          if (log?.orderId) {
+            orderId = log.orderId;
+            console.log(`🔍 Webhook: orderId resolved from payment_logs fallback: ${orderId}`);
+          }
+        } catch (e) {
+          console.error("Webhook orderId fallback lookup failed:", e);
+        }
+      }
 
       if (!orderId) {
         console.error(`❌ Beam webhook: charge.succeeded but could NOT extract orderId! Full payload:`, JSON.stringify(body));

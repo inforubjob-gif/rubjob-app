@@ -27,11 +27,18 @@ export default function AdminAuthGate({ children }: { children: React.ReactNode 
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
-      const data = await res.json();
+      const data = await res.json() as any;
 
       if (res.ok && data.success) {
         localStorage.setItem("rubjob_admin_session", email);
         await refreshAdmin();
+        // ถ้า refreshAdmin สำเร็จ → admin จะถูก set → AuthGate จะ render children
+        // ถ้า refreshAdmin ล้มเหลว → cookie ถูก set แล้ว → reload ให้ลองใหม่
+        // ป้องกัน loop ที่ login สำเร็จแต่วนกลับมาหน้า login
+        setTimeout(() => {
+          // ถ้ายังอยู่หน้า login (admin ยังเป็น null) → force reload
+          window.location.reload();
+        }, 500);
       } else {
         setError(data.error || "เข้าสู่ระบบไม่สำเร็จ");
       }

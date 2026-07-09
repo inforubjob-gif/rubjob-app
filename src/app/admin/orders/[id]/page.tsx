@@ -49,6 +49,8 @@ export default function AdminOrderDetailPage() {
  const [isBroadcasting, setIsBroadcasting] = useState<string | null>(null);
  const [elapsedTime, setElapsedTime] = useState("00:00:00");
  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+ const [isVerifyingSlip, setIsVerifyingSlip] = useState(false);
+ const [rejectReason, setRejectReason] = useState("");
 
  useEffect(() => {
   if (id) { fetchOrder(); fetchRiders(); fetchStores(); }
@@ -364,7 +366,109 @@ export default function AdminOrderDetailPage() {
         </button>
        )}
       </Card>
-     )}
+      )}
+
+      {/* ── Slip Verification (แนบสลิปจากลูกค้า) ── */}
+      {order.paymentStatus === 'slip_uploaded' && (
+       <Card className="p-6 border-2 border-amber-200 bg-amber-50/30 shadow-lg shadow-amber-100/30">
+        <h2 className="text-xs font-black text-amber-700 uppercase tracking-widest mb-5 flex items-center gap-2">
+         🧾 สลิปชำระเงินจากลูกค้า — รอตรวจสอบ
+        </h2>
+        
+        {/* Slip Image */}
+        {(() => {
+          // Find slip URL from payment_logs data (stored in rawResponse)
+          const slipLog = order.paymentLogs?.find((l: any) => l.gateway === 'manual_slip');
+          let slipUrl = null;
+          try {
+            if (slipLog?.rawResponse) {
+              slipUrl = JSON.parse(slipLog.rawResponse)?.slipUrl;
+            }
+          } catch {}
+          // Fallback: search all payment logs for slip URL
+          if (!slipUrl) {
+            const anySlip = order.paymentLogs?.find((l: any) => l.rawResponse?.includes?.('slipUrl'));
+            try { if (anySlip) slipUrl = JSON.parse(anySlip.rawResponse)?.slipUrl; } catch {}
+          }
+          return slipUrl ? (
+            <div className="mb-5 cursor-pointer" onClick={() => setSelectedPhoto(slipUrl)}>
+              <img src={slipUrl} alt="สลิปการโอนเงิน" className="w-full max-w-sm mx-auto rounded-xl border-2 border-amber-200 shadow-lg" />
+              <p className="text-[10px] text-amber-500 text-center mt-2 font-bold">กดที่รูปเพื่อดูขนาดเต็ม</p>
+            </div>
+          ) : (
+            <div className="mb-5 p-6 bg-amber-50 rounded-xl text-center">
+              <p className="text-xs font-bold text-amber-500">⚠️ ไม่พบรูปสลิป — ตรวจสอบใน R2 Bucket โดยตรง</p>
+            </div>
+          );
+        })()}
+
+        {/* Amount Info */}
+        <div className="mb-5 p-4 bg-white rounded-xl border border-amber-100">
+          <div className="flex justify-between items-center">
+            <span className="text-xs font-bold text-slate-500">ยอดที่ต้องจ่าย</span>
+            <span className="text-xl font-black text-slate-900">฿{order.totalPrice || 0}</span>
+          </div>
+        </div>
+
+        {/* Reject Reason */}
+        <div className="mb-4">
+          <label className="text-[10px] font-black text-slate-400 uppercase block mb-2">เหตุผล (กรณีปฏิเสธ)</label>
+          <input
+            type="text"
+            value={rejectReason}
+            onChange={(e) => setRejectReason(e.target.value)}
+            placeholder="เช่น ยอดไม่ตรง, สลิปไม่ชัด, สลิปปลอม"
+            className="w-full bg-white border-2 border-slate-100 rounded-xl px-4 py-3 text-sm font-medium focus:border-amber-400 outline-none transition-all"
+          />
+        </div>
+
+        {/* Action Buttons */}
+        <div className="grid grid-cols-2 gap-3">
+          <button
+            onClick={async () => {
+              if (!confirm("ยืนยัน: ปฏิเสธสลิปนี้?")) return;
+              setIsVerifyingSlip(true);
+              try {
+                const res = await fetch("/api/admin/orders/verify-slip", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ orderId: order.id, action: "reject", reason: rejectReason || undefined }),
+                });
+                const data = await res.json() as any;
+                if (res.ok) { showToast("❌ ปฏิเสธสลิปแล้ว — แจ้งลูกค้าเรียบร้อย", "success"); fetchOrder(); }
+                else showToast(data.error || "เกิดข้อผิดพลาด", "error");
+              } catch { showToast("เกิดข้อผิดพลาดในการเชื่อมต่อ", "error"); }
+              finally { setIsVerifyingSlip(false); }
+            }}
+            disabled={isVerifyingSlip}
+            className="py-4 bg-white border-2 border-rose-200 text-rose-600 font-black text-sm rounded-xl hover:bg-rose-50 transition-all active:scale-95 disabled:opacity-50"
+          >
+            ❌ ปฏิเสธ
+          </button>
+          <button
+            onClick={async () => {
+              if (!confirm("ยืนยัน: อนุมัติสลิปนี้? ระบบจะส่งงานให้ Rubber ทันที")) return;
+              setIsVerifyingSlip(true);
+              try {
+                const res = await fetch("/api/admin/orders/verify-slip", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ orderId: order.id, action: "approve" }),
+                });
+                const data = await res.json() as any;
+                if (res.ok) { showToast("✅ อนุมัติสลิปสำเร็จ — กำลังหา Rubber!", "success"); fetchOrder(); }
+                else showToast(data.error || "เกิดข้อผิดพลาด", "error");
+              } catch { showToast("เกิดข้อผิดพลาดในการเชื่อมต่อ", "error"); }
+              finally { setIsVerifyingSlip(false); }
+            }}
+            disabled={isVerifyingSlip}
+            className="py-4 bg-emerald-500 text-white font-black text-sm rounded-xl hover:bg-emerald-600 shadow-lg shadow-emerald-500/30 transition-all active:scale-95 disabled:opacity-50"
+          >
+            {isVerifyingSlip ? "กำลังดำเนินการ..." : "✅ อนุมัติ — ส่งงาน"}
+          </button>
+        </div>
+       </Card>
+      )}
 
       {/* ── Evidence Photos ── */}
       <Card className="p-6">

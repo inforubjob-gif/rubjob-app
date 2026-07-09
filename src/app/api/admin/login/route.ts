@@ -39,20 +39,31 @@ export async function POST(req: Request) {
 
           if (isBcryptHash(admin.password)) {
             // Already hashed — use bcrypt compare
-            passwordValid = await verifyPassword(password, admin.password);
+            try {
+              passwordValid = await verifyPassword(password, admin.password);
+            } catch (bcryptErr) {
+              console.error(`⚠️ [AUTH] bcrypt.compare crashed for ${email}:`, bcryptErr);
+              passwordValid = false;
+            }
           } else {
             // Legacy plaintext — compare directly, then auto-hash (lazy migration)
             passwordValid = admin.password === password;
             if (passwordValid) {
-              const hashed = await hashPassword(password);
-              await db.prepare("UPDATE admin_users SET password = ? WHERE id = ?")
-                .bind(hashed, admin.id).run();
-              console.log(`🔒 [AUTH] Auto-migrated admin ${email} password to bcrypt`);
+              try {
+                const hashed = await hashPassword(password);
+                await db.prepare("UPDATE admin_users SET password = ? WHERE id = ?")
+                  .bind(hashed, admin.id).run();
+                console.log(`🔒 [AUTH] Auto-migrated admin ${email} password to bcrypt`);
+              } catch (hashErr) {
+                console.error(`⚠️ [AUTH] Failed to auto-migrate password for ${email}:`, hashErr);
+              }
             }
           }
 
           if (passwordValid) {
             adminData = admin;
+          } else {
+            console.warn(`🔐 [AUTH] Password mismatch for ${email} (hash type: ${isBcryptHash(admin.password) ? 'bcrypt' : 'plaintext'})`);
           }
         }
       }

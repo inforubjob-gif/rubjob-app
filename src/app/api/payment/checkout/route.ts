@@ -61,6 +61,28 @@ export async function POST(req: Request) {
     // Beam uses HTTP Basic Auth: Base64(merchantId:apiKey)
     const authHeader = btoa(`${merchantId}:${apiKey}`);
 
+    // ═══ ป้องกันจ่ายเงินซ้ำ: ยกเลิก charge เก่าก่อนสร้างใหม่ ═══
+    try {
+      const prevCharge = await db.prepare(
+        "SELECT chargeId FROM payment_logs WHERE orderId = ? AND gateway = 'beam' AND status = 'pending' ORDER BY createdAt DESC LIMIT 1"
+      ).bind(orderId).first() as { chargeId: string } | null;
+
+      if (prevCharge?.chargeId) {
+        const voidRes = await fetch(`${BEAM_API_URL}/api/v1/charges/${prevCharge.chargeId}/void`, {
+          method: "POST",
+          headers: { "Authorization": `Basic ${authHeader}`, "Content-Type": "application/json" }
+        });
+        console.log(`🚫 Voided previous charge ${prevCharge.chargeId} for order ${orderId}: ${voidRes.status}`);
+        
+        // Mark old charge as voided in payment_logs
+        await db.prepare(
+          "UPDATE payment_logs SET status = 'voided' WHERE chargeId = ? AND status = 'pending'"
+        ).bind(prevCharge.chargeId).run();
+      }
+    } catch (e) {
+      console.warn("Void previous charge failed (non-critical):", e);
+    }
+
     // Create Beam Charge for PromptPay
     // Amount must be in satang (THB * 100)
     const chargeBody = {
